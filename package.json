@@ -1,0 +1,32 @@
+{
+  "name": "protocol",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tslint --fix -p ./",
+    "format": "prettier --write '**/*.{sol,js,json,md,yml}'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frame00/protocol.git"
+  },
+  "author": "aggre",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/frame00/protocol/issues"
+  },
+  "homepage": "https://github.com/frame00/protocol#readme",
+  "devDependencies": {
+    "prettier": "^1.16.4",
+    "prettier-plugin-solidity": "^1.0.0-alpha.18",
+    "truffle": "^5.0.8",
+    "tslint": "^5.14.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "tslint-xo": "^0.15.0",
+    "typescript": "^3.3.3333"
+  }
+}
