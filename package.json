@@ -5,7 +5,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "truffle test",
+    "pretest": "npm run generate",
+    "generate": "truffle compile && typechain --target truffle './build/**/*.json'",
+    "ts": "tsc -p ./",
     "lint": "tslint --fix -p ./ && solium --dir . --fix",
     "format": "prettier --write '**/*.{sol,js,json,md,yml}'"
   },
@@ -20,14 +23,18 @@
   },
   "homepage": "https://github.com/frame00/protocol#readme",
   "devDependencies": {
+    "@types/node": "^11.11.3",
     "ethlint": "^1.2.3",
     "prettier": "^1.16.4",
     "prettier-plugin-solidity": "^1.0.0-alpha.18",
     "truffle": "^5.0.8",
+    "truffle-typings": "^1.0.6",
+    "ts-node": "^8.0.3",
     "tslint": "^5.14.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
     "tslint-xo": "^0.15.0",
+    "typechain": "^0.3.13",
     "typescript": "^3.3.3333"
   }
 }
