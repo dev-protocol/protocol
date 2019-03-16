@@ -2,7 +2,7 @@
 	"extends": "solium:recommended",
 	"plugins": ["security"],
 	"rules": {
-		"indentation": ["error", "tab"],
-		"linebreak-style": ["error", "unix"]
+		"quotes": ["error", "single"],
+		"indentation": ["error", "tab"]
 	}
 }
