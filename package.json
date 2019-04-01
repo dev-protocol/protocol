@@ -36,5 +36,8 @@
     "tslint-xo": "^0.15.0",
     "typechain": "^0.3.13",
     "typescript": "^3.3.3333"
+  },
+  "dependencies": {
+    "openzeppelin-solidity": "^2.2.0"
   }
 }
