@@ -23,19 +23,19 @@
   },
   "homepage": "https://github.com/frame00/protocol#readme",
   "devDependencies": {
-    "@types/node": "^11.11.3",
+    "@types/node": "^11.12.2",
     "ethlint": "^1.2.3",
     "prettier": "^1.16.4",
-    "prettier-plugin-solidity": "^1.0.0-alpha.18",
-    "truffle": "^5.0.8",
+    "prettier-plugin-solidity": "^1.0.0-alpha.21",
+    "truffle": "^5.0.10",
     "truffle-typings": "^1.0.6",
     "ts-node": "^8.0.3",
     "tslint": "^5.14.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "tslint-xo": "^0.15.0",
-    "typechain": "^0.3.13",
-    "typescript": "^3.3.3333"
+    "tslint-xo": "^0.16.0",
+    "typechain": "^0.3.14",
+    "typescript": "^3.4.1"
   },
   "dependencies": {
     "openzeppelin-solidity": "^2.2.0"
