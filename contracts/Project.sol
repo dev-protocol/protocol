@@ -22,8 +22,8 @@ contract Project is Ownable {
 	Options public options;
 	string[] public keys;
 	address[] public users;
-	mapping(string => bool) private usedKey;
-	mapping(address => bool) private enteredUsers;
+	mapping(string => uint) private usedKey;
+	mapping(address => uint) private enteredUsers;
 	mapping(address => address) public entries;
 	mapping(string => uint) private totalScores;
 	mapping(address => mapping(string => uint)) private userScores;
@@ -37,19 +37,31 @@ contract Project is Ownable {
 
 	function entry(address _relayer) public {
 		address user = msg.sender;
-		if (!enteredUsers[user]) {
-			enteredUsers[user] = true;
+		if (enteredUsers[user] == 0) {
+			enteredUsers[user] += 1;
 			users.push(user);
 		}
 		entries[user] = _relayer;
 	}
 
 	function evaluate(string memory key) public {
-		if (!usedKey[key]) {
-			usedKey[key] = true;
+		if (usedKey[key] == 0) {
+			usedKey[key] += 1;
 			keys.push(key);
 		}
 		emit StartEvaluate(key, block.number);
+	}
+
+	function isUsedKey(string memory key) public view returns(uint) {
+		return usedKey[key];
+	}
+
+	function isEnterdUser(address addr) public view returns(uint) {
+		return enteredUsers[addr];
+	}
+
+	function getRelayer(address addr) public view returns(address) {
+		return entries[addr];
 	}
 
 	function setScore(string memory key, Score[] memory scores) public {

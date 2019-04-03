@@ -1,5 +1,6 @@
 // tslint:disable:no-unsafe-any
 import { values } from 'ramda'
+import { ProjectInstance } from '../types/truffle-contracts'
 const project = artifacts.require('Project')
 
 contract('Project', ([deployer, relayer, backlog, user1]) => {
@@ -16,9 +17,29 @@ contract('Project', ([deployer, relayer, backlog, user1]) => {
 	})
 
 	describe('Entry user', () => {
-		it('Save a map of the user and relayer addresses when the user enters')
+		let contract: ProjectInstance
+		before(async () => {
+			contract = await project.new(relayer, backlog, 'UUID', 'github', {
+				from: deployer
+			})
+		})
+		it('Save a map of the user and relayer addresses when the user enters', async () => {
+			const from = deployer
+			await contract.entry(relayer, { from })
+			const entered = await contract.isEnterdUser(deployer, { from })
+			const results = await contract.getRelayer(deployer, { from })
+			expect(entered.toString()).to.be.eq('1')
+			expect(results.toString()).to.be.eq(relayer)
+		})
 
-		it('Should be users have no duplicates')
+		it('Should be users have no duplicates', async () => {
+			const from = deployer
+			await contract.entry(relayer, { from })
+			await contract.entry(relayer, { from })
+			await contract.entry(relayer, { from })
+			const results = await contract.isEnterdUser(deployer, { from })
+			expect(results.toString()).to.be.eq('1')
+		})
 	})
 
 	describe('Run evaluate', () => {
