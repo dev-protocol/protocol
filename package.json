@@ -1,8 +1,8 @@
 {
-  "name": "protocol",
+  "name": "security",
   "private": true,
   "version": "1.0.0",
-  "description": "",
+  "description": "# Development",
   "main": "index.js",
   "scripts": {
     "test": "truffle test",
@@ -12,16 +12,8 @@
     "lint": "tslint --fix -p ./ && solium --dir . --fix",
     "format": "prettier --write '**/*.{sol,js,json,md,yml}'"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/frame00/protocol.git"
-  },
   "author": "aggre",
   "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/frame00/protocol/issues"
-  },
-  "homepage": "https://github.com/frame00/protocol#readme",
   "devDependencies": {
     "@types/node": "^11.12.2",
     "@types/ramda": "^0.26.6",
@@ -41,5 +33,16 @@
   },
   "dependencies": {
     "openzeppelin-solidity": "^2.2.0"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frame00/security.git"
+  },
+  "bugs": {
+    "url": "https://github.com/frame00/security/issues"
+  },
+  "homepage": "https://github.com/frame00/security#readme"
 }
