@@ -3,30 +3,30 @@ const useState = artifacts.require('UseState')
 
 contract('UseState', () => {
 	describe('State', () => {
-		it('Only the owner can change the state address.')
+		it('Change state address')
 
-		it('Get the State instance by calling "state()".')
+		it('Fail to change state address from a non-owner account')
 
-		it(
-			'After the state address has changed, "state()" returns a new state instance.'
-		)
+		it('Get a State instance')
+
+		it('After the state address has changed, returns a new State instance')
 	})
 
 	describe('Utility token', () => {
-		it('Get the token address from state.')
+		it('Get a token address')
 	})
 
 	describe('Security token', () => {
-		it('Get the security address of package from state.')
+		it('Get a security address of a package')
 
-		it('Add the security address of package to state.')
+		it('Add a security address of a package')
 
-		it('Get all securities address from state.')
+		it('Get all securities address')
 	})
 
 	describe('Balance', () => {
 		it(
-			'Get the utility tokens balance of all holders from a security address stored in the state.'
+			'Get the utility tokens balance of all holders from a security address stored in the state'
 		)
 	})
 })

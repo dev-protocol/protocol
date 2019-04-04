@@ -3,14 +3,16 @@ const factory = artifacts.require('Factory')
 
 contract('Factory', () => {
 	describe('Create new security', () => {
-		it('Can create new security for packages.')
+		it('Create new security of a package')
 
 		it(
-			'If the package already has security, should not be able to create new security.'
+			'Fail to create new security of a package when the package already has security.'
 		)
 	})
 
 	describe('Destroy', () => {
-		it('Only the owner can destroy this contract.')
+		it('Destruct this contract')
+
+		it('Fail to destruct this contract from a non-owner account')
 	})
 })

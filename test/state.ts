@@ -3,27 +3,29 @@ const state = artifacts.require('State')
 
 contract('State', () => {
 	describe('Roles', () => {
-		it('Owners should be able to add operators.')
+		it('Add operators')
 
-		it('Non-owner accounts should not be able to add operators.')
+		it('Fail to add operator from a non-owner account')
 	})
 
 	describe('Utility token', () => {
 		it('Token default value is 0x98626E2C9231f03504273d55f397409deFD4a093.')
 
-		it('Only the owner can change the utility token address.')
+		it('Change the utility token address')
+
+		it('Fail to change the utility token address from a non-owner account')
 	})
 
 	describe('Security token', () => {
-		it('Operators can add security token addresses.')
+		it('Add security token address')
 
-		it('Non-owner accounts should not be able to add security token address.')
+		it('Fail to add security token address from a non-operator account')
 
-		it('Can not add the same address.')
+		it('Fail to add security token address when the exists same security')
 
-		it('Get the security address from a package name.')
+		it('Get the security address by package name')
 
-		it('Get all securities address.')
+		it('Get all securities address')
 	})
 
 	describe('Balance', () => {
