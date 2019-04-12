@@ -63,7 +63,16 @@ contract('UseState', ([deployer, u1, u2]) => {
 	})
 
 	describe('Utility token', () => {
-		it('Get a token address')
+		it('Get a token address', async () => {
+			const state1 = await stateContract.new({ from: deployer })
+			await state1.setToken(u1, { from: deployer })
+			const contract = await useState.new({ from: deployer })
+			await contract.changeStateAddress(state1.address, {
+				from: deployer
+			})
+			const results = await contract.getToken()
+			expect(results.toString()).to.be.equal(u1)
+		})
 	})
 
 	describe('Security token', () => {
