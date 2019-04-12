@@ -12,6 +12,10 @@ contract State is Ownable {
 		operator[addr] = true;
 	}
 
+	function isOperator(address addr) public view returns(bool) {
+		return operator[addr];
+	}
+
 	function setToken(address nextToken) public onlyOwner {
 		token = address(nextToken);
 	}
