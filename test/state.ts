@@ -1,7 +1,7 @@
 // tslint:disable:no-unsafe-any
 // tslint:disable:no-unused-expression
 const state = artifacts.require('State')
-const securityContract = artifacts.require('Security')
+const securityContractState = artifacts.require('Security')
 
 contract('State', ([deployer, u1, u2]) => {
 	describe('Roles', () => {
@@ -48,7 +48,7 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Security token', () => {
 		it('Add security token address', async () => {
-			const security = await securityContract.new(
+			const security = await securityContractState.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -67,7 +67,7 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Fail to add security token address from a non-operator account', async () => {
-			const security = await securityContract.new(
+			const security = await securityContractState.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -85,7 +85,7 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Fail to add security token address when the exists same security', async () => {
-			const security = await securityContract.new(
+			const security = await securityContractState.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -107,7 +107,7 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Get the security address by package name', async () => {
-			const security = await securityContract.new(
+			const security = await securityContractState.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -125,13 +125,13 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Get all securities address', async () => {
-			const a = await securityContract.new('a', 'a', 'PKGA', 18, 10000, {
+			const a = await securityContractState.new('a', 'a', 'PKGA', 18, 10000, {
 				from: deployer
 			})
-			const b = await securityContract.new('b', 'b', 'PKGB', 18, 10000, {
+			const b = await securityContractState.new('b', 'b', 'PKGB', 18, 10000, {
 				from: deployer
 			})
-			const c = await securityContract.new('c', 'c', 'PKGC', 18, 10000, {
+			const c = await securityContractState.new('c', 'c', 'PKGC', 18, 10000, {
 				from: deployer
 			})
 			const contract = await state.new({ from: deployer })

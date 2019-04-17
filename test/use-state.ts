@@ -1,6 +1,7 @@
 // tslint:disable:no-unsafe-any
 const useState = artifacts.require('UseState')
 const stateContract = artifacts.require('State')
+const securityContractUseState = artifacts.require('Security')
 
 contract('UseState', ([deployer, u1, u2]) => {
 	describe('State', () => {
