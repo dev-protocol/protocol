@@ -77,7 +77,30 @@ contract('UseState', ([deployer, u1, u2]) => {
 	})
 
 	describe('Security token', () => {
-		it('Get a security address of a package')
+		// FIXME: following test case doesn't pass
+		it.skip('Get a security address of a package', async () => {
+			const security = await securityContractUseState.new(
+				'pkg',
+				'pkg_token',
+				'PKG',
+				18,
+				10000,
+				{
+					from: deployer
+				}
+			)
+			const state = await stateContract.new({ from: deployer })
+			await state.addOperator(deployer, { from: deployer })
+			await state.addSecurity('pkg', security.address, { from: deployer })
+			const contract = await useState.new({ from: deployer })
+			await contract.changeStateAddress(state.address, {
+				from: deployer
+			})
+			const results = await contract.getSecurity('pkg', {
+				from: deployer
+			})
+			expect(results.toString()).to.be.equal(security.address)
+		})
 
 		it('Add a security address of a package')
 
