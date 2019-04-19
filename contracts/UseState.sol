@@ -20,7 +20,7 @@ contract UseState is Ownable {
 	}
 
 	function getSecurity(string memory package) public returns (address) {
-		return state().getSecurity(package);
+		return(state().getSecurity(package));
 	}
 
 	function addSecurity(string memory package, address security) public {
