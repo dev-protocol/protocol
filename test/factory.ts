@@ -15,8 +15,8 @@ contract('Factory', ([deployer]) => {
 			const results = await contract
 				.createSecurity('pkg', { from: deployer })
 				.catch((err: Error) => err)
-			console.log(results)
 			expect(results).to.instanceOf(Error)
+			expect((results as any).reason).to.be.equal('Security is already created')
 		})
 	})
 
