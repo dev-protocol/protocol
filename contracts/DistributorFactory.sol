@@ -7,6 +7,7 @@ import './Distributor.sol';
 contract DistributorFactory is Killable, Ownable {
 	mapping(string => address) distributors;
 
+	//TODO: calculate the term from the stored last run date
 	function distribute(string memory start, string memory end, uint value)
 		public
 		onlyOwner
