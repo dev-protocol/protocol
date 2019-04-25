@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
 
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import './State.sol';
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./State.sol";
 
 contract UseState is Ownable {
 	address private _state;
@@ -20,7 +20,7 @@ contract UseState is Ownable {
 	}
 
 	function getRepository(string memory package) public returns (address) {
-		return(state().getRepository(package));
+		return (state().getRepository(package));
 	}
 
 	function addRepository(string memory package, address repository) public {

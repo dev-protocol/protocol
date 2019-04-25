@@ -2,7 +2,6 @@
 	"extends": "solium:recommended",
 	"plugins": ["security"],
 	"rules": {
-		"quotes": ["error", "single"],
 		"indentation": ["error", "tab"]
 	}
 }

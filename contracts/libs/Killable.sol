@@ -8,7 +8,7 @@ contract Killable {
 	}
 
 	function kill() public {
-		require(msg.sender == _owner, 'Only owner method');
+		require(msg.sender == _owner, "Only owner method");
 		selfdestruct(_owner);
 	}
 }

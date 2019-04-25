@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract State is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -12,7 +12,7 @@ contract State is Ownable {
 		operator[addr] = true;
 	}
 
-	function isOperator(address addr) public view returns(bool) {
+	function isOperator(address addr) public view returns (bool) {
 		return operator[addr];
 	}
 
@@ -24,20 +24,22 @@ contract State is Ownable {
 		return token;
 	}
 
-	function addRepository(string memory package, address repository)
-		public
-	{
-		require(operator[msg.sender] == true, 'Only the operator.');
-		require(repository != address(0), 'Repository is an invalid address');
+	function addRepository(string memory package, address repository) public {
+		require(operator[msg.sender] == true, "Only the operator.");
+		require(repository != address(0), "Repository is an invalid address");
 		require(
 			repositoriesMap[package] == address(0),
-			'Repository is already added'
+			"Repository is already added"
 		);
 		repositoriesMap[package] = repository;
 		repositories.push(repository);
 	}
 
-	function getRepository(string memory package) public view returns (address) {
+	function getRepository(string memory package)
+		public
+		view
+		returns (address)
+	{
 		return repositoriesMap[package];
 	}
 

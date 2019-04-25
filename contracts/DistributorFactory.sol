@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import './libs/Killable.sol';
-import './Distributor.sol';
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./libs/Killable.sol";
+import "./Distributor.sol";
 
 contract DistributorFactory is Killable, Ownable {
 	mapping(string => address) distributors;

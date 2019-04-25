@@ -1,11 +1,11 @@
 pragma solidity ^0.5.0;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import './modules/oraclizeAPI_0.5.sol';
-import './libs/Killable.sol';
-import './UseState.sol';
-import './Repository.sol';
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./modules/oraclizeAPI_0.5.sol";
+import "./libs/Killable.sol";
+import "./UseState.sol";
+import "./Repository.sol";
 
 contract Distributor is Killable, usingOraclize, UseState {
 	using SafeMath for uint;
@@ -56,14 +56,14 @@ contract Distributor is Killable, usingOraclize, UseState {
 	) private returns (uint) {
 		string memory url = string(
 			abi.encodePacked(
-				'https://api.npmjs.org/downloads/point/',
+				"https://api.npmjs.org/downloads/point/",
 				start,
-				':',
+				":",
 				end,
-				'/',
+				"/",
 				package
 			)
 		);
-		oraclize_query('URL', url);
+		oraclize_query("URL", url);
 	}
 }
