@@ -1,9 +1,9 @@
-# protocol
+![Dev Repository Token](https://raw.githubusercontent.com/dev-protocol/repository-token/readme/public/asset/logo.png)
 
-# Development
+# Dev Repository Token
 
-how to running truffle:
+This repository is the place to develop smart contracts for Dev Repository Token.
 
-```bash
-npx truffle <options>
-```
+## How to contribute:
+
+Read the contributing guide, and create PR when you have time. 🧚✨
