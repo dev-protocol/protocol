@@ -4,9 +4,9 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract State is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
-	address[] public securities;
+	address[] public repositories;
 	mapping(address => bool) internal operator;
-	mapping(string => address) internal securitiesMap;
+	mapping(string => address) internal repositoriesMap;
 
 	function addOperator(address addr) public onlyOwner {
 		operator[addr] = true;
@@ -24,28 +24,28 @@ contract State is Ownable {
 		return token;
 	}
 
-	function addSecurity(string memory package, address security)
+	function addRepository(string memory package, address repository)
 		public
 	{
 		require(operator[msg.sender] == true, 'Only the operator.');
-		require(security != address(0), 'Security is an invalid address');
+		require(repository != address(0), 'Repository is an invalid address');
 		require(
-			securitiesMap[package] == address(0),
-			'Security is already added'
+			repositoriesMap[package] == address(0),
+			'Repository is already added'
 		);
-		securitiesMap[package] = security;
-		securities.push(security);
+		repositoriesMap[package] = repository;
+		repositories.push(repository);
 	}
 
-	function getSecurity(string memory package) public view returns (address) {
-		return securitiesMap[package];
+	function getRepository(string memory package) public view returns (address) {
+		return repositoriesMap[package];
 	}
 
-	function getSecurities() public view returns (address[] memory) {
-		return securities;
+	function getRepositories() public view returns (address[] memory) {
+		return repositories;
 	}
 
-	function getTotalBalance(address security) public view returns (uint) {
+	function getTotalBalance(address repository) public view returns (uint) {
 		return 1234567890; // Mock
 	}
 }

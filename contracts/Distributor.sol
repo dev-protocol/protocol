@@ -4,7 +4,7 @@ import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './modules/oraclizeAPI_0.5.sol';
 import './libs/Killable.sol';
 import './UseState.sol';
-import './Security.sol';
+import './Repository.sol';
 
 contract Distributor is Killable, usingOraclize, UseState {
 	using SafeMath for uint;
@@ -26,29 +26,29 @@ contract Distributor is Killable, usingOraclize, UseState {
 		private
 	{
 		address token = getToken();
-		address[] memory securities = getSecurities();
-		for (uint i = 0; i < securities.length; i++) {
-			address security = securities[i];
-			uint balance = getTotalBalance(security);
+		address[] memory repositories = getRepositories();
+		for (uint i = 0; i < repositories.length; i++) {
+			address repository = repositories[i];
+			uint balance = getTotalBalance(repository);
 			uint downloads = getNpmDownloads(
 				start,
 				end,
-				Security(security).getPackage()
+				Repository(repository).getPackage()
 			);
 			uint point = balance.add(downloads);
 			total = total.add(point);
 			packages.push(Package(point, downloads, balance));
 		}
-		for (uint i = 0; i < securities.length; i++) {
-			address security = securities[i];
+		for (uint i = 0; i < repositories.length; i++) {
+			address repository = repositories[i];
 			uint point = packages[i].point;
 			uint per = point.div(total);
 			uint count = value.mul(per);
-			// solium-disable-next-line security/no-low-level-calls
+			// solium-disable-next-line repository/no-low-level-calls
 			token.delegatecall(
 				abi.encodePacked(
 					bytes4(keccak256('mint(address, uint256)')),
-					security,
+					repository,
 					count
 				)
 			);

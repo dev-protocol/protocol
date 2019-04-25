@@ -1,7 +1,7 @@
 // tslint:disable:no-unsafe-any
 // tslint:disable:no-unused-expression
 const state = artifacts.require('State')
-const securityContractState = artifacts.require('Security')
+const repositoryContractState = artifacts.require('Repository')
 
 contract('State', ([deployer, u1, u2]) => {
 	describe('Roles', () => {
@@ -46,9 +46,9 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Security token', () => {
-		it('Add security token address', async () => {
-			const security = await securityContractState.new(
+	describe('Repository token', () => {
+		it('Add repository token address', async () => {
+			const repository = await repositoryContractState.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -60,14 +60,14 @@ contract('State', ([deployer, u1, u2]) => {
 			)
 			const contract = await state.new({ from: deployer })
 			await contract.addOperator(deployer, { from: deployer })
-			const results = await contract.addSecurity('pkg', security.address, {
+			const results = await contract.addRepository('pkg', repository.address, {
 				from: deployer
 			})
 			expect(results).to.be.ok
 		})
 
-		it('Fail to add security token address from a non-operator account', async () => {
-			const security = await securityContractState.new(
+		it('Fail to add repository token address from a non-operator account', async () => {
+			const repository = await repositoryContractState.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -79,13 +79,13 @@ contract('State', ([deployer, u1, u2]) => {
 			)
 			const contract = await state.new({ from: deployer })
 			const results = await contract
-				.addSecurity('pkg', security.address, { from: deployer })
+				.addRepository('pkg', repository.address, { from: deployer })
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
 
-		it('Fail to add security token address when the exists same security', async () => {
-			const security = await securityContractState.new(
+		it('Fail to add repository token address when the exists same repository', async () => {
+			const repository = await repositoryContractState.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -97,17 +97,19 @@ contract('State', ([deployer, u1, u2]) => {
 			)
 			const contract = await state.new({ from: deployer })
 			await contract.addOperator(deployer, { from: deployer })
-			await contract.addSecurity('pkg', security.address, { from: deployer })
+			await contract.addRepository('pkg', repository.address, {
+				from: deployer
+			})
 			const results = await contract
-				.addSecurity('pkg', security.address, {
+				.addRepository('pkg', repository.address, {
 					from: deployer
 				})
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
 
-		it('Get the security address by package name', async () => {
-			const security = await securityContractState.new(
+		it('Get the repository address by package name', async () => {
+			const repository = await repositoryContractState.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -119,33 +121,35 @@ contract('State', ([deployer, u1, u2]) => {
 			)
 			const contract = await state.new({ from: deployer })
 			await contract.addOperator(deployer, { from: deployer })
-			await contract.addSecurity('pkg', security.address, { from: deployer })
-			const results = await contract.getSecurity('pkg')
-			expect(results.toString()).to.be.equal(security.address)
+			await contract.addRepository('pkg', repository.address, {
+				from: deployer
+			})
+			const results = await contract.getRepository('pkg')
+			expect(results.toString()).to.be.equal(repository.address)
 		})
 
-		it('Get all securities address', async () => {
-			const a = await securityContractState.new('a', 'a', 'PKGA', 18, 10000, {
+		it('Get all repositories address', async () => {
+			const a = await repositoryContractState.new('a', 'a', 'PKGA', 18, 10000, {
 				from: deployer
 			})
-			const b = await securityContractState.new('b', 'b', 'PKGB', 18, 10000, {
+			const b = await repositoryContractState.new('b', 'b', 'PKGB', 18, 10000, {
 				from: deployer
 			})
-			const c = await securityContractState.new('c', 'c', 'PKGC', 18, 10000, {
+			const c = await repositoryContractState.new('c', 'c', 'PKGC', 18, 10000, {
 				from: deployer
 			})
 			const contract = await state.new({ from: deployer })
 			await contract.addOperator(deployer, { from: deployer })
-			await contract.addSecurity('a', a.address, {
+			await contract.addRepository('a', a.address, {
 				from: deployer
 			})
-			await contract.addSecurity('b', b.address, {
+			await contract.addRepository('b', b.address, {
 				from: deployer
 			})
-			await contract.addSecurity('c', c.address, {
+			await contract.addRepository('c', c.address, {
 				from: deployer
 			})
-			const results = await contract.getSecurities({
+			const results = await contract.getRepositories({
 				from: deployer
 			})
 			expect(results).to.be.deep.equal([a.address, b.address, c.address])
@@ -153,6 +157,8 @@ contract('State', ([deployer, u1, u2]) => {
 	})
 
 	describe('Balance', () => {
-		it('Get the utility tokens balance of all holders from a security address.')
+		it(
+			'Get the utility tokens balance of all holders from a repository address.'
+		)
 	})
 })

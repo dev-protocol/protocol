@@ -1,7 +1,7 @@
 // tslint:disable:no-unsafe-any
 const useState = artifacts.require('UseState')
 const stateContract = artifacts.require('State')
-const securityContractUseState = artifacts.require('Security')
+const repositoryContractUseState = artifacts.require('Repository')
 
 contract('UseState', ([deployer, u1, u2]) => {
 	describe('State', () => {
@@ -76,9 +76,9 @@ contract('UseState', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Security token', () => {
-		it('Add a security address of a package', async () => {
-			const security = await securityContractUseState.new(
+	describe('Repository token', () => {
+		it('Add a repository address of a package', async () => {
+			const repository = await repositoryContractUseState.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -94,19 +94,21 @@ contract('UseState', ([deployer, u1, u2]) => {
 				from: deployer
 			})
 			await state.addOperator(contract.address, { from: deployer })
-			await contract.addSecurity('pkg', security.address, { from: deployer })
-			const results = await state.getSecurity('pkg', {
+			await contract.addRepository('pkg', repository.address, {
 				from: deployer
 			})
-			expect(results.toString()).to.be.equal(security.address)
+			const results = await state.getRepository('pkg', {
+				from: deployer
+			})
+			expect(results.toString()).to.be.equal(repository.address)
 		})
 
-		it('Get all securities address')
+		it('Get all repositories address')
 	})
 
 	describe('Balance', () => {
 		it(
-			'Get the utility tokens balance of all holders from a security address stored in the state'
+			'Get the utility tokens balance of all holders from a repository address stored in the state'
 		)
 	})
 })

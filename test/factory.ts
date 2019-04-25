@@ -3,20 +3,22 @@ const factory = artifacts.require('Factory')
 const stateContractFactory = artifacts.require('State')
 
 contract('Factory', ([deployer]) => {
-	describe('Create new security', () => {
-		it('Create new security of a package')
+	describe('Create new repository', () => {
+		it('Create new repository of a package')
 
-		it('Fail to create new security of a package when the package already has security.', async () => {
+		it('Fail to create new repository of a package when the package already has repository.', async () => {
 			const contract = await factory.new({ from: deployer })
 			const state = await stateContractFactory.new({ from: deployer })
 			await state.addOperator(contract.address, { from: deployer })
 			await contract.changeStateAddress(state.address, { from: deployer })
-			await contract.createSecurity('pkg', { from: deployer })
+			await contract.createRepository('pkg', { from: deployer })
 			const results = await contract
-				.createSecurity('pkg', { from: deployer })
+				.createRepository('pkg', { from: deployer })
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
-			expect((results as any).reason).to.be.equal('Security is already created')
+			expect((results as any).reason).to.be.equal(
+				'Repository is already created'
+			)
 		})
 	})
 

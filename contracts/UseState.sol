@@ -19,16 +19,16 @@ contract UseState is Ownable {
 		return state().getToken();
 	}
 
-	function getSecurity(string memory package) public returns (address) {
-		return(state().getSecurity(package));
+	function getRepository(string memory package) public returns (address) {
+		return(state().getRepository(package));
 	}
 
-	function addSecurity(string memory package, address security) public {
-		state().addSecurity(package, address(security));
+	function addRepository(string memory package, address repository) public {
+		state().addRepository(package, address(repository));
 	}
 
-	function getSecurities() public view returns (address[] memory) {
-		return state().getSecurities();
+	function getRepositories() public view returns (address[] memory) {
+		return state().getRepositories();
 	}
 
 	function getTotalBalance(address addr) public view returns (uint) {
