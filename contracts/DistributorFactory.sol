@@ -3,11 +3,13 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./modules/BokkyPooBahsDateTimeLibrary.sol";
+import "./libs/UintToString.sol";
 import "./libs/Killable.sol";
 import "./Distributor.sol";
 
 contract DistributorFactory is Killable, Ownable {
 	using SafeMath for uint;
+	using UintToString for uint;
 	uint public mintVolumePerDay;
 	uint public lastDistribute;
 	struct BaseTime {
@@ -45,14 +47,22 @@ contract DistributorFactory is Killable, Ownable {
 			yesterday
 		);
 		require(diff >= 1, "Expected an interval is one day or more");
-		uint startY = BokkyPooBahsDateTimeLibrary.getYear(lastDistribute);
-		uint startM = BokkyPooBahsDateTimeLibrary.getMonth(lastDistribute);
-		uint startD = BokkyPooBahsDateTimeLibrary.getDay(lastDistribute);
-		uint endY = BokkyPooBahsDateTimeLibrary.getYear(yesterday);
-		uint endM = BokkyPooBahsDateTimeLibrary.getMonth(yesterday);
-		uint endD = BokkyPooBahsDateTimeLibrary.getDay(yesterday);
-		string memory start = string(abi.encodePacked(startY, startM, startD));
-		string memory end = string(abi.encodePacked(endY, endM, endD));
+		(uint startY, uint startM, uint startD) = BokkyPooBahsDateTimeLibrary.timestampToDate(
+			lastDistribute
+		);
+		(uint endY, uint endM, uint endD) = BokkyPooBahsDateTimeLibrary.timestampToDate(
+			yesterday
+		);
+		string memory start = string(
+			abi.encodePacked(
+				startY.toString(),
+				startM.toString(),
+				startD.toString()
+			)
+		);
+		string memory end = string(
+			abi.encodePacked(endY.toString(), endM.toString(), endD.toString())
+		);
 		uint value = diff.mul(mintVolumePerDay);
 		Distributor dist = new Distributor(start, end, value);
 		distributors[start] = address(dist);
