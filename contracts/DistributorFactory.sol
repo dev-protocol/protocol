@@ -40,6 +40,22 @@ contract DistributorFactory is Killable, Ownable {
 		secondsPerBlock = _sec;
 	}
 
+	function dateFormat(uint _y, uint _m, uint _d)
+		internal
+		pure
+		returns (string memory)
+	{
+		return string(
+			abi.encodePacked(
+				_y.toString(),
+				"-",
+				_m.toString(),
+				"-",
+				_d.toString()
+			)
+		);
+	}
+
 	function distribute() public {
 		uint yesterday = timestamp() - 1 days;
 		uint diff = BokkyPooBahsDateTimeLibrary.diffDays(
@@ -53,16 +69,8 @@ contract DistributorFactory is Killable, Ownable {
 		(uint endY, uint endM, uint endD) = BokkyPooBahsDateTimeLibrary.timestampToDate(
 			yesterday
 		);
-		string memory start = string(
-			abi.encodePacked(
-				startY.toString(),
-				startM.toString(),
-				startD.toString()
-			)
-		);
-		string memory end = string(
-			abi.encodePacked(endY.toString(), endM.toString(), endD.toString())
-		);
+		string memory start = dateFormat(startY, startM, startD);
+		string memory end = dateFormat(endY, endM, endD);
 		uint value = diff.mul(mintVolumePerDay);
 		Distributor dist = new Distributor(start, end, value);
 		distributors[start] = address(dist);
