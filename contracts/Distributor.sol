@@ -1,5 +1,6 @@
 pragma solidity ^0.5.0;
 
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './modules/oraclizeAPI_0.5.sol';
 import './libs/Killable.sol';
@@ -44,14 +45,7 @@ contract Distributor is Killable, usingOraclize, UseState {
 			uint point = packages[i].point;
 			uint per = point.div(total);
 			uint count = value.mul(per);
-			// solium-disable-next-line repository/no-low-level-calls
-			token.delegatecall(
-				abi.encodePacked(
-					bytes4(keccak256('mint(address, uint256)')),
-					repository,
-					count
-				)
-			);
+			ERC20Mintable(token).mint(repository, count);
 		}
 	}
 
