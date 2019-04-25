@@ -1,18 +1,61 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./modules/BokkyPooBahsDateTimeLibrary.sol";
 import "./libs/Killable.sol";
 import "./Distributor.sol";
 
 contract DistributorFactory is Killable, Ownable {
+	using SafeMath for uint;
+	uint public mintVolumePerDay;
+	uint public lastDistribute;
+	struct BaseTime {
+		uint time;
+		uint blockHeight;
+	}
+	BaseTime public baseTime;
+	uint public secondsPerBlock = 15;
 	mapping(string => address) distributors;
 
-	//TODO: calculate the term from the stored last run date
-	function distribute(string memory start, string memory end, uint value)
-		public
-		onlyOwner
-	{
+	constructor() public {
+		// solium-disable-next-line security/no-block-members
+		baseTime = BaseTime(now, block.number);
+	}
+
+	function timestamp() internal view returns (uint) {
+		uint diff = block.number - baseTime.blockHeight;
+		uint sec = diff.div(secondsPerBlock);
+		uint _now = baseTime.time.add(sec);
+		return _now;
+	}
+
+	function setMintVolumePerDay(uint _vol) public onlyOwner {
+		mintVolumePerDay = _vol;
+	}
+
+	function setSecondsPerBlock(uint _sec) public onlyOwner {
+		secondsPerBlock = _sec;
+	}
+
+	function distribute() public {
+		uint yesterday = timestamp() - 1 days;
+		uint diff = BokkyPooBahsDateTimeLibrary.diffDays(
+			lastDistribute,
+			yesterday
+		);
+		require(diff >= 1, "Expected an interval is one day or more");
+		uint startY = BokkyPooBahsDateTimeLibrary.getYear(lastDistribute);
+		uint startM = BokkyPooBahsDateTimeLibrary.getMonth(lastDistribute);
+		uint startD = BokkyPooBahsDateTimeLibrary.getDay(lastDistribute);
+		uint endY = BokkyPooBahsDateTimeLibrary.getYear(yesterday);
+		uint endM = BokkyPooBahsDateTimeLibrary.getMonth(yesterday);
+		uint endD = BokkyPooBahsDateTimeLibrary.getDay(yesterday);
+		string memory start = string(abi.encodePacked(startY, startM, startD));
+		string memory end = string(abi.encodePacked(endY, endM, endD));
+		uint value = diff.mul(mintVolumePerDay);
 		Distributor dist = new Distributor(start, end, value);
 		distributors[start] = address(dist);
+		lastDistribute = timestamp();
 	}
 }

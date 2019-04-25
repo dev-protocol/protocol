@@ -12,8 +12,13 @@ contract State is Ownable {
 		operator[addr] = true;
 	}
 
-	function isOperator(address addr) public view returns (bool) {
-		return operator[addr];
+	function isOperator() public view returns (bool) {
+		return operator[msg.sender];
+	}
+
+	modifier onlyOperator() {
+		require(isOperator(), "Only Operator");
+		_;
 	}
 
 	function setToken(address nextToken) public onlyOwner {
@@ -24,8 +29,10 @@ contract State is Ownable {
 		return token;
 	}
 
-	function addRepository(string memory package, address repository) public {
-		require(operator[msg.sender] == true, "Only the operator.");
+	function addRepository(string memory package, address repository)
+		public
+		onlyOperator
+	{
 		require(repository != address(0), "Repository is an invalid address");
 		require(
 			repositoriesMap[package] == address(0),

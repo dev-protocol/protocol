@@ -11,27 +11,27 @@ contract UseState is Ownable {
 		_state = nextState;
 	}
 
-	function state() public view returns (State) {
+	function state() internal view returns (State) {
 		return State(_state);
 	}
 
-	function getToken() public view returns (address) {
+	function getToken() internal view returns (address) {
 		return state().getToken();
 	}
 
-	function getRepository(string memory package) public returns (address) {
+	function getRepository(string memory package) internal returns (address) {
 		return (state().getRepository(package));
 	}
 
-	function addRepository(string memory package, address repository) public {
+	function addRepository(string memory package, address repository) internal {
 		state().addRepository(package, address(repository));
 	}
 
-	function getRepositories() public view returns (address[] memory) {
+	function getRepositories() internal view returns (address[] memory) {
 		return state().getRepositories();
 	}
 
-	function getTotalBalance(address addr) public view returns (uint) {
+	function getTotalBalance(address addr) internal view returns (uint) {
 		return state().getTotalBalance(addr);
 	}
 }
