@@ -1,7 +1,7 @@
 {
-  "name": "security",
+  "name": "repository-token",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "# Development",
   "main": "index.js",
   "scripts": {
@@ -39,10 +39,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/frame00/security.git"
+    "url": "git+https://github.com/dev-protocol/repository-token.git"
   },
   "bugs": {
-    "url": "https://github.com/frame00/security/issues"
+    "url": "https://github.com/dev-protocol/repository-token/issues"
   },
-  "homepage": "https://github.com/frame00/security#readme"
+  "homepage": "https://github.com/dev-protocol/repository-token#readme"
 }
