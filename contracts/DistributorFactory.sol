@@ -58,7 +58,7 @@ contract DistributorFactory is Killable, Ownable, UseState {
 		);
 	}
 
-	function distribute() public payable {
+	function createDistributor() public payable {
 		uint yesterday = timestamp() - 1 days;
 		uint diff = BokkyPooBahsDateTimeLibrary.diffDays(
 			lastDistribute,
