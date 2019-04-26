@@ -2,12 +2,14 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "./modules/BokkyPooBahsDateTimeLibrary.sol";
 import "./libs/UintToString.sol";
 import "./libs/Killable.sol";
 import "./Distributor.sol";
+import "./UseState.sol";
 
-contract DistributorFactory is Killable, Ownable {
+contract DistributorFactory is Killable, Ownable, UseState {
 	using SafeMath for uint;
 	using UintToString for uint;
 	uint public mintVolumePerDay;
@@ -80,6 +82,7 @@ contract DistributorFactory is Killable, Ownable {
 		);
 		dist.distribute();
 		distributors[start] = address(dist);
+		ERC20Mintable(getToken()).addMinter(address(dist));
 		lastDistribute = timestamp();
 	}
 }
