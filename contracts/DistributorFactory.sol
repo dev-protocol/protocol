@@ -56,7 +56,7 @@ contract DistributorFactory is Killable, Ownable {
 		);
 	}
 
-	function distribute() public {
+	function distribute() public payable {
 		uint yesterday = timestamp() - 1 days;
 		uint diff = BokkyPooBahsDateTimeLibrary.diffDays(
 			lastDistribute,
@@ -72,7 +72,13 @@ contract DistributorFactory is Killable, Ownable {
 		string memory start = dateFormat(startY, startM, startD);
 		string memory end = dateFormat(endY, endM, endD);
 		uint value = diff.mul(mintVolumePerDay);
-		Distributor dist = new Distributor(start, end, value);
+		Distributor dist = (new Distributor).value(msg.value)(
+			start,
+			end,
+			value,
+			msg.sender
+		);
+		dist.distribute();
 		distributors[start] = address(dist);
 		lastDistribute = timestamp();
 	}
