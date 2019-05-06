@@ -80,9 +80,8 @@ contract DistributorFactory is Killable, Ownable, UseState {
 			value,
 			msg.sender
 		);
-		dist.distribute();
-		distributors[start] = address(dist);
 		ERC20Mintable(getToken()).addMinter(address(dist));
+		distributors[start] = address(dist);
 		lastDistribute = timestamp();
 	}
 }

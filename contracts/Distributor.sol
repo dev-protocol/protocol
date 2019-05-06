@@ -23,15 +23,19 @@ contract Distributor is usingOraclize, UseState {
 		uint downloads;
 		address repository;
 	}
-	Package[] public packages;
+	string[] public packages;
 	uint public total = 0;
 	uint expectedQueriesCount;
+	uint pendingPayouts;
 	mapping(bytes32 => bool) pendingQueries;
 	mapping(bytes32 => string) pendingPackages;
 	mapping(string => uint) downloads;
+	mapping(string => Package) details;
+	mapping(string => bool) payoutCompleted;
 	event LogNewOraclizeQuery(string _description);
 	event LogDownloadsUpdated(string _package, uint _downloads);
 	event LogFinishedAllQueries();
+	event LogPayout(string _package, uint _value);
 	event LogComplete();
 
 	constructor(
@@ -41,9 +45,10 @@ contract Distributor is usingOraclize, UseState {
 		address payable invoker
 	) public payable {
 		options = Options(start, end, value, invoker);
+		distribute();
 	}
 
-	function distribute() public {
+	function distribute() private {
 		address[] memory repositories = getRepositories();
 		for (uint i = 0; i < repositories.length; i++) {
 			address repository = repositories[i];
@@ -94,30 +99,39 @@ contract Distributor is usingOraclize, UseState {
 		string memory package = pendingPackages[id];
 		uint count = result.toUint(0);
 		address repos = getRepository(package);
-		packages.push(Package(package, count, repos));
+		packages.push(package);
+		details[package] = Package(package, count, repos);
 		emit LogDownloadsUpdated(package, count);
 		expectedQueriesCount -= 1;
+		pendingPayouts += 1;
 		if (expectedQueriesCount == 0) {
 			emit LogFinishedAllQueries();
-			finishing();
+			calcTotal();
 		}
 	}
 
-	function finishing() private {
-		address token = getToken();
+	function calcTotal() private {
 		for (uint i = 0; i < packages.length; i++) {
-			Package memory pkg = packages[i];
+			Package memory pkg = details[packages[i]];
 			total = total.add(pkg.downloads);
 		}
-		for (uint i = 0; i < packages.length; i++) {
-			Package memory pkg = packages[i];
-			uint point = pkg.downloads;
-			uint per = point.div(total);
-			uint count = options.value.mul(per);
-			ERC20Mintable(token).mint(pkg.repository, count);
+	}
+
+	function payout(string memory _package) public {
+		require(payoutCompleted[_package] == false, "already payout");
+		Package memory pkg = details[_package];
+		uint point = pkg.downloads;
+		uint per = point.div(total);
+		uint count = options.value.mul(per);
+		address token = getToken();
+		ERC20Mintable(token).mint(pkg.repository, count);
+		emit LogPayout(_package, count);
+		payoutCompleted[_package] = true;
+		pendingPayouts -= 1;
+		if (pendingPayouts == 0) {
+			emit LogComplete();
+			kill();
 		}
-		emit LogComplete();
-		kill();
 	}
 
 	function kill() private {
