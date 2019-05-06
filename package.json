@@ -2,7 +2,7 @@
   "name": "repository-token",
   "private": true,
   "version": "0.1.0",
-  "description": "# Development",
+  "description": "The token that acts as a security for the OSS",
   "main": "index.js",
   "scripts": {
     "test": "truffle test",
