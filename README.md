@@ -4,6 +4,8 @@
 
 This repository is the place to develop smart contracts for Dev Repository Token.
 
+Whitepaper: https://hackmd.io/s/ByHi5zOiN
+
 ## How to contribute:
 
 Read the contributing guide, and create PR when you have time. 🧚✨
