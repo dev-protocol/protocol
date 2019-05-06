@@ -1,4 +1,4 @@
-![Dev Repository Token](https://raw.githubusercontent.com/dev-protocol/repository-token/readme/public/asset/logo.png)
+![Dev Repository Token](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/logo.png)
 
 # Dev Repository Token
 
