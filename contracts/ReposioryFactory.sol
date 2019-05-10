@@ -4,7 +4,7 @@ import "./libs/Killable.sol";
 import "./UseState.sol";
 import "./Repository.sol";
 
-contract Factory is Killable, UseState {
+contract ReposioryFactory is Killable, UseState {
 	uint8 decimals = 18;
 	uint supply = 10000000;
 

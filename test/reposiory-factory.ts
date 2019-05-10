@@ -1,13 +1,13 @@
 // tslint:disable:no-unsafe-any
-const factory = artifacts.require('Factory')
+const reposioryFactory = artifacts.require('ReposioryFactory')
 const stateContractFactory = artifacts.require('State')
 
-contract('Factory', ([deployer]) => {
+contract('ReposioryFactory', ([deployer]) => {
 	describe('Create new repository', () => {
 		it('Create new repository of a package')
 
 		it('Fail to create new repository of a package when the package already has repository.', async () => {
-			const contract = await factory.new({ from: deployer })
+			const contract = await reposioryFactory.new({ from: deployer })
 			const state = await stateContractFactory.new({ from: deployer })
 			await state.addOperator(contract.address, { from: deployer })
 			await contract.changeStateAddress(state.address, { from: deployer })
