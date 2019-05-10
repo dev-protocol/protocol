@@ -27,6 +27,7 @@ contract Distributor is usingOraclize, UseState {
 	uint public total = 0;
 	uint expectedQueriesCount;
 	uint pendingPayouts;
+	address payable public factory;
 	mapping(bytes32 => bool) pendingQueries;
 	mapping(bytes32 => string) pendingPackages;
 	mapping(string => uint) downloads;
@@ -44,17 +45,25 @@ contract Distributor is usingOraclize, UseState {
 		uint value,
 		address payable invoker
 	) public payable {
+		factory = msg.sender;
 		options = Options(start, end, value, invoker);
-		distribute();
+		oraclize();
 	}
 
-	function distribute() private {
+	function oraclize() private {
 		address[] memory repositories = getRepositories();
-		for (uint i = 0; i < repositories.length; i++) {
-			address repository = repositories[i];
-			string memory package = Repository(repository).getPackage();
-			queryNpmDownloads(options.start, options.end, package);
-			expectedQueriesCount += 1;
+		if (oraclize_getPrice("URL").mul(repositories.length) > address(this).balance) {
+			emit LogNewOraclizeQuery(
+				"All Oraclize queries were NOT sent, please add some ETH to cover for the query fee"
+			);
+			kill(factory);
+		} else {
+			for (uint i = 0; i < repositories.length; i++) {
+				address repository = repositories[i];
+				string memory package = Repository(repository).getPackage();
+				queryNpmDownloads(options.start, options.end, package);
+				expectedQueriesCount += 1;
+			}
 		}
 	}
 
@@ -67,7 +76,7 @@ contract Distributor is usingOraclize, UseState {
 			emit LogNewOraclizeQuery(
 				"Oraclize query was NOT sent, please add some ETH to cover for the query fee"
 			);
-			kill();
+			kill(factory);
 		} else {
 			emit LogNewOraclizeQuery(
 				"Oraclize query was sent, standing by for the answer.."
@@ -130,11 +139,18 @@ contract Distributor is usingOraclize, UseState {
 		pendingPayouts -= 1;
 		if (pendingPayouts == 0) {
 			emit LogComplete();
-			kill();
+			kill(options.invoker);
 		}
 	}
 
-	function kill() private {
-		selfdestruct(options.invoker);
+	function payoutAll() public {
+		for (uint i = 0; i < packages.length; i++) {
+			string memory _package = packages[i];
+			payout(_package);
+		}
+	}
+
+	function kill(address payable _addr) private {
+		selfdestruct(_addr);
 	}
 }

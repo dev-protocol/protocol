@@ -2,13 +2,35 @@
 const distributor = artifacts.require('Distributor')
 
 contract('Distributor', () => {
-	describe('Distribution', () => {
+	describe('Oraclize', () => {
+		it('Send Oraclize queries as soon as it is created')
+
 		it(
-			'Get the number of downloads for each package and the number of tokens held by each repository holder.'
+			'Should fail to all Oraclize queries when the ETH balance of this contract is insufficient'
 		)
 
-		it('Call mint by the token address obtained from the state contract.')
+		it('When failed to Oraclize, self-destruct the creator as an address')
 
-		it('Self-destruct when a distribution is done.')
+		it('Oraclize gets the downloads count of each npm packages')
+	})
+
+	describe('Payout', () => {
+		it(
+			"Distribution token's total supply increases after `payout` function are executed"
+		)
+
+		it('Destination of newly issued part is each repository contract')
+
+		it(
+			'Distributions per repository contract is equal to "each_packages_downloads / all_packages_downloads * total_distributions"'
+		)
+
+		it(
+			'When all packages payout is done, self-destruct this contract and send ETH to the creator of this contract'
+		)
+
+		it('Should fail to payout already executed')
+
+		it('Force execute payout to all repository contracts')
 	})
 })
