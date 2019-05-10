@@ -25,9 +25,10 @@ contract DistributorFactory is Killable, Ownable, UseState {
 	constructor() public {
 		// solium-disable-next-line security/no-block-members
 		baseTime = BaseTime(now, block.number);
+		lastDistribute = timestamp();
 	}
 
-	function timestamp() internal view returns (uint) {
+	function timestamp() public view returns (uint) {
 		uint diff = block.number - baseTime.blockHeight;
 		uint sec = diff.div(secondsPerBlock);
 		uint _now = baseTime.time.add(sec);
