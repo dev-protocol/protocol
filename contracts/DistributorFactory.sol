@@ -14,6 +14,7 @@ contract DistributorFactory is Killable, Ownable, UseState {
 	using UintToString for uint;
 	uint public mintVolumePerDay;
 	uint public lastDistribute;
+	uint public funds;
 	struct BaseTime {
 		uint time;
 		uint blockHeight;
@@ -59,7 +60,12 @@ contract DistributorFactory is Killable, Ownable, UseState {
 		);
 	}
 
+	function deposit() public payable {
+		funds += msg.value;
+	}
+
 	function createDistributor() public payable {
+		deposit();
 		uint yesterday = timestamp() - 1 days;
 		uint diff = BokkyPooBahsDateTimeLibrary.diffDays(
 			lastDistribute,
@@ -75,12 +81,13 @@ contract DistributorFactory is Killable, Ownable, UseState {
 		string memory start = dateFormat(startY, startM, startD);
 		string memory end = dateFormat(endY, endM, endD);
 		uint value = diff.mul(mintVolumePerDay);
-		Distributor dist = (new Distributor).value(msg.value)(
+		Distributor dist = (new Distributor).value(funds)(
 			start,
 			end,
 			value,
 			msg.sender
 		);
+		funds = 0;
 		ERC20Mintable(getToken()).addMinter(address(dist));
 		distributors[start] = address(dist);
 		lastDistribute = timestamp();

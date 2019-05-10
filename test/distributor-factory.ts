@@ -36,6 +36,18 @@ contract('DistributorFactory', () => {
 		)
 	})
 
+	describe('Deposit', () => {
+		it('Add the deposit value by sending ETH to `deposit` function')
+
+		it(
+			'ETH sent to the `createDistributor` function is also added to the deposit'
+		)
+
+		it(
+			'When creating a new distributor, sending the deposit to the new distributor and reset the deposit'
+		)
+	})
+
 	describe('Destroy', () => {
 		it('Destruct this contract')
 
