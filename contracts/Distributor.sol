@@ -134,6 +134,7 @@ contract Distributor is usingOraclize, UseState {
 		uint count = options.value.mul(per);
 		address token = getToken();
 		ERC20Mintable(token).mint(pkg.repository, count);
+		Repository(pkg.repository).increment(count);
 		emit LogPayout(_package, count);
 		payoutCompleted[_package] = true;
 		pendingPayouts -= 1;

@@ -15,7 +15,6 @@ contract Repository is ERC20, ERC20Detailed, Ownable, UseState {
 	}
 	mapping(address => uint) internal lastWithdrawals;
 	mapping(address => WithdrawalLimit) internal withdrawalLimits;
-	mapping(address => bool) internal distributor;
 
 	constructor(
 		string memory _package,
@@ -32,16 +31,8 @@ contract Repository is ERC20, ERC20Detailed, Ownable, UseState {
 		return package;
 	}
 
-	function addDistributor(address addr) public onlyOwner {
-		distributor[addr] = true;
-	}
-
-	function isDistributor() public view returns (bool) {
-		return distributor[msg.sender];
-	}
-
 	modifier onlyDistributor() {
-		require(isDistributor(), "Only Distributor");
+		require(isDistributor(msg.sender), "Only Distributor");
 		_;
 	}
 

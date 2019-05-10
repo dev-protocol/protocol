@@ -27,11 +27,15 @@ contract UseState is Ownable {
 		state().addRepository(package, address(repository));
 	}
 
+	function addDistributor(address distributor) internal {
+		state().addDistributor(address(distributor));
+	}
+
 	function getRepositories() internal view returns (address[] memory) {
 		return state().getRepositories();
 	}
 
-	function getTotalBalance(address addr) internal view returns (uint) {
-		return state().getTotalBalance(addr);
+	function isDistributor(address addr) internal view returns (bool) {
+		return state().isDistributor(addr);
 	}
 }

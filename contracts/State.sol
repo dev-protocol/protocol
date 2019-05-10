@@ -6,6 +6,7 @@ contract State is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address[] public repositories;
 	mapping(address => bool) internal operator;
+	mapping(address => bool) internal distributors;
 	mapping(string => address) internal repositoriesMap;
 
 	function addOperator(address addr) public onlyOwner {
@@ -14,6 +15,10 @@ contract State is Ownable {
 
 	function isOperator() public view returns (bool) {
 		return operator[msg.sender];
+	}
+
+	function isDistributor(address addr) public view returns (bool) {
+		return distributors[addr];
 	}
 
 	modifier onlyOperator() {
@@ -40,6 +45,14 @@ contract State is Ownable {
 		);
 		repositoriesMap[package] = repository;
 		repositories.push(repository);
+	}
+
+	function addDistributor(address distributor)
+		public
+		onlyOperator
+	{
+		require(distributor != address(0), "Distributor is an invalid address");
+		distributors[distributor] = true;
 	}
 
 	function getRepository(string memory package)

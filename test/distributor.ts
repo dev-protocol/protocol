@@ -19,6 +19,10 @@ contract('Distributor', () => {
 			"Distribution token's total supply increases after `payout` function are executed"
 		)
 
+		it(
+			"Repository Contract's `total` and `price` increases after `payout` function are executed"
+		)
+
 		it('Destination of newly issued part is each repository contract')
 
 		it(

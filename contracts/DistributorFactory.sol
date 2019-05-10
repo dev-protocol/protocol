@@ -7,6 +7,7 @@ import "./modules/BokkyPooBahsDateTimeLibrary.sol";
 import "./libs/UintToString.sol";
 import "./libs/Killable.sol";
 import "./Distributor.sol";
+import "./Repository.sol";
 import "./UseState.sol";
 
 contract DistributorFactory is Killable, Ownable, UseState {
@@ -86,8 +87,10 @@ contract DistributorFactory is Killable, Ownable, UseState {
 			value,
 			msg.sender
 		);
-		ERC20Mintable(getToken()).addMinter(address(dist));
-		distributors[start] = address(dist);
+		address distributor = address(dist);
+		ERC20Mintable(getToken()).addMinter(distributor);
+		addDistributor(distributor);
+		distributors[start] = distributor;
 		lastDistribute = timestamp();
 	}
 }
