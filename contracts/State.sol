@@ -66,8 +66,4 @@ contract State is Ownable {
 	function getRepositories() public view returns (address[] memory) {
 		return repositories;
 	}
-
-	function getTotalBalance(address repository) public view returns (uint) {
-		return 1234567890; // Mock
-	}
 }
