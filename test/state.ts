@@ -12,13 +12,17 @@ contract('State', ([deployer, u1, u2]) => {
 			expect(results).to.be.equal(true)
 		})
 
-		it('Fail to add operator from a non-owner account', async () => {
+		it('Should fail to add operator from a non-owner account', async () => {
 			const contract = await state.new({ from: deployer })
 			const results = await contract
 				.addOperator(u1, { from: u2 })
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
+
+		it('Add distributor')
+
+		it('Should fail to add distributor from a non-operator account')
 	})
 
 	describe('Utility token', () => {
@@ -37,7 +41,7 @@ contract('State', ([deployer, u1, u2]) => {
 			expect(results.toString()).to.be.equal(u1)
 		})
 
-		it('Fail to change the utility token address from a non-owner account', async () => {
+		it('Should fail to change the utility token address from a non-owner account', async () => {
 			const contract = await state.new({ from: deployer })
 			const results = await contract
 				.setToken(u1, { from: u2 })
@@ -156,9 +160,9 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Balance', () => {
-		it(
-			'Get the utility tokens balance of all holders from a repository address.'
-		)
+	describe('Validating distributors', () => {
+		it('Valid distributor address')
+
+		it('Should returns false when invalid distributor address')
 	})
 })
