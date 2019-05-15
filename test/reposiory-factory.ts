@@ -6,7 +6,11 @@ contract('ReposioryFactory', ([deployer]) => {
 	describe('Create new repository', () => {
 		it('Create new repository of a package')
 
-		it('Fail to create new repository of a package when the package already has repository.', async () => {
+		it(
+			'Should fail to create a new repository when failed authorization of npm'
+		)
+
+		it('Should fail to create a new repository of a package when the package already has a repository', async () => {
 			const contract = await reposioryFactory.new({ from: deployer })
 			const state = await stateContractFactory.new({ from: deployer })
 			await state.addOperator(contract.address, { from: deployer })
