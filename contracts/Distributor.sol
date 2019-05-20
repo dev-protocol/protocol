@@ -47,10 +47,10 @@ contract Distributor is usingOraclize, UseState {
 	) public payable {
 		factory = msg.sender;
 		options = Options(start, end, value, invoker);
-		oraclize();
+		oraclizing();
 	}
 
-	function oraclize() private {
+	function oraclizing() private {
 		address[] memory repositories = getRepositories();
 		if (oraclize_getPrice("URL").mul(repositories.length) > address(this).balance) {
 			emit LogNewOraclizeQuery(
