@@ -4,7 +4,7 @@ Dev Challenge is developer reward program for Dev Repository Token.
 
 Distribute Dev tokens as rewards for pull requests merged between July 1, 2019, and December 19, 2019.
 
-💡 You can also send pull requests for this document; this document may changes.
+💡 You can send pull-requests for this document; this document may changes.
 
 ## Rules
 
