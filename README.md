@@ -6,6 +6,10 @@ This repository is the place to develop smart contracts for Dev Repository Token
 
 Whitepaper: https://hackmd.io/s/ByHi5zOiN
 
+## Dev Challenge
+
+The developer reward program for this project is coming soon. [Check the details.](https://github.com/dev-protocol/repository-token/blob/master/DEV_CHALLENGE.md)
+
 ## How to contribute:
 
 Read the contributing guide, and create PR when you have time. 🧚✨
