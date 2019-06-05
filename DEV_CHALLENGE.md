@@ -4,7 +4,7 @@ Dev Challenge is developer reward program for Dev Repository Token.
 
 Distribute Dev tokens as rewards for pull requests merged between July 1, 2019, and December 19, 2019.
 
-💡 You can also submit pull requests for this document.
+💡 You can also send pull requests for this document; this document may changes.
 
 ## Rules
 
@@ -22,13 +22,13 @@ Here are the Dev Challenge rules:
 
 ## Severity
 
-| Severity | Points | e.g.                                                                                       |
-| -------- | ------ | ------------------------------------------------------------------------------------------ |
-| Critical | 50     | Update token model, Update the core of this software.                                      |
-| High     | 30     | Fix vulnerability, Make the Developer Rewards Program better, Fix or Kaizen unknown issues |
-| Medium   | 20     | Add implementation, Fix test, Refactoring, Fix to follow whitepaper.                       |
-| Low      | 4      | Empty test, Rename variable, Fix without implementation.                                   |
-| Note     | 1      | Typo, Sentence mistakes, Fix not related to software.                                      |
+| Severity | Points | e.g.                                                                                        |
+| -------- | ------ | ------------------------------------------------------------------------------------------- |
+| Critical | 50     | Update token model, Update the core of this software.                                       |
+| High     | 30     | Fix vulnerability, Make the Developer Rewards Program better, Fix or Kaizen unknown issues. |
+| Medium   | 20     | Add implementation, Fix test, Refactoring, Fix to follow whitepaper.                        |
+| Low      | 4      | Empty test, Rename variable, Fix without implementation.                                    |
+| Note     | 1      | Typo, Sentence mistakes, Fix not related to software.                                       |
 
 When you fix an issue reported by others, severity points are divided by the following ratio:
 
