@@ -7,6 +7,7 @@ const reposioryFactory = artifacts.require('ReposioryFactory')
 const repository = artifacts.require('Repository')
 const state = artifacts.require('State')
 const useState = artifacts.require('UseState')
+const useStateTest = artifacts.require('UseStateTest')
 
 module.exports = (deployer: {
 	deploy<T>(contract: Truffle.Contract<T>): void
@@ -18,4 +19,5 @@ module.exports = (deployer: {
 	deployer.deploy(repository)
 	deployer.deploy(state)
 	deployer.deploy(useState)
+	deployer.deploy(useStateTest)
 }

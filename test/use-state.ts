@@ -1,5 +1,5 @@
 // tslint:disable:no-unsafe-any
-const useState = artifacts.require('UseState')
+const useState = artifacts.require('UseStateTest')
 const stateContract = artifacts.require('State')
 const repositoryContractUseState = artifacts.require('Repository')
 
@@ -9,13 +9,13 @@ contract('UseState', ([deployer, u1, u2]) => {
 			const state1 = await stateContract.new({ from: deployer })
 			await state1.setToken(u1, { from: deployer })
 			const contract = await useState.new({ from: deployer })
-			const token = await contract.getToken().catch((err: Error) => err)
+			const token = await contract.t_getToken().catch((err: Error) => err)
 			expect(token).to.instanceOf(Error)
 
 			await contract.changeStateAddress(state1.address, {
 				from: deployer
 			})
-			const results = await contract.getToken()
+			const results = await contract.t_getToken()
 			expect(results.toString()).to.be.equal(u1)
 		})
 
@@ -37,7 +37,7 @@ contract('UseState', ([deployer, u1, u2]) => {
 			await contract.changeStateAddress(state1.address, {
 				from: deployer
 			})
-			const results = await contract.state({
+			const results = await contract.t_state({
 				from: deployer
 			})
 			expect(results).to.be.deep.equal(state1.address)
@@ -52,13 +52,13 @@ contract('UseState', ([deployer, u1, u2]) => {
 			await contract.changeStateAddress(state1.address, {
 				from: deployer
 			})
-			const prev = await contract.getToken()
+			const prev = await contract.t_getToken()
 			expect(prev.toString()).to.be.equal(u1)
 
 			await contract.changeStateAddress(state2.address, {
 				from: deployer
 			})
-			const next = await contract.getToken()
+			const next = await contract.t_getToken()
 			expect(next.toString()).to.be.equal(u2)
 		})
 	})
@@ -71,7 +71,7 @@ contract('UseState', ([deployer, u1, u2]) => {
 			await contract.changeStateAddress(state1.address, {
 				from: deployer
 			})
-			const results = await contract.getToken()
+			const results = await contract.t_getToken()
 			expect(results.toString()).to.be.equal(u1)
 		})
 	})
@@ -94,7 +94,7 @@ contract('UseState', ([deployer, u1, u2]) => {
 				from: deployer
 			})
 			await state.addOperator(contract.address, { from: deployer })
-			await contract.addRepository('pkg', repository.address, {
+			await contract.t_addRepository('pkg', repository.address, {
 				from: deployer
 			})
 			const results = await state.getRepository('pkg', {
