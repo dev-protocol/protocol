@@ -47,10 +47,7 @@ contract State is Ownable {
 		repositories.push(repository);
 	}
 
-	function addDistributor(address distributor)
-		public
-		onlyOperator
-	{
+	function addDistributor(address distributor) public onlyOperator {
 		require(distributor != address(0), "Distributor is an invalid address");
 		distributors[distributor] = true;
 	}

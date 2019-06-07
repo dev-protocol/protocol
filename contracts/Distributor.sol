@@ -52,7 +52,9 @@ contract Distributor is usingOraclize, UseState {
 
 	function oraclizing() private {
 		address[] memory repositories = getRepositories();
-		if (oraclize_getPrice("URL").mul(repositories.length) > address(this).balance) {
+		if (oraclize_getPrice("URL").mul(repositories.length) > address(
+			this
+		).balance) {
 			emit LogNewOraclizeQuery(
 				"All Oraclize queries were NOT sent, please add some ETH to cover for the query fee"
 			);
