@@ -15,24 +15,24 @@
   "author": "aggre",
   "license": "MPL-2.0",
   "devDependencies": {
-    "@types/node": "^11.12.2",
-    "@types/ramda": "^0.26.6",
-    "ethlint": "^1.2.3",
-    "prettier": "^1.16.4",
+    "@types/node": "^12.0.7",
+    "@types/ramda": "^0.26.9",
+    "ethlint": "^1.2.4",
+    "prettier": "^1.18.2",
     "prettier-plugin-solidity": "^1.0.0-alpha.21",
     "ramda": "^0.26.1",
-    "truffle": "^5.0.10",
+    "truffle": "^5.0.21",
     "truffle-typings": "^1.0.6",
-    "ts-node": "^8.0.3",
-    "tslint": "^5.14.0",
+    "ts-node": "^8.2.0",
+    "tslint": "^5.17.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
     "tslint-xo": "^0.16.0",
     "typechain": "^0.3.14",
-    "typescript": "^3.4.1"
+    "typescript": "^3.5.1"
   },
   "dependencies": {
-    "openzeppelin-solidity": "^2.2.0"
+    "openzeppelin-solidity": "^2.3.0"
   },
   "directories": {
     "test": "test"
