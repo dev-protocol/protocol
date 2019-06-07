@@ -8,7 +8,7 @@ contract('State', ([deployer, u1, u2]) => {
 		it('Add operators', async () => {
 			const contract = await state.new({ from: deployer })
 			await contract.addOperator(u1, { from: deployer })
-			const results = await contract.isOperator(u1, { from: deployer })
+			const results = await contract.isOperator({ from: u1 })
 			expect(results).to.be.equal(true)
 		})
 
