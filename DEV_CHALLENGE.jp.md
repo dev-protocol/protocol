@@ -1,37 +1,37 @@
-# About Dev Challenge
+# Dev Challengeについて
 
-Dev Challenge is developer reward program for Dev Repository Token.
+Dev Challengeは、Dev Repository Tokenの開発者報酬プログラムです。
 
-Distribute Dev tokens as rewards for pull requests merged between July 1, 2019, and December 19, 2019.
+2019年7月1日から2019年12月19日の間にマージされたプルリクエストの報酬としてDevトークンを配布します。
 
-💡 You can send pull-requests for this document; this document may changes.
+💡 この文書のプルリクエストを送ることができます。この文書は変更される可能性があります。
 
-## Rules
+## ルール
 
-Here are the Dev Challenge rules:
+開発チャレンジのルールは次のとおりです:
 
-1. Applies to pull requests merged between July 1, 2019, and December 19, 2019.
-1. The reward is [Dev token](https://etherscan.io/token/0x98626e2c9231f03504273d55f397409defd4a093).
-1. Set the severity points for each pull requests. The severity points are determined by your self-assessment and agreement with the assessment by this project owner. Its detail is described in the section of Severity.
-1. In the case of a pull request that fixes a known issue, if the issue is reported by others, then divide severity points the issue reporter and resolver. Its ratio is described in the section of Severity.
-1. The reward is 3 DEV for severity points 1.
-1. Send rewards on the 20th of every month.
-1. The rewards are the cumulative severity points of pull requests merged from the 19th of this month to the 20th of the last month multiplied by the DEV rate.
-1. As soon as the distribution of XXXX DEV is completed, Dev Challenge ends.
-1. In any case, Dev Challenge ends on December 20, 2019.
+1. 2019年7月1日から2019年12月19日の間にマージされたプルリクエストに適用されます。
+1. 報酬は[Dev token](https://etherscan.io/token/0x98626e2c9231f03504273d55f397409defd4a093)。
+1. プルリクエストごとに重大度を設定します。重大度は、自己評価とこのプロジェクト所有者による評価との一致によって決定されます。その詳細は重大度の節で説明されています。
+1. 既知の問題を修正するプル要求の場合、その問題が他のユーザーによって報告されている場合は、重大度を問題報告者と解決者に分けます。その比率は、重大度のセクションに記載されています。
+1. 重要度1の報酬は3DEVです。
+1. 毎月20日に報酬を送ります。
+1. 報酬は、今月の19日から先月の20日までにマージされたプル要求の累積深刻度ポイントにDEVレートを掛けたものです。
+1. XXXX DEVの配布が完了するとすぐに、Dev Challengeは終了します。
+1. いずれにせよ、Dev Challengeは2019年12月20日に終了します。
 
-## Severity
+## 重大度
 
-| Severity | Points | e.g.                                                                                        |
-| -------- | ------ | ------------------------------------------------------------------------------------------- |
-| Critical | 50     | Update token model, Update the core of this software.                                       |
-| High     | 30     | Fix vulnerability, Make the Developer Rewards Program better, Fix or Kaizen unknown issues. |
-| Medium   | 20     | Add implementation, Fix test, Refactoring, Fix to follow whitepaper.                        |
-| Low      | 4      | Empty test, Rename variable, Fix without implementation.                                    |
-| Note     | 1      | Typo, Sentence mistakes, Fix not related to software.                                       |
+| 重大度 | ポイント | 例                                                                         |
+| -------- | ------ | ---------------------------------------------------------------------- |
+| Critical | 50     | トークンモデルを更新し、このソフトウェアのコアを更新します。                            |
+| High     | 30     | 脆弱性を修正し、Developer Rewards Programを改善し、未知の問題を修正または改善する。 |
+| Medium   | 20     | ホワイトペーパーに従うように、実装、テストの修正、リファクタリング、修正を追加します。          |
+| Low      | 4      | 空のテスト、変数名の変更、実装なしで修正。                                       |
+| Note     | 1      | タイプミス、文の間違い、修正はソフトウェアに関連しません。                             |
 
-When you fix an issue reported by others, severity points are divided by the following ratio:
+他の人が報告した問題を解決すると、重要度のポイントは次の比率で分けられます。:
 
-| Reporter | Resolver |
-| -------- | -------- |
-| 20%      | 80%      |
+| 報告者 | 解決者 |
+| ----- | ----- |
+| 20%   | 80%   |
