@@ -1,4 +1,3 @@
-// tslint:disable:no-unsafe-any
 const reposioryFactory = artifacts.require('ReposioryFactory')
 const stateContractFactory = artifacts.require('State')
 

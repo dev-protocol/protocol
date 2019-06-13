@@ -1,5 +1,4 @@
-// tslint:disable:no-unsafe-any
-// tslint:disable:no-unused-expression
+/* eslint-disable no-unused-expressions */
 const state = artifacts.require('State')
 const repositoryContractState = artifacts.require('Repository')
 

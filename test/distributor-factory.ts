@@ -1,6 +1,3 @@
-// tslint:disable:no-unsafe-any
-const distributorFactory = artifacts.require('DistributorFactory')
-
 contract('DistributorFactory', () => {
 	describe('Create distributor', () => {
 		it('Create a distributor contract')
