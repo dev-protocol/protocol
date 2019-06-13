@@ -1,6 +1,3 @@
-// tslint:disable:no-unsafe-any
-const distributor = artifacts.require('Distributor')
-
 contract('Distributor', () => {
 	describe('Oraclize', () => {
 		it('Send Oraclize queries as soon as it is created')

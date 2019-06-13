@@ -1,0 +1,39 @@
+{
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"project": "./tsconfig.json",
+		"tsconfigRootDir": "."
+	},
+	"plugins": ["@typescript-eslint", "prettier"],
+	"extends": [
+		"prettier/@typescript-eslint",
+		"plugin:prettier/recommended",
+		"xo",
+		"xo-typescript"
+	],
+	"rules": {
+		"prettier/prettier": "error",
+		"@typescript-eslint/semi": ["error", "never"],
+		"@typescript-eslint/member-delimiter-style": "off",
+		"object-curly-spacing": "off",
+		"quotes": "off"
+	},
+	"overrides": [
+		{
+			"files": ["test/**/*.ts"],
+			"globals": {
+				"describe": "readonly",
+				"expect": "readonly",
+				"it": "readonly",
+				"artifacts": "readonly",
+				"contract": "readonly"
+			}
+		},
+		{
+			"files": ["migrations/**/*.ts"],
+			"globals": {
+				"artifacts": "readonly"
+			}
+		}
+	]
+}

@@ -2,7 +2,9 @@
 	"solidity.linter": "solium",
 	"solidity.packageDefaultDependenciesContractsDirectory": "",
 	"solidity.packageDefaultDependenciesDirectory": "node_modules",
-	"editor.codeActionsOnSave": {
-		"source.fixAll.tslint": true
-	}
+	"eslint.autoFixOnSave": true,
+	"eslint.validate": [
+		"javascript",
+		{ "language": "typescript", "autoFix": true }
+	]
 }

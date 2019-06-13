@@ -1,4 +1,3 @@
-// tslint:disable:no-unsafe-any
 const useState = artifacts.require('UseStateTest')
 const stateContract = artifacts.require('State')
 const repositoryContractUseState = artifacts.require('Repository')
