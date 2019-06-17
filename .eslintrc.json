@@ -6,17 +6,13 @@
 	},
 	"plugins": ["@typescript-eslint", "prettier"],
 	"extends": [
-		"prettier/@typescript-eslint",
-		"plugin:prettier/recommended",
 		"xo",
-		"xo-typescript"
+		"xo-typescript",
+		"plugin:prettier/recommended",
+		"prettier/@typescript-eslint"
 	],
 	"rules": {
-		"prettier/prettier": "error",
-		"@typescript-eslint/semi": ["error", "never"],
-		"@typescript-eslint/member-delimiter-style": "off",
-		"object-curly-spacing": "off",
-		"quotes": "off"
+		"prettier/prettier": "error"
 	},
 	"overrides": [
 		{
