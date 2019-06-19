@@ -8,6 +8,10 @@
 
 [ Please write here about why needs this change ]
 
+# Code
+
+- [ ] I ran `npm run lint`
+
 # Severity
 
 During the Dev Challenge, you can receive Dev tokens depending on the severity of this pull request. Please select one of your expectations.
