@@ -43,7 +43,7 @@ When running distributions rates calculation by Distributor Contract, Repository
 
 The number of Dev Tokens received depends on the number of times the OSS has been downloaded. Repository Contract holders can then trade their Dev Tokens on the exchange.
 
-![Distribute](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Distribute.png)
+![Distribute](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Disribute.png)
 
 ## Repository Contract
 
