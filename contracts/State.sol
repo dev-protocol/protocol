@@ -5,9 +5,10 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 contract State is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address[] public repositories;
+	address public distributor;
 	mapping(address => bool) internal operator;
-	mapping(address => bool) internal distributors;
-	mapping(string => address) internal repositoriesMap;
+	mapping(string => address) internal repositoriesName;
+	mapping(address => string) internal repositoriesAddress;
 
 	function addOperator(address addr) public onlyOwner {
 		operator[addr] = true;
@@ -17,8 +18,8 @@ contract State is Ownable {
 		return operator[msg.sender];
 	}
 
-	function isDistributor(address addr) public view returns (bool) {
-		return distributors[addr];
+	function setDistributor(address addr) public onlyOwner {
+		distributor = addr;
 	}
 
 	modifier onlyOperator() {
@@ -34,16 +35,21 @@ contract State is Ownable {
 		return token;
 	}
 
+	function getDistributor() public view returns (address) {
+		return distributor;
+	}
+
 	function addRepository(string memory package, address repository)
 		public
 		onlyOperator
 	{
 		require(repository != address(0), "Repository is an invalid address");
 		require(
-			repositoriesMap[package] == address(0),
+			repositoriesName[package] == address(0),
 			"Repository is already added"
 		);
-		repositoriesMap[package] = repository;
+		repositoriesName[package] = repository;
+		repositoriesAddress[repository] = package;
 		repositories.push(repository);
 	}
 
@@ -57,10 +63,14 @@ contract State is Ownable {
 		view
 		returns (address)
 	{
-		return repositoriesMap[package];
+		return repositoriesName[package];
 	}
 
 	function getRepositories() public view returns (address[] memory) {
 		return repositories;
+	}
+
+	function isRepository(address _addr) public view returns (bool) {
+		return repositoriesAddress[_addr] != address(0);
 	}
 }

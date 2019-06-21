@@ -15,6 +15,10 @@ contract UseState is Ownable {
 		return State(_state);
 	}
 
+	function getDistributor() internal view returns (address) {
+		return state().getDistributor();
+	}
+
 	function getToken() internal view returns (address) {
 		return state().getToken();
 	}
@@ -35,7 +39,8 @@ contract UseState is Ownable {
 		return state().getRepositories();
 	}
 
-	function isDistributor(address addr) internal view returns (bool) {
-		return state().isDistributor(addr);
+	function isRepository(address _addr) internal view returns (bool) {
+		return state().isRepository(_addr);
 	}
+
 }

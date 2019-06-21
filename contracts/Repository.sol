@@ -4,17 +4,10 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./UseState.sol";
+import "./Distributor.sol";
 
 contract Repository is ERC20, ERC20Detailed, Ownable, UseState {
 	string public package;
-	uint public total;
-	uint public price;
-	struct WithdrawalLimit {
-		uint total;
-		uint balance;
-	}
-	mapping(address => uint) internal lastWithdrawals;
-	mapping(address => WithdrawalLimit) internal withdrawalLimits;
 
 	constructor(
 		string memory _package,
@@ -31,45 +24,14 @@ contract Repository is ERC20, ERC20Detailed, Ownable, UseState {
 		return package;
 	}
 
-	modifier onlyDistributor() {
-		require(isDistributor(msg.sender), "Only Distributor");
-		_;
-	}
-
-	function increment(uint _value) public onlyDistributor {
-		total += _value;
-		price += total / totalSupply();
-	}
-
-	function withdraw() public {
-		WithdrawalLimit memory _limit = withdrawalLimits[msg.sender];
-		uint _price = price - lastWithdrawals[msg.sender];
-		uint _balance = balanceOf(msg.sender);
-		if (_limit.total == total) {
-			_balance = _limit.balance;
-		}
-		uint _value = _price * _balance;
-		ERC20(getToken()).transfer(msg.sender, _value);
-		lastWithdrawals[msg.sender] = price;
-	}
-
-	function setWithdrawalLimit(address to, uint value) internal {
-		WithdrawalLimit memory _limit = withdrawalLimits[to];
-		if (_limit.total == total) {
-			withdrawalLimits[to] = WithdrawalLimit(
-				total,
-				_limit.balance + value
-			);
-		} else {
-			withdrawalLimits[to] = WithdrawalLimit(total, value);
-		}
-		lastWithdrawals[to] = price;
-	}
-
 	function transfer(address to, uint256 value) public returns (bool) {
-		withdraw();
+		address distributor = getDistributor();
+		Distributor(distributor).beforeBalanceChange(
+			address(this),
+			msg.sender,
+			to
+		);
 		_transfer(msg.sender, to, value);
-		setWithdrawalLimit(to, value);
 		return true;
 	}
 }
