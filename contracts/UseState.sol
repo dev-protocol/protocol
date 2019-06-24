@@ -23,16 +23,16 @@ contract UseState is Ownable {
 		return state().getToken();
 	}
 
-	function getRepository(string memory package) internal returns (address) {
+	function getRepository(string memory package)
+		internal
+		view
+		returns (address)
+	{
 		return (state().getRepository(package));
 	}
 
 	function addRepository(string memory package, address repository) internal {
 		state().addRepository(package, address(repository));
-	}
-
-	function addDistributor(address distributor) internal {
-		state().addDistributor(address(distributor));
 	}
 
 	function getRepositories() internal view returns (address[] memory) {
@@ -43,4 +43,7 @@ contract UseState is Ownable {
 		return state().isRepository(_addr);
 	}
 
+	function isDistributor(address _addr) public view returns (bool) {
+		return state().isDistributor(_addr);
+	}
 }

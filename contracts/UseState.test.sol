@@ -16,16 +16,16 @@ contract UseStateTest is UseState {
 		return getToken();
 	}
 
-	function t_getRepository(string memory package) public returns (address) {
+	function t_getRepository(string memory package)
+		public
+		view
+		returns (address)
+	{
 		return getRepository(package);
 	}
 
 	function t_addRepository(string memory package, address repository) public {
 		addRepository(package, address(repository));
-	}
-
-	function t_addDistributor(address distributor) public {
-		addDistributor(address(distributor));
 	}
 
 	function t_getRepositories() public view returns (address[] memory) {

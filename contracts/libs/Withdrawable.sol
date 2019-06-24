@@ -20,7 +20,7 @@ contract Withdrawable {
 		// DEPOSIT_TO_DISTRIBUTOR(); // Deposit a fee to the Distributor Factory Contract.
 		uint _value = calculateWithdrawableAmount(_token, msg.sender);
 		uint value = _value + pendingWithdrawals[_token][msg.sender];
-		ERC20(_token).mint(msg.sender, value);
+		ERC20Mintable(_token).mint(msg.sender, value);
 		lastWithdrawalPrices[_token][msg.sender] = prices[_token];
 		pendingWithdrawals[_token][msg.sender] = 0;
 	}

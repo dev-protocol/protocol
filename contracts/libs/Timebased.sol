@@ -1,8 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-contract Timebased is Ownable {
+contract Timebased {
+	using SafeMath for uint;
 	struct BaseTime {
 		uint time;
 		uint blockHeight;
@@ -15,7 +16,7 @@ contract Timebased is Ownable {
 		baseTime = BaseTime(now, block.number);
 	}
 
-	function setSecondsPerBlock(uint _sec) public onlyOwner {
+	function _setSecondsPerBlock(uint _sec) internal {
 		secondsPerBlock = _sec;
 	}
 
