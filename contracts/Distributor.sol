@@ -19,7 +19,6 @@ contract Distributor is Timebased, Killable, Ownable, UseState, usingOraclize, W
 	using StringToUint for string;
 	uint public mintVolumePerDay;
 	uint public lastDistribute;
-	mapping(string => address) distributors;
 	struct Request {
 		string start;
 		string end;
