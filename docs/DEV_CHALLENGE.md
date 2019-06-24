@@ -6,6 +6,10 @@ Distribute Dev tokens as rewards for pull requests merged between July 1, 2019, 
 
 💡 You can send pull-requests for this document; this document may changes.
 
+## Translations
+
+[日本語](https://github.com/dev-protocol/repository-token/blob/master/docs/DEV_CHALLENGE.JA.md)
+
 ## Rules
 
 Here are the Dev Challenge rules:
