@@ -24,13 +24,13 @@ During the Dev Challenge, you can receive Dev tokens depending on the severity o
 
 _Severity and example are:_
 
-| Severity | Points | e.g.                                                                                        |
-| -------- | ------ | ------------------------------------------------------------------------------------------- |
-| Critical | 100    | Update token model, Update the core of this software.                                       |
-| High     | 50     | Fix vulnerability, Make the Developer Rewards Program better, Fix or Kaizen unknown issues. |
-| Medium   | 20     | Add implementation, Fix test, Refactoring, Fix to follow whitepaper.                        |
-| Low      | 4      | Empty test, Rename variable, Fix without implementation.                                    |
-| Note     | 1      | Typo, Sentence mistakes, Fix not related to software.                                       |
+| Severity | Points | e.g.                                                                                              |
+| -------- | ------ | ------------------------------------------------------------------------------------------------- |
+| Critical | 100    | Update token model, Update the core of this software.                                             |
+| High     | 50     | Fix vulnerability, Make the Developer Rewards Program better, etc.; Fix or Kaizen unknown issues. |
+| Medium   | 20     | Add implementation, Fix test, Refactoring, etc.; Fix to follow whitepaper.                        |
+| Low      | 4      | Empty test, Rename variable, etc.; Fix without implementation.                                    |
+| Note     | 1      | Typo, Sentence mistakes, etc.; Fix not related to software.                                       |
 
 When you fix an issue reported by others, severity points are divided by the following ratio:
 
