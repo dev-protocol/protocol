@@ -5,7 +5,7 @@ module.exports = {
 	test_file_extension_regexp: /.*\.ts$/,
 	compilers: {
 		solc: {
-			version: '^0.5.2'
+			version: '^0.5.9'
 		}
 	}
 }

@@ -2,7 +2,6 @@ import '../types/truffle-contracts/merge'
 
 const migrations = artifacts.require('Migrations')
 const distributor = artifacts.require('Distributor')
-const distributorFactory = artifacts.require('DistributorFactory')
 const reposioryFactory = artifacts.require('ReposioryFactory')
 const repository = artifacts.require('Repository')
 const state = artifacts.require('State')
@@ -14,7 +13,6 @@ module.exports = (deployer: {
 }): void => {
 	deployer.deploy(migrations)
 	deployer.deploy(distributor)
-	deployer.deploy(distributorFactory)
 	deployer.deploy(reposioryFactory)
 	deployer.deploy(repository)
 	deployer.deploy(state)

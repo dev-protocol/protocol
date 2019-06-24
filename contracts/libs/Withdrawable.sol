@@ -20,8 +20,8 @@ contract Withdrawable {
 		// DEPOSIT_TO_DISTRIBUTOR(); // Deposit a fee to the Distributor Factory Contract.
 		uint _value = calculateWithdrawableAmount(_token, msg.sender);
 		uint value = _value + pendingWithdrawals[_token][msg.sender];
-		ERC20(token).mint(msg.sender, value);
-		lastWithdrawalPrices[_token][msg.sender] = price;
+		ERC20(_token).mint(msg.sender, value);
+		lastWithdrawalPrices[_token][msg.sender] = prices[_token];
 		pendingWithdrawals[_token][msg.sender] = 0;
 	}
 
@@ -50,7 +50,7 @@ contract Withdrawable {
 	{
 		uint _last = lastWithdrawalPrices[_token][_user];
 		WithdrawalLimit memory _limit = withdrawalLimits[_token][_user];
-		uint priceGap = price - _last;
+		uint priceGap = prices[_token] - _last;
 		uint balance = ERC20(_token).balanceOf(_user);
 		if (_limit.total == totals[_token]) {
 			balance = _limit.balance;
@@ -60,7 +60,7 @@ contract Withdrawable {
 	}
 
 	function increment(address _token, uint value) internal {
-		totals[repos] += value;
-		prices[repos] += totals[repos].div(ERC20(repos).totalSupply());
+		totals[_token] += value;
+		prices[_token] += totals[_token].div(ERC20(_token).totalSupply());
 	}
 }
