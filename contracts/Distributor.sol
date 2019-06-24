@@ -88,6 +88,7 @@ contract Distributor is Timebased, Killable, Ownable, UseState, usingOraclize, W
 		msg.sender.transfer(address(this).balance);
 	}
 
+	// It is expected to be called by [Oraclize](https://docs.oraclize.it/#ethereum-quick-start).
 	function __callback(bytes32 _id, string memory _result) public {
 		Query memory query = oraclePendingQueries[_id];
 		if (msg.sender != oraclize_cbAddress()) {
