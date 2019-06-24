@@ -16,4 +16,4 @@ The developer reward program for this project is coming soon. [Check the details
 
 ## How to contribute:
 
-Read the contributing guide, and create PR when you have time. 🧚✨
+Read the [contributing guide](https://github.com/dev-protocol/repository-token/blob/master/.github/CONTRIBUTING.md), and create PR when you have time. 🧚✨
