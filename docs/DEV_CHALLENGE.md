@@ -28,8 +28,8 @@ Here are the Dev Challenge rules:
 
 | Severity | Points | e.g.                                                                                        |
 | -------- | ------ | ------------------------------------------------------------------------------------------- |
-| Critical | 50     | Update token model, Update the core of this software.                                       |
-| High     | 30     | Fix vulnerability, Make the Developer Rewards Program better, Fix or Kaizen unknown issues. |
+| Critical | 100    | Update token model, Update the core of this software.                                       |
+| High     | 50     | Fix vulnerability, Make the Developer Rewards Program better, Fix or Kaizen unknown issues. |
 | Medium   | 20     | Add implementation, Fix test, Refactoring, Fix to follow whitepaper.                        |
 | Low      | 4      | Empty test, Rename variable, Fix without implementation.                                    |
 | Note     | 1      | Typo, Sentence mistakes, Fix not related to software.                                       |
