@@ -26,20 +26,12 @@ contract Distributor is Timebased, Killable, Ownable, UseState, usingOraclize, W
 		address invoker;
 		address package;
 	}
-	struct Query {
-		bytes32 requestId;
-		address repository;
-	}
 	mapping(address => uint) lastDistributes;
 	mapping(address => Request) requests;
 	mapping(bytes32 => address) oraclePendingQueries;
 	mapping(address => uint) lastDownloads;
 
-	event LogNewOraclizeQuery(string _description);
 	event LogDownloadsUpdated(address _repository, uint _downloads);
-	event LogFinishedAllQueries();
-	event LogPayout(string _package, uint _value);
-	event LogComplete();
 
 	function setMintVolumePerDay(uint _vol) public onlyOwner {
 		mintVolumePerDay = _vol;
