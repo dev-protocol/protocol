@@ -1,6 +1,6 @@
 # Dev Repository Token Whitepaper
 
-Version: **`0.2.0`**
+Version: **`0.3.0`**
 
 _This whitepaper may be updated. When updating, the version number is incremented according to [Semantic Versioning](https://semver.org/)._
 
@@ -71,7 +71,7 @@ The Distributor Contract role is calculating distributions and withdrawing token
 
 The distributes calculation requires access to information outside the blockchain, so Oraclize is used.
 
-Oraclize requires ETH to use, so calculate function is a `payable` function. Any ETH that was not used in the distribution calculation is returned to the function's sender (distributor) upon ended calculation. The processing fee for the Repository Contract's `withdraw()` function is deposited in the Distributor Contract. If the deposit is less than Oraclize's processing fee, additional ETH must be paid, but when the deposit is more than the processing fee, the distributor will take the surplus. This is a reward for the distributor performing the calculation.
+Oraclize requires ETH to use, so calculate function is a `payable` function.
 
 ### Running Distributor Contract
 
@@ -93,23 +93,27 @@ function setMintVolumePerDay(uint _vol) public onlyOwner {
 
 ### Calculating Distributions
 
-The Distributor Contract calculates the number of Dev Tokens to be distributed as soon as it is created.
+The calculation of the number of distributions is through by the Distributor Contracts `distribution()` function.
 
 The Repository Contract's distribution calculation uses the following variables.
 
-- `v` = Total number of new tokens to be issued
-- `d` = Number of downloads of the npm package recorded in the target Repository Contract over a specified period
-- `ad` = Sum of `d` values from every Repository Contract
+- `p` = Number of downloads of the target package in a specified period
+- `t` = Specified period
+- `l` = Last number of downloads(per day) for target package
+- `d` = Total downloads per day
+- `m` = Mint volume per day
+
+The basic idea is determined by the total number of downloads(per day) and the ratio of each download (per day). Every time a calculation is performed, the total download number is overridden and used for the next calculation.
 
 The equation is as follows.
 
 ```
-distributions = v * (d+b) / ad
+distributions = (p / t) / (d - l + (p / t)) * m * t
 ```
 
-The Distributor Contract mints Dev Tokens for the Repository Contract according to the number of tokens to be distributed. For this reason, the Distributor Contract should also have permission to mint Dev Tokens.
+After this calculation, `l` is overridden by the value of`(d - l + (p / t)`.
 
-When ended this calculate, the calculation reward is transferred to the sender(distributor).
+The Distributor Contract mints Dev Tokens for the Repository Contract according to the number of tokens to be distributed. For this reason, the Distributor Contract should also have permission to mint Dev Tokens.
 
 ### Receiving Distributed Tokens
 

@@ -18,23 +18,22 @@ contract Distributor is Timebased, Killable, Ownable, UseState, usingOraclize, W
 	using UintToString for uint;
 	using StringToUint for string;
 	uint public mintVolumePerDay;
-	uint public lastDistribute;
+	uint public totalDownloadsPerDay;
 	struct Request {
 		string start;
 		string end;
-		uint value;
+		uint period;
 		address invoker;
+		address package;
 	}
 	struct Query {
 		bytes32 requestId;
 		address repository;
 	}
-	mapping(bytes32 => Request) requests;
-	mapping(bytes32 => uint) oracleExpectedCallbackCounts;
-	mapping(bytes32 => Query) oraclePendingQueries;
-	mapping(bytes32 => mapping(address => uint)) downloads;
-	mapping(bytes32 => address[]) packages;
-	mapping(bytes32 => uint) totalsEachRequests;
+	mapping(address => uint) lastDistributes;
+	mapping(address => Request) requests;
+	mapping(bytes32 => address) oraclePendingQueries;
+	mapping(address => uint) lastDownloads;
 
 	event LogNewOraclizeQuery(string _description);
 	event LogDownloadsUpdated(address _repository, uint _downloads);
@@ -66,7 +65,9 @@ contract Distributor is Timebased, Killable, Ownable, UseState, usingOraclize, W
 		);
 	}
 
-	function distribute() public payable {
+	function distribute(address _repos) public payable {
+		require(isRepository(_repos), "Is't Repository Token");
+		uint lastDistribute = lastDistributes[_repos] > 0 ? lastDistributes[_repos] : baseTime.time;
 		uint yesterday = timestamp() - 1 days;
 		uint diff = BokkyPooBahsDateTimeLibrary.diffDays(
 			lastDistribute,
@@ -81,67 +82,48 @@ contract Distributor is Timebased, Killable, Ownable, UseState, usingOraclize, W
 		);
 		string memory start = dateFormat(startY, startM, startD);
 		string memory end = dateFormat(endY, endM, endD);
-		uint value = diff.mul(mintVolumePerDay);
-		calculate(start, end, value);
-		lastDistribute = timestamp();
+		requests[_repos] = Request(start, end, diff, msg.sender, _repos);
+		oracleQueryNpmDownloads(_repos);
+		lastDistributes[_repos] = timestamp();
 		msg.sender.transfer(address(this).balance);
 	}
 
 	// It is expected to be called by [Oraclize](https://docs.oraclize.it/#ethereum-quick-start).
 	function __callback(bytes32 _id, string memory _result) public {
-		Query memory query = oraclePendingQueries[_id];
+		Request memory req = requests[oraclePendingQueries[_id]];
 		if (msg.sender != oraclize_cbAddress()) {
 			revert("mismatch oraclize_cbAddress");
 		}
-		bytes32 requestId = query.requestId;
-		address repos = query.repository;
-		require(query.repository != address(0), "invalid query id");
+		address repos = req.package;
+		require(repos != address(0), "invalid query id");
 		uint count = _result.toUint(0);
-		packages[requestId].push(repos);
-		downloads[requestId][repos] = count;
 		emit LogDownloadsUpdated(repos, count);
-		oracleExpectedCallbackCounts[requestId] -= 1;
-		finishingCalculation(requestId);
-	}
-
-	function calculate(string memory _start, string memory _end, uint _value)
-		internal
-	{
-		bytes32 id = createRequestId(_start, _end);
-		requests[id] = Request(_start, _end, _value, msg.sender);
-		oracleRun(id);
-	}
-
-	function createRequestId(string memory _start, string memory _end)
-		private
-		pure
-		returns (bytes32)
-	{
-		return sha256(abi.encodePacked(_start, _end));
-	}
-
-	function oracleRun(bytes32 _reqId) private {
-		address[] memory repositories = getRepositories();
-		require(
-			oraclize_getPrice("URL").mul(repositories.length) > address(
-				this
-			).balance,
-			"All Oraclize queries were NOT sent, please add some ETH to cover for the query fee"
+		uint dailyDownloads = daily(count, req.period);
+		uint nextTotalDownloads = totalDownloadsPerDay.sub(
+			lastDownloads[repos].add(dailyDownloads)
 		);
-		for (uint i = 0; i < repositories.length; i++) {
-			address repos = repositories[i];
-			oracleExpectedCallbackCounts[_reqId] += 1;
-			oracleQueryNpmDownloads(_reqId, repos);
-		}
+		uint rate = dailyDownloads.div(nextTotalDownloads);
+		uint vol = req.period.mul(mintVolumePerDay);
+		uint value = vol.mul(rate);
+		increment(repos, value);
+		setTotalDownloadsPerDay(nextTotalDownloads);
 	}
 
-	function oracleQueryNpmDownloads(bytes32 _reqId, address _repos) private {
+	function daily(uint _downloads, uint _period) internal pure returns (uint) {
+		return _downloads.div(_period);
+	}
+
+	function setTotalDownloadsPerDay(uint _d) internal {
+		totalDownloadsPerDay = _d;
+	}
+
+	function oracleQueryNpmDownloads(address _reqrepos) private {
 		require(
 			oraclize_getPrice("URL") > address(this).balance,
 			"Oraclize query was NOT sent, please add some ETH to cover for the query fee"
 		);
-		Request memory req = requests[_reqId];
-		string memory package = Repository(_repos).getPackage();
+		Request memory req = requests[_reqrepos];
+		string memory package = Repository(req.package).getPackage();
 		string memory url = string(
 			abi.encodePacked(
 				"https://api.npmjs.org/downloads/point/",
@@ -156,27 +138,6 @@ contract Distributor is Timebased, Killable, Ownable, UseState, usingOraclize, W
 			abi.encodePacked("json(", url, ").downloads")
 		);
 		bytes32 queryId = oraclize_query("URL", param);
-		oraclePendingQueries[queryId] = Query(_reqId, _repos);
-	}
-
-	function finishingCalculation(bytes32 _reqId) private {
-		if (oracleExpectedCallbackCounts[_reqId] != 0) {
-			return;
-		}
-		emit LogFinishedAllQueries();
-
-		address[] memory pkgs = packages[_reqId];
-		for (uint i = 0; i < pkgs.length; i++) {
-			uint count = downloads[_reqId][pkgs[i]];
-			totalsEachRequests[_reqId] = totalsEachRequests[_reqId].add(count);
-		}
-		for (uint i = 0; i < pkgs.length; i++) {
-			address repos = pkgs[i];
-			uint count = downloads[_reqId][pkgs[i]];
-			totalsEachRequests[_reqId] = totalsEachRequests[_reqId].add(count);
-			uint per = count.div(totalsEachRequests[_reqId]);
-			uint value = requests[_reqId].value.mul(per);
-			increment(repos, value);
-		}
+		oraclePendingQueries[queryId] = _reqrepos;
 	}
 }
