@@ -19,6 +19,7 @@ contract Withdrawable {
 	function withdraw(address _token) public payable {
 		uint _value = calculateWithdrawableAmount(_token, msg.sender);
 		uint value = _value + pendingWithdrawals[_token][msg.sender];
+		// Should be _token is Dev
 		ERC20Mintable(_token).mint(msg.sender, value);
 		lastWithdrawalPrices[_token][msg.sender] = prices[_token];
 		pendingWithdrawals[_token][msg.sender] = 0;
