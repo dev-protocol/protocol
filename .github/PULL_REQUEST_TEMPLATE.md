@@ -1,5 +1,3 @@
-🍧🍭🍰 FREE AREA 🎪🎠🎢
-
 # Description
 
 [ Please write here what changes this pull request ]
@@ -12,7 +10,20 @@
 
 - [ ] I ran `npm run lint`
 
-# Severity
+# Dev Challenge
+
+Entry to [Dev Challenge](https://github.com/dev-protocol/repository-token/blob/master/docs/DEV_CHALLENGE.md).
+
+- [ ] I entry to Dev Challenge with this pull request
+- [ ] I don't enter to Dev Challenge with this pull request
+
+If you enter, please edit the following sections.
+
+## Address
+
+[ Please write here your wallet address(supports ERC-20) ]
+
+## Severity
 
 During the Dev Challenge, you can receive Dev tokens depending on the severity of this pull request. Please select one of your expectations.
 
