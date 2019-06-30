@@ -1,31 +1,21 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Feature request
+about: Suggest an idea for this project
 title: ''
-labels: bug
+labels: enhancement
 assignees: ''
 
 ---
 
-# Problem subject
-
-- [ ] Contracts
-- [ ] Tests
-- [ ] Other
-
-[ If other, please write here problem subject ]
-
 # Description
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-[ Please write here describe what kind of problem ]
+# Solution
+A clear and concise description of what you want to happen.
 
-# Expected behavior/contents
-
-[ Please write here the expected behavior/contents ]
-
-# Actual behavior/contents
-
-[ Please write here the actual behavior/contents ]
+# Alternatives/Features
+A clear and concise description of any alternative solutions or features you've considered.
 
 # Dev Challenge
 
