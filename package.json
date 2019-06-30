@@ -9,9 +9,9 @@
     "pretest": "npm run generate",
     "generate": "truffle compile && typechain --target truffle './build/**/*.json'",
     "ts": "tsc -p ./",
-		"lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
-		"lint:eslint": "eslint . --ext .ts,.js --fix --ignore-pattern node_modules/ --ignore-pattern types/",
-		"lint:solium": "solium --dir . --fix",
+    "lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
+    "lint:eslint": "eslint . --ext .ts,.js --fix --ignore-pattern node_modules/ --ignore-pattern types/",
+    "lint:solium": "solium --dir . --fix",
     "lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'"
   },
   "author": "aggre",
