@@ -2,14 +2,14 @@ const reposioryFactory = artifacts.require('ReposioryFactory')
 const stateContractFactory = artifacts.require('State')
 
 contract('ReposioryFactory', ([deployer]) => {
-	describe('Create new repository', () => {
-		it('Create new repository of a package')
+	describe('Create a new Repository Contract', () => {
+		it('Create a new Repository Contract of a package')
 
 		it(
-			'Should fail to create a new repository when failed authorization of npm'
+			'Should fail to create a new Repository Contract when failed authorization of npm'
 		)
 
-		it('Should fail to create a new repository of a package when the package already has a repository', async () => {
+		it('Should fail to create a new Repository Contract of a package when the package already has a Repository Contract', async () => {
 			const contract = await reposioryFactory.new({ from: deployer })
 			const state = await stateContractFactory.new({ from: deployer })
 			await state.addOperator(contract.address, { from: deployer })
@@ -28,6 +28,8 @@ contract('ReposioryFactory', ([deployer]) => {
 	describe('Destroy', () => {
 		it('Destruct this contract')
 
-		it('Fail to destruct this contract from a non-owner account')
+		it(
+			'Should fail to destruct this contract when sent from the non-owner account'
+		)
 	})
 })

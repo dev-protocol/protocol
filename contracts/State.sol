@@ -62,8 +62,4 @@ contract State is Ownable {
 	function isRepository(address _addr) public view returns (bool) {
 		return repositoriesName[repositoriesAddress[_addr]] != address(0);
 	}
-
-	function isDistributor(address _addr) public view returns (bool) {
-		return distributor == _addr;
-	}
 }

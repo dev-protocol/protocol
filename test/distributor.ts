@@ -30,7 +30,7 @@ contract('Distributor', () => {
 				the previous download count is x,
 				the current download count is y,
 				and 'mintVolumePerDay' is 5;
-				the result is y ÷ (100 - x + y) * 5`
+				the result is (y ÷ (100 - x + y) * 5)`
 			)
 
 			it(
@@ -64,6 +64,22 @@ contract('Distributor', () => {
 			)
 
 			it('When the withdrawable amount is 0, the withdrawal amount is 0')
+
+			it("When 'increment' is executed, the withdrawable amount increases")
+		})
+
+		describe('Alice has sent 800 out of 1000 tokens to Bob. Bob has increased from 200 tokens to 1000 tokens. Price is 100', () => {
+			describe('Before increment', () => {
+				it("Alice's withdrawable amount is (1000 * 100)")
+
+				it("Bob's withdrawable amount is (200 * 100)")
+			})
+
+			describe('After increment; New price is 120', () => {
+				it("Alice's withdrawable amount is (1000 * 100 + 200 * 120)")
+
+				it("Bob's withdrawable amount is (200 * 100 + 1000 * 120)")
+			})
 		})
 	})
 })

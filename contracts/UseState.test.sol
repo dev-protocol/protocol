@@ -26,8 +26,4 @@ contract UseStateTest is UseState {
 	function t_addRepository(string memory package, address repository) public {
 		addRepository(package, address(repository));
 	}
-
-	function t_isDistributor(address addr) public view returns (bool) {
-		return isDistributor(addr);
-	}
 }

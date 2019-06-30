@@ -18,7 +18,7 @@ contract('UseState', ([deployer, u1, u2]) => {
 			expect(results.toString()).to.be.equal(u1)
 		})
 
-		it('Fail to change state address from a non-owner account', async () => {
+		it('Should fail to change state address when sent from the non-owner account', async () => {
 			const state1 = await stateContract.new({ from: deployer })
 			await state1.setToken(u1, { from: deployer })
 			const contract = await useState.new({ from: deployer })
@@ -76,7 +76,7 @@ contract('UseState', ([deployer, u1, u2]) => {
 	})
 
 	describe('Repository token', () => {
-		it('Add a repository address of a package', async () => {
+		it('Add Repository Contract token address', async () => {
 			const repository = await repositoryContractUseState.new(
 				'pkg',
 				'pkg_token',
@@ -102,12 +102,24 @@ contract('UseState', ([deployer, u1, u2]) => {
 			expect(results.toString()).to.be.equal(repository.address)
 		})
 
-		it('Get all repositories address')
+		it(
+			'Should fail to add Repository Contract token address when sent from the non-operator account'
+		)
+
+		it(
+			'Should fail to add Repository Contract token address when the exists same package name'
+		)
+
+		it('Get the repository address by package name')
+
+		it('Verifying the passed address is a Repository Contract address')
+
+		it(
+			'Should fail to verify the passed address is a Repository Contract address when not exists Repository Contract'
+		)
 	})
 
-	describe('Balance', () => {
-		it(
-			'Get the utility tokens balance of all holders from a repository address stored in the state'
-		)
+	describe('Distributor', () => {
+		it('Get a Distributor Contract address')
 	})
 })

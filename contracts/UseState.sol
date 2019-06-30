@@ -37,8 +37,4 @@ contract UseState is Ownable {
 	function isRepository(address _addr) internal view returns (bool) {
 		return state().isRepository(_addr);
 	}
-
-	function isDistributor(address _addr) public view returns (bool) {
-		return state().isDistributor(_addr);
-	}
 }
