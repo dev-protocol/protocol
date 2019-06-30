@@ -3,7 +3,7 @@ const stateContract = artifacts.require('State')
 const repositoryContractUseState = artifacts.require('Repository')
 
 contract('UseState', ([deployer, u1, u2]) => {
-	describe('State', () => {
+	describe('State; changeStateAddress', () => {
 		it('Change state address', async () => {
 			const state1 = await stateContract.new({from: deployer})
 			await state1.setToken(u1, {from: deployer})
@@ -29,7 +29,9 @@ contract('UseState', ([deployer, u1, u2]) => {
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
+	})
 
+	describe('State; state', () => {
 		it('Get a State instance', async () => {
 			const state1 = await stateContract.new({from: deployer})
 			const contract = await useState.new({from: deployer})
@@ -62,7 +64,7 @@ contract('UseState', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Utility token', () => {
+	describe('Utility token; getToken', () => {
 		it('Get a token address', async () => {
 			const state1 = await stateContract.new({from: deployer})
 			await state1.setToken(u1, {from: deployer})
@@ -75,7 +77,7 @@ contract('UseState', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Repository token', () => {
+	describe('Repository token; addRepository', () => {
 		it('Add Repository Contract token address', async () => {
 			const repository = await repositoryContractUseState.new(
 				'pkg',
@@ -109,9 +111,13 @@ contract('UseState', ([deployer, u1, u2]) => {
 		it(
 			'Should fail to add Repository Contract token address when the exists same package name'
 		)
+	})
 
+	describe('Repository token; getRepository', () => {
 		it('Get the repository address by package name')
+	})
 
+	describe('Repository token; isRepository', () => {
 		it('Verifying the passed address is a Repository Contract address')
 
 		it(
@@ -119,7 +125,7 @@ contract('UseState', ([deployer, u1, u2]) => {
 		)
 	})
 
-	describe('Distributor', () => {
+	describe('Distributor; getDistributor', () => {
 		it('Get a Distributor Contract address')
 	})
 })

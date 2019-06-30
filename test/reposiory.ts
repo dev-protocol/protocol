@@ -1,9 +1,9 @@
 contract('Reposiory', () => {
-	describe('Package name', () => {
+	describe('getPackage', () => {
 		it('Get a mapped package name')
 	})
 
-	describe('Transfer', () => {
+	describe('transfer', () => {
 		it(
 			"Execute the Distributor Contract's 'beforeBalanceChange' function before the 'transfer' function changes the balance"
 		)

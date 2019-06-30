@@ -80,6 +80,18 @@ contract('Distributor', () => {
 
 				it("Bob's withdrawable amount is (200 * 100 + 1000 * 120)")
 			})
+
+			it(
+				"Should fail to execute 'beforeBalanceChange' when sent from the not Repository Contract address"
+			)
 		})
+	})
+
+	describe('kill', () => {
+		it('Destruct this contract')
+
+		it(
+			'Should fail to destruct this contract when sent from the non-owner account'
+		)
 	})
 })

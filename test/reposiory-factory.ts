@@ -2,7 +2,7 @@ const reposioryFactory = artifacts.require('ReposioryFactory')
 const stateContractFactory = artifacts.require('State')
 
 contract('ReposioryFactory', ([deployer]) => {
-	describe('Create a new Repository Contract', () => {
+	describe('createRepository', () => {
 		it('Create a new Repository Contract of a package')
 
 		it(
@@ -25,7 +25,7 @@ contract('ReposioryFactory', ([deployer]) => {
 		})
 	})
 
-	describe('Destroy', () => {
+	describe('kill', () => {
 		it('Destruct this contract')
 
 		it(
