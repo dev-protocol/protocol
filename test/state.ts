@@ -5,48 +5,20 @@ const repositoryContractState = artifacts.require('Repository')
 contract('State', ([deployer, u1, u2]) => {
 	describe('Roles; addOperator', () => {
 		it('Add operators', async () => {
-			const contract = await state.new({from: deployer})
-			await contract.addOperator(u1, {from: deployer})
-			const results = await contract.isOperator({from: u1})
+			const contract = await state.new({ from: deployer })
+			await contract.addOperator(u1, { from: deployer })
+			const results = await contract.isOperator({ from: u1 })
 			expect(results).to.be.equal(true)
 		})
 
 		it('Should fail to add operator when sent from the non-owner account', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await state.new({ from: deployer })
 			const results = await contract
-				.addOperator(u1, {from: u2})
+				.addOperator(u1, { from: u2 })
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
 	})
-
-		it('Add distributor', async () => {
-			const contract = await state.new({ from: deployer })
-			await contract.setDistributor(
-				'0x111122223333444455556666777788889999aAaa',
-				{ from: deployer }
-			)
-			const result = await contract.getDistributor({ from: deployer })
-			expect(result).to.be.equal('0x111122223333444455556666777788889999aAaa')
-		})
-
-		it('Should fail to add distributor from a non-operator account', async () => {
-			const contract = await state.new({ from: deployer })
-			const result = await contract
-				.setDistributor('0x111122223333444455556666777788889999aAaa', {
-					from: u1
-				})
-				.catch((err: Error) => err)
-			expect(result).to.instanceOf(Error)
-
-			const distributorAddress = await contract.getDistributor({
-				from: deployer
-			})
-
-			expect(distributorAddress).to.be.equal(
-				'0x0000000000000000000000000000000000000000'
-			)
-		})
 
 	describe('Roles; isOperator', () => {
 		it('Verifying the passed address is an operator address')
@@ -58,8 +30,8 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Utility token; getToken', () => {
 		it('Token default value is 0x98626E2C9231f03504273d55f397409deFD4a093.', async () => {
-			const contract = await state.new({from: deployer})
-			const results = await contract.getToken({from: deployer})
+			const contract = await state.new({ from: deployer })
+			const results = await contract.getToken({ from: deployer })
 			expect(results.toString()).to.be.equal(
 				'0x98626E2C9231f03504273d55f397409deFD4a093'
 			)
@@ -68,16 +40,16 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Utility token; setToken', () => {
 		it('Change the value of the token address', async () => {
-			const contract = await state.new({from: deployer})
-			await contract.setToken(u1, {from: deployer})
-			const results = await contract.getToken({from: deployer})
+			const contract = await state.new({ from: deployer })
+			await contract.setToken(u1, { from: deployer })
+			const results = await contract.getToken({ from: deployer })
 			expect(results.toString()).to.be.equal(u1)
 		})
 
 		it('Should fail to change the utility token address when sent from the non-owner account', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await state.new({ from: deployer })
 			const results = await contract
-				.setToken(u1, {from: u2})
+				.setToken(u1, { from: u2 })
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
@@ -95,8 +67,8 @@ contract('State', ([deployer, u1, u2]) => {
 					from: deployer
 				}
 			)
-			const contract = await state.new({from: deployer})
-			await contract.addOperator(deployer, {from: deployer})
+			const contract = await state.new({ from: deployer })
+			await contract.addOperator(deployer, { from: deployer })
 			const results = await contract.addRepository('pkg', repository.address, {
 				from: deployer
 			})
@@ -114,9 +86,9 @@ contract('State', ([deployer, u1, u2]) => {
 					from: deployer
 				}
 			)
-			const contract = await state.new({from: deployer})
+			const contract = await state.new({ from: deployer })
 			const results = await contract
-				.addRepository('pkg', repository.address, {from: deployer})
+				.addRepository('pkg', repository.address, { from: deployer })
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
@@ -132,8 +104,8 @@ contract('State', ([deployer, u1, u2]) => {
 					from: deployer
 				}
 			)
-			const contract = await state.new({from: deployer})
-			await contract.addOperator(deployer, {from: deployer})
+			const contract = await state.new({ from: deployer })
+			await contract.addOperator(deployer, { from: deployer })
 			await contract.addRepository('pkg', repository.address, {
 				from: deployer
 			})
@@ -158,8 +130,8 @@ contract('State', ([deployer, u1, u2]) => {
 					from: deployer
 				}
 			)
-			const contract = await state.new({from: deployer})
-			await contract.addOperator(deployer, {from: deployer})
+			const contract = await state.new({ from: deployer })
+			await contract.addOperator(deployer, { from: deployer })
 			await contract.addRepository('pkg', repository.address, {
 				from: deployer
 			})
@@ -177,14 +149,61 @@ contract('State', ([deployer, u1, u2]) => {
 	})
 
 	describe('Distributor; getDistributor', () => {
-		it('Get a Distributor Contract address')
+		it('Get a Distributor Contract address', async () => {
+			const contract = await state.new({ from: deployer })
+			await contract.setDistributor(
+				'0x111122223333444455556666777788889999aAaa',
+				{ from: deployer }
+			)
+			const result = await contract.getDistributor({ from: deployer })
+			expect(result).to.be.equal('0x111122223333444455556666777788889999aAaa')
+		})
 	})
 
 	describe('Distributor; setDistributor', () => {
-		it('Change a Distributor Contract address')
+		it('Change a Distributor Contract address', async () => {
+			const contract = await state.new({ from: deployer })
 
-		it(
-			'Should fail to change a Distributor Contract address when sent from the non-owner account'
-		)
+			const distributorAddress = await contract.getDistributor({
+				from: deployer
+			})
+
+			expect(distributorAddress).to.be.equal(
+				'0x0000000000000000000000000000000000000000'
+			)
+
+			await contract.setDistributor(
+				'0x111122223333444455556666777788889999aAaa',
+				{
+					from: deployer
+				}
+			)
+
+			const changedDistributorAddress = await contract.getDistributor({
+				from: deployer
+			})
+
+			expect(changedDistributorAddress).to.be.equal(
+				'0x111122223333444455556666777788889999aAaa'
+			)
+		})
+
+		it('Should fail to change a Distributor Contract address when sent from the non-owner account', async () => {
+			const contract = await state.new({ from: deployer })
+			const result = await contract
+				.setDistributor('0x111122223333444455556666777788889999aAaa', {
+					from: u1
+				})
+				.catch((err: Error) => err)
+			expect(result).to.instanceOf(Error)
+
+			const distributorAddress = await contract.getDistributor({
+				from: deployer
+			})
+
+			expect(distributorAddress).to.be.equal(
+				'0x0000000000000000000000000000000000000000'
+			)
+		})
 	})
 })
