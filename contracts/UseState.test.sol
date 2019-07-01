@@ -1,5 +1,4 @@
 pragma solidity ^0.5.0;
-pragma experimental ABIEncoderV2;
 
 import "./UseState.sol";
 
@@ -26,13 +25,5 @@ contract UseStateTest is UseState {
 
 	function t_addRepository(string memory package, address repository) public {
 		addRepository(package, address(repository));
-	}
-
-	function t_getRepositories() public view returns (address[] memory) {
-		return getRepositories();
-	}
-
-	function t_isDistributor(address addr) public view returns (bool) {
-		return isDistributor(addr);
 	}
 }

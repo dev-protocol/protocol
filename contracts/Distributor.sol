@@ -13,7 +13,14 @@ import "./modules/oraclizeAPI_0.5.sol";
 import "./Repository.sol";
 import "./UseState.sol";
 
-contract Distributor is Timebased, Killable, Ownable, UseState, usingOraclize, Withdrawable {
+contract Distributor is
+	Timebased,
+	Killable,
+	Ownable,
+	UseState,
+	usingOraclize,
+	Withdrawable
+{
 	using SafeMath for uint;
 	using UintToString for uint;
 	using StringToUint for string;
@@ -59,19 +66,19 @@ contract Distributor is Timebased, Killable, Ownable, UseState, usingOraclize, W
 
 	function distribute(address _repos) public payable {
 		require(isRepository(_repos), "Is't Repository Token");
-		uint lastDistribute = lastDistributes[_repos] > 0 ? lastDistributes[_repos] : baseTime.time;
+		uint lastDistribute = lastDistributes[_repos] > 0
+			? lastDistributes[_repos]
+			: baseTime.time;
 		uint yesterday = timestamp() - 1 days;
 		uint diff = BokkyPooBahsDateTimeLibrary.diffDays(
 			lastDistribute,
 			yesterday
 		);
 		require(diff >= 1, "Expected an interval is one day or more");
-		(uint startY, uint startM, uint startD) = BokkyPooBahsDateTimeLibrary.timestampToDate(
-			lastDistribute
-		);
-		(uint endY, uint endM, uint endD) = BokkyPooBahsDateTimeLibrary.timestampToDate(
-			yesterday
-		);
+		(uint startY, uint startM, uint startD) = BokkyPooBahsDateTimeLibrary
+			.timestampToDate(lastDistribute);
+		(uint endY, uint endM, uint endD) = BokkyPooBahsDateTimeLibrary
+			.timestampToDate(yesterday);
 		string memory start = dateFormat(startY, startM, startD);
 		string memory end = dateFormat(endY, endM, endD);
 		requests[_repos] = Request(start, end, diff, msg.sender, _repos);

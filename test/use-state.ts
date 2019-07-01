@@ -3,11 +3,11 @@ const stateContract = artifacts.require('State')
 const repositoryContractUseState = artifacts.require('Repository')
 
 contract('UseState', ([deployer, u1, u2]) => {
-	describe('State', () => {
+	describe('State; changeStateAddress', () => {
 		it('Change state address', async () => {
-			const state1 = await stateContract.new({ from: deployer })
-			await state1.setToken(u1, { from: deployer })
-			const contract = await useState.new({ from: deployer })
+			const state1 = await stateContract.new({from: deployer})
+			await state1.setToken(u1, {from: deployer})
+			const contract = await useState.new({from: deployer})
 			const token = await contract.t_getToken().catch((err: Error) => err)
 			expect(token).to.instanceOf(Error)
 
@@ -18,10 +18,10 @@ contract('UseState', ([deployer, u1, u2]) => {
 			expect(results.toString()).to.be.equal(u1)
 		})
 
-		it('Fail to change state address from a non-owner account', async () => {
-			const state1 = await stateContract.new({ from: deployer })
-			await state1.setToken(u1, { from: deployer })
-			const contract = await useState.new({ from: deployer })
+		it('Should fail to change state address when sent from the non-owner account', async () => {
+			const state1 = await stateContract.new({from: deployer})
+			await state1.setToken(u1, {from: deployer})
+			const contract = await useState.new({from: deployer})
 			const results = await contract
 				.changeStateAddress(state1.address, {
 					from: u2
@@ -29,10 +29,12 @@ contract('UseState', ([deployer, u1, u2]) => {
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
+	})
 
+	describe('State; state', () => {
 		it('Get a State instance', async () => {
-			const state1 = await stateContract.new({ from: deployer })
-			const contract = await useState.new({ from: deployer })
+			const state1 = await stateContract.new({from: deployer})
+			const contract = await useState.new({from: deployer})
 			await contract.changeStateAddress(state1.address, {
 				from: deployer
 			})
@@ -43,11 +45,11 @@ contract('UseState', ([deployer, u1, u2]) => {
 		})
 
 		it('After the state address has changed, returns a new State instance', async () => {
-			const state1 = await stateContract.new({ from: deployer })
-			await state1.setToken(u1, { from: deployer })
-			const state2 = await stateContract.new({ from: deployer })
-			await state2.setToken(u2, { from: deployer })
-			const contract = await useState.new({ from: deployer })
+			const state1 = await stateContract.new({from: deployer})
+			await state1.setToken(u1, {from: deployer})
+			const state2 = await stateContract.new({from: deployer})
+			await state2.setToken(u2, {from: deployer})
+			const contract = await useState.new({from: deployer})
 			await contract.changeStateAddress(state1.address, {
 				from: deployer
 			})
@@ -62,11 +64,11 @@ contract('UseState', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Utility token', () => {
+	describe('Utility token; getToken', () => {
 		it('Get a token address', async () => {
-			const state1 = await stateContract.new({ from: deployer })
-			await state1.setToken(u1, { from: deployer })
-			const contract = await useState.new({ from: deployer })
+			const state1 = await stateContract.new({from: deployer})
+			await state1.setToken(u1, {from: deployer})
+			const contract = await useState.new({from: deployer})
 			await contract.changeStateAddress(state1.address, {
 				from: deployer
 			})
@@ -75,8 +77,8 @@ contract('UseState', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Repository token', () => {
-		it('Add a repository address of a package', async () => {
+	describe('Repository token; addRepository', () => {
+		it('Add Repository Contract token address', async () => {
 			const repository = await repositoryContractUseState.new(
 				'pkg',
 				'pkg_token',
@@ -87,12 +89,12 @@ contract('UseState', ([deployer, u1, u2]) => {
 					from: deployer
 				}
 			)
-			const state = await stateContract.new({ from: deployer })
-			const contract = await useState.new({ from: deployer })
+			const state = await stateContract.new({from: deployer})
+			const contract = await useState.new({from: deployer})
 			await contract.changeStateAddress(state.address, {
 				from: deployer
 			})
-			await state.addOperator(contract.address, { from: deployer })
+			await state.addOperator(contract.address, {from: deployer})
 			await contract.t_addRepository('pkg', repository.address, {
 				from: deployer
 			})
@@ -102,12 +104,28 @@ contract('UseState', ([deployer, u1, u2]) => {
 			expect(results.toString()).to.be.equal(repository.address)
 		})
 
-		it('Get all repositories address')
+		it(
+			'Should fail to add Repository Contract token address when sent from the non-operator account'
+		)
+
+		it(
+			'Should fail to add Repository Contract token address when the exists same package name'
+		)
 	})
 
-	describe('Balance', () => {
+	describe('Repository token; getRepository', () => {
+		it('Get the repository address by package name')
+	})
+
+	describe('Repository token; isRepository', () => {
+		it('Verifying the passed address is a Repository Contract address')
+
 		it(
-			'Get the utility tokens balance of all holders from a repository address stored in the state'
+			'Should fail to verify the passed address is a Repository Contract address when not exists Repository Contract'
 		)
+	})
+
+	describe('Distributor; getDistributor', () => {
+		it('Get a Distributor Contract address')
 	})
 })

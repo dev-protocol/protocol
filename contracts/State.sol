@@ -4,7 +4,6 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract State is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
-	address[] public repositories;
 	address public distributor;
 	mapping(address => bool) internal operator;
 	mapping(string => address) internal repositoriesName;
@@ -50,7 +49,6 @@ contract State is Ownable {
 		);
 		repositoriesName[package] = repository;
 		repositoriesAddress[repository] = package;
-		repositories.push(repository);
 	}
 
 	function getRepository(string memory package)
@@ -61,15 +59,7 @@ contract State is Ownable {
 		return repositoriesName[package];
 	}
 
-	function getRepositories() public view returns (address[] memory) {
-		return repositories;
-	}
-
 	function isRepository(address _addr) public view returns (bool) {
 		return repositoriesName[repositoriesAddress[_addr]] != address(0);
-	}
-
-	function isDistributor(address _addr) public view returns (bool) {
-		return distributor == _addr;
 	}
 }

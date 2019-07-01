@@ -11,9 +11,11 @@ library StringToUint {
 		uint mint = 0;
 		bool decimals = false;
 		for (uint i = 0; i < bresult.length; i++) {
-			if ((uint(uint8(bresult[i])) >= 48) && (uint(
-				uint8(bresult[i])
-			) <= 57)) {
+			if (
+				(uint(uint8(bresult[i])) >= 48) && (
+					uint(uint8(bresult[i])) <= 57
+				)
+			) {
 				if (decimals) {
 					if (b == 0) {
 						break;
