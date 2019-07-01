@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-expressions *
+/* eslint-disable no-unused-expressions */
 const state = artifacts.require('State')
 const repositoryContractState = artifacts.require('Repository')
 
