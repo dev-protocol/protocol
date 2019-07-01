@@ -19,9 +19,33 @@ contract('State', ([deployer, u1, u2]) => {
 			expect(results).to.instanceOf(Error)
 		})
 
-		it('Add distributor')
+		it('Add distributor', async () => {
+			const contract = await state.new({ from: deployer })
+			await contract.setDistributor(
+				'0x111122223333444455556666777788889999aAaa',
+				{ from: deployer }
+			)
+			const result = await contract.getDistributor({ from: deployer })
+			expect(result).to.be.equal('0x111122223333444455556666777788889999aAaa')
+		})
 
-		it('Should fail to add distributor from a non-operator account')
+		it('Should fail to add distributor from a non-operator account', async () => {
+			const contract = await state.new({ from: deployer })
+			const result = await contract
+				.setDistributor('0x111122223333444455556666777788889999aAaa', {
+					from: u1
+				})
+				.catch((err: Error) => err)
+			expect(result).to.instanceOf(Error)
+
+			const distributorAddress = await contract.getDistributor({
+				from: deployer
+			})
+
+			expect(distributorAddress).to.be.equal(
+				'0x0000000000000000000000000000000000000000'
+			)
+		})
 	})
 
 	describe('Utility token', () => {
