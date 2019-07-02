@@ -12,7 +12,7 @@ Whitepaper: https://github.com/dev-protocol/repository-token/blob/master/docs/WH
 
 ## Dev Challenge
 
-The developer reward program for this project is coming soon. [Check the details.](https://github.com/dev-protocol/repository-token/blob/master/docs/DEV_CHALLENGE.md)
+The developer reward program for this project is taking place. [Check the details.](https://github.com/dev-protocol/repository-token/blob/master/docs/DEV_CHALLENGE.md)
 
 ## How to contribute:
 
