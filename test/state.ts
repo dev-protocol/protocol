@@ -21,11 +21,18 @@ contract('State', ([deployer, u1, u2]) => {
 	})
 
 	describe('Roles; isOperator', () => {
-		it('Verifying the passed address is an operator address')
+		it('Verifying the passed address is an operator address', async () => {
+			const contract = await state.new({from: deployer})
+			await contract.addOperator(u1, {from: deployer})
+			const results = await contract.isOperator({from: u1})
+			expect(results).to.be.equal(true)
+		})
 
-		it(
-			'Should fail to verify the passed address is an operator address when not exists in operators'
-		)
+		it('Should fail to verify the passed address is an operator address when not exists in operators', async () => {
+			const contract = await state.new({from: deployer})
+			const results = await contract.isOperator({from: u2})
+			expect(results).to.be.equal(false)
+		})
 	})
 
 	describe('Utility token; getToken', () => {
@@ -141,11 +148,32 @@ contract('State', ([deployer, u1, u2]) => {
 	})
 
 	describe('Repository token; isRepository', () => {
-		it('Verifying the passed address is a Repository Contract address')
+		it('Verifying the passed address is a Repository Contract address', async () => {
+			const address = '0x111122223333444455556666777788889999aAaa'
+			const contract = await state.new({from: deployer})
+			await contract.addOperator(deployer, {from: deployer})
+			await contract.addRepository('pkg', address, {
+				from: deployer
+			})
+			const results = await contract.isRepository(address)
+			expect(results).to.be.equal(true)
+		})
 
-		it(
-			'Should fail to verify the passed address is a Repository Contract address when not exists Repository Contract'
-		)
+		it('Should fail to verify the passed address is a Repository Contract address when not exists Repository Contract', async () => {
+			const contract = await state.new({from: deployer})
+			await contract.addOperator(deployer, {from: deployer})
+			await contract.addRepository(
+				'pkg',
+				'0x40da26927c9d53106c0ca47608a4fdadf1ab6d29',
+				{
+					from: deployer
+				}
+			)
+			const results = await contract.isRepository(
+				'0x111122223333444455556666777788889999aAaa'
+			)
+			expect(results).to.be.equal(false)
+		})
 	})
 
 	describe('Distributor; getDistributor', () => {
