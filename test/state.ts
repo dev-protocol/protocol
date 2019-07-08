@@ -1,18 +1,19 @@
 /* eslint-disable no-unused-expressions */
-const state = artifacts.require('State')
-const repositoryContractState = artifacts.require('Repository')
 
 contract('State', ([deployer, u1, u2]) => {
+	const stateContract = artifacts.require('State')
+	const repositoryContract = artifacts.require('Repository')
+
 	describe('Roles; addOperator', () => {
 		it('Add operators', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			await contract.addOperator(u1, {from: deployer})
 			const results = await contract.isOperator({from: u1})
 			expect(results).to.be.equal(true)
 		})
 
 		it('Should fail to add operator when sent from the non-owner account', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			const results = await contract
 				.addOperator(u1, {from: u2})
 				.catch((err: Error) => err)
@@ -22,14 +23,14 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Roles; isOperator', () => {
 		it('Verifying the passed address is an operator address', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			await contract.addOperator(u1, {from: deployer})
 			const results = await contract.isOperator({from: u1})
 			expect(results).to.be.equal(true)
 		})
 
 		it('Should fail to verify the passed address is an operator address when not exists in operators', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			const results = await contract.isOperator({from: u2})
 			expect(results).to.be.equal(false)
 		})
@@ -37,7 +38,7 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Utility token; getToken', () => {
 		it('Token default value is 0x98626E2C9231f03504273d55f397409deFD4a093.', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			const results = await contract.getToken({from: deployer})
 			expect(results.toString()).to.be.equal(
 				'0x98626E2C9231f03504273d55f397409deFD4a093'
@@ -47,14 +48,14 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Utility token; setToken', () => {
 		it('Change the value of the token address', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			await contract.setToken(u1, {from: deployer})
 			const results = await contract.getToken({from: deployer})
 			expect(results.toString()).to.be.equal(u1)
 		})
 
 		it('Should fail to change the utility token address when sent from the non-owner account', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			const results = await contract
 				.setToken(u1, {from: u2})
 				.catch((err: Error) => err)
@@ -64,7 +65,7 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Repository token; addRepository', () => {
 		it('Add Repository Contract token address', async () => {
-			const repository = await repositoryContractState.new(
+			const repository = await repositoryContract.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -74,7 +75,7 @@ contract('State', ([deployer, u1, u2]) => {
 					from: deployer
 				}
 			)
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			await contract.addOperator(deployer, {from: deployer})
 			const results = await contract.addRepository('pkg', repository.address, {
 				from: deployer
@@ -83,7 +84,7 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Should fail to add Repository Contract token address when sent from the non-operator account', async () => {
-			const repository = await repositoryContractState.new(
+			const repository = await repositoryContract.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -93,7 +94,7 @@ contract('State', ([deployer, u1, u2]) => {
 					from: deployer
 				}
 			)
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			const results = await contract
 				.addRepository('pkg', repository.address, {from: deployer})
 				.catch((err: Error) => err)
@@ -101,7 +102,7 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Should fail to add Repository Contract token address when the exists same package name', async () => {
-			const repository = await repositoryContractState.new(
+			const repository = await repositoryContract.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -111,7 +112,7 @@ contract('State', ([deployer, u1, u2]) => {
 					from: deployer
 				}
 			)
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			await contract.addOperator(deployer, {from: deployer})
 			await contract.addRepository('pkg', repository.address, {
 				from: deployer
@@ -127,7 +128,7 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Repository token; getRepository', () => {
 		it('Get the repository address by package name', async () => {
-			const repository = await repositoryContractState.new(
+			const repository = await repositoryContract.new(
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -137,7 +138,7 @@ contract('State', ([deployer, u1, u2]) => {
 					from: deployer
 				}
 			)
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			await contract.addOperator(deployer, {from: deployer})
 			await contract.addRepository('pkg', repository.address, {
 				from: deployer
@@ -150,7 +151,7 @@ contract('State', ([deployer, u1, u2]) => {
 	describe('Repository token; isRepository', () => {
 		it('Verifying the passed address is a Repository Contract address', async () => {
 			const address = '0x111122223333444455556666777788889999aAaa'
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			await contract.addOperator(deployer, {from: deployer})
 			await contract.addRepository('pkg', address, {
 				from: deployer
@@ -160,7 +161,7 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Should fail to verify the passed address is a Repository Contract address when not exists Repository Contract', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			await contract.addOperator(deployer, {from: deployer})
 			await contract.addRepository(
 				'pkg',
@@ -178,7 +179,7 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Distributor; getDistributor', () => {
 		it('Get a Distributor Contract address', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			await contract.setDistributor(
 				'0x111122223333444455556666777788889999aAaa',
 				{from: deployer}
@@ -190,7 +191,7 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Distributor; setDistributor', () => {
 		it('Change a Distributor Contract address', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 
 			const distributorAddress = await contract.getDistributor({
 				from: deployer
@@ -217,7 +218,7 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Should fail to change a Distributor Contract address when sent from the non-owner account', async () => {
-			const contract = await state.new({from: deployer})
+			const contract = await stateContract.new({from: deployer})
 			const result = await contract
 				.setDistributor('0x111122223333444455556666777788889999aAaa', {
 					from: u1

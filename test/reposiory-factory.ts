@@ -1,7 +1,7 @@
-const reposioryFactory = artifacts.require('ReposioryFactory')
-const stateContractFactory = artifacts.require('State')
-
 contract('ReposioryFactory', ([deployer]) => {
+	const reposioryFactoryContract = artifacts.require('ReposioryFactory')
+	const stateContract = artifacts.require('State')
+
 	describe('createRepository', () => {
 		it('Create a new Repository Contract of a package')
 
@@ -10,8 +10,8 @@ contract('ReposioryFactory', ([deployer]) => {
 		)
 
 		it('Should fail to create a new Repository Contract of a package when the package already has a Repository Contract', async () => {
-			const contract = await reposioryFactory.new({from: deployer})
-			const state = await stateContractFactory.new({from: deployer})
+			const contract = await reposioryFactoryContract.new({from: deployer})
+			const state = await stateContract.new({from: deployer})
 			await state.addOperator(contract.address, {from: deployer})
 			await contract.changeStateAddress(state.address, {from: deployer})
 			await contract.createRepository('pkg', {from: deployer})
