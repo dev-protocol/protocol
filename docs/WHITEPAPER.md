@@ -1,109 +1,139 @@
-# Dev Repository Token Whitepaper
+# Dev Protocol Whitepaper
 
-Version: **`0.3.0`**
+Version: **`1.0.0`**
 
 _This whitepaper may be updated. When updating, the version number is incremented according to [Semantic Versioning](https://semver.org/)._
 
-###### tags: `Dev`, `Dev Repository Token`
-
 ## Introduction
 
-Dev Repository Token is a token that treats repositories of open source software (OSS) like securities. It can monetize OSS without changing its licensing or code, and solves the issue of sustainability in OSS.
+Dev Protocol is a protocol that treats various non-economic properties to like securities. For example, It can monetize OSS without changing its licensing or code and solves the issue of sustainability in OSS.
 
-Dev Repository Token is made up of Repository Contracts and that Factory Contract, Distributor Contracts and the State Contract. The Repository Contract is an ERC-20 token, which is paired with a piece of OSS. After the number of downloads of the OSS has been comparatively evaluated by the Distributor Contract, the Repository Contract uses this evaluation to distribute Dev Tokens to holders of the Repository Contract. The State Contract serves to maintain the relationship between the Repository Contract and the OSS.
-
-By functioning like securities for OSS, Dev Repository Token creates an incentive for OSS developers to develop better OSS. The developers and companies that rely on a particular piece of OSS can purchase the Dev Repository Tokens for that software, which is effectively donating to the developers, but can also be expected to provide a financial return in future.
+Dev Protocol is made up of Property Contracts, Allocator Contracts, State Contract, and the Market Contract. The Property Contract is an ERC-20 token, which is paired with a piece of non-economic property. After the index value of the property has been comparatively evaluated by the Allocator Contract, the Property Contract uses this evaluation to distribute Dev Tokens to holders of the Property Contract. The State Contract serves to maintain each state.
 
 This piece uses simplified pseudo code to explain concepts.
 
 ## Overview
 
-The core of Dev Repository Token is made up of an exchangeable Repository Contract (Repository Token) attached to a particular piece of OSS, and the Dev Tokens distributed to the holders of that contract.
+The core of Dev Protocol is made up of an exchangeable Property Contract (Property Token) attached to a particular piece of non-economic property, and the Dev Tokens distributed to the holders of that contract.
 
-Dev Repository Token is ERC-20 compliant, and can be bought and sold freely. Owner of this protocol does not charge any transaction processing fees.
+Dev Protocol is ERC-20 compliant and can be bought and sold freely. Owner of this protocol does not charge any transaction processing fees.
 
-Dev Repository Token holders have the right to receive Dev Tokens. The number of Dev Tokens distributed to an individual is determined by the number of Dev Repository Tokens they possess. The total number they receive will be determined by the rating of the OSS mapped to their Dev Repository Tokens.
+Dev Protocol holders have the right to receive Dev Tokens. The number of Dev Tokens distributed to an individual is determined by the number of Property Token they possess. The total number they receive will be determined by the rating of the non-economic property mapped to their Dev Protocols.
 
-Users in possession of Dev Repository Tokens for highly rated OSS will be given more. For OSS projects in the early stages of development, giving Dev Repository Tokens to contributors can provide motivation for more active project development.
+Dev Protocol allows anyone to add markets for the non-economic property.
+
+The market created by a Market Contract and is available once it is certified by the votes of the Dev Token holders.
 
 ![Overview](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Overview.png)
 
 ### Life Cycle
 
-The life cycle of Dev Repository Contract begins when an OSS developer issues a Repository Contract.
+The life cycle of Dev Protocol begins when a non-economic property owner issues a Property Contract.
 
-When an OSS developer issues a Repository Contract mapped to their OSS, they own 100% of those tokens. This balance will change when they transfer them to others.
+When non-economic property owner issues a Property Contract mapped to their property, they own 100% of those tokens. This balance will change when they transfer them to others.
 
-The Repository Contracts are ERC-20 compliant, so you can transfer them at will. In the future, we hope to create a decentralized exchange where you can list Repository contracts when you issue them.
+The Property Contracts are ERC-20 compliant, so you can transfer them at will. In the future, we hope to create a decentralized exchange where you can list Property contracts when you issue them.
 
 ![Create](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Create.png)
 
-When a Distributor Contract is created, Repository Contracts become able to receive Dev Tokens. Repository Contract holders can withdraw Dev Tokens depending on their current balance.
-When running distributions rates calculation by Distributor Contract, Repository Contracts holders become able to receive Dev Tokens. Repository Contract holders can withdraw Dev Tokens depending on their current balance.
+When Allocator Contract's `allocate` function is called, Property Contracts become able to receive Dev Tokens. Property Contract holders can withdraw Dev Tokens depending on their current balance.
 
-The number of Dev Tokens received depends on the number of times the OSS has been downloaded. Repository Contract holders can then trade their Dev Tokens on the exchange.
+The number of Dev Tokens received depends on the index value of the non-economic property. Property Contract holders can then trade their Dev Tokens on the exchanges.
 
 ![Distribute](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Disribute.png)
 
-## Repository Contract
+## Property Contract
+The Property Contract is a smart contract created by the Market Contract's `createProperty()` function. Property Contracts are always created in a one-to-one relationship with owned non-economic property. The Property Contract token is ERC-20 compliant and can be transferred to any address.
 
-The Repository Contract is a smart contract created by the Repository Factory Contract's `createRepository()` function. Repository Contracts are always created in a one-to-one relationship with OSS. The Repository Contract token is ERC-20 compliant, and can be transferred to any address.
+Every Property Contract holder will receive Dev Tokens. The number received for each Property Contract will be evaluated/decided by the Allocator Contract.
 
-**Note:** At present, the only types of OSS that can be registered as Repository Contracts are those published as npm packages.
+### Creating Property Contract
 
-Every Repository Contract holder will receive Dev Tokens. The number received for each Repository Contract will be evaluated/decided by the Distributor Contract.
+The Market Contract's `createProperty()` function creates a new Property Contract.
 
-### Creating Repository Contract
+The function takes the information required to authenticate the owner as an argument. In most cases, this information the property URL and a read-only token.
 
-The Repository Factory Contract's `createRepository()` function creates a new Repository Contract.
-
-The function takes the remote repository URL, the npm package name, and the npm read-only token as arguments.
-
-After someone is recognized as an npm package owner by the npm read-only token, an ERC-20 compliant Repository Contract is created with fixed variables `totalSupply` and `decimals`.
+After someone is recognized as a non-economic property owner, an ERC-20 compliant Property Contract is created with fixed variables `totalSupply` and `decimals`.
 
 **Note:** To make it easy for developers to register, and to make it easier to calculate the value, `totalSupply` and `decimals` must be fixed.
 
-The relationship between the Repository Contract address and the OSS is mapped by a State Contract.
+The relationship between the Property Contract address and the non-economic property is mapped by a State Contract.
 
-## Distributor Contract
+### Investing in Property
 
-The Distributor Contract role is calculating distributions and withdrawing tokens. Distributor Contracts use the number of times the OSS has been downloaded to calculate how many Dev Tokens to distribute to the Repository Contract. And, withdrawing tokens by requests from each user.
+Property Contract supports third-party investments.
+
+Call the Property Contact's `invest` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and receives the new-minted Property Contract as compensation.
+
+The number of new Property Contract issuances is determined by the ratio to the cumulative number of received Dev Tokens in the Property Contract. The ratio is multiplied by the Property Contract's `totalSupply` to obtain the number of new issuances.
+
+Investors hold part of the Property Contract. In other words, the investor can receive part of Dev Token that Property Contract receives. Investing against a highly growing Property Contract means increasing your Dev Token.
+
+However, it should be kept in mind that non-economic properties do not inherently make a profit. This market is a minus-sum in the long run.
+
+Invest in the Property Contract mean supporting the market for non-economic properties.
+
+Investors will be withdrawing Dev Token when their property turns positive and there will be watching the activity of next investors.
+
+The Property Contract held by the investor can not be transferred to anyone; And, burn when withdrawn distributed Dev Token.
+
+### Total Investment Value ≒ Next Total Allocate Value
+
+Each time an investment is added, the total allocate value for all Property Contracts is updated.
+
+The total investment and the total distribution are not equal because the investment acceleration is taken into account as a factor.
+
+The following pseudo-code figure the logic to update the variable `mintPerBlock` used for the next total allocate value.
+
+```sol
+uint initialInvestBlock;
+uint prevInvestBlock;
+uint totalInvests;
+uint mintPerBlock;
+
+function updateAllocateValue(uint _value) internal {
+	totalInvests += _value;
+	uint totalInvestsPerBlock = totalInvests / (block.number - initialInvestBlock);
+	uint lastInvestsPerBlock = _value / (block.number - prevInvestBlock);
+	uint acceleration = lastInvestsPerBlock / totalInvestsPerBlock;
+	prevInvestBlock = block.number;
+	mintPerBlock = totalInvestsPerBlock * acceleration;
+}
+```
+
+### Support to Property
+
+Property Contract supports backers.
+
+Call the Property Contact's `back` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and the increase withdrawable amount of Property Contract holders.
+
+## Allocator Contract
+
+The Allocator Contract role is calculating distributions and withdrawing tokens. Allocator Contracts use the index value of non-economic property to calculate how many Dev Tokens to distribute to the Property Contract. And, withdrawing tokens by requests from each user.
 
 The distributes calculation requires access to information outside the blockchain, so Oraclize is used.
 
 Oraclize requires ETH to use, so calculate function is a `payable` function.
 
-### Running Distributor Contract
+### Running Allocator Contract
 
-The Distributor Contract contains the variable `mintVolumePerDay`, which is set beforehand, and this value represents how many will be issued per day. The previous date of execution is recorded in the self contract, and the period between the previous execution and the day before the next one is defined as the target period. The target period must be longer than one day.
+The Allocator Contract contains the variable `mintPerBlock`, which is set beforehand, and this value represents how many will be issued per day. The previous date of execution is recorded in the self contract, and the period between the previous execution and the day before the next one is defined as the target period. The target period must be longer than one day.
 
-The number of new issues that will create the funding for the distribution is calculated as `mintVolumePerDay` multiplied by the length of the target period.
-
-### Setting Mint Volume
-
-The value of `mintVolumePerDay` is updated by executing the Distributor Factory Contract's `setMintVolumePerDay()` function.
-
-```sol
-function setMintVolumePerDay(uint _vol) public onlyOwner {
-    mintVolumePerDay = _vol;
-}
-```
-
-**Note:** This operation is carried out by the owner of the Distributor Contract, but in future, we believe that a decision under a governance model would be better.
+The number of new issues that will create the funding for the distribution is calculated as `mintPerBlock` multiplied by the length of the target period.
 
 ### Calculating Distributions
 
-The calculation of the number of distributions is through by the Distributor Contracts `distribution()` function.
+The calculation of the number of distributions is through by the Allocator Contracts `allocate()` function.
 
-The Repository Contract's distribution calculation uses the following variables.
+The Property Contract's distribution calculation uses the following variables.
 
-- `p` = Number of downloads of the target package in a specified period
+- `p` = The index value of the target property in a specified period
 - `t` = Specified period
-- `l` = Last number of downloads(per day) for target package
-- `d` = Total downloads per day
-- `m` = Mint volume per day
+- `l` = Last index value(per day) for the target property
+- `d` = Total index value per day
+- `m` = Mint volume per day(actually, this is a block)
 
-The basic idea is determined by the total number of downloads(per day) and the ratio of each download (per day). Every time a calculation is performed, the total download number is overridden and used for the next calculation.
+The basic idea is determined by the total index value(per day) and the ratio of each index value(per day). Every time a calculation is performed, the total index value is overridden and used for the next calculation.
 
 The equation is as follows.
 
@@ -113,24 +143,24 @@ distributions = (p / t) / (d - l + (p / t)) * m * t
 
 After this calculation, `l` is overridden by the value of`(d - l + (p / t)`.
 
-The Distributor Contract mints Dev Tokens for the Repository Contract according to the number of tokens to be distributed. For this reason, the Distributor Contract should also have permission to mint Dev Tokens.
+The Allocator Contract mints Dev Tokens for the Property Contract according to the number of tokens to be distributed. For this reason, the Allocator Contract should also have permission to mint Dev Tokens.
 
 ### Receiving Distributed Tokens
 
-Dev Tokens can be received when the user account invokes the Distributor Contract's `withdraw()` function.
+Dev Tokens can be received when the user account invokes the Allocator Contract's `withdraw()` function.
 
-The Distributor Contract records the total number of distributed tokens as `totals`, and the total value of distributed tokens as `prices`, each Repository.
+The Allocator Contract records the total number of distributed tokens as `totals`, and the total value of distributed tokens as `prices`, each Property.
 
 ```sol
 mapping(address => uint) totals;
 mapping(address => uint) prices;
 ```
 
-When the user account invokes the `withdraw()` function, the user can receive a number of Dev Tokens equal to `price` multiplied by the user's balance in the Repository Contract. The `price` variable at this time is mapped to the user account in the Repository Contract, and it will be deducted from the value the next time the same account invokes the `withdraw()` function. In this way, the amount withdrawn will not exceed the maximum amount that can be withdrawn by one person.
+When the user account invokes the `withdraw()` function, the user can receive a number of Dev Tokens equal to `price` multiplied by the user's balance in the Property Contract. The `price` variable at this time is mapped to the user account in the Property Contract, and it will be deducted from the value the next time the same account invokes the `withdraw()` function. In this way, the amount withdrawn will not exceed the maximum amount that can be withdrawn by one person.
 
 #### Calculating Price
 
-The Distributor Contract's `increment()` function adds the rating given by the Distributor Contract to `total` and `price`.
+The Allocator Contract's `increment()` function adds the rating given by the Allocator Contract to `total` and `price`.
 
 ```sol
 function increment(address _repository, uint _value) internal {
@@ -141,7 +171,7 @@ function increment(address _repository, uint _value) internal {
 
 #### Withdrawing Tokens
 
-The Distributor Contract's `withdraw()` function will deposit into the user's account as many Dev Tokens as they can receive. The processing fee for this transaction is a quantity of ETH equivalent to the value of `oraclize_getPrice("URL")`. This is usually a small amount. This processing fee is deposited into the Distributor Contract and will be used for the calculation of the next distribution.
+The Allocator Contract's `withdraw()` function will deposit into the user's account as many Dev Tokens as they can receive. The processing fee for this transaction is a quantity of ETH equivalent to the value of `oraclize_getPrice("URL")`. This is usually a small amount. This processing fee is deposited into the Allocator Contract and will be used for the calculation of the next distribution.
 
 The value of `prices[_repository]` after executing `withdraw()` will be mapped in each user account, and subtracted from withdrawing amount the next time `withdraw()` is called. The value of `prices[_repository]` is constantly added to. For that reason, subtracting the previous value of `prices[_repository]` is the same as withdrawing the value received from the previous execution until the present.
 
@@ -182,12 +212,12 @@ function calculateWithdrawableAmount(address _repository, address _user)
 
 This calculation is only completed when the user account's balance is fixed. Hence, before the balance is changed, `lastWithdrawalPrices` and `pendingWithdrawals` must be updated. Also, when the balance is changed, a withdrawal limit will be set for the recipient. This withdrawal limit only applies while `total[_repository]` is the same. Like `price[_repository]`, the value of `total[_repository]` is constantly added to. Creating a withdrawal limit for that recipient when the balance is changed means that the amount that can be withdrawn is determined by the balance at the time of last distribution.
 
-This is what the implementation of Repository Contract's `transfer()` function looks like.
+This is what the implementation of Property Contract's `transfer()` function looks like.
 
 ```sol
-// Repository Contract (ERC-20)
+// Property Contract (ERC-20)
 function transfer(address to, uint256 value) public returns (bool) {
-    Distributor(distributor).beforeBalanceChange(
+    Allocator(allocatorAddress).beforeBalanceChange(
         address(this),
         msg.sender,
         to
@@ -198,7 +228,7 @@ function transfer(address to, uint256 value) public returns (bool) {
 ```
 
 ```sol
-// Distributor Contract
+// Allocator Contract
 function beforeBalanceChange(address _token, address _from, address _to) public {
     lastWithdrawalPrices[_token][_from] = prices[_token];
     lastWithdrawalPrices[_token][_to] = prices[_token];
@@ -213,37 +243,41 @@ function beforeBalanceChange(address _token, address _from, address _to) public 
 }
 ```
 
-`beforeBalanceChange` function affects the withdrawable amount in the account, so this invokes ability should be restricted to each Repository Contract.
+`beforeBalanceChange` function affects the withdrawable amount in the account, so this invokes ability should be restricted to each Property Contract.
+
+## Market Contract
+
+// WIP
 
 ## State Contract
 
-The State Contract is a smart contract whose purpose is to make the state of the Dev Repository Tokens permanent.
+The State Contract is a smart contract whose purpose is to make the state of the Dev Protocols permanent.
 
-The Repository Contract's address and the name of the OSS also and Distributor Contract's address is mapped on the State Contract. It also includes several getter/setter functions to control this mapping.
+The Property Contract's address and the name of the property also and Allocator Contract's address is mapped on the State Contract. It also includes several getter/setter functions to control this mapping.
 
-We can save a similar mapping without using the State Contract and just using the Repository Factory Contract or the Distributor Contract. But the reason you have to use the State Contract is in the differences between life cycles.
+We can save a similar mapping without using the State Contract and just using the Property Factory Contract or the Allocator Contract. But the reason you have to use the State Contract is in the differences between life cycles.
 
-When an upgrade for the Repository Contract arises, there is a chance that multiple versions of the Repository Factory Contract will exist. Ideally, the Dev Repository Tokens would maintain a single state even if multiple Repository Factory Contracts are in existence. That is why a State Contract is prepared.
+When an upgrade for the Property Contract arises, there is a chance that multiple versions of the Property Contract will exist. Ideally, the Dev Protocols would maintain a single state even if multiple Property Contracts are in existence. That is why a State Contract is prepared.
 
 ### Operator
 
 The only accounts that can change the state of the State Contract are accounts included in `operator`.
 
-Only the Repository Factory Contract is included in `operator`. Whenever the Repository Factory Contract creates a new Repository Contract, the State Contract is updated. The state of the State Contract affects the validation of a Repository Contract when it is created, so this ability should be restricted to the Repository Factory Contract.
+Only the Market Contract is included in `operator`. Whenever the Market Contract creates a new Property Contract, the State Contract is updated. The state of the State Contract affects the validation of a Property Contract when it is created, so this ability should be restricted to the Market Contract.
 
-### Adding Repository Contract Address
+### Adding Property Contract Address
 
-The State Contract's `addRepository()` function maps a Repository Contract to a piece of OSS.
+The State Contract's `addProperty()` function maps a Property Contract to a piece of property.
 
-It takes the name of the OSS and the Repository Contract address as arguments.
+It takes the name of the property and the Property Contract address as arguments.
 
-The State Contract must prevent OSS that has already been registered from being registered multiple times. This is because the state of the State Contract affects the calculation of Dev Tokens to be distributed.
+The State Contract must prevent property that has already been registered from being registered multiple times. This is because the state of the State Contract affects the calculation of Dev Tokens to be distributed.
 
-For this reason, only the Repository Factory Contract can call `addRepository()`, and the property used in the Repository Factory Contract's authentication process should be used as a unique key.
+For this reason, only the Market Contract can call `addProperty()`, and the property used in the Market Contract's authentication process should be used as a unique key.
 
-## Develop Dev Repository Token
+## Develop Dev Protocol
 
-Dev Repository Token is OSS. Anyone can participate in its development.
+Dev Protocol is OSS. Anyone can participate in its development.
 
 GitHub: https://github.com/dev-protocol/repository-token
 Discord: https://discord.gg/VwJp4KM
