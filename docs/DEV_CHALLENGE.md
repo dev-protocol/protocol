@@ -18,10 +18,10 @@ Here are the Dev Challenge rules:
 1. The reward is [Dev token](https://etherscan.io/token/0x98626e2c9231f03504273d55f397409defd4a093).
 1. Set the severity points for each pull requests. The severity points are determined by your self-assessment and agreement with the assessment by this project owner. Its detail is described in the section of Severity.
 1. In the case of a pull request that fixes a known issue, if the issue is reported by others who have already entered, then divide severity points the issue reporter and resolver. Its ratio is described in the section of Severity.
-1. The reward is 3 DEV for severity points 1.
+1. The reward is 12 DEV for severity points 1.
 1. Send rewards on the 20th of every month.
 1. The rewards are the cumulative severity points of pull requests merged from the 19th of this month to the 20th of the last month multiplied by the DEV rate.
-1. As soon as the distribution of XXXX DEV is completed, Dev Challenge ends.
+1. As soon as the distribution of 111,690 DEV is completed, Dev Challenge ends.
 1. In any case, Dev Challenge ends on December 20, 2019.
 
 ## Severity
