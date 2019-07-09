@@ -21,7 +21,7 @@ Here are the Dev Challenge rules:
 1. The reward is 3 DEV for severity points 1.
 1. Send rewards on the 20th of every month.
 1. The rewards are the cumulative severity points of pull requests merged from the 19th of this month to the 20th of the last month multiplied by the DEV rate.
-1. As soon as the distribution of XXXX DEV is completed, Dev Challenge ends.
+1. As soon as the distribution of 111,690 DEV is completed, Dev Challenge ends.
 1. In any case, Dev Challenge ends on December 20, 2019.
 
 ## Severity
