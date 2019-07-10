@@ -126,6 +126,17 @@ contract('UseState', ([deployer, u1, u2]) => {
 	})
 
 	describe('Distributor; getDistributor', () => {
-		it('Get a Distributor Contract address')
+		it('Get a Distributor Contract address', async () => {
+			const state = await stateContract.new({from: deployer})
+			await state.setDistributor('0x111122223333444455556666777788889999aAaa', {
+				from: deployer
+			})
+			const contract = await useStateContract.new({from: deployer})
+			await contract.changeStateAddress(state.address, {
+				from: deployer
+			})
+			const results = await contract.t_getDistributor()
+			expect(results).to.be.equal('0x111122223333444455556666777788889999aAaa')
+		})
 	})
 })
