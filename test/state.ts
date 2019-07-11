@@ -177,23 +177,11 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Distributor; getDistributor', () => {
-		it('Get a Distributor Contract address', async () => {
-			const contract = await stateContract.new({from: deployer})
-			await contract.setDistributor(
-				'0x111122223333444455556666777788889999aAaa',
-				{from: deployer}
-			)
-			const result = await contract.getDistributor({from: deployer})
-			expect(result).to.be.equal('0x111122223333444455556666777788889999aAaa')
-		})
-	})
-
 	describe('Distributor; setDistributor', () => {
 		it('Change a Distributor Contract address', async () => {
 			const contract = await stateContract.new({from: deployer})
 
-			const distributorAddress = await contract.getDistributor({
+			const distributorAddress = await contract.distributor({
 				from: deployer
 			})
 
@@ -208,7 +196,7 @@ contract('State', ([deployer, u1, u2]) => {
 				}
 			)
 
-			const changedDistributorAddress = await contract.getDistributor({
+			const changedDistributorAddress = await contract.distributor({
 				from: deployer
 			})
 
@@ -226,7 +214,7 @@ contract('State', ([deployer, u1, u2]) => {
 				.catch((err: Error) => err)
 			expect(result).to.instanceOf(Error)
 
-			const distributorAddress = await contract.getDistributor({
+			const distributorAddress = await contract.distributor({
 				from: deployer
 			})
 

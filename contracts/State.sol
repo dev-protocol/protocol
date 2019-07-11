@@ -34,10 +34,6 @@ contract State is Ownable {
 		return token;
 	}
 
-	function getDistributor() public view returns (address) {
-		return distributor;
-	}
-
 	function addRepository(string memory package, address repository)
 		public
 		onlyOperator
