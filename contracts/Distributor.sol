@@ -122,7 +122,7 @@ contract Distributor is
 			"Oraclize query was NOT sent, please add some ETH to cover for the query fee"
 		);
 		Request memory req = requests[_reqrepos];
-		string memory package = Repository(req.package).getPackage();
+		string memory package = Repository(req.package).package();
 		string memory url = string(
 			abi.encodePacked(
 				"https://api.npmjs.org/downloads/point/",
