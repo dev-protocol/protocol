@@ -20,10 +20,6 @@ contract Repository is ERC20, ERC20Detailed, Ownable, UseState {
 		_mint(msg.sender, supply);
 	}
 
-	function getPackage() public view returns (string memory) {
-		return package;
-	}
-
 	function transfer(address to, uint256 value) public returns (bool) {
 		address distributor = getDistributor();
 		Distributor(distributor).beforeBalanceChange(

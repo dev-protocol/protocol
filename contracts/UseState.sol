@@ -15,7 +15,7 @@ contract UseState is Ownable {
 	}
 
 	function getDistributor() internal view returns (address) {
-		return state().getDistributor();
+		return state().distributor();
 	}
 
 	function getToken() internal view returns (address) {
