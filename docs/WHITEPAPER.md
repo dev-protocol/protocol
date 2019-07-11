@@ -24,23 +24,35 @@ Dev Protocol allows anyone to add markets for the non-economic property.
 
 The market created by a Market Contract and is available once it is certified by the votes of the Dev Token holders.
 
-![Overview](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Overview.png)
+![Overview](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/Overview.png)
 
 ### Life Cycle
 
-The life cycle of Dev Protocol begins when a non-economic property owner issues a Property Contract.
+The life cycle of Dev Protocol begins when a create a Market Contract.
+
+Market Contract allows non-economic property owners to generate their own Property Contract.
 
 When non-economic property owner issues a Property Contract mapped to their property, they own 100% of those tokens. This balance will change when they transfer them to others.
 
 The Property Contracts are ERC-20 compliant, so you can transfer them at will. In the future, we hope to create a decentralized exchange where you can list Property contracts when you issue them.
 
-![Create](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Create.png)
+![Create Market](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/CreateMarket.png)
+
+![Create Property](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/CreateProperty.png)
 
 When Allocator Contract's `allocate` function is called, Property Contracts become able to receive Dev Tokens. Property Contract holders can withdraw Dev Tokens depending on their current balance.
 
 The number of Dev Tokens received depends on the index value of the non-economic property. Property Contract holders can then trade their Dev Tokens on the exchanges.
 
-![Distribute](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Disribute.png)
+![Allocate](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/Allocate.png)
+
+Property Contract can also accept third party investments and contributions.
+
+Investments and contributions can be made free from an external contract called Relayer.
+
+![Invest](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/Invest.png)
+
+![Contribution](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/Contribution.png)
 
 ## Property Contract
 
