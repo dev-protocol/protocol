@@ -43,6 +43,7 @@ The number of Dev Tokens received depends on the index value of the non-economic
 ![Distribute](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Disribute.png)
 
 ## Property Contract
+
 The Property Contract is a smart contract created by the Market Contract's `createProperty()` function. Property Contracts are always created in a one-to-one relationship with owned non-economic property. The Property Contract token is ERC-20 compliant and can be transferred to any address.
 
 Every Property Contract holder will receive Dev Tokens. The number received for each Property Contract will be evaluated/decided by the Allocator Contract.
@@ -63,9 +64,9 @@ The relationship between the Property Contract address and the non-economic prop
 
 Property Contract supports third-party investments.
 
-Call the Property Contact's `invest` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and receives the new-minted Property Contract as compensation.
+Call the Property Contact's `increase` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and receives the new-minted Property Contract as compensation.
 
-The number of new Property Contract issuances is determined by the ratio to the cumulative number of received Dev Tokens in the Property Contract. The ratio is multiplied by the Property Contract's `totalSupply` to obtain the number of new issuances.
+The number of new Property Contract issuances is determined by the ratio to the cumulative number of received Dev Tokens in the Property Contract. The ratio is multiplied by the Property Contract's `totalSupply` to obtain the number of new issuances. In order to protect members of non-economic property, the composition of investors should be limited to a maximum of 50%.
 
 Investors hold part of the Property Contract. In other words, the investor can receive part of Dev Token that Property Contract receives. Investing against a highly growing Property Contract means increasing your Dev Token.
 
@@ -77,35 +78,47 @@ Investors will be withdrawing Dev Token when their property turns positive and t
 
 The Property Contract held by the investor can not be transferred to anyone; And, burn when withdrawn distributed Dev Token.
 
-### Total Investment Value ≒ Next Total Allocate Value
-
-Each time an investment is added, the total allocate value for all Property Contracts is updated.
-
-The total investment and the total distribution are not equal because the investment acceleration is taken into account as a factor.
-
-The following pseudo-code figure the logic to update the variable `mintPerBlock` used for the next total allocate value.
-
-```sol
-uint initialInvestBlock;
-uint prevInvestBlock;
-uint totalInvests;
-uint mintPerBlock;
-
-function updateAllocateValue(uint _value) internal {
-	totalInvests += _value;
-	uint totalInvestsPerBlock = totalInvests / (block.number - initialInvestBlock);
-	uint lastInvestsPerBlock = _value / (block.number - prevInvestBlock);
-	uint acceleration = lastInvestsPerBlock / totalInvestsPerBlock;
-	prevInvestBlock = block.number;
-	mintPerBlock = totalInvestsPerBlock * acceleration;
-}
-```
-
 ### Support to Property
 
 Property Contract supports backers.
 
-Call the Property Contact's `back` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and the increase withdrawable amount of Property Contract holders.
+Call the Property Contact's `contribute` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and the increase withdrawable amount of Property Contract holders.
+
+### Total Contribute Value ≒ Next Total Allocated Value
+
+Each time a contribution is added, the total allocate value for all Property Contracts is updated.
+
+The total contribution and the total distribution are not equal because the contribute acceleration is taken into account as a factor.
+
+The following pseudo-code figure the logic to update the variable `mintPerBlock` used for the next total allocate value.
+
+```sol
+uint initialContributionBlock;
+uint prevContributionBlock;
+uint totalContributions;
+uint totalAllocation;
+uint mintPerBlock;
+
+function updateAllocateValue(uint _value) internal {
+	totalContributions += _value;
+	uint totalContributionsPerBlock = totalContributions / (block.number - initialContributionBlock);
+	uint lastContributionPerBlock = _value / (block.number - prevContributionBlock);
+	uint acceleration = lastContributionPerBlock / totalContributionsPerBlock;
+	prevContributionBlock = block.number;
+	totalAllocation += _value * acceleration;
+	mintPerBlock = totalContributionsPerBlock * acceleration;
+}
+```
+
+### Contribution Relayer/Invest Relayer
+
+Calling a Property Contract's `contribute` or `increase` function is restricted to third-party contracts.
+
+The third-party contract is called Contribution Relayer/Invest Relayer.
+
+By opening the Property Contract's money collection function to Relayer, users can enjoy the benefits provided by Relayer. It could, for example, be the ability to send a message at the same time as a money transfer, get a pledge from the Property Contract owner, etc.
+
+For these reasons, the execution of the `contribute` and `increase` functions should be limited to the contract account on Ethreum.
 
 ## Allocator Contract
 
@@ -117,7 +130,7 @@ Oraclize requires ETH to use, so calculate function is a `payable` function.
 
 ### Running Allocator Contract
 
-The Allocator Contract contains the variable `mintPerBlock`, which is set beforehand, and this value represents how many will be issued per day. The previous date of execution is recorded in the self contract, and the period between the previous execution and the day before the next one is defined as the target period. The target period must be longer than one day.
+The Allocator Contract contains the variable `mintPerBlock`, which is set beforehand, and this value represents how many will be issued per day. And, the value of `totalAllocation` indicates the total number of allocations. The previous date of execution is recorded in the self contract, and the period between the previous execution and the day before the next one is defined as the target period. The target period must be longer than one day.
 
 The number of new issues that will create the funding for the distribution is calculated as `mintPerBlock` multiplied by the length of the target period.
 
@@ -140,6 +153,8 @@ The equation is as follows.
 ```
 distributions = (p / t) / (d - l + (p / t)) * m * t
 ```
+
+This calculated value should be subtracted from `totalAllocation`. It should be noted that if the calculated value exceeds `totalAllocation`, need to use `totalAllocation` as the calculated value.
 
 After this calculation, `l` is overridden by the value of`(d - l + (p / t)`.
 
@@ -185,7 +200,6 @@ mapping(address => mapping(address => uint)) internal pendingWithdrawals;
 mapping(address => mapping(address => WithdrawalLimit)) internal withdrawalLimits;
 
 function withdraw(address _repository) public payable {
-    DEPOSIT(); // Deposit a fee to this contract.
     uint _value = calculateWithdrawableAmount(_repository, msg.sender);
     uint value = _value + pendingWithdrawals[_repository][msg.sender];
     ERC20(token).mint(msg.sender, value);
@@ -247,7 +261,19 @@ function beforeBalanceChange(address _token, address _from, address _to) public 
 
 ## Market Contract
 
-// WIP
+Market Contract is created by Market Factory Contract. Market Contract manages indicators of non-economic properties. Market Contract guarantees the authenticity of the property and its valuation. Everyone is free to create Market Contract, but only those approved by a vote are enabled.
+
+### Creating Market
+
+The Market Factory Contract's `createMarket()` function creates a new Market Contract.
+
+The function takes the Authentication Query and Index Query as strings.
+
+Authentication Query defines oraclize method for authentication the owner. Index Query defines oraclize method for fetch index value each property.
+
+The new Market Contract will be activated upon a vote by the Dev Token owner.
+
+The balance of the voter's Dev Token determines the importance of one vote. Voting chooses yes/no. When the total number of votes reaches 10% of the total Dev Token total supply, the Market Contract becomes effective if the number of positive votes exceeds the negative ones.
 
 ## State Contract
 
