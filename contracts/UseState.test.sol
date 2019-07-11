@@ -27,7 +27,7 @@ contract UseStateTest is UseState {
 		addRepository(package, address(repository));
 	}
 
-    function t_getDistributor() public view returns (address) {
+	function t_getDistributor() public view returns (address) {
 		return state().distributor();
 	}
 
