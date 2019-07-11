@@ -28,7 +28,7 @@ contract UseStateTest is UseState {
 	}
 
 	function t_getDistributor() public view returns (address) {
-		return state().distributor();
+		return getDistributor();
 	}
 
 }
