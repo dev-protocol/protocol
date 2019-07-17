@@ -6,21 +6,21 @@ _This whitepaper may be updated. When updating, the version number is incremente
 
 ## Introduction
 
-Dev Protocol is a protocol that treats various non-economic properties to like securities. For example, It can monetize OSS without changing its licensing or code and solves the issue of sustainability in OSS.
+Dev Protocol is a protocol that treats various Internet assets to like securities. For example, It can monetize OSS without changing its licensing or code and solves the issue of sustainability in OSS.
 
-Dev Protocol is made up of Property Contracts, Allocator Contracts, State Contract, and the Market Contract. The Property Contract is an ERC-20 token, which is paired with a piece of non-economic property. After the index value of the property has been comparatively evaluated by the Allocator Contract, the Property Contract uses this evaluation to distribute Dev Tokens to holders of the Property Contract. The State Contract serves to maintain each state.
+Dev Protocol is made up of Property Contracts, Allocator Contracts, State Contract, and the Market Contract. The Property Contract is an ERC-20 token, which is paired with a piece of Internet asset. After the index value of the property has been comparatively evaluated by the Allocator Contract, the Property Contract uses this evaluation to distribute Dev Tokens to holders of the Property Contract. The State Contract serves to maintain each state.
 
 This piece uses simplified pseudo code to explain concepts.
 
 ## Overview
 
-The core of Dev Protocol is made up of an exchangeable Property Contract (Property Token) attached to a particular piece of non-economic property, and the Dev Tokens distributed to the holders of that contract.
+The core of Dev Protocol is made up of an exchangeable Property Contract (Property Token) attached to a particular piece of Internet asset, and the Dev Tokens distributed to the holders of that contract.
 
 Dev Protocol is ERC-20 compliant and can be bought and sold freely. Owner of this protocol does not charge any transaction processing fees.
 
-Dev Protocol holders have the right to receive Dev Tokens. The number of Dev Tokens distributed to an individual is determined by the number of Property Token they possess. The total number they receive will be determined by the rating of the non-economic property mapped to their Dev Protocols.
+Dev Protocol holders have the right to receive Dev Tokens. The number of Dev Tokens distributed to an individual is determined by the number of Property Token they possess. The total number they receive will be determined by the rating of the Internet asset mapped to their Dev Protocols.
 
-Dev Protocol allows anyone to add markets for the non-economic property.
+Dev Protocol allows anyone to add markets for the Internet asset.
 
 The market created by a Market Contract and is available once it is certified by the votes of the Dev Token holders.
 
@@ -30,9 +30,9 @@ The market created by a Market Contract and is available once it is certified by
 
 The life cycle of Dev Protocol begins when a create a Market Contract.
 
-Market Contract allows non-economic property owners to generate their own Property Contract.
+Market Contract allows Internet asset owners to generate their own Property Contract.
 
-When non-economic property owner issues a Property Contract mapped to their property, they own 100% of those tokens. This balance will change when they transfer them to others.
+When Internet asset owner issues a Property Contract mapped to their property, they own 100% of those tokens. This balance will change when they transfer them to others.
 
 The Property Contracts are ERC-20 compliant, so you can transfer them at will. In the future, we hope to create a decentralized exchange where you can list Property contracts when you issue them.
 
@@ -42,7 +42,7 @@ The Property Contracts are ERC-20 compliant, so you can transfer them at will. I
 
 When Allocator Contract's `allocate` function is called, Property Contracts become able to receive Dev Tokens. Property Contract holders can withdraw Dev Tokens depending on their current balance.
 
-The number of Dev Tokens received depends on the index value of the non-economic property. Property Contract holders can then trade their Dev Tokens on the exchanges.
+The number of Dev Tokens received depends on the index value of the Internet asset. Property Contract holders can then trade their Dev Tokens on the exchanges.
 
 ![Allocate](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/Allocate.png)
 
@@ -56,7 +56,7 @@ Investments and contributions can be made free from an external contract called 
 
 ## Property Contract
 
-The Property Contract is a smart contract created by the Market Contract's `createProperty()` function. Property Contracts are always created in a one-to-one relationship with owned non-economic property. The Property Contract token is ERC-20 compliant and can be transferred to any address.
+The Property Contract is a smart contract created by the Market Contract's `createProperty()` function. Property Contracts are always created in a one-to-one relationship with owned Internet asset. The Property Contract token is ERC-20 compliant and can be transferred to any address.
 
 Every Property Contract holder will receive Dev Tokens. The number received for each Property Contract will be evaluated/decided by the Allocator Contract.
 
@@ -66,11 +66,11 @@ The Market Contract's `createProperty()` function creates a new Property Contrac
 
 The function takes the information required to authenticate the owner as an argument. In most cases, this information the property URL and a read-only token.
 
-After someone is recognized as a non-economic property owner, an ERC-20 compliant Property Contract is created with fixed variables `totalSupply` and `decimals`.
+After someone is recognized as a Internet asset owner, an ERC-20 compliant Property Contract is created with fixed variables `totalSupply` and `decimals`.
 
 **Note:** To make it easy for developers to register, and to make it easier to calculate the value, `totalSupply` and `decimals` must be fixed.
 
-The relationship between the Property Contract address and the non-economic property is mapped by a State Contract.
+The relationship between the Property Contract address and the Internet asset is mapped by a State Contract.
 
 ### Investing in Property
 
@@ -78,13 +78,13 @@ Property Contract supports third-party investments.
 
 Call the Property Contact's `increase` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and receives the new-minted Property Contract as compensation.
 
-The number of new Property Contract issuances is determined by the ratio to the cumulative number of received Dev Tokens in the Property Contract. The ratio is multiplied by the Property Contract's `totalSupply` to obtain the number of new issuances. In order to protect members of non-economic property, the composition of investors should be limited to a maximum of 50%.
+The number of new Property Contract issuances is determined by the ratio to the cumulative number of received Dev Tokens in the Property Contract. The ratio is multiplied by the Property Contract's `totalSupply` to obtain the number of new issuances. In order to protect members of Internet asset, the composition of investors should be limited to a maximum of 50%.
 
 Investors hold part of the Property Contract. In other words, the investor can receive part of Dev Token that Property Contract receives. Investing against a highly growing Property Contract means increasing your Dev Token.
 
-However, it should be kept in mind that non-economic properties do not inherently make a profit. This market is a minus-sum in the long run.
+However, it should be kept in mind that Internet assets do not inherently make a profit. This market is a minus-sum in the long run.
 
-Invest in the Property Contract mean supporting the market for non-economic properties.
+Invest in the Property Contract mean supporting the market for Internet assets.
 
 Investors will be withdrawing Dev Token when their property turns positive and there will be watching the activity of next investors.
 
@@ -134,7 +134,7 @@ For these reasons, the execution of the `contribute` and `increase` functions sh
 
 ## Allocator Contract
 
-The Allocator Contract role is calculating distributions and withdrawing tokens. Allocator Contracts use the index value of non-economic property to calculate how many Dev Tokens to distribute to the Property Contract. And, withdrawing tokens by requests from each user.
+The Allocator Contract role is calculating distributions and withdrawing tokens. Allocator Contracts use the index value of Internet asset to calculate how many Dev Tokens to distribute to the Property Contract. And, withdrawing tokens by requests from each user.
 
 The distributes calculation requires access to information outside the blockchain, so Oraclize is used.
 
@@ -273,7 +273,7 @@ function beforeBalanceChange(address _token, address _from, address _to) public 
 
 ## Market Contract
 
-Market Contract is created by Market Factory Contract. Market Contract manages indicators of non-economic properties. Market Contract guarantees the authenticity of the property and its valuation. Everyone is free to create Market Contract, but only those approved by a vote are enabled.
+Market Contract is created by Market Factory Contract. Market Contract manages indicators of Internet assets. Market Contract guarantees the authenticity of the property and its valuation. Everyone is free to create Market Contract, but only those approved by a vote are enabled.
 
 ### Creating Market
 
