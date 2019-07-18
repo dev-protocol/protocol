@@ -1,4 +1,4 @@
-contract('Reposiory', ([deployer, u1, u2]) => {
+contract('Reposiory', ([deployer]) => {
 	const repositoryContract = artifacts.require('Repository')
 
 	describe('getPackage', () => {
