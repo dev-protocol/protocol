@@ -64,13 +64,21 @@ Every Property Contract holder will receive Dev Tokens. The number received for 
 
 The Market Contract's `createProperty()` function creates a new Property Contract.
 
-The function takes the information required to authenticate the owner as an argument. In most cases, this information the property URL and a read-only token.
+To create a new Property Contract, it needs a property identity that expected ownership authentication. The owner of Property Contract is initially zero address, and the owner's authentication is performed asynchronously.
 
-After someone is recognized as a Internet asset owner, an ERC-20 compliant Property Contract is created with fixed variables `totalSupply` and `decimals`.
+The state where the owner's authentication has not completed is called _unauthorized_.
 
 **Note:** To make it easy for developers to register, and to make it easier to calculate the value, `totalSupply` and `decimals` must be fixed.
 
 The relationship between the Property Contract address and the Internet asset is mapped by a State Contract.
+
+### Authenticate Owner
+
+The Market Contract's `authentication()` function authenticate owner and set owner address the Property Contract.
+
+The balance held by the zero address in the Property Contract is transfer to the authorized account's address.
+
+The function takes the information required to authenticate the owner as an argument. In most cases, this information read-only token.
 
 ### Investing in Property
 
@@ -94,11 +102,15 @@ The Property Contract held by the investor can not be transferred to anyone; And
 
 Property Contract supports backers.
 
-Call the Property Contact's `contribute` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and the increase withdrawable amount of Property Contract holders.
+Call the Property Contact's `contribute()` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and the increase withdrawable amount of Property Contract holders.
+
+#### Canceling Contribution
+
+Contributors can withdraw their contribution only if the Property Contract is unauthorized.
 
 ### Total Contribute Value ≒ Next Total Allocated Value
 
-Each time a contribution is added, the total allocate value for all Property Contracts is updated.
+Each time a contribution is added or subtracted, the total allocate value for all Property Contracts is updated.
 
 The total contribution and the total distribution are not equal because the contribute acceleration is taken into account as a factor.
 
