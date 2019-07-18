@@ -166,11 +166,11 @@ The Property Contract's distribution calculation uses the following variables.
 
 - `p` = The index value of the target property in a specified period
 - `t` = Specified period
-- `l` = Last index value(per day) for the target property
-- `d` = Total index value per day
-- `m` = Mint volume per day(actually, this is a block)
+- `l` = Last index value(per block) for the target property
+- `d` = Total index value per block
+- `m` = Mint volume per block
 
-The basic idea is determined by the total index value(per day) and the ratio of each index value(per day). Every time a calculation is performed, the total index value is overridden and used for the next calculation.
+The basic idea is determined by the total index value(per block) and the ratio of each index value(per block). Every time a calculation is performed, the total index value is overridden and used for the next calculation.
 
 The equation is as follows.
 
@@ -180,7 +180,7 @@ distributions = (p / t) / (d - l + (p / t)) * m * t
 
 This calculated value should be subtracted from `totalAllocation`. It should be noted that if the calculated value exceeds `totalAllocation`, need to use `totalAllocation` as the calculated value.
 
-After this calculation, `l` is overridden by the value of`(d - l + (p / t)`.
+After this calculation, `d` is overridden by the value of`(d - l + (p / t)`.
 
 The Allocator Contract mints Dev Tokens for the Property Contract according to the number of tokens to be distributed. For this reason, the Allocator Contract should also have permission to mint Dev Tokens.
 
@@ -291,13 +291,46 @@ Market Contract is created by Market Factory Contract. Market Contract manages i
 
 The Market Factory Contract's `createMarket()` function creates a new Market Contract.
 
-The function takes the Authentication Query and Index Query as strings.
-
-Authentication Query defines oraclize method for authentication the owner. Index Query defines oraclize method for fetch index value each property.
+This function takes a contract address that defines Market Contract's behavior.
 
 The new Market Contract will be activated upon a vote by the Dev Token owner.
 
 The balance of the voter's Dev Token determines the importance of one vote. Voting chooses yes/no. When the total number of votes reaches 10% of the total Dev Token total supply, the Market Contract becomes effective if the number of positive votes exceeds the negative ones.
+
+### Contract as a behavior
+
+A contract as a behavior requires two public functions, `authentication()` and `index()`.
+
+`authentication()` function is called when authenticating the owner of Property Contract.
+
+`index()` function is called by the Allocator Contract to calculate the number of new distributions to the Property Contract. It gets the metrics of the Property Contract mapped Internet asset and expect to call the `updateIndex()`of the Allocator Contract.
+
+The interface of this contract looks like this:
+
+```sol
+contract Behavior {
+	string public schema;
+
+	function authentication(
+		address _prop,
+		string memory _args1,
+		string memory _args2,
+		string memory _args3,
+		string memory _args4,
+		string memory _args5
+	) public returns (bool);
+
+	function index(address _prop, uint _start, uint _end) public returns (bool);
+}
+```
+
+`authentication()` function can take up to five arguments in addition to the target Property Contract address. Need to define `schema` as a JSON string as an array to indicate what each argument should mean.
+
+It looks like this, for example:
+
+```sol
+string public schema = "['read-only token', 'Your namespace', 'More something']";
+```
 
 ## State Contract
 
