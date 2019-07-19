@@ -4,38 +4,26 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "./modules/BokkyPooBahsDateTimeLibrary.sol";
-import "./libs/UintToString.sol";
-import "./libs/StringToUint.sol";
 import "./libs/Killable.sol";
 import "./libs/Timebased.sol";
 import "./libs/Withdrawable.sol";
-import "./modules/oraclizeAPI_0.5.sol";
 import "./Property.sol";
 import "./Market.sol";
 import "./UseState.sol";
 
-contract Allocator is
-	Timebased,
-	Killable,
-	Ownable,
-	UseState,
-	usingOraclize,
-	Withdrawable
-{
+contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 	using SafeMath for uint;
-	using UintToString for uint;
-	using StringToUint for string;
 
-	mapping(address => uint) lastDistributionTime;
-	mapping(address => uint) lastDistributionBlock;
+	mapping(address => uint) lastAllocationTimeEachProperty;
+	mapping(address => uint) lastAllocationBlockEachProperty;
+	mapping(address => uint) lastAllocationValueEachProperty;
+	mapping(address => uint) lastTotalAllocationValuePerBlockEachMarket;
+
+	mapping(address => uint) initialContributionBlockEachMarket;
+	mapping(address => uint) lastContributionBlockEachMarket;
+	mapping(address => uint) totalContributionValueEachMarket;
+	mapping(address => uint) totalAllocationValueEachMarket;
 	mapping(address => bool) pendingIncrements;
-	mapping(address => uint) lastDistributionValuePerBlock;
-	mapping(address => uint) lastTotalDistributionValuePerBlock;
-
-	mapping(address => uint) initialContributionBlock;
-	mapping(address => uint) prevContributionBlock;
-	mapping(address => uint) totalContributions;
-	mapping(address => uint) totalAllocation;
 	mapping(address => uint) mintPerBlock;
 
 	function setSecondsPerBlock(uint _sec) public onlyOwner {
@@ -46,26 +34,26 @@ contract Allocator is
 		address prop = msg.sender;
 		require(isProperty(prop), "Is't Property Contract");
 		address market = Property(prop).market();
-		totalContributions[market] += _value;
-		uint totalContributionsPerBlock = totalContributions[market] / (
-			block.number - initialContributionBlock[market]
+		totalContributionValueEachMarket[market] += _value;
+		uint totalContributionsPerBlock = totalContributionValueEachMarket[market] / (
+			block.number - initialContributionBlockEachMarket[market]
 		);
 		uint lastContributionPerBlock = _value / (
-			block.number - prevContributionBlock[market]
+			block.number - lastContributionBlockEachMarket[market]
 		);
 		uint acceleration = lastContributionPerBlock / totalContributionsPerBlock;
-		totalAllocation[market] += _value * acceleration;
+		totalAllocationValueEachMarket[market] += _value * acceleration;
 		mintPerBlock[market] = totalContributionsPerBlock * acceleration;
 
 		if (_value > 0) {
-			prevContributionBlock[market] = block.number;
+			lastContributionBlockEachMarket[market] = block.number;
 		}
 	}
 
 	function allocate(address _prop) public payable {
 		require(isProperty(_prop), "Is't Property Contract");
-		uint lastDistribute = lastDistributionTime[_prop] > 0
-			? lastDistributionTime[_prop]
+		uint lastDistribute = lastAllocationTimeEachProperty[_prop] > 0
+			? lastAllocationTimeEachProperty[_prop]
 			: baseTime.time;
 		uint yesterday = timestamp() - 1 days;
 		uint diff = BokkyPooBahsDateTimeLibrary.diffDays(
@@ -75,25 +63,32 @@ contract Allocator is
 		require(diff >= 1, "Expected an interval is one day or more");
 		address market = Property(_prop).market();
 		pendingIncrements[_prop] = true;
-		Market(market).calculate(_prop, lastDistributionTime[_prop], yesterday);
-		lastDistributionTime[_prop] = timestamp();
+		Market(market).calculate(
+			_prop,
+			lastAllocationTimeEachProperty[_prop],
+			yesterday
+		);
+		lastAllocationTimeEachProperty[_prop] = timestamp();
 	}
 
 	function calculatedCallback(address _prop, uint _value) public {
-		require(msg.sender == Market(Property(_prop).market()).behavior(), "Don't call from other than Market Behavior");
+		require(
+			msg.sender == Market(Property(_prop).market()).behavior(),
+			"Don't call from other than Market Behavior"
+		);
 		require(
 			pendingIncrements[_prop] == true,
 			"Not asking for an indicator"
 		);
 		address market = Property(_prop).market();
-		uint period = block.number - lastDistributionBlock[_prop];
-		uint distributionsPerBlock = _value / period;
-		uint nextTotalValuePerBlock = lastTotalDistributionValuePerBlock[market] - lastDistributionValuePerBlock[_prop] + distributionsPerBlock;
-		uint distributions = distributionsPerBlock / nextTotalValuePerBlock * mintPerBlock[market] * period;
-		lastDistributionBlock[_prop] = block.number;
-		lastDistributionValuePerBlock[_prop] = distributionsPerBlock;
-		lastTotalDistributionValuePerBlock[market] = nextTotalValuePerBlock;
-		increment(_prop, distributions);
+		uint period = block.number - lastAllocationBlockEachProperty[_prop];
+		uint allocationPerBlock = _value / period;
+		uint nextTotalAllocationValuePerBlock = lastTotalAllocationValuePerBlockEachMarket[market] - lastAllocationValueEachProperty[_prop] + allocationPerBlock;
+		uint allocation = allocationPerBlock / nextTotalAllocationValuePerBlock * mintPerBlock[market] * period;
+		lastAllocationBlockEachProperty[_prop] = block.number;
+		lastAllocationValueEachProperty[_prop] = allocationPerBlock;
+		lastTotalAllocationValuePerBlockEachMarket[market] = nextTotalAllocationValuePerBlock;
+		increment(_prop, allocation);
 		delete pendingIncrements[_prop];
 	}
 }
