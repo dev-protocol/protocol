@@ -30,6 +30,10 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		// not implemented yet.
 	}
 
+	function cancelContribute() public returns (bool) {
+		// not implemented yet.
+	}
+
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		Allocator(allocator()).beforeBalanceChange(
 			address(this),
