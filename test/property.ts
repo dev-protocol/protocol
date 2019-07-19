@@ -1,10 +1,20 @@
 contract('Property', ([deployer]) => {
 	const marketContract = artifacts.require('Market')
+	const marketBehaviorTestContract = artifacts.require('MarketBehaviorTest')
 	const propertyContract = artifacts.require('Property')
 
 	describe('id', () => {
 		it('Get a mapped property id', async () => {
-			const market = await marketContract.new({from: deployer})
+			const marketBehaviorTest = await marketBehaviorTestContract.new({
+				from: deployer
+			})
+			const market = await marketContract.new(
+				marketBehaviorTest.address,
+				true,
+				{
+					from: deployer
+				}
+			)
 			const property = await propertyContract.new(
 				market,
 				'pkg',

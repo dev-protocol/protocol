@@ -4,6 +4,7 @@ contract('State', ([deployer, u1, u2]) => {
 	const stateContract = artifacts.require('State')
 	const marketFactoryContract = artifacts.require('MarketFactory')
 	const marketContract = artifacts.require('Market')
+	const marketBehaviorTestContract = artifacts.require('MarketBehaviorTest')
 	const propertyContract = artifacts.require('Property')
 
 	describe('Roles; addMarket', () => {
@@ -68,7 +69,14 @@ contract('State', ([deployer, u1, u2]) => {
 	describe('Property token; addProperty', () => {
 		it('Add Property Contract token address', async () => {
 			const marketFactory = await marketFactoryContract.new({from: deployer})
-			const market = await marketContract.new({from: deployer})
+			const marketBehaviorTest = await marketBehaviorTestContract.new({
+				from: deployer
+			})
+			const market = await marketContract.new(
+				marketBehaviorTest.address,
+				true,
+				{from: deployer}
+			)
 			const property = await propertyContract.new(
 				market,
 				'pkg',
@@ -89,7 +97,14 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Should fail to add Property Contract token address when sent from the non-Market Factory account', async () => {
-			const market = await marketContract.new({from: deployer})
+			const marketBehaviorTest = await marketBehaviorTestContract.new({
+				from: deployer
+			})
+			const market = await marketContract.new(
+				marketBehaviorTest.address,
+				true,
+				{from: deployer}
+			)
 			const property = await propertyContract.new(
 				market,
 				'pkg',
@@ -110,7 +125,14 @@ contract('State', ([deployer, u1, u2]) => {
 
 		it('Should fail to add Property Contract token address when the exists same id', async () => {
 			const marketFactory = await marketFactoryContract.new({from: deployer})
-			const market = await marketContract.new({from: deployer})
+			const marketBehaviorTest = await marketBehaviorTestContract.new({
+				from: deployer
+			})
+			const market = await marketContract.new(
+				marketBehaviorTest.address,
+				true,
+				{from: deployer}
+			)
 			const property = await propertyContract.new(
 				market,
 				'pkg',
@@ -139,7 +161,14 @@ contract('State', ([deployer, u1, u2]) => {
 	describe('Property token; getProperty', () => {
 		it('Get the property address by id', async () => {
 			const marketFactory = await marketFactoryContract.new({from: deployer})
-			const market = await marketContract.new({from: deployer})
+			const marketBehaviorTest = await marketBehaviorTestContract.new({
+				from: deployer
+			})
+			const market = await marketContract.new(
+				marketBehaviorTest.address,
+				true,
+				{from: deployer}
+			)
 			const property = await propertyContract.new(
 				market,
 				'pkg',

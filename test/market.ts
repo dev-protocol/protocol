@@ -1,6 +1,7 @@
 contract('Market', ([deployer]) => {
 	const marketFactoryContract = artifacts.require('MarketFactory')
 	const marketContract = artifacts.require('Market')
+	const marketBehaviorTestContract = artifacts.require('MarketBehaviorTest')
 	const stateContract = artifacts.require('State')
 
 	describe('createProperty', () => {
@@ -8,9 +9,16 @@ contract('Market', ([deployer]) => {
 			const marketFactory = await marketFactoryContract.new({
 				from: deployer
 			})
-			const market = await marketContract.new({
+			const marketBehaviorTest = await marketBehaviorTestContract.new({
 				from: deployer
 			})
+			const market = await marketContract.new(
+				marketBehaviorTest.address,
+				true,
+				{
+					from: deployer
+				}
+			)
 			const state = await stateContract.new({from: deployer})
 			await state.setMarketFactory(marketFactory.address, {from: deployer})
 			await market.changeStateAddress(state.address, {from: deployer})
@@ -24,9 +32,16 @@ contract('Market', ([deployer]) => {
 			const marketFactory = await marketFactoryContract.new({
 				from: deployer
 			})
-			const market = await marketContract.new({
+			const marketBehaviorTest = await marketBehaviorTestContract.new({
 				from: deployer
 			})
+			const market = await marketContract.new(
+				marketBehaviorTest.address,
+				true,
+				{
+					from: deployer
+				}
+			)
 			const state = await stateContract.new({from: deployer})
 			await state.setMarketFactory(marketFactory.address, {from: deployer})
 			await market.changeStateAddress(state.address, {from: deployer})
