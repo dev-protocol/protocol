@@ -79,7 +79,7 @@ contract Market is UseState {
 		public
 		returns (address)
 	{
-		address exists = getRepository(_id);
+		address exists = getProperty(_id);
 		require(exists == address(0), "Property is already created");
 		Property property = new Property(
 			address(this),
@@ -90,7 +90,7 @@ contract Market is UseState {
 			supply
 		);
 		address propertyAddress = address(property);
-		addRepository(_id, propertyAddress);
+		addProperty(_id, propertyAddress);
 		return propertyAddress;
 	}
 }

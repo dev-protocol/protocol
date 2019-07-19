@@ -1,9 +1,10 @@
 import '../types/truffle-contracts/merge'
 
 const migrations = artifacts.require('Migrations')
-const distributor = artifacts.require('Distributor')
-const reposioryFactory = artifacts.require('ReposioryFactory')
-const repository = artifacts.require('Repository')
+const allocator = artifacts.require('Allocator')
+const market = artifacts.require('Market')
+const marketFactory = artifacts.require('MarketFactory')
+const property = artifacts.require('Property')
 const state = artifacts.require('State')
 const useState = artifacts.require('UseState')
 const useStateTest = artifacts.require('UseStateTest')
@@ -12,9 +13,10 @@ module.exports = (deployer: {
 	deploy<T>(contract: Truffle.Contract<T>): void
 }): void => {
 	deployer.deploy(migrations)
-	deployer.deploy(distributor)
-	deployer.deploy(reposioryFactory)
-	deployer.deploy(repository)
+	deployer.deploy(allocator)
+	deployer.deploy(market)
+	deployer.deploy(marketFactory)
+	deployer.deploy(property)
 	deployer.deploy(state)
 	deployer.deploy(useState)
 	deployer.deploy(useStateTest)

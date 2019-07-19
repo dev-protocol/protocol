@@ -44,7 +44,7 @@ contract Allocator is
 
 	function updateAllocateValue(uint _value) public {
 		address prop = msg.sender;
-		require(isRepository(prop), "Is't Property Contract");
+		require(isProperty(prop), "Is't Property Contract");
 		address market = Property(prop).market();
 		totalContributions[market] += _value;
 		uint totalContributionsPerBlock = totalContributions[market] / (
@@ -63,7 +63,7 @@ contract Allocator is
 	}
 
 	function allocate(address _prop) public payable {
-		require(isRepository(_prop), "Is't Property Contract");
+		require(isProperty(_prop), "Is't Property Contract");
 		uint lastDistribute = lastDistributionTime[_prop] > 0
 			? lastDistributionTime[_prop]
 			: baseTime.time;

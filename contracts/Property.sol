@@ -31,8 +31,7 @@ contract Property is ERC20, ERC20Detailed, UseState {
 	}
 
 	function transfer(address _to, uint256 _value) public returns (bool) {
-		address distributor = getDistributor();
-		Allocator(distributor).beforeBalanceChange(
+		Allocator(allocator()).beforeBalanceChange(
 			address(this),
 			msg.sender,
 			_to

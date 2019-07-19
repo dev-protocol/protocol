@@ -11,24 +11,27 @@ contract UseStateTest is UseState {
 		return state();
 	}
 
+	function t_allocator() public view returns (address) {
+		return allocator();
+	}
+
+	function t_addMarket(address _addr) public returns (bool) {
+		return addMarket(_addr);
+	}
+
 	function t_getToken() public view returns (address) {
 		return getToken();
 	}
 
-	function t_getRepository(string memory package)
-		public
-		view
-		returns (address)
-	{
-		return getRepository(package);
+	function t_addProperty(string memory _id, address _prop) public {
+		return addProperty(_id, _prop);
 	}
 
-	function t_addRepository(string memory package, address repository) public {
-		addRepository(package, address(repository));
+	function t_getProperty(string memory _id) public view returns (address) {
+		return getProperty(_id);
 	}
 
-	function t_getDistributor() public view returns (address) {
-		return getDistributor();
+	function t_isProperty(address _addr) public view returns (bool) {
+		return isProperty(_addr);
 	}
-
 }
