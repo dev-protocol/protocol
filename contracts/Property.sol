@@ -41,8 +41,8 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		return true;
 	}
 
-	function isAuthorized() public returns (bool) {
-		return balanceOf(address(0)) == 0;
+	function isAuthorized() public view returns (bool) {
+		return balanceOf(address(0)) != totalSupply();
 	}
 
 	function authorizeOwner(address _owner) public returns (bool) {
