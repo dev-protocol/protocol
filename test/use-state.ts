@@ -1,7 +1,8 @@
 contract('UseState', ([deployer, u1, u2]) => {
 	const useStateContract = artifacts.require('UseStateTest')
 	const stateContract = artifacts.require('State')
-	const repositoryContract = artifacts.require('Repository')
+	const marketContract = artifacts.require('Market')
+	const propertyContract = artifacts.require('Property')
 
 	describe('State; changeStateAddress', () => {
 		it('Change state address', async () => {
@@ -77,9 +78,11 @@ contract('UseState', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Repository token; addRepository', () => {
-		it('Add Repository Contract token address', async () => {
-			const repository = await repositoryContract.new(
+	describe('Property token; addProperty', () => {
+		it('Add Property Contract token address', async () => {
+			const market = await marketContract.new({from: deployer})
+			const property = await propertyContract.new(
+				market,
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -94,48 +97,48 @@ contract('UseState', ([deployer, u1, u2]) => {
 			await useState.changeStateAddress(state.address, {
 				from: deployer
 			})
-			await state.addOperator(useState.address, {from: deployer})
-			await useState.t_addRepository('pkg', repository.address, {
+			await state.setMarketFactory(useState.address, {from: deployer})
+			await useState.t_addProperty('pkg', property.address, {
+				from: useState.address
+			})
+			const results = await state.getProperty('pkg', {
 				from: deployer
 			})
-			const results = await state.getRepository('pkg', {
-				from: deployer
-			})
-			expect(results.toString()).to.be.equal(repository.address)
+			expect(results.toString()).to.be.equal(property.address)
 		})
 
 		it(
-			'Should fail to add Repository Contract token address when sent from the non-operator account'
+			'Should fail to add Property Contract token address when sent from the non-Market Factory account'
 		)
 
 		it(
-			'Should fail to add Repository Contract token address when the exists same package name'
+			'Should fail to add Property Contract token address when the exists same id'
 		)
 	})
 
-	describe('Repository token; getRepository', () => {
-		it('Get the repository address by package name')
+	describe('Property token; getProperty', () => {
+		it('Get the property address by id')
 	})
 
-	describe('Repository token; isRepository', () => {
-		it('Verifying the passed address is a Repository Contract address')
+	describe('Property token; isProperty', () => {
+		it('Verifying the passed address is a Property Contract address')
 
 		it(
-			'Should fail to verify the passed address is a Repository Contract address when not exists Repository Contract'
+			'Should fail to verify the passed address is a Property Contract address when not exists Property Contract'
 		)
 	})
 
-	describe('Distributor; getDistributor', () => {
-		it('Get a Distributor Contract address', async () => {
+	describe('Allocator; get allocator', () => {
+		it('Get a Allocator Contract address', async () => {
 			const state = await stateContract.new({from: deployer})
-			await state.setDistributor('0x111122223333444455556666777788889999aAaa', {
+			await state.setAllocator('0x111122223333444455556666777788889999aAaa', {
 				from: deployer
 			})
 			const useState = await useStateContract.new({from: deployer})
 			await useState.changeStateAddress(state.address, {
 				from: deployer
 			})
-			const results = await useState.t_getDistributor()
+			const results = await useState.t_allocator()
 			expect(results).to.be.equal('0x111122223333444455556666777788889999aAaa')
 		})
 	})
