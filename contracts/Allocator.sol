@@ -80,6 +80,7 @@ contract Allocator is
 	}
 
 	function calculatedCallback(address _prop, uint _value) public {
+		require(msg.sender == Market(Property(_prop).market()).behavior(), "Don't call from other than Market Behavior");
 		require(
 			pendingIncrements[_prop] == true,
 			"Not asking for an indicator"
