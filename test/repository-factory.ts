@@ -4,11 +4,11 @@ contract('ReposioryFactory', ([deployer]) => {
 
 	describe('createRepository', () => {
 		it('Create a new Repository Contract of a package', async () => {
-			const contract = await reposioryFactoryContract.new({from: deployer})
+			const reposioryFactory = await reposioryFactoryContract.new({from: deployer})
 			const state = await stateContract.new({from: deployer})
-			await state.addOperator(contract.address, {from: deployer})
-			await contract.changeStateAddress(state.address, {from: deployer})
-			const results = await contract.createRepository('pkg', {from: deployer})
+			await state.addOperator(reposioryFactory.address, {from: deployer})
+			await reposioryFactory.changeStateAddress(state.address, {from: deployer})
+			const results = await reposioryFactory.createRepository('pkg', {from: deployer})
 			expect(results).not.to.be.equal(0)
 		})
 
@@ -17,12 +17,12 @@ contract('ReposioryFactory', ([deployer]) => {
 		)
 
 		it('Should fail to create a new Repository Contract of a package when the package already has a Repository Contract', async () => {
-			const contract = await reposioryFactoryContract.new({from: deployer})
+			const reposioryFactory = await reposioryFactoryContract.new({from: deployer})
 			const state = await stateContract.new({from: deployer})
-			await state.addOperator(contract.address, {from: deployer})
-			await contract.changeStateAddress(state.address, {from: deployer})
-			await contract.createRepository('pkg', {from: deployer})
-			const results = await contract
+			await state.addOperator(reposioryFactory.address, {from: deployer})
+			await reposioryFactory.changeStateAddress(state.address, {from: deployer})
+			await reposioryFactory.createRepository('pkg', {from: deployer})
+			const results = await reposioryFactory
 				.createRepository('pkg', {from: deployer})
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
