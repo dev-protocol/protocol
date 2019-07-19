@@ -245,9 +245,9 @@ For this reason, only the Repository Factory Contract can call `addRepository()`
 
 Dev Repository Token is OSS. Anyone can participate in its development.
 
-GitHub: https://github.com/dev-protocol/repository-token
-Discord: https://discord.gg/VwJp4KM
-Spectrum: https://spectrum.chat/devtoken
-Twitter: https://twitter.com/devtoken_rocks
-Blog: https://medium.com/devtoken
-Web site: https://devtoken.rocks
+- GitHub: https://github.com/dev-protocol/repository-token
+- Discord: https://discord.gg/VwJp4KM
+- Spectrum: https://spectrum.chat/devtoken
+- Twitter: https://twitter.com/devtoken_rocks
+- Blog: https://medium.com/devtoken
+- Web site: https://devtoken.rocks
