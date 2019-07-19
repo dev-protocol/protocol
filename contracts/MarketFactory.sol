@@ -5,7 +5,7 @@ import "./Market.sol";
 
 contract MarketFactory is UseState {
 	function createMarket(address _addr) public returns (address) {
-		Market market = new Market(_addr);
+		Market market = new Market(_addr, false);
 		address marketAddr = address(market);
 		addMarket(marketAddr);
 		return marketAddr;
