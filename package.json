@@ -1,8 +1,8 @@
 {
-  "name": "repository-token",
+  "name": "protocol",
   "private": true,
   "version": "0.1.0",
-  "description": "Securitize OSS",
+  "description": "Securitize for Internet assets",
   "main": "index.js",
   "scripts": {
     "test": "truffle test",
@@ -44,10 +44,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dev-protocol/repository-token.git"
+    "url": "git+https://github.com/dev-protocol/protocol.git"
   },
   "bugs": {
-    "url": "https://github.com/dev-protocol/repository-token/issues"
+    "url": "https://github.com/dev-protocol/protocol/issues"
   },
-  "homepage": "https://github.com/dev-protocol/repository-token#readme"
+  "homepage": "https://github.com/dev-protocol/protocol#readme"
 }
