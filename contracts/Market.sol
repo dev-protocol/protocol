@@ -26,13 +26,14 @@ contract Behavior {
 }
 
 contract Market is UseState {
-	bool public enabled = false;
+	bool public enabled;
 	address public behavior;
 	uint8 decimals = 18;
 	uint supply = 10000000;
 
-	constructor(address _behavior) public {
+	constructor(address _behavior, bool _enabled) public {
 		behavior = _behavior;
+		enabled = _enabled;
 	}
 
 	function schema() public view returns (string memory) {
@@ -79,6 +80,7 @@ contract Market is UseState {
 		public
 		returns (address)
 	{
+		require(enabled == true, "This market is not enabled");
 		address exists = getProperty(_id);
 		require(exists == address(0), "Property is already created");
 		Property property = new Property(
