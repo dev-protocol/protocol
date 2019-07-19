@@ -14,7 +14,7 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		string memory _id,
 		string memory _name,
 		string memory _symbol,
-		uint _decimals,
+		uint8 _decimals,
 		uint _supply
 	) public ERC20Detailed(_name, _symbol, _decimals) {
 		market = _market;
