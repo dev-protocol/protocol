@@ -40,4 +40,18 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		_transfer(msg.sender, _to, _value);
 		return true;
 	}
+
+	function isAuthorized() public returns (bool) {
+		return balanceOf(address(0)) == 0;
+	}
+
+	function authorizeOwner(address _owner) public returns (bool) {
+		require(
+			msg.sender == market,
+			"Don't call from other than Market Contract"
+		);
+		require(isAuthorized() == false, "Already authorized");
+		_transfer(address(0), _owner, totalSupply());
+		return true;
+	}
 }

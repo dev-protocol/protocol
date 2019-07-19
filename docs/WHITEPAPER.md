@@ -299,11 +299,11 @@ The balance of the voter's Dev Token determines the importance of one vote. Voti
 
 ### Contract as a behavior
 
-A contract as a behavior requires two public functions, `authentication()` and `index()`.
+A contract as a behavior requires two public functions, `authenticate()` and `calculate()`.
 
-`authentication()` function is called when authenticating the owner of Property Contract.
+The Market Contract calls `authenticate()` function to authentication ownership to the Property Contract. It authentication the owner of the Property Contract mapped Internet asset and expected to call the `authenticatedCallback()` of the Market Contract.
 
-`index()` function is called by the Allocator Contract to calculate the number of new distributions to the Property Contract. It gets the metrics of the Property Contract mapped Internet asset and expect to call the `updateIndex()`of the Allocator Contract.
+The Allocator Contract calls `calculate()` function to calculate the number of new distributions to the Property Contract. It gets the metrics of the Property Contract mapped Internet asset and expect to call the `calculatedCallback()`of the Allocator Contract.
 
 The interface of this contract looks like this:
 
@@ -311,7 +311,7 @@ The interface of this contract looks like this:
 contract Behavior {
 	string public schema;
 
-	function authentication(
+	function authenticate(
 		address _prop,
 		string memory _args1,
 		string memory _args2,
@@ -320,11 +320,13 @@ contract Behavior {
 		string memory _args5
 	) public returns (bool);
 
-	function index(address _prop, uint _start, uint _end) public returns (bool);
+	function calculate(address _prop, uint _start, uint _end)
+		public
+		returns (bool);
 }
 ```
 
-`authentication()` function can take up to five arguments in addition to the target Property Contract address. Need to define `schema` as a JSON string as an array to indicate what each argument should mean.
+`authenticate()` function can take up to five arguments in addition to the target Property Contract address. Need to define `schema` as a JSON string as an array to indicate what each argument should mean.
 
 It looks like this, for example:
 

@@ -6,7 +6,7 @@ import "./Property.sol";
 contract Behavior {
 	string public schema;
 
-	function authentication(
+	function authenticate(
 		address _prop,
 		string memory _args1,
 		string memory _args2,
@@ -17,7 +17,7 @@ contract Behavior {
 		// Implementation for authentication.
 	}
 
-	function index(address _prop, uint _start, uint _end)
+	function calculate(address _prop, uint _start, uint _end)
 		public
 		returns (bool)
 	{
@@ -39,7 +39,7 @@ contract Market is UseState {
 		return Behavior(behavior).schema();
 	}
 
-	function authentication(
+	function authenticate(
 		address _prop,
 		string memory _args1,
 		string memory _args2,
@@ -47,7 +47,7 @@ contract Market is UseState {
 		string memory _args4,
 		string memory _args5
 	) public returns (bool) {
-		return Behavior(behavior).authentication(
+		return Behavior(behavior).authenticate(
 			_prop,
 			_args1,
 			_args2,
@@ -57,15 +57,22 @@ contract Market is UseState {
 		);
 	}
 
-	function index(address _prop, uint _start, uint _end)
+	function calculate(address _prop, uint _start, uint _end)
 		public
 		returns (bool)
 	{
-		return Behavior(behavior).index(_prop, _start, _end);
+		return Behavior(behavior).calculate(_prop, _start, _end);
 	}
 
 	function vote(bool _answer) public {
 		// not implemented yet.
+	}
+
+	function authenticatedCallback(address _prop, address _owner)
+		public
+		returns (bool)
+	{
+		return Property(_prop).authorizeOwner(_owner);
 	}
 
 	function createProperty(string memory _id, string memory _symbol)

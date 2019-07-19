@@ -75,11 +75,11 @@ contract Allocator is
 		require(diff >= 1, "Expected an interval is one day or more");
 		address market = Property(_prop).market();
 		pendingIncrements[_prop] = true;
-		Market(market).index(_prop, lastDistributionTime[_prop], yesterday);
+		Market(market).calculate(_prop, lastDistributionTime[_prop], yesterday);
 		lastDistributionTime[_prop] = timestamp();
 	}
 
-	function updateIndex(address _prop, uint _value) public {
+	function calculatedCallback(address _prop, uint _value) public {
 		require(
 			pendingIncrements[_prop] == true,
 			"Not asking for an indicator"
