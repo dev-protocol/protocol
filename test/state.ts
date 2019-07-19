@@ -2,37 +2,39 @@
 
 contract('State', ([deployer, u1, u2]) => {
 	const stateContract = artifacts.require('State')
-	const repositoryContract = artifacts.require('Repository')
+	const marketFactoryContract = artifacts.require('MarketFactory')
+	const marketContract = artifacts.require('Market')
+	const propertyContract = artifacts.require('Property')
 
-	describe('Roles; addOperator', () => {
-		it('Add operators', async () => {
+	describe('Roles; addMarket', () => {
+		it('Set Market Factory', async () => {
 			const contract = await stateContract.new({from: deployer})
-			await contract.addOperator(u1, {from: deployer})
-			const results = await contract.isOperator({from: u1})
-			expect(results).to.be.equal(true)
+			await contract.setMarketFactory(u1, {from: deployer})
+			const results = await contract.marketFactory({from: deployer})
+			expect(results).to.be.equal(u1)
 		})
 
-		it('Should fail to add operator when sent from the non-owner account', async () => {
+		it('Should fail to set Market Factory when sent from the non-owner account', async () => {
 			const contract = await stateContract.new({from: deployer})
 			const results = await contract
-				.addOperator(u1, {from: u2})
+				.setMarketFactory(u1, {from: u2})
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
-	})
 
-	describe('Roles; isOperator', () => {
-		it('Verifying the passed address is an operator address', async () => {
+		it('Add market', async () => {
 			const contract = await stateContract.new({from: deployer})
-			await contract.addOperator(u1, {from: deployer})
-			const results = await contract.isOperator({from: u1})
+			await contract.setMarketFactory(u1, {from: deployer})
+			const results = await contract.addMarket(u2, {from: deployer})
 			expect(results).to.be.equal(true)
 		})
 
-		it('Should fail to verify the passed address is an operator address when not exists in operators', async () => {
+		it('Should fail to add Market when sent from the non-Market Factory account', async () => {
 			const contract = await stateContract.new({from: deployer})
-			const results = await contract.isOperator({from: u2})
-			expect(results).to.be.equal(false)
+			const results = await contract
+				.addMarket(u1, {from: deployer})
+				.catch((err: Error) => err)
+			expect(results).to.instanceOf(Error)
 		})
 	})
 
@@ -63,9 +65,12 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Repository token; addRepository', () => {
-		it('Add Repository Contract token address', async () => {
-			const repository = await repositoryContract.new(
+	describe('Property token; addProperty', () => {
+		it('Add Property Contract token address', async () => {
+			const marketFactory = await marketFactoryContract.new({from: deployer})
+			const market = await marketContract.new({from: deployer})
+			const property = await propertyContract.new(
+				market,
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -76,15 +81,17 @@ contract('State', ([deployer, u1, u2]) => {
 				}
 			)
 			const contract = await stateContract.new({from: deployer})
-			await contract.addOperator(deployer, {from: deployer})
-			const results = await contract.addRepository('pkg', repository.address, {
-				from: deployer
+			await contract.setMarketFactory(marketFactory, {from: deployer})
+			const results = await contract.addProperty('pkg', property.address, {
+				from: marketFactory.address
 			})
 			expect(results).to.be.ok
 		})
 
-		it('Should fail to add Repository Contract token address when sent from the non-operator account', async () => {
-			const repository = await repositoryContract.new(
+		it('Should fail to add Property Contract token address when sent from the non-Market Factory account', async () => {
+			const market = await marketContract.new({from: deployer})
+			const property = await propertyContract.new(
+				market,
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -96,13 +103,16 @@ contract('State', ([deployer, u1, u2]) => {
 			)
 			const contract = await stateContract.new({from: deployer})
 			const results = await contract
-				.addRepository('pkg', repository.address, {from: deployer})
+				.addProperty('pkg', property.address, {from: deployer})
 				.catch((err: Error) => err)
 			expect(results).to.instanceOf(Error)
 		})
 
-		it('Should fail to add Repository Contract token address when the exists same package name', async () => {
-			const repository = await repositoryContract.new(
+		it('Should fail to add Property Contract token address when the exists same id', async () => {
+			const marketFactory = await marketFactoryContract.new({from: deployer})
+			const market = await marketContract.new({from: deployer})
+			const property = await propertyContract.new(
+				market,
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -113,12 +123,12 @@ contract('State', ([deployer, u1, u2]) => {
 				}
 			)
 			const contract = await stateContract.new({from: deployer})
-			await contract.addOperator(deployer, {from: deployer})
-			await contract.addRepository('pkg', repository.address, {
-				from: deployer
+			await contract.setMarketFactory(marketFactory, {from: deployer})
+			await contract.addProperty('pkg', property.address, {
+				from: marketFactory.address
 			})
 			const results = await contract
-				.addRepository('pkg', repository.address, {
+				.addProperty('pkg', property.address, {
 					from: deployer
 				})
 				.catch((err: Error) => err)
@@ -126,9 +136,12 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 	})
 
-	describe('Repository token; getRepository', () => {
-		it('Get the repository address by package name', async () => {
-			const repository = await repositoryContract.new(
+	describe('Property token; getProperty', () => {
+		it('Get the property address by id', async () => {
+			const marketFactory = await marketFactoryContract.new({from: deployer})
+			const market = await marketContract.new({from: deployer})
+			const property = await propertyContract.new(
+				market,
 				'pkg',
 				'pkg_token',
 				'PKG',
@@ -139,86 +152,88 @@ contract('State', ([deployer, u1, u2]) => {
 				}
 			)
 			const contract = await stateContract.new({from: deployer})
-			await contract.addOperator(deployer, {from: deployer})
-			await contract.addRepository('pkg', repository.address, {
-				from: deployer
+			await contract.setMarketFactory(marketFactory, {from: deployer})
+			await contract.addProperty('pkg', property.address, {
+				from: marketFactory.address
 			})
-			const results = await contract.getRepository('pkg')
-			expect(results.toString()).to.be.equal(repository.address)
+			const results = await contract.getProperty('pkg')
+			expect(results.toString()).to.be.equal(property.address)
 		})
 	})
 
-	describe('Repository token; isRepository', () => {
-		it('Verifying the passed address is a Repository Contract address', async () => {
+	describe('Property token; isProperty', () => {
+		it('Verifying the passed address is a Property Contract address', async () => {
+			const marketFactory = await marketFactoryContract.new({from: deployer})
 			const address = '0x111122223333444455556666777788889999aAaa'
 			const contract = await stateContract.new({from: deployer})
-			await contract.addOperator(deployer, {from: deployer})
-			await contract.addRepository('pkg', address, {
-				from: deployer
+			await contract.setMarketFactory(marketFactory.address, {from: deployer})
+			await contract.addProperty('pkg', address, {
+				from: marketFactory.address
 			})
-			const results = await contract.isRepository(address)
+			const results = await contract.isProperty(address)
 			expect(results).to.be.equal(true)
 		})
 
-		it('Should fail to verify the passed address is a Repository Contract address when not exists Repository Contract', async () => {
+		it('Should fail to verify the passed address is a Property Contract address when not exists Property Contract', async () => {
+			const marketFactory = await marketFactoryContract.new({from: deployer})
 			const contract = await stateContract.new({from: deployer})
-			await contract.addOperator(deployer, {from: deployer})
-			await contract.addRepository(
+			await contract.setMarketFactory(marketFactory.address, {from: deployer})
+			await contract.addProperty(
 				'pkg',
 				'0x40da26927c9d53106c0ca47608a4fdadf1ab6d29',
 				{
-					from: deployer
+					from: marketFactory.address
 				}
 			)
-			const results = await contract.isRepository(
+			const results = await contract.isProperty(
 				'0x111122223333444455556666777788889999aAaa'
 			)
 			expect(results).to.be.equal(false)
 		})
 	})
 
-	describe('Distributor; setDistributor', () => {
-		it('Change a Distributor Contract address', async () => {
+	describe('Allocator; setAllocator', () => {
+		it('Change a Allocator Contract address', async () => {
 			const contract = await stateContract.new({from: deployer})
 
-			const distributorAddress = await contract.distributor({
+			const allocatorAddress = await contract.allocator({
 				from: deployer
 			})
 
-			expect(distributorAddress).to.be.equal(
+			expect(allocatorAddress).to.be.equal(
 				'0x0000000000000000000000000000000000000000'
 			)
 
-			await contract.setDistributor(
+			await contract.setAllocator(
 				'0x111122223333444455556666777788889999aAaa',
 				{
 					from: deployer
 				}
 			)
 
-			const changedDistributorAddress = await contract.distributor({
+			const changedAllocatorAddress = await contract.allocator({
 				from: deployer
 			})
 
-			expect(changedDistributorAddress).to.be.equal(
+			expect(changedAllocatorAddress).to.be.equal(
 				'0x111122223333444455556666777788889999aAaa'
 			)
 		})
 
-		it('Should fail to change a Distributor Contract address when sent from the non-owner account', async () => {
+		it('Should fail to change a Allocator Contract address when sent from the non-owner account', async () => {
 			const contract = await stateContract.new({from: deployer})
 			const result = await contract
-				.setDistributor('0x111122223333444455556666777788889999aAaa', {
+				.setAllocator('0x111122223333444455556666777788889999aAaa', {
 					from: u1
 				})
 				.catch((err: Error) => err)
 			expect(result).to.instanceOf(Error)
 
-			const distributorAddress = await contract.distributor({
+			const allocatorAddress = await contract.allocator({
 				from: deployer
 			})
 
-			expect(distributorAddress).to.be.equal(
+			expect(allocatorAddress).to.be.equal(
 				'0x0000000000000000000000000000000000000000'
 			)
 		})
