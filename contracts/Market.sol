@@ -35,7 +35,7 @@ contract Market is UseState {
 		behavior = _behavior;
 	}
 
-	function schema() public returns (string memory) {
+	function schema() public view returns (string memory) {
 		return Behavior(behavior).schema();
 	}
 
