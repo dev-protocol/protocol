@@ -28,7 +28,7 @@ contract Behavior {
 contract Market is UseState {
 	bool public enabled = false;
 	address public behavior;
-	uint decimals = 18;
+	uint8 decimals = 18;
 	uint supply = 10000000;
 
 	constructor(address _behavior) public {
