@@ -1,67 +1,22 @@
-contract('Market', ([deployer]) => {
-	const marketFactoryContract = artifacts.require('MarketFactory')
-	const marketContract = artifacts.require('Market')
-	const marketBehaviorTestContract = artifacts.require('MarketBehaviorTest')
-	const stateContract = artifacts.require('State')
-
-	describe('createProperty', () => {
-		it('Create a new Property Contract', async () => {
-			const marketFactory = await marketFactoryContract.new({
-				from: deployer
-			})
-			const marketBehaviorTest = await marketBehaviorTestContract.new({
-				from: deployer
-			})
-			const market = await marketContract.new(
-				marketBehaviorTest.address,
-				true,
-				{
-					from: deployer
-				}
-			)
-			const state = await stateContract.new({from: deployer})
-			await state.setMarketFactory(marketFactory.address, {from: deployer})
-			await market.changeStateAddress(state.address, {from: deployer})
-			const results = await market.createProperty('pkg', 'PKG', {
-				from: deployer
-			})
-			expect(results).not.to.be.equal(0)
-		})
-
-		it('Should fail to create a new Property Contract when the id already has a Property Contract', async () => {
-			const marketFactory = await marketFactoryContract.new({
-				from: deployer
-			})
-			const marketBehaviorTest = await marketBehaviorTestContract.new({
-				from: deployer
-			})
-			const market = await marketContract.new(
-				marketBehaviorTest.address,
-				true,
-				{
-					from: deployer
-				}
-			)
-			const state = await stateContract.new({from: deployer})
-			await state.setMarketFactory(marketFactory.address, {from: deployer})
-			await market.changeStateAddress(state.address, {from: deployer})
-			await market.createProperty('pkg', 'PKGA', {from: deployer})
-			const results: any = await market
-				.createProperty('pkg', 'PKGB', {from: deployer})
-				.catch((err: Error) => err)
-			expect(results).to.instanceOf(Error)
-			expect(results.reason).to.be.equal('Property is already created')
-		})
-
-		it('Should fail to create a new Property Contract when not enabled')
-	})
-
+contract('Market', () => {
 	describe('schema', () => {
 		it('Get Schema of mapped Behavior Contract')
 	})
 
 	describe('authenticate', () => {
 		it('Proxy to mapped Behavior Contract')
+	})
+
+	describe('authenticatedCallback', () => {
+		it('Create a new Metrics Contract')
+
+		it(
+			'Market Contract address and Property Contract address are mapped to the created Metrics Contract'
+		)
+
+		it(
+			'Should fail to create a new Metrics Contract when sent from non-Behavior Contract'
+		)
 	})
 
 	describe('calculate', () => {

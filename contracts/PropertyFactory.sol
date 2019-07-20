@@ -13,7 +13,6 @@ contract PropertyFactory is UseState {
 		Property property = new Property(
 			_name,
 			_symbol,
-			_symbol,
 			decimals,
 			supply
 		);

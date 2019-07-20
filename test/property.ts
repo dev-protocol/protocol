@@ -1,36 +1,4 @@
-contract('Property', ([deployer]) => {
-	const marketContract = artifacts.require('Market')
-	const marketBehaviorTestContract = artifacts.require('MarketBehaviorTest')
-	const propertyContract = artifacts.require('Property')
-
-	describe('id', () => {
-		it('Get a mapped property id', async () => {
-			const marketBehaviorTest = await marketBehaviorTestContract.new({
-				from: deployer
-			})
-			const market = await marketContract.new(
-				marketBehaviorTest.address,
-				true,
-				{
-					from: deployer
-				}
-			)
-			const property = await propertyContract.new(
-				market,
-				'pkg',
-				'pkg_token',
-				'PKG',
-				18,
-				10000,
-				{
-					from: deployer
-				}
-			)
-			const results = await property.id()
-			expect(results.toString()).to.be.equal('pkg')
-		})
-	})
-
+contract('Property', () => {
 	describe('Initialize Property Contract', () => {
 		it(
 			'The holder of the total supply amount of Property Contract is sender address by default'
@@ -67,16 +35,6 @@ contract('Property', ([deployer]) => {
 		)
 
 		it('Should fail to cancel when the Property Contract is authenticated')
-	})
-
-	describe('authorizeOwner', () => {
-		it('Transfer the total supply to the specified address')
-
-		it(
-			'Should fail to authorize when sent from other than mapped Market Contract'
-		)
-
-		it('Should fail to authorize when already authenticated')
 	})
 
 	describe('transfer', () => {

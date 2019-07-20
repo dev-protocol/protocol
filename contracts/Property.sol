@@ -6,16 +6,12 @@ import "./UseState.sol";
 import "./Allocator.sol";
 
 contract Property is ERC20, ERC20Detailed, UseState {
-	string public id;
-
 	constructor(
-		string memory _id,
 		string memory _name,
 		string memory _symbol,
 		uint8 _decimals,
 		uint256 _supply
 	) public ERC20Detailed(_name, _symbol, _decimals) {
-		id = _id;
 		_mint(msg.sender, _supply);
 	}
 
