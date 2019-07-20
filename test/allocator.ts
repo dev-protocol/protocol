@@ -1,11 +1,11 @@
 contract('Allocator', () => {
 	describe('allocate', () => {
-		it("Calls Market Contract's calculate function mapped to Property Contract")
+		it("Calls Market Contract's calculate function mapped to Metrics Contract")
 
 		it('Should fail to re-run if within one day from the last run date')
 
 		describe('Arguments to pass to calculate', () => {
-			it('The first argument is the address of Property Contract')
+			it('The first argument is the address of Metrics Contract')
 
 			it('The second argument is last run timestamp')
 
@@ -26,20 +26,25 @@ contract('Allocator', () => {
 	describe('calculatedCallback', () => {
 		it(
 			`
-			Market's 'lastTotalDistributionValuePerBlock' is 100,
-			Property's 'lastDistributionValuePerBlock' is 20,
+			'lastTotalAllocationValuePerBlock' is 300,
+			Metrics's 'lastAllocationValueEachMetrics' is 20,
 			the target period is 11520 block(2 days),
-			the current index value is y,
-			and 'mintPerDay' is 5;
-			the result is ((y ÷ 11520) ÷ (100 - 20 + (y ÷ 11520)) × 5 × 11520)`
+			the current calculated index value is 100,
+			'mintPerBlock' is 5,
+			total number of metrics is 10000,
+			and mapped market's total number of metrics is 500;
+			the result is ${(((100 / 11520 / (300 - 20 + 100 / 11520)) * 5 * 500) / 1000) *
+				11520}`
 		)
 
 		it(
-			"When after increment, change the value of 'lastTotalDistributionValuePerBlock' is (100 - 20 + (y ÷ 11520))"
+			`When after increment, change the value of 'lastTotalAllocationValuePerBlock' is ${300 -
+				20 +
+				100 / 11520}`
 		)
 
 		it(
-			'Should fail to call the function when sent from other than Behavior Contract mapped to Market Contract'
+			'Should fail to call the function when sent from other than Behavior Contract mapped to Metrics Contract'
 		)
 
 		it(
@@ -50,12 +55,13 @@ contract('Allocator', () => {
 	describe('updateAllocateValue', () => {
 		it(
 			`
-			Market's 'totalContributions' is 90000,
-			Market's 'initialContributionBlock' is 1,
-			and Market's 'prevContributionBlock' is 28800.
+			'totalContributionValue' is 90000,
+			'initialContributionBlock' is 1,
+			and 'lastContributionBlock' is 28800.
 			When the block is 40320,
 			if contributes 2000,
-			'mintPerBlock' becomes ((92000 ÷ (40320 - 1) × (2000 ÷ (40320 - 28800)) ÷ (92000 ÷ (40320 - 1))).`
+			'mintPerBlock' becomes ${(92000 / (40320 - 1)) *
+				(2000 / (40320 - 28800) / (92000 / (40320 - 1)))}.`
 		)
 	})
 
@@ -80,15 +86,15 @@ contract('Allocator', () => {
 
 		describe('Alice has sent 800 out of 1000 tokens to Bob. Bob has increased from 200 tokens to 1000 tokens. Price is 100', () => {
 			describe('Before increment', () => {
-				it("Alice's withdrawable amount is (1000 * 100)")
+				it(`Alice's withdrawable amount is ${1000 * 100}`)
 
-				it("Bob's withdrawable amount is (200 * 100)")
+				it(`Bob's withdrawable amount is ${200 * 100}`)
 			})
 
 			describe('After increment; New price is 120', () => {
-				it("Alice's withdrawable amount is (1000 * 100 + 200 * 120)")
+				it(`Alice's withdrawable amount is ${1000 * 100 + 200 * 120}`)
 
-				it("Bob's withdrawable amount is (200 * 100 + 1000 * 120)")
+				it(`Bob's withdrawable amount is ${200 * 100 + 1000 * 120}`)
 			})
 
 			it(

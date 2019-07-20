@@ -116,10 +116,6 @@ contract('UseState', ([deployer, u1, u2]) => {
 		)
 	})
 
-	describe('Property token; getProperty', () => {
-		it('Get the property address by id')
-	})
-
 	describe('Property token; isProperty', () => {
 		it('Verifying the passed address is a Property Contract address')
 
@@ -141,5 +137,21 @@ contract('UseState', ([deployer, u1, u2]) => {
 			const results = await useState.t_allocator()
 			expect(results).to.be.equal('0x111122223333444455556666777788889999aAaa')
 		})
+	})
+
+	describe('Metrics Contract; addMetrics', () => {
+		it('Add Metrics Contract token address')
+
+		it(
+			'Should fail to add Metrics Contract address when sent from the non-Market Contract'
+		)
+	})
+
+	describe('Metrics Contract; isMetrics', () => {
+		it('Verifying the passed address is a Metrics Contract address')
+
+		it(
+			'Should fail to verify the passed address is a Metrics Contract address when not exists Metrics Contract'
+		)
 	})
 })

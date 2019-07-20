@@ -6,13 +6,17 @@ import "./UseState.sol";
 import "./Allocator.sol";
 
 contract Property is ERC20, ERC20Detailed, UseState {
+	address public owner;
+
 	constructor(
+		address _owner,
 		string memory _name,
 		string memory _symbol,
 		uint8 _decimals,
 		uint256 _supply
 	) public ERC20Detailed(_name, _symbol, _decimals) {
-		_mint(msg.sender, _supply);
+		owner = _owner;
+		_mint(owner, _supply);
 	}
 
 	function increase(uint256 _value) public returns (bool) {
@@ -35,9 +39,5 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		);
 		_transfer(msg.sender, _to, _value);
 		return true;
-	}
-
-	function isAuthorized() public view returns (bool) {
-		return balanceOf(address(0)) != totalSupply();
 	}
 }

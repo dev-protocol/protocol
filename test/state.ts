@@ -188,4 +188,20 @@ contract('State', ([deployer, u1, u2]) => {
 			)
 		})
 	})
+
+	describe('Metrics Contract; addMetrics', () => {
+		it('Add Metrics Contract token address')
+
+		it(
+			'Should fail to add Metrics Contract address when sent from the non-Market Contract'
+		)
+	})
+
+	describe('Metrics Contract; isMetrics', () => {
+		it('Verifying the passed address is a Metrics Contract address')
+
+		it(
+			'Should fail to verify the passed address is a Metrics Contract address when not exists Metrics Contract'
+		)
+	})
 })

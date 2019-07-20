@@ -5,6 +5,10 @@ contract('Market', () => {
 
 	describe('authenticate', () => {
 		it('Proxy to mapped Behavior Contract')
+
+		it(
+			'Should fail to run when sent from other than the owner of Property Contract'
+		)
 	})
 
 	describe('authenticatedCallback', () => {
