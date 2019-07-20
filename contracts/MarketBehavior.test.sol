@@ -16,17 +16,12 @@ contract MarketBehaviorTest {
 		allocator = _allocator;
 	}
 
-	function authenticate(
-		address _prop
-	) public returns (bool) {
-		Market(market).authenticatedCallback(_prop, msg.sender);
+	function authenticate(address _prop) public returns (bool) {
+		Market(market).authenticatedCallback(_prop);
 		return true;
 	}
 
-	function calculate(address _prop)
-		public
-		returns (bool)
-	{
+	function calculate(address _prop) public returns (bool) {
 		Allocator(allocator).calculatedCallback(_prop, 100);
 	}
 }
