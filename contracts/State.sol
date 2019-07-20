@@ -7,8 +7,9 @@ contract State is Ownable {
 	address public allocator;
 	address public marketFactory;
 	mapping(address => bool) internal markets;
-	mapping(string => address) internal propertyIdToAddress;
-	mapping(address => string) internal propertyAddressToId;
+	mapping(address => bool) internal metrics;
+	mapping(address => bool) internal properties;
+	uint256 public totalIssuedMetrics;
 
 	modifier onlyMarketFactory() {
 		require(msg.sender == marketFactory, "Only Market Factory Contract");
@@ -41,21 +42,23 @@ contract State is Ownable {
 		return token;
 	}
 
-	function addProperty(string memory _id, address _prop) public onlyMarket {
+	function addProperty(address _prop) public onlyMarket {
 		require(_prop != address(0), "Property is an invalid address");
-		require(
-			propertyIdToAddress[_id] == address(0),
-			"Property is already added"
-		);
-		propertyIdToAddress[_id] = _prop;
-		propertyAddressToId[_prop] = _id;
-	}
-
-	function getProperty(string memory _id) public view returns (address) {
-		return propertyIdToAddress[_id];
+		properties[_prop] = true;
 	}
 
 	function isProperty(address _addr) public view returns (bool) {
-		return propertyIdToAddress[propertyAddressToId[_addr]] != address(0);
+		return properties[_addr];
 	}
+
+	function addMetrics(address _metrics) public onlyMarket {
+		require(_metrics != address(0), "Metrics is an invalid address");
+		totalIssuedMetrics += 1;
+		metrics[_metrics] = true;
+	}
+
+	function isMetrics(address _metrics) public view returns (bool) {
+		return metrics[_metrics];
+	}
+
 }

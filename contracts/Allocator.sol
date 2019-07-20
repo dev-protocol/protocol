@@ -9,86 +9,93 @@ import "./libs/Timebased.sol";
 import "./libs/Withdrawable.sol";
 import "./Property.sol";
 import "./Market.sol";
+import "./Metrics.sol";
 import "./UseState.sol";
 
 contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
-	using SafeMath for uint;
+	using SafeMath for uint256;
 
-	mapping(address => uint) lastAllocationTimeEachProperty;
-	mapping(address => uint) lastAllocationBlockEachProperty;
-	mapping(address => uint) lastAllocationValueEachProperty;
-	mapping(address => uint) lastTotalAllocationValuePerBlockEachMarket;
+	mapping(address => uint256) lastAllocationTimeEachMetrics;
+	mapping(address => uint256) lastAllocationBlockEachMetrics;
+	mapping(address => uint256) lastAllocationValueEachMetrics;
+	uint256 public lastTotalAllocationValuePerBlock;
 
-	mapping(address => uint) initialContributionBlockEachMarket;
-	mapping(address => uint) lastContributionBlockEachMarket;
-	mapping(address => uint) totalContributionValueEachMarket;
-	mapping(address => uint) totalAllocationValueEachMarket;
+	uint256 public initialContributionBlock;
+	uint256 public lastContributionBlock;
+	uint256 public totalContributionValue;
 	mapping(address => bool) pendingIncrements;
-	mapping(address => uint) mintPerBlock;
+	uint256 public mintPerBlock;
 
-	function setSecondsPerBlock(uint _sec) public onlyOwner {
+	function setSecondsPerBlock(uint256 _sec) public onlyOwner {
 		_setSecondsPerBlock(_sec);
 	}
 
-	function updateAllocateValue(uint _value) public {
+	function updateAllocateValue(uint256 _value) public {
 		address prop = msg.sender;
 		require(isProperty(prop), "Is't Property Contract");
-		address market = Property(prop).market();
-		totalContributionValueEachMarket[market] += _value;
-		uint totalContributionsPerBlock = totalContributionValueEachMarket[market] / (
-			block.number - initialContributionBlockEachMarket[market]
-		);
-		uint lastContributionPerBlock = _value / (
-			block.number - lastContributionBlockEachMarket[market]
-		);
-		uint acceleration = lastContributionPerBlock / totalContributionsPerBlock;
-		totalAllocationValueEachMarket[market] += _value * acceleration;
-		mintPerBlock[market] = totalContributionsPerBlock * acceleration;
+		totalContributionValue += _value;
+		uint256 totalContributionsPerBlock = totalContributionValue /
+			(block.number - initialContributionBlock);
+		uint256 lastContributionPerBlock = _value /
+			(block.number - lastContributionBlock);
+		uint256 acceleration = lastContributionPerBlock /
+			totalContributionsPerBlock;
+		mintPerBlock = totalContributionsPerBlock * acceleration;
 
 		if (_value > 0) {
-			lastContributionBlockEachMarket[market] = block.number;
+			lastContributionBlock = block.number;
 		}
 	}
 
-	function allocate(address _prop) public payable {
-		require(isProperty(_prop), "Is't Property Contract");
-		uint lastDistribute = lastAllocationTimeEachProperty[_prop] > 0
-			? lastAllocationTimeEachProperty[_prop]
+	function allocate(address _metrics) public payable {
+		require(isMetrics(_metrics), "Is't Metrics Contract");
+		uint256 lastDistribute = lastAllocationTimeEachMetrics[_metrics] > 0
+			? lastAllocationTimeEachMetrics[_metrics]
 			: baseTime.time;
-		uint yesterday = timestamp() - 1 days;
-		uint diff = BokkyPooBahsDateTimeLibrary.diffDays(
+		uint256 yesterday = timestamp() - 1 days;
+		uint256 diff = BokkyPooBahsDateTimeLibrary.diffDays(
 			lastDistribute,
 			yesterday
 		);
 		require(diff >= 1, "Expected an interval is one day or more");
-		address market = Property(_prop).market();
-		pendingIncrements[_prop] = true;
+		address market = Metrics(_metrics).market();
+		pendingIncrements[_metrics] = true;
 		Market(market).calculate(
-			_prop,
-			lastAllocationTimeEachProperty[_prop],
+			_metrics,
+			lastAllocationTimeEachMetrics[_metrics],
 			yesterday
 		);
-		lastAllocationTimeEachProperty[_prop] = timestamp();
+		lastAllocationTimeEachMetrics[_metrics] = timestamp();
 	}
 
-	function calculatedCallback(address _prop, uint _value) public {
+	function calculatedCallback(address _metrics, uint256 _value) public {
 		require(
-			msg.sender == Market(Property(_prop).market()).behavior(),
+			msg.sender == Market(Metrics(_metrics).market()).behavior(),
 			"Don't call from other than Market Behavior"
 		);
 		require(
-			pendingIncrements[_prop] == true,
+			pendingIncrements[_metrics] == true,
 			"Not asking for an indicator"
 		);
-		address market = Property(_prop).market();
-		uint period = block.number - lastAllocationBlockEachProperty[_prop];
-		uint allocationPerBlock = _value / period;
-		uint nextTotalAllocationValuePerBlock = lastTotalAllocationValuePerBlockEachMarket[market] - lastAllocationValueEachProperty[_prop] + allocationPerBlock;
-		uint allocation = allocationPerBlock / nextTotalAllocationValuePerBlock * mintPerBlock[market] * period;
-		lastAllocationBlockEachProperty[_prop] = block.number;
-		lastAllocationValueEachProperty[_prop] = allocationPerBlock;
-		lastTotalAllocationValuePerBlockEachMarket[market] = nextTotalAllocationValuePerBlock;
-		increment(_prop, allocation);
-		delete pendingIncrements[_prop];
+		address market = Metrics(_metrics).market();
+		address property = Metrics(_metrics).property();
+		uint256 share = Market(market).issuedMetrics() /
+			state().totalIssuedMetrics();
+		uint256 period = block.number -
+			lastAllocationBlockEachMetrics[_metrics];
+		uint256 allocationPerBlock = _value / period;
+		uint256 nextTotalAllocationValuePerBlock = lastTotalAllocationValuePerBlock -
+			lastAllocationValueEachMetrics[_metrics] +
+			allocationPerBlock;
+		uint256 allocation = allocationPerBlock /
+			nextTotalAllocationValuePerBlock *
+			mintPerBlock *
+			share *
+			period;
+		lastAllocationBlockEachMetrics[_metrics] = block.number;
+		lastAllocationValueEachMetrics[_metrics] = allocationPerBlock;
+		lastTotalAllocationValuePerBlock = nextTotalAllocationValuePerBlock;
+		increment(property, allocation);
+		delete pendingIncrements[_metrics];
 	}
 }

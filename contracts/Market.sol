@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "./UseState.sol";
-import "./Property.sol";
+import "./Metrics.sol";
 
 contract Behavior {
 	string public schema;
@@ -17,7 +17,7 @@ contract Behavior {
 		// Implementation for authentication.
 	}
 
-	function calculate(address _prop, uint _start, uint _end)
+	function calculate(address _metrics, uint256 _start, uint256 _end)
 		public
 		returns (bool)
 	{
@@ -28,8 +28,7 @@ contract Behavior {
 contract Market is UseState {
 	bool public enabled;
 	address public behavior;
-	uint8 decimals = 18;
-	uint supply = 10000000;
+	uint256 public issuedMetrics;
 
 	constructor(address _behavior, bool _enabled) public {
 		behavior = _behavior;
@@ -48,51 +47,32 @@ contract Market is UseState {
 		string memory _args4,
 		string memory _args5
 	) public returns (bool) {
-		return Behavior(behavior).authenticate(
-			_prop,
-			_args1,
-			_args2,
-			_args3,
-			_args4,
-			_args5
-		);
+		return
+			Behavior(behavior).authenticate(
+				_prop,
+				_args1,
+				_args2,
+				_args3,
+				_args4,
+				_args5
+			);
 	}
 
-	function calculate(address _prop, uint _start, uint _end)
+	function calculate(address _metrics, uint256 _start, uint256 _end)
 		public
 		returns (bool)
 	{
-		return Behavior(behavior).calculate(_prop, _start, _end);
+		return Behavior(behavior).calculate(_metrics, _start, _end);
 	}
 
 	function vote(bool _answer) public {
 		// not implemented yet.
 	}
 
-	function authenticatedCallback(address _prop, address _owner)
-		public
-		returns (bool)
-	{
-		return Property(_prop).authorizeOwner(_owner);
-	}
-
-	function createProperty(string memory _id, string memory _symbol)
-		public
-		returns (address)
-	{
-		require(enabled == true, "This market is not enabled");
-		address exists = getProperty(_id);
-		require(exists == address(0), "Property is already created");
-		Property property = new Property(
-			address(this),
-			_id,
-			_symbol,
-			_symbol,
-			decimals,
-			supply
-		);
-		address propertyAddress = address(property);
-		addProperty(_id, propertyAddress);
-		return propertyAddress;
+	function authenticatedCallback(address _prop) public returns (address) {
+		Metrics metrics = new Metrics(_prop);
+		addMetrics(address(metrics));
+		issuedMetrics += 1;
+		return address(metrics);
 	}
 }

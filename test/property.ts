@@ -33,7 +33,7 @@ contract('Property', ([deployer]) => {
 
 	describe('Initialize Property Contract', () => {
 		it(
-			'The holder of the total supply amount of Property Contract is zero address by default'
+			'The holder of the total supply amount of Property Contract is sender address by default'
 		)
 	})
 

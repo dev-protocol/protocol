@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`1.0.0`**
+Version: **`1.1.0`**
 
 _This whitepaper may be updated. When updating, the version number is incremented according to [Semantic Versioning](https://semver.org/)._
 
@@ -56,29 +56,15 @@ Investments and contributions can be made free from an external contract called 
 
 ## Property Contract
 
-The Property Contract is a smart contract created by the Market Contract's `createProperty()` function. Property Contracts are always created in a one-to-one relationship with owned Internet asset. The Property Contract token is ERC-20 compliant and can be transferred to any address.
+The Property Contract is a smart contract created by the Property Factory Contract's `createProperty()` function. The Property Contract token is ERC-20 compliant and can be transferred to any address.
 
 Every Property Contract holder will receive Dev Tokens. The number received for each Property Contract will be evaluated/decided by the Allocator Contract.
 
 ### Creating Property Contract
 
-The Market Contract's `createProperty()` function creates a new Property Contract.
+The Property Factory Contract's `createProperty()` function creates a new Property Contract.
 
-To create a new Property Contract, it needs a property identity that expected ownership authentication. The owner of Property Contract is initially zero address, and the owner's authentication is performed asynchronously.
-
-The state where the owner's authentication has not completed is called _unauthorized_.
-
-**Note:** To make it easy for developers to register, and to make it easier to calculate the value, `totalSupply` and `decimals` must be fixed.
-
-The relationship between the Property Contract address and the Internet asset is mapped by a State Contract.
-
-### Authenticate Owner
-
-The Market Contract's `authentication()` function authenticate owner and set owner address the Property Contract.
-
-The balance held by the zero address in the Property Contract is transfer to the authorized account's address.
-
-The function takes the information required to authenticate the owner as an argument. In most cases, this information read-only token.
+To make it easy for developers to register, and to make it easier to calculate the value, `totalSupply` and `decimals` must be fixed.
 
 ### Investing in Property
 
@@ -118,19 +104,17 @@ The following pseudo-code figure the logic to update the variable `mintPerBlock`
 
 ```sol
 uint initialContributionBlock;
-uint prevContributionBlock;
-uint totalContributions;
-uint totalAllocation;
+uint lastContributionBlock;
+uint totalContributionValue;
 uint mintPerBlock;
 
 function updateAllocateValue(uint _value) internal {
-	totalContributions += _value;
-	uint totalContributionsPerBlock = totalContributions / (block.number - initialContributionBlock);
-	uint lastContributionPerBlock = _value / (block.number - prevContributionBlock);
-	uint acceleration = lastContributionPerBlock / totalContributionsPerBlock;
-	prevContributionBlock = block.number;
-	totalAllocation += _value * acceleration;
-	mintPerBlock = totalContributionsPerBlock * acceleration;
+	totalContributionValue += _value;
+	uint totalContributionValuePerBlock = totalContributionValue / (block.number - initialContributionBlock);
+	uint lastContributionPerBlock = _value / (block.number - lastContributionBlock);
+	uint acceleration = lastContributionPerBlock / totalContributionValuePerBlock;
+	lastContributionBlock = block.number;
+	mintPerBlock = totalContributionValuePerBlock * acceleration;
 }
 ```
 
@@ -147,10 +131,6 @@ For these reasons, the execution of the `contribute` and `increase` functions sh
 ## Allocator Contract
 
 The Allocator Contract role is calculating distributions and withdrawing tokens. Allocator Contracts use the index value of Internet asset to calculate how many Dev Tokens to distribute to the Property Contract. And, withdrawing tokens by requests from each user.
-
-The distributes calculation requires access to information outside the blockchain, so Oraclize is used.
-
-Oraclize requires ETH to use, so calculate function is a `payable` function.
 
 ### Running Allocator Contract
 
@@ -169,16 +149,15 @@ The Property Contract's distribution calculation uses the following variables.
 - `l` = Last index value(per block) for the target property
 - `d` = Total index value per block
 - `m` = Mint volume per block
+- `s` = Issued metrics share of the target market
 
 The basic idea is determined by the total index value(per block) and the ratio of each index value(per block). Every time a calculation is performed, the total index value is overridden and used for the next calculation.
 
 The equation is as follows.
 
 ```
-distributions = (p / t) / (d - l + (p / t)) * m * t
+distributions = (p / t) / (d - l + (p / t)) * m * s * t
 ```
-
-This calculated value should be subtracted from `totalAllocation`. It should be noted that if the calculated value exceeds `totalAllocation`, need to use `totalAllocation` as the calculated value.
 
 After this calculation, `d` is overridden by the value of`(d - l + (p / t)`.
 
@@ -320,7 +299,7 @@ contract Behavior {
 		string memory _args5
 	) public returns (bool);
 
-	function calculate(address _prop, uint _start, uint _end)
+	function calculate(address _prop, uint256 _start, uint256 _end)
 		public
 		returns (bool);
 }
@@ -333,6 +312,20 @@ It looks like this, for example:
 ```sol
 string public schema = "['read-only token', 'Your namespace', 'More something']";
 ```
+
+### Authenticate Owner
+
+The Market Contract's `authenticate()` function authenticate owner and create a new Metrics Contract.
+
+## Metrics Contract
+
+Metrics Contract is a smart contract to associate a Property Contract with a Market Contract.
+
+The Market Contract contains the address of one Property Contract and the information used by the Market Contract for authentication.
+
+The owner of the Internet assets can obtain the evaluation of the corresponding index passing the Metrics Contract address to the Allocator Contract.
+
+Metrics Contract is created after being certified by Market Contract.
 
 ## State Contract
 

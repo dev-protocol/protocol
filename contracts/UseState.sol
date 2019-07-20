@@ -26,15 +26,19 @@ contract UseState is Ownable {
 		return state().getToken();
 	}
 
-	function addProperty(string memory _id, address _prop) internal {
-		state().addProperty(_id, _prop);
-	}
-
-	function getProperty(string memory _id) internal view returns (address) {
-		return state().getProperty(_id);
+	function addProperty(address _prop) internal {
+		state().addProperty(_prop);
 	}
 
 	function isProperty(address _addr) internal view returns (bool) {
 		return state().isProperty(_addr);
+	}
+
+	function addMetrics(address _metrics) internal {
+		state().addMetrics(_metrics);
+	}
+
+	function isMetrics(address _metrics) internal view returns (bool) {
+		return state().isMetrics(_metrics);
 	}
 }

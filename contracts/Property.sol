@@ -6,27 +6,24 @@ import "./UseState.sol";
 import "./Allocator.sol";
 
 contract Property is ERC20, ERC20Detailed, UseState {
-	address public market;
 	string public id;
 
 	constructor(
-		address _market,
 		string memory _id,
 		string memory _name,
 		string memory _symbol,
 		uint8 _decimals,
-		uint _supply
+		uint256 _supply
 	) public ERC20Detailed(_name, _symbol, _decimals) {
-		market = _market;
 		id = _id;
-		_mint(address(0), _supply);
+		_mint(msg.sender, _supply);
 	}
 
-	function increase(uint _value) public returns (bool) {
+	function increase(uint256 _value) public returns (bool) {
 		// not implemented yet.
 	}
 
-	function contribute(uint _value) public returns (bool) {
+	function contribute(uint256 _value) public returns (bool) {
 		// not implemented yet.
 	}
 
@@ -46,15 +43,5 @@ contract Property is ERC20, ERC20Detailed, UseState {
 
 	function isAuthorized() public view returns (bool) {
 		return balanceOf(address(0)) != totalSupply();
-	}
-
-	function authorizeOwner(address _owner) public returns (bool) {
-		require(
-			msg.sender == market,
-			"Don't call from other than Market Contract"
-		);
-		require(isAuthorized() == false, "Already authorized");
-		_transfer(address(0), _owner, totalSupply());
-		return true;
 	}
 }
