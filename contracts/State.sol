@@ -18,7 +18,10 @@ contract State is Ownable {
 	}
 
 	modifier onlyPropertyFactory() {
-		require(msg.sender == propertyFactory, "Only Property Factory Contract");
+		require(
+			msg.sender == propertyFactory,
+			"Only Property Factory Contract"
+		);
 		_;
 	}
 
