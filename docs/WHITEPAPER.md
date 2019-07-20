@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`1.1.1`**
+Version: **`1.1.2`**
 
 _This whitepaper may be updated. When updating, the version number is incremented according to [Semantic Versioning](https://semver.org/)._
 
@@ -24,35 +24,39 @@ Dev Protocol allows anyone to add markets for the Internet asset.
 
 The market created by a Market Contract and is available once it is certified by the votes of the Dev Token holders.
 
-![Overview](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/Overview.png)
+![Overview](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Overview.png)
 
 ### Life Cycle
 
 The life cycle of Dev Protocol begins when a create a Market Contract.
 
-Market Contract allows Internet asset owners to generate their own Property Contract.
+Market Contract allows Internet asset owners to valuation their property.
 
-When Internet asset owner issues a Property Contract mapped to their property, they own 100% of those tokens. This balance will change when they transfer them to others.
+Users can create Property Contracts that are not associated with any Market Contract. Property Contract can connect with all Market Contracts. Connection requires identity verification. They own 100% of those tokens. This balance will change when they transfer them to others.
 
-The Property Contracts are ERC-20 compliant, so you can transfer them at will. In the future, we hope to create a decentralized exchange where you can list Property contracts when you issue them.
+The Property Contracts are ERC-20 compliant so that you can transfer them at will. In the future, we hope to create a decentralized exchange where you can list Property contracts when you issue them.
 
-![Create Market](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/CreateMarket.png)
+By connecting various Market Contracts to Property Contract, there can build assets freely. For example, an asset representing an owner itself or an asset representing a project.
 
-![Create Property](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/CreateProperty.png)
+![Create Market](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/CreateMarket.png)
 
-When Allocator Contract's `allocate` function is called, Property Contracts become able to receive Dev Tokens. Property Contract holders can withdraw Dev Tokens depending on their current balance.
+![Create Property](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/CreateProperty.png)
+
+![Authenticate](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Authenticate.png)
+
+When Allocator Contract's `allocate` function is called, Property Contracts become able to receive Dev Tokens. Its Allocator Contract evaluates the asset with reference to the specified Metrics Contract. Property Contract holders can withdraw Dev Tokens depending on their current balance.
 
 The number of Dev Tokens received depends on the index value of the Internet asset. Property Contract holders can then trade their Dev Tokens on the exchanges.
 
-![Allocate](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/Allocate.png)
+![Allocate](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Allocate.png)
 
 Property Contract can also accept third party investments and contributions.
 
 Investments and contributions can be made free from an external contract called Relayer.
 
-![Invest](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/Invest.png)
+![Invest](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Invest.png)
 
-![Contribution](https://raw.githubusercontent.com/dev-protocol/repository-token/whitepaper-v1/public/asset/whitepaper/Contribution.png)
+![Contribution](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Contribution.png)
 
 ## Property Contract
 
