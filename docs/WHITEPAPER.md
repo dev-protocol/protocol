@@ -317,6 +317,8 @@ string public schema = "['read-only token', 'Your namespace', 'More something']"
 
 The Market Contract's `authenticate()` function authenticate owner and create a new Metrics Contract.
 
+This function should be executed by the owner of the Property Contract, as it is involved in managing the Market Contract to which the Property Contract connects.
+
 ## Metrics Contract
 
 Metrics Contract is a smart contract to associate a Property Contract with a Market Contract.
@@ -331,27 +333,7 @@ Metrics Contract is created after being certified by Market Contract.
 
 The State Contract is a smart contract whose purpose is to make the state of the Dev Protocols permanent.
 
-The Property Contract's address and the name of the property also and Allocator Contract's address is mapped on the State Contract. It also includes several getter/setter functions to control this mapping.
-
-We can save a similar mapping without using the State Contract and just using the Property Factory Contract or the Allocator Contract. But the reason you have to use the State Contract is in the differences between life cycles.
-
-When an upgrade for the Property Contract arises, there is a chance that multiple versions of the Property Contract will exist. Ideally, the Dev Protocols would maintain a single state even if multiple Property Contracts are in existence. That is why a State Contract is prepared.
-
-### Operator
-
-The only accounts that can change the state of the State Contract are accounts included in `operator`.
-
-Only the Market Contract is included in `operator`. Whenever the Market Contract creates a new Property Contract, the State Contract is updated. The state of the State Contract affects the validation of a Property Contract when it is created, so this ability should be restricted to the Market Contract.
-
-### Adding Property Contract Address
-
-The State Contract's `addProperty()` function maps a Property Contract to a piece of property.
-
-It takes the name of the property and the Property Contract address as arguments.
-
-The State Contract must prevent property that has already been registered from being registered multiple times. This is because the state of the State Contract affects the calculation of Dev Tokens to be distributed.
-
-For this reason, only the Market Contract can call `addProperty()`, and the property used in the Market Contract's authentication process should be used as a unique key.
+This contract is used to manage values of crossover the multiple contracts. It also includes several getter/setter functions to control this state updating.
 
 ## Develop Dev Protocol
 

@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./UseState.sol";
 import "./Metrics.sol";
+import "./Property.sol";
 
 contract Behavior {
 	string public schema;
@@ -47,6 +48,10 @@ contract Market is UseState {
 		string memory _args4,
 		string memory _args5
 	) public returns (bool) {
+		require(
+			msg.sender == Property(_prop).owner(),
+			"Only owner of Property Contract"
+		);
 		return
 			Behavior(behavior).authenticate(
 				_prop,
