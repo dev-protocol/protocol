@@ -1,8 +1,8 @@
 contract('UseState', ([deployer, u1, u2]) => {
 	const useStateContract = artifacts.require('UseStateTest')
 	const stateContract = artifacts.require('State')
-	const marketContract = artifacts.require('Market')
 	const propertyContract = artifacts.require('Property')
+	const propertyFactoryContract = artifacts.require('PropertyFactory')
 
 	describe('State; changeStateAddress', () => {
 		it('Change state address', async () => {
@@ -80,10 +80,10 @@ contract('UseState', ([deployer, u1, u2]) => {
 
 	describe('Property token; addProperty', () => {
 		it('Add Property Contract token address', async () => {
-			const market = await marketContract.new({from: deployer})
+			const propertyFactory = await propertyFactoryContract.new({
+				from: deployer
+			})
 			const property = await propertyContract.new(
-				market,
-				'pkg',
 				'pkg_token',
 				'PKG',
 				18,
@@ -97,11 +97,11 @@ contract('UseState', ([deployer, u1, u2]) => {
 			await useState.changeStateAddress(state.address, {
 				from: deployer
 			})
-			await state.setMarketFactory(useState.address, {from: deployer})
-			await useState.t_addProperty('pkg', property.address, {
-				from: useState.address
+			await state.setPropertyFactory(propertyFactory.address, {from: deployer})
+			await useState.t_addProperty(property.address, {
+				from: propertyFactory.address
 			})
-			const results = await state.getProperty('pkg', {
+			const results = await state.isProperty(property.address, {
 				from: deployer
 			})
 			expect(results.toString()).to.be.equal(property.address)
