@@ -55,11 +55,11 @@ contract('Allocator', () => {
 	describe('updateAllocateValue', () => {
 		it(
 			`
-			'totalContributionValue' is 90000,
-			'initialContributionBlock' is 1,
-			and 'lastContributionBlock' is 28800.
+			'totalPaymentValue' is 90000,
+			'initialPaymentBlock' is 1,
+			and 'lastPaymentBlock' is 28800.
 			When the block is 40320,
-			if contributes 2000,
+			if pays 2000,
 			'mintPerBlock' becomes ${(92000 / (40320 - 1)) *
 				(2000 / (40320 - 28800) / (92000 / (40320 - 1)))}.`
 		)

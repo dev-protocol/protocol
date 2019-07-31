@@ -27,11 +27,7 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		// not implemented yet.
 	}
 
-	function contribute(uint256 _value) public returns (bool) {
-		// not implemented yet.
-	}
-
-	function cancelContribute() public returns (bool) {
+	function pay(uint256 _value) public returns (bool) {
 		// not implemented yet.
 	}
 

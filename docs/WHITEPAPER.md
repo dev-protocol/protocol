@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`1.1.3`**
+Version: **`1.1.4`**
 
 _This whitepaper may be updated. When updating, the version number is incremented according to [Semantic Versioning](https://semver.org/)._
 
@@ -50,13 +50,13 @@ The number of Dev Tokens received depends on the index value of the Internet ass
 
 ![Allocate](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Allocate.png)
 
-Property Contract can also accept third party investments and contributions.
+Property Contract can also accept third party investments and peyments.
 
-Investments and contributions can be made free from an external contract called Relayer.
+Investments and payments can be made free from an external contract called Relayer.
 
 ![Invest](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Invest.png)
 
-![Contribution](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Contribution.png)
+![Payment](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Payment.png)
 
 ## Property Contract
 
@@ -92,45 +92,41 @@ The Property Contract held by the investor can not be transferred to anyone; And
 
 Property Contract supports backers.
 
-Call the Property Contact's `contribute()` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and the increase withdrawable amount of Property Contract holders.
+Call the Property Contact's `pay()` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and the increase withdrawable amount of Property Contract holders.
 
-#### Canceling Contribution
+### Total Payment Value ≒ Next Total Allocated Value
 
-Contributors can withdraw their contribution only if the Property Contract is unauthorized.
+Each time a payment is added, the total allocate value for all Property Contracts is updated.
 
-### Total Contribute Value ≒ Next Total Allocated Value
-
-Each time a contribution is added or subtracted, the total allocate value for all Property Contracts is updated.
-
-The total contribution and the total distribution are not equal because the contribute acceleration is taken into account as a factor.
+The total payments and the total distribution are not equal because the payment acceleration is taken into account as a factor.
 
 The following pseudo-code figure the logic to update the variable `mintPerBlock` used for the next total allocate value.
 
 ```sol
-uint initialContributionBlock;
-uint lastContributionBlock;
-uint totalContributionValue;
+uint initialPaymentBlock;
+uint lastPaymentBlock;
+uint totalPaymentValue;
 uint mintPerBlock;
 
 function updateAllocateValue(uint _value) internal {
-	totalContributionValue += _value;
-	uint totalContributionValuePerBlock = totalContributionValue / (block.number - initialContributionBlock);
-	uint lastContributionPerBlock = _value / (block.number - lastContributionBlock);
-	uint acceleration = lastContributionPerBlock / totalContributionValuePerBlock;
-	lastContributionBlock = block.number;
-	mintPerBlock = totalContributionValuePerBlock * acceleration;
+	totalPaymentValue += _value;
+	uint totalPaymentValuePerBlock = totalPaymentValue / (block.number - initialPaymentBlock);
+	uint lastPaymentPerBlock = _value / (block.number - lastPaymentBlock);
+	uint acceleration = lastPaymentPerBlock / totalPaymentValuePerBlock;
+	lastPaymentBlock = block.number;
+	mintPerBlock = totalPaymentValuePerBlock * acceleration;
 }
 ```
 
-### Contribution Relayer/Invest Relayer
+### Payment Relayer/Invest Relayer
 
-Calling a Property Contract's `contribute` or `increase` function is restricted to third-party contracts.
+Calling a Property Contract's `pay()` or `increase` function is restricted to third-party contracts.
 
-The third-party contract is called Contribution Relayer/Invest Relayer.
+The third-party contract is called Payment Relayer/Invest Relayer.
 
 By opening the Property Contract's money collection function to Relayer, users can enjoy the benefits provided by Relayer. It could, for example, be the ability to send a message at the same time as a money transfer, get a pledge from the Property Contract owner, etc.
 
-For these reasons, the execution of the `contribute` and `increase` functions should be limited to the contract account on Ethreum.
+For these reasons, the execution of the `pay()` and `increase` functions should be limited to the contract account on Ethreum.
 
 ## Allocator Contract
 
