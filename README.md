@@ -6,7 +6,7 @@
 
 # Dev Protocol
 
-This repository is the place to develop smart contracts for Dev Repository Token.
+This repository is the place to develop smart contracts for Dev Protocol.
 
 Whitepaper: https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.md
 
