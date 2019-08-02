@@ -21,6 +21,7 @@
     "@types/ramda": "^0.26.12",
     "@typescript-eslint/eslint-plugin": "^1.11.0",
     "@typescript-eslint/parser": "^1.11.0",
+    "dotenv": "^8.0.0",
     "eslint": "^6.0.1",
     "eslint-config-prettier": "^6.0.0",
     "eslint-config-xo": "^0.26.0",
