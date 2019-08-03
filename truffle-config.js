@@ -24,11 +24,12 @@ module.exports = {
 	},
 	networks: {
 		azure: {
-			provider: createProvider(
-				WEB3_PROVIDERS_AZURE,
-				WEB3_PROVIDERS_AZURE_FROM,
-				WEB3_PROVIDERS_AZURE_ACCOUNT_PASSPHRASE
-			),
+			provider: () =>
+				createProvider(
+					WEB3_PROVIDERS_AZURE,
+					WEB3_PROVIDERS_AZURE_FROM,
+					WEB3_PROVIDERS_AZURE_ACCOUNT_PASSPHRASE
+				),
 			from: WEB3_PROVIDERS_AZURE_FROM,
 			network_id: '*',
 			gas: 0,
