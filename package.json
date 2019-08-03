@@ -7,7 +7,8 @@
   "scripts": {
     "test": "truffle test",
     "pretest": "npm run generate",
-    "generate": "truffle compile && typechain --target truffle './build/**/*.json'",
+		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
+		"deploy": "truffle migrate --reset --network",
     "lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
     "lint:eslint": "eslint . --ext .ts,.js --fix --ignore-pattern node_modules/ --ignore-pattern types/",
     "lint:solium": "solium --dir . --fix",
