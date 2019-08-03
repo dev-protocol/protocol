@@ -1,7 +1,0 @@
-{
-	"extends": "../tslint.json",
-	"rules": {
-		"file-name-casing": [true, "snake-case"],
-		"no-import-side-effect": false
-	}
-}

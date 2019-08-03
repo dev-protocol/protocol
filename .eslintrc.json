@@ -26,7 +26,7 @@
 			}
 		},
 		{
-			"files": ["migrations/**/*.ts"],
+			"files": ["migrations/**/*"],
 			"globals": {
 				"artifacts": "readonly"
 			}
