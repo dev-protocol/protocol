@@ -90,8 +90,3 @@ typings/
 # output of typechain
 build
 types
-
-# output of typescript
-*.js
-!truffle-config.js
-!migrations/*.js
