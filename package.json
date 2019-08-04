@@ -7,8 +7,8 @@
   "scripts": {
     "test": "truffle test",
     "pretest": "npm run generate",
-		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
-		"deploy": "truffle migrate --reset --network",
+    "generate": "truffle compile && typechain --target truffle './build/**/*.json'",
+    "deploy": "truffle migrate --reset --network",
     "lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
     "lint:eslint": "eslint . --ext .ts,.js --fix --ignore-pattern node_modules/ --ignore-pattern types/",
     "lint:solium": "solium --dir . --fix",
@@ -20,7 +20,6 @@
     "@types/dotenv": "^6.1.1",
     "@types/node": "^12.0.10",
     "@types/ramda": "^0.26.12",
-    "@types/web3": "^1.0.19",
     "@typescript-eslint/eslint-plugin": "^1.11.0",
     "@typescript-eslint/parser": "^1.11.0",
     "dotenv": "^8.0.0",
@@ -34,11 +33,11 @@
     "prettier-plugin-solidity": "^1.0.0-alpha.26",
     "ramda": "^0.26.1",
     "truffle": "^5.0.5",
+    "truffle-hdwallet-provider": "^1.0.15",
     "truffle-typings": "^1.0.8",
     "ts-node": "^8.3.0",
     "typechain": "^0.3.17",
-    "typescript": "^3.5.2",
-    "web3": "^1.2.0"
+    "typescript": "^3.5.2"
   },
   "dependencies": {
     "openzeppelin-solidity": "^2.3.0"
