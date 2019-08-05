@@ -95,10 +95,9 @@ contract('UseState', ([deployer, u1, u2]) => {
 				from: deployer
 			})
 			await state.setPropertyFactory(useState.address, {from: deployer})
-			await useState
-				.t_addProperty(property.address, {
-					from: deployer
-				})
+			await useState.t_addProperty(property.address, {
+				from: deployer
+			})
 
 			const results = await state.isProperty(property.address, {
 				from: deployer

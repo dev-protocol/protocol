@@ -3,7 +3,6 @@
 contract('State', ([deployer, u1, u2]) => {
 	const stateContract = artifacts.require('StateTest')
 	const propertyContract = artifacts.require('Property')
-	const propertyFactoryContract = artifacts.require('PropertyFactory')
 
 	describe('Roles; addMarket', () => {
 		it('Set Market Factory', async () => {
@@ -24,9 +23,9 @@ contract('State', ([deployer, u1, u2]) => {
 		it('Add market', async () => {
 			const contract = await stateContract.new({from: deployer})
 			await contract.setMarketFactory(u1, {from: deployer})
-            await contract.addMarket(u2, {from: u1})
-            const results = await contract.containsMarket(u2, {from: u1})
-            expect(results).to.be.equal(true)
+			await contract.addMarket(u2, {from: u1})
+			const results = await contract.containsMarket(u2, {from: u1})
+			expect(results).to.be.equal(true)
 		})
 
 		it('Should fail to add Market when sent from the non-Market Factory account', async () => {
@@ -68,7 +67,7 @@ contract('State', ([deployer, u1, u2]) => {
 	describe('Property token; addProperty', () => {
 		it('Add Property Contract token address', async () => {
 			const contract = await stateContract.new({from: deployer})
-			// use u1 address as dummy PropertyFactory's address
+			// Use u1 address as dummy PropertyFactory's address
 			await contract.setPropertyFactory(u1, {
 				from: deployer
 			})
@@ -110,9 +109,6 @@ contract('State', ([deployer, u1, u2]) => {
 
 	describe('Property token; isProperty', () => {
 		it('Verifying the passed address is a Property Contract address', async () => {
-			const propertyFactory = await propertyFactoryContract.new({
-				from: deployer
-			})
 			const address = '0x111122223333444455556666777788889999aAaa'
 			const contract = await stateContract.new({from: deployer})
 			await contract.setPropertyFactory(u1, {
@@ -126,9 +122,6 @@ contract('State', ([deployer, u1, u2]) => {
 		})
 
 		it('Should fail to verify the passed address is a Property Contract address when not exists Property Contract', async () => {
-			const propertyFactory = await propertyFactoryContract.new({
-				from: deployer
-			})
 			const contract = await stateContract.new({from: deployer})
 			await contract.setPropertyFactory(u1, {
 				from: deployer
@@ -139,7 +132,7 @@ contract('State', ([deployer, u1, u2]) => {
 			const results = await contract
 				.isProperty('0x111122223333444455556666777788889999aAaa')
 				.catch((err: Error) => err)
-            expect(results).to.be.equal(false)
+			expect(results).to.be.equal(false)
 		})
 	})
 
