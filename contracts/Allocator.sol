@@ -20,9 +20,9 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 	mapping(address => uint256) lastAllocationValueEachMetrics;
 	uint256 public lastTotalAllocationValuePerBlock;
 
-	uint256 public initialContributionBlock;
-	uint256 public lastContributionBlock;
-	uint256 public totalContributionValue;
+	uint256 public initialPaymentBlock;
+	uint256 public lastPaymentBlock;
+	uint256 public totalPaymentValue;
 	mapping(address => bool) pendingIncrements;
 	uint256 public mintPerBlock;
 
@@ -33,17 +33,16 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 	function updateAllocateValue(uint256 _value) public {
 		address prop = msg.sender;
 		require(isProperty(prop), "Is't Property Contract");
-		totalContributionValue += _value;
-		uint256 totalContributionsPerBlock = totalContributionValue /
-			(block.number - initialContributionBlock);
-		uint256 lastContributionPerBlock = _value /
-			(block.number - lastContributionBlock);
-		uint256 acceleration = lastContributionPerBlock /
-			totalContributionsPerBlock;
-		mintPerBlock = totalContributionsPerBlock * acceleration;
+		totalPaymentValue += _value;
+		uint256 totalPaymentsPerBlock = totalPaymentValue /
+			(block.number - initialPaymentBlock);
+		uint256 lastPaymentPerBlock = _value /
+			(block.number - lastPaymentBlock);
+		uint256 acceleration = lastPaymentPerBlock / totalPaymentsPerBlock;
+		mintPerBlock = totalPaymentsPerBlock * acceleration;
 
 		if (_value > 0) {
-			lastContributionBlock = block.number;
+			lastPaymentBlock = block.number;
 		}
 	}
 

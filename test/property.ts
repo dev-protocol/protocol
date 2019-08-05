@@ -27,7 +27,7 @@ contract('Property', () => {
 		)
 	})
 
-	describe('contribute', () => {
+	describe('pay', () => {
 		it('Sender burns the self specified number of DEVs')
 
 		it(
@@ -35,16 +35,8 @@ contract('Property', () => {
 		)
 
 		it(
-			'Should fail to contribute when sent from other than a smart-contract address'
+			'Should fail to payment when sent from other than a smart-contract address'
 		)
-	})
-
-	describe('cancelContribute', () => {
-		it(
-			'When unauthenticated, the sender can withdrawal the number of DEVs self burned'
-		)
-
-		it('Should fail to cancel when the Property Contract is authenticated')
 	})
 
 	describe('transfer', () => {

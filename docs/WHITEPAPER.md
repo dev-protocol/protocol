@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`1.1.2`**
+Version: **`1.1.4`**
 
 _This whitepaper may be updated. When updating, the version number is incremented according to [Semantic Versioning](https://semver.org/)._
 
@@ -24,7 +24,7 @@ Dev Protocol allows anyone to add markets for the Internet asset.
 
 The market created by a Market Contract and is available once it is certified by the votes of the Dev Token holders.
 
-![Overview](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Overview.png)
+![Overview](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Overview.png)
 
 ### Life Cycle
 
@@ -38,25 +38,25 @@ The Property Contracts are ERC-20 compliant so that you can transfer them at wil
 
 By connecting various Market Contracts to Property Contract, there can build assets freely. For example, an asset representing an owner itself or an asset representing a project.
 
-![Create Market](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/CreateMarket.png)
+![Create Market](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/CreateMarket.png)
 
-![Create Property](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/CreateProperty.png)
+![Create Property](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/CreateProperty.png)
 
-![Authenticate](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Authenticate.png)
+![Authenticate](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Authenticate.png)
 
 When Allocator Contract's `allocate` function is called, Property Contracts become able to receive Dev Tokens. Its Allocator Contract evaluates the asset with reference to the specified Metrics Contract. Property Contract holders can withdraw Dev Tokens depending on their current balance.
 
 The number of Dev Tokens received depends on the index value of the Internet asset. Property Contract holders can then trade their Dev Tokens on the exchanges.
 
-![Allocate](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Allocate.png)
+![Allocate](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Allocate.png)
 
-Property Contract can also accept third party investments and contributions.
+Property Contract can also accept third party investments and peyments.
 
-Investments and contributions can be made free from an external contract called Relayer.
+Investments and payments can be made free from an external contract called Relayer.
 
-![Invest](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Invest.png)
+![Invest](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Invest.png)
 
-![Contribution](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/whitepaper/Contribution.png)
+![Payment](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Payment.png)
 
 ## Property Contract
 
@@ -92,45 +92,41 @@ The Property Contract held by the investor can not be transferred to anyone; And
 
 Property Contract supports backers.
 
-Call the Property Contact's `contribute()` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and the increase withdrawable amount of Property Contract holders.
+Call the Property Contact's `pay()` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and the increase withdrawable amount of Property Contract holders.
 
-#### Canceling Contribution
+### Total Payment Value ≒ Next Total Allocated Value
 
-Contributors can withdraw their contribution only if the Property Contract is unauthorized.
+Each time a payment is added, the total allocate value for all Property Contracts is updated.
 
-### Total Contribute Value ≒ Next Total Allocated Value
-
-Each time a contribution is added or subtracted, the total allocate value for all Property Contracts is updated.
-
-The total contribution and the total distribution are not equal because the contribute acceleration is taken into account as a factor.
+The total payments and the total distribution are not equal because the payment acceleration is taken into account as a factor.
 
 The following pseudo-code figure the logic to update the variable `mintPerBlock` used for the next total allocate value.
 
 ```sol
-uint initialContributionBlock;
-uint lastContributionBlock;
-uint totalContributionValue;
+uint initialPaymentBlock;
+uint lastPaymentBlock;
+uint totalPaymentValue;
 uint mintPerBlock;
 
 function updateAllocateValue(uint _value) internal {
-	totalContributionValue += _value;
-	uint totalContributionValuePerBlock = totalContributionValue / (block.number - initialContributionBlock);
-	uint lastContributionPerBlock = _value / (block.number - lastContributionBlock);
-	uint acceleration = lastContributionPerBlock / totalContributionValuePerBlock;
-	lastContributionBlock = block.number;
-	mintPerBlock = totalContributionValuePerBlock * acceleration;
+	totalPaymentValue += _value;
+	uint totalPaymentValuePerBlock = totalPaymentValue / (block.number - initialPaymentBlock);
+	uint lastPaymentPerBlock = _value / (block.number - lastPaymentBlock);
+	uint acceleration = lastPaymentPerBlock / totalPaymentValuePerBlock;
+	lastPaymentBlock = block.number;
+	mintPerBlock = totalPaymentValuePerBlock * acceleration;
 }
 ```
 
-### Contribution Relayer/Invest Relayer
+### Payment Relayer/Invest Relayer
 
-Calling a Property Contract's `contribute` or `increase` function is restricted to third-party contracts.
+Calling a Property Contract's `pay()` or `increase` function is restricted to third-party contracts.
 
-The third-party contract is called Contribution Relayer/Invest Relayer.
+The third-party contract is called Payment Relayer/Invest Relayer.
 
 By opening the Property Contract's money collection function to Relayer, users can enjoy the benefits provided by Relayer. It could, for example, be the ability to send a message at the same time as a money transfer, get a pledge from the Property Contract owner, etc.
 
-For these reasons, the execution of the `contribute` and `increase` functions should be limited to the contract account on Ethreum.
+For these reasons, the execution of the `pay()` and `increase` functions should be limited to the contract account on Ethreum.
 
 ## Allocator Contract
 
@@ -185,9 +181,9 @@ When the user account invokes the `withdraw()` function, the user can receive a 
 The Allocator Contract's `increment()` function adds the rating given by the Allocator Contract to `total` and `price`.
 
 ```sol
-function increment(address _repository, uint _value) internal {
-    totals[_repository] += _value;
-    prices[_repository] += total / ERC20(_repository).totalSupply();
+function increment(address _property, uint _value) internal {
+    totals[_property] += _value;
+    prices[_property] += total / ERC20(_property).totalSupply();
 }
 ```
 
@@ -195,7 +191,7 @@ function increment(address _repository, uint _value) internal {
 
 The Allocator Contract's `withdraw()` function will deposit into the user's account as many Dev Tokens as they can receive. The processing fee for this transaction is a quantity of ETH equivalent to the value of `oraclize_getPrice("URL")`. This is usually a small amount. This processing fee is deposited into the Allocator Contract and will be used for the calculation of the next distribution.
 
-The value of `prices[_repository]` after executing `withdraw()` will be mapped in each user account, and subtracted from withdrawing amount the next time `withdraw()` is called. The value of `prices[_repository]` is constantly added to. For that reason, subtracting the previous value of `prices[_repository]` is the same as withdrawing the value received from the previous execution until the present.
+The value of `prices[_property]` after executing `withdraw()` will be mapped in each user account, and subtracted from withdrawing amount the next time `withdraw()` is called. The value of `prices[_property]` is constantly added to. For that reason, subtracting the previous value of `prices[_property]` is the same as withdrawing the value received from the previous execution until the present.
 
 ```sol
 struct WithdrawalLimit {
@@ -206,23 +202,23 @@ mapping(address => mapping(address => uint)) internal lastWithdrawalPrices;
 mapping(address => mapping(address => uint)) internal pendingWithdrawals;
 mapping(address => mapping(address => WithdrawalLimit)) internal withdrawalLimits;
 
-function withdraw(address _repository) public payable {
-    uint _value = calculateWithdrawableAmount(_repository, msg.sender);
-    uint value = _value + pendingWithdrawals[_repository][msg.sender];
+function withdraw(address _property) public payable {
+    uint _value = calculateWithdrawableAmount(_property, msg.sender);
+    uint value = _value + pendingWithdrawals[_property][msg.sender];
     ERC20(token).mint(msg.sender, value);
-    lastWithdrawalPrices[_repository][msg.sender] = price;
-    pendingWithdrawals[_repository][msg.sender] = 0;
+    lastWithdrawalPrices[_property][msg.sender] = price;
+    pendingWithdrawals[_property][msg.sender] = 0;
 }
 
-function calculateWithdrawableAmount(address _repository, address _user)
+function calculateWithdrawableAmount(address _property, address _user)
     private
     view
     returns (uint)
 {
-    uint _last = lastWithdrawalPrices[_repository][_user];
-    WithdrawalLimit memory _limit = withdrawalLimits[_repository][_user];
+    uint _last = lastWithdrawalPrices[_property][_user];
+    WithdrawalLimit memory _limit = withdrawalLimits[_property][_user];
     uint priceGap = price - _last;
-    uint balance = ERC20(_repository).balanceOf(_user);
+    uint balance = ERC20(_property).balanceOf(_user);
     if (_limit.total == total) {
         balance = _limit.balance;
     }
@@ -231,7 +227,7 @@ function calculateWithdrawableAmount(address _repository, address _user)
 }
 ```
 
-This calculation is only completed when the user account's balance is fixed. Hence, before the balance is changed, `lastWithdrawalPrices` and `pendingWithdrawals` must be updated. Also, when the balance is changed, a withdrawal limit will be set for the recipient. This withdrawal limit only applies while `total[_repository]` is the same. Like `price[_repository]`, the value of `total[_repository]` is constantly added to. Creating a withdrawal limit for that recipient when the balance is changed means that the amount that can be withdrawn is determined by the balance at the time of last distribution.
+This calculation is only completed when the user account's balance is fixed. Hence, before the balance is changed, `lastWithdrawalPrices` and `pendingWithdrawals` must be updated. Also, when the balance is changed, a withdrawal limit will be set for the recipient. This withdrawal limit only applies while `total[_property]` is the same. Like `price[_property]`, the value of `total[_property]` is constantly added to. Creating a withdrawal limit for that recipient when the balance is changed means that the amount that can be withdrawn is determined by the balance at the time of last distribution.
 
 This is what the implementation of Property Contract's `transfer()` function looks like.
 
@@ -343,7 +339,7 @@ This contract is used to manage values of crossover the multiple contracts. It a
 
 Dev Protocol is OSS. Anyone can participate in its development.
 
-- GitHub: https://github.com/dev-protocol/repository-token
+- GitHub: https://github.com/dev-protocol/protocol
 - Discord: https://discord.gg/VwJp4KM
 - Spectrum: https://spectrum.chat/devtoken
 - Twitter: https://twitter.com/devtoken_rocks
