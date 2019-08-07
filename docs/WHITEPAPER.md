@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`1.1.4`**
+Version: **`1.1.5`**
 
 _This whitepaper may be updated. When updating, the version number is incremented according to [Semantic Versioning](https://semver.org/)._
 
@@ -274,7 +274,7 @@ This function takes a contract address that defines Market Contract's behavior.
 
 The new Market Contract will be activated upon a vote by the Dev Token owner.
 
-The balance of the voter's Dev Token determines the importance of one vote. Voting chooses yes/no. When the total number of votes reaches 10% of the total Dev Token total supply, the Market Contract becomes effective if the number of positive votes exceeds the negative ones.
+The number of Dev Tokens sent by the voter determines the importance of one vote. Voting always means "Yes," not to vote means "No." Burn Dev Token by each voting. When the total number of votes reaches 10% of the total Dev Token total supply, the Market Contract becomes enabled.
 
 ### Contract as a behavior
 
@@ -310,7 +310,21 @@ contract Behavior {
 It looks like this, for example:
 
 ```sol
-string public schema = "['read-only token', 'Your namespace', 'More something']";
+string public schema = "['Your asset identity', 'Read-only token' 'More something']";
+```
+
+Market Contract's `authenticate()` function always treats the second argument as a unique ID. So, you cannot enter an existing value.
+
+The following schema is the correct example:
+
+```sol
+string public schema = "['Your GitHub repository(e.g. your-name/repos)', 'Read-only token']";
+```
+
+Then, the following schema is the incorrect example:
+
+```sol
+string public schema = "['Read-only token', 'Your GitHub repository(e.g. your-name/repos)']";
 ```
 
 ### Authenticate Owner
