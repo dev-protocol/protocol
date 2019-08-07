@@ -9,6 +9,10 @@ contract('Market', () => {
 		it(
 			'Should fail to run when sent from other than the owner of Property Contract'
 		)
+
+		it(
+			'Should fail to the transaction if the second argument as ID and a Metrics Contract exists with the same ID.'
+		)
 	})
 
 	describe('authenticatedCallback', () => {
@@ -28,20 +32,12 @@ contract('Market', () => {
 	})
 
 	describe('vote', () => {
-		it('Vote in favor, votes are the number of DEVs held by the sender')
+		it('Vote as a positive vote, votes are the number of sent DEVs')
 
 		it(
-			'Vote as a negative vote, votes are the number of DEVs held by the sender'
+			'When votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled'
 		)
 
-		it(
-			'When votes for more than 10% of the total supply of DEV are obtained, and if there are more positive votes than negative votes, this Market Contract is enabled'
-		)
-
-		it(
-			'When votes for more than 10% of the total supply of DEV are obtained, and if there are more negative votes than positive votes, this Market Contract is disabled'
-		)
-
-		it('Should fail to vote when already determined enabled/ disabled')
+		it('Should fail to vote when already determined enabled')
 	})
 })
