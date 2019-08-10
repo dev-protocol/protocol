@@ -2,7 +2,6 @@ contract('UseState', ([deployer, u1, u2]) => {
 	const useStateContract = artifacts.require('UseStateTest')
 	const stateContract = artifacts.require('State')
 	const propertyContract = artifacts.require('Property')
-	const propertyFactoryContract = artifacts.require('PropertyFactory')
 
 	describe('State; changeStateAddress', () => {
 		it('Change state address', async () => {
@@ -80,10 +79,8 @@ contract('UseState', ([deployer, u1, u2]) => {
 
 	describe('Property token; addProperty', () => {
 		it('Add Property Contract token address', async () => {
-			const propertyFactory = await propertyFactoryContract.new({
-				from: deployer
-			})
 			const property = await propertyContract.new(
+				deployer,
 				'pkg_token',
 				'PKG',
 				18,
@@ -97,14 +94,15 @@ contract('UseState', ([deployer, u1, u2]) => {
 			await useState.changeStateAddress(state.address, {
 				from: deployer
 			})
-			await state.setPropertyFactory(propertyFactory.address, {from: deployer})
+			await state.setPropertyFactory(useState.address, {from: deployer})
 			await useState.t_addProperty(property.address, {
-				from: propertyFactory.address
+				from: deployer
 			})
+
 			const results = await state.isProperty(property.address, {
 				from: deployer
 			})
-			expect(results.toString()).to.be.equal(property.address)
+			expect(results).to.be.equal(true)
 		})
 
 		it(
