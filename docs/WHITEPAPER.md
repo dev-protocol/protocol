@@ -144,9 +144,9 @@ The calculation of the number of distributions is through by the Allocator Contr
 
 The Property Contract's distribution calculation uses the following variables.
 
-- `p` = The index value of the target property in a specified period
+- `p` = The index value of the target metrics in a specified period
 - `t` = Specified period
-- `l` = Last index value(per block) for the target property
+- `l` = Last index value(per block) for the target metrics
 - `d` = Total index value per block
 - `m` = Mint volume per block
 - `s` = Issued metrics share of the target market
