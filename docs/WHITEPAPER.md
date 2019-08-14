@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`1.2.0`**
+Version: **`1.2.1`**
 
 _This whitepaper may be updated. When updating, the version number is incremented according to [Semantic Versioning](https://semver.org/)._
 
@@ -50,11 +50,9 @@ The number of Dev Tokens received depends on the index value of the Internet ass
 
 ![Allocate](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Allocate.png)
 
-Property Contract can also accept third party investments and peyments.
+Property Contract can also receive third-party payments.
 
-Investments and payments can be made free from an external contract called Relayer.
-
-![Invest](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Invest.png)
+Payments can receive payments freely from an external contract called Relayer.
 
 ![Payment](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Payment.png)
 
