@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`1.1.5`**
+Version: **`1.2.0`**
 
 _This whitepaper may be updated. When updating, the version number is incremented according to [Semantic Versioning](https://semver.org/)._
 
@@ -70,24 +70,6 @@ The Property Factory Contract's `createProperty()` function creates a new Proper
 
 To make it easy for developers to register, and to make it easier to calculate the value, `totalSupply` and `decimals` must be fixed.
 
-### Investing in Property
-
-Property Contract supports third-party investments.
-
-Call the Property Contact's `increase` function and send a Dev Token to the Property Contract. The Dev Token sent is burned and receives the new-minted Property Contract as compensation.
-
-The number of new Property Contract issuances is determined by the ratio to the cumulative number of received Dev Tokens in the Property Contract. The ratio is multiplied by the Property Contract's `totalSupply` to obtain the number of new issuances. In order to protect members of Internet asset, the composition of investors should be limited to a maximum of 50%.
-
-Investors hold part of the Property Contract. In other words, the investor can receive part of Dev Token that Property Contract receives. Investing against a highly growing Property Contract means increasing your Dev Token.
-
-However, it should be kept in mind that Internet assets do not inherently make a profit. This market is a minus-sum in the long run.
-
-Invest in the Property Contract mean supporting the market for Internet assets.
-
-Investors will be withdrawing Dev Token when their property turns positive and there will be watching the activity of next investors.
-
-The Property Contract held by the investor can not be transferred to anyone; And, burn when withdrawn distributed Dev Token.
-
 ### Support to Property
 
 Property Contract supports backers.
@@ -118,15 +100,15 @@ function updateAllocateValue(uint _value) internal {
 }
 ```
 
-### Payment Relayer/Invest Relayer
+### Payment Relayer
 
-Calling a Property Contract's `pay()` or `increase` function is restricted to third-party contracts.
+Calling a Property Contract's `pay()` function is restricted to third-party contracts.
 
-The third-party contract is called Payment Relayer/Invest Relayer.
+The third-party contract is called Payment Relayer.
 
 By opening the Property Contract's money collection function to Relayer, users can enjoy the benefits provided by Relayer. It could, for example, be the ability to send a message at the same time as a money transfer, get a pledge from the Property Contract owner, etc.
 
-For these reasons, the execution of the `pay()` and `increase` functions should be limited to the contract account on Ethreum.
+For these reasons, the execution of the `pay()` functions should be limited to the contract account on Ethreum.
 
 ## Allocator Contract
 

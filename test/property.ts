@@ -15,18 +15,6 @@ contract('Property', () => {
 		it('Total supply is string passed in the fifth argument')
 	})
 
-	describe('increase', () => {
-		it('Sender burns the self specified number of DEVs')
-
-		it(
-			'The sender takes a new mint of Property Contract, depending on the total dividend amount of Property Contract and the ratio of DEVs incinerated by the sender'
-		)
-
-		it(
-			'Should fail to increase when sent from other than a smart-contract address'
-		)
-	})
-
 	describe('pay', () => {
 		it('Sender burns the self specified number of DEVs')
 

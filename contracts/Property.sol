@@ -23,10 +23,6 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		return _owner;
 	}
 
-	function increase(uint256 _value) public returns (bool) {
-		// not implemented yet.
-	}
-
 	function pay(uint256 _value) public returns (bool) {
 		// not implemented yet.
 	}
