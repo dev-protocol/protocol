@@ -68,18 +68,18 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) public {
+		Metrics metrics = Metrics(_metrics);
+		Market market = Market(metrics.market());
 		require(
-			msg.sender == Market(Metrics(_metrics).market()).behavior(),
+			msg.sender == market.behavior(),
 			"Don't call from other than Market Behavior"
 		);
 		require(
 			pendingIncrements[_metrics] == true,
 			"Not asking for an indicator"
 		);
-		address market = Metrics(_metrics).market();
-		address property = Metrics(_metrics).property();
-		uint256 share = Market(market).issuedMetrics() /
-			state().totalIssuedMetrics();
+		address property = metrics.property();
+		uint256 share = market.issuedMetrics() / state().totalIssuedMetrics();
 		uint256 period = block.number -
 			lastAllocationBlockEachMetrics[_metrics];
 		uint256 allocationPerBlock = _value / period;
