@@ -1,4 +1,8 @@
-contract('Market', () => {
+import {BigNumber} from 'bignumber.js'
+
+contract('Market', ([deployer, u1, u2]) => {
+	const marketContract = artifacts.require('Market')
+
 	describe('schema', () => {
 		it('Get Schema of mapped Behavior Contract')
 	})
@@ -32,10 +36,23 @@ contract('Market', () => {
 	})
 
 	describe('vote', () => {
-		it('Vote as a positive vote, votes are the number of sent DEVs')
+		it('Vote as a positive vote, votes are the number of sent DEVs', async () => {
+			const market = await marketContract.new(u1, false, {from: deployer})
+			// Console.log(market.address)
+
+			await market.vote(10, {from: u2}) // 1 DEV
+			const firstTotalVotes = await market.getTotalVotes({from: u2})
+			// console.log(firstTotalVotes.toNumber())
+
+			expect(firstTotalVotes.toNumber()).to.be.equal(10)
+
+			await market.vote(20, {from: u2}) // 3 DEV
+			const secondTotalVotes = await market.getTotalVotes({from: u2})
+			expect(secondTotalVotes.toNumber()).to.be.equal(30)
+		})
 
 		it(
-			'When votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled'
+			'When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled'
 		)
 
 		it('Should fail to vote when already determined enabled')
