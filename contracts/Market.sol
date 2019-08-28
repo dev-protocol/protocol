@@ -29,12 +29,17 @@ contract Behavior {
 }
 
 contract Market is UseState {
-    using SafeMath for uint256;
+	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
 	uint256 public issuedMetrics;
 	uint256 private totalVotes;
 	address public DEVaddress;
+
+	modifier onlyInvalidMarket() {
+		require(enabled == false, "Market is already valid.");
+		_;
+	}
 
 	constructor(address _behavior, bool _enabled) public {
 		behavior = _behavior;
@@ -75,7 +80,7 @@ contract Market is UseState {
 		return Behavior(behavior).calculate(_metrics, _start, _end);
 	}
 
-	function vote(uint256 _tokenNumber) public {
+	function vote(uint256 _tokenNumber) public onlyInvalidMarket {
 		totalVotes = totalVotes + _tokenNumber;
 		uint256 DEVtotalSupply = ERC20(DEVaddress).totalSupply();
 		if (totalVotes >= DEVtotalSupply.div(10)) {
@@ -97,5 +102,9 @@ contract Market is UseState {
 
 	function setDEVtokenAddress(address _devAddress) public {
 		DEVaddress = _devAddress;
+	}
+
+	function activateMarket() public {
+		enabled = true;
 	}
 }

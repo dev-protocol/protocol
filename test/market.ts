@@ -58,12 +58,18 @@ contract('Market', ([deployer, u1, u2]) => {
 
 			await market.vote(1000, {from: u2})
 			const isEnable = await market.enabled({from: u1})
-	
+
 			expect(isEnable).to.be.true
-	
-			
 		})
 
-		it('Should fail to vote when already determined enabled')
+		it('Should fail to vote when already determined enabled', async () => {
+			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000,{from: deployer})
+			const market = await marketContract.new(u1, false, {from: deployer})
+			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+			await market.activateMarket({from: deployer})
+
+			const result = await market.vote(100, {from: u2}).catch((err: Error) => err)
+			expect(result).to.instanceOf(Error)
+		})
 	})
 })
