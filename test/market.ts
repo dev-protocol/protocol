@@ -1,5 +1,6 @@
 contract('Market', ([deployer, u1, u2]) => {
 	const marketContract = artifacts.require('Market')
+	const dummyDEVContract = artifacts.require('DummyDEV')
 
 	describe('schema', () => {
 		it('Get Schema of mapped Behavior Contract')
@@ -48,8 +49,18 @@ contract('Market', ([deployer, u1, u2]) => {
 		})
 
 		it(
-			'When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled'
-		)
+			'When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled', async () => {
+			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000,{from: deployer})
+			const market = await marketContract.new(u1, false, {from: deployer})
+			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+
+			await market.vote(1000, {from: u2})
+			const isEnable = await market.enabled({from: u1})
+	
+			expect(isEnable).to.be.true
+	
+			
+		})
 
 		it('Should fail to vote when already determined enabled')
 	})

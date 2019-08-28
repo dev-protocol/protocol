@@ -85,4 +85,8 @@ contract Market is UseState {
 	function getTotalVotes() public view returns (uint256) {
 		return totalVotes;
 	}
+
+	function setDEVtokenAddress(address _devAddress) public {
+		// TODO 
+	}
 }
