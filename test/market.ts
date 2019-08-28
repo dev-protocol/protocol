@@ -36,7 +36,9 @@ contract('Market', ([deployer, u1, u2]) => {
 
 	describe('vote', () => {
 		it('Vote as a positive vote, votes are the number of sent DEVs', async () => {
+			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000,{from: deployer})
 			const market = await marketContract.new(u1, false, {from: deployer})
+			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
 			await market.vote(10, {from: u2})
 			const firstTotalVotes = await market.getTotalVotes({from: u2})

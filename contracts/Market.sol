@@ -3,6 +3,8 @@ pragma solidity ^0.5.0;
 import "./UseState.sol";
 import "./Metrics.sol";
 import "./Property.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract Behavior {
 	string public schema;
@@ -27,10 +29,12 @@ contract Behavior {
 }
 
 contract Market is UseState {
+    using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
 	uint256 public issuedMetrics;
 	uint256 private totalVotes;
+	address public DEVaddress;
 
 	constructor(address _behavior, bool _enabled) public {
 		behavior = _behavior;
@@ -73,6 +77,11 @@ contract Market is UseState {
 
 	function vote(uint256 _tokenNumber) public {
 		totalVotes = totalVotes + _tokenNumber;
+		uint256 DEVtotalSupply = ERC20(DEVaddress).totalSupply();
+		if (totalVotes >= DEVtotalSupply.div(10)) {
+			enabled = true;
+		}
+
 	}
 
 	function authenticatedCallback(address _prop) public returns (address) {
@@ -87,6 +96,6 @@ contract Market is UseState {
 	}
 
 	function setDEVtokenAddress(address _devAddress) public {
-		// TODO 
+		DEVaddress = _devAddress;
 	}
 }
