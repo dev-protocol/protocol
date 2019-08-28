@@ -30,6 +30,7 @@ contract Market is UseState {
 	bool public enabled;
 	address public behavior;
 	uint256 public issuedMetrics;
+	uint256 private totalVotes;
 
 	constructor(address _behavior, bool _enabled) public {
 		behavior = _behavior;
@@ -70,8 +71,8 @@ contract Market is UseState {
 		return Behavior(behavior).calculate(_metrics, _start, _end);
 	}
 
-	function vote(bool _answer) public {
-		// not implemented yet.
+	function vote(uint256 _tokenNumber) public {
+		totalVotes = totalVotes + _tokenNumber;
 	}
 
 	function authenticatedCallback(address _prop) public returns (address) {
@@ -79,5 +80,9 @@ contract Market is UseState {
 		addMetrics(address(metrics));
 		issuedMetrics += 1;
 		return address(metrics);
+	}
+
+	function getTotalVotes() public view returns (uint256) {
+		return totalVotes;
 	}
 }
