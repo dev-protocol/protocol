@@ -1,5 +1,3 @@
-import {BigNumber} from 'bignumber.js'
-
 contract('Market', ([deployer, u1, u2]) => {
 	const marketContract = artifacts.require('Market')
 
@@ -38,15 +36,13 @@ contract('Market', ([deployer, u1, u2]) => {
 	describe('vote', () => {
 		it('Vote as a positive vote, votes are the number of sent DEVs', async () => {
 			const market = await marketContract.new(u1, false, {from: deployer})
-			// Console.log(market.address)
 
-			await market.vote(10, {from: u2}) // 1 DEV
+			await market.vote(10, {from: u2})
 			const firstTotalVotes = await market.getTotalVotes({from: u2})
-			// console.log(firstTotalVotes.toNumber())
 
 			expect(firstTotalVotes.toNumber()).to.be.equal(10)
 
-			await market.vote(20, {from: u2}) // 3 DEV
+			await market.vote(20, {from: u2})
 			const secondTotalVotes = await market.getTotalVotes({from: u2})
 			expect(secondTotalVotes.toNumber()).to.be.equal(30)
 		})
