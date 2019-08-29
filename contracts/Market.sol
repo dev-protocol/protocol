@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "./UseState.sol";
 import "./Metrics.sol";
 import "./Property.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract Behavior {
@@ -82,7 +82,8 @@ contract Market is UseState {
 
 	function vote(uint256 _tokenNumber) public onlyInvalidMarket {
 		totalVotes = totalVotes + _tokenNumber;
-		uint256 DEVtotalSupply = ERC20(DEVaddress).totalSupply();
+		uint256 DEVtotalSupply = ERC20Burnable(DEVaddress).totalSupply();
+		ERC20Burnable(DEVaddress).burn(_tokenNumber);
 		if (totalVotes >= DEVtotalSupply.div(10)) {
 			enabled = true;
 		}
