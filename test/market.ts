@@ -37,6 +37,8 @@ contract('Market', ([deployer, u1, u2]) => {
 	describe('vote', () => {
 		it('Vote as a positive vote, votes are the number of sent DEVs', async () => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000,{from: deployer})
+			await dummyDEV.transfer(u2, 1000, {from: deployer})
+
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
@@ -53,6 +55,8 @@ contract('Market', ([deployer, u1, u2]) => {
 		it(
 			'When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled', async () => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000,{from: deployer})
+			await dummyDEV.transfer(u2, 5000, {from: deployer})
+
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
@@ -64,12 +68,27 @@ contract('Market', ([deployer, u1, u2]) => {
 
 		it('Should fail to vote when already determined enabled', async () => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000,{from: deployer})
+			await dummyDEV.transfer(u2, 1000, {from: deployer})
+
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 			await market.activateMarket({from: deployer})
 
 			const result = await market.vote(100, {from: u2}).catch((err: Error) => err)
 			expect(result).to.instanceOf(Error)
+		})
+
+		it ('Vote decrease the number of sent DEVs from voter owned DEVs', async () => {
+			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {from: deployer})
+			await dummyDEV.transfer(u1, 1000, {from: deployer})
+
+			const market = await marketContract.new(u1, false, {from: deployer})
+			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+
+			await market.vote(100, {from: u1})
+			const ownedDEVs = await dummyDEV.balanceOf(u1, {from: u1})
+
+			expect(ownedDEVs.toNumber()).to.be.equal(900)
 		})
 	})
 })
