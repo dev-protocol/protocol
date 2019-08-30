@@ -98,5 +98,20 @@ contract('Market', ([deployer, u1, u2]) => {
 
 			expect(ownedDEVs.toNumber()).to.be.equal(900)
 		})
+
+		it ('Vote decrease the number of sent DEVs from DEVtoken totalSupply', async () => {
+			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {from: deployer})
+			await dummyDEV.transfer(u1, 1000, {from: deployer})
+
+			const market = await marketContract.new(u1, false, {from: deployer})
+			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+
+			await dummyDEV.approve(market.address, 100, {from: u1})
+
+			await market.vote(100, {from: u1})
+			const DEVsTotalSupply = await dummyDEV.totalSupply({from: u1})
+
+			expect(DEVsTotalSupply.toNumber()).to.be.equal(9900)
+		})
 	})
 })
