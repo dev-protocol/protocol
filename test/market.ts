@@ -42,6 +42,8 @@ contract('Market', ([deployer, u1, u2]) => {
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
+			await dummyDEV.approve(market.address, 40, {from: u2})
+
 			await market.vote(10, {from: u2})
 			const firstTotalVotes = await market.getTotalVotes({from: u2})
 
@@ -60,6 +62,8 @@ contract('Market', ([deployer, u1, u2]) => {
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
+			await dummyDEV.approve(market.address, 1000, {from: u2})
+
 			await market.vote(1000, {from: u2})
 			const isEnable = await market.enabled({from: u1})
 
@@ -74,6 +78,8 @@ contract('Market', ([deployer, u1, u2]) => {
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 			await market.activateMarket({from: deployer})
 
+			await dummyDEV.approve(market.address, 100, {from: u2})
+
 			const result = await market.vote(100, {from: u2}).catch((err: Error) => err)
 			expect(result).to.instanceOf(Error)
 		})
@@ -84,6 +90,8 @@ contract('Market', ([deployer, u1, u2]) => {
 
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+
+			await dummyDEV.approve(market.address, 100, {from: u1})
 
 			await market.vote(100, {from: u1})
 			const ownedDEVs = await dummyDEV.balanceOf(u1, {from: u1})

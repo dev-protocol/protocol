@@ -80,14 +80,19 @@ contract Market is UseState {
 		return Behavior(behavior).calculate(_metrics, _start, _end);
 	}
 
+	/**
+	 * In advance, msg.sender is supposed to approve same amount DEV token as vote number.
+	 *
+	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol
+	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
+	 */
 	function vote(uint256 _tokenNumber) public onlyInvalidMarket {
+		ERC20Burnable(DEVaddress).burnFrom(msg.sender, _tokenNumber);
 		totalVotes = totalVotes + _tokenNumber;
 		uint256 DEVtotalSupply = ERC20Burnable(DEVaddress).totalSupply();
-		ERC20Burnable(DEVaddress).burn(_tokenNumber);
 		if (totalVotes >= DEVtotalSupply.div(10)) {
 			enabled = true;
 		}
-
 	}
 
 	function authenticatedCallback(address _prop) public returns (address) {
