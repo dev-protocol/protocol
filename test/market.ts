@@ -47,12 +47,12 @@ contract('Market', ([deployer, u1, u2]) => {
 			await dummyDEV.approve(market.address, 40, {from: u2})
 
 			await market.vote(10, {from: u2})
-			const firstTotalVotes = await market.getTotalVotes({from: u2})
+			const firstTotalVotes = await market.totalVotes({from: u2})
 
 			expect(firstTotalVotes.toNumber()).to.be.equal(10)
 
 			await market.vote(20, {from: u2})
-			const secondTotalVotes = await market.getTotalVotes({from: u2})
+			const secondTotalVotes = await market.totalVotes({from: u2})
 			expect(secondTotalVotes.toNumber()).to.be.equal(30)
 		})
 

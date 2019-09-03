@@ -33,7 +33,7 @@ contract Market is UseState {
 	bool public enabled;
 	address public behavior;
 	uint256 public issuedMetrics;
-	uint256 private totalVotes;
+	uint256 public totalVotes;
 	address public DEVaddress;
 
 	modifier onlyInvalidMarket() {
@@ -100,10 +100,6 @@ contract Market is UseState {
 		addMetrics(address(metrics));
 		issuedMetrics += 1;
 		return address(metrics);
-	}
-
-	function getTotalVotes() public view returns (uint256) {
-		return totalVotes;
 	}
 
 	function setDEVtokenAddress(address _devAddress) public {
