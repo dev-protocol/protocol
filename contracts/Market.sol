@@ -105,8 +105,4 @@ contract Market is UseState {
 	function setDEVtokenAddress(address _devAddress) public {
 		DEVaddress = _devAddress;
 	}
-
-	function activateMarket() public {
-		enabled = true;
-	}
 }

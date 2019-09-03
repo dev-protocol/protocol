@@ -79,9 +79,8 @@ contract('Market', ([deployer, u1, u2]) => {
 			})
 			await dummyDEV.transfer(u2, 1000, {from: deployer})
 
-			const market = await marketContract.new(u1, false, {from: deployer})
+			const market = await marketContract.new(u1, true, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
-			await market.activateMarket({from: deployer})
 
 			await dummyDEV.approve(market.address, 100, {from: u2})
 
