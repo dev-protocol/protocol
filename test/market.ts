@@ -39,20 +39,19 @@ contract('Market', ([deployer, u1, u2]) => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
-			await dummyDEV.transfer(u2, 1000, {from: deployer})
 
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
-			await dummyDEV.approve(market.address, 40, {from: u2})
+			await dummyDEV.approve(market.address, 40, {from: deployer})
 
-			await market.vote(10, {from: u2})
-			const firstTotalVotes = await market.totalVotes({from: u2})
+			await market.vote(10, {from: deployer})
+			const firstTotalVotes = await market.totalVotes({from: deployer})
 
 			expect(firstTotalVotes.toNumber()).to.be.equal(10)
 
-			await market.vote(20, {from: u2})
-			const secondTotalVotes = await market.totalVotes({from: u2})
+			await market.vote(20, {from: deployer})
+			const secondTotalVotes = await market.totalVotes({from: deployer})
 			expect(secondTotalVotes.toNumber()).to.be.equal(30)
 		})
 
@@ -60,15 +59,14 @@ contract('Market', ([deployer, u1, u2]) => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
-			await dummyDEV.transfer(u2, 5000, {from: deployer})
 
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
-			await dummyDEV.approve(market.address, 1000, {from: u2})
+			await dummyDEV.approve(market.address, 1000, {from: deployer})
 
-			await market.vote(1000, {from: u2})
-			const isEnable = await market.enabled({from: u1})
+			await market.vote(1000, {from: deployer})
+			const isEnable = await market.enabled({from: deployer})
 
 			expect(isEnable).to.be.equal(true)
 		})
@@ -77,15 +75,14 @@ contract('Market', ([deployer, u1, u2]) => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
-			await dummyDEV.transfer(u2, 1000, {from: deployer})
 
 			const market = await marketContract.new(u1, true, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
-			await dummyDEV.approve(market.address, 100, {from: u2})
+			await dummyDEV.approve(market.address, 100, {from: deployer})
 
 			const result = await market
-				.vote(100, {from: u2})
+				.vote(100, {from: deployer})
 				.catch((err: Error) => err)
 			expect(result).to.instanceOf(Error)
 		})
@@ -94,32 +91,30 @@ contract('Market', ([deployer, u1, u2]) => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
-			await dummyDEV.transfer(u1, 1000, {from: deployer})
 
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
-			await dummyDEV.approve(market.address, 100, {from: u1})
+			await dummyDEV.approve(market.address, 100, {from: deployer})
 
-			await market.vote(100, {from: u1})
-			const ownedDEVs = await dummyDEV.balanceOf(u1, {from: u1})
+			await market.vote(100, {from: deployer})
+			const ownedDEVs = await dummyDEV.balanceOf(deployer, {from: deployer})
 
-			expect(ownedDEVs.toNumber()).to.be.equal(900)
+			expect(ownedDEVs.toNumber()).to.be.equal(9900)
 		})
 
 		it('Vote decrease the number of sent DEVs from DEVtoken totalSupply', async () => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
-			await dummyDEV.transfer(u1, 1000, {from: deployer})
 
 			const market = await marketContract.new(u1, false, {from: deployer})
 			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
 
-			await dummyDEV.approve(market.address, 100, {from: u1})
+			await dummyDEV.approve(market.address, 100, {from: deployer})
 
-			await market.vote(100, {from: u1})
-			const DEVsTotalSupply = await dummyDEV.totalSupply({from: u1})
+			await market.vote(100, {from: deployer})
+			const DEVsTotalSupply = await dummyDEV.totalSupply({from: deployer})
 
 			expect(DEVsTotalSupply.toNumber()).to.be.equal(9900)
 		})
