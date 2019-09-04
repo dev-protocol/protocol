@@ -1,6 +1,7 @@
 contract('Market', ([deployer, u1, u2]) => {
 	const marketContract = artifacts.require('Market')
 	const dummyDEVContract = artifacts.require('DummyDEV')
+	const stateContract = artifacts.require('State')
 
 	describe('schema', () => {
 		it('Get Schema of mapped Behavior Contract')
@@ -39,9 +40,11 @@ contract('Market', ([deployer, u1, u2]) => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
+			const state = await stateContract.new({from: deployer})
+			await state.setToken(dummyDEV.address, {from: deployer})
 
 			const market = await marketContract.new(u1, false, {from: deployer})
-			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+			await market.changeStateAddress(state.address, {from: deployer})
 
 			await dummyDEV.approve(market.address, 40, {from: deployer})
 
@@ -59,9 +62,11 @@ contract('Market', ([deployer, u1, u2]) => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
+			const state = await stateContract.new({from: deployer})
+			await state.setToken(dummyDEV.address, {from: deployer})
 
 			const market = await marketContract.new(u1, false, {from: deployer})
-			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+			await market.changeStateAddress(state.address, {from: deployer})
 
 			await dummyDEV.approve(market.address, 1000, {from: deployer})
 
@@ -75,9 +80,11 @@ contract('Market', ([deployer, u1, u2]) => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
+			const state = await stateContract.new({from: deployer})
+			await state.setToken(dummyDEV.address, {from: deployer})
 
 			const market = await marketContract.new(u1, true, {from: deployer})
-			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+			await market.changeStateAddress(state.address, {from: deployer})
 
 			await dummyDEV.approve(market.address, 100, {from: deployer})
 
@@ -91,9 +98,11 @@ contract('Market', ([deployer, u1, u2]) => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
+			const state = await stateContract.new({from: deployer})
+			await state.setToken(dummyDEV.address, {from: deployer})
 
 			const market = await marketContract.new(u1, false, {from: deployer})
-			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+			await market.changeStateAddress(state.address, {from: deployer})
 
 			await dummyDEV.approve(market.address, 100, {from: deployer})
 
@@ -107,9 +116,11 @@ contract('Market', ([deployer, u1, u2]) => {
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
+			const state = await stateContract.new({from: deployer})
+			await state.setToken(dummyDEV.address, {from: deployer})
 
 			const market = await marketContract.new(u1, false, {from: deployer})
-			await market.setDEVtokenAddress(dummyDEV.address, {from: deployer})
+			await market.changeStateAddress(state.address, {from: deployer})
 
 			await dummyDEV.approve(market.address, 100, {from: deployer})
 
