@@ -1,4 +1,4 @@
-contract('Market', ([deployer, u1, u2]) => {
+contract('Market', ([deployer, u1]) => {
 	const marketContract = artifacts.require('Market')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const stateContract = artifacts.require('State')
