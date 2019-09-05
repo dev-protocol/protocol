@@ -35,8 +35,8 @@ contract Market is UseState {
 	uint256 public issuedMetrics;
 	uint256 public totalVotes;
 
-	modifier onlyInvalidMarket() {
-		require(enabled == false, "Market is already valid.");
+	modifier onlyDisabledMarket() {
+		require(enabled == false, "Market is already enabled.");
 		_;
 	}
 
@@ -85,7 +85,7 @@ contract Market is UseState {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
-	function vote(uint256 _tokenNumber) public onlyInvalidMarket {
+	function vote(uint256 _tokenNumber) public onlyDisabledMarket {
 		ERC20Burnable(getToken()).burnFrom(msg.sender, _tokenNumber);
 		totalVotes = totalVotes + _tokenNumber;
 		uint256 DEVtotalSupply = ERC20Burnable(getToken()).totalSupply();
