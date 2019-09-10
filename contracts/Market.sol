@@ -3,6 +3,8 @@ pragma solidity ^0.5.0;
 import "./UseState.sol";
 import "./Metrics.sol";
 import "./Property.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract Behavior {
 	string public schema;
@@ -27,9 +29,16 @@ contract Behavior {
 }
 
 contract Market is UseState {
+	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
 	uint256 public issuedMetrics;
+	uint256 public totalVotes;
+
+	modifier onlyDisabledMarket() {
+		require(enabled == false, "Market is already enabled.");
+		_;
+	}
 
 	constructor(address _behavior, bool _enabled) public {
 		behavior = _behavior;
@@ -70,8 +79,19 @@ contract Market is UseState {
 		return Behavior(behavior).calculate(_metrics, _start, _end);
 	}
 
-	function vote(bool _answer) public {
-		// not implemented yet.
+	/**
+	 * In advance, msg.sender is supposed to approve same amount DEV token as vote number.
+	 *
+	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol
+	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
+	 */
+	function vote(uint256 _tokenNumber) public onlyDisabledMarket {
+		ERC20Burnable(getToken()).burnFrom(msg.sender, _tokenNumber);
+		totalVotes = totalVotes + _tokenNumber;
+		uint256 DEVtotalSupply = ERC20Burnable(getToken()).totalSupply();
+		if (totalVotes >= DEVtotalSupply.div(10)) {
+			enabled = true;
+		}
 	}
 
 	function authenticatedCallback(address _prop) public returns (address) {
