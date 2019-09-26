@@ -16,14 +16,21 @@ contract('Property', () => {
 	})
 
 	describe('pay', () => {
-		it('Sender burns the self specified number of DEVs')
+		it('Sender burns the self specified number of DEVs', asyonc () => {
 
+        })
+
+		// TODO Withdrawable incrementをたたけばいい
 		it(
 			'The number of DEVs burned by the sender is added to the withdrawal amount'
 		)
 
 		it(
 			'Should fail to payment when sent from other than a smart-contract address'
+		)
+
+        it(
+			'Should fail to payment when Sender try to send more DEVs than Sender owned DEVs'
 		)
 	})
 
