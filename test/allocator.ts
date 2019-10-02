@@ -110,4 +110,10 @@ contract('Allocator', () => {
 			'Should fail to destruct this contract when sent from the non-owner account'
 		)
 	})
+
+	describe('invest', () => {
+		it('is able to be called from a Property Contract')
+
+		it('adds wisdrawable amount to specified Token')
+	})
 })

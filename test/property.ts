@@ -1,4 +1,8 @@
-contract('Property', () => {
+contract('Property', ([deployer, u1]) => {
+	const marketContract = artifacts.require('Market')
+	const dummyDEVContract = artifacts.require('DummyDEV')
+	const stateContract = artifacts.require('State')
+
 	describe('Initialize Property Contract', () => {
 		it(
 			'Holder of the total supply amount is address passed in the first argument'
@@ -16,9 +20,7 @@ contract('Property', () => {
 	})
 
 	describe('pay', () => {
-		it('Sender burns the self specified number of DEVs', asyonc () => {
-
-        })
+		it('Sender burns the self specified number of DEVs', async () => {})
 
 		// TODO Withdrawable incrementをたたけばいい
 		it(
@@ -29,7 +31,7 @@ contract('Property', () => {
 			'Should fail to payment when sent from other than a smart-contract address'
 		)
 
-        it(
+		it(
 			'Should fail to payment when Sender try to send more DEVs than Sender owned DEVs'
 		)
 	})
