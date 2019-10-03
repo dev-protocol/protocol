@@ -170,28 +170,3 @@ contract('Allocator', ([deployer, u1, u2]) => {
 		)
 	})
 })
-
-// Const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
-// 				from: deployer
-// 			})
-// 			const state = await stateContract.new({from: deployer})
-// 			await state.setToken(dummyDEV.address, {from: deployer})
-
-// 			const market = await marketContract.new(u1, false, {from: deployer})
-// 			await market.changeStateAddress(state.address, {from: deployer})
-
-// 			await dummyDEV.approve(market.address, 40, {from: deployer})
-
-// 			await market.vote(10, {from: deployer})
-// 			const firstTotalVotes = await market.totalVotes({from: deployer})
-
-// 			expect(firstTotalVotes.toNumber()).to.be.equal(10)
-
-// 			await market.vote(20, {from: deployer})
-// 			const secondTotalVotes = await market.totalVotes({from: deployer})
-// 			expect(secondTotalVotes.toNumber()).to.be.equal(30)
-
-// const result = await market
-// 				.vote(100, {from: deployer})
-// 				.catch((err: Error) => err)
-// 			expect(result).to.instanceOf(Error)
