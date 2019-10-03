@@ -1,4 +1,8 @@
-contract('Allocator', () => {
+contract('Allocator', ([deployer, u1]) => {
+	const marketContract = artifacts.require('Market')
+	const dummyDEVContract = artifacts.require('DummyDEV')
+	const stateContract = artifacts.require('State')
+
 	describe('allocate', () => {
 		it("Calls Market Contract's calculate function mapped to Metrics Contract")
 
@@ -112,8 +116,21 @@ contract('Allocator', () => {
 	})
 
 	describe('invest', () => {
-		it('is able to be called from a Property Contract')
+		it('is able to specify a Property Contract address')
 
-		it('adds wisdrawable amount to specified Token')
+		it('Sender burns the self specified number of DEVs', async () => {})
+
+		// TODO Withdrawable incrementをたたけばいい
+		it(
+			'The number of DEVs burned by the sender is added to the withdrawal amount'
+		)
+
+		it(
+			'Should fail to payment when sent from other than a smart-contract address'
+		)
+
+		it(
+			'Should fail to payment when Sender try to send more DEVs than Sender owned DEVs'
+		)
 	})
 })
