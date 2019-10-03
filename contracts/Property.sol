@@ -23,10 +23,6 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		return _owner;
 	}
 
-	function pay(uint256 _value) public returns (bool) {
-		// not implemented yet.
-	}
-
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		Allocator(allocator()).beforeBalanceChange(
 			address(this),
