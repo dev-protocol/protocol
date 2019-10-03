@@ -106,10 +106,11 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 		delete pendingIncrements[_metrics];
 	}
 
-	function investToProperty(address _property, uint256 _ammout)
+	function investToProperty(address _property, uint256 _amount)
 		public
 		onlyProperty(_property)
 	{
 		// TODO WIP
+		ERC20Burnable(getToken()).burnFrom(msg.sender, _amount);
 	}
 }

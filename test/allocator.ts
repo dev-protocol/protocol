@@ -150,7 +150,11 @@ contract('Allocator', ([deployer, u1, u2]) => {
 			expect(result).to.instanceOf(Error)
 		})
 
-		it('Sender burns the self specified number of DEVs', async () => {})
+		it('Sender burns the self specified number of DEVs', async () => {
+			await allocator.investToProperty(u1, 40, {from: deployer})
+			const ownedDEVs = await dummyDEV.balanceOf(deployer, {from: deployer})
+			expect(ownedDEVs.toNumber()).to.be.equal(9960)
+		})
 
 		// TODO Withdrawable incrementをたたけばいい
 		it(
