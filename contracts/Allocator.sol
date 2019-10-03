@@ -26,6 +26,14 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 	mapping(address => bool) pendingIncrements;
 	uint256 public mintPerBlock;
 
+	modifier onlyProperty(address _addr) {
+		require(
+			isProperty(_addr) == true,
+			"only Property contract address can be specified"
+		);
+		_;
+	}
+
 	function setSecondsPerBlock(uint256 _sec) public onlyOwner {
 		_setSecondsPerBlock(_sec);
 	}
@@ -96,5 +104,12 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 		lastTotalAllocationValuePerBlock = nextTotalAllocationValuePerBlock;
 		increment(property, allocation);
 		delete pendingIncrements[_metrics];
+	}
+
+	function investToProperty(address _property, uint256 _ammout)
+		public
+		onlyProperty(_property)
+	{
+		// TODO WIP
 	}
 }

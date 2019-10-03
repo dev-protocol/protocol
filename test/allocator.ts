@@ -1,7 +1,13 @@
-contract('Allocator', ([deployer, u1]) => {
-	const marketContract = artifacts.require('Market')
+import {
+	AllocatorInstance,
+	StateInstance,
+	DummyDEVInstance
+} from '../types/truffle-contracts'
+
+contract('Allocator', ([deployer, u1, u2]) => {
+	const allocatorContract = artifacts.require('Allocator')
 	const dummyDEVContract = artifacts.require('DummyDEV')
-	const stateContract = artifacts.require('State')
+	const stateContract = artifacts.require('StateTest')
 
 	describe('allocate', () => {
 		it("Calls Market Contract's calculate function mapped to Metrics Contract")
@@ -116,7 +122,33 @@ contract('Allocator', ([deployer, u1]) => {
 	})
 
 	describe('invest', () => {
-		it('is able to specify a Property Contract address')
+		var dummyDEV: DummyDEVInstance
+		var state: StateInstance
+		var allocator: AllocatorInstance
+
+		beforeEach(async () => {
+			dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
+				from: deployer
+			})
+
+			state = await stateContract.new({from: deployer})
+			await state.setToken(dummyDEV.address, {from: deployer})
+			await state.setPropertyFactory(deployer, {from: deployer})
+			await state.addProperty(u1, {from: deployer})
+
+			allocator = await allocatorContract.new({from: deployer})
+			await allocator.changeStateAddress(state.address, {from: deployer})
+
+			await dummyDEV.approve(allocator.address, 40, {from: deployer})
+		})
+
+		it('is able to specify a Property Contract address', async () => {
+			const result = await allocator
+				.investToProperty(u2, 40, {from: deployer})
+				.catch((err: Error) => err)
+
+			expect(result).to.instanceOf(Error)
+		})
 
 		it('Sender burns the self specified number of DEVs', async () => {})
 
@@ -134,3 +166,28 @@ contract('Allocator', ([deployer, u1]) => {
 		)
 	})
 })
+
+// Const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
+// 				from: deployer
+// 			})
+// 			const state = await stateContract.new({from: deployer})
+// 			await state.setToken(dummyDEV.address, {from: deployer})
+
+// 			const market = await marketContract.new(u1, false, {from: deployer})
+// 			await market.changeStateAddress(state.address, {from: deployer})
+
+// 			await dummyDEV.approve(market.address, 40, {from: deployer})
+
+// 			await market.vote(10, {from: deployer})
+// 			const firstTotalVotes = await market.totalVotes({from: deployer})
+
+// 			expect(firstTotalVotes.toNumber()).to.be.equal(10)
+
+// 			await market.vote(20, {from: deployer})
+// 			const secondTotalVotes = await market.totalVotes({from: deployer})
+// 			expect(secondTotalVotes.toNumber()).to.be.equal(30)
+
+// const result = await market
+// 				.vote(100, {from: deployer})
+// 				.catch((err: Error) => err)
+// 			expect(result).to.instanceOf(Error)
