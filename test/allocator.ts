@@ -154,14 +154,6 @@ contract('Allocator', ([deployer, u1]) => {
 			await dummyDEV.approve(allocator.address, 10000, {from: deployer})
 		})
 
-		it('is able to specify a Property Contract address', async () => {
-			const result = await allocator
-				.investToProperty(u1, 100, {from: deployer})
-				.catch((err: Error) => err)
-
-			expect(result).to.instanceOf(Error)
-		})
-
 		it('Sender burns the self specified number of DEVs', async () => {
 			await allocator.investToProperty(property.address, 100, {from: deployer})
 			const ownedDEVs = await dummyDEV.balanceOf(deployer, {from: deployer})
@@ -188,6 +180,14 @@ contract('Allocator', ([deployer, u1]) => {
 		it(
 			'Should fail to payment when sent from other than a smart-contract address'
 		)
+
+		it('Should fail to specify address except Property Contract address', async () => {
+			const result = await allocator
+				.investToProperty(u1, 100, {from: deployer})
+				.catch((err: Error) => err)
+
+			expect(result).to.instanceOf(Error)
+		})
 
 		it('Should fail to payment when Sender try to send more DEVs than Sender owned DEVs', async () => {
 			const result = await allocator
