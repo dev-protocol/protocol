@@ -189,8 +189,12 @@ contract('Allocator', ([deployer, u1]) => {
 			'Should fail to payment when sent from other than a smart-contract address'
 		)
 
-		it(
-			'Should fail to payment when Sender try to send more DEVs than Sender owned DEVs'
-		)
+		it('Should fail to payment when Sender try to send more DEVs than Sender owned DEVs', async () => {
+			const result = await allocator
+				.investToProperty(property.address, 2000000000, {from: deployer})
+				.catch((err: Error) => err)
+
+			expect(result).to.instanceOf(Error)
+		})
 	})
 })
