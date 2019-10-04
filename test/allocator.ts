@@ -1,13 +1,15 @@
 import {
-	AllocatorInstance,
 	StateInstance,
-	DummyDEVInstance
+	DummyDEVInstance,
+	AllocatorTestInstance,
+	PropertyInstance
 } from '../types/truffle-contracts'
 
-contract('Allocator', ([deployer, u1, u2]) => {
-	const allocatorContract = artifacts.require('Allocator')
+contract('Allocator', ([deployer, u1]) => {
+	const allocatorContract = artifacts.require('AllocatorTest')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const stateContract = artifacts.require('StateTest')
+	const propertyContract = artifacts.require('Property')
 
 	describe('allocate', () => {
 		it("Calls Market Contract's calculate function mapped to Metrics Contract")
@@ -124,7 +126,8 @@ contract('Allocator', ([deployer, u1, u2]) => {
 	describe('invest', () => {
 		var dummyDEV: DummyDEVInstance
 		var state: StateInstance
-		var allocator: AllocatorInstance
+		var allocator: AllocatorTestInstance
+		var property: PropertyInstance
 
 		beforeEach(async () => {
 			dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
@@ -134,32 +137,53 @@ contract('Allocator', ([deployer, u1, u2]) => {
 			state = await stateContract.new({from: deployer})
 			await state.setToken(dummyDEV.address, {from: deployer})
 			await state.setPropertyFactory(deployer, {from: deployer})
-			await state.addProperty(u1, {from: deployer})
+
+			property = await propertyContract.new(
+				deployer,
+				'test',
+				'TEST',
+				18,
+				1000,
+				{from: deployer}
+			)
+			await state.addProperty(property.address, {from: deployer})
 
 			allocator = await allocatorContract.new({from: deployer})
 			await allocator.changeStateAddress(state.address, {from: deployer})
 
-			await dummyDEV.approve(allocator.address, 40, {from: deployer})
+			await dummyDEV.approve(allocator.address, 10000, {from: deployer})
 		})
 
 		it('is able to specify a Property Contract address', async () => {
 			const result = await allocator
-				.investToProperty(u2, 40, {from: deployer})
+				.investToProperty(u1, 100, {from: deployer})
 				.catch((err: Error) => err)
 
 			expect(result).to.instanceOf(Error)
 		})
 
 		it('Sender burns the self specified number of DEVs', async () => {
-			await allocator.investToProperty(u1, 40, {from: deployer})
+			await allocator.investToProperty(property.address, 100, {from: deployer})
 			const ownedDEVs = await dummyDEV.balanceOf(deployer, {from: deployer})
-			expect(ownedDEVs.toNumber()).to.be.equal(9960)
+			expect(ownedDEVs.toNumber()).to.be.equal(9900)
 		})
 
-		// TODO Withdrawable incrementをたたけばいい
-		it(
-			'The number of DEVs burned by the sender is added to the withdrawal amount'
-		)
+		it('The number of DEVs burned by the sender is added to the withdrawal amount', async () => {
+			await allocator.investToProperty(property.address, 10000, {
+				from: deployer
+			})
+
+			const withdrawTotal = await allocator.getTotal(property.address, {
+				from: deployer
+			})
+
+			const withdrawPrice = await allocator.getPrice(property.address, {
+				from: deployer
+			})
+
+			expect(withdrawTotal.toNumber()).to.be.equal(10000)
+			expect(withdrawPrice.toNumber()).to.be.equal(10)
+		})
 
 		it(
 			'Should fail to payment when sent from other than a smart-contract address'

@@ -112,5 +112,6 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 	{
 		// TODO WIP
 		ERC20Burnable(getToken()).burnFrom(msg.sender, _amount);
+		increment(_property, _amount);
 	}
 }
