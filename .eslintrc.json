@@ -22,7 +22,11 @@
 				"expect": "readonly",
 				"it": "readonly",
 				"artifacts": "readonly",
-				"contract": "readonly"
+				"contract": "readonly",
+				"beforeEach": "readonly",
+				"before": "readonly",
+				"afterEach": "readonly",
+				"after": "readonly"
 			}
 		},
 		{
