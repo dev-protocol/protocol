@@ -4,7 +4,7 @@ import {
 	StateTestInstance
 } from '../types/truffle-contracts'
 
-contract('PropertyFactory', ([deployer, u1]) => {
+contract('PropertyFactory', ([deployer]) => {
 	const propertyFactoryContract = artifacts.require('PropertyFactory')
 	const propertyContract = artifacts.require('Property')
 	const stateContract = artifacts.require('StateTest')
