@@ -46,6 +46,12 @@ contract('PropertyFactory', ([deployer, u1]) => {
 			expect(totalSupply.toNumber()).to.be.equal(10000000)
 		})
 
-		it('Adds a new Property Contract address to State Contract')
+		it('Adds a new Property Contract address to State Contract', async () => {
+			const isProperty = await state.isProperty(expectedPropertyAddress, {
+				from: deployer
+			})
+
+			expect(isProperty).to.be.equal(true)
+		})
 	})
 })
