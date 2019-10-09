@@ -15,18 +15,6 @@ contract('Property', () => {
 		it('Total supply is string passed in the fifth argument')
 	})
 
-	describe('pay', () => {
-		it('Sender burns the self specified number of DEVs')
-
-		it(
-			'The number of DEVs burned by the sender is added to the withdrawal amount'
-		)
-
-		it(
-			'Should fail to payment when sent from other than a smart-contract address'
-		)
-	})
-
 	describe('transfer', () => {
 		it(
 			"Execute the Allocator Contract's 'beforeBalanceChange' function before the 'transfer' function changes the balance"
