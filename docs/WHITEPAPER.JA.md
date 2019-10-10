@@ -61,3 +61,22 @@ Property Contractはサードパーティの支払いも受け取ることがで
 支払いは、Relayerと呼ばれる外部契約から支払いを自由に受け取ることができます。
 
 ![Payment](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Payment.png)
+
+## Property Contract
+
+Property Contractは、Property Factory Contractの `createProperty（）`関数によって作成されたスマートコントラクトです。Property Contract TokenはERC-20に準拠しており、任意のアドレスに転送できます。
+
+全てのProperty ContractホルダーはDev Tokenを受け取ります。それぞれのProperty Contractから受け取るDev Tokenの数はAllocator Contractによって評価/決定されます。
+
+### Property Contractの作成
+
+Property Factory Contractの `createProperty（）`関数は新しいProperty Contractを作成します。
+
+開発者が登録しやすくし、計算しやすくするには`totalSupply` と `decimals` を修正する必要があります。
+
+### Propertyのサポート
+
+Property Contract は支援者をサポートします。
+
+Property Contactの `pay（）`関数を呼び出し、Property ContactにDev Tokenを送信します。送信されたDev Tokenはバーンされ、Property Contractホルダーの引き出し可能な額が増加します。
+
