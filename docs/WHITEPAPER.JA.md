@@ -80,3 +80,37 @@ Property Contract は支援者をサポートします。
 
 Property Contactの `pay（）`関数を呼び出し、Property ContactにDev Tokenを送信します。送信されたDev Tokenはバーンされ、Property Contractホルダーの引き出し可能な額が増加します。
 
+
+### 合計支払額 ≒ 次回合計割り当て値
+
+支払いされるたびに、全てのProperty Contractの合計割り当て値が更新されます。
+
+支払い加速度が要員として考慮されるため、合計支払いと合計分配は等しくありません、
+
+次の擬似コードは、次の合計割り当て値に使用される変数 `mintPerBlock`を更新するロジックを示しています。
+
+```sol
+uint initialPaymentBlock;
+uint lastPaymentBlock;
+uint totalPaymentValue;
+uint mintPerBlock;
+
+function updateAllocateValue(uint _value) internal {
+	totalPaymentValue += _value;
+	uint totalPaymentValuePerBlock = totalPaymentValue / (block.number - initialPaymentBlock);
+	uint lastPaymentPerBlock = _value / (block.number - lastPaymentBlock);
+	uint acceleration = lastPaymentPerBlock / totalPaymentValuePerBlock;
+	lastPaymentBlock = block.number;
+	mintPerBlock = totalPaymentValuePerBlock * acceleration;
+}
+```
+
+### Payment Relayer
+
+Property Contractの `pay（）`関数の呼び出しは、サードパーティのコントラクトに制限されています。
+
+そのサードパーティのコントラクトをPayment Relayerと呼ばれます。
+
+By opening the Property Contract's money collection function to Relayer, users can enjoy the benefits provided by Relayer. It could, for example, be the ability to send a message at the same time as a money transfer, get a pledge from the Property Contract owner, etc.
+
+For these reasons, the execution of the `pay()` functions should be limited to the contract account on Ethreum.
