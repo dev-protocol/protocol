@@ -106,7 +106,7 @@ The third-party contract is called Payment Relayer.
 
 By opening the Property Contract's money collection function to Relayer, users can enjoy the benefits provided by Relayer. It could, for example, be the ability to send a message at the same time as a money transfer, get a pledge from the Property Contract owner, etc.
 
-For these reasons, the execution of the `pay()` functions should be limited to the contract account on Ethreum.
+For these reasons, the execution of the `pay()` functions should be limited to the contract account on Ethereum.
 
 ## Allocator Contract
 
