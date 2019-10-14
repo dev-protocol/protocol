@@ -266,4 +266,88 @@ Market Factory Contractの `createMarket（）`関数は新しいMarket Contract
 
 投票者が送信したDev Tokenの数によって、1つの投票の重要性が決まります。投票は常に「はい」を意味し、投票しないことは「いいえ」を意味します。投票ごとに開発トークンはバーンされます。投票総数がDev Tokenの合計供給量の10％に達すると、Market Contractが有効になります。
 
+### Contract の動作
 
+コントラクトには、2つのパブリック関数、 `authenticate（）`と `calculate（）`が必要です。
+
+Market Contractは、Property Contractの所有権を認証するために `authenticate（）`関数を呼び出します。それは、インターネット資産にマップされたProperty Contractの所有者を認証し、Market Contract.の `authenticatedCallback（）` を呼び出すことが期待されます。
+
+Allocator Contractは `calculate（）`関数を呼び出して、Property Contractへの新しい配布数を計算します。それは、インターネットアセットにマップされたProperty Contractのメトリックを取得し、Allocator Contractの `calculatedCallback（）`を呼び出すことを期待しています。
+
+
+このコントラクトのインターフェイスは次のようになります。
+
+```sol
+contract Behavior {
+	string public schema;
+
+	function authenticate(
+		address _prop,
+		string memory _args1,
+		string memory _args2,
+		string memory _args3,
+		string memory _args4,
+		string memory _args5
+	) public returns (bool);
+
+	function calculate(address _prop, uint256 _start, uint256 _end)
+		public
+		returns (bool);
+}
+```
+
+`authenticate（）`関数は、ターゲットのProperty Contractアドレスに加えて、最大5つの引数を取ることができます。`schema`をJSON文字列として配列として定義して、各引数の意味を示す必要があります。
+
+たとえば、次のようになります。
+
+```sol
+string public schema = "['Your asset identity', 'Read-only token' 'More something']";
+```
+
+Market Contract'の `authenticate（）`関数は、常に2番目の引数を一意のIDとして扱います。したがって、既存の値を入力することはできません。
+
+次のスキーマは正しい例です。
+
+```sol
+string public schema = "['Your GitHub repository(e.g. your-name/repos)', 'Read-only token']";
+```
+
+そして、次のスキーマは間違った例です。
+
+```sol
+string public schema = "['Read-only token', 'Your GitHub repository(e.g. your-name/repos)']";
+```
+
+### 所有者の認証
+
+Market Contractの「authenticate（）」関数は所有者を認証し、新しいMetrics Contractを作成します。
+
+この機能は、Property Contractが接続するMarket Contractの管理に関与するため、Property Contractの所有者が実行する必要があります。
+
+## Metrics Contract
+
+Metrics Contractは、Property ContractをMarket Contractに関連付けるsmart contractです。
+
+Market Contract には、1つのProperty Contractのアドレスと、認証のためにMarket Contractで使用される情報が含まれています。
+
+インターネット資産の所有者は、Metrics ContractアドレスをAllocator Contractに渡す対応するインデックスの評価を取得できます。
+
+Metrics Contractは、Market Contractによって認証された後に作成されます。
+
+## State Contract
+
+State Contractは、Dev Protocolの状態を永続的にすることを目的とするsmart contractです。
+
+このcontractは、複数のcontractのクロスオーバー値を管理するために使用されます。また、この状態の更新を制御するいくつかのゲッター/セッター関数が含まれています。
+
+## Develop Dev Protocol
+
+Dev ProtocolはOSSです。誰でもその開発に参加できます。
+
+
+- GitHub: https://github.com/dev-protocol/protocol
+- Discord: https://discord.gg/VwJp4KM
+- Spectrum: https://spectrum.chat/devtoken
+- Twitter: https://twitter.com/devtoken_rocks
+- Blog: https://medium.com/devtoken
+- Web site: https://devtoken.rocks
