@@ -23,7 +23,7 @@ Dev Protocolのコアは、特定のインターネット資産に接続され�
 
 Dev ProtocolはERC-20に準拠しており、自由に売買できます。Dev Protocolの所有者はトランザクション手数料を請求しません。
 
-Dev Protocolの所有者はDev tokenを受け取る権利があります。個人に配布されるDev tokenの数は所有するProperty Tokenの数によってきまります。受け取る合計数はDev Protocolにマッピングされたインターネット資産の評価によって決まります。
+Dev Protocolの所有者はDev Tokenを受け取る権利があります。個人に配布されるDev Tokenの数は所有するProperty Tokenの数によってきまります。受け取る合計数はDev Protocolにマッピングされたインターネット資産の評価によって決まります。
 
 Dev Protocolにより、誰でもインターネット資産の市場を追加できます。
 
@@ -38,9 +38,9 @@ Dev ProtocolのライフサイクルはMarket Contractを作成するときに�
 
 Market Contractは インターネット資産の所有者が彼らの中身を評価することを許可します。
 
-ユーザはMarket Contractに関連していないProperty Contractを作成することができます。Property Contractは全てのMarket Contractに接続できます。接続には本人確認が必要です。Property ContractはそのためのTokenを100%所有しています。Tokenを転送すると残高が変更されます。、
+ユーザはMarket Contractに関連していないProperty Contractを作成することができます。Property Contractは全てのMarket Contractに接続できます。接続には本人確認が必要です。Property ContractはそのためのTokenを100%所有しています。Tokenを転送すると残高が変更されます。
 
-Property ContractはERC-20に準拠しているため、自由に譲渡できます。将来的にはProperty contractを発行するときに一覧表示できる分散型の取引所を作成したいと考慮しています。
+Property ContractはERC-20に準拠しているため、自由に譲渡できます。将来的にはProperty Contractを発行するときに一覧表示できる分散型の取引所を作成したいと考慮しています。
 
 様々なMarket ContractをProperty Contractに接続することにより、所有者自体を表す資産だったり、プロジェクトを表す資産だったり、資産を自由に構築できます。
 
@@ -50,7 +50,7 @@ Property ContractはERC-20に準拠しているため、自由に譲渡できま
 
 ![Authenticate](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Authenticate.png)
 
-Allocator Contractの「allocate」関数が呼び出されると、Property ContractはDev tokenを受信できるようになります。そのAllocator Contractは指定されたMetrics Contractを参照して資産を評価します。Property Contract所有者は現在の残高に応じてDev Tokenを引き出すことができます。
+Allocator Contractの `allocate` 関数が呼び出されると、Property ContractはDev Tokenを受信できるようになります。そのAllocator Contractは指定されたMetrics Contractを参照して資産を評価します。Property Contract所有者は現在の残高に応じてDev Tokenを引き出すことができます。
 
 受信したDev Tokenの数はインターネット資産のインデックス値によって異なります。Property Contract保持者は取引所でDev Tokenを交換できます。
 
