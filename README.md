@@ -17,3 +17,33 @@ The developer reward program for this project is taking place. [Check the detail
 ## How to contribute:
 
 Read the [contributing guide](https://github.com/dev-protocol/protocol/blob/master/.github/CONTRIBUTING.md), and create PR when you have time. 🧚✨
+
+## How to setup
+
+Executing the following command will compile each contract.
+
+```
+git clone https://github.com/dev-protocol/protocol.git
+cd protocol
+npm init
+npm install -g truffle
+truffle init
+  →Proceed anyway?　：Yes  Other question :No
+npm install -E openzeppelin-solidity
+truffle compile
+```
+
+Executing the following command will test each contract.
+```
+npm run generate
+truffle test
+```
+
+
+If you use Visual Studio Code, we recommend that you install the following plug-ins:
+
+```
+EditorConfig
+vscode-eslint
+solidity
+```
