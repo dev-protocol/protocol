@@ -17,3 +17,28 @@ The developer reward program for this project is taking place. [Check the detail
 ## How to contribute:
 
 Read the [contributing guide](https://github.com/dev-protocol/protocol/blob/master/.github/CONTRIBUTING.md), and create PR when you have time. 🧚✨
+
+## How to setup
+
+Executing the following command will compile each contract.
+
+```
+git clone https://github.com/dev-protocol/protocol.git
+cd protocol
+npm i
+npm run generate
+```
+
+After compilation, run the following command to test each contract.
+```
+npm test
+```
+
+
+If you use Visual Studio Code, we recommend that you install the following plug-ins:
+
+```
+EditorConfig
+vscode-eslint
+solidity
+```
