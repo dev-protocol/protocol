@@ -30,10 +30,10 @@ npm run generate
 ```
 
 After compilation, run the following command to test each contract.
+
 ```
 npm test
 ```
-
 
 If you use Visual Studio Code, we recommend that you install the following plug-ins:
 
