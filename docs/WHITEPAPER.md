@@ -18,7 +18,7 @@ The core of Dev Protocol is made up of an exchangeable Property Contract (Proper
 
 Dev Protocol is ERC-20 compliant and can be bought and sold freely. Owner of this protocol does not charge any transaction processing fees.
 
-Dev Protocol holders have the right to receive Dev Tokens. The number of Dev Tokens distributed to an individual is determined by the number of Property Token they possess. The total number they receive will be determined by the rating of the Internet asset mapped to their Dev Protocols.
+Dev Property Token holders have the right to receive Dev Tokens. The number of Dev Tokens distributed to an individual is determined by the number of Property Token they possess. The total number they receive will be determined by the rating of the Internet asset mapped to their Dev Protocols.
 
 Dev Protocol allows anyone to add markets for the Internet asset.
 

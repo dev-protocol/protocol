@@ -29,6 +29,7 @@
     "eslint-config-xo-typescript": "^0.15.0",
     "eslint-plugin-prettier": "^3.1.0",
     "ethlint": "^1.2.4",
+    "husky": "^3.0.9",
     "prettier": "^1.18.2",
     "prettier-plugin-solidity": "^1.0.0-alpha.26",
     "ramda": "^0.26.1",
@@ -52,5 +53,10 @@
   "bugs": {
     "url": "https://github.com/dev-protocol/protocol/issues"
   },
-  "homepage": "https://github.com/dev-protocol/protocol#readme"
+  "homepage": "https://github.com/dev-protocol/protocol#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  }
 }
