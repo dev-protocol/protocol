@@ -6,10 +6,6 @@
 
 [ Please write here about why needs this change ]
 
-# Code
-
-- [ ] I ran `npm run lint`
-
 # Dev Challenge
 
 Entry to [Dev Challenge](https://github.com/dev-protocol/repository-token/blob/master/docs/DEV_CHALLENGE.md).
