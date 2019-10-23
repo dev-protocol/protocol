@@ -25,18 +25,13 @@ Executing the following command will compile each contract.
 ```
 git clone https://github.com/dev-protocol/protocol.git
 cd protocol
-npm init
-npm install -g truffle
-truffle init
-  →Proceed anyway?　：Yes  Other question :No
-npm install -E openzeppelin-solidity
-truffle compile
+npm i
+npm run generate
 ```
 
-Executing the following command will test each contract.
+After compilation, run the following command to test each contract.
 ```
-npm run generate
-truffle test
+npm test
 ```
 
 
