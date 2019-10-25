@@ -166,7 +166,7 @@ Allocator Contract の `increment()` 関数は、Allocator Contrac で指定さ�
 ```sol
 function increment(address _property, uint _value) internal {
     totals[_property] += _value;
-    prices[_property] += total / ERC20(_property).totalSupply();
+    prices[_property] += _value.div(ERC20(_token).totalSupply());
 }
 ```
 
