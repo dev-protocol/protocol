@@ -21,7 +21,7 @@ Dev Protocol のコアは、特定のインターネット資産に接続され�
 
 Dev Protocol は ERC-20 に準拠しており、自由に売買できます。Dev Protocol の所有者はトランザクション手数料を請求しません。
 
-Dev Protocol の所有者は Dev Token を受け取る権利があります。個人に配布される Dev Token の数は所有する Property Token の数によってきまります。受け取る合計数は Dev Protocol にマッピングされたインターネット資産の評価によって決まります。
+Dev Property Token の所有者は Dev Token を受け取る権利があります。個人に配布される Dev Token の数は所有する Property Token の数によってきまります。受け取る合計数は Dev Protocol にマッピングされたインターネット資産の評価によって決まります。
 
 Dev Protocol により、誰でもインターネット資産の市場を追加できます。
 
