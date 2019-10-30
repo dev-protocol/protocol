@@ -8,7 +8,7 @@ _このホワイトペーパーは更新される可能性があります。更�
 
 Dev Protocol は様々なインターネット資産を証券のように扱うためのプロトコルです。例えばライセンスやコードを変更せずに OSS を収益化し、OSS の持続可能性の問題を解決できます。
 
-Dev Protocol は Property Contracts、Allocator Contracts、State Contract、Market Contract で構成されています。
+Dev Protocol は Property Contract、Allocator Contract、State Contract、Market Contract で構成されています。
 Property Contract は ERC-20 トークンであり、インターネット上での資産となっています。
 Allocator Contract によって指標が比較、評価された後、Property Contract がその評価を使用して、Dev Token を所有者に配布します。
 State Contract はそれぞれのステータスのメンテナンスします。
