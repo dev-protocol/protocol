@@ -61,6 +61,6 @@ contract Withdrawable {
 
 	function increment(address _token, uint256 value) internal {
 		totals[_token] += value;
-		prices[_token] += totals[_token].div(ERC20(_token).totalSupply());
+		prices[_token] += value.div(ERC20(_token).totalSupply());
 	}
 }

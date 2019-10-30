@@ -163,7 +163,7 @@ The Allocator Contract's `increment()` function adds the rating given by the All
 ```sol
 function increment(address _property, uint _value) internal {
     totals[_property] += _value;
-    prices[_property] += total / ERC20(_property).totalSupply();
+    prices[_property] += _value.div(ERC20(_token).totalSupply());
 }
 ```
 
