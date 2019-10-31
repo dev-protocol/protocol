@@ -1,4 +1,4 @@
-contract('WithdrawableTest', ([deployer, u1, u2]) => {
+contract('WithdrawableTest', ([deployer]) => {
 	const withdrawableTestContract = artifacts.require('libs/WithdrawableTest')
 	const testErc20TokenContract = artifacts.require('TestErc20Token')
 	describe('WithdrawableTest; t_increment', () => {
@@ -7,30 +7,11 @@ contract('WithdrawableTest', ([deployer, u1, u2]) => {
 				from: deployer
 			})
 			const erc20 = await testErc20TokenContract.new()
-			withdrawableTest.t_increment(erc20.address, 5)
-			// WithdrawableTest.t_increment()
-			// Await state.setToken(u1, {from: deployer})
-			// const useState = await useStateContract.new({from: deployer})
-			// const token = await useState.t_getToken().catch((err: Error) => err)
-			// expect(token).to.instanceOf(Error)
-
-			// await useState.changeStateAddress(state.address, {
-			// 	from: deployer
-			// })
-			// const results = await useState.t_getToken()
-			// expect(results.toString()).to.be.equal(u1)
+			await withdrawableTest.t_increment(erc20.address, 5)
+			const total = await withdrawableTest.t_total(erc20.address)
+			expect(total.toNumber()).to.be.equal(5)
+			const price = await withdrawableTest.t_price(erc20.address)
+			expect(price.toNumber()).to.be.equal(0)
 		})
-
-		// It('Should fail to change state address when sent from the non-owner account', async () => {
-		// 	const state = await stateContract.new({from: deployer})
-		// 	await state.setToken(u1, {from: deployer})
-		// 	const useState = await useStateContract.new({from: deployer})
-		// 	const results = await useState
-		// 		.changeStateAddress(state.address, {
-		// 			from: u2
-		// 		})
-		// 		.catch((err: Error) => err)
-		// 	expect(results).to.instanceOf(Error)
-		// })
 	})
 })
