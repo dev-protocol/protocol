@@ -22,7 +22,7 @@ contract Timebased {
 
 	function timestamp() internal view returns (uint256) {
 		uint256 diff = block.number - baseTime.blockHeight;
-		uint256 sec = diff.div(secondsPerBlock);
+		uint256 sec = diff.mod(secondsPerBlock);
 		uint256 _now = baseTime.time.add(sec);
 		return _now;
 	}
