@@ -8,22 +8,26 @@ contract Timebased {
 		uint256 time;
 		uint256 blockHeight;
 	}
-	BaseTime internal baseTime;
-	uint256 internal secondsPerBlock = 15;
+	BaseTime private baseTime;
+	uint256 private secondsPerBlock = 15;
 
 	constructor() public {
 		// solium-disable-next-line security/no-block-members
 		baseTime = BaseTime(now, block.number);
 	}
 
-	function _setSecondsPerBlock(uint256 _sec) internal {
+	function setSecondsPerBlock(uint256 _sec) public {
 		secondsPerBlock = _sec;
 	}
 
-	function timestamp() internal view returns (uint256) {
+	function timestamp() public view returns (uint256) {
 		uint256 diff = block.number - baseTime.blockHeight;
 		uint256 sec = diff.div(secondsPerBlock);
 		uint256 _now = baseTime.time.add(sec);
 		return _now;
+	}
+
+	function getStartTime() public view returns (uint256) {
+		return baseTime.time;
 	}
 }
