@@ -4,10 +4,14 @@ contract('TimebasedTest', () => {
 		it('t_timestamp', async () => {
 			const timebasedTest = await timebasedTestContract.new()
 			const timestamp = await timebasedTest.t_timestamp()
-			await timebasedTest.t_setSecondsPerBlock(10)
 			const timestamp2 = await timebasedTest.t_timestamp()
+			// Expect(timestamp.toNumber()).to.be.equal()
 			console.log(timestamp.toNumber())
 			console.log(timestamp2.toNumber())
+			assert.isTrue(
+				timestamp.toNumber() <= timestamp2.toNumber(),
+				"10000 wasn't in the first account"
+			)
 			// Const timebasedTest = await timebasedTestContract.new()
 			// const blockNumber = await timebasedTest.t_blockNumber()
 			// const secondsPerBlock = await timebasedTest.t_secondsPerBlock()
