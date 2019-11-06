@@ -9,7 +9,9 @@ contract('TimebasedTest', () => {
 			const blockNumber = await timebasedTest.t_blockNumber()
 			const diff = blockNumber - blockHeight
 			const sec = diff * secondsPerBlock
+			console.log(sec)
 			const time = Number(await timebasedTest.t_time())
+			console.log(time)
 			const currentTime = time + sec
 			expect(timestamp.toNumber()).to.be.equal(currentTime)
 		})
