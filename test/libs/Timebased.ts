@@ -5,25 +5,11 @@ contract('TimebasedTest', () => {
 			const timebasedTest = await timebasedTestContract.new()
 			const timestamp = await timebasedTest.t_timestamp()
 			const timestamp2 = await timebasedTest.t_timestamp()
-			// Expect(timestamp.toNumber()).to.be.equal()
-			console.log(timestamp.toNumber())
-			console.log(timestamp2.toNumber())
+			// eslint-disable-next-line no-undef
 			assert.isTrue(
 				timestamp.toNumber() <= timestamp2.toNumber(),
 				"10000 wasn't in the first account"
 			)
-			// Const timebasedTest = await timebasedTestContract.new()
-			// const blockNumber = await timebasedTest.t_blockNumber()
-			// const secondsPerBlock = await timebasedTest.t_secondsPerBlock()
-			// const blockHeight = await timebasedTest.t_blockHeight()
-			// const timestamp = await timebasedTest.t_timestamp()
-			// const diff = blockNumber - blockHeight
-			// const sec = diff * secondsPerBlock
-			// console.log(sec)
-			// const time = Number(await timebasedTest.t_time())
-			// console.log(time)
-			// const currentTime = time + sec
-			// expect(timestamp.toNumber()).to.be.equal(currentTime)
 		})
 	})
 })
