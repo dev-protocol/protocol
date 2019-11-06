@@ -4,7 +4,7 @@ contract('TimebasedTest', () => {
 		it('t_timestamp', async () => {
 			const timebasedTest = await timebasedTestContract.new()
 			const timestamp = await timebasedTest.t_timestamp()
-			await timebasedTest._setSecondsPerBlock(10)
+			await timebasedTest.t_setSecondsPerBlock(10)
 			const timestamp2 = await timebasedTest.t_timestamp()
 			console.log(timestamp.toNumber())
 			console.log(timestamp2.toNumber())

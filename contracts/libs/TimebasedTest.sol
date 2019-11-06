@@ -8,16 +8,19 @@ contract TimebasedTest is Timebased {
 	function t_timestamp() public view returns (uint256){
 		return timestamp();
 	}
-	function t_time() public view returns (uint256){
-		return baseTime.time;
+	function t_setSecondsPerBlock(uint256 _sec) public{
+		_setSecondsPerBlock(_sec);
 	}
-	function t_secondsPerBlock() public view returns (uint256){
-		return secondsPerBlock;
-	}
-	function t_blockHeight() public view returns (uint256){
-		return baseTime.blockHeight;
-	}
-	function t_blockNumber() public view returns (uint256){
-		return block.number;
-	}
+	// function t_time() public view returns (uint256){
+	// 	return baseTime.time;
+	// }
+	// function t_secondsPerBlock() public view returns (uint256){
+	// 	return secondsPerBlock;
+	// }
+	// function t_blockHeight() public view returns (uint256){
+	// 	return baseTime.blockHeight;
+	// }
+	// function t_blockNumber() public view returns (uint256){
+	// 	return block.number;
+	// }
 }
