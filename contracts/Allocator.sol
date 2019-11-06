@@ -12,7 +12,7 @@ import "./Market.sol";
 import "./Metrics.sol";
 import "./UseState.sol";
 
-contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
+contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	using SafeMath for uint256;
 
 	mapping(address => uint256) lastAllocationTimeEachMetrics;
@@ -25,6 +25,11 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 	uint256 public totalPaymentValue;
 	mapping(address => bool) pendingIncrements;
 	uint256 public mintPerBlock;
+	Timebased private timeBased;
+
+	constructor() public {
+		timeBased = new Timebased();
+	}
 
 	modifier onlyProperty(address _addr) {
 		require(
@@ -35,7 +40,7 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 	}
 
 	function setSecondsPerBlock(uint256 _sec) public onlyOwner {
-		_setSecondsPerBlock(_sec);
+		timeBased.setSecondsPerBlock(_sec);
 	}
 
 	function updateAllocateValue(uint256 _value) public {
@@ -58,8 +63,9 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 		require(isMetrics(_metrics), "Is't Metrics Contract");
 		uint256 lastDistribute = lastAllocationTimeEachMetrics[_metrics] > 0
 			? lastAllocationTimeEachMetrics[_metrics]
-			: baseTime.time;
-		uint256 yesterday = timestamp() - 1 days;
+			: timeBased.getStartTime();
+		uint256 timestamp = timeBased.timestamp();
+		uint256 yesterday = timestamp - 1 days;
 		uint256 diff = BokkyPooBahsDateTimeLibrary.diffDays(
 			lastDistribute,
 			yesterday
@@ -72,7 +78,7 @@ contract Allocator is Timebased, Killable, Ownable, UseState, Withdrawable {
 			lastAllocationTimeEachMetrics[_metrics],
 			yesterday
 		);
-		lastAllocationTimeEachMetrics[_metrics] = timestamp();
+		lastAllocationTimeEachMetrics[_metrics] = timestamp;
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) public {
