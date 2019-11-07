@@ -20,7 +20,7 @@ contract Timebased {
 		secondsPerBlock = _sec;
 	}
 
-	function timestamp() public view returns (uint256) {
+	function getTimestamp() public view returns (uint256) {
 		uint256 diff = block.number - baseTime.blockHeight;
 		uint256 sec = diff.mod(secondsPerBlock);
 		uint256 _now = baseTime.time.add(sec);

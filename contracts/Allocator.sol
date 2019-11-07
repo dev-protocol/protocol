@@ -3,19 +3,17 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import "./modules/BokkyPooBahsDateTimeLibrary.sol";
 import "./libs/Killable.sol";
-import "./libs/Timebased.sol";
 import "./libs/Withdrawable.sol";
 import "./Property.sol";
 import "./Market.sol";
 import "./Metrics.sol";
 import "./UseState.sol";
+import "./LastAllocationTime.sol";
 
 contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	using SafeMath for uint256;
 
-	mapping(address => uint256) lastAllocationTimeEachMetrics;
 	mapping(address => uint256) lastAllocationBlockEachMetrics;
 	mapping(address => uint256) lastAllocationValueEachMetrics;
 	uint256 public lastTotalAllocationValuePerBlock;
@@ -25,10 +23,10 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	uint256 public totalPaymentValue;
 	mapping(address => bool) pendingIncrements;
 	uint256 public mintPerBlock;
-	Timebased private timeBased;
+	LastAllocationTime private lastAllocationTime;
 
 	constructor() public {
-		timeBased = new Timebased();
+		lastAllocationTime = new LastAllocationTime();
 	}
 
 	modifier onlyProperty(address _addr) {
@@ -40,7 +38,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	}
 
 	function setSecondsPerBlock(uint256 _sec) public onlyOwner {
-		timeBased.setSecondsPerBlock(_sec);
+		lastAllocationTime.setSecondsPerBlock(_sec);
 	}
 
 	function updateAllocateValue(uint256 _value) public {
@@ -61,24 +59,16 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 
 	function allocate(address _metrics) public payable {
 		require(isMetrics(_metrics), "Is't Metrics Contract");
-		uint256 lastDistribute = lastAllocationTimeEachMetrics[_metrics] > 0
-			? lastAllocationTimeEachMetrics[_metrics]
-			: timeBased.getStartTime();
-		uint256 timestamp = timeBased.timestamp();
-		uint256 yesterday = timestamp - 1 days;
-		uint256 diff = BokkyPooBahsDateTimeLibrary.diffDays(
-			lastDistribute,
-			yesterday
-		);
-		require(diff >= 1, "Expected an interval is one day or more");
+		(uint256 timestamp, uint256 yesterday) = lastAllocationTime.getTimeInfo();
+		lastAllocationTime.ensureDiffDays(_metrics, yesterday);
 		address market = Metrics(_metrics).market();
 		pendingIncrements[_metrics] = true;
 		Market(market).calculate(
 			_metrics,
-			lastAllocationTimeEachMetrics[_metrics],
+			lastAllocationTime.getLastAllocationTime(_metrics),
 			yesterday
 		);
-		lastAllocationTimeEachMetrics[_metrics] = timestamp;
+		lastAllocationTime.setLastAllocationTime(_metrics, timestamp);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) public {
