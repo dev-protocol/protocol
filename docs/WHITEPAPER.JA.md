@@ -1,276 +1,48 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`1.2.1`**
+Version: **`2.0.0`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
-## はじめに
+# メカニズム
 
-Dev Protocol は様々なインターネット資産を証券のように扱うためのプロトコルです。例えばライセンスやコードを変更せずに OSS を収益化し、OSS の持続可能性の問題を解決できます。
+Dev Protocol は以下の 10 個のコントラクトによって構成される。
 
-Dev Protocol は Property Contract、Allocator Contract、State Contract、Market Contract で構成されています。
-Property Contract は ERC-20 トークンであり、インターネット上での資産となっています。
-Allocator Contract によって指標が比較、評価された後、Property Contract がその評価を使用して、Dev Token を所有者に配布します。
-State Contract はそれぞれのステータスのメンテナンスします。
+- Market
+- Market Factory
+- Property
+- Property Factory
+- Metrics
+- Allocator
+- Policy
+- Policy Factory
+- State
+- DEV
 
-このドキュメントは概念を説明するために単純化された擬似コードを使用しています。
+コントラクトの概観図:
 
-## 概要
+![Overview](https://i.imgur.com/5JwNQ3o.png)
 
-Dev Protocol のコアは、特定のインターネット資産に接続された Property Contract (Property Token)と、そのコントラクトの所有者に配布される Dev Token によって構成されます。
+## Market
 
-Dev Protocol は ERC-20 に準拠しており、自由に売買できます。Dev Protocol の所有者はトランザクション手数料を請求しません。
+Market Contract は特定の資産群を表す。資産の認証を行う `authenticate` 関数、資産価値の評価を行う `calculate` 関数の 2 つのインターフェイスによって、Dev Protocol で扱う資産を定義することができる。
 
-Dev Property Token の所有者は Dev Token を受け取る権利があります。個人に配布される Dev Token の数は所有する Property Token の数によってきまります。受け取る合計数は Dev Protocol にマッピングされたインターネット資産の評価によって決まります。
+Market Contract は誰でも自由に提案できる。ただし、有効化するためには既存の資産保有者( Property Contract オーナー )たちの投票によって承認される必要がある。Property Contract の被ロックアップ数と `totals` の合計値を票数とする。投票は基本的に資産保有者によって行われることを期待するが、ロックアップ実行者が自らのロックアップ数を票数として投票することもできる。この場合はロックアップ対象の Property Contract アドレスを指定する。
 
-Dev Protocol により、誰でもインターネット資産の市場を追加できます。
+`authenticate` 関数は、認証する資産の表明と、実行者が資産の所有者であることを認証する。例えば、1 つの GitHub リポジトリを指定し実行者がその GitHub リポジトリの所有者であることを認証する。そのため `authenticate` 関数は Property Contract の所有者以外から実行できるべきではない。この関数はユーザーから直接呼び出され、認証成功の場合には `authenticatedCallback` を呼び出すことが期待されている。`authenticate` 関数の実行時には Policy Contract によって定められた手数料を DEV で支払い、支払われた手数料は自動的にバーンされる。
 
-Market Contract によって作成された市場は、Dev Token 保有者の投票によって認証されると利用可能になります、
+`calculate` 関数は、マーケット報酬の決定のために資産価値を算出する。この関数は Allocator Contract から呼び出されることを期待しているが、ユーザーからも直接呼び出すことができる。ただし Allocator Contract から呼び出さるとき以外はなんら効果をもたらさない。実行時のコンテキストをバリデーションする必要はなく、それらはすべて Allocator Contract によって行われる。算出結果は Allocator Contract の `calculatedCallback` を呼び出すことで Allocator Contract に通告する。
 
-![Overview](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Overview.png)
+ひとつの Market Contract が 何を資産として 扱うかを `authenticate` が定義し、 どのように評価 するかを `calculate` が定義する。
 
-### ライフサイクル
+## Market Factory
 
-Dev Protocol のライフサイクルは Market Contract を作成するときに始まります。
+Market Factory Contract は新しい Market Contract を生成する。
 
-Market Contract は インターネット資産の所有者が彼らの中身を評価することを許可します。
+Market Contract の生成は `createMarket` 関数を実行することで行われる。 `createMarket` 関数は次のインターフェイスを持つコントラクトのアドレスを受け取り、新たな Market Contract を生成する。
 
-ユーザは Market Contract に関連していない Property Contract を作成することができます。Property Contract は全ての Market Contract に接続できます。接続には本人確認が必要です。Property Contract はそのための Token を 100%所有しています。Token を転送すると残高が変更されます。
-
-Property Contract は ERC-20 に準拠しているため、自由に譲渡できます。将来的には Property Contract を発行するときに一覧表示できる分散型の取引所を作成したいと考慮しています。
-
-様々な Market Contract を Property Contract に接続することにより、所有者自体を表す資産だったり、プロジェクトを表す資産だったり、資産を自由に構築できます。
-
-![Create Market](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/CreateMarket.png)
-
-![Create Property](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/CreateProperty.png)
-
-![Authenticate](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Authenticate.png)
-
-Allocator Contract の `allocate` 関数が呼び出されると、Property Contract は Dev Token を受信できるようになります。その Allocator Contract は指定された Metrics Contract を参照して資産を評価します。Property Contract 所有者は現在の残高に応じて Dev Token を引き出すことができます。
-
-受信した Dev Token の数はインターネット資産のインデックス値によって異なります。Property Contract 保持者は取引所で Dev Token を交換できます。
-
-![Allocate](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Allocate.png)
-
-Property Contract はサードパーティの支払いも受け取ることができます。
-
-支払いは、Relayer と呼ばれる外部契約から支払いを自由に受け取ることができます。
-
-![Payment](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/whitepaper/Payment.png)
-
-## Property Contract
-
-Property Contract は、Property Factory Contract の `createProperty（）`関数によって作成されたスマートコントラクトです。Property Contract Token は ERC-20 に準拠しており、任意のアドレスに転送できます。
-
-全ての Property Contract ホルダーは Dev Token を受け取ります。それぞれの Property Contract から受け取る Dev Token の数は Allocator Contract によって評価/決定されます。
-
-### Property Contract の作成
-
-Property Factory Contract の `createProperty（）`関数は新しい Property Contract を作成します。
-
-開発者が登録しやすくし、計算しやすくするには`totalSupply` と `decimals` を修正する必要があります。
-
-### Property のサポート
-
-Property Contract は支援者をサポートします。
-
-Property Contact の `pay（）`関数を呼び出し、Property Contact に Dev Token を送信します。送信された Dev Token はバーンされ、Property Contract ホルダーの引き出し可能な額が増加します。
-
-### 合計支払額 ≒ 次回合計割り当て値
-
-支払いされるたびに、全ての Property Contract の合計割り当て値が更新されます。
-
-支払い加速度が要員として考慮されるため、合計支払いと合計分配は等しくありません、
-
-次の擬似コードは、次の合計割り当て値に使用される変数 `mintPerBlock`を更新するロジックを示しています。
-
-```sol
-uint initialPaymentBlock;
-uint lastPaymentBlock;
-uint totalPaymentValue;
-uint mintPerBlock;
-
-function updateAllocateValue(uint _value) internal {
-	totalPaymentValue += _value;
-	uint totalPaymentValuePerBlock = totalPaymentValue / (block.number - initialPaymentBlock);
-	uint lastPaymentPerBlock = _value / (block.number - lastPaymentBlock);
-	uint acceleration = lastPaymentPerBlock / totalPaymentValuePerBlock;
-	lastPaymentBlock = block.number;
-	mintPerBlock = totalPaymentValuePerBlock * acceleration;
-}
-```
-
-### Payment Relayer
-
-Property Contract の `pay（）`関数の呼び出しは、サードパーティのコントラクトに制限されています。
-
-そのサードパーティのコントラクトを Payment Relayer と呼ばれます。
-
-Property Contract の集金機能の Relayer に公開することで、Relayer と呼ばれます。たとえば、送金と同時にメッセージを送信したり、Property Contract 所有者から誓約を取得したりすることができます。
-
-これらの理由から、 `pay（）`関数の実行はコントラクトアカウントに制限されるべきです。
-
-## Allocator Contract
-
-Allocator Contract の役割は、分布の計算とトークンの引き出しです。Allocator Contract は、インターネット資産のインデックス値を使用して、Property Contract に配布する Dev Token の数を計算します。そして、各ユーザーからのリクエストによってトークンを引き出します。
-
-### Allocator Contract の実行
-
-Allocator Contract には、事前に設定されている変数 `mintPerBlock`が含まれており、この値は 1 日に発行される数を表します。そして、「totalAllocation」の値は、割り当ての総数を示します。前の実行日はコントラクト自身に記録され、前の実行から次の実行の前日までの期間がターゲット期間として定義されます。対象期間は 1 日より長くする必要があります。
-
-配布のための資金は「mintPerBlock」に目標期間の長さを掛けて計算されます。
-
-### 配布計算
-
-配布数の計算は、Allocator Contract の `allocate（）`関数によって行われます。
-
-Property Contract の分布計算では、次の変数を使用します。
-
-- `p` = 指定された期間のターゲットメトリックのインデックス値
-- `t` = 指定期間
-- `l` = ターゲットメトリックの最後のインデックス値（ブロックごと）
-- `d` = ブロックごとの合計インデックス値
-- `m` = ブロックあたりのミント量
-- `s` = ターゲット市場の発行済み指標シェア
-
-基本的な考え方は、合計インデックス値（ブロックごと）と各インデックス値の比率（ブロックごと）によって決まります。計算が実行されるたびに、合計インデックス値が上書きされ、次の計算に使用されます。
-
-方程式は次のとおりです。
-
-```
-配布数 = (p / t) / (d - l + (p / t)) * m * s * t
-```
-
-この計算の後、「d」は「（d-l +（p / t）」の値によって上書きされます。
-
-Allocator Contract は、配布されるトークンの数に応じて、Property Contract の Dev Token を作成します。このため、Allocator Contract には、Dev Token を増やす権限も必要です。
-
-### 配布された Token の受け取り
-
-Dev Token は、ユーザーアカウントが Allocator Contract の「withdraw（）」関数を呼び出したときに受け取ることができます。
-
-Allocator Contract は、各プロパティの配布トークンの合計数を「合計」として、配布トークンの合計値を「価格」として記録します。
-
-```sol
-mapping(address => uint) totals;
-mapping(address => uint) prices;
-```
-
-ユーザーアカウントが `withdraw()` 関数を呼び出すと、ユーザーは `price` に Property Contract のユーザーの残高を乗じた数の Dev Token を受け取ることができます。このときの `price` 変数は、Property Contract のユーザーアカウントにマッピングされ、同じアカウントが次回 `withdraw()` 関数を呼び出すときに値から差し引かれます。このようにして、引き出し金額は、一人が引き出すことができる最大金額を超えません。
-
-#### 価格計算
-
-Allocator Contract の `increment()` 関数は、Allocator Contrac で指定された評価を `total` と `price` に追加します。
-
-```sol
-function increment(address _property, uint _value) internal {
-    totals[_property] += _value;
-    prices[_property] += _value.div(ERC20(_token).totalSupply());
-}
-```
-
-#### トークンの引き出し
-
-Allocator Contract の `withdraw()` 関数は、ユーザーのアカウントに、受信できる限り多くの Dev Token を預け入れます。このトランザクションの処理料金は、 `oraclize_getPrice（" URL "）`の値に相当する ETH の量です。これは通常少量です。この処理料金は Allocator Contract に振り込まれ、次の配布の計算に使用されます。
-
-`withdraw（）`を実行した後の `prices [_property]`の値は各ユーザーアカウントにマッピングされ、次に `withdraw（）`が呼び出されたときに引き出し額から差し引かれます。`prices [_property]`の値は常に追加されます。そのため、 `prices [_property]` の以前の値を減算することは、以前の実行から受け取った値を現在まで引き出すことと同じです。
-
-```sol
-struct WithdrawalLimit {
-    uint total;
-    uint balance;
-}
-mapping(address => mapping(address => uint)) internal lastWithdrawalPrices;
-mapping(address => mapping(address => uint)) internal pendingWithdrawals;
-mapping(address => mapping(address => WithdrawalLimit)) internal withdrawalLimits;
-
-function withdraw(address _property) public payable {
-    uint _value = calculateWithdrawableAmount(_property, msg.sender);
-    uint value = _value + pendingWithdrawals[_property][msg.sender];
-    ERC20(token).mint(msg.sender, value);
-    lastWithdrawalPrices[_property][msg.sender] = price;
-    pendingWithdrawals[_property][msg.sender] = 0;
-}
-
-function calculateWithdrawableAmount(address _property, address _user)
-    private
-    view
-    returns (uint)
-{
-    uint _last = lastWithdrawalPrices[_property][_user];
-    WithdrawalLimit memory _limit = withdrawalLimits[_property][_user];
-    uint priceGap = price - _last;
-    uint balance = ERC20(_property).balanceOf(_user);
-    if (_limit.total == total) {
-        balance = _limit.balance;
-    }
-    uint value = priceGap * balance;
-    return value;
-}
-```
-
-この計算は、ユーザーアカウントの残高が修正された場合にのみ完了します。したがって、残高を変更する前に、`lastWithdrawalPrices` と`pendingWithdrawals` を更新する必要があります。また、残高が変更されると、受取人に引き出し限度額が設定されます。この引き出し制限は、 `total [_property]`が同じ場合にのみ適用されます。 `price [_property]`のように、 `total [_property]`の値は常に追加されます。残高が変更されたときにその受取人の引き出し限度額を作成すると、引き出し可能な金額は最後の分配時の残高によって決定されます。
-
-これは、Property Contract の `transfer（）`関数の実装がどのように見えるかです。
-
-```sol
-// Property Contract (ERC-20)
-function transfer(address to, uint256 value) public returns (bool) {
-    Allocator(allocatorAddress).beforeBalanceChange(
-        address(this),
-        msg.sender,
-        to
-    );
-    _transfer(msg.sender, to, value);
-    return true;
-}
-```
-
-```sol
-// Allocator Contract
-function beforeBalanceChange(address _token, address _from, address _to) public {
-    lastWithdrawalPrices[_token][_from] = prices[_token];
-    lastWithdrawalPrices[_token][_to] = prices[_token];
-    pendingWithdrawals[_token][_from] += calculateWithdrawableAmount(_token, _from);
-    WithdrawalLimit memory _limit = withdrawalLimits[_token][_to];
-    if (_limit.total != totals[_token]) {
-        withdrawalLimits[_token][_to] = WithdrawalLimit(
-            totals[_token],
-            ERC20(_token).balanceOf(_to)
-        );
-    }
-}
-```
-
-「beforeBalanceChange」関数はアカウントの引き出し可能な金額に影響するため、これは各 Property Contract に制限されるべきです。
-
-## Market Contract
-
-Market Contract は、Market Factory Contract によって作成されます。Market Contract は、インターネット資産の指標を管理します。Market Contract は、財産の真正性とその評価を保証します。誰でも自由に Market Contract を作成できますが、投票で承認されたもののみが有効になります。
-
-### Market の作成
-
-Market Factory Contract の `createMarket（）`関数は新しい Market Contract を作成します。
-
-この関数は、Market Contract の動作を定義するコントラクトアドレスを受け取ります。
-
-新しい Market Contract は、Dev Token 所有者の投票により有効になります。
-
-投票者が送信した Dev Token の数によって、1 つの投票の重要性が決まります。投票は常に「はい」を意味し、投票しないことは「いいえ」を意味します。投票ごとに開発トークンはバーンされます。投票総数が Dev Token の合計供給量の 10％に達すると、Market Contract が有効になります。
-
-### Contract の動作
-
-コントラクトには、2 つのパブリック関数、 `authenticate（）`と `calculate（）`が必要です。
-
-Market Contract は、Property Contract の所有権を認証するために `authenticate（）`関数を呼び出します。それは、インターネット資産にマップされた Property Contract の所有者を認証し、Market Contract.の `authenticatedCallback（）` を呼び出すことが期待されます。
-
-Allocator Contract は `calculate（）`関数を呼び出して、Property Contract への新しい配布数を計算します。それは、インターネットアセットにマップされた Property Contract のメトリックを取得し、Allocator Contract の `calculatedCallback（）`を呼び出すことを期待しています。
-
-このコントラクトのインターフェイスは次のようになります。
-
-```sol
-contract Behavior {
+```solidity
+contract IMarket {
 	string public schema;
 
 	function authenticate(
@@ -288,53 +60,215 @@ contract Behavior {
 }
 ```
 
-`authenticate（）`関数は、ターゲットの Property Contract アドレスに加えて、最大 5 つの引数を取ることができます。`schema`を JSON 文字列として配列として定義して、各引数の意味を示す必要があります。
+`schema` は配列型の JSON 文字列で、 `authenticate` 関数が認証のために受け取る引数の意味を説明する。この引数は Property Contract のアドレスに加えて最大 5 つである。例えば以下のようになる。
 
-たとえば、次のようになります。
-
-```sol
-string public schema = "['Your asset identity', 'Read-only token' 'More something']";
+```solidity
+string public schema = "['Your asset identity', 'Read-only token', 'More something']";
 ```
 
-Market Contract'の `authenticate（）`関数は、常に 2 番目の引数を一意の ID として扱います。したがって、既存の値を入力することはできません。
+`authenticate` 関数は、常に 2 番目の引数を一意の ID として扱う。したがって、一意性を担保できない値は指定すべきではない。次のスキーマは誤った例である。
 
-次のスキーマは正しい例です。
-
-```sol
-string public schema = "['Your GitHub repository(e.g. your-name/repos)', 'Read-only token']";
-```
-
-そして、次のスキーマは間違った例です。
-
-```sol
+```solidity
 string public schema = "['Read-only token', 'Your GitHub repository(e.g. your-name/repos)']";
 ```
 
-### 所有者の認証
+そして次のスキーマは正しい例である。
 
-Market Contract の「authenticate（）」関数は所有者を認証し、新しい Metrics Contract を作成します。
+```solidity
+string public schema = "['Your GitHub repository(e.g. your-name/repos)', 'Read-only token']";
+```
 
-この機能は、Property Contract が接続する Market Contract の管理に関与するため、Property Contract の所有者が実行する必要があります。
+Market Factory Contract はこのコントラクトへのプロキシメソッドなどを持つ Market Contract を新たに作成する。プロキシメソッドは `authenticate` と `calculate` の 2 つ。認証成功を受け取る `authenticatedCallback` 関数と、投票を受け付ける `vote` 関数も追加される。
 
-## Metrics Contract
+## Property
 
-Metrics Contract は、Property Contract を Market Contract に関連付ける smart contract です。
+Property Contract はユーザーの資産グループを表す。ERC20 に準拠したトークンであり、任意のアドレスに転送できる。
 
-Market Contract には、1 つの Property Contract のアドレスと、認証のために Market Contract で使用される情報が含まれています。
+すべての Property Contract(Token) ホルダーは、自分の持つ Property Contract(Token) のバランスに応じてマーケット報酬を受け取る。マーケット報酬の計算や受け取りは Allocator Contract の責務であり、Property Contract は基本的にピュアな ERC20 となる。
 
-インターネット資産の所有者は、Metrics Contract アドレスを Allocator Contract に渡す対応するインデックスの評価を取得できます。
+Property Contract の `transfer` 関数は、バランスの変化に伴ってマーケット報酬の引出可能額を変更するため、Allocator Contract に引出可能額の調整を要請する。
 
-Metrics Contract は、Market Contract によって認証された後に作成されます。
+初期状態の Property Contract はマーケット報酬を受け取ることができない。マーケット報酬はロックアップと資産価値に基づいて決まるため、マーケット報酬を受け取るには資産との関連付けが必須となる。
 
-## State Contract
+Property Contract が資産を表す状態となるためには、Property Contract と Market Contract の関連付けが必要となる。関連付けは Market Contract の `authenticate` 関数によって行われる。Property Contract には複数の Market Contract を関連付けできる。特定の資産グループを表す 1 つの Property Contract としたり、資産毎に Property Contract を作成してもよい。
 
-State Contract は、Dev Protocol の状態を永続的にすることを目的とする smart contract です。
+## Property Factory
 
-この contract は、複数の contract のクロスオーバー値を管理するために使用されます。また、この状態の更新を制御するいくつかのゲッター/セッター関数が含まれています。
+Property Factory Contract は新しい Property Contract を生成する。
+
+Property Contract の生成は `createProperty` 関数を実行することで行われる。引数として `name` と `symbol` を指定する。Property Contract の比較容易性のために `totalSupply` は `10000000` に、 `decimals` は `18` に固定する。
+
+## Metrics
+
+Metrics Contract は Property Contract と Market Contract の関連を表す。
+
+Market Contract の `authenticatedCallback` が呼び出されると、Property Contract と Market Contract のアドレスを保持した Metrics Contract が生成される。
+
+Market Contract の `authenticatedCallback` は Metrics Contract のアドレスを返却する。Market Contract は Metrics Contract のアドレスをキーにしたマップを作ることで、認証時のコンテキストを保持しておくことが可能となる。認証時のコンテキストはマーケット報酬の計算時に使用できる。
+
+## Allocator
+
+Allocator Contract はマーケット報酬の決定のためのいくつかの役割を持つ。
+
+### lock
+
+ユーザーが Property Contract に対して自身の DEV をロックアップする。ロックアップした DEV は `cancel` 関数を実行してから一定期間経過後に引き出すことができる。ロックアップは `cancel` 関数が実行されるまでのあいだ何度でも追加できる。
+
+ユーザーは DEV をロックアップすることで、その対象の Property Contract オーナーから何らかのユーティリティを受け入れる。そのユーティリティを必要とする間はロックアップが継続され、DEV の希少価値を高める。
+
+### cancel
+
+ユーザーが Property Contract に対してロックアップしている DEV を解除する。解除が要請されてから一定期間はロックアップが継続する。その期間は Policy Contract によって定められたブロック数で決定する。
+
+### allocate
+
+Property Contract のマーケット報酬を計算し引出可能額を増額する。引数として Metrics Contract のアドレスを受け取る。マーケット報酬の決定には以下の変数を用いる。
+
+- `t` = `allocate` 関数が前回実行されてから今回までの期間( ブロック数 )
+- `a` = Metrics Contract によって関連付けされている Market Contract の `calculate` 関数を呼び出すことで得られた資産価値を `t` で除算した数
+- `l` = Metrics Contract によって関連付けされている Property Contract のロックアップ数
+- `v` = `a` と `l` に基づいて Policy Contract が決定する総資産価値( ブロック毎 )
+- `p` = 前回の `v`
+- `d` = Metrics Contract によって関連付けされている Market Contract の合計総資産価値( ブロック毎 )
+- `m` = Policy Contract によって算出された総報酬額( ブロック毎 )
+- `s` = Metrics Contract によって関連付けされている Market Contract の発行済み Metrics 数のシェア
+
+基本的な考え方は、合計総資産価値( ブロック毎 )と各総資産価値の比率( ブロック毎 )によって決まる。計算が実行されるたびに、合計総資産価値がオーバーライドされ、次の計算に使用される。
+
+式は以下のとおり。
+
+```
+distributions = v / (d - p + v) * m * s * t
+```
+
+この計算の後、`d` は `(d - p + v)` の値によってオーバーライドされる。
+
+### withdraw
+
+Property Contract のマーケット報酬を引き出す。実行者は呼び出し時点の引出可能額全額を引き出す。
+
+Allocator Contract は、Property Contract のマーケット報酬の合計数を `totals` として、マーケット報酬の累積価格を `prices` として記録する。Property Contract が被ロックアップされている場合、ロックアップ実行者向けの値として `lockTotals` と `lockPrices` も記録される。Property Contract(Token) のホルダーとロックアップ実行者のマーケット報酬のシェアは Policy Contract によって定められる。
+
+```solidity
+mapping(address => uint) totals;
+mapping(address => uint) prices;
+mapping(address => uint) lockTotals;
+mapping(address => uint) lockPrices;
+```
+
+ユーザーが `withdraw` 関数を呼び出すと、ユーザーは `price` に Property Contract のユーザーの残高を乗じた数の DEV を受け取る。
+
+`totals` と `prices` の更新は Allocator Contract の `increment` 関数によって行われる。
+
+```solidity
+function increment(address _property, uint _value) internal {
+	totals[_property] += _value;
+	prices[_property] += _value / ERC20(_token).totalSupply();
+}
+```
+
+`totals` はマーケット報酬の累積和であり、 `prices` は Property Contract(Token) の 1 につき引出可能なマーケット報酬の累積和となる。
+
+`prices` は Property Contract のユーザーアカウント毎にマッピングされ、同じユーザーが次回 `withdraw` 関数を呼び出すときに値から差し引かれる。このようにして、引出可能額は一人が引き出すことができる最大金額を超えない。このことを以下に例示する。
+
+1. Property Contract を 500 保有している Alice は、`prices` が 100 のときにはじめて引き出す。引出可能額は `(100 - 0) × 500 = 50000` である。
+2. `prices` が 120 になり、再び Alice は引き出す。引出可能額は `(120 - 100) × 500 = 10000` である。
+
+Alice は 2 回に分けて引き出し、合計で `50000 + 10000 = 60000` を得た。仮に 1 回目の引き出しをしなかったなら、`120 × 500 = 60000` であり引出可能額は変わらない。
+
+この式はユーザーのバランスが一定のときにのみ成立する。そのため Property Contract の `transfer` 関数実行時には Allocator Contract にその通告を行い、転送者と受領者の引出可能額を調整する必要がある。
+
+## Policy
+
+Policy Contract は Dev Protocol の政策を表す。Dev Protocol は不確実性のある指針の策定をコミュニティに移譲し、状況に合わせて指針をアップデートする。
+
+Policy Contract は誰でも自由に提案できる。ただし、有効化するためには既存の資産保有者( Property Contract オーナー )たちの投票によって承認される必要がある。Property Contract の被ロックアップ数と `totals` の合計値を票数とする。投票は基本的に資産保有者によって行われることを期待するが、ロックアップ実行者が自らのロックアップ数を票数として投票することもできる。この場合はロックアップ対象の Property Contract アドレスを指定して行なう。
+
+新しい Policy Contract が有効化条件を満たすだけの賛成票を得られるとただちに有効化され、古い Policy Contract は消滅する。
+
+Policy Contract によって決定される指針は以下のとおり。
+
+### rewards
+
+ブロックあたり総マーケット報酬額。Allocator Contract でマーケット報酬の計算過程で呼び出され、以下の変数から総報酬額を計算する。
+
+- 総ロックアップ数
+- 総資産数( Metrics Contract 総数 )
+
+### holdersShare
+
+Property Contract(Token) ホルダーが受け取るマーケット報酬のシェア。Allocator Contract でマーケット報酬の計算過程で呼び出され、以下の変数から Property Contract(Token) ホルダーが受け取るシェアを計算する。
+
+- マーケット報酬額
+- 被ロックアップ数
+
+ロックアップ実行者の受け取るシェアは Holders Share の余剰分となる。
+
+### assetValue
+
+資産価値。Allocator Contract でマーケット報酬の計算過程で呼び出され、以下の変数から資産価値を計算する。
+
+- Market Contract による資産評価
+- 被ロックアップ数
+
+### authenticationFee
+
+資産認証の手数料。Market Contract の `authenticatedCallback` の中で呼び出され、以下の変数から資産認証の手数料を計算する。
+
+- 総資産数( Metrcis Contract 総数 )
+- Property Contract に関連付けされた資産数
+
+### marketApproval
+
+新しい Market Contract の有効化可否。Market Contract の `vote` の中で呼び出され、以下の変数から Market Contract の有効化を決定する。
+
+- 賛成票数
+- 反対票数
+
+### policyApproval
+
+新しい Policy Contract の有効化可否。Policy Contract の `vote` の中で呼び出され、以下の変数から Policy Contract の有効化を決定する。
+
+- 賛成票数
+- 反対票数
+
+### marketVotingBlocks
+
+新しい Market Contract が提案されてから投票を終了するまでのブロック数。投票を終了すると、Market Contract は否決される。
+
+### policyVotingBlocks
+
+新しい Policy Contract が提案されてから投票を終了するまでのブロック数。投票を終了すると、Policy Contract は否決される。
+
+### abstentionPenalty
+
+Property Contract オーナーが Market Contract 及び Policy Contract への投票を棄権した場合のペナルティ。Allocator Contract の `allocate` の中で呼び出され、以下の変数からペナルティを決定する。
+
+- 棄権回数
+
+ペナルティはマーケット報酬の計算対象外期間( ブロック数 )を設けることで罰則とする。対象外期間の開始ブロックは `allocate` の前回実行ブロックとする。計算対象外期間中は `allocate` の実行が失敗し、期間経過後も期間中の資産価値は考慮されない。
+
+棄権回数の算出のために、Market Contract 及び Policy Contract の投票受付期間中に投票しなかった Property Contract を記録する必要がある。そのための単純な方法として、State Contract に `pol`, `vot` という変数を追加する。 `pol` は整数型で新たな投票が開始するたびに 1 を加算する。`vot` は Property Contract のアドレスをキーとした整数のマップ型で、Property Contract オーナーによる投票のたびに 1 を加算する。Property Contract の生成時には `pol` の値を `vot[address]` に記録する。`pol` から `vot[address]` を差し引いた数が棄権数となる。Property Contract がペナルティを受けると `vot[address]` の値は再び `pol` と同期される。
+
+## Policy Factory
+
+Policy Factory Contract は新しい Policy Contract を生成する。
+
+Policy Contract の生成は `createPolicy` 関数を実行することで行われる。 `createPolicy` 関数は Policy Contract のアドレスを受け取り、投票を受け付ける `vote` 関数を追加して新たな Policy Contract を生成する。
+
+## State
+
+State Contract は他のコントラクトの状態を永続化するためのコントラクト。実装を持たず、専ら状態の保持と getter メソッドを責務とする。
+
+## DEV
+
+DEV は Dev Protocol において基軸通貨となる ERC20 トークンである。
+
+https://etherscan.io/token/0x98626e2c9231f03504273d55f397409defd4a093
 
 ## Develop Dev Protocol
 
-Dev Protocol は OSS です。誰でもその開発に参加できます。
+Dev Protocol は OSS であり、誰でもその開発に参加できる。
 
 - GitHub: https://github.com/dev-protocol/protocol
 - Discord: https://discord.gg/VwJp4KM
