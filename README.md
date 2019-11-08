@@ -8,8 +8,8 @@
 
 This repository is the place to develop smart contracts for Dev Protocol.
 
-Whitepaper: https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.md
-ホワイトペーパー(日本語): https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md
+- Whitepaper: https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.md
+- ホワイトペーパー(日本語): https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md
 
 ## Dev Challenge
 
