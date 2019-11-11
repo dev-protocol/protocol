@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 
-contract('State', ([deployer, u1, u2]) => {
+contract('State', ([deployer, u1, u2, u3]) => {
 	const stateContract = artifacts.require('StateTest')
 	const propertyContract = artifacts.require('Property')
 
@@ -184,18 +184,49 @@ contract('State', ([deployer, u1, u2]) => {
 	})
 
 	describe('Metrics Contract; addMetrics', () => {
-		it('Add Metrics Contract token address')
+		it('Add Metrics Contract token address', async () => {
+			const contract = await stateContract.new({from: deployer})
+			await contract.setMarketFactory(u1, {from: deployer})
+			await contract.addMarket(u2, {from: u1})
+			await contract.addMetrics(u3, {from: u2})
+			const result = await contract.isMetrics(u3, {from: deployer})
+			expect(result).to.be.equal(true)
+		})
 
-		it(
-			'Should fail to add Metrics Contract address when sent from the non-Market Contract'
-		)
+		it('Increaments totalIssuedMetrics', async () => {
+			const contract = await stateContract.new({from: deployer})
+			await contract.setMarketFactory(u1, {from: deployer})
+			await contract.addMarket(u2, {from: u1})
+			await contract.addMetrics(u3, {from: u2})
+			await contract.isMetrics(u3, {from: deployer})
+			const result = await contract.totalIssuedMetrics({from: deployer})
+			expect(result.toNumber()).to.be.equal(1)
+		})
+
+		it('Should fail to add Metrics Contract address when sent from the non-Market Contract', async () => {
+			const contract = await stateContract.new({from: deployer})
+			await contract.setMarketFactory(u1, {from: deployer})
+			await contract.addMarket(u2, {from: u1})
+			const result = await contract
+				.addMetrics(u3, {from: deployer})
+				.catch((err: Error) => err)
+			expect(result).to.instanceOf(Error)
+		})
 	})
 
 	describe('Metrics Contract; isMetrics', () => {
-		it('Verifying the passed address is a Metrics Contract address')
+		it('Verifying the passed address is a Metrics Contract address', async () => {
+			const contract = await stateContract.new({from: deployer})
+			await contract.setMarketFactory(u1, {from: deployer})
+			await contract.addMarket(u2, {from: u1})
 
-		it(
-			'Should fail to verify the passed address is a Metrics Contract address when not exists Metrics Contract'
-		)
+			const beforeResult = await contract.isMetrics(u3, {from: deployer})
+			expect(beforeResult).to.be.equal(false)
+
+			await contract.addMetrics(u3, {from: u2})
+
+			const afterResult = await contract.isMetrics(u3, {from: deployer})
+			expect(afterResult).to.be.equal(true)
+		})
 	})
 })
