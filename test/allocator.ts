@@ -144,7 +144,9 @@ contract('Allocator', ([deployer, u1]) => {
 				'TEST',
 				18,
 				1000,
-				{from: deployer}
+				{
+					from: deployer
+				}
 			)
 			await state.addProperty(property.address, {from: deployer})
 

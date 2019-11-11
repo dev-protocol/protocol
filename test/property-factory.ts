@@ -33,13 +33,11 @@ contract('PropertyFactory', ([deployer]) => {
 		it('Create a new Property Contract and emit Create Event telling created property address', async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			deployedProperty = await propertyContract.at(expectedPropertyAddress)
-			const owner = await deployedProperty._owner({from: deployer})
 			const name = await deployedProperty.name({from: deployer})
 			const symbol = await deployedProperty.symbol({from: deployer})
 			const decimals = await deployedProperty.decimals({from: deployer})
 			const totalSupply = await deployedProperty.totalSupply({from: deployer})
 
-			expect(owner).to.be.equal(deployer)
 			expect(name).to.be.equal('sample')
 			expect(symbol).to.be.equal('SAMPLE')
 			expect(decimals.toNumber()).to.be.equal(18)

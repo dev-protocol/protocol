@@ -6,21 +6,16 @@ import "./UseState.sol";
 import "./Allocator.sol";
 
 contract Property is ERC20, ERC20Detailed, UseState {
-	address public _owner;
-
+	address private _owner;
 	constructor(
 		address _own,
 		string memory _name,
 		string memory _symbol,
 		uint8 _decimals,
 		uint256 _supply
-	) public ERC20Detailed(_name, _symbol, _decimals) {
+	) public ERC20Detailed(_name, _symbol, _decimals){
 		_owner = _own;
 		_mint(_owner, _supply);
-	}
-
-	function owner() public view returns (address) {
-		return _owner;
 	}
 
 	function transfer(address _to, uint256 _value) public returns (bool) {
@@ -30,6 +25,15 @@ contract Property is ERC20, ERC20Detailed, UseState {
 			_to
 		);
 		_transfer(msg.sender, _to, _value);
+		return true;
+	}
+
+	function lockUp(uint256 value) public returns (bool) {
+		require(msg.sender == _owner, "Ownable: caller is not the owner");
+		Allocator(allocator()).lockUp(
+			address(this),
+			value
+		);
 		return true;
 	}
 }
