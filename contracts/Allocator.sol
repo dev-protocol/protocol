@@ -10,6 +10,7 @@ import "./Market.sol";
 import "./Metrics.sol";
 import "./UseState.sol";
 import "./LastAllocationTime.sol";
+import "./DevLockUp.sol";
 
 contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	using SafeMath for uint256;
@@ -24,9 +25,11 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	mapping(address => bool) pendingIncrements;
 	uint256 public mintPerBlock;
 	LastAllocationTime private lastAllocationTime;
+	DevLockUp private devLockUp;
 
 	constructor() public {
 		lastAllocationTime = new LastAllocationTime();
+		devLockUp = new DevLockUp();
 	}
 
 	modifier onlyProperty(address _addr) {
@@ -108,5 +111,9 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	{
 		ERC20Burnable(getToken()).burnFrom(msg.sender, _amount);
 		increment(_property, _amount);
+	}
+
+	function lockUp(address propatyAddress, uint256 amount) public{
+		devLockUp.lockUp(propatyAddress, amount);
 	}
 }

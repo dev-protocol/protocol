@@ -72,7 +72,6 @@ contract('State', ([deployer, u1, u2]) => {
 				from: deployer
 			})
 			const property = await propertyContract.new(
-				deployer,
 				'pkg_token',
 				'PKG',
 				18,
@@ -89,7 +88,6 @@ contract('State', ([deployer, u1, u2]) => {
 
 		it('Should fail to add Property Contract token address when sent from the non-Property Factory Contract', async () => {
 			const property = await propertyContract.new(
-				deployer,
 				'pkg_token',
 				'PKG',
 				18,
