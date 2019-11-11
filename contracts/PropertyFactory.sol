@@ -13,6 +13,7 @@ contract PropertyFactory is UseState {
 		returns (address)
 	{
 		Property property = new Property(
+			msg.sender,
 			_name,
 			_symbol,
 			decimals,

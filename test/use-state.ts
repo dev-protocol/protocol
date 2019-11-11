@@ -80,6 +80,7 @@ contract('UseState', ([deployer, u1, u2]) => {
 	describe('Property token; addProperty', () => {
 		it('Add Property Contract token address', async () => {
 			const property = await propertyContract.new(
+				deployer,
 				'pkg_token',
 				'PKG',
 				18,

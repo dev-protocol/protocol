@@ -6,7 +6,7 @@ import "./UseState.sol";
 
 contract DevLockUp is UseState{
 	using SafeMath for uint256;
-	mapping(address => mapping(address => uint256)) private lockupedDev;
+	mapping(address => mapping(address => uint256)) private _lockupedDev;
 	function lockUp(address propatyAddress, uint256 value) public {
 		ERC20 devToken = ERC20(getToken());
 		uint256 balance = devToken.balanceOf(msg.sender);
@@ -15,6 +15,6 @@ contract DevLockUp is UseState{
 			"insufficient balance"
 		);
 		devToken.transfer(propatyAddress, value);
-		lockupedDev[msg.sender][propatyAddress] = value;
+		_lockupedDev[msg.sender][propatyAddress] = value;
 	}
 }
