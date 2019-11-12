@@ -5,7 +5,7 @@ import "./Policy.sol";
 contract PolicyFactory {
 	address private owner;
 
-	constructor(	) public  {
+	constructor() public {
 		owner = msg.sender;
 	}
 
@@ -19,12 +19,10 @@ contract PolicyFactory {
 	}
 	function vote(address policyAddress) public {
 		// TODO
-
 	}
 }
-
-
 
 //投票者が新しいコントラクトを承認する仕組み
 //アクティブなポリシーは常に一つ
 //古いポリシーは参照されない
+
