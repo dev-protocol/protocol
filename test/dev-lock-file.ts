@@ -1,0 +1,50 @@
+contract('DevLockUpTest', () => {
+	const DevValueContract = artifacts.require('DevValue')
+	describe('DevValueTest; hasTokenByPropaty', () => {
+		it('has token by propaty', async () => {
+			const devValue = await DevValueContract.new()
+			await devValue.set('0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d', 10)
+			let result = await devValue.hasTokenByPropaty(
+				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
+			)
+			expect(result).to.be.equal(true)
+			result = await devValue.hasTokenByPropaty(
+				'0x32A5598b078Ad20287f210803a6ad5D96C8df1d1'
+			)
+			expect(result).to.be.equal(false)
+		})
+	})
+})
+
+contract('CanceledLockUpFlgTest', () => {
+	const CanceledLockUpFlgContract = artifacts.require('CanceledLockUpFlg')
+	describe('CanceledLockUpFlgTest; isCanceled', () => {
+		it('is canceled', async () => {
+			const canceled = await CanceledLockUpFlgContract.new()
+			await canceled.setCancelFlg('0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d')
+			let result = await canceled.isCanceled(
+				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
+			)
+			expect(result).to.be.equal(true)
+			result = await canceled.isCanceled(
+				'0x32A5598b078Ad20287f210803a6ad5D96C8df1d1'
+			)
+			expect(result).to.be.equal(false)
+		})
+	})
+})
+
+contract('ReleasedBlockNumberTest', () => {
+	const ReleasedBlockNumberContract = artifacts.require('ReleasedBlockNumber')
+	describe('ReleasedBlockNumberTest; setBlockNumber', () => {
+		it('set blockNumber', async () => {
+			const canceled = await ReleasedBlockNumberContract.new()
+			// eslint-disable-next-line no-warning-comments
+			// TODO assert
+			await canceled.setBlockNumber(
+				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d',
+				30
+			)
+		})
+	})
+})
