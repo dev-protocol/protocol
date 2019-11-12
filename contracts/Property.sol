@@ -13,7 +13,7 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		string memory _symbol,
 		uint8 _decimals,
 		uint256 _supply
-	) public ERC20Detailed(_name, _symbol, _decimals){
+	) public ERC20Detailed(_name, _symbol, _decimals) {
 		_owner = _own;
 		_mint(_owner, _supply);
 	}
@@ -30,18 +30,13 @@ contract Property is ERC20, ERC20Detailed, UseState {
 
 	function lockUp(uint256 value) public returns (bool) {
 		require(msg.sender == _owner, "Ownable: caller is not the owner");
-		Allocator(allocator()).lockUp(
-			address(this),
-			value
-		);
+		Allocator(allocator()).lockUp(address(this), value);
 		return true;
 	}
 
 	function cancel() public returns (bool) {
 		require(msg.sender == _owner, "Ownable: caller is not the owner");
-		Allocator(allocator()).cancel(
-			address(this)
-		);
+		Allocator(allocator()).cancel(address(this));
 		return true;
 	}
 }
