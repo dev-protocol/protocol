@@ -17,7 +17,11 @@ contract LastAllocationTime {
 		return lastDistribute;
 	}
 
-	function getLastAllocationTime(address metrics) public view returns (uint256) {
+	function getLastAllocationTime(address metrics)
+		public
+		view
+		returns (uint256)
+	{
 		return lastAllocationTimeEachMetrics[metrics];
 	}
 
@@ -37,16 +41,19 @@ contract LastAllocationTime {
 
 	function ensureDiffDays(address metrics, uint256 yesterday) public view {
 		uint256 lastDistribute = getLastDistribute(metrics);
-		uint256 diff = diffDays(
-			lastDistribute,
-			yesterday
-		);
+		uint256 diff = diffDays(lastDistribute, yesterday);
 		require(diff >= 1, "Expected an interval is one day or more");
 	}
 
-	function diffDays(uint fromTimestamp, uint toTimestamp) private pure returns (uint _days)
+	function diffDays(uint256 fromTimestamp, uint256 toTimestamp)
+		private
+		pure
+		returns (uint256 _days)
 	{
-		require(fromTimestamp <= toTimestamp, "From timestamp is lower then to timestamp");
+		require(
+			fromTimestamp <= toTimestamp,
+			"From timestamp is lower then to timestamp"
+		);
 		_days = (toTimestamp - fromTimestamp) / (24 * 60 * 60);
 	}
 }
