@@ -67,7 +67,7 @@ contract CanceledLockUpFlg {
 	function setCancelFlg(address propertyAddress) public {
 		_canceled[msg.sender][propertyAddress] = true;
 	}
-	function isCanceled(address propertyAddress) public view returns (bool){
+	function isCanceled(address propertyAddress) public view returns (bool) {
 		return _canceled[msg.sender][propertyAddress];
 	}
 }
