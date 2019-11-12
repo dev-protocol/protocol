@@ -114,11 +114,11 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 		increment(_property, _amount);
 	}
 
-	function lockUp(address propatyAddress, uint256 amount) public {
-		devLockUp.lockUp(propatyAddress, amount);
+	function lockUp(address propertyAddress, uint256 amount) public {
+		devLockUp.lockUp(propertyAddress, amount);
 	}
 
-	function cancel(address propatyAddress) public {
-		devLockUp.cancel(propatyAddress);
+	function cancel(address propertyAddress) public {
+		devLockUp.cancel(propertyAddress);
 	}
 }
