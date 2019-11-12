@@ -27,7 +27,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	LastAllocationTime private lastAllocationTime;
 	DevLockUp private devLockUp;
 
-	constructor() public {
+	constructor() Killable(msg.sender) public {
 		lastAllocationTime = new LastAllocationTime();
 		devLockUp = new DevLockUp();
 	}
