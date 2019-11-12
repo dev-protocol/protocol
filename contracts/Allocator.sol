@@ -59,7 +59,8 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 
 	function allocate(address _metrics) public payable {
 		require(isMetrics(_metrics), "Is't Metrics Contract");
-		(uint256 timestamp, uint256 yesterday) = lastAllocationTime.getTimeInfo();
+		(uint256 timestamp, uint256 yesterday) = lastAllocationTime
+			.getTimeInfo();
 		lastAllocationTime.ensureDiffDays(_metrics, yesterday);
 		address market = Metrics(_metrics).market();
 		pendingIncrements[_metrics] = true;
