@@ -16,9 +16,9 @@ contract DevLockUp is UseState{
 		releasedBlockNumber = new ReleasedBlockNumber();
 	}
 
-	function lockUp(address propatyAddress, uint256 value) public {
+	function lockUp(address propertyAddress, uint256 value) public {
 		require(
-			canceledFlg.isCanceled(propatyAddress) == false,
+			canceledFlg.isCanceled(propertyAddress) == false,
 			"lock up is already canceled"
 		);
 		ERC20 devToken = ERC20(getToken());
@@ -27,52 +27,52 @@ contract DevLockUp is UseState{
 			value <= balance,
 			"insufficient balance"
 		);
-		devToken.transfer(propatyAddress, value);
-		devValue.set(propatyAddress, value);
+		devToken.transfer(propertyAddress, value);
+		devValue.set(propertyAddress, value);
 	}
 
-	function cancel(address propatyAddress) public {
+	function cancel(address propertyAddress) public {
 		require(
-			devValue.hasTokenByPropaty(propatyAddress),
+			devValue.hasTokenByProperty(propertyAddress),
 			"dev token is not locked"
 		);
 		require(
-			canceledFlg.isCanceled(propatyAddress) == false,
+			canceledFlg.isCanceled(propertyAddress) == false,
 			"lock up is already canceled"
 		);
 		// TODO after withdrawal, allow the flag to be set again
-		canceledFlg.setCancelFlg(propatyAddress);
+		canceledFlg.setCancelFlg(propertyAddress);
 		// TODO get wait block number from polisy contract
-		releasedBlockNumber.setBlockNumber(propatyAddress, 10);
+		releasedBlockNumber.setBlockNumber(propertyAddress, 10);
 	}
 }
 
 contract DevValue {
 	using SafeMath for uint256;
 	mapping(address => mapping(address => uint256)) private _lockUpedDevValue;
-	function set(address propatyAddress, uint256 value) public {
-		_lockUpedDevValue[msg.sender][propatyAddress] = _lockUpedDevValue[msg.sender][propatyAddress] + value;
+	function set(address propertyAddress, uint256 value) public {
+		_lockUpedDevValue[msg.sender][propertyAddress] = _lockUpedDevValue[msg.sender][propertyAddress] + value;
 	}
 
-	function hasTokenByPropaty(address propatyAddress) public view returns (bool){
-		return _lockUpedDevValue[msg.sender][propatyAddress] != 0;
+	function hasTokenByProperty(address propertyAddress) public view returns (bool){
+		return _lockUpedDevValue[msg.sender][propertyAddress] != 0;
 	}
 }
 
 contract CanceledLockUpFlg {
 	mapping(address => mapping(address => bool)) private _canceled;
-	function setCancelFlg(address propatyAddress) public {
-		_canceled[msg.sender][propatyAddress] = true;
+	function setCancelFlg(address propertyAddress) public {
+		_canceled[msg.sender][propertyAddress] = true;
 	}
-	function isCanceled(address propatyAddress) public view returns (bool){
-		return _canceled[msg.sender][propatyAddress];
+	function isCanceled(address propertyAddress) public view returns (bool){
+		return _canceled[msg.sender][propertyAddress];
 	}
 }
 
 contract ReleasedBlockNumber {
 	using SafeMath for uint256;
 	mapping(address => mapping(address => uint256)) private _released;
-	function setBlockNumber(address propatyAddress, uint256 wait) public {
-		_released[msg.sender][propatyAddress] = block.number + wait;
+	function setBlockNumber(address propertyAddress, uint256 wait) public {
+		_released[msg.sender][propertyAddress] = block.number + wait;
 	}
 }

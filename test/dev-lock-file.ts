@@ -1,14 +1,14 @@
 contract('DevLockUpTest', () => {
 	const DevValueContract = artifacts.require('DevValue')
-	describe('DevValueTest; hasTokenByPropaty', () => {
-		it('has token by propaty', async () => {
+	describe('DevValueTest; hasTokenByProperty', () => {
+		it('has token by property', async () => {
 			const devValue = await DevValueContract.new()
 			await devValue.set('0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d', 10)
-			let result = await devValue.hasTokenByPropaty(
+			let result = await devValue.hasTokenByProperty(
 				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
 			)
 			expect(result).to.be.equal(true)
-			result = await devValue.hasTokenByPropaty(
+			result = await devValue.hasTokenByProperty(
 				'0x32A5598b078Ad20287f210803a6ad5D96C8df1d1'
 			)
 			expect(result).to.be.equal(false)
