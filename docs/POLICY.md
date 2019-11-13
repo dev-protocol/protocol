@@ -58,3 +58,7 @@ This value is still under consideration.
 ## abstentionPenalty
 
 This value is still under consideration.
+
+## lockUpBlocks
+
+This value is still under consideration.
