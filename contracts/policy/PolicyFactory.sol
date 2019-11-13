@@ -37,6 +37,7 @@ contract PolicyFactory is UseState {
 		for (uint256 i = 0; i < losePoliciesLength; i++) {
 			Policy(losePolicies[i]).kill();
 		}
+		Policy(votingRsult).clearVote();
 		_policyVote = new PolicyVote();
 	}
 }

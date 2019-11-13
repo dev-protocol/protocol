@@ -81,7 +81,12 @@ contract Policy is Killable {
 	}
 
 	function vote(uint256 count) public {
+		// TODO require
 		boteCount = boteCount.add(count);
 	}
 
+	function clearVote() public {
+		// TODO require
+		boteCount = 0;
+	}
 }
