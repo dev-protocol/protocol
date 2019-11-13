@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`2.0.3`**
+Version: **`2.0.4`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -329,6 +329,11 @@ Property Contract オーナーが Market Contract 及び Policy Contract への�
 ペナルティはマーケット報酬の計算対象外期間( ブロック数 )を設けることで罰則とする。対象外期間の開始ブロックは `allocate` の前回実行ブロックとする。計算対象外期間中は `allocate` の実行が失敗し、期間経過後も期間中の資産価値は考慮されない。
 
 棄権回数の算出のために、Market Contract 及び Policy Contract の投票受付期間中に投票しなかった Property Contract を記録する必要がある。そのための単純な方法として、State Contract に `pol`, `vot` という変数を追加する。 `pol` は整数型で新たな投票が開始するたびに 1 を加算する。`vot` は Property Contract のアドレスをキーとした整数のマップ型で、Property Contract オーナーによる投票のたびに 1 を加算する。Property Contract の生成時には `pol` の値を `vot[address]` に記録する。`pol` から `vot[address]` を差し引いた数が棄権数となる。Property Contract がペナルティを受けると `vot[address]` の値は再び `pol` と同期される。
+
+### lockUpBlocks
+
+ロックアップの解除申請後の継続ブロック数。
+ユーザーは Property Contract に対してロックアップしている DEV を解除することができるが、解除が要請されてから指定されたブロック数だけロックアップが継続する。
 
 ## Policy Factory
 
