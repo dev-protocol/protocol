@@ -4,11 +4,11 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./PolicyInterface.sol";
 import "./libs/Killable.sol";
 
-contract Policy is Killable{
+contract Policy is Killable {
 	using SafeMath for uint256;
 	address private owner;
 	PolicyInterface private innerPolicy;
-	constructor(address own, address innerPolicyAddress) Killable(own) public {
+	constructor(address own, address innerPolicyAddress) public Killable(own) {
 		owner = own;
 		innerPolicy = PolicyInterface(innerPolicyAddress);
 	}

@@ -7,6 +7,7 @@ contract State is Ownable {
 	address public allocator;
 	address public marketFactory;
 	address public propertyFactory;
+	address public policy;
 	mapping(address => bool) internal markets;
 	mapping(address => bool) internal metrics;
 	mapping(address => bool) internal properties;
@@ -74,4 +75,7 @@ contract State is Ownable {
 		return metrics[_metrics];
 	}
 
+	function setPolicy(address _addr) public onlyOwner {
+		policy = _addr;
+	}
 }

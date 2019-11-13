@@ -3,6 +3,7 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "./UseState.sol";
+import "./Policy.sol";
 
 contract DevLockUp is UseState {
 	using SafeMath for uint256;
@@ -40,6 +41,7 @@ contract DevLockUp is UseState {
 		// TODO after withdrawal, allow the flag to be set again
 		canceledFlg.setCancelFlg(propertyAddress);
 		// TODO get wait block number from polisy contract
+		//Policy(policy()).
 		releasedBlockNumber.setBlockNumber(propertyAddress, 10);
 	}
 }
