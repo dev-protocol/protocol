@@ -1,15 +1,16 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../libs/Killable.sol";
 import "./PolicyInterface.sol";
-import "./libs/Killable.sol";
 
 contract Policy is Killable {
 	using SafeMath for uint256;
-	address private owner;
+	address private _owner;
+	uint256 public boteCount;
 	PolicyInterface private innerPolicy;
-	constructor(address own, address innerPolicyAddress) public Killable(own) {
-		owner = own;
+	constructor(address payable own, address innerPolicyAddress) public Killable(own) {
+		_owner = own;
 		innerPolicy = PolicyInterface(innerPolicyAddress);
 	}
 	function rewards(uint256 lockups, uint256 assets)
@@ -69,10 +70,15 @@ contract Policy is Killable {
 	}
 
 	function abstentionPenalty(uint256 count) public view returns (bool) {
-		return innerPolicy.abstentionPenalty();
+		return innerPolicy.abstentionPenalty(count);
 	}
 
-	function vote() public {
-		_;
+	function lockUpBlocks() public view returns (uint256) {
+		return innerPolicy.lockUpBlocks();
 	}
+
+	function vote(uint256 count) public {
+		boteCount = boteCount.add(count);
+	}
+
 }

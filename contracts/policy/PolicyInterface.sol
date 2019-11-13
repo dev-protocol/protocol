@@ -40,4 +40,6 @@ contract PolicyInterface {
 	function policyVotingBlocks() public pure returns (uint256);
 
 	function abstentionPenalty(uint256 count) public pure returns (bool);
+
+	function lockUpBlocks() public pure returns (uint256);
 }

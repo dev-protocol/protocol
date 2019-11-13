@@ -2,8 +2,9 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "./libs/Mapping.sol";
 import "./UseState.sol";
-import "./Policy.sol";
+import "./policy/Policy.sol";
 
 contract DevLockUp is UseState {
 	using SafeMath for uint256;
@@ -39,20 +40,24 @@ contract DevLockUp is UseState {
 			"lock up is already canceled"
 		);
 		// TODO after withdrawal, allow the flag to be set again
+		// TODO after withdrawal, update locked up value
 		canceledFlg.setCancelFlg(propertyAddress);
-		// TODO get wait block number from polisy contract
-		//Policy(policy()).
-		releasedBlockNumber.setBlockNumber(propertyAddress, 10);
+		releasedBlockNumber.setBlockNumber(propertyAddress, Policy(policy()).lockUpBlocks());
+	}
+
+	function getAllLockUpedValue() public view returns (uint256){
+		return devValue.getAllLockUpedValue();
 	}
 }
 
 contract DevValue {
 	using SafeMath for uint256;
-	mapping(address => mapping(address => uint256)) private _lockUpedDevValue;
+	mapping(address => AddressValueMapping) private _lockUpedDevValue;
+	address[] private _senderAddresses;
+
 	function set(address propertyAddress, uint256 value) public {
-		_lockUpedDevValue[msg.sender][propertyAddress] =
-			_lockUpedDevValue[msg.sender][propertyAddress] +
-			value;
+		_lockUpedDevValue[msg.sender].add(propertyAddress, value);
+		_senderAddresses.push(msg.sender);
 	}
 
 	function hasTokenByProperty(address propertyAddress)
@@ -60,7 +65,16 @@ contract DevValue {
 		view
 		returns (bool)
 	{
-		return _lockUpedDevValue[msg.sender][propertyAddress] != 0;
+		return _lockUpedDevValue[msg.sender].get(propertyAddress) != 0;
+	}
+
+	function getAllLockUpedValue() public view returns (uint256) {
+		uint256 arrayLength = _senderAddresses.length;
+		uint256 totalValue;
+		for (uint256 i = 0; i<arrayLength; i++) {
+			totalValue = totalValue.add(_lockUpedDevValue[_senderAddresses[i]].getTotalValues());
+		}
+		return totalValue;
 	}
 }
 

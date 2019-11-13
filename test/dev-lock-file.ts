@@ -1,4 +1,4 @@
-contract('DevLockUpTest', () => {
+contract('DevValueTest', () => {
 	const DevValueContract = artifacts.require('DevValue')
 	describe('DevValueTest; hasTokenByProperty', () => {
 		it('has token by property', async () => {

@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "./libs/Killable.sol";
 import "./libs/Withdrawable.sol";
+import "./libs/Mapping.sol";
 import "./Property.sol";
 import "./Market.sol";
 import "./Metrics.sol";
@@ -26,6 +27,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	uint256 public mintPerBlock;
 	LastAllocationTime private lastAllocationTime;
 	DevLockUp private devLockUp;
+	AddressValueMapping private totals;
 
 	constructor() public Killable(msg.sender) {
 		lastAllocationTime = new LastAllocationTime();
@@ -120,5 +122,9 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 
 	function cancel(address propertyAddress) public {
 		devLockUp.cancel(propertyAddress);
+	}
+
+	function getAllVoteCount() public view returns (uint256){
+		return devLockUp.getAllLockUpedValue() + totals.getTotalValues();
 	}
 }
