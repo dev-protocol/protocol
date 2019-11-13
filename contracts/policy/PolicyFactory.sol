@@ -18,7 +18,7 @@ contract PolicyFactory is UseState {
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
 		_policyVote.vote(policyAddress, 0);
-		if (_policyVote.isVoting() == false){
+		if (_policyVote.isVoting() == false) {
 			setPolicy(policyAddress);
 		}
 		return policyAddress;

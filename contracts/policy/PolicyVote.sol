@@ -14,14 +14,14 @@ contract PolicyVote {
 	function vote(address _policyAddress, uint256 _vote) public {
 		// TODO 同一userから複数回投票を受けないようにする
 		Policy(_policyAddress).vote(_vote);
-		if (_existAddress[_policyAddress]){
+		if (_existAddress[_policyAddress]) {
 			return;
 		}
 		_existAddress[_policyAddress] = true;
 		_targetAddresses.push(_policyAddress);
 	}
 
-	function isVoting() public view returns (bool){
+	function isVoting() public view returns (bool) {
 		return _targetAddresses.length != 0;
 	}
 
@@ -35,7 +35,10 @@ contract PolicyVote {
 	}
 
 	function getLosePolicies() public returns (address[] memory) {
-		require(_currentPolicy != address(0), "next policy is not decided yet.");
+		require(
+			_currentPolicy != address(0),
+			"next policy is not decided yet."
+		);
 		require(_tmpLosePolicies.length == 0, "_tmpLosePolicies is used.");
 		uint256 arrayLength = _targetAddresses.length;
 		for (uint256 i = 0; i < arrayLength; i++) {
