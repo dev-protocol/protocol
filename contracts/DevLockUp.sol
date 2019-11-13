@@ -42,10 +42,13 @@ contract DevLockUp is UseState {
 		// TODO after withdrawal, allow the flag to be set again
 		// TODO after withdrawal, update locked up value
 		canceledFlg.setCancelFlg(propertyAddress);
-		releasedBlockNumber.setBlockNumber(propertyAddress, Policy(policy()).lockUpBlocks());
+		releasedBlockNumber.setBlockNumber(
+			propertyAddress,
+			Policy(policy()).lockUpBlocks()
+		);
 	}
 
-	function getAllLockUpedValue() public view returns (uint256){
+	function getAllLockUpedValue() public view returns (uint256) {
 		return devValue.getAllLockUpedValue();
 	}
 }
@@ -71,8 +74,10 @@ contract DevValue {
 	function getAllLockUpedValue() public view returns (uint256) {
 		uint256 arrayLength = _senderAddresses.length;
 		uint256 totalValue;
-		for (uint256 i = 0; i<arrayLength; i++) {
-			totalValue = totalValue.add(_lockUpedDevValue[_senderAddresses[i]].getTotalValues());
+		for (uint256 i = 0; i < arrayLength; i++) {
+			totalValue = totalValue.add(
+				_lockUpedDevValue[_senderAddresses[i]].getTotalValues()
+			);
 		}
 		return totalValue;
 	}

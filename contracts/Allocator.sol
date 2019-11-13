@@ -124,7 +124,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 		devLockUp.cancel(propertyAddress);
 	}
 
-	function getAllVoteCount() public view returns (uint256){
+	function getAllVoteCount() public view returns (uint256) {
 		return devLockUp.getAllLockUpedValue() + totals.getTotalValues();
 	}
 }

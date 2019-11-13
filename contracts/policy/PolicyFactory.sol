@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "./Policy.sol";
 import "./PolicyVote.sol";
 
-contract PolicyFactory is UseState{
+contract PolicyFactory is UseState {
 	PolicyVote private _policyVote;
 	address payable _owner;
 	event Create(address indexed _from, address _property);
@@ -22,8 +22,8 @@ contract PolicyFactory is UseState{
 
 	function vote(address _policyAddress, uint256 _vote) public {
 		_policyVote.vote(_policyAddress, _vote);
-		address votingRsult =_policyVote.getVotingRsult(allocator());
-		if (votingRsult == address(0)){
+		address votingRsult = _policyVote.getVotingRsult(allocator());
+		if (votingRsult == address(0)) {
 			return;
 		} else {
 			setPolicy(votingRsult);

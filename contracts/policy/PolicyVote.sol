@@ -6,7 +6,7 @@ import "./Policy.sol";
 
 contract PolicyVote {
 	using SafeMath for uint256;
-	mapping(address=>bool) private _existAddress;
+	mapping(address => bool) private _existAddress;
 	address[] private _targetAddresses;
 	address private currentPolicy;
 	address[] private tmpLosePolicies;
@@ -26,13 +26,13 @@ contract PolicyVote {
 		return currentPolicy;
 	}
 
-	function getLosePolicies() public returns (address[] memory){
+	function getLosePolicies() public returns (address[] memory) {
 		require(currentPolicy != address(0), "next policy is not decided yet.");
 		require(tmpLosePolicies.length == 0, "tmpLosePolicies is used.");
 		uint256 arrayLength = _targetAddresses.length;
-		for (uint256 i = 0; i<arrayLength; i++) {
-			if (_existAddress[_targetAddresses[i]]){
-				if (currentPolicy != _targetAddresses[i]){
+		for (uint256 i = 0; i < arrayLength; i++) {
+			if (_existAddress[_targetAddresses[i]]) {
+				if (currentPolicy != _targetAddresses[i]) {
 					tmpLosePolicies.push(_targetAddresses[i]);
 				}
 			}

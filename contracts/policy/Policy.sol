@@ -9,7 +9,10 @@ contract Policy is Killable {
 	address private _owner;
 	uint256 public boteCount;
 	PolicyInterface private innerPolicy;
-	constructor(address payable own, address innerPolicyAddress) public Killable(own) {
+	constructor(address payable own, address innerPolicyAddress)
+		public
+		Killable(own)
+	{
 		_owner = own;
 		innerPolicy = PolicyInterface(innerPolicyAddress);
 	}
