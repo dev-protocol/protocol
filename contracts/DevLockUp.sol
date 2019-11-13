@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "./libs/Mapping.sol";
+import "./libs/ERC20Transfer.sol";
 import "./UseState.sol";
 import "./policy/Policy.sol";
 
@@ -23,10 +23,7 @@ contract DevLockUp is UseState {
 			canceledFlg.isCanceled(propertyAddress) == false,
 			"lock up is already canceled"
 		);
-		ERC20 devToken = ERC20(getToken());
-		uint256 balance = devToken.balanceOf(msg.sender);
-		require(value <= balance, "insufficient balance");
-		devToken.transfer(propertyAddress, value);
+		new ERC20Transfer(getToken()).transfer(propertyAddress, value);
 		devValue.set(propertyAddress, value);
 	}
 

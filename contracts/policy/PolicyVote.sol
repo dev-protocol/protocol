@@ -8,50 +8,46 @@ contract PolicyVote {
 	using SafeMath for uint256;
 	mapping(address => bool) private _existAddress;
 	address[] private _targetAddresses;
-	address private currentPolicy;
-	address[] private tmpLosePolicies;
+	address private _currentPolicy;
+	address[] private _tmpLosePolicies;
 
 	function vote(address _policyAddress, uint256 _vote) public {
-		//emit Vote(msg.sender, _policyAddress, _vote);
+		// TODO 同一userから複数回投票を受けないようにする
 		Policy(_policyAddress).vote(_vote);
+		if (_existAddress[_policyAddress]){
+			return;
+		}
 		_existAddress[_policyAddress] = true;
 		_targetAddresses.push(_policyAddress);
+	}
+
+	function isVoting() public view returns (bool){
+		return _targetAddresses.length != 0;
 	}
 
 	function getVotingRsult(address allocatorAddress) public returns (address) {
 		uint256 allVoteCount = Allocator(allocatorAddress).getAllVoteCount();
 		// TODO
+		// 投票された結果をみて当選確実かどうかを判定する
 		allVoteCount = allVoteCount + 1;
-		currentPolicy = address(0);
-		return currentPolicy;
+		_currentPolicy = address(0);
+		return _currentPolicy;
 	}
 
 	function getLosePolicies() public returns (address[] memory) {
-		require(currentPolicy != address(0), "next policy is not decided yet.");
-		require(tmpLosePolicies.length == 0, "tmpLosePolicies is used.");
+		require(_currentPolicy != address(0), "next policy is not decided yet.");
+		require(_tmpLosePolicies.length == 0, "_tmpLosePolicies is used.");
 		uint256 arrayLength = _targetAddresses.length;
 		for (uint256 i = 0; i < arrayLength; i++) {
 			if (_existAddress[_targetAddresses[i]]) {
-				if (currentPolicy != _targetAddresses[i]) {
-					tmpLosePolicies.push(_targetAddresses[i]);
+				if (_currentPolicy != _targetAddresses[i]) {
+					_tmpLosePolicies.push(_targetAddresses[i]);
 				}
 			}
 		}
-		require(tmpLosePolicies.length != 0, "lost policies is not exist.");
-		address[] memory losePolicies = new address[](tmpLosePolicies.length);
-		losePolicies = tmpLosePolicies;
+		require(_tmpLosePolicies.length != 0, "lost policies is not exist.");
+		address[] memory losePolicies = new address[](_tmpLosePolicies.length);
+		losePolicies = _tmpLosePolicies;
 		return losePolicies;
 	}
-
-}
-
-contract PolicyVoteProvider {
-	PolicyVote private _policyVote;
-	function setUp() public {
-		_policyVote = new PolicyVote();
-	}
-	function vote(address _policyAddress, uint256 _vote) public {
-		_policyVote.vote(_policyAddress, _vote);
-	}
-
 }

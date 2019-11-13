@@ -17,25 +17,26 @@ contract PolicyFactory is UseState {
 		Policy policy = new Policy(_owner, _newPolicyAddress);
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
+		_policyVote.vote(policyAddress, 0);
+		if (_policyVote.isVoting() == false){
+			setPolicy(policyAddress);
+		}
 		return policyAddress;
 	}
 
 	function vote(address _policyAddress, uint256 _vote) public {
+		require(_policyVote.isVoting(), "not in voting period.");
 		_policyVote.vote(_policyAddress, _vote);
 		address votingRsult = _policyVote.getVotingRsult(allocator());
 		if (votingRsult == address(0)) {
 			return;
-		} else {
-			setPolicy(votingRsult);
-			_policyVote = new PolicyVote();
 		}
-	}
-
-	function killPolicy(address _policyAddress) private {
-		Policy(_policyAddress).kill();
+		setPolicy(votingRsult);
+		address[] memory losePolicies = _policyVote.getLosePolicies();
+		uint256 losePoliciesLength = losePolicies.length;
+		for (uint256 i = 0; i < losePoliciesLength; i++) {
+			Policy(losePolicies[i]).kill();
+		}
+		_policyVote = new PolicyVote();
 	}
 }
-// TODO
-//投票者が新しいコントラクトを承認する仕組み
-//アクティブなポリシーは常に一つ
-//古いポリシーは参照されない
