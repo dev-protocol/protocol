@@ -35,7 +35,7 @@ contract PolicyFactory is UseState {
 		address[] memory policyAddresses = _policyVote.getPolicyAddresses();
 		uint256 losePoliciesLength = policyAddresses.length;
 		for (uint256 i = 0; i < losePoliciesLength; i++) {
-			if (votingRsult == policyAddresses[i]){
+			if (votingRsult == policyAddresses[i]) {
 				Policy(votingRsult).clearVote();
 				continue;
 			}

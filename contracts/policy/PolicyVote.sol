@@ -27,16 +27,20 @@ contract PolicyVote {
 			votes[i] = Policy(_targetAddresses.get()[i]).voteCount();
 		}
 		uint256[] memory sortResult = new QuickSort().sort(votes);
-		if (new VoteResult(allVoteCount, sortResult).isDecided()){
+		if (new VoteResult(allVoteCount, sortResult).isDecided()) {
 			return getPolicyAddressFromVoteCount(sortResult[0]);
 		}
 		return address(0);
 	}
 
-	function getPolicyAddressFromVoteCount(uint256 voteCount) private view returns (address){
+	function getPolicyAddressFromVoteCount(uint256 voteCount)
+		private
+		view
+		returns (address)
+	{
 		uint256 arrayLength = _targetAddresses.get().length;
 		for (uint256 i = 0; i < arrayLength; i++) {
-			if(voteCount == Policy(_targetAddresses.get()[i]).voteCount()){
+			if (voteCount == Policy(_targetAddresses.get()[i]).voteCount()) {
 				return _targetAddresses.get()[i];
 			}
 		}
@@ -48,16 +52,17 @@ contract PolicyVote {
 	}
 }
 
-contract VoteResult{
+contract VoteResult {
 	uint256 private _allVoteCount;
 	uint256[] private _vsortedVoteCount;
 	constructor(uint256 allVoteCount, uint256[] memory sortedVoteCount) public {
 		_allVoteCount = allVoteCount;
 		_vsortedVoteCount = sortedVoteCount;
 	}
-	function isDecided() public returns (bool){
+	function isDecided() public returns (bool) {
 		//TODO supports more complex patterns
-		uint256 remainingVoteCount = _allVoteCount - new MathUtils().sum(_vsortedVoteCount);
+		uint256 remainingVoteCount = _allVoteCount -
+			new MathUtils().sum(_vsortedVoteCount);
 		return _vsortedVoteCount[0] > _vsortedVoteCount[1] + remainingVoteCount;
 	}
 }
