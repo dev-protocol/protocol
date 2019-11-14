@@ -117,16 +117,26 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	function lockUp(address propertyAddress, uint256 amount) public {
 		// solium-disable-next-line security/no-low-level-calls
 		(bool success, ) = address(devLockUp).delegatecall(
-			abi.encodeWithSignature("lockUp(address,address,uint256)", msg.sender, propertyAddress, amount)
+			abi.encodeWithSignature(
+				"lockUp(address,address,uint256)",
+				msg.sender,
+				propertyAddress,
+				amount
+			)
 		);
-		require(success,"lockup was failed.");
+		require(success, "lockup was failed.");
 	}
 
 	function cancel(address propertyAddress) public {
 		// solium-disable-next-line security/no-low-level-calls
 		(bool success, ) = address(devLockUp).delegatecall(
-			abi.encodeWithSignature("cancel(address,address)", msg.sender, propertyAddress, propertyAddress)
+			abi.encodeWithSignature(
+				"cancel(address,address)",
+				msg.sender,
+				propertyAddress,
+				propertyAddress
+			)
 		);
-		require(success,"cancel was failed.");
+		require(success, "cancel was failed.");
 	}
 }
