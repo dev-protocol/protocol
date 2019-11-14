@@ -1,6 +1,5 @@
 {
-	"name": "protocol",
-	"private": true,
+	"name": "@devprotocol/protocol",
 	"version": "0.1.0",
 	"description": "Securitize for Internet assets",
 	"main": "index.js",
@@ -44,6 +43,7 @@
 		"openzeppelin-solidity": "^2.3.0"
 	},
 	"directories": {
+		"doc": "docs",
 		"test": "test"
 	},
 	"repository": {
@@ -58,5 +58,8 @@
 		"hooks": {
 			"pre-commit": "npm run lint"
 		}
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com/"
 	}
 }
