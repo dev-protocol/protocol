@@ -32,12 +32,16 @@ contract PolicyFactory is UseState {
 			return;
 		}
 		setPolicy(votingRsult);
-		address[] memory losePolicies = _policyVote.getLosePolicies();
-		uint256 losePoliciesLength = losePolicies.length;
+		address[] memory policyAddresses = _policyVote.getPolicyAddresses();
+		uint256 losePoliciesLength = policyAddresses.length;
 		for (uint256 i = 0; i < losePoliciesLength; i++) {
-			Policy(losePolicies[i]).kill();
+			if (votingRsult == policyAddresses[i]){
+				Policy(votingRsult).clearVote();
+				continue;
+			}
+			Policy(policyAddresses[i]).kill();
 		}
-		Policy(votingRsult).clearVote();
 		_policyVote = new PolicyVote();
+		_policyVote.vote(votingRsult, 0);
 	}
 }

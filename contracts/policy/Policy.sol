@@ -7,7 +7,7 @@ import "./PolicyInterface.sol";
 contract Policy is Killable {
 	using SafeMath for uint256;
 	address private _owner;
-	uint256 public boteCount;
+	uint256 public voteCount;
 	PolicyInterface private innerPolicy;
 	constructor(address payable own, address innerPolicyAddress)
 		public
@@ -82,11 +82,11 @@ contract Policy is Killable {
 
 	function vote(uint256 count) public {
 		// TODO require
-		boteCount = boteCount.add(count);
+		voteCount = voteCount.add(count);
 	}
 
 	function clearVote() public {
 		// TODO require
-		boteCount = 0;
+		voteCount = 0;
 	}
 }

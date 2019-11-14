@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./libs/Mapping.sol";
+import "./libs/Utils.sol";
 import "./libs/ERC20Transfer.sol";
 import "./UseState.sol";
 import "./policy/Policy.sol";

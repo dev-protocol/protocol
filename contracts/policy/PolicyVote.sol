@@ -1,56 +1,63 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../libs/Utils.sol";
 import "../Allocator.sol";
 import "./Policy.sol";
 
 contract PolicyVote {
 	using SafeMath for uint256;
-	mapping(address => bool) private _existAddress;
-	address[] private _targetAddresses;
-	address private _currentPolicy;
-	address[] private _tmpLosePolicies;
+	AddressSet private _targetAddresses;
 
 	function vote(address _policyAddress, uint256 _vote) public {
 		// TODO 同一userから複数回投票を受けないようにする
 		Policy(_policyAddress).vote(_vote);
-		if (_existAddress[_policyAddress]) {
-			return;
-		}
-		_existAddress[_policyAddress] = true;
-		_targetAddresses.push(_policyAddress);
+		_targetAddresses.add(_policyAddress);
 	}
 
 	function isVoting() public view returns (bool) {
-		return _targetAddresses.length != 0;
+		return _targetAddresses.length() != 0;
 	}
 
 	function getVotingRsult(address allocatorAddress) public returns (address) {
 		uint256 allVoteCount = Allocator(allocatorAddress).getAllVoteCount();
-		// TODO
-		// 投票された結果をみて当選確実かどうかを判定する
-		allVoteCount = allVoteCount + 1;
-		_currentPolicy = address(0);
-		return _currentPolicy;
+		uint256 arrayLength = _targetAddresses.get().length;
+		uint256[] memory votes = new uint256[](arrayLength);
+		for (uint256 i = 0; i < arrayLength; i++) {
+			votes[i] = Policy(_targetAddresses.get()[i]).voteCount();
+		}
+		uint256[] memory sortResult = new QuickSort().sort(votes);
+		if (new VoteResult(allVoteCount, sortResult).isDecided()){
+			return getPolicyAddressFromVoteCount(sortResult[0]);
+		}
+		return address(0);
 	}
 
-	function getLosePolicies() public returns (address[] memory) {
-		require(
-			_currentPolicy != address(0),
-			"next policy is not decided yet."
-		);
-		require(_tmpLosePolicies.length == 0, "_tmpLosePolicies is used.");
-		uint256 arrayLength = _targetAddresses.length;
+	function getPolicyAddressFromVoteCount(uint256 voteCount) private view returns (address){
+		uint256 arrayLength = _targetAddresses.get().length;
 		for (uint256 i = 0; i < arrayLength; i++) {
-			if (_existAddress[_targetAddresses[i]]) {
-				if (_currentPolicy != _targetAddresses[i]) {
-					_tmpLosePolicies.push(_targetAddresses[i]);
-				}
+			if(voteCount == Policy(_targetAddresses.get()[i]).voteCount()){
+				return _targetAddresses.get()[i];
 			}
 		}
-		require(_tmpLosePolicies.length != 0, "lost policies is not exist.");
-		address[] memory losePolicies = new address[](_tmpLosePolicies.length);
-		losePolicies = _tmpLosePolicies;
-		return losePolicies;
+		revert("not found address.");
+	}
+
+	function getPolicyAddresses() public view returns (address[] memory) {
+		return _targetAddresses.get();
+	}
+}
+
+contract VoteResult{
+	uint256 private _allVoteCount;
+	uint256[] private _vsortedVoteCount;
+	constructor(uint256 allVoteCount, uint256[] memory sortedVoteCount) public {
+		_allVoteCount = allVoteCount;
+		_vsortedVoteCount = sortedVoteCount;
+	}
+	function isDecided() public returns (bool){
+		//TODO supports more complex patterns
+		uint256 remainingVoteCount = _allVoteCount - new MathUtils().sum(_vsortedVoteCount);
+		return _vsortedVoteCount[0] > _vsortedVoteCount[1] + remainingVoteCount;
 	}
 }
