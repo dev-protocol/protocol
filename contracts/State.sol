@@ -7,6 +7,7 @@ contract State is Ownable {
 	address public allocator;
 	address public marketFactory;
 	address public propertyFactory;
+	address public policyFactory;
 	address public policy;
 	address public lockup;
 	mapping(address => bool) internal markets;
@@ -27,6 +28,14 @@ contract State is Ownable {
 		_;
 	}
 
+	modifier onlyPolicyFactory() {
+		require(
+			msg.sender == policyFactory,
+			"Only Policy Factory Contract"
+		);
+		_;
+	}
+
 	modifier onlyMarket() {
 		require(markets[msg.sender], "Only Market Contract");
 		_;
@@ -42,6 +51,10 @@ contract State is Ownable {
 
 	function setPropertyFactory(address _addr) public onlyOwner {
 		propertyFactory = _addr;
+	}
+
+	function setPolicyFactory(address _addr) public onlyOwner {
+		policyFactory = _addr;
 	}
 
 	function addMarket(address _addr) public onlyMarketFactory returns (bool) {
@@ -76,7 +89,7 @@ contract State is Ownable {
 		return metrics[_metrics];
 	}
 
-	function setPolicy(address _addr) public onlyOwner {
+	function setPolicy(address _addr) public onlyPolicyFactory {
 		policy = _addr;
 	}
 

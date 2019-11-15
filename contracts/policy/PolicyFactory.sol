@@ -6,7 +6,6 @@ import "../libs/Utils.sol";
 import "../UseState.sol";
 import "../Lockup.sol";
 import "./IPolicy.sol";
-import "./PolicyValidator.sol";
 
 contract PolicyFactory is UseState {
 	AddressSet private _policySet;
@@ -27,7 +26,7 @@ contract PolicyFactory is UseState {
 		return policyAddress;
 	}
 
-	function killLosePolicy(address _currentPolicyAddress) public {
+	function convergePolicy(address _currentPolicyAddress) public {
 		for (uint256 i = 0; i < _policySet.length(); i++) {
 			address policyAddress = _policySet.get()[i];
 			if (policyAddress == _currentPolicyAddress) {
@@ -35,6 +34,7 @@ contract PolicyFactory is UseState {
 			}
 			Policy(policyAddress).kill();
 		}
+		setPolicy(_currentPolicyAddress);
 		_policySet = new AddressSet();
 		_policySet.add(_currentPolicyAddress);
 	}
@@ -44,7 +44,6 @@ contract Policy is Killable, UseState {
 	using SafeMath for uint256;
 	address private _factoryAddress;
 	IPolicy private _policy;
-	PolicyVoteValidator private _validator;
 	uint256 private _agreeCount;
 	uint256 private _oppositeCount;
 	uint256 private _votingEndBlockNumber;
@@ -53,7 +52,6 @@ contract Policy is Killable, UseState {
 	constructor(address _factory, address _innerPolicyAddress) public {
 		_factoryAddress = _factory;
 		_policy = IPolicy(_innerPolicyAddress);
-		_validator = new PolicyVoteValidator();
 		_votingEndBlockNumber = block.number + _policy.policyVotingBlocks();
 	}
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
@@ -97,6 +95,10 @@ contract Policy is Killable, UseState {
 		return _policy.marketApproval(_agree, _opposite);
 	}
 
+	function policyApproval(uint256 _agree, uint256 _opposite) public view returns (bool){
+		return _policy.policyApproval(_agree, _opposite);
+	}
+
 	function marketVotingBlocks() public view returns (uint256) {
 		return _policy.marketVotingBlocks();
 	}
@@ -124,8 +126,8 @@ contract Policy is Killable, UseState {
 			msg.sender,
 			_propertyAddress
 		);
-		require(voteCount != 0, "vote count is 0");
-		require(_voteRecord[msg.sender][_propertyAddress], "already vote");
+		require(voteCount != 0, "vote count is 0.");
+		require(_voteRecord[msg.sender][_propertyAddress], "already vote.");
 		_voteRecord[msg.sender][_propertyAddress] = true;
 		if (_agree) {
 			_agreeCount += voteCount;
@@ -136,7 +138,10 @@ contract Policy is Killable, UseState {
 		if (result == false) {
 			return;
 		}
-		setPolicy(address(this));
-		PolicyFactory(_factoryAddress).killLosePolicy(address(this));
+		bool result2 = Policy(policy()).policyApproval(_agreeCount, _oppositeCount);
+		if (result2 == false) {
+			return;
+		}
+		PolicyFactory(_factoryAddress).convergePolicy(address(this));
 	}
 }
