@@ -21,9 +21,9 @@ contract('TokenValueTest', () => {
 	})
 })
 
-contract('CanceledLockUpFlgTest', () => {
-	const CanceledLockUpFlgContract = artifacts.require('CanceledLockUpFlg')
-	describe('CanceledLockUpFlgTest; isCanceled', () => {
+contract('CanceledLockupFlgTest', () => {
+	const CanceledLockUpFlgContract = artifacts.require('CanceledLockupFlg')
+	describe('CanceledLockupFlgTest; isCanceled', () => {
 		it('is canceled', async () => {
 			const canceled = await CanceledLockUpFlgContract.new()
 			await canceled.setCancelFlg(
