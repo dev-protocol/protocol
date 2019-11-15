@@ -10,7 +10,6 @@ import "./Market.sol";
 import "./Metrics.sol";
 import "./UseState.sol";
 import "./LastAllocationTime.sol";
-import "./DevLockUp.sol";
 
 contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	using SafeMath for uint256;
@@ -25,11 +24,9 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	mapping(address => bool) pendingIncrements;
 	uint256 public mintPerBlock;
 	LastAllocationTime private lastAllocationTime;
-	DevLockUp private devLockUp;
 
 	constructor() public {
 		lastAllocationTime = new LastAllocationTime();
-		devLockUp = new DevLockUp();
 	}
 
 	modifier onlyProperty(address _addr) {
@@ -112,31 +109,5 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	{
 		ERC20Burnable(getToken()).burnFrom(msg.sender, _amount);
 		increment(_property, _amount);
-	}
-
-	function lockUp(address propertyAddress, uint256 amount) public {
-		// solium-disable-next-line security/no-low-level-calls
-		(bool success, ) = address(devLockUp).delegatecall(
-			abi.encodeWithSignature(
-				"lockUp(address,address,uint256)",
-				msg.sender,
-				propertyAddress,
-				amount
-			)
-		);
-		require(success, "lockup was failed.");
-	}
-
-	function cancel(address propertyAddress) public {
-		// solium-disable-next-line security/no-low-level-calls
-		(bool success, ) = address(devLockUp).delegatecall(
-			abi.encodeWithSignature(
-				"cancel(address,address)",
-				msg.sender,
-				propertyAddress,
-				propertyAddress
-			)
-		);
-		require(success, "cancel was failed.");
 	}
 }

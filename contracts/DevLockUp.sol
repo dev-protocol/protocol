@@ -16,15 +16,15 @@ contract DevLockUp is UseState {
 		releasedBlockNumber = new ReleasedBlockNumber();
 	}
 
-	function lockUp(address fromAddress, address propertyAddress, uint256 value)
+	function lockUp(address propertyAddress, uint256 value)
 		public
 	{
 		require(
-			canceledFlg.isCanceled(fromAddress, propertyAddress) == false,
+			canceledFlg.isCanceled(msg.sender, propertyAddress) == false,
 			"lock up is already canceled"
 		);
 		ERC20 devToken = ERC20(getToken());
-		uint256 balance = devToken.balanceOf(fromAddress);
+		uint256 balance = devToken.balanceOf(msg.sender);
 		require(value <= balance, "insufficient balance");
 		// solium-disable-next-line security/no-low-level-calls
 		(bool success, bytes memory data) = address(devToken).delegatecall(
@@ -36,22 +36,22 @@ contract DevLockUp is UseState {
 		);
 		require(success, "transfer was failed.");
 		require(abi.decode(data, (bool)), "transfer was failed.");
-		devValue.set(fromAddress, propertyAddress, value);
+		devValue.set(msg.sender, propertyAddress, value);
 	}
 
-	function cancel(address fromAddress, address propertyAddress) public {
+	function cancel(address propertyAddress) public {
 		require(
-			devValue.hasTokenByProperty(fromAddress, propertyAddress),
+			devValue.hasTokenByProperty(msg.sender, propertyAddress),
 			"dev token is not locked"
 		);
 		require(
-			canceledFlg.isCanceled(fromAddress, propertyAddress) == false,
+			canceledFlg.isCanceled(msg.sender, propertyAddress) == false,
 			"lock up is already canceled"
 		);
 		// TODO after withdrawal, allow the flag to be set again
-		canceledFlg.setCancelFlg(fromAddress, propertyAddress);
+		canceledFlg.setCancelFlg(msg.sender, propertyAddress);
 		// TODO get wait block number from polisy contract
-		releasedBlockNumber.setBlockNumber(fromAddress, propertyAddress, 10);
+		releasedBlockNumber.setBlockNumber(msg.sender, propertyAddress, 10);
 	}
 }
 
