@@ -43,7 +43,7 @@ contract PolicyFactory is UseState {
 contract Policy is Killable, UseState {
 	using SafeMath for uint256;
 	address private _factoryAddress;
-	IPolicy private _innerPolicy;
+	IPolicy private _policy;
 	PolicyVoteValidator private _validator;
 	uint256 private _agreeCount;
 	uint256 private _oppositeCount;
@@ -51,10 +51,9 @@ contract Policy is Killable, UseState {
 
 	constructor(address _factory, address _innerPolicyAddress) public {
 		_factoryAddress = _factory;
-		_innerPolicy = IPolicy(_innerPolicyAddress);
+		_policy = IPolicy(_innerPolicyAddress);
 		_validator = new PolicyVoteValidator();
-		_votingEndBlockNumber = block.number +
-			_innerPolicy.policyVotingBlocks();
+		_votingEndBlockNumber = block.number + _policy.policyVotingBlocks();
 	}
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function rewards(uint256 _lockups, uint256 _assets)
@@ -62,7 +61,7 @@ contract Policy is Killable, UseState {
 		view
 		returns (uint256)
 	{
-		return _innerPolicy.rewards(_lockups, _assets);
+		return _policy.rewards(_lockups, _assets);
 	}
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function holdersShare(uint256 _amount, uint256 _lockups)
@@ -70,7 +69,7 @@ contract Policy is Killable, UseState {
 		view
 		returns (uint256)
 	{
-		return _innerPolicy.holdersShare(_amount, _lockups);
+		return _policy.holdersShare(_amount, _lockups);
 	}
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function assetValue(uint256 _value, uint256 _lockups)
@@ -78,7 +77,7 @@ contract Policy is Killable, UseState {
 		view
 		returns (uint256)
 	{
-		return _innerPolicy.assetValue(_value, _lockups);
+		return _policy.assetValue(_value, _lockups);
 	}
 	// TODO Need to be called authenticatedCallbackt in Market Contract
 	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
@@ -86,7 +85,7 @@ contract Policy is Killable, UseState {
 		view
 		returns (uint256)
 	{
-		return _innerPolicy.authenticationFee(_assets, _propertyAssets);
+		return _policy.authenticationFee(_assets, _propertyAssets);
 	}
 	// TODO Need to be called vote in Market Contract
 	function marketApproval(uint256 _agree, uint256 _opposite)
@@ -94,20 +93,20 @@ contract Policy is Killable, UseState {
 		view
 		returns (bool)
 	{
-		return _innerPolicy.marketApproval(_agree, _opposite);
+		return _policy.marketApproval(_agree, _opposite);
 	}
 
 	function marketVotingBlocks() public view returns (uint256) {
-		return _innerPolicy.marketVotingBlocks();
+		return _policy.marketVotingBlocks();
 	}
 
 	// TODO event trigger?
 	function abstentionPenalty(uint256 count) public view returns (bool) {
-		return _innerPolicy.abstentionPenalty(count);
+		return _policy.abstentionPenalty(count);
 	}
 
 	function lockUpBlocks() public view returns (uint256) {
-		return _innerPolicy.lockUpBlocks();
+		return _policy.lockUpBlocks();
 	}
 
 	function vote(address _propertyAddress, bool _agree) public {
@@ -126,7 +125,7 @@ contract Policy is Killable, UseState {
 		} else {
 			_oppositeCount += voteCount;
 		}
-		bool result = _innerPolicy.policyApproval(_agreeCount, _oppositeCount);
+		bool result = _policy.policyApproval(_agreeCount, _oppositeCount);
 		if (result == false) {
 			return;
 		}
