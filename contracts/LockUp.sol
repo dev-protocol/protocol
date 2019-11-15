@@ -4,14 +4,14 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "./UseState.sol";
 
-contract DevLockUp is UseState {
+contract LockUp is UseState {
 	using SafeMath for uint256;
-	DevValue private devValue;
+	TokenValue private tokenValue;
 	CanceledLockUpFlg private canceledFlg;
 	ReleasedBlockNumber private releasedBlockNumber;
 
 	constructor() public {
-		devValue = new DevValue();
+		tokenValue = new TokenValue();
 		canceledFlg = new CanceledLockUpFlg();
 		releasedBlockNumber = new ReleasedBlockNumber();
 	}
@@ -34,12 +34,12 @@ contract DevLockUp is UseState {
 		);
 		require(success, "transfer was failed.");
 		require(abi.decode(data, (bool)), "transfer was failed.");
-		devValue.set(msg.sender, propertyAddress, value);
+		tokenValue.set(msg.sender, propertyAddress, value);
 	}
 
 	function cancel(address propertyAddress) public {
 		require(
-			devValue.hasTokenByProperty(msg.sender, propertyAddress),
+			tokenValue.hasTokenByProperty(msg.sender, propertyAddress),
 			"dev token is not locked"
 		);
 		require(
@@ -53,7 +53,7 @@ contract DevLockUp is UseState {
 	}
 }
 
-contract DevValue {
+contract TokenValue {
 	using SafeMath for uint256;
 	mapping(address => mapping(address => uint256)) private _lockUpedDevValue;
 	function set(address fromAddress, address propertyAddress, uint256 value)
