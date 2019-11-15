@@ -16,9 +16,7 @@ contract DevLockUp is UseState {
 		releasedBlockNumber = new ReleasedBlockNumber();
 	}
 
-	function lockUp(address propertyAddress, uint256 value)
-		public
-	{
+	function lockUp(address propertyAddress, uint256 value) public {
 		require(
 			canceledFlg.isCanceled(msg.sender, propertyAddress) == false,
 			"lock up is already canceled"
