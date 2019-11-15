@@ -47,11 +47,13 @@ contract Policy is Killable, UseState {
 	PolicyVoteValidator private _validator;
 	uint256 private _agreeCount;
 	uint256 private _oppositeCount;
+	uint256 private _votingEndBlockNumber;
 
 	constructor(address _factory, address _innerPolicyAddress) public {
 		_factoryAddress = _factory;
 		_innerPolicy = IPolicy(_innerPolicyAddress);
 		_validator = new PolicyVoteValidator();
+		_votingEndBlockNumber = block.number + _innerPolicy.policyVotingBlocks();
 	}
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function rewards(uint256 _lockups, uint256 _assets)
@@ -98,9 +100,6 @@ contract Policy is Killable, UseState {
 		return _innerPolicy.marketVotingBlocks();
 	}
 
-	function policyVotingBlocks() public view returns (uint256) {
-		return _innerPolicy.policyVotingBlocks();
-	}
 	// TODO event trigger?
 	function abstentionPenalty(uint256 count) public view returns (bool) {
 		return _innerPolicy.abstentionPenalty(count);
@@ -112,6 +111,7 @@ contract Policy is Killable, UseState {
 
 	function vote(address _propertyAddress, bool _agree) public {
 		require(policy() != address(this), "this policy is current.");
+		require(block.number <= _votingEndBlockNumber, "voting deadline is over.");
 		uint256 voteCount = Lockup(lockup()).getTokenValue(
 			msg.sender,
 			_propertyAddress
