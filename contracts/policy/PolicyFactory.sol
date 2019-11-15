@@ -95,7 +95,11 @@ contract Policy is Killable, UseState {
 		return _policy.marketApproval(_agree, _opposite);
 	}
 
-	function policyApproval(uint256 _agree, uint256 _opposite) public view returns (bool){
+	function policyApproval(uint256 _agree, uint256 _opposite)
+		public
+		view
+		returns (bool)
+	{
 		return _policy.policyApproval(_agree, _opposite);
 	}
 
@@ -138,7 +142,10 @@ contract Policy is Killable, UseState {
 		if (result == false) {
 			return;
 		}
-		bool result2 = Policy(policy()).policyApproval(_agreeCount, _oppositeCount);
+		bool result2 = Policy(policy()).policyApproval(
+			_agreeCount,
+			_oppositeCount
+		);
 		if (result2 == false) {
 			return;
 		}

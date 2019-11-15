@@ -29,10 +29,7 @@ contract State is Ownable {
 	}
 
 	modifier onlyPolicyFactory() {
-		require(
-			msg.sender == policyFactory,
-			"Only Policy Factory Contract"
-		);
+		require(msg.sender == policyFactory, "Only Policy Factory Contract");
 		_;
 	}
 
