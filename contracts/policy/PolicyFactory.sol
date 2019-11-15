@@ -48,6 +48,7 @@ contract Policy is Killable, UseState {
 	uint256 private _agreeCount;
 	uint256 private _oppositeCount;
 	uint256 private _votingEndBlockNumber;
+	mapping(address => mapping(address => bool)) private _voteRecord;
 
 	constructor(address _factory, address _innerPolicyAddress) public {
 		_factoryAddress = _factory;
@@ -100,7 +101,7 @@ contract Policy is Killable, UseState {
 		return _policy.marketVotingBlocks();
 	}
 
-	// TODO event trigger?
+	// TODO Need to be called allocate in Allocator Contract
 	function abstentionPenalty(uint256 count) public view returns (bool) {
 		return _policy.abstentionPenalty(count);
 	}
@@ -110,6 +111,7 @@ contract Policy is Killable, UseState {
 	}
 
 	function vote(address _propertyAddress, bool _agree) public {
+		require(isProperty(_propertyAddress), "this address is not property contract.");
 		require(policy() != address(this), "this policy is current.");
 		require(
 			block.number <= _votingEndBlockNumber,
@@ -119,7 +121,9 @@ contract Policy is Killable, UseState {
 			msg.sender,
 			_propertyAddress
 		);
-		_validator.validate(msg.sender, _propertyAddress, voteCount);
+		require(voteCount != 0, "vote count is 0");
+		require(_voteRecord[msg.sender][_propertyAddress], "already vote");
+		_voteRecord[msg.sender][_propertyAddress] = true;
 		if (_agree) {
 			_agreeCount += voteCount;
 		} else {
