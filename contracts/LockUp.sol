@@ -4,19 +4,19 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "./UseState.sol";
 
-contract LockUp is UseState {
+contract Lockup is UseState {
 	using SafeMath for uint256;
 	TokenValue private tokenValue;
-	CanceledLockUpFlg private canceledFlg;
+	CanceledLockupFlg private canceledFlg;
 	ReleasedBlockNumber private releasedBlockNumber;
 
 	constructor() public {
 		tokenValue = new TokenValue();
-		canceledFlg = new CanceledLockUpFlg();
+		canceledFlg = new CanceledLockupFlg();
 		releasedBlockNumber = new ReleasedBlockNumber();
 	}
 
-	function lockUp(address propertyAddress, uint256 value) public {
+	function lockup(address propertyAddress, uint256 value) public {
 		require(
 			canceledFlg.isCanceled(msg.sender, propertyAddress) == false,
 			"lock up is already canceled"
@@ -55,13 +55,11 @@ contract LockUp is UseState {
 
 contract TokenValue {
 	using SafeMath for uint256;
-	mapping(address => mapping(address => uint256)) private _lockUpedDevValue;
+	mapping(address => mapping(address => uint256)) private _lockupedTokenValue;
 	function set(address fromAddress, address propertyAddress, uint256 value)
 		public
 	{
-		_lockUpedDevValue[fromAddress][propertyAddress] =
-			_lockUpedDevValue[fromAddress][propertyAddress] +
-			value;
+		_lockupedTokenValue[fromAddress][propertyAddress] += value;
 	}
 
 	function hasTokenByProperty(address fromAddress, address propertyAddress)
@@ -69,11 +67,11 @@ contract TokenValue {
 		view
 		returns (bool)
 	{
-		return _lockUpedDevValue[fromAddress][propertyAddress] != 0;
+		return _lockupedTokenValue[fromAddress][propertyAddress] != 0;
 	}
 }
 
-contract CanceledLockUpFlg {
+contract CanceledLockupFlg {
 	mapping(address => mapping(address => bool)) private _canceled;
 	function setCancelFlg(address fromAddress, address propertyAddress) public {
 		_canceled[fromAddress][propertyAddress] = true;
