@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`2.0.4`**
+Version: **`2.1.0`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -93,6 +93,7 @@ Dev Protocol は以下の 10 個のコントラクトによって構成される
 - Property
 - Property Factory
 - Metrics
+- Lockup
 - Allocator
 - Policy
 - Policy Factory
@@ -186,19 +187,29 @@ Market Contract の `authenticatedCallback` が呼び出されると、Property 
 
 Market Contract の `authenticatedCallback` は Metrics Contract のアドレスを返却する。Market Contract は Metrics Contract のアドレスをキーにしたマップを作ることで、認証時のコンテキストを保持しておくことが可能となる。認証時のコンテキストはマーケット報酬の計算時に使用できる。
 
-## Allocator
+## Lockup
 
-Allocator Contract はマーケット報酬の決定のためのいくつかの役割を持つ。
+Lockup Contract はユーザーが Property Contract に対して行なうロックアップを管理する。
 
 ### lock
 
-ユーザーが Property Contract に対して自身の DEV をロックアップする。ロックアップした DEV は `cancel` 関数を実行してから一定期間経過後に引き出すことができる。ロックアップは `cancel` 関数が実行されるまでのあいだ何度でも追加できる。
+ユーザーが Property Contract に対して自身の DEV をロックアップする。ロックアップ対象とする Property Contract のアドレスと、DEV の数量を指定することで、Lockup Contract が DEV をロックアップする。ロックアップした DEV は `cancel` 関数を実行してから一定期間経過後に引き出すことができる。ロックアップは `cancel` 関数が実行されるまでのあいだ何度でも追加できる。
 
 ユーザーは DEV をロックアップすることで、その対象の Property Contract オーナーから何らかのユーティリティを受け入れる。そのユーティリティを必要とする間はロックアップが継続され、DEV の希少価値を高める。
 
 ### cancel
 
 ユーザーが Property Contract に対してロックアップしている DEV を解除する。解除が要請されてから一定期間はロックアップが継続する。その期間は Policy Contract によって定められたブロック数で決定する。
+
+### withdraw
+
+ユーザーが Property Contract に対してロックアップしている DEV を引き出す。`cancel` 関数によって解除が要請されていないと引き出すことはできない。また、解除要請によって設定されたブロック高に到達するまでは引き出すことはできない。
+
+解除要請によって設定されたブロック高に到達していている場合、ユーザーが Property Contract に対してロックアップしていた DEV の全額をユーザーに転送する。
+
+## Allocator
+
+Allocator Contract はマーケット報酬の決定のためのいくつかの役割を持つ。
 
 ### allocate
 
