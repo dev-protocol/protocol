@@ -25,9 +25,6 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	mapping(address => bool) pendingIncrements;
 	uint256 public mintPerBlock;
 	LastAllocationTime private lastAllocationTime;
-	// TODO
-	// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#withdraw
-	AddressValueMapping private totals;
 
 	constructor() public {
 		lastAllocationTime = new LastAllocationTime();

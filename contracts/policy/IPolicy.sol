@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-contract PolicyInterface {
+contract IPolicy {
 	using SafeMath for uint256;
 
 	function rewards(uint256 lockups, uint256 assets)
