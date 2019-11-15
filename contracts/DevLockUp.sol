@@ -68,13 +68,19 @@ contract DevLockUp is UseState {
 contract DevValue {
 	using SafeMath for uint256;
 	mapping(address => AddressValueMapping) private _lockUpedDevValue;
-	address[] private _senderAddresses;
+	AddressSet private _senderAddresses;
+
+	constructor() public {
+		_senderAddresses = new AddressSet();
+	}
 
 	function set(address fromAddress, address propertyAddress, uint256 value)
 		public
 	{
+		if (_senderAddresses.hasAddress(fromAddress) == false){
+			_lockUpedDevValue[fromAddress] = new AddressValueMapping();
+		}
 		_lockUpedDevValue[fromAddress].add(propertyAddress, value);
-		_senderAddresses.push(fromAddress);
 	}
 
 	function hasTokenByProperty(address fromAddress, address propertyAddress)
@@ -86,11 +92,10 @@ contract DevValue {
 	}
 
 	function getAllLockUpedValue() public view returns (uint256) {
-		uint256 arrayLength = _senderAddresses.length;
 		uint256 totalValue;
-		for (uint256 i = 0; i < arrayLength; i++) {
+		for (uint256 i = 0; i < _senderAddresses.length(); i++) {
 			totalValue = totalValue.add(
-				_lockUpedDevValue[_senderAddresses[i]].getTotalValues()
+				_lockUpedDevValue[_senderAddresses.get()[i]].getTotalValues()
 			);
 		}
 		return totalValue;
