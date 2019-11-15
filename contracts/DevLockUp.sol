@@ -70,7 +70,9 @@ contract DevValue {
 	mapping(address => AddressValueMapping) private _lockUpedDevValue;
 	address[] private _senderAddresses;
 
-	function set(address fromAddress, address propertyAddress, uint256 value) public {
+	function set(address fromAddress, address propertyAddress, uint256 value)
+		public
+	{
 		_lockUpedDevValue[fromAddress].add(propertyAddress, value);
 		_senderAddresses.push(fromAddress);
 	}
