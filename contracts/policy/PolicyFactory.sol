@@ -111,7 +111,10 @@ contract Policy is Killable, UseState {
 	}
 
 	function vote(address _propertyAddress, bool _agree) public {
-		require(isProperty(_propertyAddress), "this address is not property contract.");
+		require(
+			isProperty(_propertyAddress),
+			"this address is not property contract."
+		);
 		require(policy() != address(this), "this policy is current.");
 		require(
 			block.number <= _votingEndBlockNumber,
