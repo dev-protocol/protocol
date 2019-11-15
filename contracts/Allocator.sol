@@ -31,7 +31,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#withdraw
 	AddressValueMapping private totals;
 
-	constructor() public Killable(msg.sender) {
+	constructor() public {
 		lastAllocationTime = new LastAllocationTime();
 		devLockUp = new DevLockUp();
 	}

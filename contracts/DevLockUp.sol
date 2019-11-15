@@ -77,7 +77,7 @@ contract DevValue {
 	function set(address fromAddress, address propertyAddress, uint256 value)
 		public
 	{
-		if (_senderAddresses.hasAddress(fromAddress) == false){
+		if (_senderAddresses.hasAddress(fromAddress) == false) {
 			_lockUpedDevValue[fromAddress] = new AddressValueMapping();
 		}
 		_lockUpedDevValue[fromAddress].add(propertyAddress, value);
