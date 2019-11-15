@@ -58,7 +58,11 @@ contract Lockup is UseState {
 		);
 	}
 
-	function getTokenValue(address fromAddress, address propertyAddress) public view returns (uint256) {
+	function getTokenValue(address fromAddress, address propertyAddress)
+		public
+		view
+		returns (uint256)
+	{
 		return tokenValue.get(fromAddress, propertyAddress);
 	}
 }
@@ -80,7 +84,11 @@ contract TokenValue {
 		return _lockupedTokenValue[fromAddress][propertyAddress] != 0;
 	}
 
-	function get(address fromAddress, address propertyAddress) public view returns (uint256) {
+	function get(address fromAddress, address propertyAddress)
+		public
+		view
+		returns (uint256)
+	{
 		return _lockupedTokenValue[fromAddress][propertyAddress];
 	}
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 contract PolicyVoteValidator {
-	mapping(address=>mapping(address=>bool)) private _voteRecord;
+	mapping(address => mapping(address => bool)) private _voteRecord;
 	function validate(
 		address _sender,
 		address _propatyAddress,

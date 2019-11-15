@@ -8,7 +8,6 @@ import "../Lockup.sol";
 import "./IPolicy.sol";
 import "./PolicyValidator.sol";
 
-
 contract PolicyFactory is UseState {
 	AddressSet private _policySet;
 	event Create(address indexed _from, address _property);
@@ -113,7 +112,10 @@ contract Policy is Killable, UseState {
 
 	function vote(address _propertyAddress, bool _agree) public {
 		require(policy() != address(this), "this policy is current.");
-		uint256 voteCount = Lockup(lockup()).getTokenValue(msg.sender, _propertyAddress);
+		uint256 voteCount = Lockup(lockup()).getTokenValue(
+			msg.sender,
+			_propertyAddress
+		);
 		_validator.validate(msg.sender, _propertyAddress, voteCount);
 		if (_agree) {
 			_agreeCount += voteCount;
