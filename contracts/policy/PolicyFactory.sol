@@ -53,7 +53,8 @@ contract Policy is Killable, UseState {
 		_factoryAddress = _factory;
 		_innerPolicy = IPolicy(_innerPolicyAddress);
 		_validator = new PolicyVoteValidator();
-		_votingEndBlockNumber = block.number + _innerPolicy.policyVotingBlocks();
+		_votingEndBlockNumber = block.number +
+			_innerPolicy.policyVotingBlocks();
 	}
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function rewards(uint256 _lockups, uint256 _assets)
@@ -111,7 +112,10 @@ contract Policy is Killable, UseState {
 
 	function vote(address _propertyAddress, bool _agree) public {
 		require(policy() != address(this), "this policy is current.");
-		require(block.number <= _votingEndBlockNumber, "voting deadline is over.");
+		require(
+			block.number <= _votingEndBlockNumber,
+			"voting deadline is over."
+		);
 		uint256 voteCount = Lockup(lockup()).getTokenValue(
 			msg.sender,
 			_propertyAddress
