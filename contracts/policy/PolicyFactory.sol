@@ -4,8 +4,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../libs/Killable.sol";
 import "../libs/Utils.sol";
 import "../UseState.sol";
+import "../Lockup.sol";
 import "./IPolicy.sol";
-import "./PolicyVote.sol";
+import "./PolicyValidator.sol";
+
 
 contract PolicyFactory is UseState {
 	AddressSet private _policySet;
@@ -52,6 +54,7 @@ contract Policy is Killable, UseState {
 		_innerPolicy = IPolicy(_innerPolicyAddress);
 		_validator = new PolicyVoteValidator();
 	}
+	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function rewards(uint256 _lockups, uint256 _assets)
 		public
 		view
@@ -59,7 +62,7 @@ contract Policy is Killable, UseState {
 	{
 		return _innerPolicy.rewards(_lockups, _assets);
 	}
-
+	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		public
 		view
@@ -67,7 +70,7 @@ contract Policy is Killable, UseState {
 	{
 		return _innerPolicy.holdersShare(_amount, _lockups);
 	}
-
+	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function assetValue(uint256 _value, uint256 _lockups)
 		public
 		view
@@ -75,7 +78,7 @@ contract Policy is Killable, UseState {
 	{
 		return _innerPolicy.assetValue(_value, _lockups);
 	}
-
+	// TODO Need to be called authenticatedCallbackt in Market Contract
 	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
 		public
 		view
@@ -83,7 +86,7 @@ contract Policy is Killable, UseState {
 	{
 		return _innerPolicy.authenticationFee(_assets, _propertyAssets);
 	}
-
+	// TODO Need to be called vote in Market Contract
 	function marketApproval(uint256 _agree, uint256 _opposite)
 		public
 		view
@@ -99,7 +102,7 @@ contract Policy is Killable, UseState {
 	function policyVotingBlocks() public view returns (uint256) {
 		return _innerPolicy.policyVotingBlocks();
 	}
-
+	// TODO event trigger?
 	function abstentionPenalty(uint256 count) public view returns (bool) {
 		return _innerPolicy.abstentionPenalty(count);
 	}
@@ -110,12 +113,12 @@ contract Policy is Killable, UseState {
 
 	function vote(address _propertyAddress, bool _agree) public {
 		require(policy() != address(this), "this policy is current.");
-		_validator.validate(msg.sender, _propertyAddress);
-		// uint voteCount =
+		uint256 voteCount = Lockup(lockup()).getTokenValue(msg.sender, _propertyAddress);
+		_validator.validate(msg.sender, _propertyAddress, voteCount);
 		if (_agree) {
-			_agreeCount += _agree;
+			_agreeCount += voteCount;
 		} else {
-			_oppositeCount += _opposite;
+			_oppositeCount += voteCount;
 		}
 		bool result = _innerPolicy.policyApproval(_agreeCount, _oppositeCount);
 		if (result == false) {

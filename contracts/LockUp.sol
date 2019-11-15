@@ -2,7 +2,9 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "./libs/Utils.sol";
 import "./UseState.sol";
+import "./policy/PolicyFactory.sol";
 
 contract Lockup is UseState {
 	using SafeMath for uint256;
@@ -47,9 +49,17 @@ contract Lockup is UseState {
 			"lock up is already canceled"
 		);
 		// TODO after withdrawal, allow the flag to be set again
+		// TODO after withdrawal, update locked up value
 		canceledFlg.setCancelFlg(msg.sender, propertyAddress);
-		// TODO get wait block number from polisy contract
-		releasedBlockNumber.setBlockNumber(msg.sender, propertyAddress, 10);
+		releasedBlockNumber.setBlockNumber(
+			msg.sender,
+			propertyAddress,
+			Policy(policy()).lockUpBlocks()
+		);
+	}
+
+	function getTokenValue(address fromAddress, address propertyAddress) public view returns (uint256) {
+		return tokenValue.get(fromAddress, propertyAddress);
 	}
 }
 
@@ -68,6 +78,10 @@ contract TokenValue {
 		returns (bool)
 	{
 		return _lockupedTokenValue[fromAddress][propertyAddress] != 0;
+	}
+
+	function get(address fromAddress, address propertyAddress) public view returns (uint256) {
+		return _lockupedTokenValue[fromAddress][propertyAddress];
 	}
 }
 

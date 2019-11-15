@@ -6,7 +6,7 @@ import "./UseState.sol";
 import "./Allocator.sol";
 
 contract Property is ERC20, ERC20Detailed, UseState {
-	address public owner;
+	address public _owner;
 	constructor(
 		address _own,
 		string memory _name,
@@ -14,8 +14,8 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		uint8 _decimals,
 		uint256 _supply
 	) public ERC20Detailed(_name, _symbol, _decimals) {
-		owner = _own;
-		_mint(owner, _supply);
+		_owner = _own;
+		_mint(_owner, _supply);
 	}
 
 	function transfer(address _to, uint256 _value) public returns (bool) {

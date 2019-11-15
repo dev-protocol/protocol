@@ -49,4 +49,8 @@ contract UseState is Ownable {
 	function setPolicy(address currentPolicyAddress) internal {
 		state().setPolicy(currentPolicyAddress);
 	}
+
+	function lockup() internal view returns (address) {
+		return state().lockup();
+	}
 }
