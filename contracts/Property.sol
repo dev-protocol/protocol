@@ -27,16 +27,4 @@ contract Property is ERC20, ERC20Detailed, UseState {
 		_transfer(msg.sender, _to, _value);
 		return true;
 	}
-
-	function lockUp(uint256 value) public returns (bool) {
-		require(msg.sender == _owner, "Ownable: caller is not the owner");
-		Allocator(allocator()).lockUp(address(this), value);
-		return true;
-	}
-
-	function cancel() public returns (bool) {
-		require(msg.sender == _owner, "Ownable: caller is not the owner");
-		Allocator(allocator()).cancel(address(this));
-		return true;
-	}
 }
