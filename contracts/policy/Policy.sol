@@ -10,8 +10,8 @@ contract Policy is KillableSender {
 	uint256 public voteCount;
 	PolicyInterface private innerPolicy;
 	constructor(address payable own, address innerPolicyAddress)
-		KillableSender(own)
 		public
+		KillableSender(own)
 	{
 		_owner = own;
 		innerPolicy = PolicyInterface(innerPolicyAddress);
