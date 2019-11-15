@@ -20,16 +20,16 @@ contract PolicyFactory is UseState {
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
 		_policySet.add(policyAddress);
-		if (_policySet.length() == 1){
+		if (_policySet.length() == 1) {
 			setPolicy(policyAddress);
 		}
 		return policyAddress;
 	}
 
 	function killLosePolicy(address _currentPolicyAddress) public {
-		for (uint i = 0; i < _policySet.length(); i++) {
+		for (uint256 i = 0; i < _policySet.length(); i++) {
 			address policyAddress = _policySet.get()[i];
-			if (policyAddress == _currentPolicyAddress){
+			if (policyAddress == _currentPolicyAddress) {
 				continue;
 			}
 			Policy(policyAddress).kill();
@@ -47,9 +47,7 @@ contract Policy is Killable, UseState {
 	uint256 private _agreeCount;
 	uint256 private _oppositeCount;
 
-	constructor(address _factory, address _innerPolicyAddress)
-		public
-	{
+	constructor(address _factory, address _innerPolicyAddress) public {
 		_factoryAddress = _factory;
 		_innerPolicy = IPolicy(_innerPolicyAddress);
 		_validator = new PolicyVoteValidator();
@@ -116,11 +114,11 @@ contract Policy is Killable, UseState {
 		// uint voteCount =
 		if (_agree) {
 			_agreeCount += _agree;
-		}else{
+		} else {
 			_oppositeCount += _opposite;
 		}
 		bool result = _innerPolicy.policyApproval(_agreeCount, _oppositeCount);
-		if (result == false){
+		if (result == false) {
 			return;
 		}
 		setPolicy(address(this));

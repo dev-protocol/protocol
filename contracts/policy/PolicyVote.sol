@@ -70,18 +70,22 @@ import "../Property.sol";
 // 	}
 // }
 
-contract PolicyVoteValidator is UseState{
-	function validate(address sender, address propatyAddress, uint256 _agree, uint256 _opposite) public {
+contract PolicyVoteValidator is UseState {
+	function validate(
+		address sender,
+		address propatyAddress,
+		uint256 _agree,
+		uint256 _opposite
+	) public {
 		validateVoteCount(_agree, _opposite);
 		//bool isPropatyOwner = (sender == Property(propatyAddress).owner());
-
 	}
 
 	function validateVoteCount(uint256 _agree, uint256 _opposite) private pure {
-		if (_agree == 0 && _opposite == 0){
+		if (_agree == 0 && _opposite == 0) {
 			revert("both vote count is 0.");
 		}
-		if (_agree != 0 && _opposite != 0){
+		if (_agree != 0 && _opposite != 0) {
 			revert("both vote count is 0.");
 		}
 	}
