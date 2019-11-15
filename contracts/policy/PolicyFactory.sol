@@ -27,6 +27,7 @@ contract PolicyFactory is UseState {
 	}
 
 	function convergePolicy(address _currentPolicyAddress) public {
+		setPolicy(_currentPolicyAddress);
 		for (uint256 i = 0; i < _policySet.length(); i++) {
 			address policyAddress = _policySet.get()[i];
 			if (policyAddress == _currentPolicyAddress) {
@@ -34,7 +35,6 @@ contract PolicyFactory is UseState {
 			}
 			Policy(policyAddress).kill();
 		}
-		setPolicy(_currentPolicyAddress);
 		_policySet = new AddressSet();
 		_policySet.add(_currentPolicyAddress);
 	}
@@ -138,15 +138,11 @@ contract Policy is Killable, UseState {
 		} else {
 			_oppositeCount += voteCount;
 		}
-		bool result = _policy.policyApproval(_agreeCount, _oppositeCount);
-		if (result == false) {
-			return;
-		}
-		bool result2 = Policy(policy()).policyApproval(
+		bool result = Policy(policy()).policyApproval(
 			_agreeCount,
 			_oppositeCount
 		);
-		if (result2 == false) {
+		if (result == false) {
 			return;
 		}
 		PolicyFactory(_factoryAddress).convergePolicy(address(this));
