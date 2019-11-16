@@ -22,7 +22,8 @@ contract PropertyFactory is UseState {
 		);
 		addProperty(address(property));
 		emit Create(msg.sender, address(property));
-		PolicyVoteCounter(Policy(policy()).voteCounterAddress()).resetVoteCountByProperty(address(property));
+		PolicyVoteCounter(Policy(policy()).voteCounterAddress())
+			.resetVoteCountByProperty(address(property));
 		return address(property);
 	}
 }
