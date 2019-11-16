@@ -59,6 +59,8 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	}
 
 	function allocate(address _metrics) public payable {
+		// TODO Add penalty judgment processing
+		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
 		require(isMetrics(_metrics), "Is't Metrics Contract");
 		(uint256 timestamp, uint256 yesterday) = lastAllocationTime
 			.getTimeInfo();

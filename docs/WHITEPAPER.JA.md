@@ -273,7 +273,8 @@ Alice は 2 回に分けて引き出し、合計で `50000 + 10000 = 60000` を�
 
 Policy Contract は Dev Protocol の政策を表す。Dev Protocol は不確実性のある指針の策定をコミュニティに移譲し、状況に合わせて指針をアップデートする。
 
-Policy Contract は誰でも自由に提案できる。ただし、有効化するためには既存の資産保有者( Property Contract オーナー )たちの投票によって承認される必要がある。Property Contract の被ロックアップ数と `totals` の合計値を票数とする。投票は基本的に資産保有者によって行われることを期待するが、ロックアップ実行者が自らのロックアップ数を票数として投票することもできる。この場合はロックアップ対象の Property Contract アドレスを指定して行なう。
+Policy Contract は誰でも自由に提案できる。ただし、有効化するためには既存の資産保有者( Property Contract オーナー )たちの投票によって承認される必要がある。Property Contract の被ロックアップ数と `totals` の合計値を票数とし、提案されたPolicy Contractの`vote` を実行することによって投票は完了する。
+基本的に資産保有者によって行われることを期待するが、ロックアップ実行者が自らのロックアップ数を票数として投票することもできる。この場合はロックアップ対象の Property Contract アドレスを指定して行なう。
 
 新しい Policy Contract が有効化条件を満たすだけの賛成票を得られるとただちに有効化され、古い Policy Contract は消滅する。現在、[初期の政策](./POLICY.md) の策定が進行中である。
 
@@ -318,10 +319,12 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 
 ### policyApproval
 
-新しい Policy Contract の有効化可否。Policy Contract の `vote` の中で呼び出され、以下の変数から Policy Contract の有効化を決定する。
+新しい Policy Contract の有効化可否。提案されたPolicy Contract の `vote` の中で現行ののPolicy Contractの `policyApproval` が呼び出され、以下の変数から 新規Policy Contract の有効化を決定する。
 
 - 賛成票数
 - 反対票数
+
+
 
 ### marketVotingBlocks
 
@@ -339,12 +342,13 @@ Property Contract オーナーが Market Contract 及び Policy Contract への�
 
 ペナルティはマーケット報酬の計算対象外期間( ブロック数 )を設けることで罰則とする。対象外期間の開始ブロックは `allocate` の前回実行ブロックとする。計算対象外期間中は `allocate` の実行が失敗し、期間経過後も期間中の資産価値は考慮されない。
 
-棄権回数の算出のために、Market Contract 及び Policy Contract の投票受付期間中に投票しなかった Property Contract を記録する必要がある。そのための単純な方法として、State Contract に `pol`, `vot` という変数を追加する。 `pol` は整数型で新たな投票が開始するたびに 1 を加算する。`vot` は Property Contract のアドレスをキーとした整数のマップ型で、Property Contract オーナーによる投票のたびに 1 を加算する。Property Contract の生成時には `pol` の値を `vot[address]` に記録する。`pol` から `vot[address]` を差し引いた数が棄権数となる。Property Contract がペナルティを受けると `vot[address]` の値は再び `pol` と同期される。
+棄権回数の算出のために、Market Contract 及び Policy Contract の投票受付期間中に投票しなかった Property Contract を記録している。
 
 ### lockUpBlocks
 
 ロックアップの解除申請後の継続ブロック数。
 ユーザーは Property Contract に対してロックアップしている DEV を解除することができるが、解除が要請されてから指定されたブロック数だけロックアップが継続する。
+
 
 ## Policy Factory
 

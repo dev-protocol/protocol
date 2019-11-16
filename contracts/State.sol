@@ -10,6 +10,7 @@ contract State is Ownable {
 	address public policyFactory;
 	address public policy;
 	address public lockup;
+	address public policyVoteAbstentionCounter;
 	mapping(address => bool) internal markets;
 	mapping(address => bool) internal metrics;
 	mapping(address => bool) internal properties;
@@ -92,5 +93,9 @@ contract State is Ownable {
 
 	function setLockup(address _addr) public onlyOwner {
 		lockup = _addr;
+	}
+
+	function setPolicyVoteAbstentionCounter(address _addr) public onlyOwner {
+		policyVoteAbstentionCounter = _addr;
 	}
 }
