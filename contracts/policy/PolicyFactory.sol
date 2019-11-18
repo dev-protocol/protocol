@@ -73,7 +73,6 @@ contract Policy is Killable, UseState {
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function rewards(uint256 _lockups, uint256 _assets)
 		public
-		view
 		returns (uint256)
 	{
 		return _policy.rewards(_lockups, _assets);
@@ -81,7 +80,6 @@ contract Policy is Killable, UseState {
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		public
-		view
 		returns (uint256)
 	{
 		return _policy.holdersShare(_amount, _lockups);
@@ -89,7 +87,6 @@ contract Policy is Killable, UseState {
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function assetValue(uint256 _value, uint256 _lockups)
 		public
-		view
 		returns (uint256)
 	{
 		return _policy.assetValue(_value, _lockups);
@@ -97,7 +94,6 @@ contract Policy is Killable, UseState {
 	// TODO Need to be called authenticatedCallbackt in Market Contract
 	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
 		public
-		view
 		returns (uint256)
 	{
 		return _policy.authenticationFee(_assets, _propertyAssets);
@@ -105,7 +101,6 @@ contract Policy is Killable, UseState {
 	// TODO Need to be called vote in Market Contract
 	function marketApproval(uint256 _agree, uint256 _opposite)
 		public
-		view
 		returns (bool)
 	{
 		return _policy.marketApproval(_agree, _opposite);
@@ -113,22 +108,21 @@ contract Policy is Killable, UseState {
 
 	function policyApproval(uint256 _agree, uint256 _opposite)
 		public
-		view
 		returns (bool)
 	{
 		return _policy.policyApproval(_agree, _opposite);
 	}
 
-	function marketVotingBlocks() public view returns (uint256) {
+	function marketVotingBlocks() public returns (uint256) {
 		return _policy.marketVotingBlocks();
 	}
 
 	// TODO Need to be called allocate in Allocator Contract
-	function abstentionPenalty(uint256 count) public view returns (bool) {
+	function abstentionPenalty(uint256 count) public returns (bool) {
 		return _policy.abstentionPenalty(count);
 	}
 
-	function lockUpBlocks() public view returns (uint256) {
+	function lockUpBlocks() public returns (uint256) {
 		return _policy.lockUpBlocks();
 	}
 
