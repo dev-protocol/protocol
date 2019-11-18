@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-contract MarketGroup{
+contract MarketGroup {
 	address private _marketFactory;
 	mapping(address => bool) private _markets;
 

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-contract PropertyGroup{
+contract PropertyGroup {
 	address private _propertyFactory;
 	mapping(address => bool) private _properties;
 

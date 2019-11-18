@@ -10,7 +10,6 @@ contract State is Ownable {
 	mapping(address => bool) internal metrics;
 	uint256 public totalIssuedMetrics;
 
-
 	function setAllocator(address _addr) public onlyOwner {
 		allocator = _addr;
 	}
@@ -32,7 +31,8 @@ contract State is Ownable {
 	}
 
 	// TODO
-	function addMetrics(address _metrics) public { //onlyMarket {
+	function addMetrics(address _metrics) public {
+		//onlyMarket {
 		require(_metrics != address(0), "Metrics is an invalid address");
 		totalIssuedMetrics += 1;
 		metrics[_metrics] = true;

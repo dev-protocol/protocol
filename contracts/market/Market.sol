@@ -6,7 +6,6 @@ import "../UseState.sol";
 import "../Metrics.sol";
 import "../property/Property.sol";
 
-
 contract Behavior {
 	string public schema;
 
