@@ -7,8 +7,17 @@ contract State is Ownable {
 	address public allocator;
 	address public marketFactory;
 	address public propertyFactory;
+	address public policyFactory;
+	address public policy;
+	address public lockup;
+	address public policyVoteAbstentionCounter;
 	mapping(address => bool) internal metrics;
 	uint256 public totalIssuedMetrics;
+
+	modifier onlyPolicyFactory() {
+		require(msg.sender == policyFactory, "Only Policy Factory Contract");
+		_;
+	}
 
 	function setAllocator(address _addr) public onlyOwner {
 		allocator = _addr;
@@ -20,6 +29,10 @@ contract State is Ownable {
 
 	function setPropertyFactory(address _addr) public onlyOwner {
 		propertyFactory = _addr;
+	}
+
+	function setPolicyFactory(address _addr) public onlyOwner {
+		policyFactory = _addr;
 	}
 
 	function setToken(address nextToken) public onlyOwner {
@@ -42,4 +55,15 @@ contract State is Ownable {
 		return metrics[_metrics];
 	}
 
+	function setPolicy(address _addr) public onlyPolicyFactory {
+		policy = _addr;
+	}
+
+	function setLockup(address _addr) public onlyOwner {
+		lockup = _addr;
+	}
+
+	function setPolicyVoteAbstentionCounter(address _addr) public onlyOwner {
+		policyVoteAbstentionCounter = _addr;
+	}
 }

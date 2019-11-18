@@ -6,7 +6,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "./libs/Killable.sol";
 import "./libs/Withdrawable.sol";
 import "./market/Market.sol";
-import "./Property.sol";
+import "./property/Property.sol";
 import "./Metrics.sol";
 import "./UseState.sol";
 import "./LastAllocationTime.sol";
@@ -18,10 +18,8 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	mapping(address => uint256) lastAllocationValueEachMetrics;
 	uint256 public lastTotalAllocationValuePerBlock;
 
-	uint256 public initialPaymentBlock;
-	uint256 public lastPaymentBlock;
-	uint256 public totalPaymentValue;
 	mapping(address => bool) pendingIncrements;
+	// TODO not set
 	uint256 public mintPerBlock;
 	LastAllocationTime private lastAllocationTime;
 
@@ -41,23 +39,9 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 		lastAllocationTime.setSecondsPerBlock(_sec);
 	}
 
-	function updateAllocateValue(uint256 _value) public {
-		address prop = msg.sender;
-		require(isProperty(prop), "Is't Property Contract");
-		totalPaymentValue += _value;
-		uint256 totalPaymentsPerBlock = totalPaymentValue /
-			(block.number - initialPaymentBlock);
-		uint256 lastPaymentPerBlock = _value /
-			(block.number - lastPaymentBlock);
-		uint256 acceleration = lastPaymentPerBlock / totalPaymentsPerBlock;
-		mintPerBlock = totalPaymentsPerBlock * acceleration;
-
-		if (_value > 0) {
-			lastPaymentBlock = block.number;
-		}
-	}
-
 	function allocate(address _metrics) public payable {
+		// TODO Add penalty judgment processing
+		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
 		require(isMetrics(_metrics), "Is't Metrics Contract");
 		(uint256 timestamp, uint256 yesterday) = lastAllocationTime
 			.getTimeInfo();
@@ -101,13 +85,5 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 		lastTotalAllocationValuePerBlock = nextTotalAllocationValuePerBlock;
 		increment(property, allocation);
 		delete pendingIncrements[_metrics];
-	}
-
-	function investToProperty(address _property, uint256 _amount)
-		public
-		onlyProperty(_property)
-	{
-		ERC20Burnable(getToken()).burnFrom(msg.sender, _amount);
-		increment(_property, _amount);
 	}
 }
