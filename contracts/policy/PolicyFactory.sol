@@ -118,8 +118,8 @@ contract Policy is Killable, UseState {
 	}
 
 	// TODO Need to be called allocate in Allocator Contract
-	function abstentionPenalty(uint256 count) public returns (bool) {
-		return _policy.abstentionPenalty(count);
+	function abstentionPenalty(uint256 _count) public returns (bool) {
+		return _policy.abstentionPenalty(_count);
 	}
 
 	function lockUpBlocks() public returns (uint256) {

@@ -5,25 +5,25 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 contract IPolicy {
 	using SafeMath for uint256;
 
-	function rewards(uint256 lockups, uint256 assets) public returns (uint256);
+	function rewards(uint256 _lockups, uint256 _assets) public returns (uint256);
 
-	function holdersShare(uint256 amount, uint256 lockups)
+	function holdersShare(uint256 _amount, uint256 _lockups)
 		public
 		returns (uint256);
 
-	function assetValue(uint256 value, uint256 lockups)
+	function assetValue(uint256 _value, uint256 _lockups)
 		public
 		returns (uint256);
 
-	function authenticationFee(uint256 assets, uint256 propertyAssets)
+	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
 		public
 		returns (uint256);
 
-	function marketApproval(uint256 agree, uint256 opposite)
+	function marketApproval(uint256 _agree, uint256 _opposite)
 		public
 		returns (bool);
 
-	function policyApproval(uint256 agree, uint256 opposite)
+	function policyApproval(uint256 _agree, uint256 _opposite)
 		public
 		returns (bool);
 
@@ -31,7 +31,7 @@ contract IPolicy {
 
 	function policyVotingBlocks() public returns (uint256);
 
-	function abstentionPenalty(uint256 count) public returns (bool);
+	function abstentionPenalty(uint256 _count) public returns (bool);
 
 	function lockUpBlocks() public returns (uint256);
 }

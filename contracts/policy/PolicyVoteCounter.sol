@@ -6,17 +6,17 @@ contract PolicyVoteCounter {
 	function addPolicyVoteCount() public {
 		_policyVoteCount++;
 	}
-	function addVoteCountByProperty(address propertyAddress) public {
-		_voteCountByProperty[propertyAddress]++;
+	function addVoteCountByProperty(address _propertyAddress) public {
+		_voteCountByProperty[_propertyAddress]++;
 	}
-	function resetVoteCountByProperty(address propertyAddress) public {
-		_voteCountByProperty[propertyAddress] = _policyVoteCount;
+	function resetVoteCountByProperty(address _propertyAddress) public {
+		_voteCountByProperty[_propertyAddress] = _policyVoteCount;
 	}
-	function getAbstentionCount(address propertyAddress)
+	function getAbstentionCount(address _propertyAddress)
 		public
 		view
 		returns (uint256)
 	{
-		return _policyVoteCount - _voteCountByProperty[propertyAddress];
+		return _policyVoteCount - _voteCountByProperty[_propertyAddress];
 	}
 }
