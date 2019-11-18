@@ -58,7 +58,7 @@ contract Market is UseState {
 		string memory _args5
 	) public returns (bool) {
 		require(
-			msg.sender == Property(_prop).owner(),
+			msg.sender == Property(_prop).author(),
 			"Only owner of Property Contract"
 		);
 		return

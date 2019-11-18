@@ -17,6 +17,7 @@ contract('TokenValueTest', () => {
 				'0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167',
 				'0x32A5598b078Ad20287f210803a6ad5D96C8df1d1'
 			)
+			expect(result).to.be.equal(false)
 		})
 	})
 })

@@ -149,7 +149,7 @@ contract Policy is Killable, UseState {
 		require(voteCount != 0, "vote count is 0.");
 		require(_voteRecord[msg.sender][_propertyAddress], "already vote.");
 		_voteRecord[msg.sender][_propertyAddress] = true;
-		if (Property(_propertyAddress).owner() == msg.sender) {
+		if (Property(_propertyAddress).author() == msg.sender) {
 			PolicyVoteCounter(voteCounterAddress).addVoteCountByProperty(
 				_propertyAddress
 			);
