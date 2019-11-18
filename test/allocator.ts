@@ -133,11 +133,9 @@ contract('Allocator', ([deployer, u1]) => {
 			dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
-
 			state = await stateContract.new({from: deployer})
 			await state.setToken(dummyDEV.address, {from: deployer})
 			await state.setPropertyFactory(deployer, {from: deployer})
-
 			property = await propertyContract.new(
 				deployer,
 				'test',
@@ -149,10 +147,8 @@ contract('Allocator', ([deployer, u1]) => {
 				}
 			)
 			await state.addProperty(property.address, {from: deployer})
-
 			allocator = await allocatorContract.new({from: deployer})
 			await allocator.changeStateAddress(state.address, {from: deployer})
-
 			await dummyDEV.approve(allocator.address, 10000, {from: deployer})
 		})
 

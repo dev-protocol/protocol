@@ -41,4 +41,16 @@ contract UseState is Ownable {
 	function isMetrics(address _metrics) internal view returns (bool) {
 		return state().isMetrics(_metrics);
 	}
+
+	function policy() internal view returns (address) {
+		return state().policy();
+	}
+
+	function setPolicy(address currentPolicyAddress) internal {
+		state().setPolicy(currentPolicyAddress);
+	}
+
+	function lockup() internal view returns (address) {
+		return state().lockup();
+	}
 }

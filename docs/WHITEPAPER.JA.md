@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`2.0.4`**
+Version: **`2.1.0`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -93,6 +93,7 @@ Dev Protocol は以下の 10 個のコントラクトによって構成される
 - Property
 - Property Factory
 - Metrics
+- Lockup
 - Allocator
 - Policy
 - Policy Factory
@@ -186,19 +187,29 @@ Market Contract の `authenticatedCallback` が呼び出されると、Property 
 
 Market Contract の `authenticatedCallback` は Metrics Contract のアドレスを返却する。Market Contract は Metrics Contract のアドレスをキーにしたマップを作ることで、認証時のコンテキストを保持しておくことが可能となる。認証時のコンテキストはマーケット報酬の計算時に使用できる。
 
-## Allocator
+## Lockup
 
-Allocator Contract はマーケット報酬の決定のためのいくつかの役割を持つ。
+Lockup Contract はユーザーが Property Contract に対して行なうロックアップを管理する。
 
 ### lock
 
-ユーザーが Property Contract に対して自身の DEV をロックアップする。ロックアップした DEV は `cancel` 関数を実行してから一定期間経過後に引き出すことができる。ロックアップは `cancel` 関数が実行されるまでのあいだ何度でも追加できる。
+ユーザーが Property Contract に対して自身の DEV をロックアップする。ロックアップ対象とする Property Contract のアドレスと、DEV の数量を指定することで、Lockup Contract が DEV をロックアップする。ロックアップした DEV は `cancel` 関数を実行してから一定期間経過後に引き出すことができる。ロックアップは `cancel` 関数が実行されるまでのあいだ何度でも追加できる。
 
 ユーザーは DEV をロックアップすることで、その対象の Property Contract オーナーから何らかのユーティリティを受け入れる。そのユーティリティを必要とする間はロックアップが継続され、DEV の希少価値を高める。
 
 ### cancel
 
 ユーザーが Property Contract に対してロックアップしている DEV を解除する。解除が要請されてから一定期間はロックアップが継続する。その期間は Policy Contract によって定められたブロック数で決定する。
+
+### withdraw
+
+ユーザーが Property Contract に対してロックアップしている DEV を引き出す。`cancel` 関数によって解除が要請されていないと引き出すことはできない。また、解除要請によって設定されたブロック高に到達するまでは引き出すことはできない。
+
+解除要請によって設定されたブロック高に到達していている場合、ユーザーが Property Contract に対してロックアップしていた DEV の全額をユーザーに転送する。
+
+## Allocator
+
+Allocator Contract はマーケット報酬の決定のためのいくつかの役割を持つ。
 
 ### allocate
 
@@ -262,7 +273,8 @@ Alice は 2 回に分けて引き出し、合計で `50000 + 10000 = 60000` を�
 
 Policy Contract は Dev Protocol の政策を表す。Dev Protocol は不確実性のある指針の策定をコミュニティに移譲し、状況に合わせて指針をアップデートする。
 
-Policy Contract は誰でも自由に提案できる。ただし、有効化するためには既存の資産保有者( Property Contract オーナー )たちの投票によって承認される必要がある。Property Contract の被ロックアップ数と `totals` の合計値を票数とする。投票は基本的に資産保有者によって行われることを期待するが、ロックアップ実行者が自らのロックアップ数を票数として投票することもできる。この場合はロックアップ対象の Property Contract アドレスを指定して行なう。
+Policy Contract は誰でも自由に提案できる。ただし、有効化するためには既存の資産保有者( Property Contract オーナー )たちの投票によって承認される必要がある。Property Contract の被ロックアップ数と `totals` の合計値を票数とし、提案された Policy Contract の`vote` を実行することによって投票は完了する。
+基本的に資産保有者によって行われることを期待するが、ロックアップ実行者が自らのロックアップ数を票数として投票することもできる。この場合はロックアップ対象の Property Contract アドレスを指定して行なう。
 
 新しい Policy Contract が有効化条件を満たすだけの賛成票を得られるとただちに有効化され、古い Policy Contract は消滅する。現在、[初期の政策](./POLICY.md) の策定が進行中である。
 
@@ -307,7 +319,7 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 
 ### policyApproval
 
-新しい Policy Contract の有効化可否。Policy Contract の `vote` の中で呼び出され、以下の変数から Policy Contract の有効化を決定する。
+新しい Policy Contract の有効化可否。提案された Policy Contract の `vote` の中で現行のの Policy Contract の `policyApproval` が呼び出され、以下の変数から 新規 Policy Contract の有効化を決定する。
 
 - 賛成票数
 - 反対票数
@@ -328,7 +340,7 @@ Property Contract オーナーが Market Contract 及び Policy Contract への�
 
 ペナルティはマーケット報酬の計算対象外期間( ブロック数 )を設けることで罰則とする。対象外期間の開始ブロックは `allocate` の前回実行ブロックとする。計算対象外期間中は `allocate` の実行が失敗し、期間経過後も期間中の資産価値は考慮されない。
 
-棄権回数の算出のために、Market Contract 及び Policy Contract の投票受付期間中に投票しなかった Property Contract を記録する必要がある。そのための単純な方法として、State Contract に `pol`, `vot` という変数を追加する。 `pol` は整数型で新たな投票が開始するたびに 1 を加算する。`vot` は Property Contract のアドレスをキーとした整数のマップ型で、Property Contract オーナーによる投票のたびに 1 を加算する。Property Contract の生成時には `pol` の値を `vot[address]` に記録する。`pol` から `vot[address]` を差し引いた数が棄権数となる。Property Contract がペナルティを受けると `vot[address]` の値は再び `pol` と同期される。
+棄権回数の算出のために、Market Contract 及び Policy Contract の投票受付期間中に投票しなかった Property Contract を記録している。
 
 ### lockUpBlocks
 
