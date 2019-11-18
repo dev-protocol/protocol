@@ -31,7 +31,7 @@ contract PolicyTest is IPolicy {
 		return _assets + _propertyAssets;
 	}
 
-	function marketApproval(uint256 a_gree, uint256 _opposite)
+	function marketApproval(uint256 _agree, uint256 _opposite)
 		public
 		returns (bool)
 	{
