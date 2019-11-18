@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "../UseState.sol";
 
-contract MarketGroup is UseState{
+contract MarketGroup is UseState {
 	mapping(address => bool) private _markets;
 
 	modifier onlyMarketFactory() {

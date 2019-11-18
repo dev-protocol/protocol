@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "../UseState.sol";
 
-contract PropertyGroup is UseState{
+contract PropertyGroup is UseState {
 	mapping(address => bool) private _properties;
 
 	modifier onlyPropertyFactory() {
