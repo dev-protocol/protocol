@@ -15,10 +15,6 @@ contract UseStateTest is UseState {
 		return allocator();
 	}
 
-	function t_addMarket(address _addr) public returns (bool) {
-		return addMarket(_addr);
-	}
-
 	function t_getToken() public view returns (address) {
 		return getToken();
 	}

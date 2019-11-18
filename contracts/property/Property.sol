@@ -2,8 +2,8 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
-import "./UseState.sol";
-import "./Allocator.sol";
+import "../UseState.sol";
+import "../Allocator.sol";
 
 contract Property is ERC20, ERC20Detailed, UseState {
 	address private _owner;

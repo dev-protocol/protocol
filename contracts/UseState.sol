@@ -18,10 +18,6 @@ contract UseState is Ownable {
 		return state().allocator();
 	}
 
-	function addMarket(address _addr) internal returns (bool) {
-		return state().addMarket(_addr);
-	}
-
 	function getToken() internal view returns (address) {
 		return state().getToken();
 	}

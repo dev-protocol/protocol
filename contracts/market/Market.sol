@@ -1,10 +1,11 @@
 pragma solidity ^0.5.0;
 
-import "./UseState.sol";
-import "./Metrics.sol";
-import "./Property.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../UseState.sol";
+import "../Metrics.sol";
+import "../property/Property.sol";
+
 
 contract Behavior {
 	string public schema;
