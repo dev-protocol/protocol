@@ -95,7 +95,9 @@ contract TokenValue {
 
 contract CanceledLockupFlg {
 	mapping(address => mapping(address => bool)) private _canceled;
-	function setCancelFlg(address _fromAddress, address _propertyAddress) public {
+	function setCancelFlg(address _fromAddress, address _propertyAddress)
+		public
+	{
 		_canceled[_fromAddress][_propertyAddress] = true;
 	}
 	function isCanceled(address _fromAddress, address _propertyAddress)

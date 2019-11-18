@@ -5,7 +5,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 contract IPolicy {
 	using SafeMath for uint256;
 
-	function rewards(uint256 _lockups, uint256 _assets) public returns (uint256);
+	function rewards(uint256 _lockups, uint256 _assets)
+		public
+		returns (uint256);
 
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		public

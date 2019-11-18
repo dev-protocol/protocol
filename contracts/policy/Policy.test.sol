@@ -3,7 +3,10 @@ pragma solidity ^0.5.0;
 import "./IPolicy.sol";
 
 contract PolicyTest is IPolicy {
-	function rewards(uint256 _lockups, uint256 _assets) public returns (uint256) {
+	function rewards(uint256 _lockups, uint256 _assets)
+		public
+		returns (uint256)
+	{
 		return _lockups + _assets;
 	}
 
