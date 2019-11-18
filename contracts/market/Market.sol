@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../UseState.sol";
 import "../Metrics.sol";
 import "../property/Property.sol";
+import "../metrics/MetricsGroup.sol";
 
 contract Behavior {
 	string public schema;
@@ -96,7 +97,7 @@ contract Market is UseState {
 
 	function authenticatedCallback(address _prop) public returns (address) {
 		Metrics metrics = new Metrics(_prop);
-		addMetrics(address(metrics));
+		MetricsGroup(metricsGroup()).addMetrics(address(metrics));
 		issuedMetrics += 1;
 		return address(metrics);
 	}

@@ -6,13 +6,14 @@ contract State is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
 	address public marketFactory;
+	address public marketGroup;
 	address public propertyFactory;
+	address public propertyGroup;
+	address public metricsGroup;
 	address public policyFactory;
 	address public policy;
 	address public lockup;
 	address public policyVoteAbstentionCounter;
-	mapping(address => bool) internal metrics;
-	uint256 public totalIssuedMetrics;
 
 	modifier onlyPolicyFactory() {
 		require(msg.sender == policyFactory, "Only Policy Factory Contract");
@@ -27,8 +28,20 @@ contract State is Ownable {
 		marketFactory = _addr;
 	}
 
+	function setMarketGroup(address _addr) public onlyOwner {
+		marketGroup = _addr;
+	}
+
 	function setPropertyFactory(address _addr) public onlyOwner {
 		propertyFactory = _addr;
+	}
+
+	function setPropertyGroup(address _addr) public onlyOwner {
+		propertyGroup = _addr;
+	}
+
+	function setMetricsGroup(address _addr) public onlyOwner {
+		metricsGroup = _addr;
 	}
 
 	function setPolicyFactory(address _addr) public onlyOwner {
@@ -41,18 +54,6 @@ contract State is Ownable {
 
 	function getToken() public view returns (address) {
 		return token;
-	}
-
-	// TODO
-	function addMetrics(address _metrics) public {
-		//onlyMarket {
-		require(_metrics != address(0), "Metrics is an invalid address");
-		totalIssuedMetrics += 1;
-		metrics[_metrics] = true;
-	}
-
-	function isMetrics(address _metrics) public view returns (bool) {
-		return metrics[_metrics];
 	}
 
 	function setPolicy(address _addr) public onlyPolicyFactory {

@@ -1,16 +1,13 @@
 pragma solidity ^0.5.0;
 
-contract PropertyGroup {
-	address private _propertyFactory;
-	mapping(address => bool) private _properties;
+import "../UseState.sol";
 
-	constructor(address propertyFactory) public {
-		_propertyFactory = propertyFactory;
-	}
+contract PropertyGroup is UseState{
+	mapping(address => bool) private _properties;
 
 	modifier onlyPropertyFactory() {
 		require(
-			msg.sender == _propertyFactory,
+			msg.sender == propertyFactory(),
 			"only property factory contract."
 		);
 		_;

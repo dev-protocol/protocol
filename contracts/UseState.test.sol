@@ -18,20 +18,4 @@ contract UseStateTest is UseState {
 	function t_getToken() public view returns (address) {
 		return getToken();
 	}
-
-	function t_addProperty(address _prop) public {
-		return addProperty(_prop);
-	}
-
-	function t_isProperty(address _addr) public view returns (bool) {
-		return isProperty(_addr);
-	}
-
-	function t_addMetrics(address _metrics) internal {
-		return addMetrics(_metrics);
-	}
-
-	function t_isMetrics(address _metrics) internal view returns (bool) {
-		return isMetrics(_metrics);
-	}
 }

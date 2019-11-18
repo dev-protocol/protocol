@@ -3,9 +3,10 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../libs/Killable.sol";
 import "../libs/Utils.sol";
+import "../property/PropertyFactory.sol";
+import "../property/PropertyGroup.sol";
 import "../UseState.sol";
 import "../Lockup.sol";
-import "../Property.sol";
 import "./IPolicy.sol";
 import "./PolicyVoteCounter.sol";
 
@@ -128,7 +129,7 @@ contract Policy is Killable, UseState {
 
 	function vote(address _propertyAddress, bool _agree) public {
 		require(
-			isProperty(_propertyAddress),
+			PropertyGroup(propertyGroup()).isProperty(_propertyAddress),
 			"this address is not property contract."
 		);
 		require(policy() != address(this), "this policy is current.");

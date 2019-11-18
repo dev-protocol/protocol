@@ -7,7 +7,8 @@ import "./libs/Killable.sol";
 import "./libs/Withdrawable.sol";
 import "./market/Market.sol";
 import "./property/Property.sol";
-import "./Metrics.sol";
+import "./metrics/Metrics.sol";
+import "./metrics/MetricsGroup.sol";
 import "./UseState.sol";
 import "./LastAllocationTime.sol";
 
@@ -27,14 +28,6 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 		lastAllocationTime = new LastAllocationTime();
 	}
 
-	modifier onlyProperty(address _addr) {
-		require(
-			isProperty(_addr) == true,
-			"only Property contract address can be specified"
-		);
-		_;
-	}
-
 	function setSecondsPerBlock(uint256 _sec) public onlyOwner {
 		lastAllocationTime.setSecondsPerBlock(_sec);
 	}
@@ -42,7 +35,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	function allocate(address _metrics) public payable {
 		// TODO Add penalty judgment processing
 		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
-		require(isMetrics(_metrics), "Is't Metrics Contract");
+		require(MetricsGroup(metricsGroup()).isMetrics(_metrics), "Is't Metrics Contract");
 		(uint256 timestamp, uint256 yesterday) = lastAllocationTime
 			.getTimeInfo();
 		lastAllocationTime.ensureDiffDays(_metrics, yesterday);
