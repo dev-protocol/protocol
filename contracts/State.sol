@@ -6,36 +6,17 @@ contract State is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
 	address public marketFactory;
+	address public marketGroup;
 	address public propertyFactory;
+	address public propertyGroup;
+	address public metricsGroup;
 	address public policyFactory;
 	address public policy;
 	address public lockup;
 	address public policyVoteAbstentionCounter;
-	mapping(address => bool) internal markets;
-	mapping(address => bool) internal metrics;
-	mapping(address => bool) internal properties;
-	uint256 public totalIssuedMetrics;
-
-	modifier onlyMarketFactory() {
-		require(msg.sender == marketFactory, "Only Market Factory Contract");
-		_;
-	}
-
-	modifier onlyPropertyFactory() {
-		require(
-			msg.sender == propertyFactory,
-			"Only Property Factory Contract"
-		);
-		_;
-	}
 
 	modifier onlyPolicyFactory() {
 		require(msg.sender == policyFactory, "Only Policy Factory Contract");
-		_;
-	}
-
-	modifier onlyMarket() {
-		require(markets[msg.sender], "Only Market Contract");
 		_;
 	}
 
@@ -47,17 +28,24 @@ contract State is Ownable {
 		marketFactory = _addr;
 	}
 
+	function setMarketGroup(address _addr) public onlyOwner {
+		marketGroup = _addr;
+	}
+
 	function setPropertyFactory(address _addr) public onlyOwner {
 		propertyFactory = _addr;
 	}
 
-	function setPolicyFactory(address _addr) public onlyOwner {
-		policyFactory = _addr;
+	function setPropertyGroup(address _addr) public onlyOwner {
+		propertyGroup = _addr;
 	}
 
-	function addMarket(address _addr) public onlyMarketFactory returns (bool) {
-		markets[_addr] = true;
-		return true;
+	function setMetricsGroup(address _addr) public onlyOwner {
+		metricsGroup = _addr;
+	}
+
+	function setPolicyFactory(address _addr) public onlyOwner {
+		policyFactory = _addr;
 	}
 
 	function setToken(address nextToken) public onlyOwner {
@@ -66,25 +54,6 @@ contract State is Ownable {
 
 	function getToken() public view returns (address) {
 		return token;
-	}
-
-	function addProperty(address _prop) public onlyPropertyFactory {
-		require(_prop != address(0), "Property is an invalid address");
-		properties[_prop] = true;
-	}
-
-	function isProperty(address _addr) public view returns (bool) {
-		return properties[_addr];
-	}
-
-	function addMetrics(address _metrics) public onlyMarket {
-		require(_metrics != address(0), "Metrics is an invalid address");
-		totalIssuedMetrics += 1;
-		metrics[_metrics] = true;
-	}
-
-	function isMetrics(address _metrics) public view returns (bool) {
-		return metrics[_metrics];
 	}
 
 	function setPolicy(address _addr) public onlyPolicyFactory {

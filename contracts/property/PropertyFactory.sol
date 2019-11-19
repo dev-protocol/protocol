@@ -1,7 +1,9 @@
 pragma solidity ^0.5.0;
 
 import "./Property.sol";
-import "./policy/PolicyFactory.sol";
+import "./PropertyGroup.sol";
+import "../policy/PolicyFactory.sol";
+import "../policy/PolicyVoteCounter.sol";
 
 contract PropertyFactory is UseState {
 	uint8 decimals = 18;
@@ -20,7 +22,8 @@ contract PropertyFactory is UseState {
 			decimals,
 			supply
 		);
-		addProperty(address(property));
+		property.changeStateAddress(address(state()));
+		PropertyGroup(propertyGroup()).addProperty(address(property));
 		emit Create(msg.sender, address(property));
 		PolicyVoteCounter(Policy(policy()).voteCounterAddress())
 			.resetVoteCountByProperty(address(property));

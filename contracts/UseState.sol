@@ -18,28 +18,8 @@ contract UseState is Ownable {
 		return state().allocator();
 	}
 
-	function addMarket(address _addr) internal returns (bool) {
-		return state().addMarket(_addr);
-	}
-
 	function getToken() internal view returns (address) {
 		return state().getToken();
-	}
-
-	function addProperty(address _prop) internal {
-		state().addProperty(_prop);
-	}
-
-	function isProperty(address _addr) internal view returns (bool) {
-		return state().isProperty(_addr);
-	}
-
-	function addMetrics(address _metrics) internal {
-		state().addMetrics(_metrics);
-	}
-
-	function isMetrics(address _metrics) internal view returns (bool) {
-		return state().isMetrics(_metrics);
 	}
 
 	function policy() internal view returns (address) {
@@ -52,5 +32,25 @@ contract UseState is Ownable {
 
 	function lockup() internal view returns (address) {
 		return state().lockup();
+	}
+
+	function propertyFactory() internal view returns (address) {
+		return state().propertyFactory();
+	}
+
+	function propertyGroup() internal view returns (address) {
+		return state().propertyGroup();
+	}
+
+	function marketFactory() internal view returns (address) {
+		return state().marketFactory();
+	}
+
+	function marketGroup() internal view returns (address) {
+		return state().marketGroup();
+	}
+
+	function metricsGroup() internal view returns (address) {
+		return state().metricsGroup();
 	}
 }

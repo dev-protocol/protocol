@@ -3,8 +3,9 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "./libs/Utils.sol";
-import "./UseState.sol";
 import "./policy/PolicyFactory.sol";
+import "./property/PropertyGroup.sol";
+import "./UseState.sol";
 
 contract Lockup is UseState {
 	using SafeMath for uint256;
@@ -19,6 +20,10 @@ contract Lockup is UseState {
 	}
 
 	function lockup(address _propertyAddress, uint256 _value) public {
+		require(
+			PropertyGroup(propertyGroup()).isProperty(_propertyAddress),
+			"this address is not property contract."
+		);
 		require(
 			_canceledFlg.isCanceled(msg.sender, _propertyAddress) == false,
 			"lock up is already canceled"
@@ -40,6 +45,10 @@ contract Lockup is UseState {
 	}
 
 	function cancel(address _propertyAddress) public {
+		require(
+			PropertyGroup(propertyGroup()).isProperty(_propertyAddress),
+			"this address is not property contract."
+		);
 		require(
 			_tokenValue.hasTokenByProperty(msg.sender, _propertyAddress),
 			"dev token is not locked"

@@ -5,10 +5,10 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "./libs/Killable.sol";
 import "./libs/Withdrawable.sol";
-import "./libs/Utils.sol";
-import "./Property.sol";
-import "./Market.sol";
-import "./Metrics.sol";
+import "./market/Market.sol";
+import "./property/Property.sol";
+import "./metrics/Metrics.sol";
+import "./metrics/MetricsGroup.sol";
 import "./UseState.sol";
 import "./LastAllocationTime.sol";
 
@@ -28,14 +28,6 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 		lastAllocationTime = new LastAllocationTime();
 	}
 
-	modifier onlyProperty(address _addr) {
-		require(
-			isProperty(_addr) == true,
-			"only Property contract address can be specified"
-		);
-		_;
-	}
-
 	function setSecondsPerBlock(uint256 _sec) public onlyOwner {
 		lastAllocationTime.setSecondsPerBlock(_sec);
 	}
@@ -43,7 +35,10 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	function allocate(address _metrics) public payable {
 		// TODO Add penalty judgment processing
 		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
-		require(isMetrics(_metrics), "Is't Metrics Contract");
+		require(
+			MetricsGroup(metricsGroup()).isMetrics(_metrics),
+			"Is't Metrics Contract"
+		);
 		(uint256 timestamp, uint256 yesterday) = lastAllocationTime
 			.getTimeInfo();
 		lastAllocationTime.ensureDiffDays(_metrics, yesterday);
@@ -69,7 +64,8 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 			"Not asking for an indicator"
 		);
 		address property = metrics.property();
-		uint256 share = market.issuedMetrics() / state().totalIssuedMetrics();
+		uint256 share = market.issuedMetrics() /
+			MetricsGroup(metricsGroup()).totalIssuedMetrics();
 		uint256 period = block.number -
 			lastAllocationBlockEachMetrics[_metrics];
 		uint256 allocationPerBlock = _value / period;

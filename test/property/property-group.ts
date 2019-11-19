@@ -1,6 +1,5 @@
-contract('PropertyFactory', ([deployer]) => {
+contract('PrpertyGroupTest', ([deployer]) => {
 	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
-	const propertyContract = artifacts.require('property/Property')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
 	const stateContract = artifacts.require('State')
 	const policyContract = artifacts.require('policy/PolicyTest')
@@ -11,7 +10,6 @@ contract('PropertyFactory', ([deployer]) => {
 		var propertyGroup: any
 		var state: any
 		var expectedPropertyAddress: any
-		var deployedProperty: any
 		var policy: any
 		var policyFactory: any
 
@@ -37,26 +35,15 @@ contract('PropertyFactory', ([deployer]) => {
 		})
 
 		it('Create a new Property Contract and emit Create Event telling created property address', async () => {
-			// eslint-disable-next-line @typescript-eslint/await-thenable
-			deployedProperty = await propertyContract.at(expectedPropertyAddress)
-			const name = await deployedProperty.name({from: deployer})
-			const symbol = await deployedProperty.symbol({from: deployer})
-			const decimals = await deployedProperty.decimals({from: deployer})
-			const totalSupply = await deployedProperty.totalSupply({from: deployer})
-			expect(name).to.be.equal('sample')
-			expect(symbol).to.be.equal('SAMPLE')
-			expect(decimals.toNumber()).to.be.equal(18)
-			expect(totalSupply.toNumber()).to.be.equal(10000000)
+			const result = await propertyGroup.isProperty(expectedPropertyAddress)
+			expect(result).to.be.equal(true)
 		})
 
 		it('Adds a new Property Contract address to State Contract', async () => {
-			const isProperty = await propertyGroup.isProperty(
-				expectedPropertyAddress,
-				{
-					from: deployer
-				}
+			const result = await propertyGroup.isProperty(
+				'0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167'
 			)
-			expect(isProperty).to.be.equal(true)
+			expect(result).to.be.equal(false)
 		})
 	})
 })

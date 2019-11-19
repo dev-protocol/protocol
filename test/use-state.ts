@@ -1,7 +1,6 @@
 contract('UseState', ([deployer, u1, u2]) => {
 	const useStateContract = artifacts.require('UseStateTest')
 	const stateContract = artifacts.require('State')
-	const propertyContract = artifacts.require('Property')
 
 	describe('State; changeStateAddress', () => {
 		it('Change state address', async () => {
@@ -78,33 +77,6 @@ contract('UseState', ([deployer, u1, u2]) => {
 	})
 
 	describe('Property token; addProperty', () => {
-		it('Add Property Contract token address', async () => {
-			const property = await propertyContract.new(
-				deployer,
-				'pkg_token',
-				'PKG',
-				18,
-				10000,
-				{
-					from: deployer
-				}
-			)
-			const state = await stateContract.new({from: deployer})
-			const useState = await useStateContract.new({from: deployer})
-			await useState.changeStateAddress(state.address, {
-				from: deployer
-			})
-			await state.setPropertyFactory(useState.address, {from: deployer})
-			await useState.t_addProperty(property.address, {
-				from: deployer
-			})
-
-			const results = await state.isProperty(property.address, {
-				from: deployer
-			})
-			expect(results).to.be.equal(true)
-		})
-
 		it(
 			'Should fail to add Property Contract token address when sent from the non-Market Factory account'
 		)

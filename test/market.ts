@@ -1,5 +1,5 @@
 contract('Market', ([deployer, u1]) => {
-	const marketContract = artifacts.require('Market')
+	const marketContract = artifacts.require('merket/Market')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const stateContract = artifacts.require('State')
 
