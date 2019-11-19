@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-expressions */
 
 contract('State', ([deployer, u1, u2, u3]) => {
-	const stateContract = artifacts.require('StateTest')
-	const propertyContract = artifacts.require('Property')
+	const stateContract = artifacts.require('State')
+	const propertyContract = artifacts.require('property/Property')
 
 	describe('Roles; addMarket', () => {
 		it('Set Market Factory', async () => {
