@@ -5,7 +5,7 @@ contract('MetricsGroupTest', ([deployer, u1]) => {
 	const stateContract = artifacts.require('State')
 	const metricsGroupContract = artifacts.require('metrics/MetricsGroup')
 	describe('MetricsGroupTest', () => {
-		//var expectedMetoricsAddress: any
+		// Var expectedMetoricsAddress: any
 		var metricsGroup: any
 		beforeEach(async () => {
 			const marketGroup = await marketGroupContract.new({
@@ -35,7 +35,7 @@ contract('MetricsGroupTest', ([deployer, u1]) => {
 			await market.authenticatedCallback(
 				'0xd868711BD9a2C6F1548F5f4737f71DA67d821090'
 			)
-			// expectedMetoricsAddress = '0x0'
+			// ExpectedMetoricsAddress = '0x0'
 		})
 		it('isMetrics', async () => {
 			// Const result3 = await metricsGroup.isMetrics(expectedMetoricsAddress)
