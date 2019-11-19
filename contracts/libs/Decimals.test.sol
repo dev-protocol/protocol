@@ -12,12 +12,4 @@ contract DecimalsTest {
 	{
 		return _a.outOf(_b);
 	}
-
-	function multipliedBy(uint256 _a, uint256 _b, uint256 _decimals)
-		public
-		pure
-		returns (uint256 result, uint256 basis)
-	{
-		return _a.multipliedBy(_b, _decimals);
-	}
 }
