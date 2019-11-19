@@ -1,11 +1,11 @@
 contract('Decimals', ([deployer]) => {
 	const decimalsTestContract = artifacts.require('DecimalsTest')
-	describe('ratioInto', () => {
-		it('ratioInto returns ratio into between two numbers', async () => {
+	describe('outOf', () => {
+		it('outOf returns ratio of the first args out of second args', async () => {
 			const decimalsTest = await decimalsTestContract.new({
 				from: deployer
 			})
-			const {0: resultBN, 1: basisBN} = await decimalsTest.ratioInto(28, 70)
+			const {0: resultBN, 1: basisBN} = await decimalsTest.outOf(28, 70)
 			const result = Number(resultBN.toString())
 			const basis = Number(basisBN.toString())
 			const answer = 28 / 70
@@ -13,12 +13,19 @@ contract('Decimals', ([deployer]) => {
 		})
 	})
 
-	describe('percentOf', () => {
-		it('percentOf returns first agrs percent of second args', async () => {
+	describe('multipliedBy', () => {
+		it('multipliedBy returns result of maybe includes decimals calculation between two numbers', async () => {
 			const decimalsTest = await decimalsTestContract.new({
 				from: deployer
 			})
-			const {0: resultBN, 1: basisBN} = await decimalsTest.percentOf(70, 40)
+			const a = 70
+			const b = 0.4
+			const decimals = 10
+			const {0: resultBN, 1: basisBN} = await decimalsTest.multipliedBy(
+				a,
+				b * decimals,
+				decimals
+			)
 			const result = Number(resultBN.toString())
 			const basis = Number(basisBN.toString())
 			const answer = 70 * 0.4

@@ -5,19 +5,19 @@ import "./Decimals.sol";
 contract DecimalsTest {
 	using Decimals for uint256;
 
-	function ratioInto(uint256 _a, uint256 _b)
+	function outOf(uint256 _a, uint256 _b)
 		public
 		pure
 		returns (uint256 result, uint256 basis)
 	{
-		return _a.ratioInto(_b);
+		return _a.outOf(_b);
 	}
 
-	function percentOf(uint256 _a, uint256 _b)
+	function multipliedBy(uint256 _a, uint256 _b, uint256 _decimals)
 		public
 		pure
 		returns (uint256 result, uint256 basis)
 	{
-		return _a.percentOf(_b);
+		return _a.multipliedBy(_b, _decimals);
 	}
 }
