@@ -1,6 +1,6 @@
 ![Dev Protocol](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/logo.png)
 
-[![Build Status](https://travis-ci.org/dev-protocol/protocol.svg?branch=master)](https://travis-ci.org/dev-protocol/protocol)
+[![CI Status](https://github.com/dev-protocol/protocol/workflows/Node/badge.svg)](https://github.com/dev-protocol/protocol/actions)
 [![code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
