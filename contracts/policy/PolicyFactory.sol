@@ -26,6 +26,7 @@ contract PolicyFactory is UseState {
 			_newPolicyAddress,
 			address(_policyVoteCounter)
 		);
+		policy.changeStateAddress(address(state()));
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
 		_policySet.add(policyAddress);

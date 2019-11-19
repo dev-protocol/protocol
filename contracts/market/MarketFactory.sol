@@ -9,6 +9,7 @@ contract MarketFactory is UseState {
 
 	function createMarket(address _addr) public returns (address) {
 		Market market = new Market(_addr, false);
+		market.changeStateAddress(address(state()));
 		address marketAddr = address(market);
 		MarketGroup(marketGroup()).addMarket(marketAddr);
 		emit Create(msg.sender, marketAddr);

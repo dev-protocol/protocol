@@ -22,6 +22,7 @@ contract PropertyFactory is UseState {
 			decimals,
 			supply
 		);
+		property.changeStateAddress(address(state()));
 		PropertyGroup(propertyGroup()).addProperty(address(property));
 		emit Create(msg.sender, address(property));
 		PolicyVoteCounter(Policy(policy()).voteCounterAddress())
