@@ -5,7 +5,7 @@ library Decimals {
 		return 1000000000000000000;
 	}
 
-	function ratioInto(uint256 _a, uint256 _b)
+	function outOf(uint256 _a, uint256 _b)
 		internal
 		pure
 		returns (uint256 result, uint256 basis)
@@ -13,19 +13,5 @@ library Decimals {
 		uint256 base = _basis();
 		uint256 numerator = base * base;
 		return ((_a * numerator) / (_b * base), base);
-	}
-
-	function percentOf(uint256 _a, uint256 _b)
-		internal
-		pure
-		returns (uint256 result, uint256 basis)
-	{
-		uint256 base = _basis();
-		uint256 numerator = base * base;
-		uint256 primaryNumerator = numerator * base;
-		return (
-			(_a * primaryNumerator) / ((_a * numerator) / (_b * base) / _a),
-			base * 100000000000000000000
-		);
 	}
 }
