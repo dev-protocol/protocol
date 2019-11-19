@@ -1,30 +1,28 @@
-import {
-	MarketFactoryInstance,
-	StateTestInstance,
-	MarketInstance
-} from '../types/truffle-contracts'
-
 contract('MarketFactory', ([deployer, u1]) => {
-	const marketFactoryContract = artifacts.require('MarketFactory')
-	const marketContract = artifacts.require('Market')
-	const stateContract = artifacts.require('StateTest')
+	const marketFactoryContract = artifacts.require('market/MarketFactory')
+	const marketContract = artifacts.require('market/Market')
+	const marketGroupContract = artifacts.require('market/MarketGroup')
+	const stateContract = artifacts.require('State')
 
 	describe('createMarket', () => {
-		var marketFactory: MarketFactoryInstance
-		var state: StateTestInstance
+		var marketFactory: any
+		var marketGroup: any
+		var state: any
 		var expectedMarketAddress: any
-		var deployedMarket: MarketInstance
+		var deployedMarket: any
 
 		beforeEach(async () => {
 			state = await stateContract.new({from: deployer})
 			marketFactory = await marketFactoryContract.new({from: deployer})
+			marketGroup = await marketGroupContract.new({from: deployer})
 			await state.setMarketFactory(marketFactory.address, {from: deployer})
+			await state.setMarketGroup(marketGroup.address, {from: deployer})
 			await marketFactory.changeStateAddress(state.address, {from: deployer})
-
+			await marketGroup.changeStateAddress(state.address, {from: deployer})
 			const result = await marketFactory.createMarket(u1, {from: deployer})
 
 			expectedMarketAddress = await result.logs.filter(
-				e => e.event === 'Create'
+				(e: {event: string}) => e.event === 'Create'
 			)[0].args._market
 		})
 
@@ -37,11 +35,9 @@ contract('MarketFactory', ([deployer, u1]) => {
 		})
 
 		it('Adds a new Market Contract address to State Contract', async () => {
-			const isContained = await state.containsMarket(expectedMarketAddress, {
+			await marketGroup.validateMarketAddress(expectedMarketAddress, {
 				from: deployer
 			})
-
-			expect(isContained).to.be.equal(true)
 		})
 	})
 })

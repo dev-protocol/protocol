@@ -1,31 +1,28 @@
-import {
-	PropertyInstance,
-	PropertyFactoryInstance,
-	StateTestInstance,
-	PolicyTestInstance,
-	PolicyFactoryInstance
-} from '../types/truffle-contracts'
-
 contract('PropertyFactory', ([deployer]) => {
-	const propertyFactoryContract = artifacts.require('PropertyFactory')
-	const propertyContract = artifacts.require('Property')
-	const stateContract = artifacts.require('StateTest')
-	const policyContract = artifacts.require('PolicyTest')
-	const policyFactoryContract = artifacts.require('PolicyFactory')
+	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
+	const propertyContract = artifacts.require('property/Property')
+	const propertyGroupContract = artifacts.require('property/PropertyGroup')
+	const stateContract = artifacts.require('State')
+	const policyContract = artifacts.require('policy/PolicyTest')
+	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
 
 	describe('createProperty', () => {
-		var propertyFactory: PropertyFactoryInstance
-		var state: StateTestInstance
+		var propertyFactory: any
+		var propertyGroup: any
+		var state: any
 		var expectedPropertyAddress: any
-		var deployedProperty: PropertyInstance
-		var policy: PolicyTestInstance
-		var policyFactory: PolicyFactoryInstance
+		var deployedProperty: any
+		var policy: any
+		var policyFactory: any
 
 		beforeEach(async () => {
 			state = await stateContract.new({from: deployer})
 			policy = await policyContract.new({from: deployer})
 			policyFactory = await policyFactoryContract.new({from: deployer})
+			propertyGroup = await propertyGroupContract.new({from: deployer})
 			await state.setPolicyFactory(policyFactory.address, {from: deployer})
+			await state.setPropertyGroup(propertyGroup.address, {from: deployer})
+			await propertyGroup.changeStateAddress(state.address, {from: deployer})
 			await policyFactory.changeStateAddress(state.address, {from: deployer})
 			await policyFactory.createPolicy(policy.address)
 			propertyFactory = await propertyFactoryContract.new({from: deployer})
@@ -35,7 +32,7 @@ contract('PropertyFactory', ([deployer]) => {
 				from: deployer
 			})
 			expectedPropertyAddress = await result.logs.filter(
-				e => e.event === 'Create'
+				(e: {event: string}) => e.event === 'Create'
 			)[0].args._property
 		})
 
@@ -53,9 +50,12 @@ contract('PropertyFactory', ([deployer]) => {
 		})
 
 		it('Adds a new Property Contract address to State Contract', async () => {
-			const isProperty = await state.isProperty(expectedPropertyAddress, {
-				from: deployer
-			})
+			const isProperty = await propertyGroup.isProperty(
+				expectedPropertyAddress,
+				{
+					from: deployer
+				}
+			)
 			expect(isProperty).to.be.equal(true)
 		})
 	})

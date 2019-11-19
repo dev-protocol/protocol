@@ -64,7 +64,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 			"Not asking for an indicator"
 		);
 		address property = metrics.property();
-		uint256 share = market.issuedMetrics() / state().totalIssuedMetrics();
+		uint256 share = market.issuedMetrics() / MetricsGroup(metricsGroup()).totalIssuedMetrics();
 		uint256 period = block.number -
 			lastAllocationBlockEachMetrics[_metrics];
 		uint256 allocationPerBlock = _value / period;
