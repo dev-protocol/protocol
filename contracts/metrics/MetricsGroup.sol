@@ -4,7 +4,7 @@ import "../UseState.sol";
 import "../market/MarketGroup.sol";
 
 contract MetricsGroup is UseState {
-	mapping(address => bool) internal _metrics;
+	mapping(address => bool) private _metrics;
 	uint256 public totalIssuedMetrics;
 	function addMetrics(address _metricsAddress) public {
 		MarketGroup(marketGroup()).validateMarketAddress(msg.sender);
