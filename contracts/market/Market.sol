@@ -16,7 +16,7 @@ contract Behavior {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
-	// solium-disable-next-line no-empty-blocks
+		// solium-disable-next-line no-empty-blocks
 	) public returns (bool) {
 		// Implementation for authentication.
 	}
@@ -26,6 +26,7 @@ contract Behavior {
 		returns (bool)
 	// solium-disable-next-line no-empty-blocks
 	{
+
 		// Implementation for fetches index value.
 	}
 }
