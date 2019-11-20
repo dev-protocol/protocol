@@ -1,17 +1,17 @@
 pragma solidity ^0.5.0;
 
-import "../UseState.sol";
 import "./Market.sol";
 import "./MarketGroup.sol";
 
-contract MarketFactory is UseState {
+contract MarketFactory is UsingConfig {
 	event Create(address indexed _from, address _market);
 
+	constructor(address configAddress) UsingConfig(configAddress) public {}
+
 	function createMarket(address _addr) public returns (address) {
-		Market market = new Market(_addr, false);
-		market.changeStateAddress(address(state()));
+		Market market = new Market(address(config()), _addr, false);
 		address marketAddr = address(market);
-		MarketGroup(marketGroup()).addMarket(marketAddr);
+		MarketGroup(config().marketGroup()).addMarket(marketAddr);
 		emit Create(msg.sender, marketAddr);
 	}
 }

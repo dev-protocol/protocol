@@ -2,30 +2,34 @@ contract('MetricsGroupTest', ([deployer, u1]) => {
 	const marketContract = artifacts.require('market/Market')
 	const marketGroupContract = artifacts.require('market/MarketGroup')
 	const marketFactoryContract = artifacts.require('market/MarketFactory')
-	const stateContract = artifacts.require('State')
+	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const metricsGroupContract = artifacts.require('metrics/MetricsGroup')
 	describe('MetricsGroupTest', () => {
 		// Var expectedMetoricsAddress: any
 		var metricsGroup: any
 		beforeEach(async () => {
-			const marketGroup = await marketGroupContract.new({
+			const addressConfig = await addressConfigContract.new({
 				from: deployer
 			})
-			const marketFactory = await marketFactoryContract.new({
+			const marketGroup = await marketGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
-			const state = await stateContract.new({
+			const marketFactory = await marketFactoryContract.new(
+				addressConfig.address,
+				{
+					from: deployer
+				}
+			)
+			metricsGroup = await metricsGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
-			metricsGroup = await metricsGroupContract.new({
+			await addressConfig.setMarketFactory(marketFactory.address, {
 				from: deployer
 			})
-			await state.setMarketFactory(marketFactory.address, {from: deployer})
-			await state.setMarketGroup(marketGroup.address, {from: deployer})
-			await state.setMetricsGroup(metricsGroup.address, {from: deployer})
-			await marketGroup.changeStateAddress(state.address, {from: deployer})
-			await marketFactory.changeStateAddress(state.address, {from: deployer})
-			await metricsGroup.changeStateAddress(state.address, {from: deployer})
+			await addressConfig.setMarketGroup(marketGroup.address, {from: deployer})
+			await addressConfig.setMetricsGroup(metricsGroup.address, {
+				from: deployer
+			})
 			const result = await marketFactory.createMarket(u1, {from: deployer})
 			const expectedMarketAddress = await result.logs.filter(
 				(e: {event: string}) => e.event === 'Create'

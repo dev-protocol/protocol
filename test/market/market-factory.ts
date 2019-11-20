@@ -2,23 +2,27 @@ contract('MarketFactory', ([deployer, u1]) => {
 	const marketFactoryContract = artifacts.require('market/MarketFactory')
 	const marketContract = artifacts.require('market/Market')
 	const marketGroupContract = artifacts.require('market/MarketGroup')
-	const stateContract = artifacts.require('State')
+	const addressConfigContract = artifacts.require('config/AddressConfig')
 
 	describe('createMarket', () => {
 		var marketFactory: any
 		var marketGroup: any
-		var state: any
+		var addressConfig: any
 		var expectedMarketAddress: any
 		var deployedMarket: any
 
 		beforeEach(async () => {
-			state = await stateContract.new({from: deployer})
-			marketFactory = await marketFactoryContract.new({from: deployer})
-			marketGroup = await marketGroupContract.new({from: deployer})
-			await state.setMarketFactory(marketFactory.address, {from: deployer})
-			await state.setMarketGroup(marketGroup.address, {from: deployer})
-			await marketFactory.changeStateAddress(state.address, {from: deployer})
-			await marketGroup.changeStateAddress(state.address, {from: deployer})
+			addressConfig = await addressConfigContract.new({from: deployer})
+			marketFactory = await marketFactoryContract.new(addressConfig.address, {
+				from: deployer
+			})
+			marketGroup = await marketGroupContract.new(addressConfig.address, {
+				from: deployer
+			})
+			await addressConfig.setMarketFactory(marketFactory.address, {
+				from: deployer
+			})
+			await addressConfig.setMarketGroup(marketGroup.address, {from: deployer})
 			const result = await marketFactory.createMarket(u1, {from: deployer})
 
 			expectedMarketAddress = await result.logs.filter(

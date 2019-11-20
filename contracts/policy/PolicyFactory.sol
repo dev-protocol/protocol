@@ -4,34 +4,31 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../libs/Killable.sol";
 import "../libs/Utils.sol";
 import "../property/PropertyFactory.sol";
-import "../property/PropertyGroup.sol";
-import "../UseState.sol";
 import "../Lockup.sol";
 import "./IPolicy.sol";
 import "./PolicyVoteCounter.sol";
 
-contract PolicyFactory is UseState {
+contract PolicyFactory is UsingConfig {
 	AddressSet private _policySet;
 	PolicyVoteCounter private _policyVoteCounter;
 	event Create(address indexed _from, address _property);
 
-	constructor() public {
+	constructor(address addressConfig) UsingConfig(addressConfig) public {
 		_policySet = new AddressSet();
 		_policyVoteCounter = new PolicyVoteCounter();
 	}
 
 	function createPolicy(address _newPolicyAddress) public returns (address) {
 		Policy policy = new Policy(
-			address(this),
+			address(config()),
 			_newPolicyAddress,
 			address(_policyVoteCounter)
 		);
-		policy.changeStateAddress(address(state()));
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
 		_policySet.add(policyAddress);
 		if (_policySet.length() == 1) {
-			setPolicy(policyAddress);
+			config().setPolicy(policyAddress);
 		} else {
 			_policyVoteCounter.addPolicyVoteCount();
 		}
@@ -39,7 +36,7 @@ contract PolicyFactory is UseState {
 	}
 
 	function convergePolicy(address _currentPolicyAddress) public {
-		setPolicy(_currentPolicyAddress);
+		config().setPolicy(_currentPolicyAddress);
 		for (uint256 i = 0; i < _policySet.length(); i++) {
 			address policyAddress = _policySet.get()[i];
 			if (policyAddress == _currentPolicyAddress) {
@@ -52,9 +49,8 @@ contract PolicyFactory is UseState {
 	}
 }
 
-contract Policy is Killable, UseState {
+contract Policy is Killable, UsingConfig {
 	using SafeMath for uint256;
-	address private _factoryAddress;
 	address public voteCounterAddress;
 	IPolicy private _policy;
 	uint256 private _agreeCount;
@@ -63,11 +59,10 @@ contract Policy is Killable, UseState {
 	mapping(address => mapping(address => bool)) private _voteRecord;
 
 	constructor(
-		address _factory,
+		address _addressConfig,
 		address _innerPolicyAddress,
 		address _policyVoteCounter
-	) public {
-		_factoryAddress = _factory;
+	) public UsingConfig(_addressConfig) {
 		_policy = IPolicy(_innerPolicyAddress);
 		voteCounterAddress = _policyVoteCounter;
 		_votingEndBlockNumber = block.number + _policy.policyVotingBlocks();
@@ -130,15 +125,15 @@ contract Policy is Killable, UseState {
 
 	function vote(address _propertyAddress, bool _agree) public {
 		require(
-			PropertyGroup(propertyGroup()).isProperty(_propertyAddress),
+			PropertyGroup(config().propertyGroup()).isProperty(_propertyAddress),
 			"this address is not property contract."
 		);
-		require(policy() != address(this), "this policy is current.");
+		require(config().policy() != address(this), "this policy is current.");
 		require(
 			block.number <= _votingEndBlockNumber,
 			"voting deadline is over."
 		);
-		uint256 voteCount = Lockup(lockup()).getTokenValue(
+		uint256 voteCount = Lockup(config().lockup()).getTokenValue(
 			msg.sender,
 			_propertyAddress
 		);
@@ -155,13 +150,13 @@ contract Policy is Killable, UseState {
 		} else {
 			_oppositeCount += voteCount;
 		}
-		bool result = Policy(policy()).policyApproval(
+		bool result = Policy(config().policy()).policyApproval(
 			_agreeCount,
 			_oppositeCount
 		);
 		if (result == false) {
 			return;
 		}
-		PolicyFactory(_factoryAddress).convergePolicy(address(this));
+		PolicyFactory(config().policyFactory()).convergePolicy(address(this));
 	}
 }

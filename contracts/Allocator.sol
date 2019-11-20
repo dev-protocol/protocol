@@ -6,13 +6,11 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "./libs/Killable.sol";
 import "./libs/Withdrawable.sol";
 import "./market/Market.sol";
-import "./property/Property.sol";
 import "./metrics/Metrics.sol";
 import "./metrics/MetricsGroup.sol";
-import "./UseState.sol";
 import "./LastAllocationTime.sol";
 
-contract Allocator is Killable, Ownable, UseState, Withdrawable {
+contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 	using SafeMath for uint256;
 
 	mapping(address => uint256) lastAllocationBlockEachMetrics;
@@ -24,7 +22,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 	uint256 public mintPerBlock;
 	LastAllocationTime private lastAllocationTime;
 
-	constructor() public {
+	constructor(address _config) UsingConfig(_config) public {
 		lastAllocationTime = new LastAllocationTime();
 	}
 
@@ -36,7 +34,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 		// TODO Add penalty judgment processing
 		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
 		require(
-			MetricsGroup(metricsGroup()).isMetrics(_metrics),
+			MetricsGroup(config().metricsGroup()).isMetrics(_metrics),
 			"Is't Metrics Contract"
 		);
 		(uint256 timestamp, uint256 yesterday) = lastAllocationTime
@@ -65,7 +63,7 @@ contract Allocator is Killable, Ownable, UseState, Withdrawable {
 		);
 		address property = metrics.property();
 		uint256 share = market.issuedMetrics() /
-			MetricsGroup(metricsGroup()).totalIssuedMetrics();
+			MetricsGroup(config().metricsGroup()).totalIssuedMetrics();
 		uint256 period = block.number -
 			lastAllocationBlockEachMetrics[_metrics];
 		uint256 allocationPerBlock = _value / period;

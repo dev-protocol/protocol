@@ -2,7 +2,6 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../UseState.sol";
 import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
@@ -29,7 +28,7 @@ contract Behavior {
 	}
 }
 
-contract Market is UseState {
+contract Market is UsingConfig {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
@@ -41,7 +40,7 @@ contract Market is UseState {
 		_;
 	}
 
-	constructor(address _behavior, bool _enabled) public {
+	constructor(address _config, address _behavior, bool _enabled) UsingConfig(_config) public {
 		behavior = _behavior;
 		enabled = _enabled;
 	}
@@ -87,9 +86,9 @@ contract Market is UseState {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
 	function vote(uint256 _tokenNumber) public onlyDisabledMarket {
-		ERC20Burnable(getToken()).burnFrom(msg.sender, _tokenNumber);
+		ERC20Burnable(config().token()).burnFrom(msg.sender, _tokenNumber);
 		totalVotes = totalVotes + _tokenNumber;
-		uint256 DEVtotalSupply = ERC20Burnable(getToken()).totalSupply();
+		uint256 DEVtotalSupply = ERC20Burnable(config().token()).totalSupply();
 		if (totalVotes >= DEVtotalSupply.div(10)) {
 			enabled = true;
 		}
@@ -97,7 +96,7 @@ contract Market is UseState {
 
 	function authenticatedCallback(address _prop) public returns (address) {
 		Metrics metrics = new Metrics(_prop);
-		MetricsGroup(metricsGroup()).addMetrics(address(metrics));
+		MetricsGroup(config().metricsGroup()).addMetrics(address(metrics));
 		issuedMetrics += 1;
 		return address(metrics);
 	}

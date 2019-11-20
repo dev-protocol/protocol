@@ -1,7 +1,7 @@
 contract('Market', ([deployer, u1]) => {
 	const marketContract = artifacts.require('merket/Market')
 	const dummyDEVContract = artifacts.require('DummyDEV')
-	const stateContract = artifacts.require('State')
+	const addressConfigContract = artifacts.require('config/AddressConfig')
 
 	describe('schema', () => {
 		it('Get Schema of mapped Behavior Contract')
@@ -36,16 +36,21 @@ contract('Market', ([deployer, u1]) => {
 	})
 
 	describe('vote', () => {
-		it('Vote as a positive vote, votes are the number of sent DEVs', async () => {
-			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
+		var dummyDEV: any
+		var market: any
+		var addressConfig: any
+		beforeEach(async () => {
+			dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
-			const state = await stateContract.new({from: deployer})
-			await state.setToken(dummyDEV.address, {from: deployer})
+			addressConfig = await addressConfigContract.new({from: deployer})
+			await addressConfig.setToken(dummyDEV.address, {from: deployer})
+		})
 
-			const market = await marketContract.new(u1, false, {from: deployer})
-			await market.changeStateAddress(state.address, {from: deployer})
-
+		it('Vote as a positive vote, votes are the number of sent DEVs', async () => {
+			market = await marketContract.new(addressConfig.address, u1, false, {
+				from: deployer
+			})
 			await dummyDEV.approve(market.address, 40, {from: deployer})
 
 			await market.vote(10, {from: deployer})
@@ -59,15 +64,9 @@ contract('Market', ([deployer, u1]) => {
 		})
 
 		it('When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled', async () => {
-			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
+			market = await marketContract.new(addressConfig.address, u1, false, {
 				from: deployer
 			})
-			const state = await stateContract.new({from: deployer})
-			await state.setToken(dummyDEV.address, {from: deployer})
-
-			const market = await marketContract.new(u1, false, {from: deployer})
-			await market.changeStateAddress(state.address, {from: deployer})
-
 			await dummyDEV.approve(market.address, 1000, {from: deployer})
 
 			await market.vote(1000, {from: deployer})
@@ -77,15 +76,9 @@ contract('Market', ([deployer, u1]) => {
 		})
 
 		it('Should fail to vote when already determined enabled', async () => {
-			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
+			market = await marketContract.new(addressConfig.address, u1, true, {
 				from: deployer
 			})
-			const state = await stateContract.new({from: deployer})
-			await state.setToken(dummyDEV.address, {from: deployer})
-
-			const market = await marketContract.new(u1, true, {from: deployer})
-			await market.changeStateAddress(state.address, {from: deployer})
-
 			await dummyDEV.approve(market.address, 100, {from: deployer})
 
 			const result = await market
@@ -95,15 +88,9 @@ contract('Market', ([deployer, u1]) => {
 		})
 
 		it('Vote decrease the number of sent DEVs from voter owned DEVs', async () => {
-			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
+			market = await marketContract.new(addressConfig.address, u1, false, {
 				from: deployer
 			})
-			const state = await stateContract.new({from: deployer})
-			await state.setToken(dummyDEV.address, {from: deployer})
-
-			const market = await marketContract.new(u1, false, {from: deployer})
-			await market.changeStateAddress(state.address, {from: deployer})
-
 			await dummyDEV.approve(market.address, 100, {from: deployer})
 
 			await market.vote(100, {from: deployer})
@@ -113,15 +100,9 @@ contract('Market', ([deployer, u1]) => {
 		})
 
 		it('Vote decrease the number of sent DEVs from DEVtoken totalSupply', async () => {
-			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
+			market = await marketContract.new(addressConfig.address, u1, false, {
 				from: deployer
 			})
-			const state = await stateContract.new({from: deployer})
-			await state.setToken(dummyDEV.address, {from: deployer})
-
-			const market = await marketContract.new(u1, false, {from: deployer})
-			await market.changeStateAddress(state.address, {from: deployer})
-
 			await dummyDEV.approve(market.address, 100, {from: deployer})
 
 			await market.vote(100, {from: deployer})
