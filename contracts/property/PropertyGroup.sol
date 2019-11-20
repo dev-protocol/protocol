@@ -5,6 +5,7 @@ import "../config/UsingConfig.sol";
 contract PropertyGroup is UsingConfig {
 	mapping(address => bool) private _properties;
 
+	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	modifier onlyPropertyFactory() {

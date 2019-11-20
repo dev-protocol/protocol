@@ -63,12 +63,17 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 		);
 		Policy policy = Policy(config().policy());
 		Lockup lockup = Lockup(config().lockup());
-		uint256 totalIssuedMetrics = MetricsGroup(config().metricsGroup()).totalIssuedMetrics();
+		uint256 totalIssuedMetrics = MetricsGroup(config().metricsGroup())
+			.totalIssuedMetrics();
 		uint256 share = market.issuedMetrics() / totalIssuedMetrics;
 		uint256 period = block.number -
 			lastAllocationBlockEachMetrics[_metrics];
-		uint256 lockupValue = lockup.getTokenValue(msg.sender, metrics.property());
-		uint256 allocationPerBlock = policy.assetValue(lockupValue, _value) / period;
+		uint256 lockupValue = lockup.getTokenValue(
+			msg.sender,
+			metrics.property()
+		);
+		uint256 allocationPerBlock = policy.assetValue(lockupValue, _value) /
+			period;
 		uint256 nextTotalAllocationValuePerBlock = lastTotalAllocationValuePerBlock -
 			lastAllocationValueEachMetrics[_metrics] +
 			allocationPerBlock;

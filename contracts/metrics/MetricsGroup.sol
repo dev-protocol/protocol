@@ -7,6 +7,7 @@ contract MetricsGroup is UsingConfig {
 	uint256 public totalIssuedMetrics;
 	address public addr;
 
+	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addMetrics(address _metricsAddress) public {
