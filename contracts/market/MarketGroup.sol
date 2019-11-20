@@ -5,7 +5,7 @@ import "../config/UsingConfig.sol";
 contract MarketGroup is UsingConfig {
 	mapping(address => bool) private _markets;
 
-	constructor(address configAddress) public UsingConfig(configAddress) {}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	modifier onlyMarketFactory() {
 		require(

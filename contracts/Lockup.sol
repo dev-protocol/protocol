@@ -13,7 +13,7 @@ contract Lockup is UsingConfig {
 	CanceledLockupFlg private _canceledFlg;
 	ReleasedBlockNumber private _releasedBlockNumber;
 
-	constructor(address addressConfig) public UsingConfig(addressConfig) {
+	constructor(address _config) public UsingConfig(_config) {
 		_tokenValue = new TokenValue();
 		_canceledFlg = new CanceledLockupFlg();
 		_releasedBlockNumber = new ReleasedBlockNumber();

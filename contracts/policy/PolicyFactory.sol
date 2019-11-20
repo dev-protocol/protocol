@@ -13,7 +13,7 @@ contract PolicyFactory is UsingConfig {
 	PolicyVoteCounter private _policyVoteCounter;
 	event Create(address indexed _from, address _property);
 
-	constructor(address addressConfig) public UsingConfig(addressConfig) {
+	constructor(address _config) public UsingConfig(_config) {
 		_policySet = new AddressSet();
 		_policyVoteCounter = new PolicyVoteCounter();
 	}
@@ -59,10 +59,10 @@ contract Policy is Killable, UsingConfig {
 	mapping(address => mapping(address => bool)) private _voteRecord;
 
 	constructor(
-		address _addressConfig,
+		address _config,
 		address _innerPolicyAddress,
 		address _policyVoteCounter
-	) public UsingConfig(_addressConfig) {
+	) public UsingConfig(_config) {
 		_policy = IPolicy(_innerPolicyAddress);
 		voteCounterAddress = _policyVoteCounter;
 		_votingEndBlockNumber = block.number + _policy.policyVotingBlocks();

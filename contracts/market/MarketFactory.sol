@@ -6,7 +6,7 @@ import "./MarketGroup.sol";
 contract MarketFactory is UsingConfig {
 	event Create(address indexed _from, address _market);
 
-	constructor(address configAddress) public UsingConfig(configAddress) {}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function createMarket(address _addr) public returns (address) {
 		Market market = new Market(address(config()), _addr, false);

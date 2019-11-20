@@ -5,7 +5,7 @@ import "../config/UsingConfig.sol";
 contract PropertyGroup is UsingConfig {
 	mapping(address => bool) private _properties;
 
-	constructor(address configAddress) public UsingConfig(configAddress) {}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	modifier onlyPropertyFactory() {
 		require(

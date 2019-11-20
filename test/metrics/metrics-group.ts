@@ -35,7 +35,7 @@ contract('MetricsGroupTest', ([deployer, u1]) => {
 				(e: {event: string}) => e.event === 'Create'
 			)[0].args._market
 			const market = await marketContract.at(expectedMarketAddress)
-			// TODO how to get address
+			// How to get address
 			await market.authenticatedCallback(
 				'0xd868711BD9a2C6F1548F5f4737f71DA67d821090'
 			)
