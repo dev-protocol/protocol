@@ -1,31 +1,41 @@
 contract('PrpertyGroupTest', ([deployer]) => {
 	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
-	const stateContract = artifacts.require('State')
+	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyContract = artifacts.require('policy/PolicyTest')
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
 
 	describe('createProperty', () => {
 		var propertyFactory: any
 		var propertyGroup: any
-		var state: any
+		var addressConfig: any
 		var expectedPropertyAddress: any
 		var policy: any
 		var policyFactory: any
 
 		beforeEach(async () => {
-			state = await stateContract.new({from: deployer})
+			addressConfig = await addressConfigContract.new({from: deployer})
 			policy = await policyContract.new({from: deployer})
-			policyFactory = await policyFactoryContract.new({from: deployer})
-			propertyGroup = await propertyGroupContract.new({from: deployer})
-			await state.setPolicyFactory(policyFactory.address, {from: deployer})
-			await state.setPropertyGroup(propertyGroup.address, {from: deployer})
-			await propertyGroup.changeStateAddress(state.address, {from: deployer})
-			await policyFactory.changeStateAddress(state.address, {from: deployer})
+			policyFactory = await policyFactoryContract.new(addressConfig.address, {
+				from: deployer
+			})
+			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
+				from: deployer
+			})
+			await addressConfig.setPolicyFactory(policyFactory.address, {
+				from: deployer
+			})
+			await addressConfig.setPropertyGroup(propertyGroup.address, {
+				from: deployer
+			})
 			await policyFactory.createPolicy(policy.address)
-			propertyFactory = await propertyFactoryContract.new({from: deployer})
-			await state.setPropertyFactory(propertyFactory.address, {from: deployer})
-			await propertyFactory.changeStateAddress(state.address, {from: deployer})
+			propertyFactory = await propertyFactoryContract.new(
+				addressConfig.address,
+				{from: deployer}
+			)
+			await addressConfig.setPropertyFactory(propertyFactory.address, {
+				from: deployer
+			})
 			const result = await propertyFactory.createProperty('sample', 'SAMPLE', {
 				from: deployer
 			})

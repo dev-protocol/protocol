@@ -1,12 +1,17 @@
 pragma solidity ^0.5.0;
 
-import "../UseState.sol";
+import "../config/UsingConfig.sol";
 
-contract MarketGroup is UseState {
+contract MarketGroup is UsingConfig {
 	mapping(address => bool) private _markets;
 
+	constructor(address _config) public UsingConfig(_config) {}
+
 	modifier onlyMarketFactory() {
-		require(msg.sender == marketFactory(), "only market factory contract.");
+		require(
+			msg.sender == config().marketFactory(),
+			"only market factory contract."
+		);
 		_;
 	}
 

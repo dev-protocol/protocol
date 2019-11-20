@@ -5,15 +5,15 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "./libs/Utils.sol";
 import "./policy/PolicyFactory.sol";
 import "./property/PropertyGroup.sol";
-import "./UseState.sol";
+import "./config/UsingConfig.sol";
 
-contract Lockup is UseState {
+contract Lockup is UsingConfig {
 	using SafeMath for uint256;
 	TokenValue private _tokenValue;
 	CanceledLockupFlg private _canceledFlg;
 	ReleasedBlockNumber private _releasedBlockNumber;
 
-	constructor() public {
+	constructor(address _config) public UsingConfig(_config) {
 		_tokenValue = new TokenValue();
 		_canceledFlg = new CanceledLockupFlg();
 		_releasedBlockNumber = new ReleasedBlockNumber();
@@ -21,14 +21,16 @@ contract Lockup is UseState {
 
 	function lockup(address _propertyAddress, uint256 _value) public {
 		require(
-			PropertyGroup(propertyGroup()).isProperty(_propertyAddress),
+			PropertyGroup(config().propertyGroup()).isProperty(
+				_propertyAddress
+			),
 			"this address is not property contract."
 		);
 		require(
 			_canceledFlg.isCanceled(msg.sender, _propertyAddress) == false,
 			"lock up is already canceled"
 		);
-		ERC20 devToken = ERC20(getToken());
+		ERC20 devToken = ERC20(config().token());
 		uint256 balance = devToken.balanceOf(msg.sender);
 		require(_value <= balance, "insufficient balance");
 		// solium-disable-next-line security/no-low-level-calls
@@ -46,7 +48,9 @@ contract Lockup is UseState {
 
 	function cancel(address _propertyAddress) public {
 		require(
-			PropertyGroup(propertyGroup()).isProperty(_propertyAddress),
+			PropertyGroup(config().propertyGroup()).isProperty(
+				_propertyAddress
+			),
 			"this address is not property contract."
 		);
 		require(
@@ -63,7 +67,7 @@ contract Lockup is UseState {
 		_releasedBlockNumber.setBlockNumber(
 			msg.sender,
 			_propertyAddress,
-			Policy(policy()).lockUpBlocks()
+			Policy(config().policy()).lockUpBlocks()
 		);
 	}
 

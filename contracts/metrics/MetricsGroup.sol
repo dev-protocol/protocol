@@ -1,16 +1,16 @@
 pragma solidity ^0.5.0;
 
-import "../UseState.sol";
 import "../market/MarketGroup.sol";
 
-contract MetricsGroup is UseState {
+contract MetricsGroup is UsingConfig {
 	mapping(address => bool) private _metrics;
 	uint256 public totalIssuedMetrics;
-
 	address public addr;
 
+	constructor(address _config) public UsingConfig(_config) {}
+
 	function addMetrics(address _metricsAddress) public {
-		MarketGroup(marketGroup()).validateMarketAddress(msg.sender);
+		MarketGroup(config().marketGroup()).validateMarketAddress(msg.sender);
 		require(
 			_metricsAddress != address(0),
 			"metrics is an invalid address."

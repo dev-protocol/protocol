@@ -60,3 +60,38 @@ contract('ReleasedBlockNumberTest', () => {
 		})
 	})
 })
+
+contract('LockupTest', ([deployer]) => {
+	const lockupContract = artifacts.require('Lockup')
+	const addressConfigContract = artifacts.require('config/AddressConfig')
+	const propertyGroupContract = artifacts.require('property/PropertyGroup')
+
+	describe('LockupTest; getTokenValue', () => {
+		it('not set token value', async () => {
+			const addressConfig = await addressConfigContract.new({from: deployer})
+			const lockup = await lockupContract.new(addressConfig.address)
+			const result = await lockup.getTokenValue(
+				'0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167',
+				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
+			)
+			expect(result.toNumber()).to.be.equal(0)
+		})
+	})
+	describe('LockupTest; cnacel', () => {
+		it('not property address', async () => {
+			const addressConfig = await addressConfigContract.new({from: deployer})
+			const propertyGroup = await propertyGroupContract.new(
+				addressConfig.address,
+				{from: deployer}
+			)
+			await addressConfig.setPropertyGroup(propertyGroup.address)
+			const lockup = await lockupContract.new(addressConfig.address)
+			const result = await lockup
+				.cancel('0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167')
+				.catch((err: Error) => err)
+			expect(result.message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert this address is not property contract. -- Reason given: this address is not property contract..'
+			)
+		})
+	})
+})
