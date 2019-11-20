@@ -40,7 +40,10 @@ contract Market is UsingConfig {
 		_;
 	}
 
-	constructor(address _config, address _behavior, bool _enabled) UsingConfig(_config) public {
+	constructor(address _config, address _behavior, bool _enabled)
+		public
+		UsingConfig(_config)
+	{
 		behavior = _behavior;
 		enabled = _enabled;
 	}

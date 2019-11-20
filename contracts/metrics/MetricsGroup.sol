@@ -7,7 +7,7 @@ contract MetricsGroup is UsingConfig {
 	uint256 public totalIssuedMetrics;
 	address public addr;
 
-	constructor(address configAddress) UsingConfig(configAddress) public {}
+	constructor(address configAddress) public UsingConfig(configAddress) {}
 
 	function addMetrics(address _metricsAddress) public {
 		MarketGroup(config().marketGroup()).validateMarketAddress(msg.sender);

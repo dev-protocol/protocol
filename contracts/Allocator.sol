@@ -22,7 +22,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 	uint256 public mintPerBlock;
 	LastAllocationTime private lastAllocationTime;
 
-	constructor(address _config) UsingConfig(_config) public {
+	constructor(address _config) public UsingConfig(_config) {
 		lastAllocationTime = new LastAllocationTime();
 	}
 

@@ -13,7 +13,7 @@ contract Lockup is UsingConfig {
 	CanceledLockupFlg private _canceledFlg;
 	ReleasedBlockNumber private _releasedBlockNumber;
 
-	constructor(address addressConfig) UsingConfig(addressConfig) public {
+	constructor(address addressConfig) public UsingConfig(addressConfig) {
 		_tokenValue = new TokenValue();
 		_canceledFlg = new CanceledLockupFlg();
 		_releasedBlockNumber = new ReleasedBlockNumber();
@@ -21,7 +21,9 @@ contract Lockup is UsingConfig {
 
 	function lockup(address _propertyAddress, uint256 _value) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(_propertyAddress),
+			PropertyGroup(config().propertyGroup()).isProperty(
+				_propertyAddress
+			),
 			"this address is not property contract."
 		);
 		require(
@@ -46,7 +48,9 @@ contract Lockup is UsingConfig {
 
 	function cancel(address _propertyAddress) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(_propertyAddress),
+			PropertyGroup(config().propertyGroup()).isProperty(
+				_propertyAddress
+			),
 			"this address is not property contract."
 		);
 		require(

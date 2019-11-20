@@ -13,7 +13,7 @@ contract PolicyFactory is UsingConfig {
 	PolicyVoteCounter private _policyVoteCounter;
 	event Create(address indexed _from, address _property);
 
-	constructor(address addressConfig) UsingConfig(addressConfig) public {
+	constructor(address addressConfig) public UsingConfig(addressConfig) {
 		_policySet = new AddressSet();
 		_policyVoteCounter = new PolicyVoteCounter();
 	}
@@ -125,7 +125,9 @@ contract Policy is Killable, UsingConfig {
 
 	function vote(address _propertyAddress, bool _agree) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(_propertyAddress),
+			PropertyGroup(config().propertyGroup()).isProperty(
+				_propertyAddress
+			),
 			"this address is not property contract."
 		);
 		require(config().policy() != address(this), "this policy is current.");

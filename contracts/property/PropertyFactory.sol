@@ -11,7 +11,7 @@ contract PropertyFactory is UsingConfig {
 
 	event Create(address indexed _from, address _property);
 
-	constructor(address configAddress) UsingConfig(configAddress) public {}
+	constructor(address configAddress) public UsingConfig(configAddress) {}
 
 	function createProperty(string memory _name, string memory _symbol)
 		public

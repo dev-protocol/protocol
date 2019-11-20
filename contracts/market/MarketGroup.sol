@@ -5,10 +5,13 @@ import "../config/UsingConfig.sol";
 contract MarketGroup is UsingConfig {
 	mapping(address => bool) private _markets;
 
-	constructor(address configAddress) UsingConfig(configAddress) public {}
+	constructor(address configAddress) public UsingConfig(configAddress) {}
 
 	modifier onlyMarketFactory() {
-		require(msg.sender == config().marketFactory(), "only market factory contract.");
+		require(
+			msg.sender == config().marketFactory(),
+			"only market factory contract."
+		);
 		_;
 	}
 

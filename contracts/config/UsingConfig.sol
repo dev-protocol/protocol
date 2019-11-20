@@ -7,7 +7,7 @@ contract UsingConfig {
 	constructor(address _addressConfig) public {
 		_config = AddressConfig(_addressConfig);
 	}
-	function config() internal view returns (AddressConfig){
+	function config() internal view returns (AddressConfig) {
 		return _config;
 	}
 }
