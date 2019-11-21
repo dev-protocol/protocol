@@ -32,7 +32,7 @@ contract AddressUintMap {
 
 	function add(address _address, uint256 value) public {
 		_addressValueMap[_address] += value;
-		if (_addressMap[_address]){
+		if (_addressMap[_address]) {
 			return;
 		}
 		_addressMap[_address] = true;

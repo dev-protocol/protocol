@@ -284,7 +284,7 @@ Policy Contract によって決定される指針は以下のとおり。
 
 ブロックあたり総マーケット報酬額。Allocator Contract でマーケット報酬の計算過程で呼び出され、以下の変数から総報酬額を計算する。
 
-- Propertyに紐づく総ロックアップ数
+- Property に紐づく総ロックアップ数
 - 総資産数( Metrics Contract 総数 )
 
 ### holdersShare
@@ -300,7 +300,7 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 
 資産価値。Allocator Contract でマーケット報酬の計算過程で呼び出され、以下の変数から資産価値を計算する。
 
-- Propertyに紐づく総ロックアップ数
+- Property に紐づく総ロックアップ数
 - Market Contract による資産評価
 
 ### authenticationFee

@@ -21,9 +21,7 @@ contract Lockup is UsingConfig {
 
 	function lockup(address _property, uint256 _value) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(
-				_property
-			),
+			PropertyGroup(config().propertyGroup()).isProperty(_property),
 			"this address is not property contract."
 		);
 		require(
@@ -48,9 +46,7 @@ contract Lockup is UsingConfig {
 
 	function cancel(address _property) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(
-				_property
-			),
+			PropertyGroup(config().propertyGroup()).isProperty(_property),
 			"this address is not property contract."
 		);
 		require(
@@ -91,10 +87,8 @@ contract Lockup is UsingConfig {
 contract TokenValue {
 	mapping(address => AddressUintMap) private _lockupedTokenValue;
 	mapping(address => bool) private _hasPropertyAddress;
-	function set(address _property, address _from, uint256 _value)
-		public
-	{
-		if(_hasPropertyAddress[_property] == false){
+	function set(address _property, address _from, uint256 _value) public {
+		if (_hasPropertyAddress[_property] == false) {
 			_lockupedTokenValue[_property] = new AddressUintMap();
 			_hasPropertyAddress[_property] = true;
 		}
@@ -106,7 +100,7 @@ contract TokenValue {
 		view
 		returns (bool)
 	{
-		if(_hasPropertyAddress[_property] == false){
+		if (_hasPropertyAddress[_property] == false) {
 			return false;
 		}
 		return _lockupedTokenValue[_property].get(_from) != 0;
@@ -117,14 +111,14 @@ contract TokenValue {
 		view
 		returns (uint256)
 	{
-		if(_hasPropertyAddress[_property] == false){
+		if (_hasPropertyAddress[_property] == false) {
 			return 0;
 		}
 		return _lockupedTokenValue[_property].get(_from);
 	}
 
 	function getByProperty(address _property) public view returns (uint256) {
-		if(_hasPropertyAddress[_property] == false){
+		if (_hasPropertyAddress[_property] == false) {
 			return 0;
 		}
 		return _lockupedTokenValue[_property].getSumAllValue();
@@ -133,9 +127,7 @@ contract TokenValue {
 
 contract CanceledLockupFlg {
 	mapping(address => mapping(address => bool)) private _canceled;
-	function setCancelFlg(address _property, address _from)
-		public
-	{
+	function setCancelFlg(address _property, address _from) public {
 		_canceled[_property][_from] = true;
 	}
 	function isCanceled(address _property, address _from)
@@ -150,11 +142,9 @@ contract CanceledLockupFlg {
 contract ReleasedBlockNumber {
 	using SafeMath for uint256;
 	mapping(address => mapping(address => uint256)) private _released;
-	function setBlockNumber(
-		address _property,
-		address _from,
-		uint256 _wait
-	) public {
+	function setBlockNumber(address _property, address _from, uint256 _wait)
+		public
+	{
 		_released[_property][_from] = block.number + _wait;
 	}
 }
