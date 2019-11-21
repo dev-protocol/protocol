@@ -8,6 +8,8 @@ import "./libs/Withdrawable.sol";
 import "./market/Market.sol";
 import "./metrics/Metrics.sol";
 import "./metrics/MetricsGroup.sol";
+import "./policy/PolicyVoteCounter.sol";
+import "./policy/PolicyFactory.sol";
 import "./LastAllocationTime.sol";
 
 contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
@@ -20,34 +22,46 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 	mapping(address => bool) pendingIncrements;
 	// TODO not set
 	uint256 public mintPerBlock;
-	LastAllocationTime private lastAllocationTime;
+	AllocationBlockNumber private _allocationBlockNumber;
 
 	constructor(address _config) public UsingConfig(_config) {
-		lastAllocationTime = new LastAllocationTime();
-	}
-
-	function setSecondsPerBlock(uint256 _sec) public onlyOwner {
-		lastAllocationTime.setSecondsPerBlock(_sec);
+		_allocationBlockNumber = new AllocationBlockNumber();
 	}
 
 	function allocate(address _metrics) public payable {
-		// TODO Add penalty judgment processing
-		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
 		require(
 			MetricsGroup(config().metricsGroup()).isMetrics(_metrics),
-			"Is't Metrics Contract"
+			"not metrics contract."
 		);
-		(uint256 timestamp, uint256 yesterday) = lastAllocationTime
-			.getTimeInfo();
-		lastAllocationTime.ensureDiffDays(_metrics, yesterday);
+		validateCoveredPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		pendingIncrements[_metrics] = true;
 		Market(market).calculate(
 			_metrics,
-			lastAllocationTime.getLastAllocationTime(_metrics),
-			yesterday
+			_allocationBlockNumber.getLastAllocationBlockNumber(_metrics),
+			block.number
 		);
-		lastAllocationTime.setLastAllocationTime(_metrics, timestamp);
+		_allocationBlockNumber.setLastAllocationBlockNumber(_metrics);
+	}
+
+	function validateCoveredPeriod(address _metrics) private {
+		uint256 notCoveredBlockNumber = getNotCoveredBlockNumber(_metrics);
+		if (notCoveredBlockNumber == 0){
+			return;
+		}
+		uint256 blockNumber = _allocationBlockNumber.getLastAllocationBlockNumber(_metrics);
+		uint256 notTargetBlockNumber = blockNumber + notCoveredBlockNumber;
+		require(
+			notTargetBlockNumber < block.number,
+			"outside the target period."
+		);
+	}
+
+	function getNotCoveredBlockNumber(address _metrics) private returns (uint256) {
+		address property = Metrics(_metrics).property();
+		PolicyVoteCounter counter = PolicyVoteCounter(config().policyVoteCounter());
+		uint256 abstentionCount = counter.getAbstentionCount(property);
+		return Policy(config().policy()).abstentionPenalty(abstentionCount);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) public {
@@ -80,5 +94,22 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 		lastTotalAllocationValuePerBlock = nextTotalAllocationValuePerBlock;
 		increment(property, allocation);
 		delete pendingIncrements[_metrics];
+	}
+}
+
+contract AllocationBlockNumber {
+	uint256 private _baseBlockNumber;
+	mapping(address=>uint256) private _lastAllocationBlockNumber;
+	constructor() public {
+		_baseBlockNumber = block.number;
+	}
+	function getLastAllocationBlockNumber(address _metrics) public view returns (uint256) {
+		uint256 lastAllocationBlockNumber = _lastAllocationBlockNumber[_metrics] > 0
+			? _lastAllocationBlockNumber[_metrics]
+			: _baseBlockNumber;
+		return lastAllocationBlockNumber;
+	}
+	function setLastAllocationBlockNumber(address _metrics) public {
+		_lastAllocationBlockNumber[_metrics] = block.number;
 	}
 }

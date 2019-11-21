@@ -13,7 +13,7 @@ contract AddressConfig is Ownable {
 	address public policyFactory;
 	address public policy;
 	address public lockup;
-	address public policyVoteAbstentionCounter;
+	address public policyVoteCounter;
 
 	modifier onlyPolicyFactory() {
 		require(msg.sender == policyFactory, "only policy factory contract.");
@@ -60,7 +60,7 @@ contract AddressConfig is Ownable {
 		lockup = _addr;
 	}
 
-	function setPolicyVoteAbstentionCounter(address _addr) public onlyOwner {
-		policyVoteAbstentionCounter = _addr;
+	function setPolicyVoteCounter(address _addr) public onlyOwner {
+		policyVoteCounter = _addr;
 	}
 }

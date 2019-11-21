@@ -89,6 +89,8 @@ contract Market is UsingConfig {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
 	function vote(uint256 _tokenNumber) public onlyDisabledMarket {
+		// TODO count vote
+		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
 		ERC20Burnable(config().token()).burnFrom(msg.sender, _tokenNumber);
 		totalVotes = totalVotes + _tokenNumber;
 		uint256 DEVtotalSupply = ERC20Burnable(config().token()).totalSupply();
