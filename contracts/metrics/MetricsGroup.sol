@@ -5,7 +5,6 @@ import "../market/MarketGroup.sol";
 contract MetricsGroup is UsingConfig {
 	mapping(address => bool) private _metrics;
 	uint256 public totalIssuedMetrics;
-	address public addr;
 
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -17,7 +16,6 @@ contract MetricsGroup is UsingConfig {
 		);
 		totalIssuedMetrics += 1;
 		_metrics[_metricsAddress] = true;
-		addr = _metricsAddress;
 	}
 
 	function isMetrics(address _metricsAddress) public view returns (bool) {

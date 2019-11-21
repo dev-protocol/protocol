@@ -32,7 +32,6 @@ contract Market is UsingConfig {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
-	uint256 public issuedMetrics;
 	uint256 public totalVotes;
 
 	modifier onlyDisabledMarket() {
@@ -99,8 +98,10 @@ contract Market is UsingConfig {
 
 	function authenticatedCallback(address _prop) public returns (address) {
 		Metrics metrics = new Metrics(_prop);
-		MetricsGroup(config().metricsGroup()).addMetrics(address(metrics));
-		issuedMetrics += 1;
+		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
+		metricsGroup.addMetrics(address(metrics));
+		// Policy(config().policy()).authenticationFee(metricsGroup.totalIssuedMetrics(), )
+
 		return address(metrics);
 	}
 }
