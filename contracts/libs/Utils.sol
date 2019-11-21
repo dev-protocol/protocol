@@ -26,17 +26,12 @@ contract AddressSet {
 }
 
 contract AddressUintMap {
-	address[] private _addresses;
-	mapping(address => bool) private _addressMap;
+	uint256 private _sumAllValue;
 	mapping(address => uint256) private _addressValueMap;
 
-	function add(address _address, uint256 value) public {
-		_addressValueMap[_address] += value;
-		if (_addressMap[_address]) {
-			return;
-		}
-		_addressMap[_address] = true;
-		_addresses.push(_address);
+	function add(address _address, uint256 _value) public {
+		_addressValueMap[_address] += _value;
+		_sumAllValue += _value;
 	}
 
 	function get(address _address) public view returns (uint256) {
@@ -44,10 +39,6 @@ contract AddressUintMap {
 	}
 
 	function getSumAllValue() public view returns (uint256) {
-		uint256 sum;
-		for (uint256 i = 0; i < _addresses.length; i++) {
-			sum += _addressValueMap[_addresses[i]];
-		}
-		return sum;
+		return _sumAllValue;
 	}
 }
