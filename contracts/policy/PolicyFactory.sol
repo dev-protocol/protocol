@@ -17,17 +17,15 @@ contract PolicyFactory is UsingConfig {
 	}
 
 	function createPolicy(address _newPolicyAddress) public returns (address) {
-		Policy policy = new Policy(
-			address(config()),
-			_newPolicyAddress
-		);
+		Policy policy = new Policy(address(config()), _newPolicyAddress);
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
 		_policySet.add(policyAddress);
 		if (_policySet.length() == 1) {
 			config().setPolicy(policyAddress);
 		} else {
-			PolicyVoteCounter(config().policyVoteCounter()).addPolicyVoteCount();
+			PolicyVoteCounter(config().policyVoteCounter())
+				.addPolicyVoteCount();
 		}
 		return policyAddress;
 	}
@@ -54,10 +52,10 @@ contract Policy is Killable, UsingConfig {
 	uint256 private _votingEndBlockNumber;
 	mapping(address => mapping(address => bool)) private _voteRecord;
 
-	constructor(
-		address _config,
-		address _innerPolicyAddress
-	) public UsingConfig(_config) {
+	constructor(address _config, address _innerPolicyAddress)
+		public
+		UsingConfig(_config)
+	{
 		_policy = IPolicy(_innerPolicyAddress);
 		_votingEndBlockNumber = block.number + _policy.policyVotingBlocks();
 	}
@@ -137,9 +135,8 @@ contract Policy is Killable, UsingConfig {
 		require(_voteRecord[msg.sender][_propertyAddress], "already vote.");
 		_voteRecord[msg.sender][_propertyAddress] = true;
 		if (Property(_propertyAddress).author() == msg.sender) {
-			PolicyVoteCounter(config().policyVoteCounter()).addVoteCountByProperty(
-				_propertyAddress
-			);
+			PolicyVoteCounter(config().policyVoteCounter())
+				.addVoteCountByProperty(_propertyAddress);
 		}
 		if (_agree) {
 			_agreeCount += voteCount;

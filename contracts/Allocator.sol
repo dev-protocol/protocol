@@ -46,10 +46,11 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 
 	function validateCoveredPeriod(address _metrics) private {
 		uint256 notCoveredBlockNumber = getNotCoveredBlockNumber(_metrics);
-		if (notCoveredBlockNumber == 0){
+		if (notCoveredBlockNumber == 0) {
 			return;
 		}
-		uint256 blockNumber = _allocationBlockNumber.getLastAllocationBlockNumber(_metrics);
+		uint256 blockNumber = _allocationBlockNumber
+			.getLastAllocationBlockNumber(_metrics);
 		uint256 notTargetBlockNumber = blockNumber + notCoveredBlockNumber;
 		require(
 			notTargetBlockNumber < block.number,
@@ -57,9 +58,14 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 		);
 	}
 
-	function getNotCoveredBlockNumber(address _metrics) private returns (uint256) {
+	function getNotCoveredBlockNumber(address _metrics)
+		private
+		returns (uint256)
+	{
 		address property = Metrics(_metrics).property();
-		PolicyVoteCounter counter = PolicyVoteCounter(config().policyVoteCounter());
+		PolicyVoteCounter counter = PolicyVoteCounter(
+			config().policyVoteCounter()
+		);
 		uint256 abstentionCount = counter.getAbstentionCount(property);
 		return Policy(config().policy()).abstentionPenalty(abstentionCount);
 	}
@@ -99,12 +105,17 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 
 contract AllocationBlockNumber {
 	uint256 private _baseBlockNumber;
-	mapping(address=>uint256) private _lastAllocationBlockNumber;
+	mapping(address => uint256) private _lastAllocationBlockNumber;
 	constructor() public {
 		_baseBlockNumber = block.number;
 	}
-	function getLastAllocationBlockNumber(address _metrics) public view returns (uint256) {
-		uint256 lastAllocationBlockNumber = _lastAllocationBlockNumber[_metrics] > 0
+	function getLastAllocationBlockNumber(address _metrics)
+		public
+		view
+		returns (uint256)
+	{
+		uint256 lastAllocationBlockNumber = _lastAllocationBlockNumber[_metrics] >
+			0
 			? _lastAllocationBlockNumber[_metrics]
 			: _baseBlockNumber;
 		return lastAllocationBlockNumber;
