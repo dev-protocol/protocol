@@ -10,7 +10,6 @@ import "./metrics/Metrics.sol";
 import "./metrics/MetricsGroup.sol";
 import "./policy/PolicyVoteCounter.sol";
 import "./policy/PolicyFactory.sol";
-import "./LastAllocationTime.sol";
 
 contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 	using SafeMath for uint256;

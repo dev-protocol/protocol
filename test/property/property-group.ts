@@ -4,7 +4,9 @@ contract('PrpertyGroupTest', ([deployer]) => {
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyContract = artifacts.require('policy/PolicyTest')
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-
+	const policyVoteCounterContract = artifacts.require(
+		'policy/PolicyVoteCounter'
+	)
 	describe('createProperty', () => {
 		var propertyFactory: any
 		var propertyGroup: any
@@ -12,6 +14,7 @@ contract('PrpertyGroupTest', ([deployer]) => {
 		var expectedPropertyAddress: any
 		var policy: any
 		var policyFactory: any
+		var policyVoteCounter: any
 
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
@@ -19,6 +22,7 @@ contract('PrpertyGroupTest', ([deployer]) => {
 			policyFactory = await policyFactoryContract.new(addressConfig.address, {
 				from: deployer
 			})
+			policyVoteCounter = await policyVoteCounterContract.new({from: deployer})
 			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
@@ -26,6 +30,9 @@ contract('PrpertyGroupTest', ([deployer]) => {
 				from: deployer
 			})
 			await addressConfig.setPropertyGroup(propertyGroup.address, {
+				from: deployer
+			})
+			await addressConfig.setPolicyVoteCounter(policyVoteCounter.address, {
 				from: deployer
 			})
 			await policyFactory.createPolicy(policy.address)
