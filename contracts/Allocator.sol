@@ -32,7 +32,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 			MetricsGroup(config().metricsGroup()).isMetrics(_metrics),
 			"not metrics contract."
 		);
-		validateCoveredPeriod(_metrics);
+		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		pendingIncrements[_metrics] = true;
 		Market(market).calculate(
@@ -43,30 +43,24 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 		_allocationBlockNumber.setLastAllocationBlockNumber(_metrics);
 	}
 
-	function validateCoveredPeriod(address _metrics) private {
-		uint256 notCoveredBlockNumber = getNotCoveredBlockNumber(_metrics);
-		if (notCoveredBlockNumber == 0) {
-			return;
-		}
-		uint256 blockNumber = _allocationBlockNumber
-			.getLastAllocationBlockNumber(_metrics);
-		uint256 notTargetBlockNumber = blockNumber + notCoveredBlockNumber;
-		require(
-			notTargetBlockNumber < block.number,
-			"outside the target period."
-		);
-	}
-
-	function getNotCoveredBlockNumber(address _metrics)
-		private
-		returns (uint256)
-	{
+	function validateTargetPeriod(address _metrics) private {
 		address property = Metrics(_metrics).property();
 		PolicyVoteCounter counter = PolicyVoteCounter(
 			config().policyVoteCounter()
 		);
 		uint256 abstentionCount = counter.getAbstentionCount(property);
-		return Policy(config().policy()).abstentionPenalty(abstentionCount);
+		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(abstentionCount);
+		if (notTargetPeriod == 0) {
+			return;
+		}
+		uint256 blockNumber = _allocationBlockNumber
+			.getLastAllocationBlockNumber(_metrics);
+		uint256 notTargetBlockNumber = blockNumber + notTargetPeriod;
+		require(
+			notTargetBlockNumber < block.number,
+			"outside the target period."
+		);
+		counter.resetVoteCountByProperty(property);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) public {
