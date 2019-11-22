@@ -49,7 +49,9 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 			config().policyVoteCounter()
 		);
 		uint256 abstentionCount = counter.getAbstentionCount(property);
-		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(abstentionCount);
+		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
+			abstentionCount
+		);
 		if (notTargetPeriod == 0) {
 			return;
 		}
