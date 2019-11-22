@@ -117,20 +117,25 @@ contract('AllocationBlockNumberTest', ([deployer]) => {
 		'AllocationBlockNumber'
 	)
 	describe('get/set', () => {
-		it('ratioInto returns ratio into between two numbers', async () => {
-			const allocationBlockNumber = await allocationBlockNumberContract.new({
+		var allocationBlockNumber: any
+		beforeEach(async () => {
+			allocationBlockNumber = await allocationBlockNumberContract.new({
 				from: deployer
 			})
 			await allocationBlockNumber.setLastAllocationBlockNumber(
 				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
 			)
-			let blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
+		})
+		it('get/set', async () => {
+			const blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
 				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
 			)
 			// eslint-disable-next-line no-undef
 			const web3BlockNumber = await web3.eth.getBlockNumber()
 			expect(blockNumber.toNumber()).to.be.equal(web3BlockNumber)
-			blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
+		})
+		it('get/set', async () => {
+			const blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
 				'0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167'
 			)
 			const blockNumber2 = await allocationBlockNumber.getLastAllocationBlockNumber(
