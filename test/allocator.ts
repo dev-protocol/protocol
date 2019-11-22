@@ -111,3 +111,32 @@ contract('Allocator', () => {
 		)
 	})
 })
+
+contract('AllocationBlockNumberTest', ([deployer]) => {
+	const allocationBlockNumberContract = artifacts.require(
+		'AllocationBlockNumber'
+	)
+	describe('get/set', () => {
+		it('ratioInto returns ratio into between two numbers', async () => {
+			const allocationBlockNumber = await allocationBlockNumberContract.new({
+				from: deployer
+			})
+			await allocationBlockNumber.setLastAllocationBlockNumber(
+				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
+			)
+			let blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
+				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
+			)
+			// eslint-disable-next-line no-undef
+			const web3BlockNumber = await web3.eth.getBlockNumber()
+			expect(blockNumber.toNumber()).to.be.equal(web3BlockNumber)
+			blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
+				'0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167'
+			)
+			const blockNumber2 = await allocationBlockNumber.getLastAllocationBlockNumber(
+				'0xfbDBcF1EbE27245E3488541f19CAC902E53239a4'
+			)
+			expect(blockNumber.toNumber()).to.be.equal(blockNumber2.toNumber())
+		})
+	})
+})
