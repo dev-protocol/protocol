@@ -134,7 +134,7 @@ contract('AllocationBlockNumberTest', ([deployer]) => {
 			const web3BlockNumber = await web3.eth.getBlockNumber()
 			expect(blockNumber.toNumber()).to.be.equal(web3BlockNumber)
 		})
-		it('get/set', async () => {
+		it('get defoult value', async () => {
 			const blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
 				'0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167'
 			)
