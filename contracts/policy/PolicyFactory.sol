@@ -24,7 +24,8 @@ contract PolicyFactory is UsingConfig {
 		if (_policySet.length() == 1) {
 			config().setPolicy(policyAddress);
 		} else {
-			PolicyVoteCounter(config().policyVoteCounter()).addPolicyVoteCount();
+			PolicyVoteCounter(config().policyVoteCounter())
+				.addPolicyVoteCount();
 		}
 		return policyAddress;
 	}
