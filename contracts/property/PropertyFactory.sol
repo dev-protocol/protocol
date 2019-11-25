@@ -11,6 +11,7 @@ contract PropertyFactory is UsingConfig {
 
 	event Create(address indexed _from, address _property);
 
+	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function createProperty(string memory _name, string memory _symbol)

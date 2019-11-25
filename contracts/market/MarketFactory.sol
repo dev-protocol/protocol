@@ -6,6 +6,7 @@ import "./MarketGroup.sol";
 contract MarketFactory is UsingConfig {
 	event Create(address indexed _from, address _market);
 
+	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function createMarket(address _addr) public returns (address) {

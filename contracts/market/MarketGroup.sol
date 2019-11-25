@@ -5,6 +5,7 @@ import "../config/UsingConfig.sol";
 contract MarketGroup is UsingConfig {
 	mapping(address => bool) private _markets;
 
+	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	modifier onlyMarketFactory() {
