@@ -5,7 +5,6 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
-//import "../policy/PolicyFactory.sol";
 import "../Lockup.sol";
 
 contract Behavior {
