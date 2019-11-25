@@ -2,7 +2,8 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract AddressConfig is Ownable {
+
+contract AddressConfig is Ownable{
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
 	address public marketFactory;
@@ -14,11 +15,6 @@ contract AddressConfig is Ownable {
 	address public policy;
 	address public lockup;
 	address public policyVoteCounter;
-
-	modifier onlyPolicyFactory() {
-		require(msg.sender == policyFactory, "only policy factory contract.");
-		_;
-	}
 
 	function setAllocator(address _addr) public onlyOwner {
 		allocator = _addr;
@@ -52,7 +48,8 @@ contract AddressConfig is Ownable {
 		token = _addr;
 	}
 
-	function setPolicy(address _addr) public onlyPolicyFactory {
+	function setPolicy(address _addr) public {
+		require(msg.sender == policyFactory, "only policy factory contract.");
 		policy = _addr;
 	}
 
