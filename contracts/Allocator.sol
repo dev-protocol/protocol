@@ -79,7 +79,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 		(uint256 aShare, uint256 aBasis) = _assets.outOf(_totalAssets);
 		(uint256 vShare, uint256 vBasis) = _value.outOf(_marketValue);
 		uint256 mint = _mint.mul(_blocks);
-		return mint.mul(aShare).mul(vShare) / aBasis / vBasis;
+		return mint.mul(aShare).mul(vShare).div(aBasis).div(vBasis);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) public {
