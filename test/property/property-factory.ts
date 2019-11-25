@@ -9,33 +9,33 @@ contract('PropertyFactory', ([deployer]) => {
 	describe('createProperty', () => {
 		var propertyFactory: any
 		var propertyGroup: any
-		var addresConfig: any
+		var addressConfig: any
 		var expectedPropertyAddress: any
 		var deployedProperty: any
 		var policy: any
 		var policyFactory: any
 
 		beforeEach(async () => {
-			addresConfig = await addressConfigContract.new({from: deployer})
+			addressConfig = await addressConfigContract.new({from: deployer})
 			policy = await policyContract.new({from: deployer})
-			policyFactory = await policyFactoryContract.new(addresConfig.address, {
+			policyFactory = await policyFactoryContract.new(addressConfig.address, {
 				from: deployer
 			})
-			propertyGroup = await propertyGroupContract.new(addresConfig.address, {
+			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
-			await addresConfig.setPolicyFactory(policyFactory.address, {
+			await addressConfig.setPolicyFactory(policyFactory.address, {
 				from: deployer
 			})
-			await addresConfig.setPropertyGroup(propertyGroup.address, {
+			await addressConfig.setPropertyGroup(propertyGroup.address, {
 				from: deployer
 			})
 			await policyFactory.createPolicy(policy.address)
 			propertyFactory = await propertyFactoryContract.new(
-				addresConfig.address,
+				addressConfig.address,
 				{from: deployer}
 			)
-			await addresConfig.setPropertyFactory(propertyFactory.address, {
+			await addressConfig.setPropertyFactory(propertyFactory.address, {
 				from: deployer
 			})
 			const result = await propertyFactory.createProperty('sample', 'SAMPLE', {
