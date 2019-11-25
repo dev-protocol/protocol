@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
+import "../Lockup.sol";
 
 contract Behavior {
 	string public schema;
@@ -32,6 +33,9 @@ contract Behavior {
 }
 
 contract Market is UsingConfig {
+	// TODO
+	// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#metrics
+	// create maoppimg key(key: Metrics Contract address  value: context)
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
@@ -104,7 +108,17 @@ contract Market is UsingConfig {
 
 	function authenticatedCallback(address _prop) public returns (address) {
 		Metrics metrics = new Metrics(_prop);
-		MetricsGroup(config().metricsGroup()).addMetrics(address(metrics));
+		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
+		metricsGroup.addMetrics(address(metrics));
+		uint256 tokenValue = Lockup(config().lockup()).getTokenValueByProperty(
+			metrics.property()
+		);
+		Policy policy = Policy(config().policy());
+		uint256 authenticationFee = policy.authenticationFee(
+			metricsGroup.totalIssuedMetrics(),
+			tokenValue
+		);
+		ERC20Burnable(config().token()).burnFrom(msg.sender, authenticationFee);
 		issuedMetrics += 1;
 		return address(metrics);
 	}
