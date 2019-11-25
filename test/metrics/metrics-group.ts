@@ -13,8 +13,6 @@ contract('MetricsGroupTest', ([deployer, u1]) => {
 		// Var expectedMetoricsAddress: any
 		var metricsGroup: any
 		beforeEach(async () => {
-			// Console.log(deployer)
-			// console.log(u1)
 			const addressConfig = await addressConfigContract.new({
 				from: deployer
 			})
@@ -46,11 +44,7 @@ contract('MetricsGroupTest', ([deployer, u1]) => {
 				from: deployer
 			})
 			await addressConfig.setToken(dummyDEV.address, {from: deployer})
-			// Console.log(await dummyDEV.balanceOf(dummyDEV.address))
-			// console.log(await dummyDEV.balanceOf(deployer))
-			// console.log(await dummyDEV.balanceOf(u1))
-			// // Await dummyDEV.transfer(u1, 1000, {from: deployer})
-			// console.log(await dummyDEV.balanceOf(u1))
+			await dummyDEV.transfer(u1, 10, {from: deployer})
 
 			metricsGroup = await metricsGroupContract.new(addressConfig.address, {
 				from: deployer
@@ -70,7 +64,7 @@ contract('MetricsGroupTest', ([deployer, u1]) => {
 			// How to get address
 			await market.authenticatedCallback(
 				'0xd868711BD9a2C6F1548F5f4737f71DA67d821090',
-				{from: deployer}
+				{from: u1}
 			)
 			// ExpectedMetoricsAddress = '0x0'
 		})

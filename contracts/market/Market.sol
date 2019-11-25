@@ -43,6 +43,12 @@ contract Market is UsingConfig {
 	uint256 public issuedMetrics;
 	uint256 public totalVotes;
 
+
+	address public tmp;
+	uint256 public tmp2;
+
+
+
 	modifier onlyDisabledMarket() {
 		require(enabled == false, "Market is already enabled.");
 		_;
@@ -119,6 +125,8 @@ contract Market is UsingConfig {
 			metricsGroup.totalIssuedMetrics(),
 			tokenValue
 		);
+		tmp = msg.sender;
+		tmp2 = authenticationFee;
 		ERC20Burnable(config().token()).burnFrom(msg.sender, authenticationFee);
 		issuedMetrics += 1;
 		return address(metrics);
