@@ -1,4 +1,7 @@
-contract('Allocator', () => {
+contract('Allocator', ([deployer]) => {
+	const addressConfigContract = artifacts.require('config/AddressConfig')
+	const allocatorContract = artifacts.require('Allocator')
+
 	describe('allocate', () => {
 		it("Calls Market Contract's calculate function mapped to Metrics Contract")
 
@@ -23,19 +26,45 @@ contract('Allocator', () => {
 		it('The sent ETH will be returned to the sender')
 	})
 
+	describe('allocation', () => {
+		it(`
+			last allocation block is 5760,
+			mint per block is 50000,
+			calculated asset value per block is 300,
+			Market's total asset value per block is 7406907,
+			number of assets per Market is 48568,
+			number of assets total all Market is 547568;
+			the result is ${5760 *
+				50000 *
+				(300 / 7406907) *
+				(48568 / 547568)}`, async () => {
+			const addressConfig = await addressConfigContract.new({from: deployer})
+			const allocator = await allocatorContract.new(addressConfig.address, {
+				from: deployer
+			})
+			const result = await allocator.allocation(
+				5760,
+				50000,
+				300,
+				7406907,
+				48568,
+				547568
+			)
+			expect(result.toNumber()).to.be.equal(
+				~~(5760 * 50000 * (300 / 7406907) * (48568 / 547568))
+			)
+		})
+	})
+
 	describe('calculatedCallback', () => {
-		it(
-			`
-			'lastTotalAllocationValuePerBlock' is 300,
-			Metrics's 'lastAllocationValueEachMetrics' is 20,
-			the target period is 11520 block(2 days),
-			the current calculated index value is 100,
-			'mintPerBlock' is 5,
-			total number of metrics is 10000,
-			and mapped market's total number of metrics is 500;
-			the result is ${(((100 / 11520 / (300 - 20 + 100 / 11520)) * 5 * 500) / 1000) *
-				11520}`
-		)
+		it(`
+			last allocation block is 5760,
+			mint per block is 50000,
+			calculated asset value per block is 300,
+			Market's total asset value per block is 7406907,
+			number of assets per Market is 48568,
+			number of assets total all Market is 547568;
+			the incremented result is ${5760 * 50000 * (300 / 7406907) * (48568 / 547568)}`)
 
 		it(
 			`When after increment, change the value of 'lastTotalAllocationValuePerBlock' is ${300 -
@@ -49,19 +78,6 @@ contract('Allocator', () => {
 
 		it(
 			'Should fail to call the function when does not call in advance `allocate` function'
-		)
-	})
-
-	describe('updateAllocateValue', () => {
-		it(
-			`
-			'totalPaymentValue' is 90000,
-			'initialPaymentBlock' is 1,
-			and 'lastPaymentBlock' is 28800.
-			When the block is 40320,
-			if pays 2000,
-			'mintPerBlock' becomes ${(92000 / (40320 - 1)) *
-				(2000 / (40320 - 28800) / (92000 / (40320 - 1)))}.`
 		)
 	})
 
