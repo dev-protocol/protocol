@@ -35,7 +35,10 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 	}
 
 	function withdrawDev(address _sender) public onlyLockup {
-		uint256 value = Lockup(config().lockup()).getTokenValue(address(this), _sender);
+		uint256 value = Lockup(config().lockup()).getTokenValue(
+			address(this),
+			_sender
+		);
 		ERC20 devToken = ERC20(config().token());
 		devToken.transfer(_sender, value);
 	}

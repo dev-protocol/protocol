@@ -75,10 +75,7 @@ contract Lockup is UsingConfig {
 			"lockup is not canceled"
 		);
 		uint256 lockupedvalue = _tokenValue.get(_property, msg.sender);
-		require(
-			lockupedvalue == 0,
-			"dev token is not locked"
-		);
+		require(lockupedvalue == 0, "dev token is not locked");
 		Property(_property).withdrawDev(msg.sender);
 		_canceledFlg.setCancelFlg(_property, msg.sender, false);
 		_tokenValue.set(_property, msg.sender, 0);
@@ -144,7 +141,9 @@ contract TokenValue {
 
 contract CanceledLockupFlg {
 	mapping(address => mapping(address => bool)) private _canceled;
-	function setCancelFlg(address _property, address _from, bool setValue) public {
+	function setCancelFlg(address _property, address _from, bool setValue)
+		public
+	{
 		_canceled[_property][_from] = setValue;
 	}
 	function isCanceled(address _property, address _from)
@@ -164,7 +163,10 @@ contract ReleasedBlockNumber {
 	{
 		_released[_property][_from] = block.number + _wait;
 	}
-	function canRlease(address _property, address _from) public view returns (bool)
+	function canRlease(address _property, address _from)
+		public
+		view
+		returns (bool)
 	{
 		return _released[_property][_from] > block.number;
 	}
