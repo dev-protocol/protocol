@@ -143,7 +143,9 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			)
 		})
 		it('policyVoteCounter normal', async () => {
-			await addressConfigTest.setPolicyVoteCounter(setAddress1, {from: deployer})
+			await addressConfigTest.setPolicyVoteCounter(setAddress1, {
+				from: deployer
+			})
 			const addresss = await addressConfigTest.policyVoteCounter()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -173,14 +175,18 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		})
 		it('policy set by owner', async () => {
 			await addressConfigTest.setPolicyFactory(setAddress1, {from: deployer})
-			const result = await addressConfigTest.setPolicy(setAddress2, {from: deployer}).catch((err: Error) => err)
+			const result = await addressConfigTest
+				.setPolicy(setAddress2, {from: deployer})
+				.catch((err: Error) => err)
 			expect(result.message).to.be.equal(
 				'Returned error: VM Exception while processing transaction: revert only policy factory contract. -- Reason given: only policy factory contract..'
 			)
 		})
 		it('policy set by other', async () => {
 			await addressConfigTest.setPolicyFactory(setAddress1, {from: deployer})
-			const result = await addressConfigTest.setPolicy(setAddress2, {from: other}).catch((err: Error) => err)
+			const result = await addressConfigTest
+				.setPolicy(setAddress2, {from: other})
+				.catch((err: Error) => err)
 			expect(result.message).to.be.equal(
 				'Returned error: VM Exception while processing transaction: revert only policy factory contract. -- Reason given: only policy factory contract..'
 			)

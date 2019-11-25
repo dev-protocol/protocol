@@ -2,8 +2,7 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-
-contract AddressConfig is Ownable{
+contract AddressConfig is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
 	address public marketFactory;

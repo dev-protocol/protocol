@@ -12,11 +12,17 @@ contract UsingConfig {
 	}
 
 	modifier onlyMarketFactory() {
-		require(msg.sender == _config.marketFactory(), "only market factory contract.");
+		require(
+			msg.sender == _config.marketFactory(),
+			"only market factory contract."
+		);
 		_;
 	}
 	modifier onlyPropertyFactory() {
-		require(msg.sender == _config.propertyFactory(),"only property factory contract.");
+		require(
+			msg.sender == _config.propertyFactory(),
+			"only property factory contract."
+		);
 		_;
 	}
 }
