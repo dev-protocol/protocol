@@ -26,7 +26,7 @@ contract Lockup is UsingConfig {
 		);
 		require(
 			_canceledFlg.isCanceled(_property, msg.sender) == false,
-			"lockup is already canceled"
+			"lockup is already canceled."
 		);
 		ERC20 devToken = ERC20(config().token());
 		uint256 balance = devToken.balanceOf(msg.sender);
@@ -51,11 +51,11 @@ contract Lockup is UsingConfig {
 		);
 		require(
 			_tokenValue.hasTokenByProperty(_property, msg.sender),
-			"dev token is not locked"
+			"dev token is not locked."
 		);
 		require(
 			_canceledFlg.isCanceled(_property, msg.sender) == false,
-			"lockup is already canceled"
+			"lockup is already canceled."
 		);
 		_canceledFlg.setCancelFlg(_property, msg.sender, true);
 		_releasedBlockNumber.setBlockNumber(
@@ -72,10 +72,14 @@ contract Lockup is UsingConfig {
 		);
 		require(
 			_canceledFlg.isCanceled(_property, msg.sender),
-			"lockup is not canceled"
+			"lockup is not canceled."
+		);
+		require(
+			_releasedBlockNumber.canRlease(_property, msg.sender),
+			"lockup is not canceled."
 		);
 		uint256 lockupedValue = _tokenValue.get(_property, msg.sender);
-		require(lockupedValue == 0, "dev token is not locked");
+		require(lockupedValue == 0, "dev token is not locked.");
 		Property(_property).withdrawDev(msg.sender);
 		_canceledFlg.setCancelFlg(_property, msg.sender, false);
 		_tokenValue.set(_property, msg.sender, 0);
