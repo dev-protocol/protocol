@@ -29,10 +29,6 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 		_transfer(msg.sender, _to, _value);
 		return true;
 	}
-	modifier onlyLockup() {
-		require(msg.sender == config().lockup(), "only lockup contract.");
-		_;
-	}
 
 	function withdrawDev(address _sender) public onlyLockup {
 		uint256 value = Lockup(config().lockup()).getTokenValue(

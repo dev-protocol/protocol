@@ -74,8 +74,8 @@ contract Lockup is UsingConfig {
 			_canceledFlg.isCanceled(_property, msg.sender),
 			"lockup is not canceled"
 		);
-		uint256 lockupedvalue = _tokenValue.get(_property, msg.sender);
-		require(lockupedvalue == 0, "dev token is not locked");
+		uint256 lockupedValue = _tokenValue.get(_property, msg.sender);
+		require(lockupedValue == 0, "dev token is not locked");
 		Property(_property).withdrawDev(msg.sender);
 		_canceledFlg.setCancelFlg(_property, msg.sender, false);
 		_tokenValue.set(_property, msg.sender, 0);
