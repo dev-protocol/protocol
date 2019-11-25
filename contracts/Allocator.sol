@@ -76,24 +76,30 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 			pendingIncrements[_metrics] == true,
 			"Not asking for an indicator"
 		);
-		address property = metrics.property();
-		uint256 share = market.issuedMetrics() /
-			MetricsGroup(config().metricsGroup()).totalIssuedMetrics();
+		Policy policy = Policy(config().policy());
+		Lockup lockup = Lockup(config().lockup());
+		uint256 totalIssuedMetrics = MetricsGroup(config().metricsGroup())
+			.totalIssuedMetrics();
+		uint256 share = market.issuedMetrics() / totalIssuedMetrics;
 		uint256 period = block.number -
 			lastAllocationBlockEachMetrics[_metrics];
-		uint256 allocationPerBlock = _value / period;
+		uint256 lockupValue = lockup.getTokenValueByProperty(
+			metrics.property()
+		);
+		uint256 allocationPerBlock = policy.assetValue(lockupValue, _value) /
+			period;
 		uint256 nextTotalAllocationValuePerBlock = lastTotalAllocationValuePerBlock -
 			lastAllocationValueEachMetrics[_metrics] +
 			allocationPerBlock;
 		uint256 allocation = allocationPerBlock /
 			nextTotalAllocationValuePerBlock *
-			mintPerBlock *
+			policy.rewards(lockupValue, totalIssuedMetrics) *
 			share *
 			period;
 		lastAllocationBlockEachMetrics[_metrics] = block.number;
 		lastAllocationValueEachMetrics[_metrics] = allocationPerBlock;
 		lastTotalAllocationValuePerBlock = nextTotalAllocationValuePerBlock;
-		increment(property, allocation);
+		increment(metrics.property(), allocation);
 		delete pendingIncrements[_metrics];
 	}
 }

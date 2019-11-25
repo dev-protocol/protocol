@@ -128,8 +128,8 @@ contract Policy is Killable, UsingConfig {
 			"voting deadline is over."
 		);
 		uint256 voteCount = Lockup(config().lockup()).getTokenValue(
-			msg.sender,
-			_propertyAddress
+			_propertyAddress,
+			msg.sender
 		);
 		require(voteCount != 0, "vote count is 0.");
 		require(_voteRecord[msg.sender][_propertyAddress], "already vote.");

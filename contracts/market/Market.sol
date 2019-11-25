@@ -16,6 +16,7 @@ contract Behavior {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
+		// solium-disable-next-line no-empty-blocks
 	) public returns (bool) {
 		// Implementation for authentication.
 	}
@@ -23,7 +24,9 @@ contract Behavior {
 	function calculate(address _metrics, uint256 _start, uint256 _end)
 		public
 		returns (bool)
+	// solium-disable-next-line no-empty-blocks
 	{
+
 		// Implementation for fetches index value.
 	}
 }

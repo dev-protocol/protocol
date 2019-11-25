@@ -24,3 +24,21 @@ contract AddressSet {
 		return _addressMap[_address];
 	}
 }
+
+contract AddressUintMap {
+	uint256 private _sumAllValue;
+	mapping(address => uint256) private _addressValueMap;
+
+	function add(address _address, uint256 _value) public {
+		_addressValueMap[_address] += _value;
+		_sumAllValue += _value;
+	}
+
+	function get(address _address) public view returns (uint256) {
+		return _addressValueMap[_address];
+	}
+
+	function getSumAllValue() public view returns (uint256) {
+		return _sumAllValue;
+	}
+}
