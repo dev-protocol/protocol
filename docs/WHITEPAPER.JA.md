@@ -334,11 +334,11 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 
 ### abstentionPenalty
 
-Property Contract オーナーが Market Contract 及び Policy Contract への投票を棄権した場合のペナルティ。Allocator Contract の `allocate` の中で呼び出され、以下の変数からペナルティを決定する。
+Property Contract オーナーが Market Contract 及び Policy Contract への投票を棄権した場合のペナルティ。ペナルティはマーケット報酬の計算対象外期間( ブロック数 )を設けることで罰則とする。Allocator Contract の `allocate` の中で呼び出され、以下の変数からペナルティを決定する。
 
 - 棄権回数
 
-ペナルティはマーケット報酬の計算対象外期間( ブロック数 )を設けることで罰則とする。対象外期間の開始ブロックは `allocate` の前回実行ブロックとする。計算対象外期間中は `allocate` の実行が失敗し、期間経過後も期間中の資産価値は考慮されない。
+計算対象外期間を算出し返却する。対象外期間の開始ブロックは `allocate` の前回実行ブロックとする。計算対象外期間中は `allocate` の実行が失敗し、期間経過後も期間中の資産価値は考慮されない。
 
 棄権回数の算出のために、Market Contract 及び Policy Contract の投票受付期間中に投票しなかった Property Contract を記録している。
 

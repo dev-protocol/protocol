@@ -53,8 +53,8 @@ contract PolicyTest is IPolicy {
 		return 20;
 	}
 
-	function abstentionPenalty(uint256 _count) public returns (bool) {
-		return _count > 0;
+	function abstentionPenalty(uint256 _count) public returns (uint256) {
+		return _count;
 	}
 
 	function lockUpBlocks() public returns (uint256) {
