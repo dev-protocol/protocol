@@ -64,7 +64,7 @@ contract('Allocator', ([deployer]) => {
 			Market's total asset value per block is 7406907,
 			number of assets per Market is 48568,
 			number of assets total all Market is 547568;
-			the result is ${5760 * 50000 * (300 / 7406907) * (48568 / 547568)}`)
+			the incremented result is ${5760 * 50000 * (300 / 7406907) * (48568 / 547568)}`)
 
 		it(
 			`When after increment, change the value of 'lastTotalAllocationValuePerBlock' is ${300 -
