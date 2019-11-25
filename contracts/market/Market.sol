@@ -32,6 +32,7 @@ contract Market is UsingConfig {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
+	uint256 public issuedMetrics;
 	uint256 public totalVotes;
 
 	modifier onlyDisabledMarket() {
@@ -100,8 +101,8 @@ contract Market is UsingConfig {
 		Metrics metrics = new Metrics(_prop);
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
 		metricsGroup.addMetrics(address(metrics));
-		// Policy(config().policy()).authenticationFee(metricsGroup.totalIssuedMetrics(), )
-
+		//Policy(config().policy()).authenticationFee(metricsGroup.totalIssuedMetrics(), )
+		issuedMetrics += 1;
 		return address(metrics);
 	}
 }
