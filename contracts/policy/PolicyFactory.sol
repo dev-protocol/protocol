@@ -10,27 +10,22 @@ import "./PolicyVoteCounter.sol";
 
 contract PolicyFactory is UsingConfig {
 	AddressSet private _policySet;
-	PolicyVoteCounter private _policyVoteCounter;
 	event Create(address indexed _from, address _property);
 
 	constructor(address _config) public UsingConfig(_config) {
 		_policySet = new AddressSet();
-		_policyVoteCounter = new PolicyVoteCounter();
 	}
 
 	function createPolicy(address _newPolicyAddress) public returns (address) {
-		Policy policy = new Policy(
-			address(config()),
-			_newPolicyAddress,
-			address(_policyVoteCounter)
-		);
+		Policy policy = new Policy(address(config()), _newPolicyAddress);
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
 		_policySet.add(policyAddress);
 		if (_policySet.length() == 1) {
 			config().setPolicy(policyAddress);
 		} else {
-			_policyVoteCounter.addPolicyVoteCount();
+			PolicyVoteCounter(config().policyVoteCounter())
+				.addPolicyVoteCount();
 		}
 		return policyAddress;
 	}
@@ -51,20 +46,17 @@ contract PolicyFactory is UsingConfig {
 
 contract Policy is Killable, UsingConfig {
 	using SafeMath for uint256;
-	address public voteCounterAddress;
 	IPolicy private _policy;
 	uint256 private _agreeCount;
 	uint256 private _oppositeCount;
 	uint256 private _votingEndBlockNumber;
 	mapping(address => mapping(address => bool)) private _voteRecord;
 
-	constructor(
-		address _config,
-		address _innerPolicyAddress,
-		address _policyVoteCounter
-	) public UsingConfig(_config) {
+	constructor(address _config, address _innerPolicyAddress)
+		public
+		UsingConfig(_config)
+	{
 		_policy = IPolicy(_innerPolicyAddress);
-		voteCounterAddress = _policyVoteCounter;
 		_votingEndBlockNumber = block.number + _policy.policyVotingBlocks();
 	}
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
@@ -115,7 +107,7 @@ contract Policy is Killable, UsingConfig {
 	}
 
 	// TODO Need to be called allocate in Allocator Contract
-	function abstentionPenalty(uint256 _count) public returns (bool) {
+	function abstentionPenalty(uint256 _count) public returns (uint256) {
 		return _policy.abstentionPenalty(_count);
 	}
 
@@ -143,9 +135,8 @@ contract Policy is Killable, UsingConfig {
 		require(_voteRecord[msg.sender][_propertyAddress], "already vote.");
 		_voteRecord[msg.sender][_propertyAddress] = true;
 		if (Property(_propertyAddress).author() == msg.sender) {
-			PolicyVoteCounter(voteCounterAddress).addVoteCountByProperty(
-				_propertyAddress
-			);
+			PolicyVoteCounter(config().policyVoteCounter())
+				.addVoteCountByProperty(_propertyAddress);
 		}
 		if (_agree) {
 			_agreeCount += voteCount;

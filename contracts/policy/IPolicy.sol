@@ -33,7 +33,7 @@ contract IPolicy {
 
 	function policyVotingBlocks() public returns (uint256);
 
-	function abstentionPenalty(uint256 _count) public returns (bool);
+	function abstentionPenalty(uint256 _count) public returns (uint256);
 
 	function lockUpBlocks() public returns (uint256);
 }
