@@ -15,11 +15,6 @@ contract AddressConfig is Ownable {
 	address public lockup;
 	address public policyVoteCounter;
 
-	modifier onlyPolicyFactory() {
-		require(msg.sender == policyFactory, "only policy factory contract.");
-		_;
-	}
-
 	function setAllocator(address _addr) public onlyOwner {
 		allocator = _addr;
 	}
@@ -52,7 +47,8 @@ contract AddressConfig is Ownable {
 		token = _addr;
 	}
 
-	function setPolicy(address _addr) public onlyPolicyFactory {
+	function setPolicy(address _addr) public {
+		require(msg.sender == policyFactory, "only policy factory contract.");
 		policy = _addr;
 	}
 

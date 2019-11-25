@@ -8,14 +8,6 @@ contract MarketGroup is UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	modifier onlyMarketFactory() {
-		require(
-			msg.sender == config().marketFactory(),
-			"only market factory contract."
-		);
-		_;
-	}
-
 	function validateMarketAddress(address marketAddress) public view {
 		require(_markets[marketAddress], "only market contract.");
 	}
