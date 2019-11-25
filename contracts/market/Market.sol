@@ -5,6 +5,8 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
+//import "../policy/PolicyFactory.sol";
+import "../Lockup.sol";
 
 contract Behavior {
 	string public schema;
@@ -32,6 +34,10 @@ contract Behavior {
 }
 
 contract Market is UsingConfig {
+	// TODO
+	// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#metrics
+	// Market Contract は Metrics Contract のアドレスをキーにしたマップを作ることで、
+	// 認証時のコンテキストを保持しておくことが可能となる。認証時のコンテキストはマーケット報酬の計算時に使用できる。
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
@@ -104,7 +110,10 @@ contract Market is UsingConfig {
 		Metrics metrics = new Metrics(_prop);
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
 		metricsGroup.addMetrics(address(metrics));
-		//Policy(config().policy()).authenticationFee(metricsGroup.totalIssuedMetrics(), )
+		uint256 tokenValue = Lockup(config().lockup()).getTokenValueByProperty(metrics.property());
+		Policy policy = Policy(config().policy());
+		uint256 authenticationFee = policy.authenticationFee(metricsGroup.totalIssuedMetrics(), tokenValue);
+		ERC20Burnable(config().token()).burnFrom(msg.sender, authenticationFee);
 		issuedMetrics += 1;
 		return address(metrics);
 	}
