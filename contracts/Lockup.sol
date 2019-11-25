@@ -26,7 +26,7 @@ contract Lockup is UsingConfig {
 		);
 		require(
 			_canceledFlg.isCanceled(_property, msg.sender) == false,
-			"lock up is already canceled"
+			"lockup is already canceled"
 		);
 		ERC20 devToken = ERC20(config().token());
 		uint256 balance = devToken.balanceOf(msg.sender);
@@ -55,16 +55,33 @@ contract Lockup is UsingConfig {
 		);
 		require(
 			_canceledFlg.isCanceled(_property, msg.sender) == false,
-			"lock up is already canceled"
+			"lockup is already canceled"
 		);
-		// TODO after withdrawal, allow the flag to be set again
-		// TODO after withdrawal, update locked up value
-		_canceledFlg.setCancelFlg(_property, msg.sender);
+		_canceledFlg.setCancelFlg(_property, msg.sender, true);
 		_releasedBlockNumber.setBlockNumber(
 			_property,
 			msg.sender,
 			Policy(config().policy()).lockUpBlocks()
 		);
+	}
+
+	function withdraw(address _property) public {
+		require(
+			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			"this address is not property contract."
+		);
+		require(
+			_canceledFlg.isCanceled(_property, msg.sender),
+			"lockup is not canceled"
+		);
+		uint256 lockupedvalue = _tokenValue.get(_property, msg.sender);
+		require(
+			lockupedvalue == 0,
+			"dev token is not locked"
+		);
+		Property(_property).withdrawDev(msg.sender);
+		_canceledFlg.setCancelFlg(_property, msg.sender, false);
+		_tokenValue.set(_property, msg.sender, 0);
 	}
 
 	function getTokenValue(address _property, address _from)
@@ -127,8 +144,8 @@ contract TokenValue {
 
 contract CanceledLockupFlg {
 	mapping(address => mapping(address => bool)) private _canceled;
-	function setCancelFlg(address _property, address _from) public {
-		_canceled[_property][_from] = true;
+	function setCancelFlg(address _property, address _from, bool setValue) public {
+		_canceled[_property][_from] = setValue;
 	}
 	function isCanceled(address _property, address _from)
 		public
@@ -146,5 +163,9 @@ contract ReleasedBlockNumber {
 		public
 	{
 		_released[_property][_from] = block.number + _wait;
+	}
+	function canRlease(address _property, address _from) public view returns (bool)
+	{
+		return _released[_property][_from] > block.number;
 	}
 }
