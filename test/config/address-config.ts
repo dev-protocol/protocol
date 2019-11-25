@@ -1,7 +1,7 @@
 contract('AddressConfigTest', ([deployer]) => {
 	const addressConfigTestContract = artifacts.require('config/AddressConfig')
 	describe('get/set', () => {
-		it('ratioInto returns ratio into between two numbers', async () => {
+		it('allocator', async () => {
 			const addressConfigTest = await addressConfigTestContract.new({
 				from: deployer
 			})
