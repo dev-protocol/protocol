@@ -3,14 +3,16 @@ contract('MarketFactory', ([deployer, u1]) => {
 	const marketContract = artifacts.require('market/Market')
 	const marketGroupContract = artifacts.require('market/MarketGroup')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
-
+	const policyContract = artifacts.require('policy/PolicyTest')
+	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
 	describe('createMarket', () => {
 		var marketFactory: any
 		var marketGroup: any
 		var addressConfig: any
 		var expectedMarketAddress: any
 		var deployedMarket: any
-
+		var policy: any
+		var policyFactory: any
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
 			marketFactory = await marketFactoryContract.new(addressConfig.address, {
@@ -23,6 +25,14 @@ contract('MarketFactory', ([deployer, u1]) => {
 				from: deployer
 			})
 			await addressConfig.setMarketGroup(marketGroup.address, {from: deployer})
+			policy = await policyContract.new({from: deployer})
+			policyFactory = await policyFactoryContract.new(addressConfig.address, {
+				from: deployer
+			})
+			await addressConfig.setPolicyFactory(policyFactory.address, {
+				from: deployer
+			})
+			await policyFactory.createPolicy(policy.address)
 			const result = await marketFactory.createMarket(u1, {from: deployer})
 
 			expectedMarketAddress = await result.logs.filter(
