@@ -54,7 +54,9 @@ contract Market is UsingConfig {
 	{
 		behavior = _behavior;
 		enabled = _enabled;
-		_votingEndBlockNumber = block.number + Policy(config().policy()).marketVotingBlocks();
+		_votingEndBlockNumber =
+			block.number +
+			Policy(config().policy()).marketVotingBlocks();
 	}
 
 	function schema() public view returns (string memory) {
