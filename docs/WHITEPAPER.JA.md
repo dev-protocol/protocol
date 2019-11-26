@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`2.1.0`**
+Version: **`2.1.1`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -308,7 +308,7 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 資産認証の手数料。Market Contract の `authenticatedCallback` の中で呼び出され、以下の変数から資産認証の手数料を計算する。
 
 - 総資産数( Metrcis Contract 総数 )
-- Property Contract に関連付けされた資産数
+- Property Contract の現在のロックアップ総数
 
 ### marketApproval
 
