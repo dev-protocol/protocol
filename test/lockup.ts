@@ -61,7 +61,7 @@ contract('CanceledLockupFlgTest', ([property, sender1, sender2]) => {
 contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 	const ReleasedBlockNumberContract = artifacts.require('ReleasedBlockNumber')
 	describe('ReleasedBlockNumberTest; setBlockNumber', () => {
-		var canceled: any
+		let canceled: any
 		beforeEach(async () => {
 			canceled = await ReleasedBlockNumberContract.new()
 			await canceled.setBlockNumber(property, sender1, 10)
@@ -87,12 +87,38 @@ contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 
 			result = await canceled.canRlease(property, sender1)
 			expect(result).to.be.equal(true)
-			await canceled.clear(property, sender1)
-			result = await canceled.canRlease(property, sender1)
-			expect(result).to.be.equal(false)
 		})
 		it('Returns false when not canceled', async () => {
 			const result = await canceled.canRlease(property, sender2)
+			expect(result).to.be.equal(false)
+		})
+	})
+	describe('ReleasedBlockNumberTest; clear', () => {
+		it('Reset block number of withdrawable', async () => {
+			const canceled = await ReleasedBlockNumberContract.new()
+			await canceled.setBlockNumber(property, sender1, 10)
+			let result = await canceled.canRlease(property, sender1)
+			expect(result).to.be.equal(false)
+			for (var i = 0; i < 20; i++) {
+				// eslint-disable-next-line no-await-in-loop
+				await new Promise(function(resolve) {
+					// eslint-disable-next-line no-undef
+					web3.currentProvider.send(
+						{
+							jsonrpc: '2.0',
+							method: 'evm_mine',
+							params: [],
+							id: 0
+						},
+						resolve
+					)
+				})
+			}
+
+			result = await canceled.canRlease(property, sender1)
+			expect(result).to.be.equal(true)
+			await canceled.clear(property, sender1)
+			result = await canceled.canRlease(property, sender1)
 			expect(result).to.be.equal(false)
 		})
 	})
