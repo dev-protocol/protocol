@@ -83,6 +83,10 @@ contract Lockup is UsingConfig {
 		Property(_property).withdrawDev(msg.sender);
 		_canceledFlg.setCancelFlg(_property, msg.sender, false);
 		_tokenValue.set(_property, msg.sender, 0);
+		_releasedBlockNumber.clear(
+			_property,
+			msg.sender
+		);
 	}
 
 	function getTokenValue(address _property, address _from)
@@ -165,13 +169,21 @@ contract ReleasedBlockNumber {
 	function setBlockNumber(address _property, address _from, uint256 _wait)
 		public
 	{
-		_released[_property][_from] = block.number + _wait;
+		_released[_property][_from] = block.number.add(_wait);
 	}
 	function canRlease(address _property, address _from)
 		public
 		view
 		returns (bool)
 	{
-		return _released[_property][_from] > block.number;
+		if (_released[_property][_from] == 0){
+			return false;
+		}
+		return _released[_property][_from] <= block.number;
+	}
+	function clear(address _property, address _from)
+		public
+	{
+		_released[_property][_from] = 0;
 	}
 }
