@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "./Withdrawable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./../../src/libs/Withdrawable.sol";
 
 contract WithdrawableTest is Withdrawable {
 	using SafeMath for uint256;

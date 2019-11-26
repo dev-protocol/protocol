@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "./IPolicy.sol";
+import "./../../src/policy/IPolicy.sol";
 
 contract PolicyTest is IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)

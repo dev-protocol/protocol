@@ -46,7 +46,6 @@ contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 		})
 		it('set blockNumber', async () => {
 			let result = await canceled.canRlease(property, sender1)
-			console.log(1)
 			expect(result).to.be.equal(false)
 			for (var i = 0; i < 20; i++) {
 				// eslint-disable-next-line no-await-in-loop
@@ -65,11 +64,9 @@ contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 			}
 
 			result = await canceled.canRlease(property, sender1)
-			console.log(2)
 			expect(result).to.be.equal(true)
 			await canceled.clear(property, sender1)
 			result = await canceled.canRlease(property, sender1)
-			console.log(4)
 			expect(result).to.be.equal(false)
 		})
 		it('other address', async () => {
