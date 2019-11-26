@@ -33,7 +33,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 	function allocate(address _metrics) public payable {
 		require(
 			MetricsGroup(config().metricsGroup()).isMetrics(_metrics),
-			"not metrics contract."
+			"not metrics contract"
 		);
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
@@ -63,7 +63,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 		uint256 notTargetBlockNumber = blockNumber + notTargetPeriod;
 		require(
 			notTargetBlockNumber < block.number,
-			"outside the target period."
+			"outside the target period"
 		);
 		counter.resetVoteCountByProperty(property);
 	}
@@ -87,11 +87,11 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 		Market market = Market(metrics.market());
 		require(
 			msg.sender == market.behavior(),
-			"Don't call from other than Market Behavior"
+			"don't call from other than market behavior"
 		);
 		require(
 			pendingIncrements[_metrics] == true,
-			"Not asking for an indicator"
+			"not asking for an indicator"
 		);
 		Policy policy = Policy(config().policy());
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())

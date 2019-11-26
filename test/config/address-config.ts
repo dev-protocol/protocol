@@ -179,7 +179,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				.setPolicy(setAddress2, {from: deployer})
 				.catch((err: Error) => err)
 			expect(result.message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert only policy factory contract. -- Reason given: only policy factory contract..'
+				'Returned error: VM Exception while processing transaction: revert only policy factory contract -- Reason given: only policy factory contract.'
 			)
 		})
 		it('policy set by other', async () => {
@@ -188,7 +188,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				.setPolicy(setAddress2, {from: other})
 				.catch((err: Error) => err)
 			expect(result.message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert only policy factory contract. -- Reason given: only policy factory contract..'
+				'Returned error: VM Exception while processing transaction: revert only policy factory contract -- Reason given: only policy factory contract.'
 			)
 		})
 	})

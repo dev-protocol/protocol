@@ -90,7 +90,7 @@ contract('LockupTest', ([deployer]) => {
 				.cancel('0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167')
 				.catch((err: Error) => err)
 			expect(result.message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert this address is not property contract. -- Reason given: this address is not property contract..'
+				'Returned error: VM Exception while processing transaction: revert this address is not property contract -- Reason given: this address is not property contract.'
 			)
 		})
 	})

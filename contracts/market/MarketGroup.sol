@@ -9,7 +9,7 @@ contract MarketGroup is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function validateMarketAddress(address marketAddress) public view {
-		require(_markets[marketAddress], "only market contract.");
+		require(_markets[marketAddress], "only market contract");
 	}
 
 	function addMarket(address _addr) public onlyMarketFactory returns (bool) {

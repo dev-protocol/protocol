@@ -22,7 +22,7 @@ contract Lockup is UsingConfig {
 	function lockup(address _property, uint256 _value) public {
 		require(
 			PropertyGroup(config().propertyGroup()).isProperty(_property),
-			"this address is not property contract."
+			"this address is not property contract"
 		);
 		require(
 			_canceledFlg.isCanceled(_property, msg.sender) == false,
@@ -40,14 +40,14 @@ contract Lockup is UsingConfig {
 			)
 		);
 		require(success, "transfer was failed.");
-		require(abi.decode(data, (bool)), "transfer was failed.");
+		require(abi.decode(data, (bool)), "transfer was failed");
 		_tokenValue.set(_property, msg.sender, _value);
 	}
 
 	function cancel(address _property) public {
 		require(
 			PropertyGroup(config().propertyGroup()).isProperty(_property),
-			"this address is not property contract."
+			"this address is not property contract"
 		);
 		require(
 			_tokenValue.hasTokenByProperty(_property, msg.sender),
