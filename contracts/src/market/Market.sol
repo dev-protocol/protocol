@@ -41,6 +41,7 @@ contract Market is UsingConfig {
 	address public behavior;
 	uint256 public issuedMetrics;
 	uint256 public totalVotes;
+	uint256 private _votingEndBlockNumber;
 
 	modifier onlyDisabledMarket() {
 		require(enabled == false, "market is already enabled");
@@ -53,6 +54,7 @@ contract Market is UsingConfig {
 	{
 		behavior = _behavior;
 		enabled = _enabled;
+		_votingEndBlockNumber = block.number + Policy(config().policy()).marketVotingBlocks();
 	}
 
 	function schema() public view returns (string memory) {
@@ -96,6 +98,10 @@ contract Market is UsingConfig {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
 	function vote(uint256 _tokenNumber) public onlyDisabledMarket {
+		require(
+			block.number <= _votingEndBlockNumber,
+			"voting deadline is over"
+		);
 		// TODO count vote
 		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
 		ERC20Burnable(config().token()).burnFrom(msg.sender, _tokenNumber);

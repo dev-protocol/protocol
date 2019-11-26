@@ -2,6 +2,8 @@ contract('Market', ([deployer, u1]) => {
 	const marketContract = artifacts.require('merket/Market')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
+	const policyContract = artifacts.require('policy/PolicyTest')
+	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
 
 	describe('schema', () => {
 		it('Get Schema of mapped Behavior Contract')
@@ -39,12 +41,22 @@ contract('Market', ([deployer, u1]) => {
 		var dummyDEV: any
 		var market: any
 		var addressConfig: any
+		var policy: any
+		var policyFactory: any
 		beforeEach(async () => {
 			dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
 			addressConfig = await addressConfigContract.new({from: deployer})
 			await addressConfig.setToken(dummyDEV.address, {from: deployer})
+			policy = await policyContract.new({from: deployer})
+			policyFactory = await policyFactoryContract.new(addressConfig.address, {
+				from: deployer
+			})
+			await addressConfig.setPolicyFactory(policyFactory.address, {
+				from: deployer
+			})
+			await policyFactory.createPolicy(policy.address)
 		})
 
 		it('Vote as a positive vote, votes are the number of sent DEVs', async () => {
@@ -110,5 +122,6 @@ contract('Market', ([deployer, u1]) => {
 
 			expect(DEVsTotalSupply.toNumber()).to.be.equal(9900)
 		})
+		it('voting deadline is over', async () => {})
 	})
 })
