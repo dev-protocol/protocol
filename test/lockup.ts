@@ -42,12 +42,13 @@ contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 		var canceled: any
 		beforeEach(async () => {
 			canceled = await ReleasedBlockNumberContract.new()
-			await canceled.setBlockNumber(property, sender1, 30)
+			await canceled.setBlockNumber(property, sender1, 10)
 		})
 		it('set blockNumber', async () => {
 			let result = await canceled.canRlease(property, sender1)
+			console.log(1)
 			expect(result).to.be.equal(false)
-			for (var i = 0; i < 29; i++) {
+			for (var i = 0; i < 20; i++) {
 				// eslint-disable-next-line no-await-in-loop
 				await new Promise(function(resolve) {
 					// eslint-disable-next-line no-undef
@@ -64,24 +65,11 @@ contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 			}
 
 			result = await canceled.canRlease(property, sender1)
-			expect(result).to.be.equal(false)
-			// eslint-disable-next-line no-await-in-loop
-			await new Promise(function(resolve) {
-				// eslint-disable-next-line no-undef
-				web3.currentProvider.send(
-					{
-						jsonrpc: '2.0',
-						method: 'evm_mine',
-						params: [],
-						id: 0
-					},
-					resolve
-				)
-			})
-			result = await canceled.canRlease(property, sender1)
+			console.log(2)
 			expect(result).to.be.equal(true)
 			await canceled.clear(property, sender1)
 			result = await canceled.canRlease(property, sender1)
+			console.log(4)
 			expect(result).to.be.equal(false)
 		})
 		it('other address', async () => {
@@ -96,7 +84,7 @@ contract('LockupTest', ([deployer]) => {
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
 
-	describe('LockupTest; getTokenValue', () => {
+	describe('getTokenValue', () => {
 		it('not set token value', async () => {
 			const addressConfig = await addressConfigContract.new({from: deployer})
 			const lockup = await lockupContract.new(addressConfig.address)
@@ -107,7 +95,7 @@ contract('LockupTest', ([deployer]) => {
 			expect(result.toNumber()).to.be.equal(0)
 		})
 	})
-	describe('LockupTest; cnacel', () => {
+	describe('cancel', () => {
 		it('not property address', async () => {
 			const addressConfig = await addressConfigContract.new({from: deployer})
 			const propertyGroup = await propertyGroupContract.new(
@@ -123,5 +111,12 @@ contract('LockupTest', ([deployer]) => {
 				'Returned error: VM Exception while processing transaction: revert this address is not property contract -- Reason given: this address is not property contract.'
 			)
 		})
+	})
+	describe('withdraw', () => {
+		it('address is not property contract', async () => {})
+		it('lockup is not canceled', async () => {})
+		it('waiting for release', async () => {})
+		it('dev token is not locked', async () => {})
+		it('success', async () => {})
 	})
 })

@@ -76,7 +76,7 @@ contract Lockup is UsingConfig {
 		);
 		require(
 			_releasedBlockNumber.canRlease(_property, msg.sender),
-			"lockup is not canceled"
+			"waiting for release"
 		);
 		uint256 lockupedValue = _tokenValue.get(_property, msg.sender);
 		require(lockupedValue == 0, "dev token is not locked");

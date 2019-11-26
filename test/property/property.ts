@@ -1,6 +1,7 @@
-contract('Property', ([deployer]) => {
+contract('Property', ([deployer, ui]) => {
 	const lockupContract = artifacts.require('Lockup')
 	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
+	const propertyContract = artifacts.require('property/Property')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyVoteCounterContract = artifacts.require(
@@ -13,6 +14,7 @@ contract('Property', ([deployer]) => {
 		var propertyAddress: any
 		var policyVoteCounter: any
 		var lockup: any
+		var property: any
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
 			lockup = await lockupContract.new(addressConfig.address)
@@ -37,14 +39,22 @@ contract('Property', ([deployer]) => {
 				from: deployer
 			})
 			const result = await propertyFactory.createProperty('sample', 'SAMPLE', {
-				from: deployer
+				from: ui
 			})
 			propertyAddress = await result.logs.filter(
 				(e: {event: string}) => e.event === 'Create'
 			)[0].args._property
 		})
 		it('only lockup', async () => {
-			console.log(propertyAddress)
+			property = await propertyContract.at(propertyAddress)
+			const result = await property
+				.withdrawDev(ui, {from: deployer})
+				.catch((err: Error) => err)
+			expect(result.message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert only lockup contract -- Reason given: only lockup contract.'
+			)
 		})
+		it('value is 0', async () => {})
+		it('success', async () => {})
 	})
 })
