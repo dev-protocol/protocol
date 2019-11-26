@@ -9,7 +9,7 @@ contract PropertyGroup is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addProperty(address _prop) public onlyPropertyFactory {
-		require(_prop != address(0), "property is an invalid address.");
+		require(_prop != address(0), "property is an invalid address");
 		_properties[_prop] = true;
 	}
 

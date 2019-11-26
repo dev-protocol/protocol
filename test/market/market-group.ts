@@ -41,7 +41,7 @@ contract('MarketGroupTest', ([deployer, u1]) => {
 			}
 
 			expect(err.message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert only market contract.'
+				'Returned error: VM Exception while processing transaction: revert only market contract'
 			)
 		})
 	})
