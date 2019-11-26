@@ -98,7 +98,7 @@ contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 	})
 })
 
-contract('LockupTest', ([deployer]) => {
+contract('LockupTest', ([deployer, property, sender1]) => {
 	const lockupContract = artifacts.require('Lockup')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
@@ -107,10 +107,7 @@ contract('LockupTest', ([deployer]) => {
 		it('Returns 0 when not locked-up accunt', async () => {
 			const addressConfig = await addressConfigContract.new({from: deployer})
 			const lockup = await lockupContract.new(addressConfig.address)
-			const result = await lockup.getTokenValue(
-				'0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167',
-				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
-			)
+			const result = await lockup.getTokenValue(property, sender1)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 	})
