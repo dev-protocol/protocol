@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "./Allocator.sol";
+import "./../src/Allocator.sol";
 
 contract AllocatorTest is Allocator {
 	function getTotal(address _property) public view returns (uint256) {
