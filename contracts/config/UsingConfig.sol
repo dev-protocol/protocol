@@ -26,7 +26,7 @@ contract UsingConfig {
 		_;
 	}
 	modifier onlyLockup() {
-		require(msg.sender == _config.lockup(), "only lockup contract.");
+		require(msg.sender == _config.lockup(), "only lockup contract");
 		_;
 	}
 }
