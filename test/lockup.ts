@@ -1,5 +1,32 @@
-contract('TokenValueTest', () => {
+contract('TokenValueTest', ([property, sender1, sender2, sender3]) => {
 	const TokenValueContract = artifacts.require('TokenValue')
+	describe('TokenValueTest; set and get', () => {
+		it('Set the amount that locking up tokens', async () => {
+			const tokenValue = await TokenValueContract.new()
+			await tokenValue.set(property, sender1, 10)
+			const result = await tokenValue.get(property, sender1)
+			expect(result.toNumber()).to.be.equal(10)
+		})
+		it('Add tokens amount to already added amount', async () => {
+			const tokenValue = await TokenValueContract.new()
+			await tokenValue.set(property, sender1, 10)
+			const first = await tokenValue.get(property, sender1)
+			expect(first.toNumber()).to.be.equal(10)
+			await tokenValue.set(property, sender1, 90)
+			const second = await tokenValue.get(property, sender1)
+			expect(second.toNumber()).to.be.equal(100)
+		})
+	})
+	describe('TokenValueTest; getByProperty', () => {
+		it('Get the amount of total locked up tokens to the Property', async () => {
+			const tokenValue = await TokenValueContract.new()
+			await tokenValue.set(property, sender1, 7356)
+			await tokenValue.set(property, sender2, 6457)
+			await tokenValue.set(property, sender3, 7568)
+			const result = await tokenValue.getByProperty(property)
+			expect(result.toNumber()).to.be.equal(7356 + 6457 + 7568)
+		})
+	})
 	describe('TokenValueTest; hasTokenByProperty', () => {
 		it('has token by property', async () => {
 			const tokenValue = await TokenValueContract.new()
