@@ -16,6 +16,11 @@ contract('TokenValueTest', ([property, sender1, sender2, sender3]) => {
 			const second = await tokenValue.get(property, sender1)
 			expect(second.toNumber()).to.be.equal(100)
 		})
+		it('Returns 0 when not locked up', async () => {
+			const tokenValue = await TokenValueContract.new()
+			const result = await tokenValue.get(property, sender1)
+			expect(result.toNumber()).to.be.equal(0)
+		})
 	})
 	describe('TokenValueTest; getByProperty', () => {
 		it('Get the amount of total locked up tokens to the Property', async () => {
