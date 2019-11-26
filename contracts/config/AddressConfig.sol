@@ -48,7 +48,7 @@ contract AddressConfig is Ownable {
 	}
 
 	function setPolicy(address _addr) public {
-		require(msg.sender == policyFactory, "only policy factory contract.");
+		require(msg.sender == policyFactory, "only policy factory contract");
 		policy = _addr;
 	}
 

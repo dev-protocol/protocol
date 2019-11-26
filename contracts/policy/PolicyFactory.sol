@@ -120,19 +120,19 @@ contract Policy is Killable, UsingConfig {
 			PropertyGroup(config().propertyGroup()).isProperty(
 				_propertyAddress
 			),
-			"this address is not property contract."
+			"this address is not property contract"
 		);
-		require(config().policy() != address(this), "this policy is current.");
+		require(config().policy() != address(this), "this policy is current");
 		require(
 			block.number <= _votingEndBlockNumber,
-			"voting deadline is over."
+			"voting deadline is over"
 		);
 		uint256 voteCount = Lockup(config().lockup()).getTokenValue(
 			_propertyAddress,
 			msg.sender
 		);
-		require(voteCount != 0, "vote count is 0.");
-		require(_voteRecord[msg.sender][_propertyAddress], "already vote.");
+		require(voteCount != 0, "vote count is 0");
+		require(_voteRecord[msg.sender][_propertyAddress], "already vote");
 		_voteRecord[msg.sender][_propertyAddress] = true;
 		if (Property(_propertyAddress).author() == msg.sender) {
 			PolicyVoteCounter(config().policyVoteCounter())

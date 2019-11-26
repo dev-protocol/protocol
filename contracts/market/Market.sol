@@ -43,7 +43,7 @@ contract Market is UsingConfig {
 	uint256 public totalVotes;
 
 	modifier onlyDisabledMarket() {
-		require(enabled == false, "Market is already enabled.");
+		require(enabled == false, "market is already enabled");
 		_;
 	}
 
@@ -69,7 +69,7 @@ contract Market is UsingConfig {
 	) public returns (bool) {
 		require(
 			msg.sender == Property(_prop).author(),
-			"Only owner of Property Contract"
+			"only owner of property contract"
 		);
 		return
 			Behavior(behavior).authenticate(
