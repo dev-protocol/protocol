@@ -54,7 +54,8 @@ contract Market is UsingConfig {
 	{
 		behavior = _behavior;
 		enabled = _enabled;
-		uint256 marketVotingBlocks = Policy(config().policy()).marketVotingBlocks();
+		uint256 marketVotingBlocks = Policy(config().policy())
+			.marketVotingBlocks();
 		_votingEndBlockNumber = block.number + marketVotingBlocks;
 	}
 
