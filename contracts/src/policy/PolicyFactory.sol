@@ -71,6 +71,7 @@ contract Policy is Killable, UsingConfig {
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		public
+		view
 		returns (uint256)
 	{
 		return _policy.rewards(_lockups, _assets);
@@ -78,6 +79,7 @@ contract Policy is Killable, UsingConfig {
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		public
+		view
 		returns (uint256)
 	{
 		return _policy.holdersShare(_amount, _lockups);
@@ -85,6 +87,7 @@ contract Policy is Killable, UsingConfig {
 
 	function assetValue(uint256 _value, uint256 _lockups)
 		public
+		view
 		returns (uint256)
 	{
 		return _policy.assetValue(_value, _lockups);
@@ -92,6 +95,7 @@ contract Policy is Killable, UsingConfig {
 
 	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
 		public
+		view
 		returns (uint256)
 	{
 		return _policy.authenticationFee(_assets, _propertyAssets);
@@ -99,6 +103,7 @@ contract Policy is Killable, UsingConfig {
 
 	function marketApproval(uint256 _agree, uint256 _opposite)
 		public
+		view
 		returns (bool)
 	{
 		return _policy.marketApproval(_agree, _opposite);
@@ -106,24 +111,25 @@ contract Policy is Killable, UsingConfig {
 
 	function policyApproval(uint256 _agree, uint256 _opposite)
 		public
+		view
 		returns (bool)
 	{
 		return _policy.policyApproval(_agree, _opposite);
 	}
 
-	function marketVotingBlocks() public returns (uint256) {
+	function marketVotingBlocks() public view returns (uint256) {
 		return _policy.marketVotingBlocks();
 	}
 
-	function policyVotingBlocks() public returns (uint256) {
+	function policyVotingBlocks() public view returns (uint256) {
 		return _policy.policyVotingBlocks();
 	}
 
-	function abstentionPenalty(uint256 _count) public returns (uint256) {
+	function abstentionPenalty(uint256 _count) public view returns (uint256) {
 		return _policy.abstentionPenalty(_count);
 	}
 
-	function lockUpBlocks() public returns (uint256) {
+	function lockUpBlocks() public view returns (uint256) {
 		return _policy.lockUpBlocks();
 	}
 

@@ -83,18 +83,18 @@ contract('MarketTest', ([deployer, behavior]) => {
 		it('Creating a market contract from other than a factory results in an error', async () => {})
 
 		it('When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled', async () => {
-			await dummyDEV.approve(market.address, 1000, {from: deployer})
+			await dummyDEV.approve(market.address, 10000, {from: deployer})
 
-			await market.vote(1000, {from: deployer})
+			await market.vote(10000, {from: deployer})
 			const isEnable = await market.enabled({from: deployer})
 
 			expect(isEnable).to.be.equal(true)
 		})
 
 		it('Should fail to vote when already determined enabled', async () => {
-			await dummyDEV.approve(market.address, 1000, {from: deployer})
+			await dummyDEV.approve(market.address, 100000, {from: deployer})
 
-			await market.vote(900, {from: deployer})
+			await market.vote(10000, {from: deployer})
 			const isEnable = await market.enabled({from: deployer})
 
 			expect(isEnable).to.be.equal(true)
