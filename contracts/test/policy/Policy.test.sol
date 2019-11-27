@@ -1,8 +1,11 @@
 pragma solidity ^0.5.0;
 
-import "./../../src/policy/IPolicy.sol";
+import "../../src/policy/IPolicy.sol";
+import "../../src/libs/Decimals.sol";
 
 contract PolicyTest is IPolicy {
+	using Decimals for uint256;
+
 	function rewards(uint256 _lockups, uint256 _assets)
 		public
 		view
@@ -16,7 +19,9 @@ contract PolicyTest is IPolicy {
 		view
 		returns (uint256)
 	{
-		return _amount + _lockups;
+		uint256 sum = _amount + _lockups;
+		(uint256 share, uint256 basis) = _lockups.outOf(sum);
+		return _amount - (_amount * share / basis);
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
@@ -24,15 +29,15 @@ contract PolicyTest is IPolicy {
 		view
 		returns (uint256)
 	{
-		return _value + _lockups;
+		return _value * _lockups;
 	}
 
-	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
+	function authenticationFee(uint256 _assets, uint256 _propertyLockups)
 		public
 		view
 		returns (uint256)
 	{
-		return _assets + _propertyAssets - 1;
+		return _assets + _propertyLockups - 1;
 	}
 
 	function marketApproval(uint256 _agree, uint256 _opposite)
@@ -40,7 +45,10 @@ contract PolicyTest is IPolicy {
 		view
 		returns (bool)
 	{
-		return _agree + _opposite > 0;
+		if (_agree + _opposite < 10000) {
+			return false;
+		}
+		return _agree > _opposite;
 	}
 
 	function policyApproval(uint256 _agree, uint256 _opposite)
@@ -48,7 +56,10 @@ contract PolicyTest is IPolicy {
 		view
 		returns (bool)
 	{
-		return _agree + _opposite > 0;
+		if (_agree + _opposite < 10000) {
+			return false;
+		}
+		return _agree > _opposite;
 	}
 
 	function marketVotingBlocks() public view returns (uint256) {
@@ -60,7 +71,7 @@ contract PolicyTest is IPolicy {
 	}
 
 	function abstentionPenalty(uint256 _count) public view returns (uint256) {
-		return _count;
+		return _count * 5760;
 	}
 
 	function lockUpBlocks() public view returns (uint256) {
