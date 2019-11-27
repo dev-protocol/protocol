@@ -61,10 +61,11 @@ contract Policy is Killable, UsingConfig {
 	}
 
 	function setVotingEndBlockNumber() private {
-		if (config().policy() == address(0)){
+		if (config().policy() == address(0)) {
 			return;
 		}
-		_votingEndBlockNumber = block.number + Policy(config().policy()).policyVotingBlocks();
+		uint256 policyVotingBlocks = Policy(config().policy()).policyVotingBlocks();
+		_votingEndBlockNumber = block.number + policyVotingBlocks;
 	}
 
 	function rewards(uint256 _lockups, uint256 _assets)
