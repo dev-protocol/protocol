@@ -5,6 +5,7 @@ import "../libs/Killable.sol";
 import "../libs/Utils.sol";
 import "../property/PropertyFactory.sol";
 import "../Lockup.sol";
+import "../Allocator.sol";
 import "./IPolicy.sol";
 import "./PolicyVoteCounter.sol";
 
@@ -127,10 +128,21 @@ contract Policy is Killable, UsingConfig {
 			block.number <= _votingEndBlockNumber,
 			"voting deadline is over"
 		);
-		uint256 voteCount = Lockup(config().lockup()).getTokenValue(
-			_propertyAddress,
-			msg.sender
-		);
+		uint256 voteCount = 0;
+		if (Property(_propertyAddress).author() == msg.sender) {
+			voteCount =
+				Lockup(config().lockup()).getTokenValueByProperty(
+					_propertyAddress
+				) +
+				Allocator(config().allocator()).getRewardsAmount(
+					_propertyAddress
+				);
+		} else {
+			voteCount = Lockup(config().lockup()).getTokenValue(
+				_propertyAddress,
+				msg.sender
+			);
+		}
 		require(voteCount != 0, "vote count is 0");
 		require(_voteRecord[msg.sender][_propertyAddress], "already vote");
 		_voteRecord[msg.sender][_propertyAddress] = true;
