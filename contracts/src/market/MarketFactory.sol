@@ -10,9 +10,10 @@ contract MarketFactory is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function createMarket(address _addr) public returns (address) {
-		Market market = new Market(address(config()), _addr, false);
+		Market market = new Market(address(config()), _addr);
 		address marketAddr = address(market);
 		MarketGroup(config().marketGroup()).addMarket(marketAddr);
 		emit Create(msg.sender, marketAddr);
+		return marketAddr;
 	}
 }

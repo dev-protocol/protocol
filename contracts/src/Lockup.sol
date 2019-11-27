@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "./libs/Utils.sol";
 import "./policy/PolicyFactory.sol";
+import "./property/Property.sol";
 import "./property/PropertyGroup.sol";
 import "./config/UsingConfig.sol";
 

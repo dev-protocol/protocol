@@ -40,20 +40,26 @@ contract Market is UsingConfig {
 	bool public enabled;
 	address public behavior;
 	uint256 public issuedMetrics;
-	uint256 public totalVotes;
 	uint256 private _votingEndBlockNumber;
+	uint256 private _agreeCount;
+	uint256 private _oppositeCount;
 
 	modifier onlyDisabledMarket() {
 		require(enabled == false, "market is already enabled");
+		require(
+			block.number <= _votingEndBlockNumber,
+			"voting deadline is over"
+		);
 		_;
 	}
 
-	constructor(address _config, address _behavior, bool _enabled)
+	constructor(address _config, address _behavior)
 		public
+		onlyMarketFactory
 		UsingConfig(_config)
 	{
 		behavior = _behavior;
-		enabled = _enabled;
+		enabled = false;
 		uint256 marketVotingBlocks = Policy(config().policy())
 			.marketVotingBlocks();
 		_votingEndBlockNumber = block.number + marketVotingBlocks;
@@ -99,19 +105,19 @@ contract Market is UsingConfig {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
-	function vote(uint256 _tokenNumber) public onlyDisabledMarket {
-		require(
-			block.number <= _votingEndBlockNumber,
-			"voting deadline is over"
-		);
+	function vote(uint256 _tokenValue, bool _agree) public onlyDisabledMarket {
 		// TODO count vote
 		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
-		ERC20Burnable(config().token()).burnFrom(msg.sender, _tokenNumber);
-		totalVotes = totalVotes + _tokenNumber;
-		uint256 DEVtotalSupply = ERC20Burnable(config().token()).totalSupply();
-		if (totalVotes >= DEVtotalSupply.div(10)) {
-			enabled = true;
+		ERC20Burnable(config().token()).burnFrom(msg.sender, _tokenValue);
+		if (_agree) {
+			_agreeCount += _tokenValue;
+		} else {
+			_oppositeCount += _tokenValue;
 		}
+		enabled = Policy(config().policy()).marketApproval(
+			_agreeCount,
+			_oppositeCount
+		);
 	}
 
 	function authenticatedCallback(address _prop) public returns (address) {

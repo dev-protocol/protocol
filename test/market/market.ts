@@ -1,5 +1,7 @@
-contract('MarketTest', ([deployer, u1]) => {
+contract('MarketTest', ([deployer, behavior]) => {
 	const marketContract = artifacts.require('merket/Market')
+	const marketFactoryContract = artifacts.require('market/MarketFactory')
+	const marketGroupContract = artifacts.require('market/MarketGroup')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyContract = artifacts.require('policy/PolicyTest')
@@ -38,17 +40,30 @@ contract('MarketTest', ([deployer, u1]) => {
 	})
 
 	describe('Market; vote', () => {
+		let marketFactory: any
+		let marketGroup: any
 		let dummyDEV: any
 		let market: any
 		let addressConfig: any
 		let policy: any
 		let policyFactory: any
+		let expectedMarketAddress: any
 		beforeEach(async () => {
 			dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
 			})
 			addressConfig = await addressConfigContract.new({from: deployer})
 			await addressConfig.setToken(dummyDEV.address, {from: deployer})
+			marketFactory = await marketFactoryContract.new(addressConfig.address, {
+				from: deployer
+			})
+			marketGroup = await marketGroupContract.new(addressConfig.address, {
+				from: deployer
+			})
+			await addressConfig.setMarketFactory(marketFactory.address, {
+				from: deployer
+			})
+			await addressConfig.setMarketGroup(marketGroup.address, {from: deployer})
 			policy = await policyContract.new({from: deployer})
 			policyFactory = await policyFactoryContract.new(addressConfig.address, {
 				from: deployer
@@ -57,28 +72,17 @@ contract('MarketTest', ([deployer, u1]) => {
 				from: deployer
 			})
 			await policyFactory.createPolicy(policy.address)
+			const result = await marketFactory.createMarket(behavior)
+			expectedMarketAddress = await result.logs.filter(
+				(e: {event: string}) => e.event === 'Create'
+			)[0].args._market
+			market = await marketContract.at(expectedMarketAddress)
 		})
 
-		it('Vote as a positive vote, votes are the number of sent DEVs', async () => {
-			market = await marketContract.new(addressConfig.address, u1, false, {
-				from: deployer
-			})
-			await dummyDEV.approve(market.address, 40, {from: deployer})
-
-			await market.vote(10, {from: deployer})
-			const firstTotalVotes = await market.totalVotes({from: deployer})
-
-			expect(firstTotalVotes.toNumber()).to.be.equal(10)
-
-			await market.vote(20, {from: deployer})
-			const secondTotalVotes = await market.totalVotes({from: deployer})
-			expect(secondTotalVotes.toNumber()).to.be.equal(30)
-		})
+		it('Total value of votes for and against, votes are the number of sent DEVs', async () => {})
+		it('Creating a market contract from other than a factory results in an error', async () => {})
 
 		it('When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled', async () => {
-			market = await marketContract.new(addressConfig.address, u1, false, {
-				from: deployer
-			})
 			await dummyDEV.approve(market.address, 1000, {from: deployer})
 
 			await market.vote(1000, {from: deployer})
@@ -88,21 +92,22 @@ contract('MarketTest', ([deployer, u1]) => {
 		})
 
 		it('Should fail to vote when already determined enabled', async () => {
-			market = await marketContract.new(addressConfig.address, u1, true, {
-				from: deployer
-			})
-			await dummyDEV.approve(market.address, 100, {from: deployer})
+			await dummyDEV.approve(market.address, 1000, {from: deployer})
+
+			await market.vote(900, {from: deployer})
+			const isEnable = await market.enabled({from: deployer})
+
+			expect(isEnable).to.be.equal(true)
 
 			const result = await market
 				.vote(100, {from: deployer})
 				.catch((err: Error) => err)
-			expect(result).to.instanceOf(Error)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert market is already enabled -- Reason given: market is already enabled.'
+			)
 		})
 
 		it('Vote decrease the number of sent DEVs from voter owned DEVs', async () => {
-			market = await marketContract.new(addressConfig.address, u1, false, {
-				from: deployer
-			})
 			await dummyDEV.approve(market.address, 100, {from: deployer})
 
 			await market.vote(100, {from: deployer})
@@ -112,9 +117,6 @@ contract('MarketTest', ([deployer, u1]) => {
 		})
 
 		it('Vote decrease the number of sent DEVs from DEVtoken totalSupply', async () => {
-			market = await marketContract.new(addressConfig.address, u1, false, {
-				from: deployer
-			})
 			await dummyDEV.approve(market.address, 100, {from: deployer})
 
 			await market.vote(100, {from: deployer})

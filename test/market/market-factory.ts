@@ -41,7 +41,6 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 		})
 
 		it('Create a new Market Contract and emit Create Event telling created market address', async () => {
-			// eslint-disable-next-line @typescript-eslint/await-thenable
 			deployedMarket = await marketContract.at(expectedMarketAddress)
 			const behaviorAddress = await deployedMarket.behavior({from: deployer})
 
