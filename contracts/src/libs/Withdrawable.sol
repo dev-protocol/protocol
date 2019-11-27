@@ -16,6 +16,10 @@ contract Withdrawable {
 	mapping(address => mapping(address => uint256)) internal pendingWithdrawals;
 	mapping(address => mapping(address => WithdrawalLimit)) internal withdrawalLimits;
 
+	function getRewardsAmount(address _property) public view returns (uint256) {
+		return totals[_property];
+	}
+
 	function withdraw(address _token) public payable {
 		uint256 _value = calculateWithdrawableAmount(_token, msg.sender);
 		uint256 value = _value + pendingWithdrawals[_token][msg.sender];
