@@ -99,9 +99,12 @@ contract('MarketTest', ([deployer, behavior]) => {
 
 			expect(isEnable).to.be.equal(true)
 
-			const result = await market.vote(100, {from: deployer})
+			const result = await market
+				.vote(100, {from: deployer})
 				.catch((err: Error) => err)
-			expect((result as Error).message).to.be.equal("Returned error: VM Exception while processing transaction: revert market is already enabled -- Reason given: market is already enabled.")
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert market is already enabled -- Reason given: market is already enabled.'
+			)
 		})
 
 		it('Vote decrease the number of sent DEVs from voter owned DEVs', async () => {

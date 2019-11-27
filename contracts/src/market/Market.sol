@@ -54,7 +54,8 @@ contract Market is UsingConfig {
 	}
 
 	constructor(address _config, address _behavior)
-		public onlyMarketFactory
+		public
+		onlyMarketFactory
 		UsingConfig(_config)
 	{
 		behavior = _behavior;
