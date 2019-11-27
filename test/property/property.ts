@@ -1,4 +1,4 @@
-contract('Property', ([deployer, ui]) => {
+contract('PropertyTest', ([deployer, ui]) => {
 	const lockupContract = artifacts.require('Lockup')
 	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
 	const propertyContract = artifacts.require('property/Property')
@@ -7,14 +7,14 @@ contract('Property', ([deployer, ui]) => {
 	const policyVoteCounterContract = artifacts.require(
 		'policy/PolicyVoteCounter'
 	)
-	describe('withdrawDev', () => {
-		var propertyFactory: any
-		var propertyGroup: any
-		var addressConfig: any
-		var propertyAddress: any
-		var policyVoteCounter: any
-		var lockup: any
-		var property: any
+	describe('Property; withdrawDev', () => {
+		let propertyFactory: any
+		let propertyGroup: any
+		let addressConfig: any
+		let propertyAddress: any
+		let policyVoteCounter: any
+		let lockup: any
+		let property: any
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
 			lockup = await lockupContract.new(addressConfig.address)
@@ -45,16 +45,16 @@ contract('Property', ([deployer, ui]) => {
 				(e: {event: string}) => e.event === 'Create'
 			)[0].args._property
 		})
-		it('only lockup', async () => {
+		it('When executed from other than the lockup address', async () => {
 			property = await propertyContract.at(propertyAddress)
 			const result = await property
 				.withdrawDev(ui, {from: deployer})
 				.catch((err: Error) => err)
-			expect(result.message).to.be.equal(
+			expect((result as Error).message).to.be.equal(
 				'Returned error: VM Exception while processing transaction: revert only lockup contract -- Reason given: only lockup contract.'
 			)
 		})
-		it('value is 0', async () => {})
-		it('success', async () => {})
+		it('When lockup value is 0', async () => {})
+		it('When withdrawn successfully', async () => {})
 	})
 })

@@ -1,18 +1,18 @@
-contract('MarketFactory', ([deployer, u1]) => {
+contract('MarketFactoryTest', ([deployer, u1]) => {
 	const marketFactoryContract = artifacts.require('market/MarketFactory')
 	const marketContract = artifacts.require('market/Market')
 	const marketGroupContract = artifacts.require('market/MarketGroup')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyContract = artifacts.require('policy/PolicyTest')
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-	describe('createMarket', () => {
-		var marketFactory: any
-		var marketGroup: any
-		var addressConfig: any
-		var expectedMarketAddress: any
-		var deployedMarket: any
-		var policy: any
-		var policyFactory: any
+	describe('MarketFactory; createMarket', () => {
+		let marketFactory: any
+		let marketGroup: any
+		let addressConfig: any
+		let expectedMarketAddress: any
+		let deployedMarket: any
+		let policy: any
+		let policyFactory: any
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
 			marketFactory = await marketFactoryContract.new(addressConfig.address, {

@@ -1,4 +1,4 @@
-contract('MetricsGroupTest', ([deployer, u1]) => {
+contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 	const marketContract = artifacts.require('market/Market')
 	const marketGroupContract = artifacts.require('market/MarketGroup')
 	const marketFactoryContract = artifacts.require('market/MarketFactory')
@@ -9,9 +9,9 @@ contract('MetricsGroupTest', ([deployer, u1]) => {
 	const lockupContract = artifacts.require('Lockup')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 
-	describe('MetricsGroupTest', () => {
-		// Var expectedMetoricsAddress: any
-		var metricsGroup: any
+	describe('MetricsGroup; isMetrics', () => {
+		// Let expectedMetoricsAddress: any
+		let metricsGroup: any
 		beforeEach(async () => {
 			const addressConfig = await addressConfigContract.new({
 				from: deployer
@@ -62,20 +62,15 @@ contract('MetricsGroupTest', ([deployer, u1]) => {
 			)[0].args._market
 			const market = await marketContract.at(expectedMarketAddress)
 			// How to get address
-			await market.authenticatedCallback(
-				'0xd868711BD9a2C6F1548F5f4737f71DA67d821090',
-				{from: u1}
-			)
+			await market.authenticatedCallback(property, {from: u1})
 			// ExpectedMetoricsAddress = '0x0'
 		})
-		it('isMetrics', async () => {
+		it('When the metrics address is specified', async () => {
 			// Const result3 = await metricsGroup.isMetrics(expectedMetoricsAddress)
 			// expect(result3).to.be.equal(true)
 		})
-		it('isMetrics false', async () => {
-			const result = await metricsGroup.isMetrics(
-				'0xfbDBcF1EbE27245E3488541f19CAC902E53239a4'
-			)
+		it('When the metrics address is not specified', async () => {
+			const result = await metricsGroup.isMetrics(dummyMetrics)
 			expect(result).to.be.equal(false)
 		})
 	})

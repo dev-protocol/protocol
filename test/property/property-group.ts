@@ -1,4 +1,4 @@
-contract('PrpertyGroupTest', ([deployer]) => {
+contract('PrpertyGroupTest', ([deployer, dummyProperty]) => {
 	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
@@ -7,14 +7,14 @@ contract('PrpertyGroupTest', ([deployer]) => {
 	const policyVoteCounterContract = artifacts.require(
 		'policy/PolicyVoteCounter'
 	)
-	describe('createProperty', () => {
-		var propertyFactory: any
-		var propertyGroup: any
-		var addressConfig: any
-		var expectedPropertyAddress: any
-		var policy: any
-		var policyFactory: any
-		var policyVoteCounter: any
+	describe('PrpertyGroup; createProperty', () => {
+		let propertyFactory: any
+		let propertyGroup: any
+		let addressConfig: any
+		let expectedPropertyAddress: any
+		let policy: any
+		let policyFactory: any
+		let policyVoteCounter: any
 
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
@@ -57,9 +57,7 @@ contract('PrpertyGroupTest', ([deployer]) => {
 		})
 
 		it('Adds a new Property Contract address to State Contract', async () => {
-			const result = await propertyGroup.isProperty(
-				'0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167'
-			)
+			const result = await propertyGroup.isProperty(dummyProperty)
 			expect(result).to.be.equal(false)
 		})
 	})

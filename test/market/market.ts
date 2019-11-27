@@ -1,15 +1,15 @@
-contract('Market', ([deployer, u1]) => {
+contract('MarketTest', ([deployer, u1]) => {
 	const marketContract = artifacts.require('merket/Market')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyContract = artifacts.require('policy/PolicyTest')
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
 
-	describe('schema', () => {
+	describe('Market; schema', () => {
 		it('Get Schema of mapped Behavior Contract')
 	})
 
-	describe('authenticate', () => {
+	describe('Market; authenticate', () => {
 		it('Proxy to mapped Behavior Contract')
 
 		it(
@@ -21,7 +21,7 @@ contract('Market', ([deployer, u1]) => {
 		)
 	})
 
-	describe('authenticatedCallback', () => {
+	describe('Market; authenticatedCallback', () => {
 		it('Create a new Metrics Contract')
 
 		it(
@@ -33,16 +33,16 @@ contract('Market', ([deployer, u1]) => {
 		)
 	})
 
-	describe('calculate', () => {
+	describe('Market; calculate', () => {
 		it('Proxy to mapped Behavior Contract')
 	})
 
-	describe('vote', () => {
-		var dummyDEV: any
-		var market: any
-		var addressConfig: any
-		var policy: any
-		var policyFactory: any
+	describe('Market; vote', () => {
+		let dummyDEV: any
+		let market: any
+		let addressConfig: any
+		let policy: any
+		let policyFactory: any
 		beforeEach(async () => {
 			dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer

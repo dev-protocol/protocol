@@ -1,4 +1,4 @@
-contract('PropertyFactory', ([deployer]) => {
+contract('PropertyFactoryTest', ([deployer]) => {
 	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
 	const propertyContract = artifacts.require('property/Property')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
@@ -8,15 +8,15 @@ contract('PropertyFactory', ([deployer]) => {
 	const policyVoteCounterContract = artifacts.require(
 		'policy/PolicyVoteCounter'
 	)
-	describe('createProperty', () => {
-		var propertyFactory: any
-		var propertyGroup: any
-		var addressConfig: any
-		var expectedPropertyAddress: any
-		var deployedProperty: any
-		var policy: any
-		var policyFactory: any
-		var policyVoteCounter: any
+	describe('PropertyFactory; createProperty', () => {
+		let propertyFactory: any
+		let propertyGroup: any
+		let addressConfig: any
+		let expectedPropertyAddress: any
+		let deployedProperty: any
+		let policy: any
+		let policyFactory: any
+		let policyVoteCounter: any
 
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
