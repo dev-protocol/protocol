@@ -134,9 +134,7 @@ contract Policy is Killable, UsingConfig {
 
 	function vote(address _property, bool _agree) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(
-				_property
-			),
+			PropertyGroup(config().propertyGroup()).isProperty(_property),
 			"this address is not property contract"
 		);
 		require(config().policy() != address(this), "this policy is current");
@@ -146,8 +144,9 @@ contract Policy is Killable, UsingConfig {
 		);
 		_vote.addVoteCount(msg.sender, _property, _agree);
 		if (Property(_property).author() == msg.sender) {
-			VoteCounter(config().voteCounter())
-				.addVoteCountByProperty(_property);
+			VoteCounter(config().voteCounter()).addVoteCountByProperty(
+				_property
+			);
 		}
 		bool result = Policy(config().policy()).policyApproval(
 			_vote.agreeCount(),

@@ -5,7 +5,7 @@ import "./property/Property.sol";
 import "./Lockup.sol";
 import "./Allocator.sol";
 
-contract Vote is UsingConfig{
+contract Vote is UsingConfig {
 	uint256 public agreeCount;
 	uint256 public oppositeCount;
 	mapping(address => mapping(address => bool)) private _voteRecord;
@@ -13,16 +13,15 @@ contract Vote is UsingConfig{
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addVoteCount(address _sender, address _property, bool _agree) public {
+	function addVoteCount(address _sender, address _property, bool _agree)
+		public
+	{
 		require(_voteRecord[_sender][_property], "already vote");
 		uint256 voteCount = 0;
 		if (Property(_property).author() == _sender) {
-			voteCount = Lockup(config().lockup()).getTokenValueByProperty(
-					_property
-				) +
-				Allocator(config().allocator()).getRewardsAmount(
-					_property
-				);
+			voteCount =
+				Lockup(config().lockup()).getTokenValueByProperty(_property) +
+				Allocator(config().allocator()).getRewardsAmount(_property);
 		} else {
 			voteCount = Lockup(config().lockup()).getTokenValue(
 				_property,
@@ -38,7 +37,6 @@ contract Vote is UsingConfig{
 		}
 	}
 }
-
 
 contract VoteCounter {
 	uint256 private _voteCount;

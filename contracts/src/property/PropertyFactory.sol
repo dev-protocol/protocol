@@ -27,8 +27,9 @@ contract PropertyFactory is UsingConfig {
 		);
 		PropertyGroup(config().propertyGroup()).addProperty(address(property));
 		emit Create(msg.sender, address(property));
-		VoteCounter(config().voteCounter())
-			.resetVoteCountByProperty(address(property));
+		VoteCounter(config().voteCounter()).resetVoteCountByProperty(
+			address(property)
+		);
 		return address(property);
 	}
 }

@@ -51,9 +51,7 @@ contract Market is UsingConfig {
 			"voting deadline is over"
 		);
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(
-				_property
-			),
+			PropertyGroup(config().propertyGroup()).isProperty(_property),
 			"this address is not property contract"
 		);
 		_;
@@ -112,11 +110,15 @@ contract Market is UsingConfig {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
-	function vote(address _property, bool _agree) public onlyDisabledMarket(_property) {
+	function vote(address _property, bool _agree)
+		public
+		onlyDisabledMarket(_property)
+	{
 		_vote.addVoteCount(msg.sender, _property, _agree);
 		if (Property(_property).author() == msg.sender) {
-			VoteCounter(config().voteCounter())
-				.addVoteCountByProperty(_property);
+			VoteCounter(config().voteCounter()).addVoteCountByProperty(
+				_property
+			);
 		}
 		enabled = Policy(config().policy()).marketApproval(
 			_vote.agreeCount(),

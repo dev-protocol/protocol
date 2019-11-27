@@ -48,9 +48,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 
 	function validateTargetPeriod(address _metrics) private {
 		address property = Metrics(_metrics).property();
-		VoteCounter counter = VoteCounter(
-			config().voteCounter()
-		);
+		VoteCounter counter = VoteCounter(config().voteCounter());
 		uint256 abstentionCount = counter.getAbstentionCount(property);
 		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
 			abstentionCount
