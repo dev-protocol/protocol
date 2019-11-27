@@ -64,7 +64,8 @@ contract Policy is Killable, UsingConfig {
 		if (config().policy() == address(0)) {
 			return;
 		}
-		uint256 policyVotingBlocks = Policy(config().policy()).policyVotingBlocks();
+		uint256 policyVotingBlocks = Policy(config().policy())
+			.policyVotingBlocks();
 		_votingEndBlockNumber = block.number + policyVotingBlocks;
 	}
 
