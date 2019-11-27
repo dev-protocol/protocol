@@ -6,8 +6,8 @@ import "../libs/Utils.sol";
 import "../property/PropertyFactory.sol";
 import "../Lockup.sol";
 import "../Allocator.sol";
+import "../Vote.sol";
 import "./IPolicy.sol";
-import "./PolicyVoteCounter.sol";
 
 contract PolicyFactory is UsingConfig {
 	AddressSet private _policySet;
@@ -25,8 +25,7 @@ contract PolicyFactory is UsingConfig {
 		if (_policySet.length() == 1) {
 			config().setPolicy(policyAddress);
 		} else {
-			PolicyVoteCounter(config().policyVoteCounter())
-				.addPolicyVoteCount();
+			VoteCounter(config().voteCounter()).addVoteCount();
 		}
 		return policyAddress;
 	}
@@ -48,15 +47,14 @@ contract PolicyFactory is UsingConfig {
 contract Policy is Killable, UsingConfig {
 	using SafeMath for uint256;
 	IPolicy private _policy;
-	uint256 private _agreeCount;
-	uint256 private _oppositeCount;
 	uint256 private _votingEndBlockNumber;
-	mapping(address => mapping(address => bool)) private _voteRecord;
+	Vote private _vote;
 
 	constructor(address _config, address _innerPolicyAddress)
 		public
 		UsingConfig(_config)
 	{
+		_vote = new Vote(_config);
 		_policy = IPolicy(_innerPolicyAddress);
 		setVotingEndBlockNumber();
 	}
@@ -134,10 +132,10 @@ contract Policy is Killable, UsingConfig {
 		return _policy.lockUpBlocks();
 	}
 
-	function vote(address _propertyAddress, bool _agree) public {
+	function vote(address _property, bool _agree) public {
 		require(
 			PropertyGroup(config().propertyGroup()).isProperty(
-				_propertyAddress
+				_property
 			),
 			"this address is not property contract"
 		);
@@ -146,36 +144,14 @@ contract Policy is Killable, UsingConfig {
 			block.number <= _votingEndBlockNumber,
 			"voting deadline is over"
 		);
-		uint256 voteCount = 0;
-		if (Property(_propertyAddress).author() == msg.sender) {
-			voteCount =
-				Lockup(config().lockup()).getTokenValueByProperty(
-					_propertyAddress
-				) +
-				Allocator(config().allocator()).getRewardsAmount(
-					_propertyAddress
-				);
-		} else {
-			voteCount = Lockup(config().lockup()).getTokenValue(
-				_propertyAddress,
-				msg.sender
-			);
-		}
-		require(voteCount != 0, "vote count is 0");
-		require(_voteRecord[msg.sender][_propertyAddress], "already vote");
-		_voteRecord[msg.sender][_propertyAddress] = true;
-		if (Property(_propertyAddress).author() == msg.sender) {
-			PolicyVoteCounter(config().policyVoteCounter())
-				.addVoteCountByProperty(_propertyAddress);
-		}
-		if (_agree) {
-			_agreeCount += voteCount;
-		} else {
-			_oppositeCount += voteCount;
+		_vote.addVoteCount(msg.sender, _property, _agree);
+		if (Property(_property).author() == msg.sender) {
+			VoteCounter(config().voteCounter())
+				.addVoteCountByProperty(_property);
 		}
 		bool result = Policy(config().policy()).policyApproval(
-			_agreeCount,
-			_oppositeCount
+			_vote.agreeCount(),
+			_vote.oppositeCount()
 		);
 		if (result == false) {
 			return;

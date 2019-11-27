@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Market.sol";
 import "./MarketGroup.sol";
+import "../vote.sol";
 
 contract MarketFactory is UsingConfig {
 	event Create(address indexed _from, address _market);
@@ -14,6 +15,7 @@ contract MarketFactory is UsingConfig {
 		address marketAddr = address(market);
 		MarketGroup(config().marketGroup()).addMarket(marketAddr);
 		emit Create(msg.sender, marketAddr);
+		VoteCounter(config().voteCounter()).addVoteCount();
 		return marketAddr;
 	}
 }

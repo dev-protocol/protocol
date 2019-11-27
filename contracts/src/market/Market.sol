@@ -6,6 +6,7 @@ import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
 import "../Lockup.sol";
+import "../Vote.sol";
 
 contract Behavior {
 	string public schema;
@@ -41,14 +42,19 @@ contract Market is UsingConfig {
 	address public behavior;
 	uint256 public issuedMetrics;
 	uint256 private _votingEndBlockNumber;
-	uint256 private _agreeCount;
-	uint256 private _oppositeCount;
+	Vote private _vote;
 
-	modifier onlyDisabledMarket() {
+	modifier onlyDisabledMarket(address _property) {
 		require(enabled == false, "market is already enabled");
 		require(
 			block.number <= _votingEndBlockNumber,
 			"voting deadline is over"
+		);
+		require(
+			PropertyGroup(config().propertyGroup()).isProperty(
+				_property
+			),
+			"this address is not property contract"
 		);
 		_;
 	}
@@ -63,6 +69,7 @@ contract Market is UsingConfig {
 		uint256 marketVotingBlocks = Policy(config().policy())
 			.marketVotingBlocks();
 		_votingEndBlockNumber = block.number + marketVotingBlocks;
+		_vote = new Vote(_config);
 	}
 
 	function schema() public view returns (string memory) {
@@ -105,18 +112,15 @@ contract Market is UsingConfig {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
-	function vote(uint256 _tokenValue, bool _agree) public onlyDisabledMarket {
-		// TODO count vote
-		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
-		ERC20Burnable(config().token()).burnFrom(msg.sender, _tokenValue);
-		if (_agree) {
-			_agreeCount += _tokenValue;
-		} else {
-			_oppositeCount += _tokenValue;
+	function vote(address _property, bool _agree) public onlyDisabledMarket(_property) {
+		_vote.addVoteCount(msg.sender, _property, _agree);
+		if (Property(_property).author() == msg.sender) {
+			VoteCounter(config().voteCounter())
+				.addVoteCountByProperty(_property);
 		}
 		enabled = Policy(config().policy()).marketApproval(
-			_agreeCount,
-			_oppositeCount
+			_vote.agreeCount(),
+			_vote.oppositeCount()
 		);
 	}
 
