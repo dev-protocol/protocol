@@ -57,9 +57,18 @@ contract Policy is Killable, UsingConfig {
 		UsingConfig(_config)
 	{
 		_policy = IPolicy(_innerPolicyAddress);
-		_votingEndBlockNumber = block.number + _policy.policyVotingBlocks();
+		setVotingEndBlockNumber();
 	}
-	// TODO Need to be called in the market reward calculation process in Allocator Contract
+
+	function setVotingEndBlockNumber() private {
+		if (config().policy() == address(0)) {
+			return;
+		}
+		uint256 policyVotingBlocks = Policy(config().policy())
+			.policyVotingBlocks();
+		_votingEndBlockNumber = block.number + policyVotingBlocks;
+	}
+
 	function rewards(uint256 _lockups, uint256 _assets)
 		public
 		returns (uint256)
@@ -73,21 +82,21 @@ contract Policy is Killable, UsingConfig {
 	{
 		return _policy.holdersShare(_amount, _lockups);
 	}
-	// TODO Need to be called in the market reward calculation process in Allocator Contract
+
 	function assetValue(uint256 _value, uint256 _lockups)
 		public
 		returns (uint256)
 	{
 		return _policy.assetValue(_value, _lockups);
 	}
-	// TODO Need to be called authenticatedCallbackt in Market Contract
+
 	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
 		public
 		returns (uint256)
 	{
 		return _policy.authenticationFee(_assets, _propertyAssets);
 	}
-	// TODO Need to be called vote in Market Contract
+
 	function marketApproval(uint256 _agree, uint256 _opposite)
 		public
 		returns (bool)
@@ -106,7 +115,10 @@ contract Policy is Killable, UsingConfig {
 		return _policy.marketVotingBlocks();
 	}
 
-	// TODO Need to be called allocate in Allocator Contract
+	function policyVotingBlocks() public returns (uint256) {
+		return _policy.policyVotingBlocks();
+	}
+
 	function abstentionPenalty(uint256 _count) public returns (uint256) {
 		return _policy.abstentionPenalty(_count);
 	}
