@@ -1,6 +1,6 @@
-contract('Decimals', ([deployer]) => {
+contract('DecimalsTest', ([deployer]) => {
 	const decimalsTestContract = artifacts.require('DecimalsTest')
-	describe('outOf', () => {
+	describe('Decimals; outOf', () => {
 		it('outOf returns ratio of the first args out of second args', async () => {
 			const decimalsTest = await decimalsTestContract.new({
 				from: deployer

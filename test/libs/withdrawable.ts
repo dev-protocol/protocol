@@ -1,8 +1,8 @@
 contract('WithdrawableTest', ([deployer]) => {
 	const withdrawableTestContract = artifacts.require('libs/WithdrawableTest')
 	const dummyDEVContract = artifacts.require('DummyDEV')
-	describe('WithdrawableTest; t_increment', () => {
-		it('t_increment', async () => {
+	describe('Withdrawable; t_increment', () => {
+		it('Incrementing normally', async () => {
 			const withdrawableTest = await withdrawableTestContract.new({
 				from: deployer
 			})

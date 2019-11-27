@@ -1,14 +1,14 @@
-contract('MarketGroupTest', ([deployer, u1]) => {
+contract('MarketGroupTest', ([deployer, u1, dummyMarket]) => {
 	const marketGroupContract = artifacts.require('market/MarketGroup')
 	const marketFactoryContract = artifacts.require('market/MarketFactory')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyContract = artifacts.require('policy/PolicyTest')
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-	describe('MarketGroupTest', () => {
-		var marketGroup: any
-		var expectedMarketAddress: any
-		var policy: any
-		var policyFactory: any
+	describe('MarketGroup validateMarketAddress', () => {
+		let marketGroup: any
+		let expectedMarketAddress: any
+		let policy: any
+		let policyFactory: any
 		beforeEach(async () => {
 			const addressConfig = await addressConfigContract.new({
 				from: deployer
@@ -39,20 +39,14 @@ contract('MarketGroupTest', ([deployer, u1]) => {
 				(e: {event: string}) => e.event === 'Create'
 			)[0].args._market
 		})
-		it('validateMarketAddress', async () => {
+		it('When a market address is specified', async () => {
 			await marketGroup.validateMarketAddress(expectedMarketAddress)
 		})
-		it('validateMarketAddress error', async () => {
-			let err = null
-			try {
-				await marketGroup.validateMarketAddress(
-					'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
-				)
-			} catch (error) {
-				err = error
-			}
-
-			expect(err.message).to.be.equal(
+		it('When the market address is not specified', async () => {
+			const result = await marketGroup
+				.validateMarketAddress(dummyMarket)
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
 				'Returned error: VM Exception while processing transaction: revert only market contract'
 			)
 		})

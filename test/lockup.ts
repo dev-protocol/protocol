@@ -1,6 +1,6 @@
 contract('TokenValueTest', ([property, sender1, sender2, sender3]) => {
 	const TokenValueContract = artifacts.require('TokenValue')
-	describe('TokenValueTest; set and get', () => {
+	describe('TokenValue; set and get', () => {
 		it('Set the amount that locking-up tokens', async () => {
 			const tokenValue = await TokenValueContract.new()
 			await tokenValue.set(property, sender1, 10)
@@ -22,7 +22,7 @@ contract('TokenValueTest', ([property, sender1, sender2, sender3]) => {
 			expect(result.toNumber()).to.be.equal(0)
 		})
 	})
-	describe('TokenValueTest; getByProperty', () => {
+	describe('TokenValue; getByProperty', () => {
 		it('Get the amount of total locked-up tokens to the Property', async () => {
 			const tokenValue = await TokenValueContract.new()
 			await tokenValue.set(property, sender1, 7356)
@@ -32,7 +32,7 @@ contract('TokenValueTest', ([property, sender1, sender2, sender3]) => {
 			expect(result.toNumber()).to.be.equal(7356 + 6457 + 7568)
 		})
 	})
-	describe('TokenValueTest; hasTokenByProperty', () => {
+	describe('TokenValue; hasTokenByProperty', () => {
 		it('Check if an account is locking-up to a Property', async () => {
 			const tokenValue = await TokenValueContract.new()
 			await tokenValue.set(property, sender1, 10)
@@ -46,7 +46,7 @@ contract('TokenValueTest', ([property, sender1, sender2, sender3]) => {
 
 contract('CanceledLockupFlgTest', ([property, sender1, sender2]) => {
 	const CanceledLockUpFlgContract = artifacts.require('CanceledLockupFlg')
-	describe('CanceledLockupFlgTest; isCanceled', () => {
+	describe('CanceledLockupFlg; isCanceled', () => {
 		it('Check if an account canceled lock-up to a Property', async () => {
 			const canceled = await CanceledLockUpFlgContract.new()
 			await canceled.setCancelFlg(property, sender1, true)
@@ -60,7 +60,7 @@ contract('CanceledLockupFlgTest', ([property, sender1, sender2]) => {
 
 contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 	const ReleasedBlockNumberContract = artifacts.require('ReleasedBlockNumber')
-	describe('ReleasedBlockNumberTest; setBlockNumber', () => {
+	describe('ReleasedBlockNumber; setBlockNumber', () => {
 		let canceled: any
 		beforeEach(async () => {
 			canceled = await ReleasedBlockNumberContract.new()
@@ -69,7 +69,7 @@ contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 		it('Check if a block has passed a withdrawable block number', async () => {
 			let result = await canceled.canRlease(property, sender1)
 			expect(result).to.be.equal(false)
-			for (var i = 0; i < 20; i++) {
+			for (let i = 0; i < 20; i++) {
 				// eslint-disable-next-line no-await-in-loop
 				await new Promise(function(resolve) {
 					// eslint-disable-next-line no-undef
@@ -93,13 +93,13 @@ contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 			expect(result).to.be.equal(false)
 		})
 	})
-	describe('ReleasedBlockNumberTest; clear', () => {
+	describe('ReleasedBlockNumber; clear', () => {
 		it('Reset block number of withdrawable', async () => {
 			const canceled = await ReleasedBlockNumberContract.new()
 			await canceled.setBlockNumber(property, sender1, 10)
 			let result = await canceled.canRlease(property, sender1)
 			expect(result).to.be.equal(false)
-			for (var i = 0; i < 20; i++) {
+			for (let i = 0; i < 20; i++) {
 				// eslint-disable-next-line no-await-in-loop
 				await new Promise(function(resolve) {
 					// eslint-disable-next-line no-undef
@@ -129,7 +129,7 @@ contract('LockupTest', ([deployer, property, sender1]) => {
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
 
-	describe('getTokenValue', () => {
+	describe('Lockup; getTokenValue', () => {
 		it('Returns 0 when not locked-up accunt', async () => {
 			const addressConfig = await addressConfigContract.new({from: deployer})
 			const lockup = await lockupContract.new(addressConfig.address)
@@ -137,7 +137,7 @@ contract('LockupTest', ([deployer, property, sender1]) => {
 			expect(result.toNumber()).to.be.equal(0)
 		})
 	})
-	describe('cancel', () => {
+	describe('Lockup; cancel', () => {
 		it('Returns an error when runs cancel to address that not Property as a target', async () => {
 			const addressConfig = await addressConfigContract.new({from: deployer})
 			const propertyGroup = await propertyGroupContract.new(
@@ -154,7 +154,7 @@ contract('LockupTest', ([deployer, property, sender1]) => {
 			)
 		})
 	})
-	describe('withdraw', () => {
+	describe('Lockup; withdraw', () => {
 		it('address is not property contract', async () => {})
 		it('lockup is not canceled', async () => {})
 		it('waiting for release', async () => {})

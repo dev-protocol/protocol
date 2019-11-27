@@ -1,44 +1,39 @@
-contract('UtilsTest', ([deployer]) => {
+contract('UtilsTest', ([key1, key2, key3, key4]) => {
 	const addressUintMapContract = artifacts.require('libs/AddressUintMap')
-	describe('AddressUintMapTest', () => {
-		var addressUintMap: any
+	describe('AddressUintMap; add,get', () => {
+		let addressUintMap: any
 		beforeEach(async () => {
-			addressUintMap = await addressUintMapContract.new({from: deployer})
-			await addressUintMap.add(
-				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d',
-				5,
-				{from: deployer}
-			)
-			await addressUintMap.add(
-				'0x32a5598b078ad20287f210803a6ad5d96c8df1d1',
-				10,
-				{from: deployer}
-			)
-			await addressUintMap.add(
-				'0xde7Ed038ce61505803280f514caa75E34EC3719e',
-				15,
-				{from: deployer}
-			)
+			addressUintMap = await addressUintMapContract.new()
+			await addressUintMap.add(key1, 5)
+			await addressUintMap.add(key2, 10)
+			await addressUintMap.add(key3, 15)
 		})
-		it('get', async () => {
-			let value = await addressUintMap.get(
-				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
-			)
+		it('The set value is taken', async () => {
+			let value = await addressUintMap.get(key1)
 			expect(value.toNumber()).to.be.equal(5)
-			value = await addressUintMap.get(
-				'0x32a5598b078ad20287f210803a6ad5d96c8df1d1'
-			)
+			value = await addressUintMap.get(key2)
 			expect(value.toNumber()).to.be.equal(10)
-			value = await addressUintMap.get(
-				'0xbce7C94B9Ac44f0B6Ea02E506c0F70Eb8f1EaF2C'
-			)
+		})
+		it('If not set, value cannot be obtained', async () => {
+			const value = await addressUintMap.get(key4)
 			expect(value.toNumber()).to.be.equal(0)
 		})
-		it('getSumAllValue', async () => {
-			let value = await addressUintMap.getSumAllValue()
+	})
+	describe('AddressUintMap; getSumAllValue', () => {
+		let addressUintMap: any
+		beforeEach(async () => {
+			addressUintMap = await addressUintMapContract.new()
+			await addressUintMap.add(key1, 5)
+			await addressUintMap.add(key2, 10)
+			await addressUintMap.add(key3, 15)
+		})
+		it('Total value can be acquired', async () => {
+			const value = await addressUintMap.getSumAllValue()
 			expect(value.toNumber()).to.be.equal(30)
-			const addressUintMap2 = await addressUintMapContract.new({from: deployer})
-			value = await addressUintMap2.getSumAllValue()
+		})
+		it('If not set, the value will be 0', async () => {
+			const addressUintMap2 = await addressUintMapContract.new()
+			const value = await addressUintMap2.getSumAllValue()
 			expect(value.toNumber()).to.be.equal(0)
 		})
 	})

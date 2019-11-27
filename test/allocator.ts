@@ -1,13 +1,13 @@
-contract('Allocator', ([deployer]) => {
+contract('AllocatorTest', ([deployer]) => {
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const allocatorContract = artifacts.require('Allocator')
 
-	describe('allocate', () => {
+	describe('Allocator; allocate', () => {
 		it("Calls Market Contract's calculate function mapped to Metrics Contract")
 
 		it('Should fail to re-run if within one day from the last run date')
 
-		describe('Arguments to pass to calculate', () => {
+		describe('Allocator; Arguments to pass to calculate', () => {
 			it('The first argument is the address of Metrics Contract')
 
 			it('The second argument is last run timestamp')
@@ -15,7 +15,7 @@ contract('Allocator', ([deployer]) => {
 			it('The third argument is yesterday timestamp')
 		})
 
-		describe('Timestamp', () => {
+		describe('Allocator; Timestamp', () => {
 			it('Change the value of seconds per block')
 
 			it(
@@ -26,7 +26,7 @@ contract('Allocator', ([deployer]) => {
 		it('The sent ETH will be returned to the sender')
 	})
 
-	describe('allocation', () => {
+	describe('Allocator; allocation', () => {
 		it(`
 			last allocation block is 5760,
 			mint per block is 50000,
@@ -56,7 +56,7 @@ contract('Allocator', ([deployer]) => {
 		})
 	})
 
-	describe('calculatedCallback', () => {
+	describe('Allocator; calculatedCallback', () => {
 		it(`
 			last allocation block is 5760,
 			mint per block is 50000,
@@ -81,12 +81,12 @@ contract('Allocator', ([deployer]) => {
 		)
 	})
 
-	describe('withdraw', () => {
-		describe('Withdraw is mint', () => {
+	describe('Allocator; withdraw', () => {
+		describe('Allocator; Withdraw is mint', () => {
 			it('Withdraw mints an ERC20 token specified in the State Contract')
 		})
 
-		describe('Withdrawable amount', () => {
+		describe('Allocator; Withdrawable amount', () => {
 			it(
 				'The withdrawable amount each holder is the number multiplied the balance of the price per Property Contract and the Property Contract of the sender'
 			)
@@ -100,14 +100,14 @@ contract('Allocator', ([deployer]) => {
 			it("When 'increment' is executed, the withdrawable amount increases")
 		})
 
-		describe('Alice has sent 800 out of 1000 tokens to Bob. Bob has increased from 200 tokens to 1000 tokens. Price is 100', () => {
-			describe('Before increment', () => {
+		describe('Allocator; Alice has sent 800 out of 1000 tokens to Bob. Bob has increased from 200 tokens to 1000 tokens. Price is 100', () => {
+			describe('Allocator; Before increment', () => {
 				it(`Alice's withdrawable amount is ${1000 * 100}`)
 
 				it(`Bob's withdrawable amount is ${200 * 100}`)
 			})
 
-			describe('After increment; New price is 120', () => {
+			describe('Allocator; After increment; New price is 120', () => {
 				it(`Alice's withdrawable amount is ${1000 * 100 + 200 * 120}`)
 
 				it(`Bob's withdrawable amount is ${200 * 100 + 1000 * 120}`)
@@ -119,7 +119,7 @@ contract('Allocator', ([deployer]) => {
 		})
 	})
 
-	describe('kill', () => {
+	describe('Allocator; kill', () => {
 		it('Destruct this contract')
 
 		it(
@@ -128,34 +128,30 @@ contract('Allocator', ([deployer]) => {
 	})
 })
 
-contract('AllocationBlockNumberTest', ([deployer]) => {
+contract('AllocationBlockNumberTest', ([key1, key2, key3]) => {
 	const allocationBlockNumberContract = artifacts.require(
 		'AllocationBlockNumber'
 	)
-	describe('get/set', () => {
-		var allocationBlockNumber: any
+	describe('AllocationBlockNumber; getLastAllocationBlockNumber', () => {
+		let allocationBlockNumber: any
 		beforeEach(async () => {
-			allocationBlockNumber = await allocationBlockNumberContract.new({
-				from: deployer
-			})
-			await allocationBlockNumber.setLastAllocationBlockNumber(
-				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
-			)
+			allocationBlockNumber = await allocationBlockNumberContract.new()
+			await allocationBlockNumber.setLastAllocationBlockNumber(key1)
 		})
-		it('get/set', async () => {
+		it('The block number of the set timing has been acquired', async () => {
 			const blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
-				'0xA717AA5E8858cA5836Fef082E6B2965ba0dB615d'
+				key1
 			)
 			// eslint-disable-next-line no-undef
 			const web3BlockNumber = await web3.eth.getBlockNumber()
 			expect(blockNumber.toNumber()).to.be.equal(web3BlockNumber)
 		})
-		it('get defoult value', async () => {
+		it('Behavior when not set', async () => {
 			const blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
-				'0x2d6ab242bc13445954ac46e4eaa7bfa6c7aca167'
+				key2
 			)
 			const blockNumber2 = await allocationBlockNumber.getLastAllocationBlockNumber(
-				'0xfbDBcF1EbE27245E3488541f19CAC902E53239a4'
+				key3
 			)
 			expect(blockNumber.toNumber()).to.be.equal(blockNumber2.toNumber())
 		})
