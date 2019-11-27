@@ -5,6 +5,7 @@ import "./../../src/policy/IPolicy.sol";
 contract PolicyTest is IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)
 		public
+		view
 		returns (uint256)
 	{
 		return _lockups + _assets;
@@ -12,6 +13,7 @@ contract PolicyTest is IPolicy {
 
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		public
+		view
 		returns (uint256)
 	{
 		return _amount + _lockups;
@@ -19,6 +21,7 @@ contract PolicyTest is IPolicy {
 
 	function assetValue(uint256 _value, uint256 _lockups)
 		public
+		view
 		returns (uint256)
 	{
 		return _value + _lockups;
@@ -26,6 +29,7 @@ contract PolicyTest is IPolicy {
 
 	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
 		public
+		view
 		returns (uint256)
 	{
 		return _assets + _propertyAssets - 1;
@@ -33,6 +37,7 @@ contract PolicyTest is IPolicy {
 
 	function marketApproval(uint256 _agree, uint256 _opposite)
 		public
+		view
 		returns (bool)
 	{
 		return _agree + _opposite > 0;
@@ -40,24 +45,25 @@ contract PolicyTest is IPolicy {
 
 	function policyApproval(uint256 _agree, uint256 _opposite)
 		public
+		view
 		returns (bool)
 	{
 		return _agree + _opposite > 0;
 	}
 
-	function marketVotingBlocks() public returns (uint256) {
+	function marketVotingBlocks() public view returns (uint256) {
 		return 10;
 	}
 
-	function policyVotingBlocks() public returns (uint256) {
+	function policyVotingBlocks() public view returns (uint256) {
 		return 20;
 	}
 
-	function abstentionPenalty(uint256 _count) public returns (uint256) {
+	function abstentionPenalty(uint256 _count) public view returns (uint256) {
 		return _count;
 	}
 
-	function lockUpBlocks() public returns (uint256) {
+	function lockUpBlocks() public view returns (uint256) {
 		return 1;
 	}
 }
