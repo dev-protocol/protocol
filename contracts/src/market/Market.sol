@@ -7,33 +7,8 @@ import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
 import "../vote/VoteCounter.sol";
 import "../Lockup.sol";
+import "./IMarket.sol";
 
-// TODO IMarket
-// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#market-factory
-contract Behavior {
-	string public schema;
-
-	function authenticate(
-		address _prop,
-		string memory _args1,
-		string memory _args2,
-		string memory _args3,
-		string memory _args4,
-		string memory _args5
-		// solium-disable-next-line no-empty-blocks
-	) public returns (bool) {
-		// Implementation for authentication.
-	}
-
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		public
-		returns (bool)
-	// solium-disable-next-line no-empty-blocks
-	{
-
-		// Implementation for fetches index value.
-	}
-}
 
 contract Market is UsingConfig {
 	// TODO
@@ -73,7 +48,7 @@ contract Market is UsingConfig {
 	}
 
 	function schema() public view returns (string memory) {
-		return Behavior(behavior).schema();
+		return IMarket(behavior).schema();
 	}
 
 	function authenticate(
@@ -89,7 +64,7 @@ contract Market is UsingConfig {
 			"only owner of property contract"
 		);
 		return
-			Behavior(behavior).authenticate(
+			IMarket(behavior).authenticate(
 				_prop,
 				_args1,
 				_args2,
@@ -103,7 +78,7 @@ contract Market is UsingConfig {
 		public
 		returns (bool)
 	{
-		return Behavior(behavior).calculate(_metrics, _start, _end);
+		return IMarket(behavior).calculate(_metrics, _start, _end);
 	}
 
 	/**
