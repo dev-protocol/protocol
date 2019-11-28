@@ -4,7 +4,6 @@ import "../libs/Utils.sol";
 import "../config/UsingConfig.sol";
 import "./Policy.sol";
 
-
 contract PolicyFactory is UsingConfig {
 	AddressSet private _policySet;
 	event Create(address indexed _from, address _property);
