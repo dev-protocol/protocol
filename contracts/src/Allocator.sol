@@ -22,8 +22,6 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 	uint64 public basis = 1000000000000000000;
 
 	mapping(address => bool) pendingIncrements;
-	// TODO not set
-	uint256 public mintPerBlock;
 	AllocationBlockNumber private _allocationBlockNumber;
 
 	constructor(address _config) public UsingConfig(_config) {
