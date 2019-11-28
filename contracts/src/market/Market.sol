@@ -9,7 +9,6 @@ import "../vote/VoteCounter.sol";
 import "../Lockup.sol";
 import "./IMarket.sol";
 
-
 contract Market is UsingConfig {
 	// TODO
 	// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#metrics

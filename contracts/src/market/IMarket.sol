@@ -9,8 +9,7 @@ contract IMarket {
 		string memory _args2,
 		string memory _args3,
 		string memory _args4,
-		string memory _args5
-		) public returns (bool);
+		string memory _args5) public returns (bool);
 
 	function calculate(address _prop, uint256 _start, uint256 _end)
 		public
