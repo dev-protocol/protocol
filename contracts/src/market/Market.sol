@@ -5,8 +5,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
+import "../vote/VoteCounter.sol";
 import "../Lockup.sol";
-import "../Vote.sol";
+
 
 contract Behavior {
 	string public schema;
@@ -42,7 +43,7 @@ contract Market is UsingConfig {
 	address public behavior;
 	uint256 public issuedMetrics;
 	uint256 private _votingEndBlockNumber;
-	Vote private _vote;
+	VoteCounter private _voteCounter;
 
 	modifier onlyDisabledMarket(address _property) {
 		require(enabled == false, "market is already enabled");
@@ -67,7 +68,7 @@ contract Market is UsingConfig {
 		uint256 marketVotingBlocks = Policy(config().policy())
 			.marketVotingBlocks();
 		_votingEndBlockNumber = block.number + marketVotingBlocks;
-		_vote = new Vote(_config);
+		_voteCounter = new VoteCounter(_config);
 	}
 
 	function schema() public view returns (string memory) {
@@ -114,15 +115,10 @@ contract Market is UsingConfig {
 		public
 		onlyDisabledMarket(_property)
 	{
-		_vote.addVoteCount(msg.sender, _property, _agree);
-		if (Property(_property).author() == msg.sender) {
-			VoteCounter(config().voteCounter()).addVoteCountByProperty(
-				_property
-			);
-		}
+		_voteCounter.addVoteCount(msg.sender, _property, _agree);
 		enabled = Policy(config().policy()).marketApproval(
-			_vote.agreeCount(),
-			_vote.oppositeCount()
+			_voteCounter.agreeCount(),
+			_voteCounter.oppositeCount()
 		);
 	}
 

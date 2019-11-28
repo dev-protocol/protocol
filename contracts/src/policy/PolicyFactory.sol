@@ -4,9 +4,9 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../libs/Killable.sol";
 import "../libs/Utils.sol";
 import "../property/PropertyFactory.sol";
+import "../vote/VoteCounter.sol";
 import "../Lockup.sol";
 import "../Allocator.sol";
-import "../Vote.sol";
 import "./IPolicy.sol";
 
 contract PolicyFactory is UsingConfig {
@@ -25,7 +25,7 @@ contract PolicyFactory is UsingConfig {
 		if (_policySet.length() == 1) {
 			config().setPolicy(policyAddress);
 		} else {
-			VoteCounter(config().voteCounter()).addVoteCount();
+			VoteTimes(config().voteTimes()).addVoteCount();
 		}
 		return policyAddress;
 	}
@@ -48,13 +48,13 @@ contract Policy is Killable, UsingConfig {
 	using SafeMath for uint256;
 	IPolicy private _policy;
 	uint256 private _votingEndBlockNumber;
-	Vote private _vote;
+	VoteCounter private _voteCounter;
 
 	constructor(address _config, address _innerPolicyAddress)
 		public
 		UsingConfig(_config)
 	{
-		_vote = new Vote(_config);
+		_voteCounter = new VoteCounter(_config);
 		_policy = IPolicy(_innerPolicyAddress);
 		setVotingEndBlockNumber();
 	}
@@ -142,15 +142,10 @@ contract Policy is Killable, UsingConfig {
 			block.number <= _votingEndBlockNumber,
 			"voting deadline is over"
 		);
-		_vote.addVoteCount(msg.sender, _property, _agree);
-		if (Property(_property).author() == msg.sender) {
-			VoteCounter(config().voteCounter()).addVoteCountByProperty(
-				_property
-			);
-		}
+		_voteCounter.addVoteCount(msg.sender, _property, _agree);
 		bool result = Policy(config().policy()).policyApproval(
-			_vote.agreeCount(),
-			_vote.oppositeCount()
+			_voteCounter.agreeCount(),
+			_voteCounter.oppositeCount()
 		);
 		if (result == false) {
 			return;

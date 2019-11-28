@@ -1,11 +1,12 @@
-pragma solidity >=0.4.25 <0.6.0;
+pragma solidity ^0.5.0;
 
-import "./config/UsingConfig.sol";
-import "./property/Property.sol";
-import "./Lockup.sol";
-import "./Allocator.sol";
+import "../config/UsingConfig.sol";
+import "../property/Property.sol";
+import "../Lockup.sol";
+import "../Allocator.sol";
+import "./VoteTimes.sol";
 
-contract Vote is UsingConfig {
+contract VoteCounter is UsingConfig {
 	uint256 public agreeCount;
 	uint256 public oppositeCount;
 	mapping(address => mapping(address => bool)) private _voteRecord;
@@ -19,9 +20,13 @@ contract Vote is UsingConfig {
 		require(_voteRecord[_sender][_property], "already vote");
 		uint256 voteCount = 0;
 		if (Property(_property).author() == _sender) {
+			// solium-disable-next-line operator-whitespace
 			voteCount =
 				Lockup(config().lockup()).getTokenValueByProperty(_property) +
 				Allocator(config().allocator()).getRewardsAmount(_property);
+			VoteTimes(config().voteTimes()).addVoteTimesByProperty(
+				_property
+			);
 		} else {
 			voteCount = Lockup(config().lockup()).getTokenValue(
 				_property,
@@ -35,26 +40,5 @@ contract Vote is UsingConfig {
 		} else {
 			oppositeCount += voteCount;
 		}
-	}
-}
-
-contract VoteCounter {
-	uint256 private _voteCount;
-	mapping(address => uint256) private _voteCountByProperty;
-	function addVoteCount() public {
-		_voteCount++;
-	}
-	function addVoteCountByProperty(address _property) public {
-		_voteCountByProperty[_property]++;
-	}
-	function resetVoteCountByProperty(address _property) public {
-		_voteCountByProperty[_property] = _voteCount;
-	}
-	function getAbstentionCount(address _property)
-		public
-		view
-		returns (uint256)
-	{
-		return _voteCount - _voteCountByProperty[_property];
 	}
 }

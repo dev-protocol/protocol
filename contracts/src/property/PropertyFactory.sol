@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./Property.sol";
 import "./PropertyGroup.sol";
-import "../Vote.sol";
+import "../vote/VoteTimes.sol";
 
 contract PropertyFactory is UsingConfig {
 	uint8 decimals = 18;
@@ -27,7 +27,7 @@ contract PropertyFactory is UsingConfig {
 		);
 		PropertyGroup(config().propertyGroup()).addProperty(address(property));
 		emit Create(msg.sender, address(property));
-		VoteCounter(config().voteCounter()).resetVoteCountByProperty(
+		VoteTimes(config().voteTimes()).resetVoteTimesByProperty(
 			address(property)
 		);
 		return address(property);
