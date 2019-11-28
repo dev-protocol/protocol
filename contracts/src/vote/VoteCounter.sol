@@ -17,7 +17,7 @@ contract VoteCounter is UsingConfig {
 	function addVoteCount(address _sender, address _property, bool _agree)
 		public
 	{
-		require(_voteRecord[_sender][_property], "already vote");
+		require(_voteRecord[_sender][_property] == false, "already vote");
 		uint256 voteCount = 0;
 		if (Property(_property).author() == _sender) {
 			// solium-disable-next-line operator-whitespace
