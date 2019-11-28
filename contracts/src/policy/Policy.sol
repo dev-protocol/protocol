@@ -7,7 +7,6 @@ import "../vote/VoteCounter.sol";
 import "../property/PropertyGroup.sol";
 import "./PolicyFactory.sol";
 
-
 contract Policy is Killable, UsingConfig {
 	using SafeMath for uint256;
 	IPolicy private _policy;
@@ -117,4 +116,3 @@ contract Policy is Killable, UsingConfig {
 		PolicyFactory(config().policyFactory()).convergePolicy(address(this));
 	}
 }
-
