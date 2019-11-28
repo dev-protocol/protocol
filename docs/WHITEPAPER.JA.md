@@ -90,14 +90,23 @@ Dev Protocol は以下の 10 個のコントラクトによって構成される
 
 - Market
 - Market Factory
+- Market Group
 - Property
 - Property Factory
+- Property Group
 - Metrics
+- Metrics Group
+- IPolicy
+- Policy
+- Policy Factory
+- Vote Counter
+- Vote Times
 - Lockup
 - Allocator
 - Policy
 - Policy Factory
-- State
+- Address Config
+- Using Config
 - DEV
 
 コントラクトの概観図:
@@ -171,7 +180,7 @@ Property Contract の `transfer` 関数は、バランスの変化に伴って�
 
 初期状態の Property Contract はマーケット報酬を受け取ることができない。マーケット報酬はロックアップと資産価値に基づいて決まるため、マーケット報酬を受け取るには資産との関連付けが必須となる。
 
-Property Contract が資産を表す状態となるためには、Property Contract と Market Contract の関連付けが必要となる。関連付けは Market Contract の `authenticate` 関数によって行われる。Property Contract には複数の Market Contract を関連付けできる。特定の資産グループを表す 1 つの Property Contract としたり、資産毎に Property Contract を作成してもよい。
+Property Contract が資産を表す状態となるためには、Property Contract と Market Contract の関連付けが必要となる。関連付けは Market Contract の `authenticatedCallback` 関数によって行われる。Property Contract には複数の Market Contract を関連付けできる。特定の資産グループを表す 1 つの Property Contract としたり、資産毎に Property Contract を作成してもよい。
 
 ## Property Factory
 

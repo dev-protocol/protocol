@@ -8,6 +8,9 @@ import "../metrics/MetricsGroup.sol";
 import "../vote/VoteCounter.sol";
 import "../Lockup.sol";
 
+
+// TODO IMarket
+// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#market-factory
 contract Behavior {
 	string public schema;
 
