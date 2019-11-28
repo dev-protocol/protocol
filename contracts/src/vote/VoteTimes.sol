@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 contract VoteTimes {
 	uint256 private _voteTimes;
 	mapping(address => uint256) private _voteTimesByProperty;

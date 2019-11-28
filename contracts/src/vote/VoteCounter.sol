@@ -24,9 +24,7 @@ contract VoteCounter is UsingConfig {
 			voteCount =
 				Lockup(config().lockup()).getTokenValueByProperty(_property) +
 				Allocator(config().allocator()).getRewardsAmount(_property);
-			VoteTimes(config().voteTimes()).addVoteTimesByProperty(
-				_property
-			);
+			VoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
 		} else {
 			voteCount = Lockup(config().lockup()).getTokenValue(
 				_property,

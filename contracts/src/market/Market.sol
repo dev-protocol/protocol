@@ -8,7 +8,6 @@ import "../metrics/MetricsGroup.sol";
 import "../vote/VoteCounter.sol";
 import "../Lockup.sol";
 
-
 contract Behavior {
 	string public schema;
 
