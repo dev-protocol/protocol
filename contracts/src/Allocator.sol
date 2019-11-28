@@ -9,8 +9,8 @@ import "./libs/Decimals.sol";
 import "./market/Market.sol";
 import "./metrics/Metrics.sol";
 import "./metrics/MetricsGroup.sol";
-import "./policy/PolicyVoteCounter.sol";
 import "./policy/PolicyFactory.sol";
+import "./vote/VoteTimes.sol";
 
 contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 	using SafeMath for uint256;
@@ -48,10 +48,8 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 
 	function validateTargetPeriod(address _metrics) private {
 		address property = Metrics(_metrics).property();
-		PolicyVoteCounter counter = PolicyVoteCounter(
-			config().policyVoteCounter()
-		);
-		uint256 abstentionCount = counter.getAbstentionCount(property);
+		VoteTimes counter = VoteTimes(config().voteTimes());
+		uint256 abstentionCount = counter.getAbstentionTimes(property);
 		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
 			abstentionCount
 		);
@@ -65,7 +63,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 			notTargetBlockNumber < block.number,
 			"outside the target period"
 		);
-		counter.resetVoteCountByProperty(property);
+		counter.resetVoteTimesByProperty(property);
 	}
 
 	function allocation(

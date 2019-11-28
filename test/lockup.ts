@@ -154,6 +154,13 @@ contract('LockupTest', ([deployer, property, sender1]) => {
 			)
 		})
 	})
+	describe('Lockup; lockup', () => {
+		it('address is not property contract', async () => {})
+		it('lockup is already canceled', async () => {})
+		it('insufficient balance', async () => {})
+		it('transfer was failed', async () => {})
+		it('success', async () => {})
+	})
 	describe('Lockup; withdraw', () => {
 		it('address is not property contract', async () => {})
 		it('lockup is not canceled', async () => {})

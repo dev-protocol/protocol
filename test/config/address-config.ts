@@ -142,16 +142,16 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
 			)
 		})
-		it('Value set by owner(policyVoteCounter)', async () => {
-			await addressConfigTest.setPolicyVoteCounter(setAddress1, {
+		it('Value set by owner(voteTimes)', async () => {
+			await addressConfigTest.setVoteTimes(setAddress1, {
 				from: deployer
 			})
-			const addresss = await addressConfigTest.policyVoteCounter()
+			const addresss = await addressConfigTest.voteTimes()
 			expect(addresss).to.be.equal(setAddress1)
 		})
-		it('Value set by non-owner(policyVoteCounter)', async () => {
+		it('Value set by non-owner(voteTimes)', async () => {
 			const result = await addressConfigTest
-				.setPolicyVoteCounter(setAddress1, {
+				.setVoteTimes(setAddress1, {
 					from: other
 				})
 				.catch((err: Error) => err)

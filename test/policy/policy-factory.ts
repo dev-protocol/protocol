@@ -12,21 +12,19 @@ contract('PolicyFactory', () => {
 		it(
 			'The number of lock-ups for it Property and the accumulated Market reward will be added to the vote when a Property owner votes for'
 		)
+		it('The number of votes VoteCounter is added when the Property owner voted')
 		it(
-			'The number of votes PolicyVoteCounter is added when the Property owner voted'
-		)
-		it(
-			'PolicyVoteCounter votes will not be added when a vote by other than Property owner voted for'
+			'VoteCounter votes will not be added when a vote by other than Property owner voted for'
 		)
 
 		it(
 			'The number of lock-ups for it Property and the accumulated Market reward will be added to the vote against when a Property owner votes against'
 		)
 		it(
-			'The number of votes PolicyVoteCounter is added when the Property owner votes against'
+			'The number of votes VoteCounter is added when the Property owner votes against'
 		)
 		it(
-			'PolicyVoteCounter votes will not be added when a vote by other than Property owner voted against'
+			'VoteCounter votes will not be added when a vote by other than Property owner voted against'
 		)
 
 		it(

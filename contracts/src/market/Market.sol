@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
+import "../vote/VoteCounter.sol";
 import "../Lockup.sol";
 
 contract Behavior {
@@ -41,14 +42,17 @@ contract Market is UsingConfig {
 	address public behavior;
 	uint256 public issuedMetrics;
 	uint256 private _votingEndBlockNumber;
-	uint256 private _agreeCount;
-	uint256 private _oppositeCount;
+	VoteCounter private _voteCounter;
 
-	modifier onlyDisabledMarket() {
+	modifier onlyDisabledMarket(address _property) {
 		require(enabled == false, "market is already enabled");
 		require(
 			block.number <= _votingEndBlockNumber,
 			"voting deadline is over"
+		);
+		require(
+			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			"this address is not property contract"
 		);
 		_;
 	}
@@ -63,6 +67,7 @@ contract Market is UsingConfig {
 		uint256 marketVotingBlocks = Policy(config().policy())
 			.marketVotingBlocks();
 		_votingEndBlockNumber = block.number + marketVotingBlocks;
+		_voteCounter = new VoteCounter(_config);
 	}
 
 	function schema() public view returns (string memory) {
@@ -105,18 +110,14 @@ contract Market is UsingConfig {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
-	function vote(uint256 _tokenValue, bool _agree) public onlyDisabledMarket {
-		// TODO count vote
-		// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#abstentionpenalty
-		ERC20Burnable(config().token()).burnFrom(msg.sender, _tokenValue);
-		if (_agree) {
-			_agreeCount += _tokenValue;
-		} else {
-			_oppositeCount += _tokenValue;
-		}
+	function vote(address _property, bool _agree)
+		public
+		onlyDisabledMarket(_property)
+	{
+		_voteCounter.addVoteCount(msg.sender, _property, _agree);
 		enabled = Policy(config().policy()).marketApproval(
-			_agreeCount,
-			_oppositeCount
+			_voteCounter.agreeCount(),
+			_voteCounter.oppositeCount()
 		);
 	}
 

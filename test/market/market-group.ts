@@ -4,11 +4,13 @@ contract('MarketGroupTest', ([deployer, u1, dummyMarket]) => {
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyContract = artifacts.require('policy/PolicyTest')
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
+	const voteTimesContract = artifacts.require('vote/VoteTimes')
 	describe('MarketGroup validateMarketAddress', () => {
 		let marketGroup: any
 		let expectedMarketAddress: any
 		let policy: any
 		let policyFactory: any
+		let voteTimes: any
 		beforeEach(async () => {
 			const addressConfig = await addressConfigContract.new({
 				from: deployer
@@ -16,6 +18,7 @@ contract('MarketGroupTest', ([deployer, u1, dummyMarket]) => {
 			marketGroup = await marketGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
+			voteTimes = await voteTimesContract.new({from: deployer})
 			const marketFactory = await marketFactoryContract.new(
 				addressConfig.address,
 				{
@@ -26,6 +29,9 @@ contract('MarketGroupTest', ([deployer, u1, dummyMarket]) => {
 				from: deployer
 			})
 			await addressConfig.setMarketGroup(marketGroup.address, {from: deployer})
+			await addressConfig.setVoteTimes(voteTimes.address, {
+				from: deployer
+			})
 			policy = await policyContract.new({from: deployer})
 			policyFactory = await policyFactoryContract.new(addressConfig.address, {
 				from: deployer

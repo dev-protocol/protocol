@@ -4,28 +4,26 @@ contract('PropertyTest', ([deployer, ui]) => {
 	const propertyContract = artifacts.require('property/Property')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
 	const addressConfigContract = artifacts.require('config/AddressConfig')
-	const policyVoteCounterContract = artifacts.require(
-		'policy/PolicyVoteCounter'
-	)
+	const voteTimesContract = artifacts.require('vote/VoteTimes')
 	describe('Property; withdrawDev', () => {
 		let propertyFactory: any
 		let propertyGroup: any
 		let addressConfig: any
 		let propertyAddress: any
-		let policyVoteCounter: any
+		let voteTimes: any
 		let lockup: any
 		let property: any
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
 			lockup = await lockupContract.new(addressConfig.address)
-			policyVoteCounter = await policyVoteCounterContract.new({from: deployer})
+			voteTimes = await voteTimesContract.new({from: deployer})
 			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
 			await addressConfig.setPropertyGroup(propertyGroup.address, {
 				from: deployer
 			})
-			await addressConfig.setPolicyVoteCounter(policyVoteCounter.address, {
+			await addressConfig.setVoteTimes(voteTimes.address, {
 				from: deployer
 			})
 			await addressConfig.setLockup(lockup.address, {

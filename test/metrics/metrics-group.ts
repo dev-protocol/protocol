@@ -8,6 +8,7 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
 	const lockupContract = artifacts.require('Lockup')
 	const dummyDEVContract = artifacts.require('DummyDEV')
+	const voteTimesContract = artifacts.require('vote/VoteTimes')
 
 	describe('MetricsGroup; isMetrics', () => {
 		// Let expectedMetoricsAddress: any
@@ -25,6 +26,7 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 					from: deployer
 				}
 			)
+			const voteTimes = await voteTimesContract.new({from: deployer})
 			const policy = await policyContract.new({from: deployer})
 			const policyFactory = await policyFactoryContract.new(
 				addressConfig.address,
@@ -33,6 +35,9 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 				}
 			)
 			await addressConfig.setPolicyFactory(policyFactory.address, {
+				from: deployer
+			})
+			await addressConfig.setVoteTimes(voteTimes.address, {
 				from: deployer
 			})
 			await policyFactory.createPolicy(policy.address)
