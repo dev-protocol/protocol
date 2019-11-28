@@ -41,4 +41,9 @@ contract('PolicyFactory', () => {
 		)
 		it('Should fail to vote when already voted')
 	})
+	describe('PolicyFactory; convergePolicy', () => {
+		it('Change the current Policy by passing a Policy')
+		it('Killing another Policy when changing Policy')
+		it('Should fail when a call from other than Policy')
+	})
 })
