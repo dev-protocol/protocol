@@ -5,7 +5,7 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyContract = artifacts.require('policy/PolicyTest')
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-	const voteTimesContract = artifacts.require('vote/Votetimes')
+	const voteTimesContract = artifacts.require('vote/VoteTimes')
 	describe('MarketFactory; createMarket', () => {
 		let marketFactory: any
 		let marketGroup: any

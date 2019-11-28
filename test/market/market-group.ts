@@ -4,7 +4,7 @@ contract('MarketGroupTest', ([deployer, u1, dummyMarket]) => {
 	const addressConfigContract = artifacts.require('config/AddressConfig')
 	const policyContract = artifacts.require('policy/PolicyTest')
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-	const voteTimesContract = artifacts.require('vote/Votetimes')
+	const voteTimesContract = artifacts.require('vote/VoteTimes')
 	describe('MarketGroup validateMarketAddress', () => {
 		let marketGroup: any
 		let expectedMarketAddress: any

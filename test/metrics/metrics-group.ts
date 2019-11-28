@@ -8,7 +8,7 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
 	const lockupContract = artifacts.require('Lockup')
 	const dummyDEVContract = artifacts.require('DummyDEV')
-	const voteTimesContract = artifacts.require('vote/Votetimes')
+	const voteTimesContract = artifacts.require('vote/VoteTimes')
 
 	describe('MetricsGroup; isMetrics', () => {
 		// Let expectedMetoricsAddress: any
