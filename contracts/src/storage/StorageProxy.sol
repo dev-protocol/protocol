@@ -4,6 +4,7 @@ import "./EternalStorage.sol";
 
 contract StorageProxy {
 	mapping(bytes32 => address) private _storageMap;
+	// TODO only execute by our sysytem
 	function getStorage(bytes32 _record) public returns (address) {
 		address strage = _storageMap[_record];
 		if (strage == address(0)) {

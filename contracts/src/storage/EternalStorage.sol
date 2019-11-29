@@ -4,6 +4,6 @@ import "./variable/UInt.sol";
 import "./variable/AddressUIntMap.sol";
 
 contract EternalStorage {
-	UInt public uInt;
-	AddressUIntMap public addressUIntMap;
+	UInt public uInt = new UInt();
+	AddressUIntMap public addressUIntMap = new AddressUIntMap();
 }

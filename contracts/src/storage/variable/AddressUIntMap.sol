@@ -2,9 +2,11 @@ pragma solidity ^0.5.0;
 
 contract AddressUIntMap {
 	mapping(bytes32 => mapping(address => uint256)) private _addressUIntMap;
+	// TODO only execute by our sysytem
 	function increment(bytes32 _key, address _address) public {
 		_addressUIntMap[_key][_address]++;
 	}
+	// TODO only execute by our sysytem
 	function set(bytes32 _key, address _address, uint256 _value) public {
 		_addressUIntMap[_key][_address] = _value;
 	}
