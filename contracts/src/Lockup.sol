@@ -105,11 +105,11 @@ contract Lockup is UsingConfig {
 }
 
 contract TokenValue {
-	mapping(address => AddressUintMap) private _lockupedTokenValue;
+	mapping(address => AddressUintMap2) private _lockupedTokenValue;
 	mapping(address => bool) private _hasPropertyAddress;
 	function set(address _property, address _from, uint256 _value) public {
 		if (_hasPropertyAddress[_property] == false) {
-			_lockupedTokenValue[_property] = new AddressUintMap();
+			_lockupedTokenValue[_property] = new AddressUintMap2();
 			_hasPropertyAddress[_property] = true;
 		}
 		_lockupedTokenValue[_property].add(_from, _value);

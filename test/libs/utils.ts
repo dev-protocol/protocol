@@ -1,6 +1,6 @@
 contract('UtilsTest', ([key1, key2, key3, key4]) => {
-	const addressUintMapContract = artifacts.require('libs/AddressUintMap')
-	describe('AddressUintMap; add,get', () => {
+	const addressUintMapContract = artifacts.require('libs/AddressUintMap2')
+	describe('AddressUintMap2; add,get', () => {
 		let addressUintMap: any
 		beforeEach(async () => {
 			addressUintMap = await addressUintMapContract.new()
@@ -19,7 +19,7 @@ contract('UtilsTest', ([key1, key2, key3, key4]) => {
 			expect(value.toNumber()).to.be.equal(0)
 		})
 	})
-	describe('AddressUintMap; getSumAllValue', () => {
+	describe('AddressUintMap2; getSumAllValue', () => {
 		let addressUintMap: any
 		beforeEach(async () => {
 			addressUintMap = await addressUintMapContract.new()

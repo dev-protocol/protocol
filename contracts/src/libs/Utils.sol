@@ -25,7 +25,8 @@ contract AddressSet {
 	}
 }
 
-contract AddressUintMap {
+//deprecated
+contract AddressUintMap2 {
 	uint256 private _sumAllValue;
 	mapping(address => uint256) private _addressValueMap;
 
