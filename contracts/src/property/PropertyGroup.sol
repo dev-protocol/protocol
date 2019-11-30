@@ -1,12 +1,13 @@
 pragma solidity ^0.5.0;
 
-import "../config/UsingConfig.sol";
+import "../common/config/UsingConfig.sol";
+import "../common/modifier/UsingModifier.sol";
 
-contract PropertyGroup is UsingConfig {
+contract PropertyGroup is UsingConfig, UsingModifier {
 	mapping(address => bool) private _properties;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _config) UsingConfig(_config) UsingModifier(_config) public {}
 
 	function addProperty(address _prop) public onlyPropertyFactory {
 		require(_prop != address(0), "property is an invalid address");

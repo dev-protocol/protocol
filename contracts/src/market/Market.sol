@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../common/modifier/UsingModifier.sol";
 import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
@@ -9,7 +10,7 @@ import "../vote/VoteCounter.sol";
 import "../Lockup.sol";
 import "./IMarket.sol";
 
-contract Market is UsingConfig {
+contract Market is UsingConfig, UsingModifier {
 	// TODO
 	// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#metrics
 	// create maoppimg key(key: Metrics Contract address  value: context)
@@ -34,9 +35,9 @@ contract Market is UsingConfig {
 	}
 
 	constructor(address _config, address _behavior)
+		UsingConfig(_config) UsingModifier(_config)
 		public
 		onlyMarketFactory
-		UsingConfig(_config)
 	{
 		behavior = _behavior;
 		enabled = false;
