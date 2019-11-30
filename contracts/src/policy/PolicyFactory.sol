@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "../libs/Utils.sol";
-import "../config/UsingConfig.sol";
+import "../common/config/UsingConfig.sol";
 import "./Policy.sol";
 
 contract PolicyFactory is UsingConfig {

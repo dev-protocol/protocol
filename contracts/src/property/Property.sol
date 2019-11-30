@@ -2,11 +2,12 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
-import "../config/UsingConfig.sol";
+import "../common/config/UsingConfig.sol";
+import "../common/modifier/UsingModifier.sol";
 import "../Allocator.sol";
 import "../Lockup.sol";
 
-contract Property is ERC20, ERC20Detailed, UsingConfig {
+contract Property is ERC20, ERC20Detailed, UsingConfig, UsingModifier {
 	address public author;
 	constructor(
 		address _config,
@@ -15,7 +16,12 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 		string memory _symbol,
 		uint8 _decimals,
 		uint256 _supply
-	) public UsingConfig(_config) ERC20Detailed(_name, _symbol, _decimals) {
+	)
+		public
+		UsingConfig(_config)
+		UsingModifier(_config)
+		ERC20Detailed(_name, _symbol, _decimals)
+	{
 		author = _own;
 		_mint(author, _supply);
 	}
