@@ -6,7 +6,7 @@ import "./libs/Utils.sol";
 import "./policy/PolicyFactory.sol";
 import "./property/Property.sol";
 import "./property/PropertyGroup.sol";
-import "./config/UsingConfig.sol";
+import "./common/config/UsingConfig.sol";
 
 contract Lockup is UsingConfig {
 	using SafeMath for uint256;

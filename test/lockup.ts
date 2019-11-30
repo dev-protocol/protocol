@@ -126,7 +126,7 @@ contract('ReleasedBlockNumberTest', ([property, sender1, sender2]) => {
 
 contract('LockupTest', ([deployer, property, sender1]) => {
 	const lockupContract = artifacts.require('Lockup')
-	const addressConfigContract = artifacts.require('config/AddressConfig')
+	const addressConfigContract = artifacts.require('common/config/AddressConfig')
 	const propertyGroupContract = artifacts.require('property/PropertyGroup')
 
 	describe('Lockup; getTokenValue', () => {

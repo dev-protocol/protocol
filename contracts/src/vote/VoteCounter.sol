@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "../config/UsingConfig.sol";
+import "../common/config/UsingConfig.sol";
 import "../property/Property.sol";
 import "../Lockup.sol";
 import "../Allocator.sol";

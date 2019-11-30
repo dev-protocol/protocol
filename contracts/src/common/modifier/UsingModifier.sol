@@ -1,14 +1,11 @@
 pragma solidity ^0.5.0;
 
-import "./AddressConfig.sol";
+import "../config/AddressConfig.sol";
 
-contract UsingConfig {
+contract UsingModifier {
 	AddressConfig private _config;
 	constructor(address _addressConfig) public {
 		_config = AddressConfig(_addressConfig);
-	}
-	function config() internal view returns (AddressConfig) {
-		return _config;
 	}
 
 	modifier onlyMarketFactory() {

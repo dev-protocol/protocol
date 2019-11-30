@@ -1,5 +1,5 @@
 contract('AllocatorTest', ([deployer]) => {
-	const addressConfigContract = artifacts.require('config/AddressConfig')
+	const addressConfigContract = artifacts.require('common/config/AddressConfig')
 	const allocatorContract = artifacts.require('Allocator')
 
 	describe('Allocator; allocate', () => {
