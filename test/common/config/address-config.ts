@@ -1,5 +1,7 @@
 contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
-	const addressConfigTestContract = artifacts.require('common/config/AddressConfig')
+	const addressConfigTestContract = artifacts.require(
+		'common/config/AddressConfig'
+	)
 	describe('AddressConfig; getter/setter', () => {
 		let addressConfigTest: any
 		beforeEach(async () => {

@@ -35,8 +35,9 @@ contract Market is UsingConfig, UsingModifier {
 	}
 
 	constructor(address _config, address _behavior)
-		UsingConfig(_config) UsingModifier(_config)
 		public
+		UsingConfig(_config)
+		UsingModifier(_config)
 		onlyMarketFactory
 	{
 		behavior = _behavior;

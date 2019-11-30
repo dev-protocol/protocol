@@ -7,7 +7,11 @@ contract PropertyGroup is UsingConfig, UsingModifier {
 	mapping(address => bool) private _properties;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) UsingConfig(_config) UsingModifier(_config) public {}
+	constructor(address _config)
+		public
+		UsingConfig(_config)
+		UsingModifier(_config)
+	{}
 
 	function addProperty(address _prop) public onlyPropertyFactory {
 		require(_prop != address(0), "property is an invalid address");

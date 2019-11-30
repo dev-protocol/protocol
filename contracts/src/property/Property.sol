@@ -16,7 +16,12 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingModifier {
 		string memory _symbol,
 		uint8 _decimals,
 		uint256 _supply
-	) UsingConfig(_config) UsingModifier(_config) ERC20Detailed(_name, _symbol, _decimals) public {
+	)
+		public
+		UsingConfig(_config)
+		UsingModifier(_config)
+		ERC20Detailed(_name, _symbol, _decimals)
+	{
 		author = _own;
 		_mint(author, _supply);
 	}
