@@ -7,7 +7,7 @@ contract UsingStorage is Ownable {
 	mapping(bytes32 => address) private _storageMap;
 	EternalStorage private _eternalStorage;
 	constructor(address _strage) public {
-		if (_strage == address(0)){
+		if (_strage == address(0)) {
 			_eternalStorage = new EternalStorage();
 			return;
 		}
