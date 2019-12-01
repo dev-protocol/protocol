@@ -1,29 +1,29 @@
-contract('AllocatorTest', ([deployer]) => {
+contract('Allocator', ([deployer]) => {
 	const addressConfigContract = artifacts.require('common/config/AddressConfig')
 	const allocatorContract = artifacts.require('Allocator')
 
 	describe('Allocator; allocate', () => {
 		it("Calls Market Contract's calculate function mapped to Metrics Contract")
 
-		it('Should fail to re-run if within one day from the last run date')
+		it('Should fail to call when other than Metrics address is passed')
+
+		it(
+			'Should fail to call when the Metrics linked Property is the target of the abstention penalty'
+		)
 
 		describe('Allocator; Arguments to pass to calculate', () => {
 			it('The first argument is the address of Metrics Contract')
 
-			it('The second argument is last run timestamp')
-
-			it('The third argument is yesterday timestamp')
-		})
-
-		describe('Allocator; Timestamp', () => {
-			it('Change the value of seconds per block')
+			it('The second argument is last run block number')
 
 			it(
-				'Should fail to change the value of seconds per block when sent from the non-owner account'
+				'The second argument is the block number of the end of the abstention penalty if the Metrics linked Property was the targeted of the abstention penalty'
 			)
+
+			it('The third argument is current block number')
 		})
 
-		it('The sent ETH will be returned to the sender')
+		it('Return ETH to the sender when sent it')
 	})
 
 	describe('Allocator; allocation', () => {
@@ -67,9 +67,7 @@ contract('AllocatorTest', ([deployer]) => {
 			the incremented result is ${5760 * 50000 * (300 / 7406907) * (48568 / 547568)}`)
 
 		it(
-			`When after increment, change the value of 'lastTotalAllocationValuePerBlock' is ${300 -
-				20 +
-				100 / 11520}`
+			'When after increment, update the value of `lastAssetValueEachMarketPerBlock`'
 		)
 
 		it(
@@ -77,7 +75,7 @@ contract('AllocatorTest', ([deployer]) => {
 		)
 
 		it(
-			'Should fail to call the function when does not call in advance `allocate` function'
+			'Should fail to call the function when it does not call in advance `allocate` function'
 		)
 	})
 
@@ -96,8 +94,6 @@ contract('AllocatorTest', ([deployer]) => {
 			)
 
 			it('When the withdrawable amount is 0, the withdrawal amount is 0')
-
-			it("When 'increment' is executed, the withdrawable amount increases")
 		})
 
 		describe('Allocator; Alice has sent 800 out of 1000 tokens to Bob. Bob has increased from 200 tokens to 1000 tokens. Price is 100', () => {
@@ -114,7 +110,7 @@ contract('AllocatorTest', ([deployer]) => {
 			})
 
 			it(
-				"Should fail to execute 'beforeBalanceChange' when sent from the not Repository Contract address"
+				'Should fail to call `beforeBalanceChange` when sent from other than Property Contract address'
 			)
 		})
 	})

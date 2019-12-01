@@ -41,7 +41,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 			_allocationBlockNumber.getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
-		_allocationBlockNumber.setLastAllocationBlockNumber(_metrics);
+		_allocationBlockNumber.setWithNow(_metrics);
 	}
 
 	function validateTargetPeriod(address _metrics) private {
@@ -61,6 +61,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 			notTargetBlockNumber < block.number,
 			"outside the target period"
 		);
+		_allocationBlockNumber.set(_metrics, notTargetBlockNumber);
 		counter.resetVoteTimesByProperty(property);
 	}
 
@@ -133,7 +134,10 @@ contract AllocationBlockNumber {
 			: _baseBlockNumber;
 		return lastAllocationBlockNumber;
 	}
-	function setLastAllocationBlockNumber(address _metrics) public {
+	function set(address _metrics, uint256 _blocks) public {
+		_lastAllocationBlockNumber[_metrics] = _blocks;
+	}
+	function setWithNow(address _metrics) public {
 		_lastAllocationBlockNumber[_metrics] = block.number;
 	}
 }
