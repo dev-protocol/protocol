@@ -1,45 +1,37 @@
 pragma solidity ^0.5.0;
 
-import "../config/UsingConfig.sol";
-import "../storage/UsingStorage.sol";
+import "../common/storage/UsingStorage.sol";
 
 contract VoteTimes is UsingStorage {
-	constructor(address _config)
+	constructor(address _strage)
 		public
-		UsingStorage(_config, keccak256("VoteTimes"))
+		UsingStorage(_strage)
 	{}
 
 	function addVoteCount() public {
-		eternalStorage().uInt().increment(keccak256("_voteTimes"));
+		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));
+		voteTimes++;
+		eternalStorage().setUint(keccak256("_voteTimes"), voteTimes);
 	}
 	function addVoteTimesByProperty(address _property) public {
-		eternalStorage().addressUIntMap().increment(
-			"_voteTimesByProperty",
-			_property
-		);
+		bytes32 key = keccak256(abi.encodePacked("_voteTimesByProperty", _property));
+		uint256 voteTimesByProperty = eternalStorage().getUint(key);
+		voteTimesByProperty++;
+		eternalStorage().setUint(key, voteTimesByProperty);
 	}
 	function resetVoteTimesByProperty(address _property) public {
-		uint256 voteTimes = eternalStorage().uInt().get(
-			keccak256("_voteTimes")
-		);
-		eternalStorage().addressUIntMap().set(
-			"_voteTimesByProperty",
-			_property,
-			voteTimes
-		);
+		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));
+		bytes32 key = keccak256(abi.encodePacked("_voteTimesByProperty", _property));
+		eternalStorage().setUint(key, voteTimes);
 	}
 	function getAbstentionTimes(address _property)
 		public
 		view
 		returns (uint256)
 	{
-		uint256 voteTimes = eternalStorage().uInt().get(
-			keccak256("_voteTimes")
-		);
-		uint256 voteTimesByProperty = eternalStorage().addressUIntMap().get(
-			"_voteTimesByProperty",
-			_property
-		);
+		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));
+		bytes32 key = keccak256(abi.encodePacked("_voteTimesByProperty", _property));
+		uint256 voteTimesByProperty = eternalStorage().getUint(key);
 		return voteTimes - voteTimesByProperty;
 	}
 }
