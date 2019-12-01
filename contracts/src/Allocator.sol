@@ -134,7 +134,7 @@ contract AllocationBlockNumber {
 			: _baseBlockNumber;
 		return lastAllocationBlockNumber;
 	}
-	function set(address _metrics, uint _blocks) public {
+	function set(address _metrics, uint256 _blocks) public {
 		_lastAllocationBlockNumber[_metrics] = _blocks;
 	}
 	function setWithNow(address _metrics) public {
