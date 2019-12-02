@@ -4,24 +4,32 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./EternalStorage.sol";
 
 contract UsingStorage is Ownable {
-	mapping(bytes32 => address) private _storageMap;
-	EternalStorage private _eternalStorage;
-	constructor(address _strage) public {
-		if (_strage == address(0)) {
-			_eternalStorage = new EternalStorage();
-			return;
-		}
-		_eternalStorage = EternalStorage(_strage);
-	}
-	function eternalStorage() internal view returns (EternalStorage) {
-		return _eternalStorage;
+	address private _storage;
+
+	modifier hasStorage() {
+		require(_storage != address(0), "strage is not setted");
+		_;
 	}
 
-	function eternalStorageAddress() public view returns (address) {
-		return address(_eternalStorage);
+	function eternalStorage() internal view hasStorage returns (EternalStorage)  {
+		return EternalStorage(_storage);
+	}
+
+	function getStorageAddress() public view hasStorage returns (address)  {
+		return _storage;
+	}
+
+	function createStorage() public onlyOwner {
+		require(_storage == address(0), "strage is setted");
+		EternalStorage strage = new EternalStorage();
+		_storage = address(strage);
+	}
+
+	function setStorage(address _storageAddress) public onlyOwner {
+		_storage = _storageAddress;
 	}
 
 	function changeOwner(address newOwner) public onlyOwner {
-		_eternalStorage.changeOwner(newOwner);
+		EternalStorage(_storage).changeOwner(newOwner);
 	}
 }

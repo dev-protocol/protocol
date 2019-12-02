@@ -24,6 +24,7 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 				from: deployer
 			})
 			voteTimes = await voteTimesContract.new({from: deployer})
+			await voteTimes.createStorage()
 			await addressConfig.setMarketFactory(marketFactory.address, {
 				from: deployer
 			})

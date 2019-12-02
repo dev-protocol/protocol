@@ -3,13 +3,14 @@ pragma solidity ^0.5.0;
 import "../common/storage/UsingStorage.sol";
 
 contract VoteTimes is UsingStorage {
-	constructor(address _strage) public UsingStorage(_strage) {}
+	constructor() UsingStorage() public {}
 
 	function addVoteCount() public {
 		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));
 		voteTimes++;
 		eternalStorage().setUint(keccak256("_voteTimes"), voteTimes);
 	}
+
 	function addVoteTimesByProperty(address _property) public {
 		bytes32 key = keccak256(
 			abi.encodePacked("_voteTimesByProperty", _property)

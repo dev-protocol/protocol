@@ -4,9 +4,9 @@ contract('VoteTimesTest', ([deployer, property1, property2]) => {
 		let voteTimes: any
 		beforeEach(async () => {
 			voteTimes = await voteTimesTestContract.new(
-				'0x0000000000000000000000000000000000000000',
 				{from: deployer}
 			)
+			await voteTimes.createStorage()
 			await voteTimes.addVoteCount()
 			await voteTimes.addVoteCount()
 			await voteTimes.addVoteTimesByProperty(property1)
@@ -16,12 +16,15 @@ contract('VoteTimesTest', ([deployer, property1, property2]) => {
 			expect(result.toNumber()).to.be.equal(1)
 		})
 		it('Storage information can be taken over.', async () => {
-			const strageAddress = await voteTimes.eternalStorageAddress()
-			const newVoteTimes = await voteTimesTestContract.new(strageAddress, {
+			const strageAddress = await voteTimes.getStorageAddress()
+			const newVoteTimes = await voteTimesTestContract.new({
 				from: deployer
 			})
+			await newVoteTimes.setStorage(strageAddress)
+			await voteTimes.changeOwner(newVoteTimes.address)
+			await newVoteTimes.addVoteCount()
 			const result = await newVoteTimes.getAbstentionTimes(property1)
-			expect(result.toNumber()).to.be.equal(1)
+			expect(result.toNumber()).to.be.equal(2)
 		})
 		it('When reset, the number of abstentions becomes 0.', async () => {
 			await voteTimes.resetVoteTimesByProperty(property1)
