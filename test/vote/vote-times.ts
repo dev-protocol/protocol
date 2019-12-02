@@ -14,11 +14,11 @@ contract('VoteTimesTest', ([deployer, property1, property2]) => {
 			expect(result.toNumber()).to.be.equal(1)
 		})
 		it('Storage information can be taken over.', async () => {
-			const strageAddress = await voteTimes.getStorageAddress()
+			const storageAddress = await voteTimes.getStorageAddress()
 			const newVoteTimes = await voteTimesTestContract.new({
 				from: deployer
 			})
-			await newVoteTimes.setStorage(strageAddress)
+			await newVoteTimes.setStorage(storageAddress)
 			await voteTimes.changeOwner(newVoteTimes.address)
 			await newVoteTimes.addVoteCount()
 			const result = await newVoteTimes.getAbstentionTimes(property1)

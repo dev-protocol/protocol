@@ -149,7 +149,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 			it('cannot be delete to other than the owner.', async () => {})
 		})
 	})
-	describe('EternalStrage; upgradeOwner', () => {
+	describe('EternalStorage; upgradeOwner', () => {
 		let eternalStorage: any
 		let key: any
 		beforeEach(async () => {
