@@ -34,7 +34,6 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				const result = await eternalStorage
 					.setUint(key, 10, {from: user1})
 					.catch((err: Error) => err)
-				/* eslint-disable max-nested-callbacks */
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
@@ -44,7 +43,6 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				const result = await eternalStorage
 					.deleteUint(key, {from: user1})
 					.catch((err: Error) => err)
-				/* eslint-disable max-nested-callbacks */
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
@@ -78,9 +76,8 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 			it('cannot be set to other than the owner.', async () => {
 				/* eslint-disable max-nested-callbacks */
 				const result = await eternalStorage
-					.setBytes(key, value, {from: user1}) // eslint-disable max-nested-callbacks
-					.catch((err: Error) => err) // eslint-disable max-nested-callbacks
-				/* eslint-disable max-nested-callbacks */
+					.setBytes(key, value, {from: user1})
+					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
@@ -90,7 +87,6 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				const result = await eternalStorage
 					.deleteBytes(key, {from: user1})
 					.catch((err: Error) => err)
-				/* eslint-disable max-nested-callbacks */
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
@@ -117,7 +113,6 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				const result = await eternalStorage
 					.setString(key, 'test', {from: user1})
 					.catch((err: Error) => err)
-				/* eslint-disable max-nested-callbacks */
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
@@ -127,7 +122,6 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				const result = await eternalStorage
 					.deleteString(key, {from: user1})
 					.catch((err: Error) => err)
-				/* eslint-disable max-nested-callbacks */
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
