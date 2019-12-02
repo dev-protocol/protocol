@@ -17,11 +17,11 @@ contract UsingStorage is Ownable {
 		return _eternalStorage;
 	}
 
-	function eternalStorageVersion() internal view returns (address) {
+	function eternalStorageAddress() public view returns (address) {
 		return address(_eternalStorage);
 	}
 
-	function changeOwner(address newOwner) internal onlyOwner {
+	function changeOwner(address newOwner) public onlyOwner {
 		_eternalStorage.changeOwner(newOwner);
 	}
 }
