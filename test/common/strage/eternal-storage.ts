@@ -30,8 +30,8 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('cannot be set to other than the owner.', async () => {
-				// eslint-disable-next-line max-nested-callbacks
 				const result = await eternalStorage
+					// eslint-disable-next-line max-nested-callbacks
 					.setUint(key, 10, {from: user1})
 					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
@@ -40,6 +40,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 			})
 			it('cannot be delete to other than the owner.', async () => {
 				const result = await eternalStorage
+					// eslint-disable-next-line max-nested-callbacks
 					.deleteUint(key, {from: user1})
 					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
@@ -74,6 +75,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 			})
 			it('cannot be set to other than the owner.', async () => {
 				const result = await eternalStorage
+					// eslint-disable-next-line max-nested-callbacks
 					.setBytes(key, value, {from: user1})
 					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
@@ -82,6 +84,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 			})
 			it('cannot be delete to other than the owner.', async () => {
 				const result = await eternalStorage
+					// eslint-disable-next-line max-nested-callbacks
 					.deleteBytes(key, {from: user1})
 					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
@@ -107,6 +110,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 			})
 			it('cannot be set to other than the owner.', async () => {
 				const result = await eternalStorage
+					// eslint-disable-next-line max-nested-callbacks
 					.setString(key, 'test', {from: user1})
 					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
@@ -115,6 +119,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 			})
 			it('cannot be delete to other than the owner.', async () => {
 				const result = await eternalStorage
+					// eslint-disable-next-line max-nested-callbacks
 					.deleteString(key, {from: user1})
 					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
@@ -153,12 +158,12 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 			key = web3.utils.keccak256('key')
 			await eternalStorage.changeOwner(newOwner)
 		})
-		it('オーナーが変わったら、そのオーナーで値の変更ができる.', async () => {
+		it('If the owner changes, the owner can change the value.', async () => {
 			await eternalStorage.setUint(key, 1, {from: newOwner})
 			const result = await eternalStorage.getUint(key)
 			expect(result.toNumber()).to.be.equal(1)
 		})
-		it('オーナーが変わったら、元のオーナーでは値の変更ができない.', async () => {
+		it('If the owner changes, the value cannot be changed by the original owner.', async () => {
 			const result = await eternalStorage
 				.setUint(key, 1, {from: deployer})
 				.catch((err: Error) => err)
@@ -166,7 +171,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 			)
 		})
-		it('オーナーが変わっても、関係のないアドレスからは値の変更ができない', async () => {
+		it('Even if the owner changes, the value cannot be changed from an unrelated address.', async () => {
 			const result = await eternalStorage
 				.setUint(key, 1, {from: user1})
 				.catch((err: Error) => err)
