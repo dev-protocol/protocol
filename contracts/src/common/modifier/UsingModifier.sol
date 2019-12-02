@@ -4,6 +4,7 @@ import "../config/AddressConfig.sol";
 
 contract UsingModifier {
 	AddressConfig private _config;
+
 	constructor(address _addressConfig) public {
 		_config = AddressConfig(_addressConfig);
 	}

@@ -27,6 +27,7 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 				}
 			)
 			const voteTimes = await voteTimesContract.new({from: deployer})
+			await voteTimes.createStorage()
 			const policy = await policyContract.new({from: deployer})
 			const policyFactory = await policyFactoryContract.new(
 				addressConfig.address,

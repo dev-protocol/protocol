@@ -23,6 +23,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 				from: deployer
 			})
 			voteTimes = await voteTimesContract.new({from: deployer})
+			await voteTimes.createStorage()
 			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
