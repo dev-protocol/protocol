@@ -1,23 +1,23 @@
 pragma solidity ^0.5.0;
 
 contract EternalStorage {
-	address private latestOwner = msg.sender;
+	address private currentOwner = msg.sender;
 
 	mapping(bytes32 => uint256) private uIntStorage;
 	mapping(bytes32 => string) private stringStorage;
 	mapping(bytes32 => address) private addressStorage;
-	mapping(bytes32 => bytes) private bytesStorage;
+	mapping(bytes32 => bytes32) private bytesStorage;
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
 
-	modifier onlyLatestOwner() {
-		require(msg.sender == latestOwner, "not latest version");
+	modifier onlyCurrentOwner() {
+		require(msg.sender == currentOwner, "not current owner");
 		_;
 	}
 
-	function upgradeOwner(address _newOwner) public {
-		require(msg.sender == latestOwner, "not current owner");
-		latestOwner = _newOwner;
+	function changeOwner(address _newOwner) public {
+		require(msg.sender == currentOwner, "not current owner");
+		currentOwner = _newOwner;
 	}
 
 	// *** Getter Methods ***
@@ -33,7 +33,7 @@ contract EternalStorage {
 		return addressStorage[_key];
 	}
 
-	function getBytes(bytes32 _key) external view returns (bytes memory) {
+	function getBytes(bytes32 _key) external view returns (bytes32) {
 		return bytesStorage[_key];
 	}
 
@@ -46,58 +46,58 @@ contract EternalStorage {
 	}
 
 	// *** Setter Methods ***
-	function setUint(bytes32 _key, uint256 _value) external onlyLatestOwner {
+	function setUint(bytes32 _key, uint256 _value) external onlyCurrentOwner {
 		uIntStorage[_key] = _value;
 	}
 
 	function setString(bytes32 _key, string calldata _value)
 		external
-		onlyLatestOwner
+		onlyCurrentOwner
 	{
 		stringStorage[_key] = _value;
 	}
 
-	function setAddress(bytes32 _key, address _value) external onlyLatestOwner {
+	function setAddress(bytes32 _key, address _value) external onlyCurrentOwner {
 		addressStorage[_key] = _value;
 	}
 
-	function setBytes(bytes32 _key, bytes calldata _value)
+	function setBytes(bytes32 _key, bytes32 _value)
 		external
-		onlyLatestOwner
+		onlyCurrentOwner
 	{
 		bytesStorage[_key] = _value;
 	}
 
-	function setBool(bytes32 _key, bool _value) external onlyLatestOwner {
+	function setBool(bytes32 _key, bool _value) external onlyCurrentOwner {
 		boolStorage[_key] = _value;
 	}
 
-	function setInt(bytes32 _key, int256 _value) external onlyLatestOwner {
+	function setInt(bytes32 _key, int256 _value) external onlyCurrentOwner {
 		intStorage[_key] = _value;
 	}
 
 	// *** Delete Methods ***
-	function deleteUint(bytes32 _key) external onlyLatestOwner {
+	function deleteUint(bytes32 _key) external onlyCurrentOwner {
 		delete uIntStorage[_key];
 	}
 
-	function deleteString(bytes32 _key) external onlyLatestOwner {
+	function deleteString(bytes32 _key) external onlyCurrentOwner {
 		delete stringStorage[_key];
 	}
 
-	function deleteAddress(bytes32 _key) external onlyLatestOwner {
+	function deleteAddress(bytes32 _key) external onlyCurrentOwner {
 		delete addressStorage[_key];
 	}
 
-	function deleteBytes(bytes32 _key) external onlyLatestOwner {
+	function deleteBytes(bytes32 _key) external onlyCurrentOwner {
 		delete bytesStorage[_key];
 	}
 
-	function deleteBool(bytes32 _key) external onlyLatestOwner {
+	function deleteBool(bytes32 _key) external onlyCurrentOwner {
 		delete boolStorage[_key];
 	}
 
-	function deleteInt(bytes32 _key) external onlyLatestOwner {
+	function deleteInt(bytes32 _key) external onlyCurrentOwner {
 		delete intStorage[_key];
 	}
 }

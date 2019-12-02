@@ -21,7 +21,7 @@ contract UsingStorage is Ownable {
 		return address(_eternalStorage);
 	}
 
-	function upgradeOwner(address newOwner) internal onlyOwner {
-		_eternalStorage.upgradeOwner(newOwner);
+	function changeOwner(address newOwner) internal onlyOwner {
+		_eternalStorage.changeOwner(newOwner);
 	}
 }
