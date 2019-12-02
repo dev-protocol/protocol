@@ -1,11 +1,12 @@
 contract('VoteTimesTest', ([deployer, property1, property2]) => {
-	const voteTimesTestContract = artifacts.require(
-		'vote/VoteTimes'
-	)
+	const voteTimesTestContract = artifacts.require('vote/VoteTimes')
 	describe('VoteTimes; addVoteTimes, addVoteTimesByProperty', () => {
 		let voteTimes: any
 		beforeEach(async () => {
-			voteTimes = await voteTimesTestContract.new('0x0000000000000000000000000000000000000000', {from: deployer})
+			voteTimes = await voteTimesTestContract.new(
+				'0x0000000000000000000000000000000000000000',
+				{from: deployer}
+			)
 			await voteTimes.addVoteCount()
 			await voteTimes.addVoteCount()
 			await voteTimes.addVoteTimesByProperty(property1)
@@ -16,7 +17,9 @@ contract('VoteTimesTest', ([deployer, property1, property2]) => {
 		})
 		it('Storage information can be taken over.', async () => {
 			const strageAddress = await voteTimes.eternalStorageAddress()
-			const newVoteTimes = await voteTimesTestContract.new(strageAddress, {from: deployer})
+			const newVoteTimes = await voteTimesTestContract.new(strageAddress, {
+				from: deployer
+			})
 			const result = await newVoteTimes.getAbstentionTimes(property1)
 			expect(result.toNumber()).to.be.equal(1)
 		})
