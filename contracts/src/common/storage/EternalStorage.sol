@@ -57,14 +57,14 @@ contract EternalStorage {
 		stringStorage[_key] = _value;
 	}
 
-	function setAddress(bytes32 _key, address _value) external onlyCurrentOwner {
-		addressStorage[_key] = _value;
-	}
-
-	function setBytes(bytes32 _key, bytes32 _value)
+	function setAddress(bytes32 _key, address _value)
 		external
 		onlyCurrentOwner
 	{
+		addressStorage[_key] = _value;
+	}
+
+	function setBytes(bytes32 _key, bytes32 _value) external onlyCurrentOwner {
 		bytesStorage[_key] = _value;
 	}
 

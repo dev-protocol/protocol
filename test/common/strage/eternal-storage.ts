@@ -8,7 +8,9 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 		let unsetkey: any
 		beforeEach(async () => {
 			eternalStorage = await eternalStorageContract.new({from: deployer})
+			// eslint-disable-next-line no-undef
 			key = web3.utils.keccak256('key')
+			// eslint-disable-next-line no-undef
 			unsetkey = web3.utils.keccak256('unsetKey')
 		})
 		describe('uint', () => {
@@ -28,13 +30,18 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('cannot be set to other than the owner.', async () => {
-				const result = await eternalStorage.setUint(key, 10, {from: user1}).catch((err: Error) => err)
+				// eslint-disable-next-line max-nested-callbacks
+				const result = await eternalStorage
+					.setUint(key, 10, {from: user1})
+					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
 			})
 			it('cannot be delete to other than the owner.', async () => {
-				const result = await eternalStorage.deleteUint(key, {from: user1}).catch((err: Error) => err)
+				const result = await eternalStorage
+					.deleteUint(key, {from: user1})
+					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
@@ -43,6 +50,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 		describe('byte32', () => {
 			let value: any
 			beforeEach(async () => {
+				// eslint-disable-next-line no-undef
 				value = web3.utils.keccak256('value')
 			})
 			it('get.', async () => {
@@ -54,20 +62,28 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				await eternalStorage.setBytes(key, value, {from: deployer})
 				await eternalStorage.deleteBytes(key)
 				const result = await eternalStorage.getBytes(key)
-				expect(result).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+				expect(result).to.be.equal(
+					'0x0000000000000000000000000000000000000000000000000000000000000000'
+				)
 			})
 			it('get initial value.', async () => {
 				const result = await eternalStorage.getBytes(unsetkey)
-				expect(result).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000000')
+				expect(result).to.be.equal(
+					'0x0000000000000000000000000000000000000000000000000000000000000000'
+				)
 			})
 			it('cannot be set to other than the owner.', async () => {
-				const result = await eternalStorage.setBytes(key, value, {from: user1}).catch((err: Error) => err)
+				const result = await eternalStorage
+					.setBytes(key, value, {from: user1})
+					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
 			})
 			it('cannot be delete to other than the owner.', async () => {
-				const result = await eternalStorage.deleteBytes(key, {from: user1}).catch((err: Error) => err)
+				const result = await eternalStorage
+					.deleteBytes(key, {from: user1})
+					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
@@ -90,13 +106,17 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 				expect(result).to.be.equal('')
 			})
 			it('cannot be set to other than the owner.', async () => {
-				const result = await eternalStorage.setString(key, 'test', {from: user1}).catch((err: Error) => err)
+				const result = await eternalStorage
+					.setString(key, 'test', {from: user1})
+					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
 			})
 			it('cannot be delete to other than the owner.', async () => {
-				const result = await eternalStorage.deleteString(key, {from: user1}).catch((err: Error) => err)
+				const result = await eternalStorage
+					.deleteString(key, {from: user1})
+					.catch((err: Error) => err)
 				expect((result as Error).message).to.be.equal(
 					'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 				)
@@ -129,6 +149,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 		let key: any
 		beforeEach(async () => {
 			eternalStorage = await eternalStorageContract.new({from: deployer})
+			// eslint-disable-next-line no-undef
 			key = web3.utils.keccak256('key')
 			await eternalStorage.changeOwner(newOwner)
 		})
@@ -138,13 +159,17 @@ contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
 			expect(result.toNumber()).to.be.equal(1)
 		})
 		it('オーナーが変わったら、元のオーナーでは値の変更ができない.', async () => {
-			const result = await eternalStorage.setUint(key, 1, {from: deployer}).catch((err: Error) => err)
+			const result = await eternalStorage
+				.setUint(key, 1, {from: deployer})
+				.catch((err: Error) => err)
 			expect((result as Error).message).to.be.equal(
 				'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 			)
 		})
 		it('オーナーが変わっても、関係のないアドレスからは値の変更ができない', async () => {
-			const result = await eternalStorage.setUint(key, 1, {from: user1}).catch((err: Error) => err)
+			const result = await eternalStorage
+				.setUint(key, 1, {from: user1})
+				.catch((err: Error) => err)
 			expect((result as Error).message).to.be.equal(
 				'Returned error: VM Exception while processing transaction: revert not current owner -- Reason given: not current owner.'
 			)
