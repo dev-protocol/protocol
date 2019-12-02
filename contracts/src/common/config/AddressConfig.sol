@@ -14,7 +14,6 @@ contract AddressConfig is Ownable {
 	address public policy;
 	address public lockup;
 	address public voteTimes;
-	address public storageMap;
 
 	function setAllocator(address _addr) public onlyOwner {
 		allocator = _addr;
@@ -59,9 +58,5 @@ contract AddressConfig is Ownable {
 
 	function setVoteTimes(address _addr) public onlyOwner {
 		voteTimes = _addr;
-	}
-
-	function setStorageMap(address _addr) public onlyOwner {
-		storageMap = _addr;
 	}
 }

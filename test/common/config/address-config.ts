@@ -161,23 +161,6 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
 			)
 		})
-		it('Value set by owner(storageProxy)', async () => {
-			await addressConfigTest.setStorageProxy(setAddress1, {
-				from: deployer
-			})
-			const addresss = await addressConfigTest.storageProxy()
-			expect(addresss).to.be.equal(setAddress1)
-		})
-		it('Value set by non-owner(storageProxy)', async () => {
-			const result = await addressConfigTest
-				.setStorageProxy(setAddress1, {
-					from: other
-				})
-				.catch((err: Error) => err)
-			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
-			)
-		})
 	})
 	describe('AddressConfig; setPolicy', () => {
 		let addressConfigTest: any

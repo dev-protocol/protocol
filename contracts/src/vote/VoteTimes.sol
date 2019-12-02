@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "../common/storage/UsingStorage.sol";
 
 contract VoteTimes is UsingStorage {
-	constructor() UsingStorage() public {}
+	constructor() public UsingStorage() {}
 
 	function addVoteCount() public {
 		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));

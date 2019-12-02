@@ -3,9 +3,7 @@ contract('VoteTimesTest', ([deployer, property1, property2]) => {
 	describe('VoteTimes; addVoteTimes, addVoteTimesByProperty', () => {
 		let voteTimes: any
 		beforeEach(async () => {
-			voteTimes = await voteTimesTestContract.new(
-				{from: deployer}
-			)
+			voteTimes = await voteTimesTestContract.new({from: deployer})
 			await voteTimes.createStorage()
 			await voteTimes.addVoteCount()
 			await voteTimes.addVoteCount()

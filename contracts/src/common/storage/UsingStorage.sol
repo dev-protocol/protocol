@@ -11,11 +11,16 @@ contract UsingStorage is Ownable {
 		_;
 	}
 
-	function eternalStorage() internal view hasStorage returns (EternalStorage)  {
+	function eternalStorage()
+		internal
+		view
+		hasStorage
+		returns (EternalStorage)
+	{
 		return EternalStorage(_storage);
 	}
 
-	function getStorageAddress() public view hasStorage returns (address)  {
+	function getStorageAddress() public view hasStorage returns (address) {
 		return _storage;
 	}
 
