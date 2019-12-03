@@ -23,6 +23,7 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 			marketGroup = await marketGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
+			await marketGroup.createStorage()
 			voteTimes = await voteTimesContract.new({from: deployer})
 			await voteTimes.createStorage()
 			await addressConfig.setMarketFactory(marketFactory.address, {
@@ -55,9 +56,10 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 		})
 
 		it('Adds a new Market Contract address to State Contract', async () => {
-			await marketGroup.validateMarketAddress(expectedMarketAddress, {
+			const result = await marketGroup.isMarket(expectedMarketAddress, {
 				from: deployer
 			})
+			expect(result).to.be.equal(true)
 		})
 	})
 })

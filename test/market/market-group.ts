@@ -18,6 +18,7 @@ contract('MarketGroupTest', ([deployer, u1, dummyMarket]) => {
 			marketGroup = await marketGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
+			await marketGroup.createStorage()
 			voteTimes = await voteTimesContract.new({from: deployer})
 			await voteTimes.createStorage()
 			const marketFactory = await marketFactoryContract.new(
@@ -47,15 +48,11 @@ contract('MarketGroupTest', ([deployer, u1, dummyMarket]) => {
 			)[0].args._market
 		})
 		it('When a market address is specified', async () => {
-			await marketGroup.validateMarketAddress(expectedMarketAddress)
+			await marketGroup.isMarket(expectedMarketAddress)
 		})
 		it('When the market address is not specified', async () => {
-			const result = await marketGroup
-				.validateMarketAddress(dummyMarket)
-				.catch((err: Error) => err)
-			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert only market contract'
-			)
+			const result = await marketGroup.isMarket(dummyMarket)
+			expect(result).to.be.equal(false)
 		})
 	})
 })

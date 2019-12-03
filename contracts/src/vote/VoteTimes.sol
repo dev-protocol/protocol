@@ -39,3 +39,5 @@ contract VoteTimes is UsingStorage {
 		return voteTimes - voteTimesByProperty;
 	}
 }
+
+
