@@ -71,6 +71,7 @@ contract('MarketTest', ([deployer]) => {
 			marketGroup = await marketGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
+			await marketGroup.createStorage()
 			allocator = await allocatorContract.new(addressConfig.address, {
 				from: deployer
 			})

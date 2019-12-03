@@ -2,8 +2,9 @@ pragma solidity ^0.5.0;
 
 import "../common/config/UsingConfig.sol";
 import "../common/modifier/UsingModifier.sol";
+import "../common/storage/UsingStorage.sol";
 
-contract MarketGroup is UsingConfig, UsingModifier {
+contract MarketGroup is UsingConfig, UsingModifier, UsingStorage {
 	mapping(address => bool) private _markets;
 
 	// solium-disable-next-line no-empty-blocks
@@ -11,14 +12,18 @@ contract MarketGroup is UsingConfig, UsingModifier {
 		public
 		UsingConfig(_config)
 		UsingModifier(_config)
+		UsingStorage()
 	{}
 
-	function validateMarketAddress(address marketAddress) public view {
-		require(_markets[marketAddress], "only market contract");
+	function getKey(address _market) private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_marketGroup", _market));
 	}
 
-	function addMarket(address _addr) public onlyMarketFactory returns (bool) {
-		_markets[_addr] = true;
-		return true;
+	function isMarket(address _market) public view returns (bool) {
+		return eternalStorage().getBool(getKey(_market));
+	}
+
+	function addMarket(address _market) public onlyMarketFactory {
+		eternalStorage().setBool(getKey(_market), true);
 	}
 }

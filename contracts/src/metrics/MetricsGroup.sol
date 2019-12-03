@@ -10,7 +10,10 @@ contract MetricsGroup is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addMetrics(address _metricsAddress) public {
-		MarketGroup(config().marketGroup()).validateMarketAddress(msg.sender);
+		require(
+			MarketGroup(config().marketGroup()).isMarket(msg.sender),
+			"only market contract"
+		);
 		require(_metricsAddress != address(0), "metrics is an invalid address");
 		totalIssuedMetrics += 1;
 		_metrics[_metricsAddress] = true;
