@@ -5,7 +5,7 @@ import "./common/storage/UsingStorage.sol";
 
 contract LockupPropertyValue is UsingStorage {
 	using SafeMath for uint256;
-	function getKey(address _property) private pure returns (bytes32){
+	function getKey(address _property) private pure returns (bytes32) {
 		return keccak256(abi.encodePacked(_property));
 	}
 

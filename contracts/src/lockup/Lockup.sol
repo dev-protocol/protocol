@@ -44,7 +44,10 @@ contract Lockup is UsingConfig, UsingStorage {
 		require(success, "transfer was failed");
 		require(abi.decode(data, (bool)), "transfer was failed");
 		LockupValue(config().lockupValue()).add(_property, msg.sender, _value);
-		LockupPropertyValue(config().lockupPropertyValue()).add(_property, _value);
+		LockupPropertyValue(config().lockupPropertyValue()).add(
+			_property,
+			_value
+		);
 	}
 
 	function cancel(address _property) public {
@@ -81,12 +84,18 @@ contract Lockup is UsingConfig, UsingStorage {
 			_releasedBlockNumber.canRlease(_property, msg.sender),
 			"waiting for release"
 		);
-		uint256 lockupedValue = LockupValue(config().lockupValue()).get(_property, msg.sender);
+		uint256 lockupedValue = LockupValue(config().lockupValue()).get(
+			_property,
+			msg.sender
+		);
 		require(lockupedValue == 0, "dev token is not locked");
 		Property(_property).withdrawDev(msg.sender);
 		_canceledFlg.setCancelFlg(_property, msg.sender, false);
 		LockupValue(config().lockupValue()).clear(_property, msg.sender);
-		LockupPropertyValue(config().lockupPropertyValue()).sub(_property, lockupedValue);
+		LockupPropertyValue(config().lockupPropertyValue()).sub(
+			_property,
+			lockupedValue
+		);
 		_releasedBlockNumber.clear(_property, msg.sender);
 	}
 }

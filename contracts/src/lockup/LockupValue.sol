@@ -4,7 +4,11 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./common/storage/UsingStorage.sol";
 
 contract LockupValue is UsingStorage {
-	function getKey(address _property, address _sender) private pure returns (bytes32){
+	function getKey(address _property, address _sender)
+		private
+		pure
+		returns (bytes32)
+	{
 		return keccak256(abi.encodePacked(_property, _sender));
 	}
 
@@ -13,12 +17,20 @@ contract LockupValue is UsingStorage {
 		eternalStorage().setUint(key, 0);
 	}
 
-	function hasValue(address _property, address _sender) external view returns (bool){
+	function hasValue(address _property, address _sender)
+		external
+		view
+		returns (bool)
+	{
 		bytes32 key = getKey(_property, _sender);
 		return eternalStorage().getUint(key) != 0;
 	}
 
-	function get(address _property, address _sender) external view returns (uint256){
+	function get(address _property, address _sender)
+		external
+		view
+		returns (uint256)
+	{
 		bytes32 key = getKey(_property, _sender);
 		return eternalStorage().getUint(key);
 	}
