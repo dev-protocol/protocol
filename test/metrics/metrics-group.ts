@@ -56,6 +56,7 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 			metricsGroup = await metricsGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
+			await metricsGroup.createStorage()
 			await addressConfig.setMarketFactory(marketFactory.address, {
 				from: deployer
 			})
