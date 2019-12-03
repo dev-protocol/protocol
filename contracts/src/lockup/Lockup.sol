@@ -7,15 +7,16 @@ import "./policy/PolicyFactory.sol";
 import "./property/Property.sol";
 import "./property/PropertyGroup.sol";
 import "./common/config/UsingConfig.sol";
+import "./common/storage/UsingStorage.sol";
+import "./LockupValue.sol";
+import "./LockupPropertyValue.sol";
 
-contract Lockup is UsingConfig {
+contract Lockup is UsingConfig, UsingStorage {
 	using SafeMath for uint256;
-	TokenValue private _tokenValue;
 	CanceledLockupFlg private _canceledFlg;
 	ReleasedBlockNumber private _releasedBlockNumber;
 
 	constructor(address _config) public UsingConfig(_config) {
-		_tokenValue = new TokenValue();
 		_canceledFlg = new CanceledLockupFlg();
 		_releasedBlockNumber = new ReleasedBlockNumber();
 	}
@@ -42,7 +43,8 @@ contract Lockup is UsingConfig {
 		);
 		require(success, "transfer was failed");
 		require(abi.decode(data, (bool)), "transfer was failed");
-		_tokenValue.set(_property, msg.sender, _value);
+		LockupValue(config().lockupValue()).add(_property, msg.sender, _value);
+		LockupPropertyValue(config().lockupPropertyValue()).add(_property, _value);
 	}
 
 	function cancel(address _property) public {
@@ -51,7 +53,7 @@ contract Lockup is UsingConfig {
 			"this address is not property contract"
 		);
 		require(
-			_tokenValue.hasTokenByProperty(_property, msg.sender),
+			LockupValue(config().lockupValue()).hasValue(_property, msg.sender),
 			"dev token is not locked"
 		);
 		require(
@@ -79,69 +81,13 @@ contract Lockup is UsingConfig {
 			_releasedBlockNumber.canRlease(_property, msg.sender),
 			"waiting for release"
 		);
-		uint256 lockupedValue = _tokenValue.get(_property, msg.sender);
+		uint256 lockupedValue = LockupValue(config().lockupValue()).get(_property, msg.sender);
 		require(lockupedValue == 0, "dev token is not locked");
 		Property(_property).withdrawDev(msg.sender);
 		_canceledFlg.setCancelFlg(_property, msg.sender, false);
-		_tokenValue.set(_property, msg.sender, 0);
+		LockupValue(config().lockupValue()).clear(_property, msg.sender);
+		LockupPropertyValue(config().lockupPropertyValue()).sub(_property, lockupedValue);
 		_releasedBlockNumber.clear(_property, msg.sender);
-	}
-
-	function getTokenValue(address _property, address _from)
-		public
-		view
-		returns (uint256)
-	{
-		return _tokenValue.get(_property, _from);
-	}
-
-	function getTokenValueByProperty(address _property)
-		public
-		view
-		returns (uint256)
-	{
-		return _tokenValue.getByProperty(_property);
-	}
-}
-
-contract TokenValue {
-	mapping(address => AddressUintMap2) private _lockupedTokenValue;
-	mapping(address => bool) private _hasPropertyAddress;
-	function set(address _property, address _from, uint256 _value) public {
-		if (_hasPropertyAddress[_property] == false) {
-			_lockupedTokenValue[_property] = new AddressUintMap2();
-			_hasPropertyAddress[_property] = true;
-		}
-		_lockupedTokenValue[_property].add(_from, _value);
-	}
-
-	function hasTokenByProperty(address _property, address _from)
-		public
-		view
-		returns (bool)
-	{
-		if (_hasPropertyAddress[_property] == false) {
-			return false;
-		}
-		return _lockupedTokenValue[_property].get(_from) != 0;
-	}
-
-	function get(address _property, address _from)
-		public
-		view
-		returns (uint256)
-	{
-		if (_hasPropertyAddress[_property] == false) {
-			return 0;
-		}
-		return _lockupedTokenValue[_property].get(_from);
-	}
-
-	function getByProperty(address _property) public view returns (uint256) {
-		if (_hasPropertyAddress[_property] == false) {
-			return 0;
-		}
-		return _lockupedTokenValue[_property].getSumAllValue();
 	}
 }
 
