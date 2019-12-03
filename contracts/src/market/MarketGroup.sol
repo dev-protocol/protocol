@@ -16,9 +16,7 @@ contract MarketGroup is UsingConfig, UsingModifier, UsingStorage {
 	{}
 
 	function getKey(address _market) private pure returns (bytes32) {
-		return keccak256(
-			abi.encodePacked("_marketGroup", _market)
-		);
+		return keccak256(abi.encodePacked("_marketGroup", _market));
 	}
 
 	function isMarket(address _market) public view returns (bool) {
