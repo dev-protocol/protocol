@@ -1,11 +1,11 @@
 contract('PropertyFactoryTest', ([deployer]) => {
-	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
-	const propertyContract = artifacts.require('property/Property')
-	const propertyGroupContract = artifacts.require('property/PropertyGroup')
-	const addressConfigContract = artifacts.require('common/config/AddressConfig')
-	const policyContract = artifacts.require('policy/PolicyTest')
-	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-	const voteTimesContract = artifacts.require('vote/VoteTimes')
+	const propertyFactoryContract = artifacts.require('PropertyFactory')
+	const propertyContract = artifacts.require('Property')
+	const propertyGroupContract = artifacts.require('PropertyGroup')
+	const addressConfigContract = artifacts.require('AddressConfig')
+	const policyContract = artifacts.require('PolicyTest')
+	const policyFactoryContract = artifacts.require('PolicyFactory')
+	const voteTimesContract = artifacts.require('VoteTimes')
 	describe('PropertyFactory; createProperty', () => {
 		let propertyFactory: any
 		let propertyGroup: any
@@ -53,6 +53,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 		})
 
 		it('Create a new Property Contract and emit Create Event telling created property address', async () => {
+			// eslint-disable-next-line @typescript-eslint/await-thenable
 			deployedProperty = await propertyContract.at(expectedPropertyAddress)
 			const name = await deployedProperty.name({from: deployer})
 			const symbol = await deployedProperty.symbol({from: deployer})

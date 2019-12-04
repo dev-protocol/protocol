@@ -1,10 +1,10 @@
 contract('PrpertyGroupTest', ([deployer, dummyProperty]) => {
-	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
-	const propertyGroupContract = artifacts.require('property/PropertyGroup')
-	const addressConfigContract = artifacts.require('common/config/AddressConfig')
-	const policyContract = artifacts.require('policy/PolicyTest')
-	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-	const voteTimesContract = artifacts.require('vote/VoteTimes')
+	const propertyFactoryContract = artifacts.require('PropertyFactory')
+	const propertyGroupContract = artifacts.require('PropertyGroup')
+	const addressConfigContract = artifacts.require('AddressConfig')
+	const policyContract = artifacts.require('PolicyTest')
+	const policyFactoryContract = artifacts.require('PolicyFactory')
+	const voteTimesContract = artifacts.require('VoteTimes')
 	describe('PrpertyGroup; createProperty', () => {
 		let propertyFactory: any
 		let propertyGroup: any

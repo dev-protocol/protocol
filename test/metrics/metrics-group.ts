@@ -1,20 +1,18 @@
 contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
-	const marketContract = artifacts.require('market/Market')
-	const marketGroupContract = artifacts.require('market/MarketGroup')
-	const marketFactoryContract = artifacts.require('market/MarketFactory')
-	const addressConfigContract = artifacts.require('common/config/AddressConfig')
-	const metricsGroupContract = artifacts.require('metrics/MetricsGroup')
-	const policyContract = artifacts.require('policy/PolicyTest')
-	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-	const lockupContract = artifacts.require('lockup/Lockup')
-	const lockupPropertyValueContract = artifacts.require(
-		'lockup/LockupPropertyValue'
-	)
+	const marketContract = artifacts.require('Market')
+	const marketGroupContract = artifacts.require('MarketGroup')
+	const marketFactoryContract = artifacts.require('MarketFactory')
+	const addressConfigContract = artifacts.require('AddressConfig')
+	const metricsGroupContract = artifacts.require('MetricsGroup')
+	const policyContract = artifacts.require('PolicyTest')
+	const policyFactoryContract = artifacts.require('PolicyFactory')
+	const lockupContract = artifacts.require('Lockup')
+	const lockupPropertyValueContract = artifacts.require('LockupPropertyValue')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const voteTimesContract = artifacts.require('vote/VoteTimes')
 
 	describe('MetricsGroup; isMetrics', () => {
-		// Let expectedMetoricsAddress: any
+		// Let expectedMetorics Address: any
 		let metricsGroup: any
 		beforeEach(async () => {
 			const addressConfig = await addressConfigContract.new({
@@ -79,14 +77,15 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 			const expectedMarketAddress = await result.logs.filter(
 				(e: {event: string}) => e.event === 'Create'
 			)[0].args._market
+			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const market = await marketContract.at(expectedMarketAddress)
-			// How to get address
+			// How t O get address
 			await market.authenticatedCallback(property, {from: u1})
-			// ExpectedMetoricsAddress = '0x0'
+			// Expec TedMetoricsAddr Ess = '0x0'
 		})
 		it('When the metrics address is specified', async () => {
-			// Const result3 = await metricsGroup.isMetrics(expectedMetoricsAddress)
-			// expect(result3).to.be.equal(true)
+			// Const Resul t3 = awai T metricsGroup.isMetrics(expectedMetoricsAddress)
+			// expec t(result3).to.b e.equal(true)
 		})
 		it('When the metrics address is not specified', async () => {
 			const result = await metricsGroup.isMetrics(dummyMetrics)

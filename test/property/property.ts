@@ -1,10 +1,10 @@
 contract('PropertyTest', ([deployer, ui]) => {
 	const lockupContract = artifacts.require('Lockup')
-	const propertyFactoryContract = artifacts.require('property/PropertyFactory')
-	const propertyContract = artifacts.require('property/Property')
-	const propertyGroupContract = artifacts.require('property/PropertyGroup')
-	const addressConfigContract = artifacts.require('common/config/AddressConfig')
-	const voteTimesContract = artifacts.require('vote/VoteTimes')
+	const propertyFactoryContract = artifacts.require('PropertyFactory')
+	const propertyContract = artifacts.require('Property')
+	const propertyGroupContract = artifacts.require('PropertyGroup')
+	const addressConfigContract = artifacts.require('AddressConfig')
+	const voteTimesContract = artifacts.require('VoteTimes')
 	describe('Property; withdrawDev', () => {
 		let propertyFactory: any
 		let propertyGroup: any
@@ -45,6 +45,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 			)[0].args._property
 		})
 		it('When executed from other than the lockup address', async () => {
+			// eslint-disable-next-line @typescript-eslint/await-thenable
 			property = await propertyContract.at(propertyAddress)
 			const result = await property
 				.withdrawDev(ui, {from: deployer})

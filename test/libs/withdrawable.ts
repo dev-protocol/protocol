@@ -1,5 +1,5 @@
 contract('WithdrawableTest', ([deployer]) => {
-	const withdrawableTestContract = artifacts.require('libs/WithdrawableTest')
+	const withdrawableTestContract = artifacts.require('WithdrawableTest')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	describe('Withdrawable; t_increment', () => {
 		it('Incrementing normally', async () => {

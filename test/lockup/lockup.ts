@@ -1,5 +1,4 @@
 contract('LockupTest', () => {
-	describe('Lockup; getTokenValue', () => {})
 	describe('Lockup; cancel', () => {})
 	describe('Lockup; lockup', () => {
 		it('address is not property contract', async () => {})
