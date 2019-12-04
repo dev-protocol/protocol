@@ -3,6 +3,7 @@ pragma solidity ^0.5.0;
 import "../libs/Utils.sol";
 import "../common/config/UsingConfig.sol";
 import "./Policy.sol";
+import "../vote/VoteTimes.sol";
 
 contract PolicyFactory is UsingConfig {
 	AddressSet private _policySet;

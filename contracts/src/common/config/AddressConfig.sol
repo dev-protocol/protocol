@@ -13,6 +13,9 @@ contract AddressConfig is Ownable {
 	address public policyFactory;
 	address public policy;
 	address public lockup;
+	address public lockupValue;
+	address public lockupPropertyValue;
+	address public lockupWithdrawalStatus;
 	address public voteTimes;
 
 	function setAllocator(address _addr) public onlyOwner {
@@ -54,6 +57,18 @@ contract AddressConfig is Ownable {
 
 	function setLockup(address _addr) public onlyOwner {
 		lockup = _addr;
+	}
+
+	function setLockupValue(address _addr) public onlyOwner {
+		lockupValue = _addr;
+	}
+
+	function setLockupPropertyValue(address _addr) public onlyOwner {
+		lockupPropertyValue = _addr;
+	}
+
+	function setLockupWithdrawalStatus(address _addr) public onlyOwner {
+		lockupWithdrawalStatus = _addr;
 	}
 
 	function setVoteTimes(address _addr) public onlyOwner {

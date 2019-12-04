@@ -6,7 +6,10 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 	const metricsGroupContract = artifacts.require('metrics/MetricsGroup')
 	const policyContract = artifacts.require('policy/PolicyTest')
 	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-	const lockupContract = artifacts.require('Lockup')
+	const lockupContract = artifacts.require('lockup/Lockup')
+	const lockupPropertyValueContract = artifacts.require(
+		'lockup/LockupPropertyValue'
+	)
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const voteTimesContract = artifacts.require('vote/VoteTimes')
 
@@ -45,6 +48,14 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 			await policyFactory.createPolicy(policy.address)
 			const lockup = await lockupContract.new(addressConfig.address)
 			await addressConfig.setLockup(lockup.address, {
+				from: deployer
+			})
+
+			const lockupPropertyValue = await lockupPropertyValueContract.new(
+				addressConfig.address
+			)
+			await lockupPropertyValue.createStorage()
+			await addressConfig.setLockupPropertyValue(lockupPropertyValue.address, {
 				from: deployer
 			})
 			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {

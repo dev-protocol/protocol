@@ -7,7 +7,7 @@ import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
 import "../vote/VoteCounter.sol";
-import "../Lockup.sol";
+import "../lockup/Lockup.sol";
 import "./IMarket.sol";
 
 contract Market is UsingConfig, UsingModifier {
@@ -103,9 +103,8 @@ contract Market is UsingConfig, UsingModifier {
 		Metrics metrics = new Metrics(_prop);
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
 		metricsGroup.addMetrics(address(metrics));
-		uint256 tokenValue = Lockup(config().lockup()).getTokenValueByProperty(
-			metrics.property()
-		);
+		uint256 tokenValue = LockupPropertyValue(config().lockupPropertyValue())
+			.get(metrics.property());
 		Policy policy = Policy(config().policy());
 		uint256 authenticationFee = policy.authenticationFee(
 			metricsGroup.totalIssuedMetrics(),
