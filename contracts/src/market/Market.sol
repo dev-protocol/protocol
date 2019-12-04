@@ -7,7 +7,7 @@ import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
 import "../vote/VoteCounter.sol";
-import "../Lockup.sol";
+import "../lockup/Lockup.sol";
 import "./IMarket.sol";
 
 contract Market is UsingConfig, UsingModifier {

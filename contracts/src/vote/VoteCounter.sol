@@ -2,7 +2,8 @@ pragma solidity ^0.5.0;
 
 import "../common/config/UsingConfig.sol";
 import "../property/Property.sol";
-import "../Lockup.sol";
+import "../lockup/LockupPropertyValue.sol";
+import "../lockup/LockupValue.sol";
 import "../Allocator.sol";
 import "./VoteTimes.sol";
 
