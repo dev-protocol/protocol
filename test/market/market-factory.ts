@@ -5,6 +5,7 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 	const addressConfigContract = artifacts.require('AddressConfig')
 	const policyContract = artifacts.require('PolicyTest')
 	const policyFactoryContract = artifacts.require('PolicyFactory')
+	const policyGroupContract = artifacts.require('PolicyGroup')
 	const voteTimesContract = artifacts.require('VoteTimes')
 	describe('MarketFactory; createMarket', () => {
 		let marketFactory: any
@@ -15,6 +16,7 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 		let policy: any
 		let policyFactory: any
 		let voteTimes: any
+		let policyGroup: any
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
 			marketFactory = await marketFactoryContract.new(addressConfig.address, {
@@ -34,6 +36,11 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 				from: deployer
 			})
 			policy = await policyContract.new({from: deployer})
+			policyGroup = await policyGroupContract.new({from: deployer})
+			policyGroup.createStorage()
+			await addressConfig.setPolicyGroup(policyGroup.address, {
+				from: deployer
+			})
 			policyFactory = await policyFactoryContract.new(addressConfig.address, {
 				from: deployer
 			})
@@ -48,7 +55,7 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 			)[0].args._market
 		})
 
-		it('Create a new Market Contract and emit Create Event telling created market address', async () => {
+		it('Create a new Market Contract and emit C Reate Event telling created market address', async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			deployedMarket = await marketContract.at(expectedMarketAddress)
 			const behaviorAddress = await deployedMarket.behavior({from: deployer})

@@ -6,13 +6,14 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 	const metricsGroupContract = artifacts.require('MetricsGroup')
 	const policyContract = artifacts.require('PolicyTest')
 	const policyFactoryContract = artifacts.require('PolicyFactory')
+	const policyGroupContract = artifacts.require('PolicyGroup')
 	const lockupContract = artifacts.require('Lockup')
 	const lockupPropertyValueContract = artifacts.require('LockupPropertyValue')
 	const dummyDEVContract = artifacts.require('DummyDEV')
-	const voteTimesContract = artifacts.require('vote/VoteTimes')
+	const voteTimesContract = artifacts.require('VoteTimes')
 
 	describe('MetricsGroup; isMetrics', () => {
-		// Let expectedMetorics Address: any
+		// Let e XpectedMetorics Address: any
 		let metricsGroup: any
 		beforeEach(async () => {
 			const addressConfig = await addressConfigContract.new({
@@ -31,6 +32,11 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 			const voteTimes = await voteTimesContract.new({from: deployer})
 			await voteTimes.createStorage()
 			const policy = await policyContract.new({from: deployer})
+			const policyGroup = await policyGroupContract.new({from: deployer})
+			policyGroup.createStorage()
+			await addressConfig.setPolicyGroup(policyGroup.address, {
+				from: deployer
+			})
 			const policyFactory = await policyFactoryContract.new(
 				addressConfig.address,
 				{
@@ -79,13 +85,13 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 			)[0].args._market
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const market = await marketContract.at(expectedMarketAddress)
-			// How t O get address
+			//  How t O get address
 			await market.authenticatedCallback(property, {from: u1})
-			// Expec TedMetoricsAddr Ess = '0x0'
+			//  Expec TedMetoricsAddr Ess = '0x0'
 		})
 		it('When the metrics address is specified', async () => {
-			// Const Resul t3 = awai T metricsGroup.isMetrics(expectedMetoricsAddress)
-			// expec t(result3).to.b e.equal(true)
+			//  Const Resul t3  = awai T metricsGroup.isMetrics(expectedMetoricsAddress)
+			//  expec t(result3).to.b e.equal(true)
 		})
 		it('When the metrics address is not specified', async () => {
 			const result = await metricsGroup.isMetrics(dummyMetrics)

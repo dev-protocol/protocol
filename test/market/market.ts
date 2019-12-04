@@ -11,6 +11,7 @@ contract('MarketTest', ([deployer]) => {
 	const propertyGroupContract = artifacts.require('PropertyGroup')
 	const lockupContract = artifacts.require('Lockup')
 	const allocatorContract = artifacts.require('Allocator')
+	const policyGroupContract = artifacts.require('PolicyGroup')
 	describe('Market; schema', () => {
 		it('Get Schema of mapped Behavior Contract')
 	})
@@ -59,6 +60,7 @@ contract('MarketTest', ([deployer]) => {
 		// Let propertyAddress: any
 		let allocator: any
 		let lockup: any
+		let policyGroup: any
 		beforeEach(async () => {
 			dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
 				from: deployer
@@ -104,6 +106,11 @@ contract('MarketTest', ([deployer]) => {
 				from: deployer
 			})
 			policy = await policyContract.new({from: deployer})
+			policyGroup = await policyGroupContract.new({from: deployer})
+			policyGroup.createStorage()
+			await addressConfig.setPolicyGroup(policyGroup.address, {
+				from: deployer
+			})
 			policyFactory = await policyFactoryContract.new(addressConfig.address, {
 				from: deployer
 			})
