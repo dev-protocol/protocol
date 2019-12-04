@@ -10,8 +10,9 @@ contract AddressConfig is Ownable {
 	address public propertyFactory;
 	address public propertyGroup;
 	address public metricsGroup;
-	address public policyFactory;
 	address public policy;
+	address public policyFactory;
+	address public policyGroup;
 	address public lockup;
 	address public lockupValue;
 	address public lockupPropertyValue;
@@ -44,6 +45,10 @@ contract AddressConfig is Ownable {
 
 	function setPolicyFactory(address _addr) public onlyOwner {
 		policyFactory = _addr;
+	}
+
+	function setPolicyGroup(address _addr) public onlyOwner {
+		policyGroup = _addr;
 	}
 
 	function setToken(address _addr) public onlyOwner {
