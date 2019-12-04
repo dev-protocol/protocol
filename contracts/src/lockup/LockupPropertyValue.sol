@@ -8,7 +8,7 @@ contract LockupPropertyValue is UsingModifier, UsingStorage {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingModifier(_config){}
+	constructor(address _config) public UsingModifier(_config) {}
 
 	function getKey(address _property) private pure returns (bytes32) {
 		return keccak256(abi.encodePacked(_property));
@@ -28,9 +28,8 @@ contract LockupPropertyValue is UsingModifier, UsingStorage {
 		eternalStorage().setUint(key, value);
 	}
 
-	function get(address _property) external view returns (uint256){
+	function get(address _property) external view returns (uint256) {
 		bytes32 key = getKey(_property);
 		return eternalStorage().getUint(key);
 	}
 }
-

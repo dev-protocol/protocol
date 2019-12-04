@@ -17,7 +17,9 @@ contract Lockup is UsingConfig {
 			PropertyGroup(config().propertyGroup()).isProperty(_property),
 			"this address is not property contract"
 		);
-		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(config().lockupWithdrawalStatus());
+		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(
+			config().lockupWithdrawalStatus()
+		);
 		require(
 			withdrawalStatus.waiting(_property, msg.sender) == false,
 			"lockup is already canceled"
@@ -52,7 +54,9 @@ contract Lockup is UsingConfig {
 			LockupValue(config().lockupValue()).hasValue(_property, msg.sender),
 			"dev token is not locked"
 		);
-		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(config().lockupWithdrawalStatus());
+		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(
+			config().lockupWithdrawalStatus()
+		);
 		require(
 			withdrawalStatus.waiting(_property, msg.sender) == false,
 			"lockup is already canceled"
@@ -69,7 +73,9 @@ contract Lockup is UsingConfig {
 			PropertyGroup(config().propertyGroup()).isProperty(_property),
 			"this address is not property contract"
 		);
-		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(config().lockupWithdrawalStatus());
+		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(
+			config().lockupWithdrawalStatus()
+		);
 		require(
 			withdrawalStatus.possible(_property, msg.sender),
 			"waiting for release"

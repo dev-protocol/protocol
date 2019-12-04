@@ -8,7 +8,7 @@ contract LockupWithdrawalStatus is UsingModifier, UsingStorage {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingModifier(_config){}
+	constructor(address _config) public UsingModifier(_config) {}
 
 	function getKey(address _property, address _sender)
 		private
@@ -23,13 +23,18 @@ contract LockupWithdrawalStatus is UsingModifier, UsingStorage {
 		eternalStorage().setUint(key, _value);
 	}
 
-	function get(address _property, address _from) private view returns (uint256){
+	function get(address _property, address _from)
+		private
+		view
+		returns (uint256)
+	{
 		bytes32 key = getKey(_property, _from);
 		return eternalStorage().getUint(key);
 	}
 
 	function start(address _property, address _from, uint256 _wait)
-		external onlyLockup
+		external
+		onlyLockup
 	{
 		set(_property, _from, block.number.add(_wait));
 	}
@@ -47,7 +52,11 @@ contract LockupWithdrawalStatus is UsingModifier, UsingStorage {
 	function complete(address _property, address _from) external onlyLockup {
 		set(_property, _from, 0);
 	}
-	function waiting(address _property, address _from) external view returns (bool) {
+	function waiting(address _property, address _from)
+		external
+		view
+		returns (bool)
+	{
 		return get(_property, _from) != 0;
 	}
 }

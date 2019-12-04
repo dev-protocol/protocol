@@ -8,7 +8,7 @@ contract LockupValue is UsingModifier, UsingStorage {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingModifier(_config){}
+	constructor(address _config) public UsingModifier(_config) {}
 
 	function getKey(address _property, address _sender)
 		private
@@ -41,7 +41,10 @@ contract LockupValue is UsingModifier, UsingStorage {
 		return eternalStorage().getUint(key);
 	}
 
-	function add(address _property, address _sender, uint256 _value) external onlyLockup {
+	function add(address _property, address _sender, uint256 _value)
+		external
+		onlyLockup
+	{
 		bytes32 key = getKey(_property, _sender);
 		uint256 value = eternalStorage().getUint(key);
 		value = value.add(_value);
