@@ -1,5 +1,5 @@
 contract('VoteTimesTest', ([deployer, property1, property2]) => {
-	const voteTimesTestContract = artifacts.require('vote/VoteTimes')
+	const voteTimesTestContract = artifacts.require('VoteTimes')
 	describe('VoteTimes; addVoteTimes, addVoteTimesByProperty', () => {
 		let voteTimes: any
 		beforeEach(async () => {

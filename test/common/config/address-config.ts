@@ -1,7 +1,5 @@
 contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
-	const addressConfigTestContract = artifacts.require(
-		'common/config/AddressConfig'
-	)
+	const addressConfigTestContract = artifacts.require('AddressConfig')
 	describe('AddressConfig; getter/setter', () => {
 		let addressConfigTest: any
 		beforeEach(async () => {
@@ -161,6 +159,12 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
 			)
 		})
+		it('Value set by owner(lockupValue)', async () => {})
+		it('Value set by non-owner(lockupValue)', async () => {})
+		it('Value set by owner(lockupPropertyValue)', async () => {})
+		it('Value set by non-owner(lockupPropertyValue)', async () => {})
+		it('Value set by owner(lockupWithdrawalStatus)', async () => {})
+		it('Value set by non-owner(lockupWithdrawalStatus)', async () => {})
 	})
 	describe('AddressConfig; setPolicy', () => {
 		let addressConfigTest: any

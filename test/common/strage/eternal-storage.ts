@@ -1,7 +1,5 @@
 contract('EternalStorageTest', ([deployer, user1, newOwner]) => {
-	const eternalStorageContract = artifacts.require(
-		'common/storage/EternalStorage'
-	)
+	const eternalStorageContract = artifacts.require('EternalStorage')
 	describe('EternalStorage; getter,setter,deleter', () => {
 		let eternalStorage: any
 		let key: any

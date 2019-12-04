@@ -1,11 +1,11 @@
 contract('MarketFactoryTest', ([deployer, u1]) => {
-	const marketFactoryContract = artifacts.require('market/MarketFactory')
-	const marketContract = artifacts.require('market/Market')
-	const marketGroupContract = artifacts.require('market/MarketGroup')
-	const addressConfigContract = artifacts.require('common/config/AddressConfig')
-	const policyContract = artifacts.require('policy/PolicyTest')
-	const policyFactoryContract = artifacts.require('policy/PolicyFactory')
-	const voteTimesContract = artifacts.require('vote/VoteTimes')
+	const marketFactoryContract = artifacts.require('MarketFactory')
+	const marketContract = artifacts.require('Market')
+	const marketGroupContract = artifacts.require('MarketGroup')
+	const addressConfigContract = artifacts.require('AddressConfig')
+	const policyContract = artifacts.require('PolicyTest')
+	const policyFactoryContract = artifacts.require('PolicyFactory')
+	const voteTimesContract = artifacts.require('VoteTimes')
 	describe('MarketFactory; createMarket', () => {
 		let marketFactory: any
 		let marketGroup: any
@@ -49,6 +49,7 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 		})
 
 		it('Create a new Market Contract and emit Create Event telling created market address', async () => {
+			// eslint-disable-next-line @typescript-eslint/await-thenable
 			deployedMarket = await marketContract.at(expectedMarketAddress)
 			const behaviorAddress = await deployedMarket.behavior({from: deployer})
 
