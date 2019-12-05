@@ -21,6 +21,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
+			propertyGroup.createStorage()
 			await addressConfig.setPropertyGroup(propertyGroup.address, {
 				from: deployer
 			})

@@ -31,6 +31,7 @@ contract('PrpertyGroupTest', ([deployer, dummyProperty]) => {
 			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
+			propertyGroup.createStorage()
 			await addressConfig.setPolicyFactory(policyFactory.address, {
 				from: deployer
 			})
