@@ -11,11 +11,7 @@ contract Allocation is UsingModifier, UsingStorage {
 	mapping(address => uint256) private _prices;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config)
-		public
-		UsingModifier(_config)
-		UsingStorage()
-	{}
+	constructor(address _config) public UsingModifier(_config) UsingStorage() {}
 
 	function increment(address _property, uint256 _value) public onlyAllocator {
 		_totals[_property] += _value;
@@ -24,7 +20,11 @@ contract Allocation is UsingModifier, UsingStorage {
 	function getRewardsAmount(address _property) public view returns (uint256) {
 		return _totals[_property];
 	}
-	function getCumulativePrice(address _property) public view returns (uint256) {
+	function getCumulativePrice(address _property)
+		public
+		view
+		returns (uint256)
+	{
 		return _prices[_property];
 	}
 }

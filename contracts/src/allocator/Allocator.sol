@@ -25,7 +25,7 @@ contract Allocator is Killable, Ownable, Withdrawable {
 	mapping(address => bool) pendingIncrements;
 	AllocationBlockNumber private _allocationBlockNumber;
 
-	constructor(address _config) public Withdrawable(_config){
+	constructor(address _config) public Withdrawable(_config) {
 		_allocationBlockNumber = new AllocationBlockNumber();
 	}
 
