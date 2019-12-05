@@ -4,7 +4,7 @@ import "../common/config/UsingConfig.sol";
 import "../property/Property.sol";
 import "../lockup/LockupPropertyValue.sol";
 import "../lockup/LockupValue.sol";
-import "../Allocator.sol";
+import "../allocator/Allocation.sol";
 import "./VoteTimes.sol";
 
 contract VoteCounter is UsingConfig {
@@ -26,7 +26,7 @@ contract VoteCounter is UsingConfig {
 				LockupPropertyValue(config().lockupPropertyValue()).get(
 					_property
 				) +
-				Allocator(config().allocator()).getRewardsAmount(_property);
+				Allocation(config().allocation()).getRewardsAmount(_property);
 			VoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
 		} else {
 			voteCount = LockupValue(config().lockupValue()).get(

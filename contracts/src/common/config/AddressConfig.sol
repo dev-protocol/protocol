@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 contract AddressConfig is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
+	address public allocation;
 	address public marketFactory;
 	address public marketGroup;
 	address public propertyFactory;
@@ -21,6 +22,10 @@ contract AddressConfig is Ownable {
 
 	function setAllocator(address _addr) public onlyOwner {
 		allocator = _addr;
+	}
+
+	function setAllocation(address _addr) public onlyOwner {
+		allocation = _addr;
 	}
 
 	function setMarketFactory(address _addr) public onlyOwner {
