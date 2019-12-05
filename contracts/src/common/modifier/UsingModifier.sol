@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 import "../config/AddressConfig.sol";
 import "../../property/PropertyGroup.sol";
 
-
 contract UsingModifier {
 	AddressConfig private _config;
 

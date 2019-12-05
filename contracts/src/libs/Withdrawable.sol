@@ -19,13 +19,21 @@ contract Withdrawable is UsingConfig, UsingModifier {
 	mapping(address => mapping(address => WithdrawalLimit)) internal withdrawalLimits;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) UsingModifier(_config){}
+	constructor(address _config)
+		public
+		UsingConfig(_config)
+		UsingModifier(_config)
+	{}
 
 	function getRewardsAmount(address _property) public view returns (uint256) {
 		return totals[_property];
 	}
 
-	function withdraw(address _property) public payable onlyProperty(_property){
+	function withdraw(address _property)
+		public
+		payable
+		onlyProperty(_property)
+	{
 		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
 		uint256 value = _value + pendingWithdrawals[_property][msg.sender];
 		ERC20Mintable(_property).mint(msg.sender, value);
