@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "../../src/policy/IPolicy.sol";
 import "../../src/libs/Decimals.sol";
 
-contract PolicyTest is IPolicy {
+contract PolicyTest1 is IPolicy {
 	using Decimals for uint256;
 
 	function rewards(uint256 _lockups, uint256 _assets)
