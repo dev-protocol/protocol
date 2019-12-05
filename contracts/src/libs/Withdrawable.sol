@@ -2,8 +2,10 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../common/config/UsingConfig.sol";
+import "../common/modifier/UsingModifier.sol";
 
-contract Withdrawable {
+contract Withdrawable is UsingConfig, UsingModifier {
 	using SafeMath for uint256;
 	struct WithdrawalLimit {
 		uint256 total;
@@ -16,17 +18,19 @@ contract Withdrawable {
 	mapping(address => mapping(address => uint256)) internal pendingWithdrawals;
 	mapping(address => mapping(address => WithdrawalLimit)) internal withdrawalLimits;
 
+	// solium-disable-next-line no-empty-blocks
+	constructor(address _config) public UsingConfig(_config) UsingModifier(_config){}
+
 	function getRewardsAmount(address _property) public view returns (uint256) {
 		return totals[_property];
 	}
 
-	function withdraw(address _token) public payable {
-		uint256 _value = calculateWithdrawableAmount(_token, msg.sender);
-		uint256 value = _value + pendingWithdrawals[_token][msg.sender];
-		// Should be _token is Dev
-		ERC20Mintable(_token).mint(msg.sender, value);
-		lastWithdrawalPrices[_token][msg.sender] = prices[_token];
-		pendingWithdrawals[_token][msg.sender] = 0;
+	function withdraw(address _property) public payable onlyProperty(_property){
+		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
+		uint256 value = _value + pendingWithdrawals[_property][msg.sender];
+		ERC20Mintable(_property).mint(msg.sender, value);
+		lastWithdrawalPrices[_property][msg.sender] = prices[_property];
+		pendingWithdrawals[_property][msg.sender] = 0;
 	}
 
 	function beforeBalanceChange(address _token, address _from, address _to)

@@ -1,6 +1,8 @@
 pragma solidity ^0.5.0;
 
 import "../config/AddressConfig.sol";
+import "../../property/PropertyGroup.sol";
+
 
 contract UsingModifier {
 	AddressConfig private _config;
@@ -25,6 +27,14 @@ contract UsingModifier {
 	}
 	modifier onlyLockup() {
 		require(msg.sender == _config.lockup(), "only lockup contract");
+		_;
+	}
+
+	modifier onlyProperty(address _property) {
+		require(
+			PropertyGroup(_config.propertyGroup()).isProperty(_property),
+			"only property contract"
+		);
 		_;
 	}
 }

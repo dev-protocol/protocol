@@ -12,7 +12,7 @@ import "./metrics/MetricsGroup.sol";
 import "./policy/PolicyFactory.sol";
 import "./vote/VoteTimes.sol";
 
-contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
+contract Allocator is Killable, Ownable, Withdrawable {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -24,7 +24,7 @@ contract Allocator is Killable, Ownable, UsingConfig, Withdrawable {
 	mapping(address => bool) pendingIncrements;
 	AllocationBlockNumber private _allocationBlockNumber;
 
-	constructor(address _config) public UsingConfig(_config) {
+	constructor(address _config) public Withdrawable(_config) {
 		_allocationBlockNumber = new AllocationBlockNumber();
 	}
 
