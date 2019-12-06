@@ -6,7 +6,7 @@ const load = deployerFn => contract => (...args) =>
 const AddressConfig = artifacts.require('AddressConfig')
 
 module.exports = (deployer, network) => {
-	if (network !== 'development') {
+	if (network !== 'mock') {
 		return
 	}
 

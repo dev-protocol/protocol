@@ -4,7 +4,7 @@ const load = deployerFn => contract => (...args) =>
 	)
 
 module.exports = (deployer, network) => {
-	if (network !== 'development') {
+	if (network !== 'mock') {
 		return
 	}
 
