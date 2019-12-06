@@ -1,5 +1,5 @@
 {
-	"name": "@devprotocol/protocol",
+	"name": "@dev-protocol/protocol",
 	"version": "0.1.0",
 	"description": "Securitize for Internet assets",
 	"main": "index.js",
