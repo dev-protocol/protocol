@@ -27,4 +27,8 @@ contract UsingModifier {
 		require(msg.sender == _config.lockup(), "only lockup contract");
 		_;
 	}
+	modifier onlyAllocator() {
+		require(msg.sender == _config.allocator(), "only allocator contract");
+		_;
+	}
 }

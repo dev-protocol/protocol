@@ -167,6 +167,8 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(lockupWithdrawalStatus)', async () => {})
 		it('Value set by owner(policyGroup)', async () => {})
 		it('Value set by non-owner(policyGroup)', async () => {})
+		it('Value set by owner(allocation)', async () => {})
+		it('Value set by non-owner(allocation)', async () => {})
 	})
 	describe('AddressConfig; setPolicy', () => {
 		let addressConfigTest: any

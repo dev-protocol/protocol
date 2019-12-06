@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "./../../src/market/Market.sol";
-import "./../../src/Allocator.sol";
+import "./../../src/allocator/Allocator.sol";
 
 contract MarketBehaviorTest {
 	string public schema = "[]";
