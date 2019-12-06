@@ -30,11 +30,9 @@ contract Lockup is UsingConfig {
 		require(_value <= balance, "insufficient balance");
 		// solium-disable-next-line security/no-low-level-calls
 		(bool success, bytes memory data) = address(devToken).delegatecall(
-			abi.encodeWithSignature(
-				"transfer(address,uint256)",
-				_property,
-				_value
-			)
+			bytes4(keccak256("transfer(address,uint256)")),
+			_property,
+			_value
 		);
 		require(success, "transfer was failed");
 		require(abi.decode(data, (bool)), "transfer was failed");
