@@ -99,6 +99,7 @@ contract Market is UsingConfig, UsingModifier {
 		);
 	}
 
+	// TODO Run many times
 	function authenticatedCallback(address _prop) public returns (address) {
 		Metrics metrics = new Metrics(_prop);
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());

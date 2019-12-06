@@ -3,14 +3,15 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import "./libs/Killable.sol";
-import "./libs/Withdrawable.sol";
-import "./libs/Decimals.sol";
-import "./market/Market.sol";
-import "./metrics/Metrics.sol";
-import "./metrics/MetricsGroup.sol";
-import "./policy/PolicyFactory.sol";
-import "./vote/VoteTimes.sol";
+import "../libs/Killable.sol";
+import "../libs/Decimals.sol";
+import "../market/Market.sol";
+import "../metrics/Metrics.sol";
+import "../metrics/MetricsGroup.sol";
+import "../policy/PolicyFactory.sol";
+import "../vote/VoteTimes.sol";
+import "./Allocation.sol";
+import "./Withdrawable.sol";
 
 contract Allocator is Killable, Ownable, Withdrawable {
 	using SafeMath for uint256;
@@ -109,7 +110,7 @@ contract Allocator is Killable, Ownable, Withdrawable {
 		lastAllocationBlockEachMetrics[_metrics] = block.number;
 		lastAssetValueEachMetrics[_metrics] = value;
 		lastAssetValueEachMarketPerBlock[metrics.market()] = marketValue;
-		increment(
+		Allocation(config().allocation()).increment(
 			metrics.property(),
 			allocation(blocks, mint, value, marketValue, assets, totalAssets)
 		);

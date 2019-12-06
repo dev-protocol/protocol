@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "../common/config/UsingConfig.sol";
 import "../common/modifier/UsingModifier.sol";
-import "../Allocator.sol";
+import "../allocator/Allocator.sol";
 import "../lockup/Lockup.sol";
 
 contract Property is ERC20, ERC20Detailed, UsingConfig, UsingModifier {
