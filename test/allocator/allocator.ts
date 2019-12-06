@@ -132,7 +132,7 @@ contract('AllocationBlockNumberTest', ([key1, key2, key3]) => {
 		let allocationBlockNumber: any
 		beforeEach(async () => {
 			allocationBlockNumber = await allocationBlockNumberContract.new()
-			await allocationBlockNumber.setLastAllocationBlockNumber(key1)
+			await allocationBlockNumber.setWithNow(key1)
 		})
 		it('The block number of the set timing has been acquired', async () => {
 			const blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(

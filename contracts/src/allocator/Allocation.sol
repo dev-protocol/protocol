@@ -14,8 +14,8 @@ contract Allocation is UsingModifier, UsingStorage {
 	constructor(address _config) public UsingModifier(_config) UsingStorage() {}
 
 	function increment(address _property, uint256 _value) public onlyAllocator {
-		_totals[_property] += _value;
-		_prices[_property] += _value.div(ERC20(_property).totalSupply());
+		_totals[_property] = _totals[_property].add(_value);
+		_prices[_property] = _prices[_property].add(_value.div(ERC20(_property).totalSupply()));
 	}
 	function getRewardsAmount(address _property) public view returns (uint256) {
 		return _totals[_property];
