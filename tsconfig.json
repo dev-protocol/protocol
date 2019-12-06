@@ -7,8 +7,7 @@
 		"strict": true,
 		"rootDir": "./",
 		"typeRoots": ["./node_modules/@types", "./types"],
-		"types": ["node", "truffle-contracts"],
-		"outDir": "dist"
+		"types": ["node", "truffle-contracts"]
 	},
 	"include": ["**/*"]
 }

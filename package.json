@@ -8,8 +8,9 @@
 		"pretest": "npm run generate",
 		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
 		"deploy": "truffle migrate --reset --network",
+		"predeploy": "tsc -p tsconfig.migrations.json",
 		"lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
-		"lint:eslint": "eslint . --ext .ts,.js --fix --ignore-pattern node_modules/ --ignore-pattern types/ --ignore-pattern dist/",
+		"lint:eslint": "eslint . --ext .ts,.js --fix",
 		"lint:solium": "solium --dir . --fix",
 		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
 		"build-cli": "tsc -p tsconfig.cli.json"
@@ -46,6 +47,7 @@
 		"truffle": "^5.1.1",
 		"truffle-hdwallet-provider": "^1.0.17",
 		"truffle-typings": "^1.0.8",
+		"ts-generator": "0.0.8",
 		"ts-node": "^8.5.2",
 		"typechain": "^1.0.3",
 		"typechain-target-truffle": "^1.0.2",
