@@ -23,7 +23,9 @@ contract Withdrawable is UsingConfig {
 			PropertyGroup(config().propertyGroup()).isProperty(_property),
 			"only property contract"
 		);
-		PendingWithdrawal pending = PendingWithdrawal(config().pendingWithdrawal());
+		PendingWithdrawal pending = PendingWithdrawal(
+			config().pendingWithdrawal()
+		);
 		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
 		uint256 value = _value + pending.get(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
@@ -50,11 +52,10 @@ contract Withdrawable is UsingConfig {
 		);
 		lastPrice.set(_property, _from, price);
 		lastPrice.set(_property, _to, price);
-		uint256 amount = calculateWithdrawableAmount(
-			_property,
-			_from
+		uint256 amount = calculateWithdrawableAmount(_property, _from);
+		PendingWithdrawal pending = PendingWithdrawal(
+			config().pendingWithdrawal()
 		);
-		PendingWithdrawal pending = PendingWithdrawal(config().pendingWithdrawal());
 		uint256 pendingWithdrawal = pending.get(_property, _from);
 		pending.set(_property, _from, pendingWithdrawal + amount);
 		WithdrawalLimit memory _limit = withdrawalLimits[_property][_to];
