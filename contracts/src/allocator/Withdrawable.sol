@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "../common/config/UsingConfig.sol";
 import "./Allocation.sol";
 import "../property/PropertyGroup.sol";
+import "./LastWithdrawalPrice.sol";
 
 contract Withdrawable is UsingConfig {
 	struct WithdrawalLimit {
@@ -11,7 +12,6 @@ contract Withdrawable is UsingConfig {
 		uint256 balance;
 	}
 
-	mapping(address => mapping(address => uint256)) private lastWithdrawalPrices;
 	mapping(address => mapping(address => uint256)) private pendingWithdrawals;
 	mapping(address => mapping(address => WithdrawalLimit)) private withdrawalLimits;
 
@@ -29,7 +29,10 @@ contract Withdrawable is UsingConfig {
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
 			_property
 		);
-		lastWithdrawalPrices[_property][msg.sender] = price;
+		LastWithdrawalPrice lastPrice = LastWithdrawalPrice(
+			config().lastWithdrawalPrice()
+		);
+		lastPrice.set(_property, msg.sender, price);
 		pendingWithdrawals[_property][msg.sender] = 0;
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		erc20.mint(msg.sender, value);
@@ -41,8 +44,11 @@ contract Withdrawable is UsingConfig {
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
 			_property
 		);
-		lastWithdrawalPrices[_property][_from] = price;
-		lastWithdrawalPrices[_property][_to] = price;
+		LastWithdrawalPrice lastPrice = LastWithdrawalPrice(
+			config().lastWithdrawalPrice()
+		);
+		lastPrice.set(_property, _from, price);
+		lastPrice.set(_property, _to, price);
 		pendingWithdrawals[_property][_from] += calculateWithdrawableAmount(
 			_property,
 			_from
@@ -64,7 +70,11 @@ contract Withdrawable is UsingConfig {
 		view
 		returns (uint256)
 	{
-		uint256 _last = lastWithdrawalPrices[_property][_user];
+		LastWithdrawalPrice lastPrice = LastWithdrawalPrice(
+			config().lastWithdrawalPrice()
+		);
+
+		uint256 _last = lastPrice.get(_property, _user);
 		WithdrawalLimit memory _limit = withdrawalLimits[_property][_user];
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
 			_property
