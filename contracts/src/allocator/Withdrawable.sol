@@ -5,6 +5,7 @@ import "../common/config/UsingConfig.sol";
 import "./Allocation.sol";
 import "../property/PropertyGroup.sol";
 import "./LastWithdrawalPrice.sol";
+import "./PendingWithdrawal.sol";
 
 contract Withdrawable is UsingConfig {
 	struct WithdrawalLimit {
@@ -12,7 +13,6 @@ contract Withdrawable is UsingConfig {
 		uint256 balance;
 	}
 
-	mapping(address => mapping(address => uint256)) private pendingWithdrawals;
 	mapping(address => mapping(address => WithdrawalLimit)) private withdrawalLimits;
 
 	// solium-disable-next-line no-empty-blocks
@@ -23,8 +23,11 @@ contract Withdrawable is UsingConfig {
 			PropertyGroup(config().propertyGroup()).isProperty(_property),
 			"only property contract"
 		);
+		PendingWithdrawal pending = PendingWithdrawal(
+			config().pendingWithdrawal()
+		);
 		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
-		uint256 value = _value + pendingWithdrawals[_property][msg.sender];
+		uint256 value = _value + pending.get(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
 			_property
@@ -33,7 +36,7 @@ contract Withdrawable is UsingConfig {
 			config().lastWithdrawalPrice()
 		);
 		lastPrice.set(_property, msg.sender, price);
-		pendingWithdrawals[_property][msg.sender] = 0;
+		pending.set(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		erc20.mint(msg.sender, value);
 	}
@@ -49,10 +52,12 @@ contract Withdrawable is UsingConfig {
 		);
 		lastPrice.set(_property, _from, price);
 		lastPrice.set(_property, _to, price);
-		pendingWithdrawals[_property][_from] += calculateWithdrawableAmount(
-			_property,
-			_from
+		uint256 amount = calculateWithdrawableAmount(_property, _from);
+		PendingWithdrawal pending = PendingWithdrawal(
+			config().pendingWithdrawal()
 		);
+		uint256 pendingWithdrawal = pending.get(_property, _from);
+		pending.set(_property, _from, pendingWithdrawal + amount);
 		WithdrawalLimit memory _limit = withdrawalLimits[_property][_to];
 		uint256 total = Allocation(config().allocation()).getRewardsAmount(
 			_property

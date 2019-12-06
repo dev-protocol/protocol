@@ -7,6 +7,7 @@ contract AddressConfig is Ownable {
 	address public allocator;
 	address public allocation;
 	address public lastWithdrawalPrice;
+	address public pendingWithdrawal;
 	address public marketFactory;
 	address public marketGroup;
 	address public propertyFactory;
@@ -31,6 +32,10 @@ contract AddressConfig is Ownable {
 
 	function setLastWithdrawalPrice(address _addr) public onlyOwner {
 		lastWithdrawalPrice = _addr;
+	}
+
+	function setPendingWithdrawal(address _addr) public onlyOwner {
+		pendingWithdrawal = _addr;
 	}
 
 	function setMarketFactory(address _addr) public onlyOwner {
