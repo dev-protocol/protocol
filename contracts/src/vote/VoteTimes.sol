@@ -1,15 +1,27 @@
 pragma solidity ^0.5.0;
 
+import "../common/config/UsingConfig.sol";
 import "../common/storage/UsingStorage.sol";
+import "../common/validate/GroupValidator.sol";
+import "../common/validate/SenderValidator.sol";
 
-contract VoteTimes is UsingStorage {
-	function addVoteCount() public {
+contract VoteTimes is UsingConfig, UsingStorage {
+
+	// solium-disable-next-line no-empty-blocks
+	constructor(address _config) public UsingConfig(_config) {}
+
+	function addVoteCount() external {
+		new SenderValidator().validateSender(msg.sender, config().marketFactory(), config().policyFactory());
+
 		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));
 		voteTimes++;
 		eternalStorage().setUint(keccak256("_voteTimes"), voteTimes);
 	}
 
-	function addVoteTimesByProperty(address _property) public {
+	function addVoteTimesByProperty(address _property) external {
+		new GroupValidator(config()).validateProperty(_property);
+		new SenderValidator().validateSender(msg.sender, config().voteCounter());
+
 		bytes32 key = keccak256(
 			abi.encodePacked("_voteTimesByProperty", _property)
 		);
@@ -17,7 +29,10 @@ contract VoteTimes is UsingStorage {
 		voteTimesByProperty++;
 		eternalStorage().setUint(key, voteTimesByProperty);
 	}
-	function resetVoteTimesByProperty(address _property) public {
+	function resetVoteTimesByProperty(address _property) external {
+		new GroupValidator(config()).validateProperty(_property);
+		new SenderValidator().validateSender(msg.sender, config().allocator(), config().propertyFactory());
+
 		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));
 		bytes32 key = keccak256(
 			abi.encodePacked("_voteTimesByProperty", _property)
@@ -25,7 +40,7 @@ contract VoteTimes is UsingStorage {
 		eternalStorage().setUint(key, voteTimes);
 	}
 	function getAbstentionTimes(address _property)
-		public
+		external
 		view
 		returns (uint256)
 	{

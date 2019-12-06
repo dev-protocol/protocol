@@ -21,7 +21,9 @@ contract('MarketGroupTest', ([deployer, u1, dummyMarket]) => {
 				from: deployer
 			})
 			await marketGroup.createStorage()
-			voteTimes = await voteTimesContract.new({from: deployer})
+			voteTimes = await voteTimesContract.new(addressConfig.address, {
+				from: deployer
+			})
 			await voteTimes.createStorage()
 			const marketFactory = await marketFactoryContract.new(
 				addressConfig.address,

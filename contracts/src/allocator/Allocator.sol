@@ -47,8 +47,8 @@ contract Allocator is Killable, Ownable, Withdrawable {
 
 	function validateTargetPeriod(address _metrics) private {
 		address property = Metrics(_metrics).property();
-		VoteTimes counter = VoteTimes(config().voteTimes());
-		uint256 abstentionCount = counter.getAbstentionTimes(property);
+		VoteTimes voteTimes = VoteTimes(config().voteTimes());
+		uint256 abstentionCount = voteTimes.getAbstentionTimes(property);
 		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
 			abstentionCount
 		);
@@ -63,7 +63,7 @@ contract Allocator is Killable, Ownable, Withdrawable {
 			"outside the target period"
 		);
 		_allocationBlockNumber.set(_metrics, notTargetBlockNumber);
-		counter.resetVoteTimesByProperty(property);
+		voteTimes.resetVoteTimesByProperty(property);
 	}
 
 	function allocation(
