@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 import "../config/AddressConfig.sol";
 import "../../property/PropertyGroup.sol";
 
-
 contract GroupValidator {
 	AddressConfig private _config;
 	constructor(AddressConfig _addressConfig) public {
