@@ -1,12 +1,11 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/config/UsingConfig.sol";
 import "./Allocation.sol";
+import "../property/PropertyGroup.sol";
 
 contract Withdrawable is UsingConfig {
-	using SafeMath for uint256;
 	struct WithdrawalLimit {
 		uint256 total;
 		uint256 balance;
@@ -16,58 +15,64 @@ contract Withdrawable is UsingConfig {
 	mapping(address => mapping(address => uint256)) private pendingWithdrawals;
 	mapping(address => mapping(address => WithdrawalLimit)) private withdrawalLimits;
 
+	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function withdraw(address _token) public payable {
-		uint256 _value = calculateWithdrawableAmount(_token, msg.sender);
-		uint256 value = _value + pendingWithdrawals[_token][msg.sender];
-		// Should be _token is Dev
-		ERC20Mintable(_token).mint(msg.sender, value);
-		uint256 price = Allocation(config().allocation()).getCumulativePrice(
-			_token
+	function withdraw(address _property) public payable {
+		require(
+			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			"only property contract"
 		);
-		lastWithdrawalPrices[_token][msg.sender] = price;
-		pendingWithdrawals[_token][msg.sender] = 0;
+		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
+		uint256 value = _value + pendingWithdrawals[_property][msg.sender];
+		require(value != 0, "withdraw value is 0");
+		uint256 price = Allocation(config().allocation()).getCumulativePrice(
+			_property
+		);
+		lastWithdrawalPrices[_property][msg.sender] = price;
+		pendingWithdrawals[_property][msg.sender] = 0;
+		ERC20Mintable erc20 = ERC20Mintable(config().token());
+		erc20.mint(msg.sender, value);
 	}
 
-	function beforeBalanceChange(address _token, address _from, address _to)
+	function beforeBalanceChange(address _property, address _from, address _to)
 		public
 	{
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
-			_token
+			_property
 		);
-		lastWithdrawalPrices[_token][_from] = price;
-		lastWithdrawalPrices[_token][_to] = price;
-		pendingWithdrawals[_token][_from] += calculateWithdrawableAmount(
-			_token,
+		lastWithdrawalPrices[_property][_from] = price;
+		lastWithdrawalPrices[_property][_to] = price;
+		pendingWithdrawals[_property][_from] += calculateWithdrawableAmount(
+			_property,
 			_from
 		);
-		WithdrawalLimit memory _limit = withdrawalLimits[_token][_to];
+		WithdrawalLimit memory _limit = withdrawalLimits[_property][_to];
 		uint256 total = Allocation(config().allocation()).getRewardsAmount(
-			_token
+			_property
 		);
 		if (_limit.total != total) {
-			withdrawalLimits[_token][_to] = WithdrawalLimit(
+			withdrawalLimits[_property][_to] = WithdrawalLimit(
 				total,
-				ERC20(_token).balanceOf(_to)
+				ERC20(_property).balanceOf(_to)
 			);
 		}
 	}
 
-	function calculateWithdrawableAmount(address _token, address _user)
+	function calculateWithdrawableAmount(address _property, address _user)
 		private
 		view
 		returns (uint256)
 	{
-		uint256 _last = lastWithdrawalPrices[_token][_user];
-		WithdrawalLimit memory _limit = withdrawalLimits[_token][_user];
+		uint256 _last = lastWithdrawalPrices[_property][_user];
+		WithdrawalLimit memory _limit = withdrawalLimits[_property][_user];
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
-			_token
+			_property
 		);
 		uint256 priceGap = price - _last;
-		uint256 balance = ERC20(_token).balanceOf(_user);
+		uint256 balance = ERC20(_property).balanceOf(_user);
 		uint256 total = Allocation(config().allocation()).getRewardsAmount(
-			_token
+			_property
 		);
 		if (_limit.total == total) {
 			balance = _limit.balance;
