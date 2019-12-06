@@ -4,8 +4,9 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/config/UsingConfig.sol";
 import "../common/modifier/UsingModifier.sol";
+import "../property/PropertyGroup.sol";
 
-contract Withdrawable is UsingConfig, UsingModifier {
+contract Withdrawable is UsingConfig {
 	using SafeMath for uint256;
 	struct WithdrawalLimit {
 		uint256 total;
@@ -22,7 +23,6 @@ contract Withdrawable is UsingConfig, UsingModifier {
 	constructor(address _config)
 		public
 		UsingConfig(_config)
-		UsingModifier(_config)
 	{}
 
 	function getRewardsAmount(address _property) public view returns (uint256) {
@@ -32,8 +32,11 @@ contract Withdrawable is UsingConfig, UsingModifier {
 	function withdraw(address _property)
 		public
 		payable
-		onlyProperty(_property)
 	{
+		require(
+			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			"only property contract"
+		);
 		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
 		uint256 value = _value + pendingWithdrawals[_property][msg.sender];
 		require(value != 0, "withdraw value is 0");
