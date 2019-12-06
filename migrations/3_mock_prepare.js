@@ -28,4 +28,5 @@ module.exports = (deployer, network) => {
 	deploy('VoteTimes')(address)
 	deploy('Allocator')(address)
 	deploy('Allocation')(address)
+	deploy('LastWithdrawalPrice')(address)
 }
