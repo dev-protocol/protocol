@@ -19,7 +19,6 @@ contract Market is UsingConfig, UsingModifier {
 	address public behavior;
 	uint256 public issuedMetrics;
 	uint256 private _votingEndBlockNumber;
-	VoteCounter private _voteCounter;
 
 	modifier onlyDisabledMarket(address _property) {
 		require(enabled == false, "market is already enabled");
@@ -45,7 +44,6 @@ contract Market is UsingConfig, UsingModifier {
 		uint256 marketVotingBlocks = Policy(config().policy())
 			.marketVotingBlocks();
 		_votingEndBlockNumber = block.number + marketVotingBlocks;
-		_voteCounter = new VoteCounter(_config);
 	}
 
 	function schema() public view returns (string memory) {
@@ -92,10 +90,11 @@ contract Market is UsingConfig, UsingModifier {
 		public
 		onlyDisabledMarket(_property)
 	{
-		_voteCounter.addVoteCount(msg.sender, _property, _agree);
+		VoteCounter voteCounter = VoteCounter(config().voteCounter());
+		voteCounter.addVoteCount(msg.sender, address(this), _property, _agree);
 		enabled = Policy(config().policy()).marketApproval(
-			_voteCounter.agreeCount(),
-			_voteCounter.oppositeCount()
+			voteCounter.getAgreeCount(address(this)),
+			voteCounter.getOppositeCount(address(this))
 		);
 	}
 

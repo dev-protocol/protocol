@@ -11,13 +11,11 @@ contract Policy is Killable, UsingConfig {
 	using SafeMath for uint256;
 	IPolicy private _policy;
 	uint256 private _votingEndBlockNumber;
-	VoteCounter private _voteCounter;
 
 	constructor(address _config, address _innerPolicyAddress)
 		public
 		UsingConfig(_config)
 	{
-		_voteCounter = new VoteCounter(_config);
 		_policy = IPolicy(_innerPolicyAddress);
 		setVotingEndBlockNumber();
 	}
@@ -105,10 +103,11 @@ contract Policy is Killable, UsingConfig {
 			block.number <= _votingEndBlockNumber,
 			"voting deadline is over"
 		);
-		_voteCounter.addVoteCount(msg.sender, _property, _agree);
+		VoteCounter voteCounter = VoteCounter(config().voteCounter());
+		voteCounter.addVoteCount(msg.sender, address(this), _property, _agree);
 		bool result = Policy(config().policy()).policyApproval(
-			_voteCounter.agreeCount(),
-			_voteCounter.oppositeCount()
+			voteCounter.getAgreeCount(address(this)),
+			voteCounter.getOppositeCount(address(this))
 		);
 		if (result == false) {
 			return;
