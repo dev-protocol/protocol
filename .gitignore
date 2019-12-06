@@ -90,3 +90,6 @@ typings/
 # output of typechain
 build
 types
+
+# output of tsc
+dist
