@@ -1,5 +1,5 @@
 {
-	"name": "@devprotocol/protocol",
+	"name": "@dev-protocol/protocol",
 	"version": "0.1.0",
 	"description": "Securitize for Internet assets",
 	"main": "index.js",
@@ -9,18 +9,29 @@
 		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
 		"deploy": "truffle migrate --reset --network",
 		"lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
-		"lint:eslint": "eslint . --ext .ts,.js --fix --ignore-pattern node_modules/ --ignore-pattern types/",
+		"lint:eslint": "eslint . --ext .ts,.js --fix --ignore-pattern node_modules/ --ignore-pattern types/ --ignore-pattern dist/",
 		"lint:solium": "solium --dir . --fix",
-		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'"
+		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
+		"build-cli": "tsc -p tsconfig.cli.json"
 	},
+	"bin": {
+		"dev-protocol": "dist/cli/index.js"
+	},
+	"files": [
+		"contracts",
+		"migrations",
+		"truffle-config.js"
+	],
 	"author": "aggre",
 	"license": "MPL-2.0",
 	"devDependencies": {
 		"@types/dotenv": "^8.2.0",
 		"@types/node": "^12.12.14",
 		"@types/ramda": "^0.26.36",
+		"@types/shelljs": "^0.8.6",
 		"@typescript-eslint/eslint-plugin": "^2.9.0",
 		"@typescript-eslint/parser": "^2.9.0",
+		"bignumber.js": "^9.0.0",
 		"dotenv": "^8.2.0",
 		"eslint": "^6.7.1",
 		"eslint-config-prettier": "^6.7.0",
@@ -41,8 +52,13 @@
 		"typescript": "^3.7.2"
 	},
 	"dependencies": {
-		"openzeppelin-solidity": "^2.4.0"
+		"openzeppelin-solidity": "^2.4.0",
+		"shelljs": "^0.8.3"
 	},
+	"bundleddependencies": [
+		"truffle",
+		"shelljs"
+	],
 	"directories": {
 		"doc": "docs",
 		"test": "test"
