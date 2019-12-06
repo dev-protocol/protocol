@@ -4,7 +4,6 @@ import "../common/storage/UsingStorage.sol";
 import "../common/modifier/UsingModifier.sol";
 
 contract LastWithdrawalPrice is UsingStorage, UsingModifier {
-
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingModifier(_config) {}
 
@@ -12,7 +11,12 @@ contract LastWithdrawalPrice is UsingStorage, UsingModifier {
 		eternalStorage().setUint(getKey(_property, _user), _value);
 	}
 
-	function get(address _property, address _user) external onlyAllocator view returns (uint256) {
+	function get(address _property, address _user)
+		external
+		view
+		onlyAllocator
+		returns (uint256)
+	{
 		return eternalStorage().getUint(getKey(_property, _user));
 	}
 

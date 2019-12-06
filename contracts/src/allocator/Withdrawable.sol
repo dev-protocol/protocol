@@ -29,7 +29,9 @@ contract Withdrawable is UsingConfig {
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
 			_property
 		);
-		LastWithdrawalPrice lastPrice = LastWithdrawalPrice(config().lastWithdrawalPrice());
+		LastWithdrawalPrice lastPrice = LastWithdrawalPrice(
+			config().lastWithdrawalPrice()
+		);
 		lastPrice.set(_property, msg.sender, price);
 		pendingWithdrawals[_property][msg.sender] = 0;
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
@@ -42,7 +44,9 @@ contract Withdrawable is UsingConfig {
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
 			_property
 		);
-		LastWithdrawalPrice lastPrice = LastWithdrawalPrice(config().lastWithdrawalPrice());
+		LastWithdrawalPrice lastPrice = LastWithdrawalPrice(
+			config().lastWithdrawalPrice()
+		);
 		lastPrice.set(_property, _from, price);
 		lastPrice.set(_property, _to, price);
 		pendingWithdrawals[_property][_from] += calculateWithdrawableAmount(
@@ -66,7 +70,9 @@ contract Withdrawable is UsingConfig {
 		view
 		returns (uint256)
 	{
-		LastWithdrawalPrice lastPrice = LastWithdrawalPrice(config().lastWithdrawalPrice());
+		LastWithdrawalPrice lastPrice = LastWithdrawalPrice(
+			config().lastWithdrawalPrice()
+		);
 
 		uint256 _last = lastPrice.get(_property, _user);
 		WithdrawalLimit memory _limit = withdrawalLimits[_property][_user];
