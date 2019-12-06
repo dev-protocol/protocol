@@ -2,8 +2,11 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../common/config/UsingConfig.sol";
+import "../common/modifier/UsingModifier.sol";
+import "../property/PropertyGroup.sol";
 
-contract Withdrawable {
+contract Withdrawable is UsingConfig {
 	using SafeMath for uint256;
 	struct WithdrawalLimit {
 		uint256 total;
@@ -16,55 +19,63 @@ contract Withdrawable {
 	mapping(address => mapping(address => uint256)) internal pendingWithdrawals;
 	mapping(address => mapping(address => WithdrawalLimit)) internal withdrawalLimits;
 
+	// solium-disable-next-line no-empty-blocks
+	constructor(address _config) public UsingConfig(_config) {}
+
 	function getRewardsAmount(address _property) public view returns (uint256) {
 		return totals[_property];
 	}
 
-	function withdraw(address _token) public payable {
-		uint256 _value = calculateWithdrawableAmount(_token, msg.sender);
-		uint256 value = _value + pendingWithdrawals[_token][msg.sender];
-		// Should be _token is Dev
-		ERC20Mintable(_token).mint(msg.sender, value);
-		lastWithdrawalPrices[_token][msg.sender] = prices[_token];
-		pendingWithdrawals[_token][msg.sender] = 0;
+	function withdraw(address _property) public payable {
+		require(
+			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			"only property contract"
+		);
+		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
+		uint256 value = _value + pendingWithdrawals[_property][msg.sender];
+		require(value != 0, "withdraw value is 0");
+		lastWithdrawalPrices[_property][msg.sender] = prices[_property];
+		pendingWithdrawals[_property][msg.sender] = 0;
+		ERC20Mintable erc20 = ERC20Mintable(config().token());
+		erc20.mint(msg.sender, value);
 	}
 
-	function beforeBalanceChange(address _token, address _from, address _to)
+	function beforeBalanceChange(address _property, address _from, address _to)
 		public
 	{
-		lastWithdrawalPrices[_token][_from] = prices[_token];
-		lastWithdrawalPrices[_token][_to] = prices[_token];
-		pendingWithdrawals[_token][_from] += calculateWithdrawableAmount(
-			_token,
+		lastWithdrawalPrices[_property][_from] = prices[_property];
+		lastWithdrawalPrices[_property][_to] = prices[_property];
+		pendingWithdrawals[_property][_from] += calculateWithdrawableAmount(
+			_property,
 			_from
 		);
-		WithdrawalLimit memory _limit = withdrawalLimits[_token][_to];
-		if (_limit.total != totals[_token]) {
-			withdrawalLimits[_token][_to] = WithdrawalLimit(
-				totals[_token],
-				ERC20(_token).balanceOf(_to)
+		WithdrawalLimit memory _limit = withdrawalLimits[_property][_to];
+		if (_limit.total != totals[_property]) {
+			withdrawalLimits[_property][_to] = WithdrawalLimit(
+				totals[_property],
+				ERC20(_property).balanceOf(_to)
 			);
 		}
 	}
 
-	function calculateWithdrawableAmount(address _token, address _user)
+	function calculateWithdrawableAmount(address _property, address _user)
 		private
 		view
 		returns (uint256)
 	{
-		uint256 _last = lastWithdrawalPrices[_token][_user];
-		WithdrawalLimit memory _limit = withdrawalLimits[_token][_user];
-		uint256 priceGap = prices[_token] - _last;
-		uint256 balance = ERC20(_token).balanceOf(_user);
-		if (_limit.total == totals[_token]) {
+		uint256 _last = lastWithdrawalPrices[_property][_user];
+		WithdrawalLimit memory _limit = withdrawalLimits[_property][_user];
+		uint256 priceGap = prices[_property] - _last;
+		uint256 balance = ERC20(_property).balanceOf(_user);
+		if (_limit.total == totals[_property]) {
 			balance = _limit.balance;
 		}
 		uint256 value = priceGap * balance;
 		return value;
 	}
 
-	function increment(address _token, uint256 value) internal {
-		totals[_token] += value;
-		prices[_token] += value.div(ERC20(_token).totalSupply());
+	function increment(address _property, uint256 value) internal {
+		totals[_property] += value;
+		prices[_property] += value.div(ERC20(_property).totalSupply());
 	}
 }
