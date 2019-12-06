@@ -20,19 +20,13 @@ contract Withdrawable is UsingConfig {
 	mapping(address => mapping(address => WithdrawalLimit)) internal withdrawalLimits;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config)
-		public
-		UsingConfig(_config)
-	{}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function getRewardsAmount(address _property) public view returns (uint256) {
 		return totals[_property];
 	}
 
-	function withdraw(address _property)
-		public
-		payable
-	{
+	function withdraw(address _property) public payable {
 		require(
 			PropertyGroup(config().propertyGroup()).isProperty(_property),
 			"only property contract"
