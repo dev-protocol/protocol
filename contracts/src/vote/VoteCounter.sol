@@ -15,20 +15,23 @@ contract VoteCounter is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addVoteCount(address _sender, address _target, address _property, bool _agree)
-		external
-	{
+	function addVoteCount(
+		address _sender,
+		address _target,
+		address _property,
+		bool _agree
+	) external {
 		bytes32 alreadyVoteKey = getAlreadyVoteKey(_sender, _target, _property);
 		bool alreadyVote = eternalStorage().getBool(alreadyVoteKey);
 		require(alreadyVote == false, "already vote");
 		uint256 voteCount = 0;
 		if (Property(_property).author() == _sender) {
 			// solium-disable-next-line operator-whitespace
-			voteCount =
-				LockupPropertyValue(config().lockupPropertyValue()).get(
-					_property
-				).add(
-				Allocation(config().allocation()).getRewardsAmount(_property));
+			voteCount = LockupPropertyValue(config().lockupPropertyValue())
+				.get(_property)
+				.add(
+				Allocation(config().allocation()).getRewardsAmount(_property)
+			);
 			VoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
 		} else {
 			voteCount = LockupValue(config().lockupValue()).get(
@@ -46,9 +49,14 @@ contract VoteCounter is UsingConfig, UsingStorage {
 	}
 
 	function addOppositeCount(address _target, uint256 _voteCount) private {
-		uint256 oppositeCount = eternalStorage().getUint(getOppositeVoteCountKey(_target));
+		uint256 oppositeCount = eternalStorage().getUint(
+			getOppositeVoteCountKey(_target)
+		);
 		oppositeCount = oppositeCount.add(_voteCount);
-		eternalStorage().setUint(getOppositeVoteCountKey(_target), oppositeCount);
+		eternalStorage().setUint(
+			getOppositeVoteCountKey(_target),
+			oppositeCount
+		);
 	}
 
 	function getOppositeCount(address _sender) external view returns (uint256) {
@@ -56,7 +64,9 @@ contract VoteCounter is UsingConfig, UsingStorage {
 	}
 
 	function addAgreeCount(address _target, uint256 _voteCount) private {
-		uint256 agreeCount = eternalStorage().getUint(getAgreeVoteCountKey(_target));
+		uint256 agreeCount = eternalStorage().getUint(
+			getAgreeVoteCountKey(_target)
+		);
 		agreeCount = agreeCount.add(_voteCount);
 		eternalStorage().setUint(getAgreeVoteCountKey(_target), agreeCount);
 	}
@@ -65,11 +75,11 @@ contract VoteCounter is UsingConfig, UsingStorage {
 		return eternalStorage().getUint(getAgreeVoteCountKey(_sender));
 	}
 
-	function getAlreadyVoteKey(address _sender, address _target, address _property)
-		private
-		pure
-		returns (bytes32)
-	{
+	function getAlreadyVoteKey(
+		address _sender,
+		address _target,
+		address _property
+	) private pure returns (bytes32) {
 		return keccak256(abi.encodePacked(_sender, _target, _property));
 	}
 	function getAgreeVoteCountKey(address _sender)
