@@ -43,7 +43,6 @@ contract Withdrawable is UsingConfig, UsingModifier {
 		erc20.mint(msg.sender, value);
 	}
 
-
 	function beforeBalanceChange(address _property, address _from, address _to)
 		public
 	{
