@@ -54,7 +54,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 				.withdrawDev(ui, {from: deployer})
 				.catch((err: Error) => err)
 			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert only lockup contract -- Reason given: only lockup contract.'
+				'Returned error: VM Exception while processing transaction: revert'
 			)
 		})
 		it('When lockup value is 0', async () => {})

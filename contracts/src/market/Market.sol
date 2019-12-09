@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/modifier/UsingModifier.sol";
+import "../common/validate/SenderValidator.sol";
 import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
@@ -10,7 +10,7 @@ import "../vote/VoteCounter.sol";
 import "../lockup/Lockup.sol";
 import "./IMarket.sol";
 
-contract Market is UsingConfig, UsingModifier {
+contract Market is UsingConfig {
 	// TODO
 	// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#metrics
 	// create maoppimg key(key: Metrics Contract address  value: context)
@@ -36,9 +36,8 @@ contract Market is UsingConfig, UsingModifier {
 	constructor(address _config, address _behavior)
 		public
 		UsingConfig(_config)
-		UsingModifier(_config)
-		onlyMarketFactory
 	{
+		new SenderValidator().validateSender(msg.sender, config().marketFactory());
 		behavior = _behavior;
 		enabled = false;
 		uint256 marketVotingBlocks = Policy(config().policy())

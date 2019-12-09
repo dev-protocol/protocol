@@ -1,11 +1,8 @@
 pragma solidity ^0.5.0;
 
 import "../common/storage/UsingStorage.sol";
-import "../common/modifier/UsingModifier.sol";
 
-contract PendingWithdrawal is UsingStorage, UsingModifier {
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingModifier(_config) {}
+contract PendingWithdrawal is UsingStorage {
 
 	function set(address _property, address _user, uint256 _value) external {
 		eternalStorage().setUint(getKey(_property, _user), _value);
@@ -14,7 +11,6 @@ contract PendingWithdrawal is UsingStorage, UsingModifier {
 	function get(address _property, address _user)
 		external
 		view
-		onlyAllocator
 		returns (uint256)
 	{
 		return eternalStorage().getUint(getKey(_property, _user));

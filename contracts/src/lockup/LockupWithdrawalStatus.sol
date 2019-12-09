@@ -2,13 +2,14 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/storage/UsingStorage.sol";
-import "../common/modifier/UsingModifier.sol";
+import "../common/config/UsingConfig.sol";
+import "../common/validate/SenderValidator.sol";
 
-contract LockupWithdrawalStatus is UsingModifier, UsingStorage {
+contract LockupWithdrawalStatus is UsingConfig, UsingStorage {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingModifier(_config) {}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function getKey(address _property, address _sender)
 		private
@@ -34,8 +35,8 @@ contract LockupWithdrawalStatus is UsingModifier, UsingStorage {
 
 	function start(address _property, address _from, uint256 _wait)
 		external
-		onlyLockup
 	{
+		new SenderValidator().validateSender(msg.sender, config().lockup());
 		set(_property, _from, block.number.add(_wait));
 	}
 	function possible(address _property, address _from)
@@ -49,7 +50,8 @@ contract LockupWithdrawalStatus is UsingModifier, UsingStorage {
 		}
 		return blockNumber <= block.number;
 	}
-	function complete(address _property, address _from) external onlyLockup {
+	function complete(address _property, address _from) external {
+		new SenderValidator().validateSender(msg.sender, config().lockup());
 		set(_property, _from, 0);
 	}
 	function waiting(address _property, address _from)
