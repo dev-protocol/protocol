@@ -43,8 +43,6 @@ run the following command to deploy each contract.
 npm run deploy mock
 ```
 
-
-
 If you use Visual Studio Code, we recommend that you install the following plug-ins:
 
 ```
