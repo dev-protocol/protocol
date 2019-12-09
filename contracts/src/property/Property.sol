@@ -3,11 +3,10 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import "../common/config/UsingConfig.sol";
-import "../common/modifier/UsingModifier.sol";
 import "../allocator/Allocator.sol";
 import "../lockup/Lockup.sol";
 
-contract Property is ERC20, ERC20Detailed, UsingConfig, UsingModifier {
+contract Property is ERC20, ERC20Detailed, UsingConfig {
 	address public author;
 	constructor(
 		address _config,
@@ -16,12 +15,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingModifier {
 		string memory _symbol,
 		uint8 _decimals,
 		uint256 _supply
-	)
-		public
-		UsingConfig(_config)
-		UsingModifier(_config)
-		ERC20Detailed(_name, _symbol, _decimals)
-	{
+	) public UsingConfig(_config) ERC20Detailed(_name, _symbol, _decimals) {
 		author = _own;
 		_mint(author, _supply);
 	}
@@ -36,11 +30,12 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingModifier {
 		return true;
 	}
 
-	function withdrawDev(address _sender) public onlyLockup {
+	function withdrawDev(address _sender) public {
 		uint256 value = LockupValue(config().lockupValue()).get(
 			address(this),
 			_sender
 		);
+		new SenderValidator().validateSender(msg.sender, config().lockup());
 		require(value != 0, "your token is 0");
 		ERC20 devToken = ERC20(config().token());
 		devToken.transfer(_sender, value);
