@@ -1,4 +1,8 @@
-const handler = function(deployer) {
+const handler = function(deployer, network) {
+	if (network !== 'mock') {
+		return
+	}
+
 	const {address} = artifacts.require('AddressConfig')
 
 	// Allocator
