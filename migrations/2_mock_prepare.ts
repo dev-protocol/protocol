@@ -34,7 +34,7 @@ const handler = function(deployer, network) {
 
 	// Vote
 	deployer.deploy(artifacts.require('VoteCounter'), address)
-	deployer.deploy(artifacts.require('VoteTimes'))
+	deployer.deploy(artifacts.require('VoteTimes'), address)
 } as Truffle.Migration
 
 export = handler

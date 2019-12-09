@@ -16,7 +16,9 @@ contract('PropertyTest', ([deployer, ui]) => {
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
 			lockup = await lockupContract.new(addressConfig.address)
-			voteTimes = await voteTimesContract.new({from: deployer})
+			voteTimes = await voteTimesContract.new(addressConfig.address, {
+				from: deployer
+			})
 			await voteTimes.createStorage()
 			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
 				from: deployer

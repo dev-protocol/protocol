@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "../config/AddressConfig.sol";
 
+//deprecated
 contract UsingModifier {
 	AddressConfig private _config;
 
@@ -9,6 +10,7 @@ contract UsingModifier {
 		_config = AddressConfig(_addressConfig);
 	}
 
+	//deprecated
 	modifier onlyMarketFactory() {
 		require(
 			msg.sender == _config.marketFactory(),
@@ -16,6 +18,8 @@ contract UsingModifier {
 		);
 		_;
 	}
+
+	//deprecated
 	modifier onlyPropertyFactory() {
 		require(
 			msg.sender == _config.propertyFactory(),
@@ -23,10 +27,12 @@ contract UsingModifier {
 		);
 		_;
 	}
+	//deprecated
 	modifier onlyLockup() {
 		require(msg.sender == _config.lockup(), "only lockup contract");
 		_;
 	}
+	//deprecated
 	modifier onlyAllocator() {
 		require(msg.sender == _config.allocator(), "only allocator contract");
 		_;

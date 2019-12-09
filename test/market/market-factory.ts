@@ -26,7 +26,9 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 				from: deployer
 			})
 			await marketGroup.createStorage()
-			voteTimes = await voteTimesContract.new({from: deployer})
+			voteTimes = await voteTimesContract.new(addressConfig.address, {
+				from: deployer
+			})
 			await voteTimes.createStorage()
 			await addressConfig.setMarketFactory(marketFactory.address, {
 				from: deployer
@@ -55,7 +57,7 @@ contract('MarketFactoryTest', ([deployer, u1]) => {
 			)[0].args._market
 		})
 
-		it('Create a new Market Contract and emit C Reate Event telling created market address', async () => {
+		it('Create a new Market Contract and emit C Reate Event telling created mark Et address', async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			deployedMarket = await marketContract.at(expectedMarketAddress)
 			const behaviorAddress = await deployedMarket.behavior({from: deployer})

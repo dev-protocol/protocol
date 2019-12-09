@@ -29,7 +29,9 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 					from: deployer
 				}
 			)
-			const voteTimes = await voteTimesContract.new({from: deployer})
+			const voteTimes = await voteTimesContract.new(addressConfig.address, {
+				from: deployer
+			})
 			await voteTimes.createStorage()
 			const policy = await policyContract.new({from: deployer})
 			const policyGroup = await policyGroupContract.new({from: deployer})
@@ -83,14 +85,14 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 			const expectedMarketAddress = await result.logs.filter(
 				(e: {event: string}) => e.event === 'Create'
 			)[0].args._market
-			// eslint-disable-next-line @typescript-eslint/await-thenable
+			//  eslint-disable-next-line @typescript-eslint/await-thenable
 			const market = await marketContract.at(expectedMarketAddress)
 			//  How t O get address
 			await market.authenticatedCallback(property, {from: u1})
 			//  Expec TedMetoricsAddr Ess = '0x0'
 		})
-		it('When the metrics address is specified', async () => {
-			//  Const Resul t3  = awai T metricsGroup.isMetrics(expectedMetoricsAddress)
+		it('When the metrics address is Specified', async () => {
+			//  Const Resul t3  = awai T metricsGroup.isMetric s(expectedMetoricsAddress)
 			//  expec t(result3).to.b e.equal(true)
 		})
 		it('When the metrics address is not specified', async () => {

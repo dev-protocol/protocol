@@ -84,7 +84,9 @@ contract('MarketTest', ([deployer]) => {
 			await addressConfig.setLockup(lockup.address, {
 				from: deployer
 			})
-			voteTimes = await voteTimesContract.new({from: deployer})
+			voteTimes = await voteTimesContract.new(addressConfig.address, {
+				from: deployer
+			})
 			await addressConfig.setMarketFactory(marketFactory.address, {
 				from: deployer
 			})
