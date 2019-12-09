@@ -92,4 +92,5 @@ build
 types
 
 # output of tsc
-dist
+*.js
+!truffle-config.js
