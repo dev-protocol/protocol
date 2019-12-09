@@ -33,9 +33,7 @@ contract LockupWithdrawalStatus is UsingConfig, UsingStorage {
 		return eternalStorage().getUint(key);
 	}
 
-	function start(address _property, address _from, uint256 _wait)
-		external
-	{
+	function start(address _property, address _from, uint256 _wait) external {
 		new SenderValidator().validateSender(msg.sender, config().lockup());
 		set(_property, _from, block.number.add(_wait));
 	}

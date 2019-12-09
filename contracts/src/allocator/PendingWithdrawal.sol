@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 import "../common/storage/UsingStorage.sol";
 
 contract PendingWithdrawal is UsingStorage {
-
 	function set(address _property, address _user, uint256 _value) external {
 		eternalStorage().setUint(getKey(_property, _user), _value);
 	}

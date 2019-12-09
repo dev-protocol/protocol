@@ -8,11 +8,7 @@ contract MarketGroup is UsingConfig, UsingStorage {
 	mapping(address => bool) private _markets;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config)
-		public
-		UsingConfig(_config)
-		UsingStorage()
-	{}
+	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	function getKey(address _market) private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_marketGroup", _market));
@@ -23,7 +19,10 @@ contract MarketGroup is UsingConfig, UsingStorage {
 	}
 
 	function addMarket(address _market) public {
-		new SenderValidator().validateSender(msg.sender, config().marketFactory());
+		new SenderValidator().validateSender(
+			msg.sender,
+			config().marketFactory()
+		);
 		eternalStorage().setBool(getKey(_market), true);
 	}
 }

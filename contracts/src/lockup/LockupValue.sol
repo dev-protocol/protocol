@@ -43,9 +43,7 @@ contract LockupValue is UsingConfig, UsingStorage {
 		return eternalStorage().getUint(key);
 	}
 
-	function add(address _property, address _sender, uint256 _value)
-		external
-	{
+	function add(address _property, address _sender, uint256 _value) external {
 		new SenderValidator().validateSender(msg.sender, config().lockup());
 		bytes32 key = getKey(_property, _sender);
 		uint256 value = eternalStorage().getUint(key);

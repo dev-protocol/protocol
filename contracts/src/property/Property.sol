@@ -15,11 +15,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 		string memory _symbol,
 		uint8 _decimals,
 		uint256 _supply
-	)
-		public
-		UsingConfig(_config)
-		ERC20Detailed(_name, _symbol, _decimals)
-	{
+	) public UsingConfig(_config) ERC20Detailed(_name, _symbol, _decimals) {
 		author = _own;
 		_mint(author, _supply);
 	}

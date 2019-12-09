@@ -37,7 +37,10 @@ contract Market is UsingConfig {
 		public
 		UsingConfig(_config)
 	{
-		new SenderValidator().validateSender(msg.sender, config().marketFactory());
+		new SenderValidator().validateSender(
+			msg.sender,
+			config().marketFactory()
+		);
 		behavior = _behavior;
 		enabled = false;
 		uint256 marketVotingBlocks = Policy(config().policy())

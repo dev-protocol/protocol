@@ -6,7 +6,6 @@ import "../common/storage/UsingStorage.sol";
 import "../common/config/UsingConfig.sol";
 import "../common/validate/SenderValidator.sol";
 
-
 contract Allocation is UsingConfig, UsingStorage {
 	using SafeMath for uint256;
 	mapping(address => uint256) private _totals;
