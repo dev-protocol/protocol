@@ -1,6 +1,13 @@
 contract(
 	'VoteTimesTest',
-	([deployer, marketFactory, propertyFactory, property, voteCounter]) => {
+	([
+		deployer,
+		marketFactory,
+		propertyFactory,
+		property,
+		dummyProperty,
+		voteCounter
+	]) => {
 		// Const propertyFactoryContract = artifacts.require('PropertyFactory')
 		const voteTimesTestContract = artifacts.require('VoteTimes')
 		const addressConfigContract = artifacts.require('AddressConfig')
@@ -10,11 +17,8 @@ contract(
 			let addressConfig: any
 			let propertyGroup: any
 			beforeEach(async () => {
-				console.log(1)
 				addressConfig = await addressConfigContract.new({from: deployer})
-				console.log(addressConfig.address)
-				console.log(addressConfig)
-				voteTimes = await voteTimesTestContract.new(addressConfig.addrres, {
+				voteTimes = await voteTimesTestContract.new(addressConfig.address, {
 					from: deployer
 				})
 				await addressConfig.setMarketFactory(marketFactory, {
@@ -26,13 +30,14 @@ contract(
 				await addressConfig.setVoteCounter(voteCounter, {
 					from: deployer
 				})
-
 				propertyGroup = await propertyGroupContract.new(addressConfig.address, {
+					from: deployer
+				})
+				await addressConfig.setPropertyGroup(propertyGroup.address, {
 					from: deployer
 				})
 				await propertyGroup.createStorage()
 				await propertyGroup.addProperty(property, {from: propertyFactory})
-
 				await voteTimes.createStorage({from: deployer})
 				await voteTimes.addVoteCount({from: marketFactory})
 				await voteTimes.addVoteCount({from: marketFactory})
@@ -41,33 +46,40 @@ contract(
 				})
 			})
 			it('If the vote was held twice, but the vote was held only once, the number of abstentions will be 1.', async () => {
-				// Const result = await voteTimes.getAbstentionTimes(property)
-				// expect(result.toNumber()).to.be.equal(1)
+				const result = await voteTimes.getAbstentionTimes(property)
+				expect(result.toNumber()).to.be.equal(1)
 			})
-			// It('Storage information can be taken over.', async () => {
-			// 	const storageAddress = await voteTimes.getStorageAddress()
-			// 	const newVoteTimes = await voteTimesTestContract.new({
-			// 		from: deployer
-			// 	})
-			// 	await newVoteTimes.setStorage(storageAddress, {
-			// 		from: deployer
-			// 	})
-			// 	await voteTimes.changeOwner(newVoteTimes.address, {
-			// 		from: deployer
-			// 	})
-			// 	await newVoteTimes.addVoteCount({from: policyFactory})
-			// 	const result = await newVoteTimes.getAbstentionTimes(propertyAddress)
-			// 	expect(result.toNumber()).to.be.equal(2)
-			// })
-			// it('When reset, the number of abstentions becomes 0.', async () => {
-			// 	await voteTimes.resetVoteTimesByProperty(propertyAddress)
-			// 	const result = await voteTimes.getAbstentionTimes(propertyAddress)
-			// 	expect(result.toNumber()).to.be.equal(0)
-			// })
-			// it('If the number of votes is 0, the number of votes cast is the number of abstentions.', async () => {
-			// 	const result = await voteTimes.getAbstentionTimes(dummyProperty)
-			// 	expect(result.toNumber()).to.be.equal(2)
-			// })
+			it('Storage information can be taken over.', async () => {
+				const storageAddress = await voteTimes.getStorageAddress({
+					from: deployer
+				})
+				const newVoteTimes = await voteTimesTestContract.new(
+					addressConfig.address,
+					{
+						from: deployer
+					}
+				)
+				await newVoteTimes.setStorage(storageAddress, {
+					from: deployer
+				})
+				await voteTimes.changeOwner(newVoteTimes.address, {
+					from: deployer
+				})
+				await newVoteTimes.addVoteCount({from: marketFactory})
+				const result = await newVoteTimes.getAbstentionTimes(property)
+				expect(result.toNumber()).to.be.equal(2)
+			})
+			it('When reset, the number of abstentions becomes 0.', async () => {
+				await voteTimes.resetVoteTimesByProperty(property, {
+					from: propertyFactory
+				})
+				const result = await voteTimes.getAbstentionTimes(property)
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('If the number of votes is 0, the number of votes cast is the number of abstentions.', async () => {
+				const result = await voteTimes.getAbstentionTimes(dummyProperty)
+				expect(result.toNumber()).to.be.equal(2)
+			})
 		})
 	}
 )
