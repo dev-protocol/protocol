@@ -1,4 +1,4 @@
 node_modules/
 types/
-dist/
-migrations/*.js
+*.js
+!truffle-config.js

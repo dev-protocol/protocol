@@ -8,15 +8,17 @@
 		"pretest": "npm run generate",
 		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
 		"deploy": "truffle migrate --reset --network",
-		"predeploy": "tsc -p tsconfig.migrations.json",
+		"predeploy": "npm run build",
 		"lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
 		"lint:eslint": "eslint . --ext .ts,.js --fix",
 		"lint:solium": "solium --dir . --fix",
 		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
-		"build-cli": "tsc -p tsconfig.cli.json"
+		"prepack": "npm run build",
+		"build": "tsc -p ./",
+		"prebuild": "npm run generate"
 	},
 	"bin": {
-		"dev-protocol": "dist/cli/index.js"
+		"dev-protocol": "cli/index.js"
 	},
 	"files": [
 		"contracts",

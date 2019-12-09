@@ -7,30 +7,30 @@ const handler = function(deployer) {
 	deployer.deploy(artifacts.require('LastWithdrawalPrice'), address)
 	deployer.deploy(artifacts.require('PendingWithdrawal'), address)
 
-	// lockup
+	// Lockup
 	deployer.deploy(artifacts.require('Lockup'), address)
 	deployer.deploy(artifacts.require('LockupPropertyValue'), address)
 	deployer.deploy(artifacts.require('LockupValue'), address)
 	deployer.deploy(artifacts.require('LockupWithdrawalStatus'), address)
 
-	// market
+	// Market
 	deployer.deploy(artifacts.require('MarketFactory'), address)
 	deployer.deploy(artifacts.require('MarketGroup'), address)
 
-	//metrics
+	// Metrics
 	deployer.deploy(artifacts.require('MetricsGroup'), address)
 
-	// policy
+	// Policy
 	deployer.deploy(artifacts.require('PolicyFactory'), address)
 	deployer.deploy(artifacts.require('PolicyGroup'))
 
-	// property
+	// Property
 	deployer.deploy(artifacts.require('PropertyFactory'), address)
 	deployer.deploy(artifacts.require('PropertyGroup'), address)
 
-	// vote
+	// Vote
 	deployer.deploy(artifacts.require('VoteCounter'), address)
-	deployer.deploy(artifacts.require('VoteTimes'), address)
+	deployer.deploy(artifacts.require('VoteTimes'))
 } as Truffle.Migration
 
 export = handler
