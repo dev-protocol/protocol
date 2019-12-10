@@ -5,9 +5,7 @@ import "../common/storage/UsingStorage.sol";
 
 contract PolicySet is UsingStorage {
 	function addSet(address _addr) external {
-		uint256 index = eternalStorage().getUint(
-			keccak256("_policySetIndex")
-		);
+		uint256 index = eternalStorage().getUint(keccak256("_policySetIndex"));
 		bytes32 key = getKey(index);
 		eternalStorage().setAddress(key, _addr);
 		index++;
@@ -24,9 +22,7 @@ contract PolicySet is UsingStorage {
 	}
 
 	function deleteAll() external {
-		uint256 index = eternalStorage().getUint(
-			keccak256("_policySetIndex")
-		);
+		uint256 index = eternalStorage().getUint(keccak256("_policySetIndex"));
 		for (uint256 i = 0; i < index; i++) {
 			bytes32 key = getKey(index);
 			eternalStorage().setAddress(key, address(0));
