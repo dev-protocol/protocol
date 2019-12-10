@@ -102,7 +102,9 @@ contract Market is UsingConfig {
 
 	// TODO Run many times
 	function authenticatedCallback(address _property) public returns (address) {
-		MetricsFactory metricsFactory = MetricsFactory(config().metricsFactory());
+		MetricsFactory metricsFactory = MetricsFactory(
+			config().metricsFactory()
+		);
 		address metrics = metricsFactory.createMetrics(_property);
 		uint256 tokenValue = LockupPropertyValue(config().lockupPropertyValue())
 			.get(_property);
