@@ -44,7 +44,7 @@ contract('MarketFactoryTest', ([deployer, policyFactory]) => {
 				addressConfig.address,
 				policyTest1.address,
 				{
-					from: deployer
+					from: policyFactory
 				}
 			)
 			await addressConfig.setPolicy(policy.address, {

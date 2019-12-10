@@ -6,9 +6,6 @@ import "../vote/VoteTimes.sol";
 import "../common/validate/StringValidator.sol";
 
 contract PropertyFactory is UsingConfig {
-	uint8 decimals = 18;
-	uint256 supply = 10000000;
-
 	event Create(address indexed _from, address _property);
 
 	// solium-disable-next-line no-empty-blocks
@@ -26,9 +23,7 @@ contract PropertyFactory is UsingConfig {
 			address(config()),
 			msg.sender,
 			_name,
-			_symbol,
-			decimals,
-			supply
+			_symbol
 		);
 		PropertyGroup(config().propertyGroup()).addGroup(address(property));
 		emit Create(msg.sender, address(property));

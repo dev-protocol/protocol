@@ -11,7 +11,7 @@ contract MetricsFactory is UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function createMetrics(address _property) public returns (address) {
+	function createMetrics(address _property) external returns (address) {
 		AddressValidator validator = new AddressValidator();
 		validator.validateGroup(_property, config().propertyGroup());
 		validator.validateSender(msg.sender, config().marketGroup());

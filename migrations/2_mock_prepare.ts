@@ -28,7 +28,7 @@ const handler = function(deployer, network) {
 	// Policy
 	deployer.deploy(artifacts.require('PolicyFactory'), address)
 	deployer.deploy(artifacts.require('PolicyGroup'), address)
-	deployer.deploy(artifacts.require('PolicySet'))
+	deployer.deploy(artifacts.require('PolicySet'), address)
 
 	// Property
 	deployer.deploy(artifacts.require('PropertyFactory'), address)

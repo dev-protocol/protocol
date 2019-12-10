@@ -16,6 +16,11 @@ contract Policy is Killable, UsingConfig {
 		public
 		UsingConfig(_config)
 	{
+		AddressValidator validator = new AddressValidator();
+		validator.validateDefault(_config);
+		validator.validateDefault(_innerPolicyAddress);
+		validator.validateSender(msg.sender, config().policyFactory());
+
 		_policy = IPolicy(_innerPolicyAddress);
 		setVotingEndBlockNumber();
 	}
@@ -93,11 +98,10 @@ contract Policy is Killable, UsingConfig {
 		return _policy.lockUpBlocks();
 	}
 
-	function vote(address _property, bool _agree) public {
-		require(
-			PropertyGroup(config().propertyGroup()).isGroup(_property),
-			"this address is not property contract"
-		);
+	function vote(address _property, bool _agree) external {
+		AddressValidator validator = new AddressValidator();
+		validator.validateGroup(_property, config().propertyGroup());
+
 		require(config().policy() != address(this), "this policy is current");
 		require(
 			block.number <= _votingEndBlockNumber,
