@@ -1,40 +1,28 @@
 pragma solidity ^0.5.0;
 
-import "../market/MarketGroup.sol";
 import "../common/storage/UsingStorage.sol";
+import "../common/config/UsingConfig.sol";
+import "../common/validate/SenderValidator.sol";
+import "../common/interface/IGroup.sol";
 
-contract PolicyGroup is UsingStorage {
-	function add(address _policy) external {
-		uint256 index = eternalStorage().getUint(
-			keccak256("_policyGroupIndex")
+contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
+	// solium-disable-next-line no-empty-blocks
+	constructor(address _config) public UsingConfig(_config) {}
+
+	function addGroup(address _addr) external {
+		new SenderValidator().validateSender(
+			msg.sender,
+			config().policyFactory()
 		);
-		bytes32 key = getKey(index);
-		eternalStorage().setAddress(key, _policy);
-		index++;
-		eternalStorage().setUint(keccak256("_policyGroupIndex"), index);
+		require(_addr != address(0), "policy is an invalid address");
+		eternalStorage().setBool(getKey(_addr), true);
 	}
 
-	function count() external view returns (uint256) {
-		return eternalStorage().getUint(keccak256("_policyGroupIndex"));
+	function isGroup(address _addr) external view returns (bool) {
+		return eternalStorage().getBool(getKey(_addr));
 	}
 
-	function get(uint256 _index) external view returns (address) {
-		bytes32 key = getKey(_index);
-		return eternalStorage().getAddress(key);
-	}
-
-	function deleteAll() external {
-		uint256 index = eternalStorage().getUint(
-			keccak256("_policyGroupIndex")
-		);
-		for (uint256 i = 0; i < index; i++) {
-			bytes32 key = getKey(index);
-			eternalStorage().setAddress(key, address(0));
-		}
-		eternalStorage().setUint(keccak256("_policyGroupIndex"), 0);
-	}
-
-	function getKey(uint256 _index) private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_policyGroup", _index));
+	function deleteGroup(address _addr) external {
+		return eternalStorage().setBool(getKey(_addr), false);
 	}
 }

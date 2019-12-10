@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "../common/config/UsingConfig.sol";
 import "./Policy.sol";
+import "./PolicySet.sol";
 import "./PolicyGroup.sol";
 import "../vote/VoteTimes.sol";
 
@@ -15,27 +16,31 @@ contract PolicyFactory is UsingConfig {
 		Policy policy = new Policy(address(config()), _newPolicyAddress);
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
-		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
-		policyGroup.add(policyAddress);
-		if (policyGroup.count() == 1) {
+		PolicySet policySet = PolicySet(config().policySet());
+		policySet.addSet(policyAddress);
+		if (policySet.count() == 1) {
 			config().setPolicy(policyAddress);
 		} else {
 			VoteTimes(config().voteTimes()).addVoteCount();
 		}
+		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
+		policyGroup.addGroup(policyAddress);
 		return policyAddress;
 	}
 
 	function convergePolicy(address _currentPolicyAddress) public {
 		config().setPolicy(_currentPolicyAddress);
+		PolicySet policySet = PolicySet(config().policySet());
 		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
-		for (uint256 i = 0; i < policyGroup.count(); i++) {
-			address policyAddress = policyGroup.get(i);
+		for (uint256 i = 0; i < policySet.count(); i++) {
+			address policyAddress = policySet.get(i);
 			if (policyAddress == _currentPolicyAddress) {
 				continue;
 			}
 			Policy(policyAddress).kill();
+			policyGroup.deleteGroup(policyAddress);
 		}
-		policyGroup.deleteAll();
-		policyGroup.add(_currentPolicyAddress);
+		policySet.deleteAll();
+		policySet.addSet(_currentPolicyAddress);
 	}
 }

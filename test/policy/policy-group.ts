@@ -1,6 +1,5 @@
 contract('PolicyGroupTest', () => {
-	describe('PolicyGroup; add', () => {})
-	describe('PolicyGroup; count', () => {})
-	describe('PolicyGroup; get', () => {})
-	describe('PolicyGroup; deleteAll', () => {})
+	describe('PolicyGroup; addGroup', () => {})
+	describe('PolicyGroup; isGroup', () => {})
+	describe('PolicyGroup; deleteGroup', () => {})
 })

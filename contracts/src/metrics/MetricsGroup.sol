@@ -2,29 +2,26 @@ pragma solidity ^0.5.0;
 
 import "../market/MarketGroup.sol";
 import "../common/storage/UsingStorage.sol";
+import "../common/interface/IGroup.sol";
 
-contract MetricsGroup is UsingConfig, UsingStorage {
+contract MetricsGroup is UsingConfig, UsingStorage, IGroup {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addMetrics(address _metrics) public {
+	function addGroup(address _addr) external {
 		require(
-			MarketGroup(config().marketGroup()).isMarket(msg.sender),
+			MarketGroup(config().marketGroup()).isGroup(msg.sender),
 			"only market contract"
 		);
-		require(_metrics != address(0), "metrics is an invalid address");
-		eternalStorage().setBool(getKey(_metrics), true);
+		require(_addr != address(0), "metrics is an invalid address");
+		eternalStorage().setBool(getKey(_addr), true);
 		uint256 totalCount = eternalStorage().getUint(keccak256("_totalCount"));
 		totalCount++;
 		eternalStorage().setUint(keccak256("_totalCount"), totalCount);
 	}
 
-	function getKey(address _metrics) private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_metricsGroup", _metrics));
-	}
-
-	function isMetrics(address _metrics) public view returns (bool) {
-		return eternalStorage().getBool(getKey(_metrics));
+	function isGroup(address _addr) external view returns (bool) {
+		return eternalStorage().getBool(getKey(_addr));
 	}
 
 	function totalIssuedMetrics() public view returns (uint256) {

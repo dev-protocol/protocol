@@ -27,7 +27,7 @@ contract Market is UsingConfig {
 			"voting deadline is over"
 		);
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			PropertyGroup(config().propertyGroup()).isGroup(_property),
 			"this address is not property contract"
 		);
 		_;
@@ -104,7 +104,7 @@ contract Market is UsingConfig {
 	function authenticatedCallback(address _prop) public returns (address) {
 		Metrics metrics = new Metrics(_prop);
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
-		metricsGroup.addMetrics(address(metrics));
+		metricsGroup.addGroup(address(metrics));
 		uint256 tokenValue = LockupPropertyValue(config().lockupPropertyValue())
 			.get(metrics.property());
 		Policy policy = Policy(config().policy());

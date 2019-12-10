@@ -25,7 +25,7 @@ contract PropertyFactory is UsingConfig {
 			decimals,
 			supply
 		);
-		PropertyGroup(config().propertyGroup()).addProperty(address(property));
+		PropertyGroup(config().propertyGroup()).addGroup(address(property));
 		emit Create(msg.sender, address(property));
 		VoteTimes(config().voteTimes()).resetVoteTimesByProperty(
 			address(property)
