@@ -23,7 +23,9 @@ contract MarketTest1 is IMarket {
 		string memory,
 		string memory,
 		string memory,
-		string memory) public returns (bool) {
+		// solium-disable-next-line no-trailing-whitespace
+		string memory
+	) public returns (bool) {
 		Market(market).authenticatedCallback(_prop);
 		return true;
 	}
