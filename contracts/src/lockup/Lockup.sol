@@ -14,7 +14,7 @@ contract Lockup is UsingConfig {
 
 	function lockup(address _property, uint256 _value) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			PropertyGroup(config().propertyGroup()).isGroup(_property),
 			"this address is not property contract"
 		);
 		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(
@@ -47,7 +47,7 @@ contract Lockup is UsingConfig {
 
 	function cancel(address _property) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			PropertyGroup(config().propertyGroup()).isGroup(_property),
 			"this address is not property contract"
 		);
 		require(
@@ -70,7 +70,7 @@ contract Lockup is UsingConfig {
 
 	function withdraw(address _property) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			PropertyGroup(config().propertyGroup()).isGroup(_property),
 			"this address is not property contract"
 		);
 		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(

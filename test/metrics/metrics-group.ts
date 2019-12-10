@@ -11,7 +11,7 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 	const lockupPropertyValueContract = artifacts.require('LockupPropertyValue')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const voteTimesContract = artifacts.require('VoteTimes')
-
+	const policySetContract = artifacts.require('PolicySet')
 	describe('MetricsGroup; isMetrics', () => {
 		// Let e XpectedMetorics Address: any
 		let metricsGroup: any
@@ -34,11 +34,19 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 			})
 			await voteTimes.createStorage()
 			const policy = await policyContract.new({from: deployer})
-			const policyGroup = await policyGroupContract.new({from: deployer})
+			const policyGroup = await policyGroupContract.new(addressConfig.address, {
+				from: deployer
+			})
 			policyGroup.createStorage()
 			await addressConfig.setPolicyGroup(policyGroup.address, {
 				from: deployer
 			})
+			const policySet = await policySetContract.new({from: deployer})
+			policySet.createStorage()
+			await addressConfig.setPolicySet(policySet.address, {
+				from: deployer
+			})
+
 			const policyFactory = await policyFactoryContract.new(
 				addressConfig.address,
 				{
@@ -96,7 +104,7 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 			//  expec t(result3).to.b e.equal(true)
 		})
 		it('When the metrics address is not specified', async () => {
-			const result = await metricsGroup.isMetrics(dummyMetrics)
+			const result = await metricsGroup.isGroup(dummyMetrics)
 			expect(result).to.be.equal(false)
 		})
 	})

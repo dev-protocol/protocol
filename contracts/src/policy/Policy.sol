@@ -95,7 +95,7 @@ contract Policy is Killable, UsingConfig {
 
 	function vote(address _property, bool _agree) public {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			PropertyGroup(config().propertyGroup()).isGroup(_property),
 			"this address is not property contract"
 		);
 		require(config().policy() != address(this), "this policy is current");

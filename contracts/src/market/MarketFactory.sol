@@ -13,7 +13,7 @@ contract MarketFactory is UsingConfig {
 	function createMarket(address _addr) public returns (address) {
 		Market market = new Market(address(config()), _addr);
 		address marketAddr = address(market);
-		MarketGroup(config().marketGroup()).addMarket(marketAddr);
+		MarketGroup(config().marketGroup()).addGroup(marketAddr);
 		emit Create(msg.sender, marketAddr);
 		VoteTimes(config().voteTimes()).addVoteCount();
 		return marketAddr;

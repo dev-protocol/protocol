@@ -31,7 +31,7 @@ contract Allocator is Killable, Ownable, Withdrawable {
 
 	function allocate(address _metrics) public payable {
 		require(
-			MetricsGroup(config().metricsGroup()).isMetrics(_metrics),
+			MetricsGroup(config().metricsGroup()).isGroup(_metrics),
 			"not metrics contract"
 		);
 		validateTargetPeriod(_metrics);
