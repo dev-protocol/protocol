@@ -18,10 +18,7 @@ contract MarketGroup is UsingConfig, UsingStorage, IGroup {
 	function addGroup(address _addr) external {
 		AddressValidator validator = new AddressValidator();
 		validator.validateAddress(_addr);
-		validator.validateSender(
-			msg.sender,
-			config().marketFactory()
-		);
+		validator.validateSender(msg.sender, config().marketFactory());
 		eternalStorage().setBool(getKey(_addr), true);
 	}
 }

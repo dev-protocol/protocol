@@ -12,10 +12,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 	function addGroup(address _addr) external {
 		AddressValidator validator = new AddressValidator();
 		validator.validateAddress(_addr);
-		validator.validateSender(
-			msg.sender,
-			config().policyFactory()
-		);
+		validator.validateSender(msg.sender, config().policyFactory());
 		require(_addr != address(0), "policy is an invalid address");
 		eternalStorage().setBool(getKey(_addr), true);
 	}

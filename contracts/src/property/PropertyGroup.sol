@@ -12,10 +12,7 @@ contract PropertyGroup is UsingConfig, UsingStorage, IGroup {
 	function addGroup(address _addr) public {
 		AddressValidator validator = new AddressValidator();
 		validator.validateAddress(_addr);
-		validator.validateSender(
-			msg.sender,
-			config().propertyFactory()
-		);
+		validator.validateSender(msg.sender, config().propertyFactory());
 		require(_addr != address(0), "property is an invalid address");
 		eternalStorage().setBool(getKey(_addr), true);
 	}
