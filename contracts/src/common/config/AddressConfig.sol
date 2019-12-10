@@ -13,6 +13,7 @@ contract AddressConfig is Ownable {
 	address public propertyFactory;
 	address public propertyGroup;
 	address public metricsGroup;
+	address public metricsFactory;
 	address public policy;
 	address public policyFactory;
 	address public policySet;
@@ -54,6 +55,10 @@ contract AddressConfig is Ownable {
 
 	function setPropertyGroup(address _addr) public onlyOwner {
 		propertyGroup = _addr;
+	}
+
+	function setMetricsFactory(address _addr) public onlyOwner {
+		metricsFactory = _addr;
 	}
 
 	function setMetricsGroup(address _addr) public onlyOwner {
