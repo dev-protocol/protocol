@@ -56,12 +56,14 @@
 		"typescript": "^3.7.2"
 	},
 	"dependencies": {
+		"commander": "^4.0.1",
 		"openzeppelin-solidity": "^2.4.0",
 		"shelljs": "^0.8.3"
 	},
 	"bundleddependencies": [
 		"truffle",
-		"shelljs"
+		"shelljs",
+		"commander"
 	],
 	"directories": {
 		"doc": "docs",
