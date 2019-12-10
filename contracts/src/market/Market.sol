@@ -3,9 +3,9 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/validate/AddressValidator.sol";
-import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
+import "../metrics/MetricsFactory.sol";
 import "../vote/VoteCounter.sol";
 import "../lockup/Lockup.sol";
 import "./IMarket.sol";
@@ -101,19 +101,19 @@ contract Market is UsingConfig {
 	}
 
 	// TODO Run many times
-	function authenticatedCallback(address _prop) public returns (address) {
-		Metrics metrics = new Metrics(_prop);
-		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
-		metricsGroup.addGroup(address(metrics));
+	function authenticatedCallback(address _property) public returns (address) {
+		MetricsFactory metricsFactory = MetricsFactory(config().metricsFactory());
+		address metrics = metricsFactory.createMetrics(_property);
 		uint256 tokenValue = LockupPropertyValue(config().lockupPropertyValue())
-			.get(metrics.property());
+			.get(_property);
 		Policy policy = Policy(config().policy());
+		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
 		uint256 authenticationFee = policy.authenticationFee(
 			metricsGroup.totalIssuedMetrics(),
 			tokenValue
 		);
 		ERC20Burnable(config().token()).burnFrom(msg.sender, authenticationFee);
 		issuedMetrics += 1;
-		return address(metrics);
+		return metrics;
 	}
 }

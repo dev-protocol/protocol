@@ -1,5 +1,5 @@
-contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
-	const marketContract = artifacts.require('Market')
+contract('MetricsGroupTest', ([deployer, u1, dummyMetrics]) => {
+	// Const marketContract = artifacts.require('Market')
 	const marketGroupContract = artifacts.require('MarketGroup')
 	const marketFactoryContract = artifacts.require('MarketFactory')
 	const addressConfigContract = artifacts.require('AddressConfig')
@@ -89,14 +89,14 @@ contract('MetricsGroupTest', ([deployer, u1, property, dummyMetrics]) => {
 			await addressConfig.setMetricsGroup(metricsGroup.address, {
 				from: deployer
 			})
-			const result = await marketFactory.createMarket(u1, {from: deployer})
-			const expectedMarketAddress = await result.logs.filter(
-				(e: {event: string}) => e.event === 'Create'
-			)[0].args._market
+			// Const result = await marketFactory.createMarket(u1, {from: deployer})
+			// const expectedMarketAddress = await result.logs.filter(
+			// 	(e: {event: string}) => e.event === 'Create'
+			// )[0].args._market
 			//  eslint-disable-next-line @typescript-eslint/await-thenable
-			const market = await marketContract.at(expectedMarketAddress)
+			// const market = await marketContract.at(expectedMarketAddress)
 			//  How t O get address
-			await market.authenticatedCallback(property, {from: u1})
+			// await market.authenticatedCallback(property, {from: u1})
 			//  Expec TedMetoricsAddr Ess = '0x0'
 		})
 		it('When the metrics address is Specified', async () => {
