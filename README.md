@@ -11,6 +11,20 @@ This repository is the place to develop smart contracts for Dev Protocol.
 - Whitepaper: https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.md
 - ホワイトペーパー(日本語): https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md
 
+## How to use
+
+Deploy a mock to the your local network:
+
+```
+# .env
+ETHEREUM_MOCK_HOST=127.0.0.1
+ETHEREUM_MOCK_PORT=7545
+```
+
+```bash
+> dev-protocol mock --host 127.0.0.1 --port 7545
+```
+
 ## Dev Challenge
 
 The developer reward program for this project is taking place. [Check the details.](https://github.com/dev-protocol/protocol/blob/master/docs/DEV_CHALLENGE.md)
@@ -36,8 +50,13 @@ run the following command to test each contract.
 npm test
 ```
 
-run the following command to deploy each contract.
-(Please start ganache in advance.)
+run the following command to deploy each contract. (Please start ganache in advance.)
+
+```
+# .env
+ETHEREUM_MOCK_HOST=127.0.0.1
+ETHEREUM_MOCK_PORT=7545
+```
 
 ```
 npm run deploy mock
