@@ -20,10 +20,7 @@ contract SenderValidator {
 		}
 		require(sender == targetSender2, "this method cannot be executed");
 	}
-	function validateVoteGroup(
-		address sender
-	) external pure {
-
+	function validateVoteGroup(address sender) external pure {
 		// if (sender == targetSender1) {
 		// 	return;
 		// }

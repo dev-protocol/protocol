@@ -16,16 +16,18 @@ contract VoteCounter is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addVoteCount(
-		address _sender,
-		address _property,
-		bool _agree
-	) external {
+	function addVoteCount(address _sender, address _property, bool _agree)
+		external
+	{
 		//_sender 0じゃないか
 		// _property _property稼働か
 		// msg.sender Marketかどうか、　Policyかどうか
 		//new SenderValidator().validateSender(msg.sender, )
-		bytes32 alreadyVoteKey = getAlreadyVoteKey(_sender, msg.sender, _property);
+		bytes32 alreadyVoteKey = getAlreadyVoteKey(
+			_sender,
+			msg.sender,
+			_property
+		);
 		bool alreadyVote = eternalStorage().getBool(alreadyVoteKey);
 		require(alreadyVote == false, "already vote");
 		uint256 voteCount = getVoteCount(_sender, _property);
@@ -46,7 +48,10 @@ contract VoteCounter is UsingConfig, UsingStorage {
 		return eternalStorage().getUint(getAgreeVoteCountKey(_sender));
 	}
 
-	function getVoteCount(address _sender, address _property) private returns (uint256){
+	function getVoteCount(address _sender, address _property)
+		private
+		returns (uint256)
+	{
 		uint256 voteCount;
 		if (Property(_property).author() == _sender) {
 			// solium-disable-next-line operator-whitespace
