@@ -19,18 +19,18 @@ contract MarketTest1 is IMarket {
 
 	function authenticate(
 		address _prop,
-		string memory,
-		string memory,
-		string memory,
-		string memory,
+		string calldata,
+		string calldata,
+		string calldata,
+		string calldata,
 		// solium-disable-next-line no-trailing-whitespace
-		string memory
-	) public returns (bool) {
+		string calldata
+	) external returns (bool) {
 		Market(market).authenticatedCallback(_prop);
 		return true;
 	}
 
-	function calculate(address _prop, uint256, uint256) public returns (bool) {
+	function calculate(address _prop, uint256, uint256) external returns (bool) {
 		Allocator(allocator).calculatedCallback(_prop, 100);
 		return true;
 	}

@@ -117,7 +117,7 @@ contract('MarketTest', ([deployer]) => {
 			await addressConfig.setPolicyGroup(policyGroup.address, {
 				from: deployer
 			})
-			policySet = await policySetContract.new({from: deployer})
+			policySet = await policySetContract.new(addressConfig.address, {from: deployer})
 			policySet.createStorage()
 			await addressConfig.setPolicySet(policySet.address, {
 				from: deployer

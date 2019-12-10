@@ -20,27 +20,18 @@ contract Market is UsingConfig {
 	uint256 public issuedMetrics;
 	uint256 private _votingEndBlockNumber;
 
-	modifier onlyDisabledMarket(address _property) {
-		require(enabled == false, "market is already enabled");
-		require(
-			block.number <= _votingEndBlockNumber,
-			"voting deadline is over"
-		);
-		require(
-			PropertyGroup(config().propertyGroup()).isGroup(_property),
-			"this address is not property contract"
-		);
-		_;
-	}
-
 	constructor(address _config, address _behavior)
 		public
 		UsingConfig(_config)
 	{
-		new AddressValidator().validateSender(
+		AddressValidator validator = new AddressValidator();
+		validator.validateSender(
 			msg.sender,
 			config().marketFactory()
 		);
+		validator.validateDefault(_config);
+		validator.validateDefault(_behavior);
+
 		behavior = _behavior;
 		enabled = false;
 		uint256 marketVotingBlocks = Policy(config().policy())
@@ -52,6 +43,7 @@ contract Market is UsingConfig {
 		return IMarket(behavior).schema();
 	}
 
+	// TODO Not called from anywhere
 	function authenticate(
 		address _prop,
 		string memory _args1,
@@ -60,10 +52,7 @@ contract Market is UsingConfig {
 		string memory _args4,
 		string memory _args5
 	) public returns (bool) {
-		require(
-			msg.sender == Property(_prop).author(),
-			"only owner of property contract"
-		);
+		new AddressValidator().validateSender(msg.sender, Property(_prop).author());
 		return
 			IMarket(behavior).authenticate(
 				_prop,
@@ -76,9 +65,19 @@ contract Market is UsingConfig {
 	}
 
 	function calculate(address _metrics, uint256 _start, uint256 _end)
-		public
+		external
 		returns (bool)
 	{
+		AddressValidator validator = new AddressValidator();
+		validator.validateSender(msg.sender, config().allocator());
+		validator.validateGroup(
+			_metrics,
+			config().metricsGroup()
+		);
+		require(
+			_start <= _end,
+			"block number is not valid"
+		);
 		return IMarket(behavior).calculate(_metrics, _start, _end);
 	}
 
@@ -89,9 +88,18 @@ contract Market is UsingConfig {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
 	function vote(address _property, bool _agree)
-		public
-		onlyDisabledMarket(_property)
+		external
 	{
+		require(enabled == false, "market is already enabled");
+		require(
+			block.number <= _votingEndBlockNumber,
+			"voting deadline is over"
+		);
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
+		);
+
 		VoteCounter voteCounter = VoteCounter(config().voteCounter());
 		voteCounter.addVoteCount(msg.sender, _property, _agree);
 		enabled = Policy(config().policy()).marketApproval(
@@ -101,7 +109,12 @@ contract Market is UsingConfig {
 	}
 
 	// TODO Run many times
-	function authenticatedCallback(address _property) public returns (address) {
+	function authenticatedCallback(address _property) external returns (address) {
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
+		);
+
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);

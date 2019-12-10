@@ -5,15 +5,15 @@ contract IMarket {
 
 	function authenticate(
 		address _prop,
-		string memory _args1,
-		string memory _args2,
-		string memory _args3,
-		string memory _args4,
-		string memory _args5
+		string calldata _args1,
+		string calldata _args2,
+		string calldata _args3,
+		string calldata _args4,
+		string calldata _args5
 		// solium-disable-next-line indentation
-	) public returns (bool);
+	) external returns (bool);
 
 	function calculate(address _prop, uint256 _start, uint256 _end)
-		public
+		external
 		returns (bool);
 }
