@@ -37,7 +37,7 @@ contract(
 					from: deployer
 				})
 				await propertyGroup.createStorage()
-				await propertyGroup.addProperty(property, {from: propertyFactory})
+				await propertyGroup.addGroup(property, {from: propertyFactory})
 				await voteTimes.createStorage({from: deployer})
 				await voteTimes.addVoteCount({from: marketFactory})
 				await voteTimes.addVoteCount({from: marketFactory})

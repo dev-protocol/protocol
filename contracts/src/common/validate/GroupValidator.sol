@@ -10,7 +10,7 @@ contract GroupValidator {
 	}
 	function validateProperty(address _property) external view {
 		require(
-			PropertyGroup(_config.propertyGroup()).isProperty(_property),
+			PropertyGroup(_config.propertyGroup()).isGroup(_property),
 			"this address is not property contract"
 		);
 	}

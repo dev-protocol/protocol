@@ -7,6 +7,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 	const policyFactoryContract = artifacts.require('PolicyFactory')
 	const policyGroupContract = artifacts.require('PolicyGroup')
 	const voteTimesContract = artifacts.require('VoteTimes')
+	const policySetContract = artifacts.require('PolicySet')
 	describe('PropertyFactory; createProperty', () => {
 		let propertyFactory: any
 		let propertyGroup: any
@@ -17,12 +18,20 @@ contract('PropertyFactoryTest', ([deployer]) => {
 		let policyFactory: any
 		let voteTimes: any
 		let policyGroup: any
+		let policySet: any
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
 			policy = await policyContract.new({from: deployer})
-			policyGroup = await policyGroupContract.new({from: deployer})
+			policyGroup = await policyGroupContract.new(addressConfig.address, {
+				from: deployer
+			})
 			policyGroup.createStorage()
 			await addressConfig.setPolicyGroup(policyGroup.address, {
+				from: deployer
+			})
+			policySet = await policySetContract.new({from: deployer})
+			policySet.createStorage()
+			await addressConfig.setPolicySet(policySet.address, {
 				from: deployer
 			})
 			policyFactory = await policyFactoryContract.new(addressConfig.address, {
@@ -75,12 +84,9 @@ contract('PropertyFactoryTest', ([deployer]) => {
 		})
 
 		it('Adds a new Property Contract address to State Contract', async () => {
-			const isProperty = await propertyGroup.isProperty(
-				expectedPropertyAddress,
-				{
-					from: deployer
-				}
-			)
+			const isProperty = await propertyGroup.isGroup(expectedPropertyAddress, {
+				from: deployer
+			})
 			expect(isProperty).to.be.equal(true)
 		})
 	})

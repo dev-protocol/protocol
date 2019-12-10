@@ -20,7 +20,7 @@ contract Withdrawable is UsingConfig {
 
 	function withdraw(address _property) public payable {
 		require(
-			PropertyGroup(config().propertyGroup()).isProperty(_property),
+			PropertyGroup(config().propertyGroup()).isGroup(_property),
 			"only property contract"
 		);
 		PendingWithdrawal pending = PendingWithdrawal(
