@@ -30,7 +30,10 @@ contract MarketTest1 is IMarket {
 		return true;
 	}
 
-	function calculate(address _prop, uint256, uint256) external returns (bool) {
+	function calculate(address _prop, uint256, uint256)
+		external
+		returns (bool)
+	{
 		Allocator(allocator).calculatedCallback(_prop, 100);
 		return true;
 	}

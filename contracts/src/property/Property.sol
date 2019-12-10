@@ -9,8 +9,8 @@ import "../allocator/Allocator.sol";
 import "../lockup/Lockup.sol";
 
 contract Property is ERC20, ERC20Detailed, UsingConfig {
-	uint8 constant private _decimals = 18;
-	uint256 constant private _supply = 10000000;
+	uint8 private constant _decimals = 18;
+	uint256 private constant _supply = 10000000;
 	address public author;
 	StringValidator sValidator = new StringValidator();
 	AddressValidator aValidator = new AddressValidator();

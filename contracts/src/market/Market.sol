@@ -25,10 +25,7 @@ contract Market is UsingConfig {
 		UsingConfig(_config)
 	{
 		AddressValidator validator = new AddressValidator();
-		validator.validateSender(
-			msg.sender,
-			config().marketFactory()
-		);
+		validator.validateSender(msg.sender, config().marketFactory());
 		validator.validateDefault(_config);
 		validator.validateDefault(_behavior);
 
@@ -52,7 +49,10 @@ contract Market is UsingConfig {
 		string memory _args4,
 		string memory _args5
 	) public returns (bool) {
-		new AddressValidator().validateSender(msg.sender, Property(_prop).author());
+		new AddressValidator().validateSender(
+			msg.sender,
+			Property(_prop).author()
+		);
 		return
 			IMarket(behavior).authenticate(
 				_prop,
@@ -70,14 +70,8 @@ contract Market is UsingConfig {
 	{
 		AddressValidator validator = new AddressValidator();
 		validator.validateSender(msg.sender, config().allocator());
-		validator.validateGroup(
-			_metrics,
-			config().metricsGroup()
-		);
-		require(
-			_start <= _end,
-			"block number is not valid"
-		);
+		validator.validateGroup(_metrics, config().metricsGroup());
+		require(_start <= _end, "block number is not valid");
 		return IMarket(behavior).calculate(_metrics, _start, _end);
 	}
 
@@ -87,9 +81,7 @@ contract Market is UsingConfig {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
-	function vote(address _property, bool _agree)
-		external
-	{
+	function vote(address _property, bool _agree) external {
 		require(enabled == false, "market is already enabled");
 		require(
 			block.number <= _votingEndBlockNumber,
@@ -109,7 +101,10 @@ contract Market is UsingConfig {
 	}
 
 	// TODO Run many times
-	function authenticatedCallback(address _property) external returns (address) {
+	function authenticatedCallback(address _property)
+		external
+		returns (address)
+	{
 		new AddressValidator().validateGroup(
 			_property,
 			config().propertyGroup()

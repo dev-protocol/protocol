@@ -4,7 +4,6 @@ import "../market/MarketGroup.sol";
 import "../common/storage/UsingStorage.sol";
 import "../common/validate/AddressValidator.sol";
 
-
 contract PolicySet is UsingConfig, UsingStorage {
 	AddressValidator validator = new AddressValidator();
 
