@@ -19,17 +19,16 @@ contract MarketTest1 is IMarket {
 
 	function authenticate(
 		address _prop,
-		string memory ,
-		string memory ,
-		string memory ,
-		string memory ,
-		string memory 
-		) public returns (bool) {
+		string memory,
+		string memory,
+		string memory,
+		string memory,
+		string memory) public returns (bool) {
 		Market(market).authenticatedCallback(_prop);
 		return true;
 	}
 
-	function calculate(address _prop, uint256 , uint256 ) public returns (bool) {
+	function calculate(address _prop, uint256, uint256) public returns (bool) {
 		Allocator(allocator).calculatedCallback(_prop, 100);
 		return true;
 	}
