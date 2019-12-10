@@ -23,6 +23,7 @@ const handler = function(deployer, network) {
 
 	// Metrics
 	deployer.deploy(artifacts.require('MetricsGroup'), address)
+	deployer.deploy(artifacts.require('MetricsFactory'), address)
 
 	// Policy
 	deployer.deploy(artifacts.require('PolicyFactory'), address)

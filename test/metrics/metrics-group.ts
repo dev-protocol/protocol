@@ -1,111 +1,37 @@
-contract('MetricsGroupTest', ([deployer, u1, dummyMetrics]) => {
-	// Const marketContract = artifacts.require('Market')
-	const marketGroupContract = artifacts.require('MarketGroup')
-	const marketFactoryContract = artifacts.require('MarketFactory')
-	const addressConfigContract = artifacts.require('AddressConfig')
-	const metricsGroupContract = artifacts.require('MetricsGroup')
-	const policyContract = artifacts.require('PolicyTest1')
-	const policyFactoryContract = artifacts.require('PolicyFactory')
-	const policyGroupContract = artifacts.require('PolicyGroup')
-	const lockupContract = artifacts.require('Lockup')
-	const lockupPropertyValueContract = artifacts.require('LockupPropertyValue')
-	const dummyDEVContract = artifacts.require('DummyDEV')
-	const voteTimesContract = artifacts.require('VoteTimes')
-	const policySetContract = artifacts.require('PolicySet')
-	describe('MetricsGroup; isMetrics', () => {
-		// Let e XpectedMetorics Address: any
-		let metricsGroup: any
-		beforeEach(async () => {
-			const addressConfig = await addressConfigContract.new({
-				from: deployer
-			})
-			const marketGroup = await marketGroupContract.new(addressConfig.address, {
-				from: deployer
-			})
-			await marketGroup.createStorage()
-			const marketFactory = await marketFactoryContract.new(
-				addressConfig.address,
-				{
+contract(
+	'MetricsGroupTest',
+	([deployer, metricsFactory, metrics, dummyMetrics]) => {
+		const addressConfigContract = artifacts.require('AddressConfig')
+		const metricsGroupContract = artifacts.require('MetricsGroup')
+		describe('MetricsGroup; isMetrics', () => {
+			// Let e XpectedMetorics Address: any
+			let metricsGroup: any
+			beforeEach(async () => {
+				const addressConfig = await addressConfigContract.new({
 					from: deployer
-				}
-			)
-			const voteTimes = await voteTimesContract.new(addressConfig.address, {
-				from: deployer
-			})
-			await voteTimes.createStorage()
-			const policy = await policyContract.new({from: deployer})
-			const policyGroup = await policyGroupContract.new(addressConfig.address, {
-				from: deployer
-			})
-			policyGroup.createStorage()
-			await addressConfig.setPolicyGroup(policyGroup.address, {
-				from: deployer
-			})
-			const policySet = await policySetContract.new({from: deployer})
-			policySet.createStorage()
-			await addressConfig.setPolicySet(policySet.address, {
-				from: deployer
-			})
-
-			const policyFactory = await policyFactoryContract.new(
-				addressConfig.address,
-				{
+				})
+				metricsGroup = await metricsGroupContract.new(addressConfig.address, {
 					from: deployer
-				}
-			)
-			await addressConfig.setPolicyFactory(policyFactory.address, {
-				from: deployer
+				})
+				await metricsGroup.createStorage()
+				await addressConfig.setMetricsGroup(metricsGroup.address, {
+					from: deployer
+				})
+				await addressConfig.setMetricsFactory(metricsFactory, {
+					from: deployer
+				})
+				metricsGroup.addGroup(metrics, {
+					from: metricsFactory
+				})
 			})
-			await addressConfig.setVoteTimes(voteTimes.address, {
-				from: deployer
+			it('When the metrics address is Specified', async () => {
+				const result = await metricsGroup.isGroup(metrics)
+				expect(result).to.be.equal(true)
 			})
-			await policyFactory.createPolicy(policy.address)
-			const lockup = await lockupContract.new(addressConfig.address)
-			await addressConfig.setLockup(lockup.address, {
-				from: deployer
+			it('When the metrics address is not specified', async () => {
+				const result = await metricsGroup.isGroup(dummyMetrics)
+				expect(result).to.be.equal(false)
 			})
-
-			const lockupPropertyValue = await lockupPropertyValueContract.new(
-				addressConfig.address
-			)
-			await lockupPropertyValue.createStorage()
-			await addressConfig.setLockupPropertyValue(lockupPropertyValue.address, {
-				from: deployer
-			})
-			const dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
-				from: deployer
-			})
-			await addressConfig.setToken(dummyDEV.address, {from: deployer})
-			await dummyDEV.transfer(u1, 10, {from: deployer})
-
-			metricsGroup = await metricsGroupContract.new(addressConfig.address, {
-				from: deployer
-			})
-			await metricsGroup.createStorage()
-			await addressConfig.setMarketFactory(marketFactory.address, {
-				from: deployer
-			})
-			await addressConfig.setMarketGroup(marketGroup.address, {from: deployer})
-			await addressConfig.setMetricsGroup(metricsGroup.address, {
-				from: deployer
-			})
-			// Const result = await marketFactory.createMarket(u1, {from: deployer})
-			// const expectedMarketAddress = await result.logs.filter(
-			// 	(e: {event: string}) => e.event === 'Create'
-			// )[0].args._market
-			//  eslint-disable-next-line @typescript-eslint/await-thenable
-			// const market = await marketContract.at(expectedMarketAddress)
-			//  How t O get address
-			// await market.authenticatedCallback(property, {from: u1})
-			//  Expec TedMetoricsAddr Ess = '0x0'
 		})
-		it('When the metrics address is Specified', async () => {
-			//  Const Resul t3  = awai T metricsGroup.isMetric s(expectedMetoricsAddress)
-			//  expec t(result3).to.b e.equal(true)
-		})
-		it('When the metrics address is not specified', async () => {
-			const result = await metricsGroup.isGroup(dummyMetrics)
-			expect(result).to.be.equal(false)
-		})
-	})
-})
+	}
+)
