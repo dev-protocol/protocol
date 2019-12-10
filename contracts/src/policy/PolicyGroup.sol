@@ -10,7 +10,9 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		new AddressValidator().validateSender(
+		AddressValidator validator = new AddressValidator();
+		validator.validateAddress(_addr);
+		validator.validateSender(
 			msg.sender,
 			config().policyFactory()
 		);
