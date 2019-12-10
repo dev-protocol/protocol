@@ -22,7 +22,11 @@ contract VoteCounter is UsingConfig, UsingStorage {
 		AddressValidator validator = new AddressValidator();
 		validator.validateAddress(_sender);
 		validator.validateGroup(_property, config().propertyGroup());
-		validator.validateGroup(msg.sender, config().marketGroup(), config().policyGroup());
+		validator.validateGroup(
+			msg.sender,
+			config().marketGroup(),
+			config().policyGroup()
+		);
 
 		bytes32 alreadyVoteKey = getAlreadyVoteKey(
 			_sender,

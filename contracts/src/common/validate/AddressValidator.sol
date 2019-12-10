@@ -4,18 +4,16 @@ import "../interface/IGroup.sol";
 
 contract AddressValidator {
 	function validateAddress(address _addr) external pure {
-		require(
-			_addr != address(0),
-			"this address is not proper"
-		);
+		require(_addr != address(0), "this address is not proper");
 	}
 	function validateGroup(address _addr, address groupAddr) external view {
-		require(
-			IGroup(groupAddr).isGroup(_addr),
-			"this address is not proper"
-		);
+		require(IGroup(groupAddr).isGroup(_addr), "this address is not proper");
 	}
-	function validateGroup(address _addr, address groupAddr1, address groupAddr2) external view {
+	function validateGroup(
+		address _addr,
+		address groupAddr1,
+		address groupAddr2
+	) external view {
 		if (IGroup(groupAddr1).isGroup(_addr)) {
 			return;
 		}
