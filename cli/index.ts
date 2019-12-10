@@ -13,8 +13,8 @@ program
 			`ETHEREUM_MOCK_HOST=${host as string}
 			ETHEREUM_MOCK_PORT=${port as number}`.replace(/\t/g, '')
 		)
-		exec('truffle compile')
-		exec('truffle migrate --reset --network mock')
+		exec('npx truffle compile')
+		exec('npx truffle migrate --reset --network mock')
 	})
 
 program.parse(process.argv)

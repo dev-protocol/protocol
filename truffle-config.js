@@ -10,8 +10,6 @@ const {
 	ETHEREUM_MOCK_PORT
 } = process.env
 
-console.log(ETHEREUM_MOCK_HOST, ETHEREUM_MOCK_PORT)
-
 module.exports = {
 	test_file_extension_regexp: /.*\.ts$/,
 	compilers: {
