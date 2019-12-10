@@ -2,15 +2,15 @@ pragma solidity ^0.5.0;
 
 import "../common/config/UsingConfig.sol";
 import "../common/storage/UsingStorage.sol";
-import "../common/validate/GroupValidator.sol";
-import "../common/validate/SenderValidator.sol";
+import "../common/validate/AddressValidator.sol";
 
 contract VoteTimes is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addVoteCount() external {
-		new SenderValidator().validateSender(
+		AddressValidator validator = new AddressValidator();
+		validator.validateSender(
 			msg.sender,
 			config().marketFactory(),
 			config().policyFactory()
@@ -22,8 +22,9 @@ contract VoteTimes is UsingConfig, UsingStorage {
 	}
 
 	function addVoteTimesByProperty(address _property) external {
-		new GroupValidator(config()).validateProperty(_property);
-		new SenderValidator().validateSender(
+		AddressValidator validator = new AddressValidator();
+		validator.validateGroup(_property, config().propertyGroup());
+		validator.validateSender(
 			msg.sender,
 			config().voteCounter()
 		);
@@ -36,8 +37,9 @@ contract VoteTimes is UsingConfig, UsingStorage {
 		eternalStorage().setUint(key, voteTimesByProperty);
 	}
 	function resetVoteTimesByProperty(address _property) external {
-		new GroupValidator(config()).validateProperty(_property);
-		new SenderValidator().validateSender(
+		AddressValidator validator = new AddressValidator();
+		validator.validateGroup(_property, config().propertyGroup());
+		validator.validateSender(
 			msg.sender,
 			config().allocator(),
 			config().propertyFactory()

@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/config/UsingConfig.sol";
 import "../common/storage/UsingStorage.sol";
-import "../common/validate/SenderValidator.sol";
+import "../common/validate/AddressValidator.sol";
 import "../property/Property.sol";
 import "../lockup/LockupPropertyValue.sol";
 import "../lockup/LockupValue.sol";
@@ -19,10 +19,11 @@ contract VoteCounter is UsingConfig, UsingStorage {
 	function addVoteCount(address _sender, address _property, bool _agree)
 		external
 	{
-		//_sender 0じゃないか
-		// _property _property稼働か
-		// msg.sender Marketかどうか、　Policyかどうか
-		//new SenderValidator().validateSender(msg.sender, )
+		AddressValidator validator = new AddressValidator();
+		validator.validateAddress(_sender);
+		validator.validateGroup(_property, config().propertyGroup());
+		validator.validateGroup(msg.sender, config().marketGroup(), config().policyGroup());
+
 		bytes32 alreadyVoteKey = getAlreadyVoteKey(
 			_sender,
 			msg.sender,

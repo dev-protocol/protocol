@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "../common/storage/UsingStorage.sol";
 import "../common/config/UsingConfig.sol";
-import "../common/validate/SenderValidator.sol";
+import "../common/validate/AddressValidator.sol";
 import "../common/interface/IGroup.sol";
 
 contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
@@ -10,7 +10,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		new SenderValidator().validateSender(
+		new AddressValidator().validateSender(
 			msg.sender,
 			config().policyFactory()
 		);

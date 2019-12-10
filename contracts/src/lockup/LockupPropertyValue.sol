@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/storage/UsingStorage.sol";
 import "../common/config/UsingConfig.sol";
-import "../common/validate/SenderValidator.sol";
+import "../common/validate/AddressValidator.sol";
 
 contract LockupPropertyValue is UsingConfig, UsingStorage {
 	using SafeMath for uint256;
@@ -16,7 +16,7 @@ contract LockupPropertyValue is UsingConfig, UsingStorage {
 	}
 
 	function add(address _property, uint256 _value) external {
-		new SenderValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateSender(msg.sender, config().lockup());
 		bytes32 key = getKey(_property);
 		uint256 value = eternalStorage().getUint(key);
 		value = value.add(_value);
@@ -24,7 +24,7 @@ contract LockupPropertyValue is UsingConfig, UsingStorage {
 	}
 
 	function sub(address _property, uint256 _value) external {
-		new SenderValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateSender(msg.sender, config().lockup());
 		bytes32 key = getKey(_property);
 		uint256 value = eternalStorage().getUint(key);
 		value = value.sub(_value);
