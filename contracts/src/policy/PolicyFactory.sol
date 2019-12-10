@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "../common/config/UsingConfig.sol";
+import "../common/validate/AddressValidator.sol";
 import "./Policy.sol";
 import "./PolicySet.sol";
 import "./PolicyGroup.sol";
@@ -13,6 +14,9 @@ contract PolicyFactory is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function createPolicy(address _newPolicyAddress) public returns (address) {
+		AddressValidator validator = new AddressValidator();
+		validator.validateDefault(_newPolicyAddress);
+
 		Policy policy = new Policy(address(config()), _newPolicyAddress);
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
@@ -29,6 +33,10 @@ contract PolicyFactory is UsingConfig {
 	}
 
 	function convergePolicy(address _currentPolicyAddress) public {
+		AddressValidator validator = new AddressValidator();
+		validator.validateGroup(_currentPolicyAddress, config().policyGroup());
+		validator.validateSender(msg.sender, config().policyGroup());
+
 		config().setPolicy(_currentPolicyAddress);
 		PolicySet policySet = PolicySet(config().policySet());
 		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());

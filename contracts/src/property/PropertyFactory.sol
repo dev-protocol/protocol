@@ -3,6 +3,7 @@ pragma solidity ^0.5.0;
 import "./Property.sol";
 import "./PropertyGroup.sol";
 import "../vote/VoteTimes.sol";
+import "../common/validate/StringValidator.sol";
 
 contract PropertyFactory is UsingConfig {
 	uint8 decimals = 18;
@@ -17,6 +18,10 @@ contract PropertyFactory is UsingConfig {
 		public
 		returns (address)
 	{
+		StringValidator validator = new StringValidator();
+		validator.validateEmpty(_name);
+		validator.validateEmpty(_symbol);
+
 		Property property = new Property(
 			address(config()),
 			msg.sender,

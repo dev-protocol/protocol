@@ -1,5 +1,6 @@
 pragma solidity ^0.5.0;
 
+import "../common/validate/AddressValidator.sol";
 import "./Market.sol";
 import "./MarketGroup.sol";
 import "../vote/VoteTimes.sol";
@@ -11,6 +12,9 @@ contract MarketFactory is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function createMarket(address _addr) public returns (address) {
+		AddressValidator validator = new AddressValidator();
+		validator.validateDefault(_addr);
+
 		Market market = new Market(address(config()), _addr);
 		address marketAddr = address(market);
 		MarketGroup(config().marketGroup()).addGroup(marketAddr);

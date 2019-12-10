@@ -20,7 +20,7 @@ contract VoteCounter is UsingConfig, UsingStorage {
 		external
 	{
 		AddressValidator validator = new AddressValidator();
-		validator.validateAddress(_sender);
+		validator.validateDefault(_sender);
 		validator.validateGroup(_property, config().propertyGroup());
 		validator.validateGroup(
 			msg.sender,

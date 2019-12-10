@@ -77,13 +77,13 @@ contract AddressConfig is Ownable {
 		policyGroup = _addr;
 	}
 
-	function setToken(address _addr) public onlyOwner {
-		token = _addr;
-	}
-
 	function setPolicy(address _addr) public {
 		require(msg.sender == policyFactory, "only policy factory contract");
 		policy = _addr;
+	}
+
+	function setToken(address _addr) public onlyOwner {
+		token = _addr;
 	}
 
 	function setLockup(address _addr) public onlyOwner {
