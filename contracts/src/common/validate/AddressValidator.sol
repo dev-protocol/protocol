@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "../interface/IGroup.sol";
 
 contract AddressValidator {
-	function validateAddress(address _addr) external pure {
+	function validateDefault(address _addr) external pure {
 		require(_addr != address(0), "this address is not proper");
 	}
 	function validateGroup(address _addr, address groupAddr) external view {

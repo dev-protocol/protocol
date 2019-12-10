@@ -11,7 +11,7 @@ contract PropertyGroup is UsingConfig, UsingStorage, IGroup {
 
 	function addGroup(address _addr) external {
 		AddressValidator validator = new AddressValidator();
-		validator.validateAddress(_addr);
+		validator.validateDefault(_addr);
 		validator.validateSender(msg.sender, config().propertyFactory());
 		eternalStorage().setBool(getKey(_addr), true);
 	}
