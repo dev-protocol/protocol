@@ -35,7 +35,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 			address(this),
 			_sender
 		);
-		new SenderValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateSender(msg.sender, config().lockup());
 		require(value != 0, "your token is 0");
 		ERC20 devToken = ERC20(config().token());
 		devToken.transfer(_sender, value);

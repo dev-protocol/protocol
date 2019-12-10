@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/validate/SenderValidator.sol";
+import "../common/validate/AddressValidator.sol";
 import "../metrics/Metrics.sol";
 import "../property/Property.sol";
 import "../metrics/MetricsGroup.sol";
@@ -37,7 +37,7 @@ contract Market is UsingConfig {
 		public
 		UsingConfig(_config)
 	{
-		new SenderValidator().validateSender(
+		new AddressValidator().validateSender(
 			msg.sender,
 			config().marketFactory()
 		);
@@ -93,7 +93,7 @@ contract Market is UsingConfig {
 		onlyDisabledMarket(_property)
 	{
 		VoteCounter voteCounter = VoteCounter(config().voteCounter());
-		voteCounter.addVoteCount(msg.sender, address(this), _property, _agree);
+		voteCounter.addVoteCount(msg.sender, _property, _agree);
 		enabled = Policy(config().policy()).marketApproval(
 			voteCounter.getAgreeCount(address(this)),
 			voteCounter.getOppositeCount(address(this))

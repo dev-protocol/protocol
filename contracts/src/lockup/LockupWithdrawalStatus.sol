@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/storage/UsingStorage.sol";
 import "../common/config/UsingConfig.sol";
-import "../common/validate/SenderValidator.sol";
+import "../common/validate/AddressValidator.sol";
 
 contract LockupWithdrawalStatus is UsingConfig, UsingStorage {
 	using SafeMath for uint256;
@@ -34,7 +34,7 @@ contract LockupWithdrawalStatus is UsingConfig, UsingStorage {
 	}
 
 	function start(address _property, address _from, uint256 _wait) external {
-		new SenderValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateSender(msg.sender, config().lockup());
 		set(_property, _from, block.number.add(_wait));
 	}
 	function possible(address _property, address _from)
@@ -49,7 +49,7 @@ contract LockupWithdrawalStatus is UsingConfig, UsingStorage {
 		return blockNumber <= block.number;
 	}
 	function complete(address _property, address _from) external {
-		new SenderValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateSender(msg.sender, config().lockup());
 		set(_property, _from, 0);
 	}
 	function waiting(address _property, address _from)

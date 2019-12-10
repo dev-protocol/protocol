@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "../common/config/UsingConfig.sol";
 import "../common/storage/UsingStorage.sol";
-import "../common/validate/SenderValidator.sol";
+import "../common/validate/AddressValidator.sol";
 import "../common/interface/IGroup.sol";
 
 contract MarketGroup is UsingConfig, UsingStorage, IGroup {
@@ -16,7 +16,7 @@ contract MarketGroup is UsingConfig, UsingStorage, IGroup {
 	}
 
 	function addGroup(address _addr) external {
-		new SenderValidator().validateSender(
+		new AddressValidator().validateSender(
 			msg.sender,
 			config().marketFactory()
 		);
