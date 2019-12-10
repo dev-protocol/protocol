@@ -2,7 +2,7 @@
 	"name": "@dev-protocol/protocol",
 	"version": "0.1.0",
 	"description": "Securitize for Internet assets",
-	"main": "index.js",
+	"main": "cli/index.js",
 	"scripts": {
 		"test": "truffle test test/**/*.ts",
 		"pretest": "npm run build",
@@ -63,7 +63,10 @@
 	"bundleddependencies": [
 		"truffle",
 		"shelljs",
-		"commander"
+		"commander",
+		"dotenv",
+		"ts-node",
+		"truffle-hdwallet-provider"
 	],
 	"directories": {
 		"doc": "docs",
