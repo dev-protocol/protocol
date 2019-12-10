@@ -15,13 +15,8 @@ This repository is the place to develop smart contracts for Dev Protocol.
 
 Deploy a mock to the your local network:
 
-```
-# .env
-ETHEREUM_MOCK_HOST=127.0.0.1
-ETHEREUM_MOCK_PORT=7545
-```
-
 ```bash
+> npm i -D @dev-protocol/protocol
 > dev-protocol mock --host 127.0.0.1 --port 7545
 ```
 
