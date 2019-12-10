@@ -93,7 +93,7 @@ contract Market is UsingConfig {
 		onlyDisabledMarket(_property)
 	{
 		VoteCounter voteCounter = VoteCounter(config().voteCounter());
-		voteCounter.addVoteCount(msg.sender, address(this), _property, _agree);
+		voteCounter.addVoteCount(msg.sender, _property, _agree);
 		enabled = Policy(config().policy()).marketApproval(
 			voteCounter.getAgreeCount(address(this)),
 			voteCounter.getOppositeCount(address(this))
