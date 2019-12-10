@@ -4,7 +4,6 @@ import "./../../src/market/Market.sol";
 import "./../../src/market/IMarket.sol";
 import "./../../src/allocator/Allocator.sol";
 
-
 contract MarketTest1 is IMarket {
 	string public schema = "[]";
 	address public market;

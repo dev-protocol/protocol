@@ -5,7 +5,6 @@ import "./Metrics.sol";
 import "./MetricsGroup.sol";
 import "../vote/VoteTimes.sol";
 
-
 contract MetricsFactory is UsingConfig {
 	event Create(address indexed _from, address _metrics);
 
