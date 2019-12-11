@@ -12,7 +12,10 @@ contract MetricsFactory is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function createMetrics(address _property) external returns (address) {
-		new AddressValidator().validateSender(msg.sender, config().marketGroup());
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().marketGroup()
+		);
 
 		Metrics metrics = new Metrics(_property);
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());

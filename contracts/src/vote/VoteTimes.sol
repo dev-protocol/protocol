@@ -21,7 +21,10 @@ contract VoteTimes is UsingConfig, UsingStorage {
 	}
 
 	function addVoteTimesByProperty(address _property) external {
-		new AddressValidator().validateSender(msg.sender, config().voteCounter());
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().voteCounter()
+		);
 
 		bytes32 key = keccak256(
 			abi.encodePacked("_voteTimesByProperty", _property)

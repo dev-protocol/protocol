@@ -18,7 +18,10 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 		string memory _name,
 		string memory _symbol
 	) public UsingConfig(_config) ERC20Detailed(_name, _symbol, _decimals) {
-		new AddressValidator().validateSender(msg.sender, config().propertyFactory());
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().propertyFactory()
+		);
 
 		author = _own;
 		_mint(author, _supply);

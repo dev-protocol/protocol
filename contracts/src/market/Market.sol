@@ -24,7 +24,10 @@ contract Market is UsingConfig {
 		public
 		UsingConfig(_config)
 	{
-		new AddressValidator().validateSender(msg.sender, config().marketFactory());
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().marketFactory()
+		);
 
 		behavior = _behavior;
 		enabled = false;

@@ -10,7 +10,10 @@ contract PropertyGroup is UsingConfig, UsingStorage, IGroup {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		new AddressValidator().validateSender(msg.sender, config().propertyFactory());
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().propertyFactory()
+		);
 
 		eternalStorage().setBool(getKey(_addr), true);
 	}

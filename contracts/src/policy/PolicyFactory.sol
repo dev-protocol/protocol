@@ -13,7 +13,10 @@ contract PolicyFactory is UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function createPolicy(address _newPolicyAddress) external returns (address) {
+	function createPolicy(address _newPolicyAddress)
+		external
+		returns (address)
+	{
 		new AddressValidator().validateDefault(_newPolicyAddress);
 
 		Policy policy = new Policy(address(config()), _newPolicyAddress);
@@ -32,7 +35,10 @@ contract PolicyFactory is UsingConfig {
 	}
 
 	function convergePolicy(address _currentPolicyAddress) external {
-		new AddressValidator().validateSender(msg.sender, config().policyGroup());
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().policyGroup()
+		);
 
 		config().setPolicy(_currentPolicyAddress);
 		PolicySet policySet = PolicySet(config().policySet());

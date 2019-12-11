@@ -16,7 +16,10 @@ contract Policy is Killable, UsingConfig {
 		public
 		UsingConfig(_config)
 	{
-		new AddressValidator().validateSender(msg.sender, config().policyFactory());
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().policyFactory()
+		);
 
 		_policy = IPolicy(_innerPolicyAddress);
 		setVotingEndBlockNumber();
