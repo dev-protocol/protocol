@@ -6,6 +6,7 @@ contract AddressConfig is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
 	address public allocationBlockNumber;
+	address public pendingIncrement;
 	address public allocation;
 	address public lastWithdrawalPrice;
 	address public pendingWithdrawal;
@@ -40,6 +41,10 @@ contract AddressConfig is Ownable {
 
 	function setLastWithdrawalPrice(address _addr) public onlyOwner {
 		lastWithdrawalPrice = _addr;
+	}
+
+	function setPendingIncrement(address _addr) public onlyOwner {
+		pendingIncrement = _addr;
 	}
 
 	function setPendingWithdrawal(address _addr) public onlyOwner {
