@@ -18,7 +18,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 		string memory _name,
 		string memory _symbol
 	) public UsingConfig(_config) ERC20Detailed(_name, _symbol, _decimals) {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().propertyFactory()
 		);
@@ -41,7 +41,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 	}
 
 	function withdrawDev(address _sender) external {
-		new AddressValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		uint256 value = LockupValue(config().lockupValue()).get(
 			address(this),

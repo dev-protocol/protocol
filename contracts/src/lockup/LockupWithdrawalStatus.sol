@@ -12,13 +12,13 @@ contract LockupWithdrawalStatus is UsingConfig, UsingStorage {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function start(address _property, address _from, uint256 _wait) external {
-		new AddressValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		set(_property, _from, block.number.add(_wait));
 	}
 
 	function complete(address _property, address _from) external {
-		new AddressValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
 		set(_property, _from, 0);
 	}
 

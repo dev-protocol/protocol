@@ -24,7 +24,7 @@ contract Market is UsingConfig {
 		public
 		UsingConfig(_config)
 	{
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().marketFactory()
 		);
@@ -40,7 +40,10 @@ contract Market is UsingConfig {
 		external
 		returns (bool)
 	{
-		new AddressValidator().validateSender(msg.sender, config().allocator());
+		new AddressValidator().validateAddress(
+			msg.sender,
+			config().allocator()
+		);
 
 		return IMarket(behavior).calculate(_metrics, _start, _end);
 	}
@@ -54,7 +57,7 @@ contract Market is UsingConfig {
 		string memory _args4,
 		string memory _args5
 	) public returns (bool) {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			Property(_prop).author()
 		);

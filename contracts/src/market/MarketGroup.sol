@@ -12,7 +12,7 @@ contract MarketGroup is UsingConfig, UsingStorage, IGroup {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	function addGroup(address _addr) external {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().marketFactory()
 		);

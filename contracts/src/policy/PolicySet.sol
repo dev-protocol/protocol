@@ -9,7 +9,7 @@ contract PolicySet is UsingConfig, UsingStorage {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addSet(address _addr) external {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);
@@ -22,7 +22,7 @@ contract PolicySet is UsingConfig, UsingStorage {
 	}
 
 	function deleteAll() external {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);

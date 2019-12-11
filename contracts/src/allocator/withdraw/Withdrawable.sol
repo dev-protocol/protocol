@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "../../common/config/UsingConfig.sol";
+import "../../common/validate/AddressValidator.sol";
 import "../../property/PropertyGroup.sol";
 import "./LastWithdrawalPrice.sol";
 import "./PendingWithdrawal.sol";
@@ -18,11 +19,12 @@ contract Withdrawable is UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function withdraw(address _property) public payable {
-		require(
-			PropertyGroup(config().propertyGroup()).isGroup(_property),
-			"only property contract"
+	function withdraw(address _property) external payable {
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
 		);
+
 		PendingWithdrawal pending = PendingWithdrawal(
 			config().pendingWithdrawal()
 		);
@@ -42,8 +44,13 @@ contract Withdrawable is UsingConfig {
 	}
 
 	function beforeBalanceChange(address _property, address _from, address _to)
-		public
+		external
 	{
+		new AddressValidator().validateGroup(
+			msg.sender,
+			config().propertyGroup()
+		);
+
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
 			_property
 		);
@@ -70,6 +77,26 @@ contract Withdrawable is UsingConfig {
 		}
 	}
 
+	function increment(address _property, uint256 allocationResult) internal {
+		new AddressValidator().validateAddress(
+			msg.sender,
+			config().allocator()
+		);
+
+		Allocation(config().allocation()).increment(
+			_property,
+			allocationResult
+		);
+	}
+
+	function getRewardsAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		return Allocation(config().allocation()).getRewardsAmount(_property);
+	}
+
 	function calculateWithdrawableAmount(address _property, address _user)
 		private
 		view
@@ -94,20 +121,5 @@ contract Withdrawable is UsingConfig {
 		}
 		uint256 value = priceGap * balance;
 		return value;
-	}
-
-	function increment(address _property, uint256 allocationResult) internal {
-		Allocation(config().allocation()).increment(
-			_property,
-			allocationResult
-		);
-	}
-
-	function getRewardsAmount(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return Allocation(config().allocation()).getRewardsAmount(_property);
 	}
 }
