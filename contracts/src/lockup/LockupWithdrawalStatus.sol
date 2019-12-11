@@ -11,6 +11,37 @@ contract LockupWithdrawalStatus is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	function start(address _property, address _from, uint256 _wait) external {
+		new AddressValidator().validateSender(msg.sender, config().lockup());
+
+		set(_property, _from, block.number.add(_wait));
+	}
+
+	function complete(address _property, address _from) external {
+		new AddressValidator().validateSender(msg.sender, config().lockup());
+		set(_property, _from, 0);
+	}
+
+	function possible(address _property, address _from)
+		external
+		view
+		returns (bool)
+	{
+		uint256 blockNumber = get(_property, _from);
+		if (blockNumber == 0) {
+			return false;
+		}
+		return blockNumber <= block.number;
+	}
+
+	function waiting(address _property, address _from)
+		external
+		view
+		returns (bool)
+	{
+		return get(_property, _from) != 0;
+	}
+
 	function getKey(address _property, address _sender)
 		private
 		pure
@@ -31,32 +62,5 @@ contract LockupWithdrawalStatus is UsingConfig, UsingStorage {
 	{
 		bytes32 key = getKey(_property, _from);
 		return eternalStorage().getUint(key);
-	}
-
-	function start(address _property, address _from, uint256 _wait) external {
-		new AddressValidator().validateSender(msg.sender, config().lockup());
-		set(_property, _from, block.number.add(_wait));
-	}
-	function possible(address _property, address _from)
-		external
-		view
-		returns (bool)
-	{
-		uint256 blockNumber = get(_property, _from);
-		if (blockNumber == 0) {
-			return false;
-		}
-		return blockNumber <= block.number;
-	}
-	function complete(address _property, address _from) external {
-		new AddressValidator().validateSender(msg.sender, config().lockup());
-		set(_property, _from, 0);
-	}
-	function waiting(address _property, address _from)
-		external
-		view
-		returns (bool)
-	{
-		return get(_property, _from) != 0;
 	}
 }
