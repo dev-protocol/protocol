@@ -10,9 +10,10 @@ contract MetricsGroup is UsingConfig, UsingStorage, IGroup {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		AddressValidator validator = new AddressValidator();
-		validator.validateDefault(_addr);
-		validator.validateSender(msg.sender, config().metricsFactory());
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().metricsFactory()
+		);
 
 		eternalStorage().setBool(getKey(_addr), true);
 		uint256 totalCount = eternalStorage().getUint(keccak256("_totalCount"));

@@ -9,8 +9,7 @@ contract VoteTimes is UsingConfig, UsingStorage {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addVoteCount() external {
-		AddressValidator validator = new AddressValidator();
-		validator.validateSender(
+		new AddressValidator().validateSender(
 			msg.sender,
 			config().marketFactory(),
 			config().policyFactory()
@@ -22,9 +21,10 @@ contract VoteTimes is UsingConfig, UsingStorage {
 	}
 
 	function addVoteTimesByProperty(address _property) external {
-		AddressValidator validator = new AddressValidator();
-		validator.validateGroup(_property, config().propertyGroup());
-		validator.validateSender(msg.sender, config().voteCounter());
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().voteCounter()
+		);
 
 		bytes32 key = keccak256(
 			abi.encodePacked("_voteTimesByProperty", _property)
@@ -33,10 +33,9 @@ contract VoteTimes is UsingConfig, UsingStorage {
 		voteTimesByProperty++;
 		eternalStorage().setUint(key, voteTimesByProperty);
 	}
+
 	function resetVoteTimesByProperty(address _property) external {
-		AddressValidator validator = new AddressValidator();
-		validator.validateGroup(_property, config().propertyGroup());
-		validator.validateSender(
+		new AddressValidator().validateSender(
 			msg.sender,
 			config().allocator(),
 			config().propertyFactory()
@@ -48,6 +47,7 @@ contract VoteTimes is UsingConfig, UsingStorage {
 		);
 		eternalStorage().setUint(key, voteTimes);
 	}
+
 	function getAbstentionTimes(address _property)
 		external
 		view

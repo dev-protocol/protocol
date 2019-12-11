@@ -24,10 +24,10 @@ contract Market is UsingConfig {
 		public
 		UsingConfig(_config)
 	{
-		AddressValidator validator = new AddressValidator();
-		validator.validateSender(msg.sender, config().marketFactory());
-		validator.validateDefault(_config);
-		validator.validateDefault(_behavior);
+		new AddressValidator().validateSender(
+			msg.sender,
+			config().marketFactory()
+		);
 
 		behavior = _behavior;
 		enabled = false;
@@ -36,8 +36,13 @@ contract Market is UsingConfig {
 		_votingEndBlockNumber = block.number + marketVotingBlocks;
 	}
 
-	function schema() public view returns (string memory) {
-		return IMarket(behavior).schema();
+	function calculate(address _metrics, uint256 _start, uint256 _end)
+		external
+		returns (bool)
+	{
+		new AddressValidator().validateSender(msg.sender, config().allocator());
+
+		return IMarket(behavior).calculate(_metrics, _start, _end);
 	}
 
 	// TODO Not called from anywhere
@@ -64,17 +69,6 @@ contract Market is UsingConfig {
 			);
 	}
 
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool)
-	{
-		AddressValidator validator = new AddressValidator();
-		validator.validateSender(msg.sender, config().allocator());
-		validator.validateGroup(_metrics, config().metricsGroup());
-		require(_start <= _end, "block number is not valid");
-		return IMarket(behavior).calculate(_metrics, _start, _end);
-	}
-
 	/**
 	 * In advance, msg.sender is supposed to approve same amount DEV token as vote number.
 	 *
@@ -82,14 +76,14 @@ contract Market is UsingConfig {
 	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
 	 */
 	function vote(address _property, bool _agree) external {
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
+		);
 		require(enabled == false, "market is already enabled");
 		require(
 			block.number <= _votingEndBlockNumber,
 			"voting deadline is over"
-		);
-		new AddressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
 		);
 
 		VoteCounter voteCounter = VoteCounter(config().voteCounter());
@@ -125,5 +119,9 @@ contract Market is UsingConfig {
 		ERC20Burnable(config().token()).burnFrom(msg.sender, authenticationFee);
 		issuedMetrics += 1;
 		return metrics;
+	}
+
+	function schema() public view returns (string memory) {
+		return IMarket(behavior).schema();
 	}
 }

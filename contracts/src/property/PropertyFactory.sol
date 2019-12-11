@@ -11,8 +11,8 @@ contract PropertyFactory is UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function createProperty(string memory _name, string memory _symbol)
-		public
+	function createProperty(string calldata _name, string calldata _symbol)
+		external
 		returns (address)
 	{
 		StringValidator validator = new StringValidator();
