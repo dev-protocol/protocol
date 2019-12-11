@@ -35,7 +35,9 @@ contract Allocator is Killable, Ownable, Withdrawable {
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		pendingIncrements[_metrics] = true;
-		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(config().allocationBlockNumber());
+		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
+			config().allocationBlockNumber()
+		);
 		Market(market).calculate(
 			_metrics,
 			allocationBlockNumber.getLastAllocationBlockNumber(_metrics),
@@ -54,7 +56,9 @@ contract Allocator is Killable, Ownable, Withdrawable {
 		if (notTargetPeriod == 0) {
 			return;
 		}
-		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(config().allocationBlockNumber());
+		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
+			config().allocationBlockNumber()
+		);
 		uint256 blockNumber = allocationBlockNumber
 			.getLastAllocationBlockNumber(_metrics);
 		uint256 notTargetBlockNumber = blockNumber + notTargetPeriod;

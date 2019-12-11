@@ -4,21 +4,26 @@ import "../common/storage/UsingStorage.sol";
 import "../common/config/UsingConfig.sol";
 import "../common/validate/AddressValidator.sol";
 
-contract AllocationBlockNumber is UsingStorage, UsingConfig{
-
+contract AllocationBlockNumber is UsingStorage, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {
 		createStorage();
 		eternalStorage().setUint(getBaseBlockNumberKey(), block.number);
 	}
 
 	function set(address _metrics, uint256 _blocks) external {
-		new AddressValidator().validateAddress(msg.sender, config().allocator());
+		new AddressValidator().validateAddress(
+			msg.sender,
+			config().allocator()
+		);
 
 		eternalStorage().setUint(getLastBlockNumberKey(_metrics), _blocks);
 	}
 
 	function setWithNow(address _metrics) external {
-		new AddressValidator().validateAddress(msg.sender, config().allocator());
+		new AddressValidator().validateAddress(
+			msg.sender,
+			config().allocator()
+		);
 
 		eternalStorage().setUint(getLastBlockNumberKey(_metrics), block.number);
 	}
@@ -28,19 +33,16 @@ contract AllocationBlockNumber is UsingStorage, UsingConfig{
 		view
 		returns (uint256)
 	{
-		uint256 blockNumber = eternalStorage().getUint(getLastBlockNumberKey(_metrics));
-		uint256 lastAllocationBlockNumber = blockNumber >
-			0
+		uint256 blockNumber = eternalStorage().getUint(
+			getLastBlockNumberKey(_metrics)
+		);
+		uint256 lastAllocationBlockNumber = blockNumber > 0
 			? blockNumber
 			: eternalStorage().getUint(getBaseBlockNumberKey());
 		return lastAllocationBlockNumber;
 	}
 
-	function getBaseBlockNumberKey()
-		private
-		pure
-		returns (bytes32)
-	{
+	function getBaseBlockNumberKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_baseBlockNumber"));
 	}
 
