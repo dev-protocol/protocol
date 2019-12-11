@@ -11,6 +11,7 @@ import "../metrics/MetricsGroup.sol";
 import "../policy/PolicyFactory.sol";
 import "../vote/VoteTimes.sol";
 import "./withdraw/Withdrawable.sol";
+import "./AllocationBlockNumber.sol";
 
 contract Allocator is Killable, Ownable, Withdrawable {
 	using SafeMath for uint256;
@@ -19,14 +20,12 @@ contract Allocator is Killable, Ownable, Withdrawable {
 	mapping(address => uint256) lastAllocationBlockEachMetrics;
 	mapping(address => uint256) lastAssetValueEachMetrics;
 	mapping(address => uint256) lastAssetValueEachMarketPerBlock;
-	uint64 public basis = 1000000000000000000;
+	uint64 private constant basis = 1000000000000000000;
 
 	mapping(address => bool) pendingIncrements;
-	AllocationBlockNumber private _allocationBlockNumber;
 
-	constructor(address _config) public Withdrawable(_config) {
-		_allocationBlockNumber = new AllocationBlockNumber();
-	}
+	// solium-disable-next-line no-empty-blocks
+	constructor(address _config) public Withdrawable(_config) {}
 
 	function allocate(address _metrics) public payable {
 		require(
@@ -36,12 +35,13 @@ contract Allocator is Killable, Ownable, Withdrawable {
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		pendingIncrements[_metrics] = true;
+		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(config().allocationBlockNumber());
 		Market(market).calculate(
 			_metrics,
-			_allocationBlockNumber.getLastAllocationBlockNumber(_metrics),
+			allocationBlockNumber.getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
-		_allocationBlockNumber.setWithNow(_metrics);
+		allocationBlockNumber.setWithNow(_metrics);
 	}
 
 	function validateTargetPeriod(address _metrics) private {
@@ -54,14 +54,15 @@ contract Allocator is Killable, Ownable, Withdrawable {
 		if (notTargetPeriod == 0) {
 			return;
 		}
-		uint256 blockNumber = _allocationBlockNumber
+		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(config().allocationBlockNumber());
+		uint256 blockNumber = allocationBlockNumber
 			.getLastAllocationBlockNumber(_metrics);
 		uint256 notTargetBlockNumber = blockNumber + notTargetPeriod;
 		require(
 			notTargetBlockNumber < block.number,
 			"outside the target period"
 		);
-		_allocationBlockNumber.set(_metrics, notTargetBlockNumber);
+		allocationBlockNumber.set(_metrics, notTargetBlockNumber);
 		voteTimes.resetVoteTimesByProperty(property);
 	}
 
@@ -119,30 +120,5 @@ contract Allocator is Killable, Ownable, Withdrawable {
 		);
 		increment(metrics.property(), result);
 		delete pendingIncrements[_metrics];
-	}
-}
-
-contract AllocationBlockNumber {
-	uint256 private _baseBlockNumber;
-	mapping(address => uint256) private _lastAllocationBlockNumber;
-	constructor() public {
-		_baseBlockNumber = block.number;
-	}
-	function getLastAllocationBlockNumber(address _metrics)
-		public
-		view
-		returns (uint256)
-	{
-		uint256 lastAllocationBlockNumber = _lastAllocationBlockNumber[_metrics] >
-			0
-			? _lastAllocationBlockNumber[_metrics]
-			: _baseBlockNumber;
-		return lastAllocationBlockNumber;
-	}
-	function set(address _metrics, uint256 _blocks) public {
-		_lastAllocationBlockNumber[_metrics] = _blocks;
-	}
-	function setWithNow(address _metrics) public {
-		_lastAllocationBlockNumber[_metrics] = block.number;
 	}
 }
