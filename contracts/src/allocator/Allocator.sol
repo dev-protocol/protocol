@@ -10,8 +10,7 @@ import "../metrics/Metrics.sol";
 import "../metrics/MetricsGroup.sol";
 import "../policy/PolicyFactory.sol";
 import "../vote/VoteTimes.sol";
-import "./Allocation.sol";
-import "./Withdrawable.sol";
+import "./withdraw/Withdrawable.sol";
 
 contract Allocator is Killable, Ownable, Withdrawable {
 	using SafeMath for uint256;
@@ -110,10 +109,15 @@ contract Allocator is Killable, Ownable, Withdrawable {
 		lastAllocationBlockEachMetrics[_metrics] = block.number;
 		lastAssetValueEachMetrics[_metrics] = value;
 		lastAssetValueEachMarketPerBlock[metrics.market()] = marketValue;
-		Allocation(config().allocation()).increment(
-			metrics.property(),
-			allocation(blocks, mint, value, marketValue, assets, totalAssets)
+		uint256 result = allocation(
+			blocks,
+			mint,
+			value,
+			marketValue,
+			assets,
+			totalAssets
 		);
+		increment(metrics.property(), result);
 		delete pendingIncrements[_metrics];
 	}
 }

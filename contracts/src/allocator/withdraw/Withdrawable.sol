@@ -1,11 +1,11 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import "../common/config/UsingConfig.sol";
-import "./Allocation.sol";
-import "../property/PropertyGroup.sol";
+import "../../common/config/UsingConfig.sol";
+import "../../property/PropertyGroup.sol";
 import "./LastWithdrawalPrice.sol";
 import "./PendingWithdrawal.sol";
+import "./Allocation.sol";
 
 contract Withdrawable is UsingConfig {
 	struct WithdrawalLimit {
@@ -94,5 +94,20 @@ contract Withdrawable is UsingConfig {
 		}
 		uint256 value = priceGap * balance;
 		return value;
+	}
+
+	function increment(address _property, uint256 allocationResult) internal {
+		Allocation(config().allocation()).increment(
+			_property,
+			allocationResult
+		);
+	}
+
+	function getRewardsAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		return Allocation(config().allocation()).getRewardsAmount(_property);
 	}
 }

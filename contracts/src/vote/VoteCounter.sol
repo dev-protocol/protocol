@@ -7,7 +7,7 @@ import "../common/validate/AddressValidator.sol";
 import "../property/Property.sol";
 import "../lockup/LockupPropertyValue.sol";
 import "../lockup/LockupValue.sol";
-import "../allocator/Allocation.sol";
+import "../allocator/Allocator.sol";
 import "./VoteTimes.sol";
 
 contract VoteCounter is UsingConfig, UsingStorage {
@@ -60,7 +60,7 @@ contract VoteCounter is UsingConfig, UsingStorage {
 			voteCount = LockupPropertyValue(config().lockupPropertyValue())
 				.get(_property)
 				.add(
-				Allocation(config().allocation()).getRewardsAmount(_property)
+				Allocator(config().allocator()).getRewardsAmount(_property)
 			);
 			VoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
 		} else {
