@@ -109,7 +109,14 @@ contract Allocator is Killable, Ownable, Withdrawable {
 		lastAllocationBlockEachMetrics[_metrics] = block.number;
 		lastAssetValueEachMetrics[_metrics] = value;
 		lastAssetValueEachMarketPerBlock[metrics.market()] = marketValue;
-		uint256 result = allocation(blocks, mint, value, marketValue, assets, totalAssets);
+		uint256 result = allocation(
+			blocks,
+			mint,
+			value,
+			marketValue,
+			assets,
+			totalAssets
+		);
 		increment(metrics.property(), result);
 		delete pendingIncrements[_metrics];
 	}

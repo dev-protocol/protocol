@@ -103,7 +103,11 @@ contract Withdrawable is UsingConfig {
 		);
 	}
 
-	function getRewardsAmount(address _property) external view returns (uint256) {
+	function getRewardsAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
 		return Allocation(config().allocation()).getRewardsAmount(_property);
 	}
 }
