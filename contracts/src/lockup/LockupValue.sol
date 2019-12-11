@@ -11,16 +11,18 @@ contract LockupValue is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function getKey(address _property, address _sender)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked(_property, _sender));
+	function add(address _property, address _sender, uint256 _value) external {
+		new AddressValidator().validateSender(msg.sender, config().lockup());
+
+		bytes32 key = getKey(_property, _sender);
+		uint256 value = eternalStorage().getUint(key);
+		value = value.add(_value);
+		eternalStorage().setUint(key, value);
 	}
 
 	function clear(address _property, address _sender) external {
 		new AddressValidator().validateSender(msg.sender, config().lockup());
+
 		bytes32 key = getKey(_property, _sender);
 		eternalStorage().setUint(key, 0);
 	}
@@ -43,11 +45,11 @@ contract LockupValue is UsingConfig, UsingStorage {
 		return eternalStorage().getUint(key);
 	}
 
-	function add(address _property, address _sender, uint256 _value) external {
-		new AddressValidator().validateSender(msg.sender, config().lockup());
-		bytes32 key = getKey(_property, _sender);
-		uint256 value = eternalStorage().getUint(key);
-		value = value.add(_value);
-		eternalStorage().setUint(key, value);
+	function getKey(address _property, address _sender)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked(_property, _sender));
 	}
 }

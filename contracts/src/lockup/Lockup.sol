@@ -1,6 +1,8 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "../common/validate/AddressValidator.sol";
+import "../common/validate/IntValidator.sol";
 import "../property/Property.sol";
 import "../property/PropertyGroup.sol";
 import "../policy/Policy.sol";
@@ -12,11 +14,10 @@ import "./LockupWithdrawalStatus.sol";
 contract Lockup is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function lockup(address _property, uint256 _value) public {
-		require(
-			PropertyGroup(config().propertyGroup()).isGroup(_property),
-			"this address is not property contract"
-		);
+	function lockup(address _property, uint256 _value) external {
+		new AddressValidator().validateGroup(_property, config().propertyGroup());
+		new IntValidator().validateEmpty(_value);
+
 		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(
 			config().lockupWithdrawalStatus()
 		);
@@ -24,7 +25,6 @@ contract Lockup is UsingConfig {
 			withdrawalStatus.waiting(_property, msg.sender) == false,
 			"lockup is already canceled"
 		);
-		require(_value != 0, "value is 0");
 		ERC20 devToken = ERC20(config().token());
 		uint256 balance = devToken.balanceOf(msg.sender);
 		require(_value <= balance, "insufficient balance");
@@ -45,11 +45,9 @@ contract Lockup is UsingConfig {
 		);
 	}
 
-	function cancel(address _property) public {
-		require(
-			PropertyGroup(config().propertyGroup()).isGroup(_property),
-			"this address is not property contract"
-		);
+	function cancel(address _property) external {
+		new AddressValidator().validateGroup(_property, config().propertyGroup());
+
 		require(
 			LockupValue(config().lockupValue()).hasValue(_property, msg.sender),
 			"dev token is not locked"
@@ -68,11 +66,9 @@ contract Lockup is UsingConfig {
 		);
 	}
 
-	function withdraw(address _property) public {
-		require(
-			PropertyGroup(config().propertyGroup()).isGroup(_property),
-			"this address is not property contract"
-		);
+	function withdraw(address _property) external {
+		new AddressValidator().validateGroup(_property, config().propertyGroup());
+
 		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(
 			config().lockupWithdrawalStatus()
 		);
