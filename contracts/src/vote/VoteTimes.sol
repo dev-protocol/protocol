@@ -9,7 +9,7 @@ contract VoteTimes is UsingConfig, UsingStorage {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addVoteCount() external {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().marketFactory(),
 			config().policyFactory()
@@ -21,7 +21,7 @@ contract VoteTimes is UsingConfig, UsingStorage {
 	}
 
 	function addVoteTimesByProperty(address _property) external {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().voteCounter()
 		);
@@ -35,7 +35,7 @@ contract VoteTimes is UsingConfig, UsingStorage {
 	}
 
 	function resetVoteTimesByProperty(address _property) external {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().allocator(),
 			config().propertyFactory()

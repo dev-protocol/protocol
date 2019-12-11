@@ -8,8 +8,8 @@ const handler = function(deployer, network) {
 	// Allocator
 	deployer.deploy(artifacts.require('Allocator'), address)
 	deployer.deploy(artifacts.require('Allocation'), address)
-	deployer.deploy(artifacts.require('LastWithdrawalPrice'))
-	deployer.deploy(artifacts.require('PendingWithdrawal'))
+	deployer.deploy(artifacts.require('LastWithdrawalPrice'), address)
+	deployer.deploy(artifacts.require('PendingWithdrawal'), address)
 
 	// Lockup
 	deployer.deploy(artifacts.require('Lockup'), address)

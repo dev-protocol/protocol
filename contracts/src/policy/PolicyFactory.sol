@@ -35,7 +35,7 @@ contract PolicyFactory is UsingConfig {
 	}
 
 	function convergePolicy(address _currentPolicyAddress) external {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().policyGroup()
 		);

@@ -12,7 +12,7 @@ contract LockupPropertyValue is UsingConfig, UsingStorage {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function add(address _property, uint256 _value) external {
-		new AddressValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getKey(_property);
 		uint256 value = eternalStorage().getUint(key);
@@ -21,7 +21,7 @@ contract LockupPropertyValue is UsingConfig, UsingStorage {
 	}
 
 	function sub(address _property, uint256 _value) external {
-		new AddressValidator().validateSender(msg.sender, config().lockup());
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getKey(_property);
 		uint256 value = eternalStorage().getUint(key);

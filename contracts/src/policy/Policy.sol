@@ -16,7 +16,7 @@ contract Policy is Killable, UsingConfig {
 		public
 		UsingConfig(_config)
 	{
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);

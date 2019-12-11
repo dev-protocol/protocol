@@ -3,39 +3,45 @@ pragma solidity ^0.5.0;
 import "../interface/IGroup.sol";
 
 contract AddressValidator {
+	string constant errorMessage = "this address is not proper";
+
 	function validateDefault(address _addr) external pure {
-		require(_addr != address(0), "this address is not proper");
+		require(_addr != address(0), errorMessage);
 	}
-	function validateGroup(address _addr, address groupAddr) external view {
-		require(IGroup(groupAddr).isGroup(_addr), "this address is not proper");
+
+	function validateGroup(address _addr, address _groupAddr) external view {
+		require(IGroup(_groupAddr).isGroup(_addr), errorMessage);
 	}
+
 	function validateGroup(
 		address _addr,
-		address groupAddr1,
-		address groupAddr2
+		address _groupAddr1,
+		address _groupAddr2
 	) external view {
-		if (IGroup(groupAddr1).isGroup(_addr)) {
+		if (IGroup(_groupAddr1).isGroup(_addr)) {
 			return;
 		}
 		require(
-			IGroup(groupAddr2).isGroup(_addr),
-			"this address is not proper"
+			IGroup(_groupAddr2).isGroup(_addr),
+			errorMessage
 		);
 	}
-	function validateSender(address sender, address targetSender)
+
+	function validateAddress(address _addr, address _target)
 		external
 		pure
 	{
-		require(sender == targetSender, "this method cannot be executed");
+		require(_addr == _target, errorMessage);
 	}
-	function validateSender(
-		address sender,
-		address targetSender1,
-		address targetSender2
+
+	function validateAddress(
+		address _addr,
+		address _target1,
+		address _target2
 	) external pure {
-		if (sender == targetSender1) {
+		if (_addr == _target1) {
 			return;
 		}
-		require(sender == targetSender2, "this method cannot be executed");
+		require(_addr == _target2, errorMessage);
 	}
 }

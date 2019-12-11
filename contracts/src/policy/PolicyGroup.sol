@@ -10,7 +10,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);
@@ -18,7 +18,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 	}
 
 	function deleteGroup(address _addr) external {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);

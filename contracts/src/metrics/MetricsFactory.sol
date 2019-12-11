@@ -12,7 +12,7 @@ contract MetricsFactory is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function createMetrics(address _property) external returns (address) {
-		new AddressValidator().validateSender(
+		new AddressValidator().validateAddress(
 			msg.sender,
 			config().marketGroup()
 		);
