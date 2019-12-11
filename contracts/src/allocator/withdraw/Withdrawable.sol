@@ -20,7 +20,10 @@ contract Withdrawable is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function withdraw(address _property) external payable {
-		new AddressValidator().validateGroup(_property, config().propertyGroup());
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
+		);
 
 		PendingWithdrawal pending = PendingWithdrawal(
 			config().pendingWithdrawal()
@@ -43,7 +46,10 @@ contract Withdrawable is UsingConfig {
 	function beforeBalanceChange(address _property, address _from, address _to)
 		external
 	{
-		new AddressValidator().validateGroup(msg.sender, config().propertyGroup());
+		new AddressValidator().validateGroup(
+			msg.sender,
+			config().propertyGroup()
+		);
 
 		uint256 price = Allocation(config().allocation()).getCumulativePrice(
 			_property
@@ -72,7 +78,10 @@ contract Withdrawable is UsingConfig {
 	}
 
 	function increment(address _property, uint256 allocationResult) internal {
-		new AddressValidator().validateAddress(msg.sender, config().allocator());
+		new AddressValidator().validateAddress(
+			msg.sender,
+			config().allocator()
+		);
 
 		Allocation(config().allocation()).increment(
 			_property,

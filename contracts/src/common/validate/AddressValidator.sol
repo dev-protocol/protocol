@@ -21,24 +21,17 @@ contract AddressValidator {
 		if (IGroup(_groupAddr1).isGroup(_addr)) {
 			return;
 		}
-		require(
-			IGroup(_groupAddr2).isGroup(_addr),
-			errorMessage
-		);
+		require(IGroup(_groupAddr2).isGroup(_addr), errorMessage);
 	}
 
-	function validateAddress(address _addr, address _target)
-		external
-		pure
-	{
+	function validateAddress(address _addr, address _target) external pure {
 		require(_addr == _target, errorMessage);
 	}
 
-	function validateAddress(
-		address _addr,
-		address _target1,
-		address _target2
-	) external pure {
+	function validateAddress(address _addr, address _target1, address _target2)
+		external
+		pure
+	{
 		if (_addr == _target1) {
 			return;
 		}

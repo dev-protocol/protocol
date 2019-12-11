@@ -15,7 +15,10 @@ contract Allocation is UsingConfig, UsingStorage {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	function increment(address _property, uint256 _value) external {
-		new AddressValidator().validateAddress(msg.sender, config().allocator());
+		new AddressValidator().validateAddress(
+			msg.sender,
+			config().allocator()
+		);
 
 		_totals[_property] = _totals[_property].add(_value);
 		_prices[_property] = _prices[_property].add(

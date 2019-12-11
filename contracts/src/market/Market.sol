@@ -40,7 +40,10 @@ contract Market is UsingConfig {
 		external
 		returns (bool)
 	{
-		new AddressValidator().validateAddress(msg.sender, config().allocator());
+		new AddressValidator().validateAddress(
+			msg.sender,
+			config().allocator()
+		);
 
 		return IMarket(behavior).calculate(_metrics, _start, _end);
 	}
