@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "../common/lifecycle/Killable.sol";
 import "../common/libs/Decimals.sol";
+import "../common/validate/AddressValidator.sol";
 import "../market/Market.sol";
 import "../metrics/Metrics.sol";
 import "../metrics/MetricsGroup.sol";
@@ -12,6 +13,7 @@ import "../policy/PolicyFactory.sol";
 import "../vote/VoteTimes.sol";
 import "./withdraw/Withdrawable.sol";
 import "./AllocationBlockNumber.sol";
+import "./PendingIncrement.sol";
 
 contract Allocator is Killable, Ownable, Withdrawable {
 	using SafeMath for uint256;
@@ -22,19 +24,15 @@ contract Allocator is Killable, Ownable, Withdrawable {
 	mapping(address => uint256) lastAssetValueEachMarketPerBlock;
 	uint64 private constant basis = 1000000000000000000;
 
-	mapping(address => bool) pendingIncrements;
-
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public Withdrawable(_config) {}
 
-	function allocate(address _metrics) public payable {
-		require(
-			MetricsGroup(config().metricsGroup()).isGroup(_metrics),
-			"not metrics contract"
-		);
+	function allocate(address _metrics) external payable {
+		new AddressValidator().validateGroup(_metrics, config().metricsGroup());
+
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
-		pendingIncrements[_metrics] = true;
+		PendingIncrement(config().pendingIncrement()).set(_metrics);
 		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
 			config().allocationBlockNumber()
 		);
@@ -46,45 +44,9 @@ contract Allocator is Killable, Ownable, Withdrawable {
 		allocationBlockNumber.setWithNow(_metrics);
 	}
 
-	function validateTargetPeriod(address _metrics) private {
-		address property = Metrics(_metrics).property();
-		VoteTimes voteTimes = VoteTimes(config().voteTimes());
-		uint256 abstentionCount = voteTimes.getAbstentionTimes(property);
-		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
-			abstentionCount
-		);
-		if (notTargetPeriod == 0) {
-			return;
-		}
-		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
-			config().allocationBlockNumber()
-		);
-		uint256 blockNumber = allocationBlockNumber
-			.getLastAllocationBlockNumber(_metrics);
-		uint256 notTargetBlockNumber = blockNumber + notTargetPeriod;
-		require(
-			notTargetBlockNumber < block.number,
-			"outside the target period"
-		);
-		allocationBlockNumber.set(_metrics, notTargetBlockNumber);
-		voteTimes.resetVoteTimesByProperty(property);
-	}
+	function calculatedCallback(address _metrics, uint256 _value) external {
+		new AddressValidator().validateGroup(_metrics, config().metricsGroup());
 
-	function allocation(
-		uint256 _blocks,
-		uint256 _mint,
-		uint256 _value,
-		uint256 _marketValue,
-		uint256 _assets,
-		uint256 _totalAssets
-	) public pure returns (uint256) {
-		(uint256 aShare, uint256 aBasis) = _assets.outOf(_totalAssets);
-		(uint256 vShare, uint256 vBasis) = _value.outOf(_marketValue);
-		uint256 mint = _mint.mul(_blocks);
-		return mint.mul(aShare).mul(vShare).div(aBasis).div(vBasis);
-	}
-
-	function calculatedCallback(address _metrics, uint256 _value) public {
 		Metrics metrics = Metrics(_metrics);
 		Market market = Market(metrics.market());
 		require(
@@ -92,7 +54,7 @@ contract Allocator is Killable, Ownable, Withdrawable {
 			"don't call from other than market behavior"
 		);
 		require(
-			pendingIncrements[_metrics] == true,
+			PendingIncrement(config().pendingIncrement()).isPending(_metrics),
 			"not asking for an indicator"
 		);
 		Policy policy = Policy(config().policy());
@@ -123,6 +85,44 @@ contract Allocator is Killable, Ownable, Withdrawable {
 			totalAssets
 		);
 		increment(metrics.property(), result);
-		delete pendingIncrements[_metrics];
+		PendingIncrement(config().pendingIncrement()).unset(_metrics);
+	}
+
+	function allocation(
+		uint256 _blocks,
+		uint256 _mint,
+		uint256 _value,
+		uint256 _marketValue,
+		uint256 _assets,
+		uint256 _totalAssets
+	) public pure returns (uint256) {
+		(uint256 aShare, uint256 aBasis) = _assets.outOf(_totalAssets);
+		(uint256 vShare, uint256 vBasis) = _value.outOf(_marketValue);
+		uint256 mint = _mint.mul(_blocks);
+		return mint.mul(aShare).mul(vShare).div(aBasis).div(vBasis);
+	}
+
+	function validateTargetPeriod(address _metrics) private {
+		address property = Metrics(_metrics).property();
+		VoteTimes voteTimes = VoteTimes(config().voteTimes());
+		uint256 abstentionCount = voteTimes.getAbstentionTimes(property);
+		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
+			abstentionCount
+		);
+		if (notTargetPeriod == 0) {
+			return;
+		}
+		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
+			config().allocationBlockNumber()
+		);
+		uint256 blockNumber = allocationBlockNumber
+			.getLastAllocationBlockNumber(_metrics);
+		uint256 notTargetBlockNumber = blockNumber + notTargetPeriod;
+		require(
+			notTargetBlockNumber < block.number,
+			"outside the target period"
+		);
+		allocationBlockNumber.set(_metrics, notTargetBlockNumber);
+		voteTimes.resetVoteTimesByProperty(property);
 	}
 }

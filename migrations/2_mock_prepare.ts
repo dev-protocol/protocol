@@ -8,6 +8,7 @@ const handler = function(deployer, network) {
 	// Allocator
 	deployer.deploy(artifacts.require('Allocator'), address)
 	deployer.deploy(artifacts.require('AllocationBlockNumber'), address)
+	deployer.deploy(artifacts.require('PendingIncrement'), address)
 
 	deployer.deploy(artifacts.require('Allocation'), address)
 	deployer.deploy(artifacts.require('LastWithdrawalPrice'), address)
