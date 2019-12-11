@@ -20,19 +20,38 @@ contract Allocation is UsingConfig, UsingStorage {
 			config().allocator()
 		);
 
-		_totals[_property] = _totals[_property].add(_value);
-		_prices[_property] = _prices[_property].add(
-			_value.div(ERC20(_property).totalSupply())
+		uint256 total = eternalStorage().getUint(getKey("_totals", _property));
+		eternalStorage().setUint(
+			getKey("_totals", _property),
+			total.add(_value)
+		);
+		uint256 price = eternalStorage().getUint(getKey("_prices", _property));
+		eternalStorage().setUint(
+			getKey("_prices", _property),
+			price.add(_value.div(ERC20(_property).totalSupply()))
 		);
 	}
-	function getRewardsAmount(address _property) public view returns (uint256) {
+	function getRewardsAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
 		return _totals[_property];
 	}
+
 	function getCumulativePrice(address _property)
-		public
+		external
 		view
 		returns (uint256)
 	{
 		return _prices[_property];
+	}
+
+	function getKey(string memory key, address _property)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked(key, _property));
 	}
 }
