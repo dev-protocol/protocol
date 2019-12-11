@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./IPolicy.sol";
-import "../libs/Killable.sol";
+import "../common/lifecycle/Killable.sol";
 import "../vote/VoteCounter.sol";
 import "../property/PropertyGroup.sol";
 import "./PolicyFactory.sol";
