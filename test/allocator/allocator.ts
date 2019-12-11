@@ -123,33 +123,3 @@ contract('Allocator', ([deployer]) => {
 		)
 	})
 })
-
-contract('AllocationBlockNumberTest', ([key1, key2, key3]) => {
-	const allocationBlockNumberContract = artifacts.require(
-		'AllocationBlockNumber'
-	)
-	describe('AllocationBlockNumber; getLastAllocationBlockNumber', () => {
-		let allocationBlockNumber: any
-		beforeEach(async () => {
-			allocationBlockNumber = await allocationBlockNumberContract.new()
-			await allocationBlockNumber.setWithNow(key1)
-		})
-		it('The block number of the set timing has been acquired', async () => {
-			const blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
-				key1
-			)
-			// eslint-disable-next-line no-undef
-			const web3BlockNumber = await web3.eth.getBlockNumber()
-			expect(blockNumber.toNumber()).to.be.equal(web3BlockNumber)
-		})
-		it('Behavior when not set', async () => {
-			const blockNumber = await allocationBlockNumber.getLastAllocationBlockNumber(
-				key2
-			)
-			const blockNumber2 = await allocationBlockNumber.getLastAllocationBlockNumber(
-				key3
-			)
-			expect(blockNumber.toNumber()).to.be.equal(blockNumber2.toNumber())
-		})
-	})
-})
