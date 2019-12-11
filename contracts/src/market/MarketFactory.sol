@@ -12,8 +12,7 @@ contract MarketFactory is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function createMarket(address _addr) public returns (address) {
-		AddressValidator validator = new AddressValidator();
-		validator.validateDefault(_addr);
+		new AddressValidator().validateDefault(_addr);
 
 		Market market = new Market(address(config()), _addr);
 		address marketAddr = address(market);

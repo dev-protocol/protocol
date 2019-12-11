@@ -16,22 +16,10 @@ contract Policy is Killable, UsingConfig {
 		public
 		UsingConfig(_config)
 	{
-		AddressValidator validator = new AddressValidator();
-		validator.validateDefault(_config);
-		validator.validateDefault(_innerPolicyAddress);
-		validator.validateSender(msg.sender, config().policyFactory());
+		new AddressValidator().validateSender(msg.sender, config().policyFactory());
 
 		_policy = IPolicy(_innerPolicyAddress);
 		setVotingEndBlockNumber();
-	}
-
-	function setVotingEndBlockNumber() private {
-		if (config().policy() == address(0)) {
-			return;
-		}
-		uint256 policyVotingBlocks = Policy(config().policy())
-			.policyVotingBlocks();
-		_votingEndBlockNumber = block.number + policyVotingBlocks;
 	}
 
 	function rewards(uint256 _lockups, uint256 _assets)
@@ -41,6 +29,7 @@ contract Policy is Killable, UsingConfig {
 	{
 		return _policy.rewards(_lockups, _assets);
 	}
+
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		public
@@ -117,5 +106,13 @@ contract Policy is Killable, UsingConfig {
 			return;
 		}
 		PolicyFactory(config().policyFactory()).convergePolicy(address(this));
+	}
+
+	function setVotingEndBlockNumber() private {
+		if (config().policy() == address(0)) {
+			return;
+		}
+		uint256 tmp = Policy(config().policy()).policyVotingBlocks();
+		_votingEndBlockNumber = block.number + tmp;
 	}
 }

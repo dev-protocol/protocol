@@ -10,17 +10,18 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		AddressValidator validator = new AddressValidator();
-		validator.validateDefault(_addr);
-		validator.validateSender(msg.sender, config().policyFactory());
+		new AddressValidator().validateSender(msg.sender, config().policyFactory());
 		eternalStorage().setBool(getKey(_addr), true);
+	}
+
+	function deleteGroup(address _addr) external {
+		new AddressValidator().validateSender(msg.sender, config().policyFactory());
+		return eternalStorage().setBool(getKey(_addr), false);
 	}
 
 	function isGroup(address _addr) external view returns (bool) {
 		return eternalStorage().getBool(getKey(_addr));
 	}
 
-	function deleteGroup(address _addr) external {
-		return eternalStorage().setBool(getKey(_addr), false);
-	}
+
 }

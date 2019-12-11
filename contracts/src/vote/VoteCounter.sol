@@ -19,10 +19,7 @@ contract VoteCounter is UsingConfig, UsingStorage {
 	function addVoteCount(address _sender, address _property, bool _agree)
 		external
 	{
-		AddressValidator validator = new AddressValidator();
-		validator.validateDefault(_sender);
-		validator.validateGroup(_property, config().propertyGroup());
-		validator.validateGroup(
+		new AddressValidator().validateGroup(
 			msg.sender,
 			config().marketGroup(),
 			config().policyGroup()
@@ -101,6 +98,7 @@ contract VoteCounter is UsingConfig, UsingStorage {
 	) private pure returns (bytes32) {
 		return keccak256(abi.encodePacked(_sender, _target, _property));
 	}
+
 	function getAgreeVoteCountKey(address _sender)
 		private
 		pure
@@ -108,6 +106,7 @@ contract VoteCounter is UsingConfig, UsingStorage {
 	{
 		return keccak256(abi.encodePacked(_sender, "_agreeVoteCount"));
 	}
+
 	function getOppositeVoteCountKey(address _sender)
 		private
 		pure
