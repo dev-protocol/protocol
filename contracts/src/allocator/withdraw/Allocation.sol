@@ -21,11 +21,21 @@ contract Allocation is UsingConfig, UsingStorage {
 		);
 
 		uint256 total = eternalStorage().getUint(getKey("_totals", _property));
-		eternalStorage().setUint(getKey("_totals", _property), total.add(_value));
+		eternalStorage().setUint(
+			getKey("_totals", _property),
+			total.add(_value)
+		);
 		uint256 price = eternalStorage().getUint(getKey("_prices", _property));
-		eternalStorage().setUint(getKey("_prices", _property), price.add(_value.div(ERC20(_property).totalSupply())));
+		eternalStorage().setUint(
+			getKey("_prices", _property),
+			price.add(_value.div(ERC20(_property).totalSupply()))
+		);
 	}
-	function getRewardsAmount(address _property) external view returns (uint256) {
+	function getRewardsAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
 		return _totals[_property];
 	}
 
