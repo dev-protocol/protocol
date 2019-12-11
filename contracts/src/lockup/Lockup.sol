@@ -15,7 +15,10 @@ contract Lockup is UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function lockup(address _property, uint256 _value) external {
-		new AddressValidator().validateGroup(_property, config().propertyGroup());
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
+		);
 		new IntValidator().validateEmpty(_value);
 
 		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(
@@ -46,7 +49,10 @@ contract Lockup is UsingConfig {
 	}
 
 	function cancel(address _property) external {
-		new AddressValidator().validateGroup(_property, config().propertyGroup());
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
+		);
 
 		require(
 			LockupValue(config().lockupValue()).hasValue(_property, msg.sender),
@@ -67,7 +73,10 @@ contract Lockup is UsingConfig {
 	}
 
 	function withdraw(address _property) external {
-		new AddressValidator().validateGroup(_property, config().propertyGroup());
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
+		);
 
 		LockupWithdrawalStatus withdrawalStatus = LockupWithdrawalStatus(
 			config().lockupWithdrawalStatus()
