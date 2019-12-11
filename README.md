@@ -13,10 +13,19 @@ This repository is the place to develop smart contracts for Dev Protocol.
 
 ## How to use
 
-Deploy a mock to the your local network:
+### Deploy a mock to your local network
+
+First, install this repository as an npm package.
 
 ```bash
 > npm i -D @dev-protocol/protocol
+```
+
+Prepare a local network using [Ganache](https://www.trufflesuite.com/ganache), etc.
+
+Finally, run the following command to deploy a mock.
+
+```bash
 > dev-protocol mock --host 127.0.0.1 --port 7545
 ```
 
@@ -45,7 +54,7 @@ run the following command to test each contract.
 npm test
 ```
 
-run the following command to deploy each contract. (Please start ganache in advance.)
+create a `.env` file like following, and run the command to deploy a mock. ( Beforehand, please prepare a local network using [Ganache](https://www.trufflesuite.com/ganache), etc. )
 
 ```
 # .env
