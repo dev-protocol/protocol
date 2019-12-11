@@ -3,7 +3,12 @@
 require('ts-node/register')
 require('dotenv').config()
 const HDWalletProvider = require('truffle-hdwallet-provider')
-const {ETHEREUM_PROVIDERS_AZURE, ETHEREUM_WALLET_MNEMONIC} = process.env
+const {
+	ETHEREUM_PROVIDERS_AZURE,
+	ETHEREUM_WALLET_MNEMONIC,
+	ETHEREUM_MOCK_HOST,
+	ETHEREUM_MOCK_PORT
+} = process.env
 
 module.exports = {
 	test_file_extension_regexp: /.*\.ts$/,
@@ -14,8 +19,8 @@ module.exports = {
 	},
 	networks: {
 		mock: {
-			host: '127.0.0.1',
-			port: 7545,
+			host: ETHEREUM_MOCK_HOST,
+			port: ETHEREUM_MOCK_PORT,
 			network_id: '*'
 		},
 		azure: {

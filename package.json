@@ -2,7 +2,7 @@
 	"name": "@dev-protocol/protocol",
 	"version": "0.1.0",
 	"description": "Securitize for Internet assets",
-	"main": "index.js",
+	"main": "cli/index.js",
 	"scripts": {
 		"test": "truffle test test/**/*.ts",
 		"pretest": "npm run build",
@@ -56,12 +56,17 @@
 		"typescript": "^3.7.2"
 	},
 	"dependencies": {
+		"commander": "^4.0.1",
 		"openzeppelin-solidity": "^2.4.0",
 		"shelljs": "^0.8.3"
 	},
 	"bundleddependencies": [
 		"truffle",
-		"shelljs"
+		"shelljs",
+		"commander",
+		"dotenv",
+		"ts-node",
+		"truffle-hdwallet-provider"
 	],
 	"directories": {
 		"doc": "docs",
