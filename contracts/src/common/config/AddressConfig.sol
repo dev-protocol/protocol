@@ -7,9 +7,7 @@ contract AddressConfig is Ownable {
 	address public allocator;
 	address public allocationBlockNumber;
 	address public pendingIncrement;
-	address public allocation;
-	address public lastWithdrawalPrice;
-	address public pendingWithdrawal;
+	address public withdraw;
 	address public marketFactory;
 	address public marketGroup;
 	address public propertyFactory;
@@ -35,20 +33,12 @@ contract AddressConfig is Ownable {
 		allocationBlockNumber = _addr;
 	}
 
-	function setAllocation(address _addr) public onlyOwner {
-		allocation = _addr;
-	}
-
-	function setLastWithdrawalPrice(address _addr) public onlyOwner {
-		lastWithdrawalPrice = _addr;
-	}
-
 	function setPendingIncrement(address _addr) public onlyOwner {
 		pendingIncrement = _addr;
 	}
 
-	function setPendingWithdrawal(address _addr) public onlyOwner {
-		pendingWithdrawal = _addr;
+	function setWithdraw(address _addr) public onlyOwner {
+		withdraw = _addr;
 	}
 
 	function setMarketFactory(address _addr) public onlyOwner {

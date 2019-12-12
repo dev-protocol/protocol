@@ -6,16 +6,17 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "../common/lifecycle/Killable.sol";
 import "../common/libs/Decimals.sol";
 import "../common/validate/AddressValidator.sol";
+import "../common/config/UsingConfig.sol";
 import "../market/Market.sol";
 import "../metrics/Metrics.sol";
 import "../metrics/MetricsGroup.sol";
 import "../policy/PolicyFactory.sol";
 import "../vote/VoteTimes.sol";
-import "./withdraw/Withdrawable.sol";
+import "../withdraw/Withdraw.sol";
 import "./AllocationBlockNumber.sol";
 import "./PendingIncrement.sol";
 
-contract Allocator is Killable, Ownable, Withdrawable {
+contract Allocator is Killable, Ownable, UsingConfig {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -25,7 +26,7 @@ contract Allocator is Killable, Ownable, Withdrawable {
 	uint64 private constant basis = 1000000000000000000;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public Withdrawable(_config) {}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function allocate(address _metrics) external payable {
 		new AddressValidator().validateGroup(_metrics, config().metricsGroup());
@@ -84,8 +85,34 @@ contract Allocator is Killable, Ownable, Withdrawable {
 			assets,
 			totalAssets
 		);
-		increment(metrics.property(), result);
+		Withdraw(config().withdraw()).increment(metrics.property(), result);
 		PendingIncrement(config().pendingIncrement()).unset(_metrics);
+	}
+
+	function beforeBalanceChange(address _property, address _from, address _to) external {
+		new AddressValidator().validateGroup(
+			msg.sender,
+			config().propertyGroup()
+		);
+
+		Withdraw(config().withdraw()).beforeBalanceChange(_property, _from, _to);
+	}
+
+	function withdraw(address _property) external {
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
+		);
+
+		return Withdraw(config().withdraw()).withdraw(_property);
+	}
+
+	function getRewardsAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		return Withdraw(config().withdraw()).getRewardsAmount(_property);
 	}
 
 	function allocation(

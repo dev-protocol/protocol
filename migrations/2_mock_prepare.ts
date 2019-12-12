@@ -10,9 +10,16 @@ const handler = function(deployer, network) {
 	deployer.deploy(artifacts.require('AllocationBlockNumber'), address)
 	deployer.deploy(artifacts.require('PendingIncrement'), address)
 
+	//withdraw
+	deployer.deploy(
+		artifacts.require('Withdraw'),
+		address,
+		artifacts.require('WithdrawStorageAddressConfig').address
+	)
 	deployer.deploy(artifacts.require('Allocation'), address)
 	deployer.deploy(artifacts.require('LastWithdrawalPrice'), address)
 	deployer.deploy(artifacts.require('PendingWithdrawal'), address)
+	deployer.deploy(artifacts.require('WithdrawalLimit'), address)
 
 	// Lockup
 	deployer.deploy(artifacts.require('Lockup'), address)
