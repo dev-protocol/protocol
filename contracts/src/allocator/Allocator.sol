@@ -12,6 +12,7 @@ import "../metrics/Metrics.sol";
 import "../metrics/MetricsGroup.sol";
 import "../policy/PolicyFactory.sol";
 import "../vote/VoteTimes.sol";
+import "../lockup/Lockup.sol";
 import "../withdraw/Withdraw.sol";
 import "./AllocationBlockNumber.sol";
 import "./PendingIncrement.sol";
@@ -61,10 +62,9 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		Policy policy = Policy(config().policy());
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
-		uint256 lockupValue = LockupPropertyValue(
-			config().lockupPropertyValue()
-		)
-			.get(metrics.property());
+		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
+			metrics.property()
+		);
 		uint256 blocks = block.number -
 			lastAllocationBlockEachMetrics[_metrics];
 		uint256 mint = policy.rewards(lockupValue, totalAssets);

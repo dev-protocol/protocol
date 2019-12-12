@@ -16,9 +16,7 @@ const handler = function(deployer, network) {
 
 	// Lockup
 	deployer.deploy(artifacts.require('Lockup'), address)
-	deployer.deploy(artifacts.require('LockupPropertyValue'), address)
-	deployer.deploy(artifacts.require('LockupValue'), address)
-	deployer.deploy(artifacts.require('LockupWithdrawalStatus'), address)
+	deployer.deploy(artifacts.require('LockupStorage'), address)
 
 	// Market
 	deployer.deploy(artifacts.require('MarketFactory'), address)
