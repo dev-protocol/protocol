@@ -111,8 +111,8 @@ contract Market is UsingConfig {
 			config().metricsFactory()
 		);
 		address metrics = metricsFactory.createMetrics(_property);
-		uint256 tokenValue = LockupPropertyValue(config().lockupPropertyValue())
-			.get(_property);
+		uint256 tokenValue = Lockup(config().lockup())
+			.getPropertyValue(_property);
 		Policy policy = Policy(config().policy());
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
 		uint256 authenticationFee = policy.authenticationFee(

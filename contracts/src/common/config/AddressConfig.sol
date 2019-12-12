@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "../validate/AddressValidator.sol";
 
 contract AddressConfig is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -20,9 +21,7 @@ contract AddressConfig is Ownable {
 	address public policySet;
 	address public policyGroup;
 	address public lockup;
-	address public lockupValue;
-	address public lockupPropertyValue;
-	address public lockupWithdrawalStatus;
+	address public lockupStorage;
 	address public voteTimes;
 	address public voteCounter;
 
@@ -83,7 +82,7 @@ contract AddressConfig is Ownable {
 	}
 
 	function setPolicy(address _addr) public {
-		require(msg.sender == policyFactory, "only policy factory contract");
+		new AddressValidator().validateAddress(msg.sender, policyFactory);
 		policy = _addr;
 	}
 
@@ -95,16 +94,8 @@ contract AddressConfig is Ownable {
 		lockup = _addr;
 	}
 
-	function setLockupValue(address _addr) public onlyOwner {
-		lockupValue = _addr;
-	}
-
-	function setLockupPropertyValue(address _addr) public onlyOwner {
-		lockupPropertyValue = _addr;
-	}
-
-	function setLockupWithdrawalStatus(address _addr) public onlyOwner {
-		lockupWithdrawalStatus = _addr;
+	function setlockupStorage(address _addr) public onlyOwner {
+		lockupStorage = _addr;
 	}
 
 	function setVoteTimes(address _addr) public onlyOwner {

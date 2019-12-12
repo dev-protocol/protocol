@@ -5,8 +5,7 @@ import "../common/config/UsingConfig.sol";
 import "../common/storage/UsingStorage.sol";
 import "../common/validate/AddressValidator.sol";
 import "../property/Property.sol";
-import "../lockup/LockupPropertyValue.sol";
-import "../lockup/LockupValue.sol";
+import "../lockup/Lockup.sol";
 import "../allocator/Allocator.sol";
 import "./VoteTimes.sol";
 
@@ -57,14 +56,14 @@ contract VoteCounter is UsingConfig, UsingStorage {
 		uint256 voteCount;
 		if (Property(_property).author() == _sender) {
 			// solium-disable-next-line operator-whitespace
-			voteCount = LockupPropertyValue(config().lockupPropertyValue())
-				.get(_property)
+			voteCount = Lockup(config().lockup())
+				.getPropertyValue(_property)
 				.add(
 				Allocator(config().allocator()).getRewardsAmount(_property)
 			);
 			VoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
 		} else {
-			voteCount = LockupValue(config().lockupValue()).get(
+			voteCount = Lockup(config().lockup()).getValue(
 				_property,
 				_sender
 			);
