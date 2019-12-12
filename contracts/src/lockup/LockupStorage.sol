@@ -12,7 +12,9 @@ contract LockupStorage is UsingConfig, UsingStorage {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	//Value
-	function addValue(address _property, address _sender, uint256 _value) external {
+	function addValue(address _property, address _sender, uint256 _value)
+		external
+	{
 		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getValueKey(_property, _sender);
@@ -73,17 +75,29 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		eternalStorage().setUint(key, value);
 	}
 
-	function getPropertyValue(address _property) external view returns (uint256) {
+	function getPropertyValue(address _property)
+		external
+		view
+		returns (uint256)
+	{
 		bytes32 key = getPropertyValueKey(_property);
 		return eternalStorage().getUint(key);
 	}
 
-	function getPropertyValueKey(address _property) private pure returns (bytes32) {
+	function getPropertyValueKey(address _property)
+		private
+		pure
+		returns (bytes32)
+	{
 		return keccak256(abi.encodePacked("_propertyValue", _property));
 	}
 
 	//WithdrawalStatus
-	function setWithdrawalStatus(address _property, address _from, uint256 _value) external {
+	function setWithdrawalStatus(
+		address _property,
+		address _from,
+		uint256 _value
+	) external {
 		bytes32 key = getWithdrawalStatusKey(_property, _from);
 		eternalStorage().setUint(key, _value);
 	}
@@ -102,6 +116,9 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_withdrawalStatus", _property, _sender));
+		return
+			keccak256(
+				abi.encodePacked("_withdrawalStatus", _property, _sender)
+			);
 	}
 }

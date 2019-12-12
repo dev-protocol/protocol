@@ -63,10 +63,7 @@ contract VoteCounter is UsingConfig, UsingStorage {
 			);
 			VoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
 		} else {
-			voteCount = Lockup(config().lockup()).getValue(
-				_property,
-				_sender
-			);
+			voteCount = Lockup(config().lockup()).getValue(_property, _sender);
 		}
 		return voteCount;
 	}

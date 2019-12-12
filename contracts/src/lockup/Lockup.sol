@@ -23,11 +23,12 @@ contract Lockup is UsingConfig {
 		);
 		new IntValidator().validateEmpty(_value);
 
-		bool isWaiting = getStorage().getWithdrawalStatus(_property, msg.sender) != 0;
-		require(
-			isWaiting == false,
-			"lockup is already canceled"
-		);
+		bool isWaiting = getStorage().getWithdrawalStatus(
+				_property,
+				msg.sender
+			) !=
+			0;
+		require(isWaiting == false, "lockup is already canceled");
 		ERC20 devToken = ERC20(config().token());
 		uint256 balance = devToken.balanceOf(msg.sender);
 		require(_value <= balance, "insufficient balance");
@@ -42,10 +43,7 @@ contract Lockup is UsingConfig {
 		require(success, "transfer was failed");
 		require(abi.decode(data, (bool)), "transfer was failed");
 		getStorage().addValue(_property, msg.sender, _value);
-		getStorage().addPropertyValue(
-			_property,
-			_value
-		);
+		getStorage().addPropertyValue(_property, _value);
 	}
 
 	function cancel(address _property) external {
@@ -58,11 +56,12 @@ contract Lockup is UsingConfig {
 			getStorage().hasValue(_property, msg.sender),
 			"dev token is not locked"
 		);
-		bool isWaiting = getStorage().getWithdrawalStatus(_property, msg.sender) != 0;
-		require(
-			isWaiting == false,
-			"lockup is already canceled"
-		);
+		bool isWaiting = getStorage().getWithdrawalStatus(
+				_property,
+				msg.sender
+			) !=
+			0;
+		require(isWaiting == false, "lockup is already canceled");
 		uint256 blockNumber = Policy(config().policy()).lockUpBlocks();
 		blockNumber = blockNumber.add(block.number);
 		getStorage().setWithdrawalStatus(_property, msg.sender, blockNumber);
@@ -74,29 +73,28 @@ contract Lockup is UsingConfig {
 			config().propertyGroup()
 		);
 
-		require(
-			possible(_property, msg.sender),
-			"waiting for release"
-		);
-		uint256 lockupedValue = getStorage().getValue(
-			_property,
-			msg.sender
-		);
+		require(possible(_property, msg.sender), "waiting for release");
+		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
 		require(lockupedValue == 0, "dev token is not locked");
 		Property(_property).withdrawDev(msg.sender);
 		getStorage().clearValue(_property, msg.sender);
-		getStorage().subPropertyValue(
-			_property,
-			lockupedValue
-		);
+		getStorage().subPropertyValue(_property, lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
-	function getPropertyValue(address _property) external view returns (uint256) {
+	function getPropertyValue(address _property)
+		external
+		view
+		returns (uint256)
+	{
 		return getStorage().getPropertyValue(_property);
 	}
 
-	function getValue(address _property, address _sender) external view returns (uint256) {
+	function getValue(address _property, address _sender)
+		external
+		view
+		returns (uint256)
+	{
 		return getStorage().getValue(_property, _sender);
 	}
 
@@ -105,7 +103,10 @@ contract Lockup is UsingConfig {
 		view
 		returns (bool)
 	{
-		uint256 blockNumber = getStorage().getWithdrawalStatus(_property, _from);
+		uint256 blockNumber = getStorage().getWithdrawalStatus(
+			_property,
+			_from
+		);
 		if (blockNumber == 0) {
 			return false;
 		}

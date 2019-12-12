@@ -62,9 +62,9 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		Policy policy = Policy(config().policy());
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
-		uint256 lockupValue = Lockup(
-			config().lockup()
-		).getPropertyValue(metrics.property());
+		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
+			metrics.property()
+		);
 		uint256 blocks = block.number -
 			lastAllocationBlockEachMetrics[_metrics];
 		uint256 mint = policy.rewards(lockupValue, totalAssets);
