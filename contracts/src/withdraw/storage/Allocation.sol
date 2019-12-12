@@ -2,23 +2,20 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../../common/validate/AddressValidator.sol";
 import "../../common/storage/UsingStorage.sol";
 import "../../common/config/UsingConfig.sol";
-import "../../common/validate/AddressValidator.sol";
 
-contract Allocation is UsingConfig, UsingStorage {
+contract Allocation is UsingStorage, UsingConfig {
 	using SafeMath for uint256;
 	mapping(address => uint256) private _totals;
 	mapping(address => uint256) private _prices;
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function increment(address _property, uint256 _value) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
-		);
+		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		uint256 total = eternalStorage().getUint(getKey("_totals", _property));
 		eternalStorage().setUint(

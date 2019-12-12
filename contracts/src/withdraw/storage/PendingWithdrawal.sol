@@ -1,18 +1,15 @@
 pragma solidity ^0.5.0;
 
-import "../../common/config/UsingConfig.sol";
 import "../../common/storage/UsingStorage.sol";
 import "../../common/validate/AddressValidator.sol";
+import "../../common/config/UsingConfig.sol";
 
 contract PendingWithdrawal is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function set(address _property, address _user, uint256 _value) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
-		);
+		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getKey(_property, _user), _value);
 	}
