@@ -11,11 +11,7 @@ const handler = function(deployer, network) {
 	deployer.deploy(artifacts.require('PendingIncrement'), address)
 
 	// Withdraw
-	deployer.deploy(
-		artifacts.require('Withdraw'),
-		address,
-		artifacts.require('WithdrawStorageAddressConfig').address
-	)
+	deployer.deploy(artifacts.require('Withdraw'), address)
 	deployer.deploy(artifacts.require('WithdrawStorage'), address)
 
 	// Lockup

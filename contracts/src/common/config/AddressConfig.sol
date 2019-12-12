@@ -8,6 +8,7 @@ contract AddressConfig is Ownable {
 	address public allocationBlockNumber;
 	address public pendingIncrement;
 	address public withdraw;
+	address public withdrawStorage;
 	address public marketFactory;
 	address public marketGroup;
 	address public propertyFactory;
@@ -39,6 +40,10 @@ contract AddressConfig is Ownable {
 
 	function setWithdraw(address _addr) public onlyOwner {
 		withdraw = _addr;
+	}
+
+	function setWithdrawStorage(address _addr) public onlyOwner {
+		withdrawStorage = _addr;
 	}
 
 	function setMarketFactory(address _addr) public onlyOwner {
