@@ -8,10 +8,7 @@ import "./WithdrawStorage.sol";
 
 contract Withdraw is UsingConfig {
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config)
-		public
-		UsingConfig(_config)
-	{}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function withdraw(address _property) external {
 		new AddressValidator().validateAddress(
@@ -81,10 +78,7 @@ contract Withdraw is UsingConfig {
 		view
 		returns (uint256)
 	{
-		uint256 _last = getStorage().getLastWithdrawalPrice(
-			_property,
-			_user
-		);
+		uint256 _last = getStorage().getLastWithdrawalPrice(_property, _user);
 		(uint256 totalLimit, uint256 balanceLimit) = getStorage()
 			.getWithdrawalLimit(_property, _user);
 		uint256 price = getStorage().getCumulativePrice(_property);
