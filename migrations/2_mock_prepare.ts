@@ -18,7 +18,6 @@ const handler = function(deployer, network) {
 	)
 	deployer.deploy(artifacts.require('WithdrawStorage'), address)
 
-
 	// Lockup
 	deployer.deploy(artifacts.require('Lockup'), address)
 	deployer.deploy(artifacts.require('LockupPropertyValue'), address)

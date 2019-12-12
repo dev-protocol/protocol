@@ -21,7 +21,8 @@ contract Withdraw is UsingConfig, UsingWithdrawStorage {
 		);
 
 		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
-		uint256 value = _value + withdrawStorage().getPendingWithdrawal(_property, msg.sender);
+		uint256 value = _value +
+			withdrawStorage().getPendingWithdrawal(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
 		uint256 price = withdrawStorage().getCumulativePrice(_property);
 		withdrawStorage().setLastWithdrawalPrice(_property, msg.sender, price);
@@ -44,7 +45,10 @@ contract Withdraw is UsingConfig, UsingWithdrawStorage {
 		uint256 amount = calculateWithdrawableAmount(_property, _from);
 		uint256 tmp = withdrawStorage().getPendingWithdrawal(_property, _from);
 		withdrawStorage().setPendingWithdrawal(_property, _from, tmp + amount);
-		uint256 totalLimit = withdrawStorage().getWithdrawalLimitTotal(_property, _to);
+		uint256 totalLimit = withdrawStorage().getWithdrawalLimitTotal(
+			_property,
+			_to
+		);
 		uint256 total = withdrawStorage().getRewardsAmount(_property);
 		if (totalLimit != total) {
 			withdrawStorage().setWithdrawalLimit(
@@ -78,11 +82,12 @@ contract Withdraw is UsingConfig, UsingWithdrawStorage {
 		view
 		returns (uint256)
 	{
-		uint256 _last = withdrawStorage().getLastWithdrawalPrice(_property, _user);
-		(uint256 totalLimit, uint256 balanceLimit) = withdrawStorage().getWithdrawalLimit(
+		uint256 _last = withdrawStorage().getLastWithdrawalPrice(
 			_property,
 			_user
 		);
+		(uint256 totalLimit, uint256 balanceLimit) = withdrawStorage()
+			.getWithdrawalLimit(_property, _user);
 		uint256 price = withdrawStorage().getCumulativePrice(_property);
 		uint256 priceGap = price - _last;
 		uint256 balance = ERC20(_property).balanceOf(_user);

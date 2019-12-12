@@ -18,10 +18,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 
 		bytes32 totalsKey = getAllocationTotalKey(_property);
 		uint256 total = eternalStorage().getUint(totalsKey);
-		eternalStorage().setUint(
-			totalsKey,
-			total.add(_value)
-		);
+		eternalStorage().setUint(totalsKey, total.add(_value));
 
 		bytes32 pricesKey = getAllocationPriceKey(_property);
 
@@ -72,8 +69,14 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 	) external {
 		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
-		eternalStorage().setUint(getWithdrawalLimitTotalKey(_property, _user), _total);
-		eternalStorage().setUint(getWithdrawalLimitBalanceKey(_property, _user), _balance);
+		eternalStorage().setUint(
+			getWithdrawalLimitTotalKey(_property, _user),
+			_total
+		);
+		eternalStorage().setUint(
+			getWithdrawalLimitBalanceKey(_property, _user),
+			_balance
+		);
 	}
 
 	function getWithdrawalLimit(address _property, address _user)
@@ -81,7 +84,9 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		view
 		returns (uint256, uint256)
 	{
-		uint256 total = eternalStorage().getUint(getWithdrawalLimitTotalKey(_property, _user));
+		uint256 total = eternalStorage().getUint(
+			getWithdrawalLimitTotalKey(_property, _user)
+		);
 		uint256 balance = eternalStorage().getUint(
 			getWithdrawalLimitBalanceKey(_property, _user)
 		);
@@ -93,7 +98,10 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getWithdrawalLimitTotalKey(_property, _user));
+		return
+			eternalStorage().getUint(
+				getWithdrawalLimitTotalKey(_property, _user)
+			);
 	}
 
 	function getWithdrawalLimitTotalKey(address _property, address _user)
@@ -101,7 +109,10 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_withdrawalLimitTotal", _property, _user));
+		return
+			keccak256(
+				abi.encodePacked("_withdrawalLimitTotal", _property, _user)
+			);
 	}
 
 	function getWithdrawalLimitBalanceKey(address _property, address _user)
@@ -109,14 +120,24 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_withdrawalLimitBalance", _property, _user));
+		return
+			keccak256(
+				abi.encodePacked("_withdrawalLimitBalance", _property, _user)
+			);
 	}
 
 	//LastWithdrawalPrice
-	function setLastWithdrawalPrice(address _property, address _user, uint256 _value) external {
+	function setLastWithdrawalPrice(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
 		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
-		eternalStorage().setUint(getLastWithdrawalPriceKey(_property, _user), _value);
+		eternalStorage().setUint(
+			getLastWithdrawalPriceKey(_property, _user),
+			_value
+		);
 	}
 
 	function getLastWithdrawalPrice(address _property, address _user)
@@ -124,7 +145,10 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getLastWithdrawalPriceKey(_property, _user));
+		return
+			eternalStorage().getUint(
+				getLastWithdrawalPriceKey(_property, _user)
+			);
 	}
 
 	function getLastWithdrawalPriceKey(address _property, address _user)
@@ -132,14 +156,24 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_lastWithdrawalPrice", _property, _user));
+		return
+			keccak256(
+				abi.encodePacked("_lastWithdrawalPrice", _property, _user)
+			);
 	}
 
 	//PendingWithdrawal
-	function setPendingWithdrawal(address _property, address _user, uint256 _value) external {
+	function setPendingWithdrawal(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
 		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
-		eternalStorage().setUint(getPendingWithdrawalKey(_property, _user), _value);
+		eternalStorage().setUint(
+			getPendingWithdrawalKey(_property, _user),
+			_value
+		);
 	}
 
 	function getPendingWithdrawal(address _property, address _user)
@@ -147,7 +181,8 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getPendingWithdrawalKey(_property, _user));
+		return
+			eternalStorage().getUint(getPendingWithdrawalKey(_property, _user));
 	}
 
 	function getPendingWithdrawalKey(address _property, address _user)
@@ -155,6 +190,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
+		return
+			keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
 	}
 }
