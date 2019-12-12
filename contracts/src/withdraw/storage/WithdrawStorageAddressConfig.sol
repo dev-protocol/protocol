@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract WithdrawStorageAddressConfig is Ownable {
-
 	address public allocation;
 	address public lastWithdrawalPrice;
 	address public pendingWithdrawal;

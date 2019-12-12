@@ -9,10 +9,7 @@ contract PendingWithdrawal is UsingConfig, UsingStorage {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function set(address _property, address _user, uint256 _value) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().withdraw()
-		);
+		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getKey(_property, _user), _value);
 	}

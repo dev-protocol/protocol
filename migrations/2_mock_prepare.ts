@@ -10,7 +10,7 @@ const handler = function(deployer, network) {
 	deployer.deploy(artifacts.require('AllocationBlockNumber'), address)
 	deployer.deploy(artifacts.require('PendingIncrement'), address)
 
-	//withdraw
+	// Withdraw
 	deployer.deploy(
 		artifacts.require('Withdraw'),
 		address,

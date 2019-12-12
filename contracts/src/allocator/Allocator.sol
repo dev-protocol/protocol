@@ -89,13 +89,19 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		PendingIncrement(config().pendingIncrement()).unset(_metrics);
 	}
 
-	function beforeBalanceChange(address _property, address _from, address _to) external {
+	function beforeBalanceChange(address _property, address _from, address _to)
+		external
+	{
 		new AddressValidator().validateGroup(
 			msg.sender,
 			config().propertyGroup()
 		);
 
-		Withdraw(config().withdraw()).beforeBalanceChange(_property, _from, _to);
+		Withdraw(config().withdraw()).beforeBalanceChange(
+			_property,
+			_from,
+			_to
+		);
 	}
 
 	function withdraw(address _property) external {

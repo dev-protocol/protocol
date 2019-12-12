@@ -8,11 +8,13 @@ contract WithdrawalLimit is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function set(address _property, address _user, uint256 _total, uint256 _balance) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().withdraw()
-		);
+	function set(
+		address _property,
+		address _user,
+		uint256 _total,
+		uint256 _balance
+	) external {
+		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getTotalKey(_property, _user), _total);
 		eternalStorage().setUint(getBalanceKey(_property, _user), _balance);
@@ -24,7 +26,9 @@ contract WithdrawalLimit is UsingConfig, UsingStorage {
 		returns (uint256, uint256)
 	{
 		uint256 total = eternalStorage().getUint(getTotalKey(_property, _user));
-		uint256 balance = eternalStorage().getUint(getBalanceKey(_property, _user));
+		uint256 balance = eternalStorage().getUint(
+			getBalanceKey(_property, _user)
+		);
 		return (total, balance);
 	}
 

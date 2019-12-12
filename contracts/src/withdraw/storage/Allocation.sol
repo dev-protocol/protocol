@@ -15,10 +15,7 @@ contract Allocation is UsingStorage, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function increment(address _property, uint256 _value) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().withdraw()
-		);
+		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		uint256 total = eternalStorage().getUint(getKey("_totals", _property));
 		eternalStorage().setUint(
