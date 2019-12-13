@@ -14,16 +14,12 @@ import "../policy/PolicyFactory.sol";
 import "../vote/VoteTimes.sol";
 import "../lockup/Lockup.sol";
 import "../withdraw/Withdraw.sol";
-import "./AllocationBlockNumber.sol";
-import "./PendingIncrement.sol";
+import "./AllocatorStorage.sol";
 
 contract Allocator is Killable, Ownable, UsingConfig {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
-	mapping(address => uint256) lastAllocationBlockEachMetrics;
-	mapping(address => uint256) lastAssetValueEachMetrics;
-	mapping(address => uint256) lastAssetValueEachMarketPerBlock;
 	uint64 private constant basis = 1000000000000000000;
 
 	// solium-disable-next-line no-empty-blocks
@@ -34,16 +30,13 @@ contract Allocator is Killable, Ownable, UsingConfig {
 
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
-		PendingIncrement(config().pendingIncrement()).set(_metrics);
-		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
-			config().allocationBlockNumber()
-		);
+		getStorage().setPendingIncrement(_metrics, true);
 		Market(market).calculate(
 			_metrics,
-			allocationBlockNumber.getLastAllocationBlockNumber(_metrics),
+			getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
-		allocationBlockNumber.setWithNow(_metrics);
+		getStorage().setAllocationBlockNumberWithNow(_metrics);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) external {
@@ -56,7 +49,7 @@ contract Allocator is Killable, Ownable, UsingConfig {
 			"don't call from other than market behavior"
 		);
 		require(
-			PendingIncrement(config().pendingIncrement()).isPending(_metrics),
+			getStorage().getPendingIncrement(_metrics),
 			"not asking for an indicator"
 		);
 		Policy policy = Policy(config().policy());
@@ -66,17 +59,21 @@ contract Allocator is Killable, Ownable, UsingConfig {
 			metrics.property()
 		);
 		uint256 blocks = block.number -
-			lastAllocationBlockEachMetrics[_metrics];
+			getStorage().getLastAllocationBlockEachMetrics(_metrics);
 		uint256 mint = policy.rewards(lockupValue, totalAssets);
 		uint256 value = policy.assetValue(lockupValue, _value) * basis / blocks;
-		uint256 marketValue = lastAssetValueEachMarketPerBlock[metrics
-				.market()] -
-			lastAssetValueEachMetrics[_metrics] +
+		uint256 marketValue = getStorage().getLastAssetValueEachMarketPerBlock(
+				metrics.market()
+			) -
+			getStorage().getLastAssetValueEachMetrics(_metrics) +
 			value;
 		uint256 assets = market.issuedMetrics();
-		lastAllocationBlockEachMetrics[_metrics] = block.number;
-		lastAssetValueEachMetrics[_metrics] = value;
-		lastAssetValueEachMarketPerBlock[metrics.market()] = marketValue;
+		getStorage().setLastAllocationBlockEachMetrics(_metrics, block.number);
+		getStorage().setLastAssetValueEachMetrics(_metrics, value);
+		getStorage().setLastAssetValueEachMarketPerBlock(
+			metrics.market(),
+			marketValue
+		);
 		uint256 result = allocation(
 			blocks,
 			mint,
@@ -86,7 +83,7 @@ contract Allocator is Killable, Ownable, UsingConfig {
 			totalAssets
 		);
 		Withdraw(config().withdraw()).increment(metrics.property(), result);
-		PendingIncrement(config().pendingIncrement()).unset(_metrics);
+		getStorage().setPendingIncrement(_metrics, false);
 	}
 
 	function beforeBalanceChange(address _property, address _from, address _to)
@@ -145,17 +142,32 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		if (notTargetPeriod == 0) {
 			return;
 		}
-		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
-			config().allocationBlockNumber()
-		);
-		uint256 blockNumber = allocationBlockNumber
-			.getLastAllocationBlockNumber(_metrics);
+		uint256 blockNumber = getLastAllocationBlockNumber(_metrics);
 		uint256 notTargetBlockNumber = blockNumber + notTargetPeriod;
 		require(
 			notTargetBlockNumber < block.number,
 			"outside the target period"
 		);
-		allocationBlockNumber.set(_metrics, notTargetBlockNumber);
+		getStorage().setAllocationBlockNumber(_metrics, notTargetBlockNumber);
 		voteTimes.resetVoteTimesByProperty(property);
+	}
+
+	function getLastAllocationBlockNumber(address _metrics)
+		private
+		returns (uint256)
+	{
+		uint256 blockNumber = getStorage().getLastBlockNumber(_metrics);
+		uint256 baseBlockNumber = getStorage().getBaseBlockNumber();
+		if (baseBlockNumber == 0) {
+			getStorage().setBaseBlockNumber();
+		}
+		uint256 lastAllocationBlockNumber = blockNumber > 0
+			? blockNumber
+			: getStorage().getBaseBlockNumber();
+		return lastAllocationBlockNumber;
+	}
+
+	function getStorage() private view returns (AllocatorStorage) {
+		return AllocatorStorage(config().allocatorStorage());
 	}
 }

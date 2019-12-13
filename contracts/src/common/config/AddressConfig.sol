@@ -6,8 +6,7 @@ import "../validate/AddressValidator.sol";
 contract AddressConfig is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
-	address public allocationBlockNumber;
-	address public pendingIncrement;
+	address public allocatorStorage;
 	address public withdraw;
 	address public withdrawStorage;
 	address public marketFactory;
@@ -29,12 +28,8 @@ contract AddressConfig is Ownable {
 		allocator = _addr;
 	}
 
-	function setAllocationBlockNumber(address _addr) public onlyOwner {
-		allocationBlockNumber = _addr;
-	}
-
-	function setPendingIncrement(address _addr) public onlyOwner {
-		pendingIncrement = _addr;
+	function setAllocatorStorage(address _addr) public onlyOwner {
+		allocatorStorage = _addr;
 	}
 
 	function setWithdraw(address _addr) public onlyOwner {
