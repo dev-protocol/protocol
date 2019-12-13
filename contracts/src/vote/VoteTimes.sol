@@ -15,9 +15,9 @@ contract VoteTimes is UsingConfig, UsingStorage {
 			config().policyFactory()
 		);
 
-		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));
+		uint256 voteTimes = eternalStorage().getUint(getVoteTimesKey());
 		voteTimes++;
-		eternalStorage().setUint(keccak256("_voteTimes"), voteTimes);
+		eternalStorage().setUint(getVoteTimesKey(), voteTimes);
 	}
 
 	function addVoteTimesByProperty(address _property) external {
@@ -26,9 +26,7 @@ contract VoteTimes is UsingConfig, UsingStorage {
 			config().voteCounter()
 		);
 
-		bytes32 key = keccak256(
-			abi.encodePacked("_voteTimesByProperty", _property)
-		);
+		bytes32 key = getVoteTimesByPropertyKey(_property);
 		uint256 voteTimesByProperty = eternalStorage().getUint(key);
 		voteTimesByProperty++;
 		eternalStorage().setUint(key, voteTimesByProperty);
@@ -41,10 +39,8 @@ contract VoteTimes is UsingConfig, UsingStorage {
 			config().propertyFactory()
 		);
 
-		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));
-		bytes32 key = keccak256(
-			abi.encodePacked("_voteTimesByProperty", _property)
-		);
+		uint256 voteTimes = eternalStorage().getUint(getVoteTimesKey());
+		bytes32 key = getVoteTimesByPropertyKey(_property);
 		eternalStorage().setUint(key, voteTimes);
 	}
 
@@ -53,11 +49,19 @@ contract VoteTimes is UsingConfig, UsingStorage {
 		view
 		returns (uint256)
 	{
-		uint256 voteTimes = eternalStorage().getUint(keccak256("_voteTimes"));
-		bytes32 key = keccak256(
-			abi.encodePacked("_voteTimesByProperty", _property)
-		);
+		uint256 voteTimes = eternalStorage().getUint(getVoteTimesKey());
+		bytes32 key = getVoteTimesByPropertyKey(_property);
 		uint256 voteTimesByProperty = eternalStorage().getUint(key);
 		return voteTimes - voteTimesByProperty;
+	}
+
+	function getVoteTimesKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_voteTimes"));
+	}
+
+	function getVoteTimesByPropertyKey(address _property) private pure returns (bytes32) {
+		return keccak256(
+			abi.encodePacked("_voteTimesByProperty", _property)
+		);
 	}
 }

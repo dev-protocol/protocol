@@ -15,17 +15,21 @@ contract MetricsGroup is UsingConfig, UsingStorage, IGroup {
 			config().metricsFactory()
 		);
 
-		eternalStorage().setBool(getKey(_addr), true);
-		uint256 totalCount = eternalStorage().getUint(keccak256("_totalCount"));
+		eternalStorage().setBool(getAddressKey(_addr), true);
+		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		totalCount++;
-		eternalStorage().setUint(keccak256("_totalCount"), totalCount);
+		eternalStorage().setUint(getTotalCountKey(), totalCount);
 	}
 
 	function isGroup(address _addr) external view returns (bool) {
-		return eternalStorage().getBool(getKey(_addr));
+		return eternalStorage().getBool(getAddressKey(_addr));
 	}
 
 	function totalIssuedMetrics() public view returns (uint256) {
-		return eternalStorage().getUint(keccak256("_totalCount"));
+		return eternalStorage().getUint(getTotalCountKey());
+	}
+
+	function getTotalCountKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_totalCount"));
 	}
 }

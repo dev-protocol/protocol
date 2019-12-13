@@ -16,10 +16,10 @@ contract MarketGroup is UsingConfig, UsingStorage, IGroup {
 			msg.sender,
 			config().marketFactory()
 		);
-		eternalStorage().setBool(getKey(_addr), true);
+		eternalStorage().setBool(getAddressKey(_addr), true);
 	}
 
 	function isGroup(address _addr) external view returns (bool) {
-		return eternalStorage().getBool(getKey(_addr));
+		return eternalStorage().getBool(getAddressKey(_addr));
 	}
 }
