@@ -14,11 +14,11 @@ contract PolicySet is UsingConfig, UsingStorage {
 			config().policyFactory()
 		);
 
-		uint256 index = eternalStorage().getUint(keccak256("_policySetIndex"));
-		bytes32 key = getKey(index);
+		uint256 index = eternalStorage().getUint(getPlicySetIndex());
+		bytes32 key = getIndexKey(index);
 		eternalStorage().setAddress(key, _addr);
 		index++;
-		eternalStorage().setUint(keccak256("_policySetIndex"), index);
+		eternalStorage().setUint(getPlicySetIndex(), index);
 	}
 
 	function deleteAll() external {
@@ -27,24 +27,28 @@ contract PolicySet is UsingConfig, UsingStorage {
 			config().policyFactory()
 		);
 
-		uint256 index = eternalStorage().getUint(keccak256("_policySetIndex"));
+		uint256 index = eternalStorage().getUint(getPlicySetIndex());
 		for (uint256 i = 0; i < index; i++) {
-			bytes32 key = getKey(index);
+			bytes32 key = getIndexKey(index);
 			eternalStorage().setAddress(key, address(0));
 		}
-		eternalStorage().setUint(keccak256("_policySetIndex"), 0);
+		eternalStorage().setUint(getPlicySetIndex(), 0);
 	}
 
 	function count() external view returns (uint256) {
-		return eternalStorage().getUint(keccak256("_policySetIndex"));
+		return eternalStorage().getUint(getPlicySetIndex());
 	}
 
 	function get(uint256 _index) external view returns (address) {
-		bytes32 key = getKey(_index);
+		bytes32 key = getIndexKey(_index);
 		return eternalStorage().getAddress(key);
 	}
 
-	function getKey(uint256 _index) private pure returns (bytes32) {
-		return keccak256(abi.encodePacked(_index));
+	function getIndexKey(uint256 _index) private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_index", _index));
+	}
+
+	function getPlicySetIndex() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_policySetIndex"));
 	}
 }
