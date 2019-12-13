@@ -10,7 +10,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
-import {VoteTimes} from "contracts/src/vote/VoteTimes.sol";
+import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
