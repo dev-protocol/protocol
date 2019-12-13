@@ -1,16 +1,18 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "../common/config/UsingConfig.sol";
 import "../common/validate/AddressValidator.sol";
 import "../property/PropertyGroup.sol";
 import "./WithdrawStorage.sol";
 
-contract Withdraw is UsingConfig {
+contract Withdraw is Pausable, UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function withdraw(address _property) external {
+		require(paused() != false, "system stop");
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().allocator()

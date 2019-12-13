@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "../common/validate/AddressValidator.sol";
 import "../common/validate/IntValidator.sol";
 import "../property/Property.sol";
@@ -10,13 +11,14 @@ import "../policy/Policy.sol";
 import "../common/config/UsingConfig.sol";
 import "./LockupStorage.sol";
 
-contract Lockup is UsingConfig {
+contract Lockup is Pausable, UsingConfig {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function lockup(address _property, uint256 _value) external {
+		require(paused() != false, "system stop");
 		new AddressValidator().validateGroup(
 			_property,
 			config().propertyGroup()
