@@ -59,9 +59,11 @@ contract VoteTimes is UsingConfig, UsingStorage {
 		return keccak256(abi.encodePacked("_voteTimes"));
 	}
 
-	function getVoteTimesByPropertyKey(address _property) private pure returns (bytes32) {
-		return keccak256(
-			abi.encodePacked("_voteTimesByProperty", _property)
-		);
+	function getVoteTimesByPropertyKey(address _property)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_voteTimesByProperty", _property));
 	}
 }

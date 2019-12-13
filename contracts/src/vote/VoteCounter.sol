@@ -92,7 +92,10 @@ contract VoteCounter is UsingConfig, UsingStorage {
 		address _target,
 		address _property
 	) private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_alreadyVote", _sender, _target, _property));
+		return
+			keccak256(
+				abi.encodePacked("_alreadyVote", _sender, _target, _property)
+			);
 	}
 
 	function getAgreeVoteCountKey(address _sender)
