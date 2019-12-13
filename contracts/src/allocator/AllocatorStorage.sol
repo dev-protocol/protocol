@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
-import "../common/storage/UsingStorage.sol";
-import "../common/config/UsingConfig.sol";
-import "../common/validate/AddressValidator.sol";
+import "contracts/src/common/storage/UsingStorage.sol";
+import "contracts/src/common/config/UsingConfig.sol";
+import "contracts/src/common/validate/AddressValidator.sol";
 
 contract AllocatorStorage is UsingStorage, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}

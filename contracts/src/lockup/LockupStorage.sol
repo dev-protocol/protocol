@@ -1,9 +1,8 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/storage/UsingStorage.sol";
-import "../common/config/UsingConfig.sol";
-import "../common/validate/AddressValidator.sol";
+import "contracts/src/common/storage/UsingStorage.sol";
+import "contracts/src/common/config/UsingConfig.sol";
 
 contract LockupStorage is UsingConfig, UsingStorage {
 	using SafeMath for uint256;

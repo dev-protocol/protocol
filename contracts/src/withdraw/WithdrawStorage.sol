@@ -2,9 +2,9 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/validate/AddressValidator.sol";
-import "../common/storage/UsingStorage.sol";
-import "../common/config/UsingConfig.sol";
+import "contracts/src/common/validate/AddressValidator.sol";
+import "contracts/src/common/storage/UsingStorage.sol";
+import "contracts/src/common/config/UsingConfig.sol";
 
 contract WithdrawStorage is UsingStorage, UsingConfig {
 	using SafeMath for uint256;

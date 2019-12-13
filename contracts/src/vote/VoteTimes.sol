@@ -1,8 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "../common/config/UsingConfig.sol";
-import "../common/storage/UsingStorage.sol";
-import "../common/validate/AddressValidator.sol";
+import "contracts/src/common/config/UsingConfig.sol";
+import "contracts/src/common/storage/UsingStorage.sol";
 
 contract VoteTimes is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks

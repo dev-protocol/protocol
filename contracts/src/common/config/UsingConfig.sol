@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "./AddressConfig.sol";
+import "contracts/src/common/config/AddressConfig.sol";
 
 contract UsingConfig {
 	AddressConfig private _config;

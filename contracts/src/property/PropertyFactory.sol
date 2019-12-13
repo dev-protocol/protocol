@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "./Property.sol";
-import "./PropertyGroup.sol";
-import "../vote/VoteTimes.sol";
-import "../common/validate/StringValidator.sol";
+import "contracts/src/common/validate/StringValidator.sol";
+import "contracts/src/vote/VoteTimes.sol";
+import "contracts/src/property/Property.sol";
+import "contracts/src/property/PropertyGroup.sol";
 
 contract PropertyFactory is UsingConfig {
 	event Create(address indexed _from, address _property);

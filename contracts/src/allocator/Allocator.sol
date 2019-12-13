@@ -1,20 +1,20 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import "../common/lifecycle/Killable.sol";
-import "../common/libs/Decimals.sol";
-import "../common/validate/AddressValidator.sol";
-import "../common/config/UsingConfig.sol";
-import "../market/Market.sol";
-import "../metrics/Metrics.sol";
-import "../metrics/MetricsGroup.sol";
-import "../policy/PolicyFactory.sol";
-import "../vote/VoteTimes.sol";
-import "../lockup/Lockup.sol";
-import "../withdraw/Withdraw.sol";
-import "./AllocatorStorage.sol";
+import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
+import {Decimals} from "contracts/src/common/libs/Decimals.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {Market} from "contracts/src/market/Market.sol";
+import {Metrics} from "contracts/src/metrics/Metrics.sol";
+import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
+import {VoteTimes} from "contracts/src/vote/VoteTimes.sol";
+import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
+import {Policy} from "contracts/src/policy/Policy.sol";
+import {Lockup} from "contracts/src/lockup/Lockup.sol";
+import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
 contract Allocator is Killable, Ownable, UsingConfig {
 	using SafeMath for uint256;

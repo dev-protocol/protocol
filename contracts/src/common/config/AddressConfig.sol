@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "../validate/AddressValidator.sol";
+import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 
 contract AddressConfig is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -23,6 +23,7 @@ contract AddressConfig is Ownable {
 	address public lockupStorage;
 	address public voteTimes;
 	address public voteCounter;
+	address public voteCounterStorage;
 
 	function setAllocator(address _addr) public onlyOwner {
 		allocator = _addr;
@@ -99,5 +100,9 @@ contract AddressConfig is Ownable {
 
 	function setVoteCounter(address _addr) public onlyOwner {
 		voteCounter = _addr;
+	}
+
+	function setVoteCounterStorage(address _addr) public onlyOwner {
+		voteCounterStorage = _addr;
 	}
 }
