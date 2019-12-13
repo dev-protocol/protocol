@@ -5,7 +5,7 @@ contract IGroup {
 
 	function addGroup(address _addr) external;
 
-	function getKey(address _addr) internal pure returns (bytes32) {
+	function getAddressKey(address _addr) internal pure returns (bytes32) {
 		return keccak256(abi.encodePacked(_addr));
 	}
 
