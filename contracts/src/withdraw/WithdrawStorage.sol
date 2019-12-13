@@ -13,7 +13,11 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	//Allocation
-	function increment(address _property, uint256 _totalValue, uint256 _priceValue) external {
+	function increment(
+		address _property,
+		uint256 _totalValue,
+		uint256 _priceValue
+	) external {
 		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		bytes32 totalsKey = getAllocationTotalKey(_property);
@@ -23,10 +27,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		bytes32 pricesKey = getAllocationPriceKey(_property);
 
 		uint256 price = eternalStorage().getUint(pricesKey);
-		eternalStorage().setUint(
-			pricesKey,
-			price.add(_priceValue)
-		);
+		eternalStorage().setUint(pricesKey, price.add(_priceValue));
 	}
 	function getRewardsAmount(address _property)
 		external
