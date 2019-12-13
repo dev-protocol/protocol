@@ -5,7 +5,6 @@ import "contracts/src/vote/VoteTimes.sol";
 import "contracts/src/market/Market.sol";
 import "contracts/src/market/MarketGroup.sol";
 
-
 contract MarketFactory is UsingConfig {
 	event Create(address indexed _from, address _market);
 

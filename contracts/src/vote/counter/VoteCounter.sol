@@ -25,7 +25,11 @@ contract VoteCounter is UsingConfig {
 			config().policyGroup()
 		);
 
-		bool alreadyVote = getStorage().getAlreadyVoteFlg(_user, msg.sender, _property);
+		bool alreadyVote = getStorage().getAlreadyVoteFlg(
+			_user,
+			msg.sender,
+			_property
+		);
 		require(alreadyVote == false, "already vote");
 		uint256 voteCount = getVoteCount(_user, _property);
 		require(voteCount != 0, "vote count is 0");

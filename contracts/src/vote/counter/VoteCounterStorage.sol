@@ -5,31 +5,30 @@ import "contracts/src/common/storage/UsingStorage.sol";
 import "contracts/src/common/config/UsingConfig.sol";
 
 contract VoteCounterStorage is UsingStorage, UsingConfig {
-
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	// Already Vote Flg
-	function setAlreadyVoteFlg(address _user, address _sender, address _property) external {
+	function setAlreadyVoteFlg(
+		address _user,
+		address _sender,
+		address _property
+	) external {
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().voteCounter()
 		);
 
-		bytes32 alreadyVoteKey = getAlreadyVoteKey(
-			_user,
-			_sender,
-			_property
-		);
+		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
 		return eternalStorage().setBool(alreadyVoteKey, true);
 	}
 
-	function getAlreadyVoteFlg(address _user, address _sender, address _property) external view returns (bool) {
-		bytes32 alreadyVoteKey = getAlreadyVoteKey(
-			_user,
-			_sender,
-			_property
-		);
+	function getAlreadyVoteFlg(
+		address _user,
+		address _sender,
+		address _property
+	) external view returns (bool) {
+		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
 		return eternalStorage().getBool(alreadyVoteKey);
 	}
 	function getAlreadyVoteKey(
@@ -48,7 +47,10 @@ contract VoteCounterStorage is UsingStorage, UsingConfig {
 		return eternalStorage().getUint(getAgreeVoteCountKey(_sender));
 	}
 
-	function setAgreeCount(address _sender, uint256 count) external returns (uint256) {
+	function setAgreeCount(address _sender, uint256 count)
+		external
+		returns (uint256)
+	{
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().voteCounter()
@@ -70,7 +72,10 @@ contract VoteCounterStorage is UsingStorage, UsingConfig {
 		return eternalStorage().getUint(getOppositeVoteCountKey(_sender));
 	}
 
-	function setOppositeCount(address _sender, uint256 count) external returns (uint256) {
+	function setOppositeCount(address _sender, uint256 count)
+		external
+		returns (uint256)
+	{
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().voteCounter()

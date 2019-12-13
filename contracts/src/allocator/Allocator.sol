@@ -16,7 +16,6 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
-
 contract Allocator is Killable, Ownable, UsingConfig {
 	using SafeMath for uint256;
 	using Decimals for uint256;
