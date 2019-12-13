@@ -40,7 +40,7 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		);
 		Market(market).calculate(
 			_metrics,
-			allocationBlockNumber.getLastAllocationBlockNumber(_metrics),
+			getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
 		allocationBlockNumber.setWithNow(_metrics);
@@ -148,8 +148,7 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
 			config().allocationBlockNumber()
 		);
-		uint256 blockNumber = allocationBlockNumber
-			.getLastAllocationBlockNumber(_metrics);
+		uint256 blockNumber = getLastAllocationBlockNumber(_metrics);
 		uint256 notTargetBlockNumber = blockNumber + notTargetPeriod;
 		require(
 			notTargetBlockNumber < block.number,
@@ -157,5 +156,23 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		);
 		allocationBlockNumber.set(_metrics, notTargetBlockNumber);
 		voteTimes.resetVoteTimesByProperty(property);
+	}
+
+	function getLastAllocationBlockNumber(address _metrics)
+		private
+		returns (uint256)
+	{
+		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
+			config().allocationBlockNumber()
+		);
+		uint256 blockNumber = allocationBlockNumber.getLastBlockNumber(_metrics);
+		uint256 baseBlockNumber = allocationBlockNumber.getBaseBlockNumber();
+		if (baseBlockNumber == 0){
+			allocationBlockNumber.setBaseBlockNumber();
+		}
+		uint256 lastAllocationBlockNumber = blockNumber > 0
+			? blockNumber
+			: allocationBlockNumber.getBaseBlockNumber();
+		return lastAllocationBlockNumber;
 	}
 }
