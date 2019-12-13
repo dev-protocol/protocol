@@ -27,7 +27,11 @@ contract VoteTimesStorage is UsingStorage, UsingConfig {
 	}
 
 	//Vote Times By Property
-	function getVoteTimesByProperty(address _property) external view returns (uint256) {
+	function getVoteTimesByProperty(address _property)
+		external
+		view
+		returns (uint256)
+	{
 		return eternalStorage().getUint(getVoteTimesByPropertyKey(_property));
 	}
 
@@ -37,7 +41,11 @@ contract VoteTimesStorage is UsingStorage, UsingConfig {
 			config().voteTimes()
 		);
 
-		return eternalStorage().setUint(getVoteTimesByPropertyKey(_property), times);
+		return
+			eternalStorage().setUint(
+				getVoteTimesByPropertyKey(_property),
+				times
+			);
 	}
 
 	function getVoteTimesByPropertyKey(address _property)

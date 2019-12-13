@@ -27,7 +27,9 @@ contract VoteTimes is UsingConfig {
 			config().voteCounter()
 		);
 
-		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(_property);
+		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(
+			_property
+		);
 		voteTimesByProperty++;
 		getStorage().setVoteTimesByProperty(_property, voteTimesByProperty);
 	}
@@ -49,13 +51,13 @@ contract VoteTimes is UsingConfig {
 		returns (uint256)
 	{
 		uint256 voteTimes = getStorage().getVoteTimes();
-		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(_property);
+		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(
+			_property
+		);
 		return voteTimes - voteTimesByProperty;
 	}
 
-
-
-	function getStorage() private view returns (VoteTimesStorage){
+	function getStorage() private view returns (VoteTimesStorage) {
 		return VoteTimesStorage(config().voteTimesStorage());
 	}
 }

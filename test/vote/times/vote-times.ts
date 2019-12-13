@@ -64,6 +64,7 @@ contract(
 				expect(result.toNumber()).to.be.equal(1)
 			})
 			it('Storage information can be taken over.', async () => {
+				// eslint-disable-next-line no-warning-comments
 				// TODO
 				// const storageAddress = await voteTimesStorage.getStorageAddress({
 				// 	from: deployer
