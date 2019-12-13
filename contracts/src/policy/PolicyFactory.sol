@@ -1,11 +1,11 @@
 pragma solidity ^0.5.0;
 
-import "../common/config/UsingConfig.sol";
-import "../common/validate/AddressValidator.sol";
-import "./Policy.sol";
-import "./PolicySet.sol";
-import "./PolicyGroup.sol";
-import "../vote/VoteTimes.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {VoteTimes} from "contracts/src/vote/VoteTimes.sol";
+import {Policy} from "contracts/src/policy/Policy.sol";
+import {PolicySet} from "contracts/src/policy/PolicySet.sol";
+import {PolicyGroup} from "contracts/src/policy/PolicyGroup.sol";
 
 contract PolicyFactory is UsingConfig {
 	event Create(address indexed _from, address _property);

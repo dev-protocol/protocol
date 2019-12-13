@@ -2,10 +2,10 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
-import "../common/config/UsingConfig.sol";
-import "../common/validate/AddressValidator.sol";
-import "../property/PropertyGroup.sol";
-import "./WithdrawStorage.sol";
+import "contracts/src/common/config/UsingConfig.sol";
+import "contracts/src/common/validate/AddressValidator.sol";
+import "contracts/src/property/PropertyGroup.sol";
+import "contracts/src/withdraw/WithdrawStorage.sol";
 
 contract Withdraw is Pausable, UsingConfig {
 	// solium-disable-next-line no-empty-blocks

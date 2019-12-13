@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
-import "../market/MarketGroup.sol";
-import "../common/storage/UsingStorage.sol";
-import "../common/validate/AddressValidator.sol";
+import "contracts/src/market/MarketGroup.sol";
+import "contracts/src/common/storage/UsingStorage.sol";
+import "contracts/src/common/validate/AddressValidator.sol";
 
 contract PolicySet is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks

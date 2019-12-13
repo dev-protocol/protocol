@@ -1,11 +1,13 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./IPolicy.sol";
-import "../common/lifecycle/Killable.sol";
-import "../vote/VoteCounter.sol";
-import "../property/PropertyGroup.sol";
-import "./PolicyFactory.sol";
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
+import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
+import {IPolicy} from "contracts/src/policy/IPolicy.sol";
+import {PolicyFactory} from "contracts/src/policy/PolicyFactory.sol";
 
 contract Policy is Killable, UsingConfig {
 	using SafeMath for uint256;

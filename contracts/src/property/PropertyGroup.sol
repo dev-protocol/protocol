@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "../common/storage/UsingStorage.sol";
-import "../common/config/UsingConfig.sol";
-import "../common/validate/AddressValidator.sol";
-import "../common/interface/IGroup.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
 contract PropertyGroup is UsingConfig, UsingStorage, IGroup {
 	// solium-disable-next-line no-empty-blocks

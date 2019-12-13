@@ -1,15 +1,15 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
-import "../common/validate/AddressValidator.sol";
-import "../common/validate/IntValidator.sol";
-import "../property/Property.sol";
-import "../property/PropertyGroup.sol";
-import "../policy/Policy.sol";
-import "../common/config/UsingConfig.sol";
-import "./LockupStorage.sol";
+import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import {IntValidator} from "contracts/src/common/validate/IntValidator.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {Property} from "contracts/src/property/Property.sol";
+import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
+import {Policy} from "contracts/src/policy/Policy.sol";
 
 contract Lockup is Pausable, UsingConfig {
 	using SafeMath for uint256;

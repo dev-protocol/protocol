@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "../common/validate/AddressValidator.sol";
-import "./Metrics.sol";
-import "./MetricsGroup.sol";
-import "../vote/VoteTimes.sol";
+import "contracts/src/common/validate/AddressValidator.sol";
+import "contracts/src/vote/VoteTimes.sol";
+import "contracts/src/metrics/Metrics.sol";
+import "contracts/src/metrics/MetricsGroup.sol";
 
 contract MetricsFactory is UsingConfig {
 	event Create(address indexed _from, address _metrics);

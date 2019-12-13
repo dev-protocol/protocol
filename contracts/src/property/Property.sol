@@ -2,10 +2,9 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
-import "../common/config/UsingConfig.sol";
-import "../common/validate/IntValidator.sol";
-import "../allocator/Allocator.sol";
-import "../lockup/Lockup.sol";
+import "contracts/src/common/config/UsingConfig.sol";
+import "contracts/src/common/validate/IntValidator.sol";
+import "contracts/src/allocator/Allocator.sol";
 
 contract Property is ERC20, ERC20Detailed, UsingConfig {
 	uint8 private constant _decimals = 18;

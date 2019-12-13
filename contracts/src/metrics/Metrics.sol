@@ -1,7 +1,5 @@
 pragma solidity ^0.5.0;
 
-import "../common/validate/AddressValidator.sol";
-
 contract Metrics {
 	address public market;
 	address public property;

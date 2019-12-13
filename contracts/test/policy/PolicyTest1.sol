@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "../../src/policy/IPolicy.sol";
-import "./../../src/common/libs/Decimals.sol";
+import "contracts/src/policy/IPolicy.sol";
+import "contracts/src/common/libs/Decimals.sol";
 
 contract PolicyTest1 is IPolicy {
 	using Decimals for uint256;
