@@ -1,13 +1,17 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
-import "contracts/src/common/config/UsingConfig.sol";
-import "contracts/src/common/validate/AddressValidator.sol";
-import "contracts/src/property/PropertyGroup.sol";
-import "contracts/src/withdraw/WithdrawStorage.sol";
+import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
+import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 
 contract Withdraw is Pausable, UsingConfig {
+	using SafeMath for uint256;
+
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -63,8 +67,10 @@ contract Withdraw is Pausable, UsingConfig {
 			msg.sender,
 			config().allocator()
 		);
-
-		getStorage().increment(_property, _allocationResult);
+		uint256 priceValue = _allocationResult.div(
+			ERC20(_property).totalSupply()
+		);
+		getStorage().increment(_property, _allocationResult, priceValue);
 	}
 
 	function getRewardsAmount(address _property)

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "contracts/src/common/libs/Decimals.sol";
+import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 
 contract DecimalsTest {
 	using Decimals for uint256;
