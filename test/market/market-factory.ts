@@ -7,6 +7,7 @@ contract('MarketFactoryTest', ([deployer, policyFactory]) => {
 	const policyContract = artifacts.require('Policy')
 	const policyTest1Contract = artifacts.require('PolicyTest1')
 	const voteTimesContract = artifacts.require('VoteTimes')
+	const voteTimesStorageContract = artifacts.require('VoteTimesStorage')
 	describe('MarketFactory; createMarket', () => {
 		let market: any
 		let marketGroup: any
@@ -33,8 +34,17 @@ contract('MarketFactoryTest', ([deployer, policyFactory]) => {
 			const voteTimes = await voteTimesContract.new(addressConfig.address, {
 				from: deployer
 			})
-			await voteTimes.createStorage()
 			await addressConfig.setVoteTimes(voteTimes.address, {
+				from: deployer
+			})
+			const voteTimesStorage = await voteTimesStorageContract.new(
+				addressConfig.address,
+				{
+					from: deployer
+				}
+			)
+			await voteTimesStorage.createStorage()
+			await addressConfig.setVoteTimesStorage(voteTimesStorage.address, {
 				from: deployer
 			})
 			const policyTest1 = await policyTest1Contract.new({

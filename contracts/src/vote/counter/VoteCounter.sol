@@ -7,7 +7,7 @@ import {AddressValidator} from "contracts/src/common/validate/AddressValidator.s
 import {Property} from "contracts/src/property/Property.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";
-import {VoteTimes} from "contracts/src/vote/VoteTimes.sol";
+import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {VoteCounterStorage} from "contracts/src/vote/counter/VoteCounterStorage.sol";
 
 contract VoteCounter is UsingConfig {

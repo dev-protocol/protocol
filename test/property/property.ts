@@ -5,6 +5,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 	const propertyGroupContract = artifacts.require('PropertyGroup')
 	const addressConfigContract = artifacts.require('AddressConfig')
 	const voteTimesContract = artifacts.require('VoteTimes')
+	const voteTimesStorageContract = artifacts.require('VoteTimesStorage')
 	describe('Property; withdrawDev', () => {
 		let propertyFactory: any
 		let propertyGroup: any
@@ -19,7 +20,19 @@ contract('PropertyTest', ([deployer, ui]) => {
 			voteTimes = await voteTimesContract.new(addressConfig.address, {
 				from: deployer
 			})
-			await voteTimes.createStorage()
+			await addressConfig.setVoteTimes(voteTimes.address, {
+				from: deployer
+			})
+			const voteTimesStorage = await voteTimesStorageContract.new(
+				addressConfig.address,
+				{
+					from: deployer
+				}
+			)
+			await voteTimesStorage.createStorage()
+			await addressConfig.setVoteTimesStorage(voteTimesStorage.address, {
+				from: deployer
+			})
 			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
@@ -27,9 +40,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 			await addressConfig.setPropertyGroup(propertyGroup.address, {
 				from: deployer
 			})
-			await addressConfig.setVoteTimes(voteTimes.address, {
-				from: deployer
-			})
+
 			await addressConfig.setLockup(lockup.address, {
 				from: deployer
 			})

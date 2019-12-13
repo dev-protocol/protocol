@@ -4,6 +4,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 	const addressConfigContract = artifacts.require('AddressConfig')
 	const propertyFactoryContract = artifacts.require('PropertyFactory')
 	const voteTimesContract = artifacts.require('VoteTimes')
+	const voteTimesStorageContract = artifacts.require('VoteTimesStorage')
 	describe('PropertyFactory; createProperty', () => {
 		let propertyFactory: any
 		let propertyGroup: any
@@ -20,8 +21,17 @@ contract('PropertyFactoryTest', ([deployer]) => {
 			const voteTimes = await voteTimesContract.new(addressConfig.address, {
 				from: deployer
 			})
-			await voteTimes.createStorage({from: deployer})
 			await addressConfig.setVoteTimes(voteTimes.address, {
+				from: deployer
+			})
+			const voteTimesStorage = await voteTimesStorageContract.new(
+				addressConfig.address,
+				{
+					from: deployer
+				}
+			)
+			await voteTimesStorage.createStorage()
+			await addressConfig.setVoteTimesStorage(voteTimesStorage.address, {
 				from: deployer
 			})
 			propertyFactory = await propertyFactoryContract.new(

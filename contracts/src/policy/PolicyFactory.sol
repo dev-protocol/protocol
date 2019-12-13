@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
-import {VoteTimes} from "contracts/src/vote/VoteTimes.sol";
+import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {PolicySet} from "contracts/src/policy/PolicySet.sol";
 import {PolicyGroup} from "contracts/src/policy/PolicyGroup.sol";

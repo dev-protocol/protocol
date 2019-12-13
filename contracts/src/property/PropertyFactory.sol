@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "contracts/src/common/validate/StringValidator.sol";
-import "contracts/src/vote/VoteTimes.sol";
+import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import "contracts/src/property/Property.sol";
 import "contracts/src/property/PropertyGroup.sol";
 

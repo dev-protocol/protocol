@@ -22,6 +22,7 @@ contract AddressConfig is Ownable {
 	address public lockup;
 	address public lockupStorage;
 	address public voteTimes;
+	address public voteTimesStorage;
 	address public voteCounter;
 	address public voteCounterStorage;
 
@@ -96,6 +97,10 @@ contract AddressConfig is Ownable {
 
 	function setVoteTimes(address _addr) public onlyOwner {
 		voteTimes = _addr;
+	}
+
+	function setVoteTimesStorage(address _addr) public onlyOwner {
+		voteTimesStorage = _addr;
 	}
 
 	function setVoteCounter(address _addr) public onlyOwner {
