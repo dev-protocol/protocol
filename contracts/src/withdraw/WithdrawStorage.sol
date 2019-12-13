@@ -1,10 +1,10 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "contracts/src/common/validate/AddressValidator.sol";
-import "contracts/src/common/storage/UsingStorage.sol";
-import "contracts/src/common/config/UsingConfig.sol";
+import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
 contract WithdrawStorage is UsingStorage, UsingConfig {
 	using SafeMath for uint256;
@@ -13,19 +13,19 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	//Allocation
-	function increment(address _property, uint256 _value) external {
+	function increment(address _property, uint256 _totalValue, uint256 _priceValue) external {
 		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		bytes32 totalsKey = getAllocationTotalKey(_property);
 		uint256 total = eternalStorage().getUint(totalsKey);
-		eternalStorage().setUint(totalsKey, total.add(_value));
+		eternalStorage().setUint(totalsKey, total.add(_totalValue));
 
 		bytes32 pricesKey = getAllocationPriceKey(_property);
 
 		uint256 price = eternalStorage().getUint(pricesKey);
 		eternalStorage().setUint(
 			pricesKey,
-			price.add(_value.div(ERC20(_property).totalSupply()))
+			price.add(_priceValue)
 		);
 	}
 	function getRewardsAmount(address _property)

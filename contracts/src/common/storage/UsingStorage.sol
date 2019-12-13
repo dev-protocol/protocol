@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "contracts/src/common/storage/EternalStorage.sol";
+import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import {EternalStorage} from "contracts/src/common/storage/EternalStorage.sol";
 
 contract UsingStorage is Ownable {
 	address private _storage;

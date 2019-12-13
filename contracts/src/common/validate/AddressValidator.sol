@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "contracts/src/common/interface/IGroup.sol";
+import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
 contract AddressValidator {
 	string constant errorMessage = "this address is not proper";

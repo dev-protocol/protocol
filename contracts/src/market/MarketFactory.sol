@@ -1,9 +1,10 @@
 pragma solidity ^0.5.0;
 
-import "contracts/src/common/validate/AddressValidator.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
-import "contracts/src/market/Market.sol";
-import "contracts/src/market/MarketGroup.sol";
+import {Market} from "contracts/src/market/Market.sol";
+import {MarketGroup} from "contracts/src/market/MarketGroup.sol";
 
 contract MarketFactory is UsingConfig {
 	event Create(address indexed _from, address _market);

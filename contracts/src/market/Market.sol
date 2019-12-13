@@ -1,14 +1,16 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "contracts/src/common/validate/AddressValidator.sol";
+import {ERC20Burnable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
-import "contracts/src/metrics/MetricsGroup.sol";
-import "contracts/src/metrics/MetricsFactory.sol";
-import "contracts/src/vote/counter/VoteCounter.sol";
-import "contracts/src/lockup/Lockup.sol";
-import "contracts/src/market/IMarket.sol";
+import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
+import {MetricsFactory} from "contracts/src/metrics/MetricsFactory.sol";
+import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
+import {Lockup} from "contracts/src/lockup/Lockup.sol";
+import {IMarket} from "contracts/src/market/IMarket.sol";
+import {Policy} from "contracts/src/policy/Policy.sol";
 
 contract Market is UsingConfig {
 	// TODO
