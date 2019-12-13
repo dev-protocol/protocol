@@ -165,9 +165,11 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		AllocationBlockNumber allocationBlockNumber = AllocationBlockNumber(
 			config().allocationBlockNumber()
 		);
-		uint256 blockNumber = allocationBlockNumber.getLastBlockNumber(_metrics);
+		uint256 blockNumber = allocationBlockNumber.getLastBlockNumber(
+			_metrics
+		);
 		uint256 baseBlockNumber = allocationBlockNumber.getBaseBlockNumber();
-		if (baseBlockNumber == 0){
+		if (baseBlockNumber == 0) {
 			allocationBlockNumber.setBaseBlockNumber();
 		}
 		uint256 lastAllocationBlockNumber = blockNumber > 0
