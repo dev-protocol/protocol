@@ -62,13 +62,18 @@ contract Allocator is Killable, Ownable, UsingConfig {
 			getStorage().getLastAllocationBlockEachMetrics(_metrics);
 		uint256 mint = policy.rewards(lockupValue, totalAssets);
 		uint256 value = policy.assetValue(lockupValue, _value) * basis / blocks;
-		uint256 marketValue = getStorage().getLastAssetValueEachMarketPerBlock(metrics.market()) -
+		uint256 marketValue = getStorage().getLastAssetValueEachMarketPerBlock(
+				metrics.market()
+			) -
 			getStorage().getLastAssetValueEachMetrics(_metrics) +
 			value;
 		uint256 assets = market.issuedMetrics();
 		getStorage().setLastAllocationBlockEachMetrics(_metrics, block.number);
 		getStorage().setLastAssetValueEachMetrics(_metrics, value);
-		getStorage().setLastAssetValueEachMarketPerBlock(metrics.market(), marketValue);
+		getStorage().setLastAssetValueEachMarketPerBlock(
+			metrics.market(),
+			marketValue
+		);
 		uint256 result = allocation(
 			blocks,
 			mint,
@@ -151,9 +156,7 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		private
 		returns (uint256)
 	{
-		uint256 blockNumber = getStorage().getLastBlockNumber(
-			_metrics
-		);
+		uint256 blockNumber = getStorage().getLastBlockNumber(_metrics);
 		uint256 baseBlockNumber = getStorage().getBaseBlockNumber();
 		if (baseBlockNumber == 0) {
 			getStorage().setBaseBlockNumber();
