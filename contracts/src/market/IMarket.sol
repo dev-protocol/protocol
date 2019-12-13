@@ -13,7 +13,7 @@ contract IMarket {
 		// solium-disable-next-line indentation
 	) external returns (bool);
 
-	function calculate(address _prop, uint256 _start, uint256 _end)
+	function calculate(address _metrics, uint256 _start, uint256 _end)
 		external
 		returns (bool);
 }
