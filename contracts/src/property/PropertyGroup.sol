@@ -15,10 +15,10 @@ contract PropertyGroup is UsingConfig, UsingStorage, IGroup {
 			config().propertyFactory()
 		);
 
-		eternalStorage().setBool(getAddressKey(_addr), true);
+		eternalStorage().setBool(getGroupKey(_addr), true);
 	}
 
 	function isGroup(address _addr) external view returns (bool) {
-		return eternalStorage().getBool(getAddressKey(_addr));
+		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 }
