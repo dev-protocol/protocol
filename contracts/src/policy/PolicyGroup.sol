@@ -14,7 +14,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 			msg.sender,
 			config().policyFactory()
 		);
-		eternalStorage().setBool(getAddressKey(_addr), true);
+		eternalStorage().setBool(getGroupKey(_addr), true);
 	}
 
 	function deleteGroup(address _addr) external {
@@ -22,11 +22,11 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 			msg.sender,
 			config().policyFactory()
 		);
-		return eternalStorage().setBool(getAddressKey(_addr), false);
+		return eternalStorage().setBool(getGroupKey(_addr), false);
 	}
 
 	function isGroup(address _addr) external view returns (bool) {
-		return eternalStorage().getBool(getAddressKey(_addr));
+		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 
 }
