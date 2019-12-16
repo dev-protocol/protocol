@@ -1,18 +1,20 @@
 pragma solidity ^0.5.0;
 
+import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {MarketGroup} from "contracts/src/market/MarketGroup.sol";
 
-contract MarketFactory is UsingConfig {
+contract MarketFactory is Pausable, UsingConfig {
 	event Create(address indexed _from, address _market);
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function createMarket(address _addr) public returns (address) {
+	function create(address _addr) public returns (address) {
+		require(paused() == false, "You cannot use that");
 		new AddressValidator().validateDefault(_addr);
 
 		Market market = new Market(address(config()), _addr);

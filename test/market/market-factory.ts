@@ -63,7 +63,7 @@ contract('MarketFactoryTest', ([deployer, policyFactory]) => {
 			market = await marketTest1Contract.new({
 				from: deployer
 			})
-			const result = await marketFactory.createMarket(market.address, {
+			const result = await marketFactory.create(market.address, {
 				from: deployer
 			})
 			expectedMarketAddress = await result.logs.filter(

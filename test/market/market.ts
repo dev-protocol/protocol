@@ -130,7 +130,7 @@ contract('MarketTest', ([deployer]) => {
 			await addressConfig.setPolicyFactory(policyFactory.address, {
 				from: deployer
 			})
-			await policyFactory.createPolicy(policy.address)
+			await policyFactory.create(policy.address)
 			// Let result = await marketFactory.createMarket(behavior)
 			// const marketAddress = await result.logs.filter(
 			// 	(e: {event: string}) => e.event === 'Create'

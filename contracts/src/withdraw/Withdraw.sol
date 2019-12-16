@@ -16,7 +16,7 @@ contract Withdraw is Pausable, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function withdraw(address _property) external {
-		require(paused() != false, "system stop");
+		require(paused() != false, "You cannot use that");
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().allocator()

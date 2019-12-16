@@ -43,7 +43,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 			await addressConfig.setPropertyFactory(propertyFactory.address, {
 				from: deployer
 			})
-			const result = await propertyFactory.createProperty('sample', 'SAMPLE')
+			const result = await propertyFactory.create('sample', 'SAMPLE')
 			expectedPropertyAddress = await result.logs.filter(
 				(e: {event: string}) => e.event === 'Create'
 			)[0].args._property
