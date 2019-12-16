@@ -18,7 +18,7 @@ contract Lockup is Pausable, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function lockup(address _property, uint256 _value) external {
-		require(paused() != false, "system stop");
+		require(paused() != false, "You cannot use that");
 		new AddressValidator().validateGroup(
 			_property,
 			config().propertyGroup()

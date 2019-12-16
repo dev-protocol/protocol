@@ -112,7 +112,7 @@ contract Market is UsingConfig {
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);
-		address metrics = metricsFactory.createMetrics(_property);
+		address metrics = metricsFactory.create(_property);
 		uint256 tokenValue = Lockup(config().lockup()).getPropertyValue(
 			_property
 		);

@@ -51,7 +51,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 			await addressConfig.setPropertyFactory(propertyFactory.address, {
 				from: deployer
 			})
-			const result = await propertyFactory.createProperty('sample', 'SAMPLE', {
+			const result = await propertyFactory.create('sample', 'SAMPLE', {
 				from: ui
 			})
 			propertyAddress = await result.logs.filter(

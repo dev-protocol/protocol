@@ -129,7 +129,7 @@ Market Contract は誰でも自由に提案できる。ただし、有効化す�
 
 Market Factory Contract は新しい Market Contract を生成する。
 
-Market Contract の生成は `createMarket` 関数を実行することで行われる。 `createMarket` 関数は次のインターフェイスを持つコントラクトのアドレスを受け取り、新たな Market Contract を生成する。
+Market Contract の生成は `create` 関数を実行することで行われる。 `create` 関数は次のインターフェイスを持つコントラクトのアドレスを受け取り、新たな Market Contract を生成する。
 
 ```solidity
 contract IMarket {
@@ -186,7 +186,7 @@ Property Contract が資産を表す状態となるためには、Property Contr
 
 Property Factory Contract は新しい Property Contract を生成する。
 
-Property Contract の生成は `createProperty` 関数を実行することで行われる。引数として `name` と `symbol` を指定する。Property Contract の比較容易性のために `totalSupply` は `10000000` に、 `decimals` は `18` に固定する。
+Property Contract の生成は `create` 関数を実行することで行われる。引数として `name` と `symbol` を指定する。Property Contract の比較容易性のために `totalSupply` は `10000000` に、 `decimals` は `18` に固定する。
 
 ## Metrics
 
@@ -360,7 +360,7 @@ Property Contract オーナーが Market Contract 及び Policy Contract への�
 
 Policy Factory Contract は新しい Policy Contract を生成する。
 
-Policy Contract の生成は `createPolicy` 関数を実行することで行われる。 `createPolicy` 関数は Policy Contract のアドレスを受け取り、投票を受け付ける `vote` 関数を追加して新たな Policy Contract を生成する。
+Policy Contract の生成は `create` 関数を実行することで行われる。 `create` 関数は Policy Contract のアドレスを受け取り、投票を受け付ける `vote` 関数を追加して新たな Policy Contract を生成する。
 
 ## State
 

@@ -1,5 +1,6 @@
 pragma solidity ^0.5.0;
 
+import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
@@ -7,16 +8,17 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {PolicySet} from "contracts/src/policy/PolicySet.sol";
 import {PolicyGroup} from "contracts/src/policy/PolicyGroup.sol";
 
-contract PolicyFactory is UsingConfig {
+contract PolicyFactory is Pausable, UsingConfig {
 	event Create(address indexed _from, address _property);
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function createPolicy(address _newPolicyAddress)
+	function create(address _newPolicyAddress)
 		external
 		returns (address)
 	{
+		require(paused() == false, "You cannot use that");
 		new AddressValidator().validateDefault(_newPolicyAddress);
 
 		Policy policy = new Policy(address(config()), _newPolicyAddress);
