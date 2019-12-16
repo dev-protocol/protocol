@@ -6,7 +6,7 @@ contract DecimalsTest {
 	using Decimals for uint256;
 
 	function outOf(uint256 _a, uint256 _b)
-		public
+		external
 		pure
 		returns (uint256 result, uint256 basis)
 	{

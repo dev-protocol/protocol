@@ -25,7 +25,7 @@ contract MetricsGroup is UsingConfig, UsingStorage, IGroup {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 
-	function totalIssuedMetrics() public view returns (uint256) {
+	function totalIssuedMetrics() external view returns (uint256) {
 		return eternalStorage().getUint(getTotalCountKey());
 	}
 

@@ -9,11 +9,11 @@ contract MarketTest1 is IMarket {
 	address public market;
 	address public allocator;
 
-	function setMarket(address _market) public {
+	function setMarket(address _market) external {
 		market = _market;
 	}
 
-	function setAllocator(address _allocator) public {
+	function setAllocator(address _allocator) external {
 		allocator = _allocator;
 	}
 

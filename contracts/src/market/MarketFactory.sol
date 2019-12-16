@@ -13,7 +13,7 @@ contract MarketFactory is Pausable, UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function create(address _addr) public returns (address) {
+	function create(address _addr) external returns (address) {
 		require(paused() == false, "You cannot use that");
 		new AddressValidator().validateDefault(_addr);
 
