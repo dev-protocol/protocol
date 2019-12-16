@@ -13,9 +13,6 @@ import {IMarket} from "contracts/src/market/IMarket.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 
 contract Market is UsingConfig {
-	// TODO
-	// https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md#metrics
-	// create maoppimg key(key: Metrics Contract address  value: context)
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
@@ -50,7 +47,6 @@ contract Market is UsingConfig {
 		return IMarket(behavior).calculate(_metrics, _start, _end);
 	}
 
-	// TODO Not called from anywhere
 	function authenticate(
 		address _prop,
 		string memory _args1,
@@ -74,12 +70,6 @@ contract Market is UsingConfig {
 			);
 	}
 
-	/**
-	 * In advance, msg.sender is supposed to approve same amount DEV token as vote number.
-	 *
-	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20Burnable.sol
-	 * https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol
-	 */
 	function vote(address _property, bool _agree) external {
 		new AddressValidator().validateGroup(
 			_property,
@@ -99,7 +89,6 @@ contract Market is UsingConfig {
 		);
 	}
 
-	// TODO Run many times
 	function authenticatedCallback(address _property)
 		external
 		returns (address)
