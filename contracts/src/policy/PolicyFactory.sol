@@ -14,10 +14,7 @@ contract PolicyFactory is Pausable, UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function create(address _newPolicyAddress)
-		external
-		returns (address)
-	{
+	function create(address _newPolicyAddress) external returns (address) {
 		require(paused() == false, "You cannot use that");
 		new AddressValidator().validateDefault(_newPolicyAddress);
 
