@@ -20,21 +20,21 @@ contract UsingStorage is Ownable {
 		return EternalStorage(_storage);
 	}
 
-	function getStorageAddress() public view hasStorage returns (address) {
+	function getStorageAddress() external view hasStorage returns (address) {
 		return _storage;
 	}
 
-	function createStorage() public onlyOwner {
+	function createStorage() external onlyOwner {
 		require(_storage == address(0), "storage is setted");
 		EternalStorage tmp = new EternalStorage();
 		_storage = address(tmp);
 	}
 
-	function setStorage(address _storageAddress) public onlyOwner {
+	function setStorage(address _storageAddress) external onlyOwner {
 		_storage = _storageAddress;
 	}
 
-	function changeOwner(address newOwner) public onlyOwner {
+	function changeOwner(address newOwner) external onlyOwner {
 		EternalStorage(_storage).changeOwner(newOwner);
 	}
 }

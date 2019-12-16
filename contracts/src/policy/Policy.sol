@@ -28,7 +28,7 @@ contract Policy is Killable, UsingConfig {
 	}
 
 	function rewards(uint256 _lockups, uint256 _assets)
-		public
+		external
 		view
 		returns (uint256)
 	{
@@ -37,7 +37,7 @@ contract Policy is Killable, UsingConfig {
 
 	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function holdersShare(uint256 _amount, uint256 _lockups)
-		public
+		external
 		view
 		returns (uint256)
 	{
@@ -45,7 +45,7 @@ contract Policy is Killable, UsingConfig {
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
-		public
+		external
 		view
 		returns (uint256)
 	{
@@ -53,7 +53,7 @@ contract Policy is Killable, UsingConfig {
 	}
 
 	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
-		public
+		external
 		view
 		returns (uint256)
 	{
@@ -61,7 +61,7 @@ contract Policy is Killable, UsingConfig {
 	}
 
 	function marketApproval(uint256 _agree, uint256 _opposite)
-		public
+		external
 		view
 		returns (bool)
 	{
@@ -69,26 +69,26 @@ contract Policy is Killable, UsingConfig {
 	}
 
 	function policyApproval(uint256 _agree, uint256 _opposite)
-		public
+		external
 		view
 		returns (bool)
 	{
 		return _policy.policyApproval(_agree, _opposite);
 	}
 
-	function marketVotingBlocks() public view returns (uint256) {
+	function marketVotingBlocks() external view returns (uint256) {
 		return _policy.marketVotingBlocks();
 	}
 
-	function policyVotingBlocks() public view returns (uint256) {
+	function policyVotingBlocks() external view returns (uint256) {
 		return _policy.policyVotingBlocks();
 	}
 
-	function abstentionPenalty(uint256 _count) public view returns (uint256) {
+	function abstentionPenalty(uint256 _count) external view returns (uint256) {
 		return _policy.abstentionPenalty(_count);
 	}
 
-	function lockUpBlocks() public view returns (uint256) {
+	function lockUpBlocks() external view returns (uint256) {
 		return _policy.lockUpBlocks();
 	}
 

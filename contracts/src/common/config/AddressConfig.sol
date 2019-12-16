@@ -26,88 +26,88 @@ contract AddressConfig is Ownable {
 	address public voteCounter;
 	address public voteCounterStorage;
 
-	function setAllocator(address _addr) public onlyOwner {
+	function setAllocator(address _addr) external onlyOwner {
 		allocator = _addr;
 	}
 
-	function setAllocatorStorage(address _addr) public onlyOwner {
+	function setAllocatorStorage(address _addr) external onlyOwner {
 		allocatorStorage = _addr;
 	}
 
-	function setWithdraw(address _addr) public onlyOwner {
+	function setWithdraw(address _addr) external onlyOwner {
 		withdraw = _addr;
 	}
 
-	function setWithdrawStorage(address _addr) public onlyOwner {
+	function setWithdrawStorage(address _addr) external onlyOwner {
 		withdrawStorage = _addr;
 	}
 
-	function setMarketFactory(address _addr) public onlyOwner {
+	function setMarketFactory(address _addr) external onlyOwner {
 		marketFactory = _addr;
 	}
 
-	function setMarketGroup(address _addr) public onlyOwner {
+	function setMarketGroup(address _addr) external onlyOwner {
 		marketGroup = _addr;
 	}
 
-	function setPropertyFactory(address _addr) public onlyOwner {
+	function setPropertyFactory(address _addr) external onlyOwner {
 		propertyFactory = _addr;
 	}
 
-	function setPropertyGroup(address _addr) public onlyOwner {
+	function setPropertyGroup(address _addr) external onlyOwner {
 		propertyGroup = _addr;
 	}
 
-	function setMetricsFactory(address _addr) public onlyOwner {
+	function setMetricsFactory(address _addr) external onlyOwner {
 		metricsFactory = _addr;
 	}
 
-	function setMetricsGroup(address _addr) public onlyOwner {
+	function setMetricsGroup(address _addr) external onlyOwner {
 		metricsGroup = _addr;
 	}
 
-	function setPolicyFactory(address _addr) public onlyOwner {
+	function setPolicyFactory(address _addr) external onlyOwner {
 		policyFactory = _addr;
 	}
 
-	function setPolicySet(address _addr) public onlyOwner {
+	function setPolicySet(address _addr) external onlyOwner {
 		policySet = _addr;
 	}
 
-	function setPolicyGroup(address _addr) public onlyOwner {
+	function setPolicyGroup(address _addr) external onlyOwner {
 		policyGroup = _addr;
 	}
 
-	function setPolicy(address _addr) public {
+	function setPolicy(address _addr) external {
 		new AddressValidator().validateAddress(msg.sender, policyFactory);
 		policy = _addr;
 	}
 
-	function setToken(address _addr) public onlyOwner {
+	function setToken(address _addr) external onlyOwner {
 		token = _addr;
 	}
 
-	function setLockup(address _addr) public onlyOwner {
+	function setLockup(address _addr) external onlyOwner {
 		lockup = _addr;
 	}
 
-	function setlockupStorage(address _addr) public onlyOwner {
+	function setlockupStorage(address _addr) external onlyOwner {
 		lockupStorage = _addr;
 	}
 
-	function setVoteTimes(address _addr) public onlyOwner {
+	function setVoteTimes(address _addr) external onlyOwner {
 		voteTimes = _addr;
 	}
 
-	function setVoteTimesStorage(address _addr) public onlyOwner {
+	function setVoteTimesStorage(address _addr) external onlyOwner {
 		voteTimesStorage = _addr;
 	}
 
-	function setVoteCounter(address _addr) public onlyOwner {
+	function setVoteCounter(address _addr) external onlyOwner {
 		voteCounter = _addr;
 	}
 
-	function setVoteCounterStorage(address _addr) public onlyOwner {
+	function setVoteCounterStorage(address _addr) external onlyOwner {
 		voteCounterStorage = _addr;
 	}
 }

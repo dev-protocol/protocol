@@ -127,7 +127,7 @@ contract Market is UsingConfig {
 		return metrics;
 	}
 
-	function schema() public view returns (string memory) {
+	function schema() external view returns (string memory) {
 		return IMarket(behavior).schema();
 	}
 }
