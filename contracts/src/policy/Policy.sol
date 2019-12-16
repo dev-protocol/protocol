@@ -35,7 +35,6 @@ contract Policy is Killable, UsingConfig {
 		return _policy.rewards(_lockups, _assets);
 	}
 
-	// TODO Need to be called in the market reward calculation process in Allocator Contract
 	function holdersShare(uint256 _amount, uint256 _lockups)
 		external
 		view
