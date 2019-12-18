@@ -69,7 +69,9 @@ contract Withdraw is Pausable, UsingConfig {
 			msg.sender,
 			config().allocator()
 		);
-		uint256 priceValue = _allocationResult.outOf(ERC20(_property).totalSupply());
+		uint256 priceValue = _allocationResult.outOf(
+			ERC20(_property).totalSupply()
+		);
 		getStorage().increment(_property, _allocationResult, priceValue);
 	}
 

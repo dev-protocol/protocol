@@ -129,7 +129,10 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		uint256 aShare = _assets.outOf(_totalAssets);
 		uint256 vShare = _value.outOf(_marketValue);
 		uint256 mint = _mint.mul(_blocks);
-		return mint.mul(aShare).mul(vShare).div(Decimals.basis()).div(Decimals.basis());
+		return
+			mint.mul(aShare).mul(vShare).div(Decimals.basis()).div(
+				Decimals.basis()
+			);
 	}
 
 	function validateTargetPeriod(address _metrics) private {
