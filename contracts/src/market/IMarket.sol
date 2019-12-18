@@ -8,7 +8,7 @@ import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 
-contract IMarket is UsingConfig{
+contract IMarket is UsingConfig {
 	string public schema;
 	uint256 public issuedMetrics;
 
