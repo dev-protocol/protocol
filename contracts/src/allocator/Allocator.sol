@@ -82,7 +82,10 @@ contract Allocator is Killable, Ownable, UsingConfig {
 			assets,
 			totalAssets
 		);
-		Withdraw(config().withdraw()).increment(metrics.property(), result);
+		uint256 holders = policy.holdersShare(result, lockupValue);
+		uint256 interest = result.sub(holders);
+		Withdraw(config().withdraw()).increment(metrics.property(), holders);
+		Lockup(config().lockup()).increment(metrics.property(), interest);
 		getStorage().setPendingIncrement(_metrics, false);
 	}
 
