@@ -3,5 +3,14 @@
 	"solidity.packageDefaultDependenciesContractsDirectory": "",
 	"solidity.packageDefaultDependenciesDirectory": "node_modules",
 	"eslint.autoFixOnSave": true,
-	"eslint.validate": ["javascript", {"language": "typescript", "autoFix": true}]
+	"eslint.validate": [
+		"javascript",
+		{
+			"language": "typescript",
+			"autoFix": true
+		}
+	],
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true
+	}
 }

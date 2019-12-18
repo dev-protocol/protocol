@@ -89,6 +89,7 @@ contract Lockup is Pausable, UsingConfig {
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
 		require(lockupedValue == 0, "dev token is not locked");
 		Property(_property).withdrawDev(msg.sender);
+		withdrawInterest(_property);
 		getStorage().clearValue(_property, msg.sender);
 		getStorage().subPropertyValue(_property, lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
