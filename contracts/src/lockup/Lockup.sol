@@ -46,6 +46,16 @@ contract Lockup is Pausable, UsingConfig {
 		require(abi.decode(data, (bool)), "transfer was failed");
 		getStorage().addValue(_property, msg.sender, _value);
 		getStorage().addPropertyValue(_property, _value);
+		getStorage().setLastInterestPrice(
+			_property,
+			msg.sender,
+			getStorage().getInterestPrice(_property)
+		);
+		getStorage().setPendingInterestWithdrawal(
+			_property,
+			msg.sender,
+			calculateInterestAmount(_property, msg.sender)
+		);
 	}
 
 	function cancel(address _property) external {
@@ -82,6 +92,46 @@ contract Lockup is Pausable, UsingConfig {
 		getStorage().clearValue(_property, msg.sender);
 		getStorage().subPropertyValue(_property, lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
+	}
+
+	function increment(address _property, uint256 _interestResult) external {
+		new AddressValidator().validateAddress(
+			msg.sender,
+			config().allocator()
+		);
+		uint256 priceValue = _interestResult.div(getPropertyValue(_property));
+		getStorage().incrementInterest(_property, priceValue);
+	}
+
+	function calculateInterestAmount(address _property, address _user)
+		private
+		view
+		returns (uint256)
+	{
+		uint256 _last = getStorage().getLastInterestPrice(_property, _user);
+		uint256 price = getStorage().getInterestPrice(_property);
+		uint256 priceGap = price - _last;
+		uint256 lockupedValue = getStorage().getValue(_property, _user);
+		uint256 value = priceGap * lockupedValue;
+		return value;
+	}
+
+	function calculateWithdrawableInterestAmount(
+		address _property,
+		address _user
+	) private view returns (uint256) {
+		uint256 pending = getStorage().getPendingInterestWithdrawal(
+			_property,
+			_user
+		);
+		return calculateInterestAmount(_property, _user).add(pending);
+	}
+
+	function withdrawInterest(address _property) public {
+		uint256 value = calculateWithdrawableInterestAmount(_property, _user);
+		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
+		ERC20Mintable erc20 = ERC20Mintable(config().token());
+		erc20.mint(msg.sender, value);
 	}
 
 	function getPropertyValue(address _property)
