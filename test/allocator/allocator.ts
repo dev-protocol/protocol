@@ -39,18 +39,12 @@ contract('Allocator', ([deployer]) => {
 				50000 *
 				(300 / 7406907) *
 				(48568 / 547568)}`, async () => {
-			console.log(1)
 			const addressConfig = await addressConfigContract.new({from: deployer})
-			console.log(2)
 			const decimals = await decimalsLibrary.new({from: deployer})
-			console.log(3)
-			await allocatorContract.link(decimalsLibrary, decimals.address)
-			console.log(4)
+			await allocatorContract.link('Decimals', decimals.address)
 			const allocator = await allocatorContract.new(addressConfig.address, {
 				from: deployer
 			})
-
-			console.log(5)
 			const result = await allocator.allocation(
 				5760,
 				50000,
@@ -59,7 +53,6 @@ contract('Allocator', ([deployer]) => {
 				48568,
 				547568
 			)
-			console.log(6)
 			expect(result.toNumber()).to.be.equal(
 				~~(5760 * 50000 * (300 / 7406907) * (48568 / 547568))
 			)

@@ -13,6 +13,7 @@ contract('MarketTest', ([deployer]) => {
 	const allocatorContract = artifacts.require('Allocator')
 	const policyGroupContract = artifacts.require('PolicyGroup')
 	const policySetContract = artifacts.require('PolicySet')
+	const decimalsLibrary = artifacts.require('Decimals')
 	describe('Market; schema', () => {
 		it('Get Schema of mapped Behavior Contract')
 	})
@@ -76,6 +77,8 @@ contract('MarketTest', ([deployer]) => {
 				from: deployer
 			})
 			await marketGroup.createStorage()
+			const decimals = await decimalsLibrary.new({from: deployer})
+			await allocatorContract.link('Decimals', decimals.address)
 			allocator = await allocatorContract.new(addressConfig.address, {
 				from: deployer
 			})

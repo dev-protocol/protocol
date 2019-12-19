@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 library Decimals {
-	uint120 public constant basisValue = 1000000000000000000000000000000000000;
+	uint120 private constant basisValue = 1000000000000000000000000000000000000;
 
 	function outOf(uint256 _a, uint256 _b)
 		internal
@@ -13,7 +13,7 @@ library Decimals {
 		return (a / _b);
 
 	}
-	function basis() external pure returns (uint256) {
+	function basis() external pure returns (uint120) {
 		return basisValue;
 	}
 }
