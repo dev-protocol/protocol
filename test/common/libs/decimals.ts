@@ -7,11 +7,12 @@ contract('DecimalsTest', ([deployer]) => {
 			const decimalsTest = await decimalsTestContract.new({
 				from: deployer
 			})
-			const {0: resultBN, 1: basisBN} = await decimalsTest.outOf(28, 70)
+			const resultBN = await decimalsTest.outOf(28, 70)
 			const result = new BigNumber(resultBN.toString())
-			const basis = new BigNumber(basisBN.toString())
 			const answer = 28 / 70
-			expect(result.div(basis).toNumber()).to.be.equal(answer)
+			expect(
+				result.div(1000000000000000000000000000000000000).toNumber()
+			).to.be.equal(answer)
 		})
 		it('outOf returns error if the denominator is 10^36 times greater than the numerator', async () => {
 			const decimalsTest = await decimalsTestContract.new({

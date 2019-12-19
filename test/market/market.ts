@@ -112,6 +112,7 @@ contract('MarketTest', ([deployer]) => {
 			await addressConfig.setPropertyGroup(propertyGroup.address, {
 				from: deployer
 			})
+			await policyContract.link('Decimals', decimals.address)
 			policy = await policyContract.new({from: deployer})
 			policyGroup = await policyGroupContract.new(addressConfig.address, {
 				from: deployer

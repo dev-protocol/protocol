@@ -8,7 +8,7 @@ contract DecimalsTest {
 	function outOf(uint256 _a, uint256 _b)
 		external
 		pure
-		returns (uint256 result, uint256 basis)
+		returns (uint256 result)
 	{
 		return _a.outOf(_b);
 	}
