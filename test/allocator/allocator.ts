@@ -1,6 +1,7 @@
 contract('Allocator', ([deployer]) => {
 	const addressConfigContract = artifacts.require('AddressConfig')
 	const allocatorContract = artifacts.require('Allocator')
+	const decimalsLibrary = artifacts.require('Decimals')
 
 	describe('Allocator; allocate', () => {
 		it("Calls Market Contract's calculate function mapped to Metrics Contract")
@@ -39,6 +40,8 @@ contract('Allocator', ([deployer]) => {
 				(300 / 7406907) *
 				(48568 / 547568)}`, async () => {
 			const addressConfig = await addressConfigContract.new({from: deployer})
+			const decimals = await decimalsLibrary.new({from: deployer})
+			await allocatorContract.link('Decimals', decimals.address)
 			const allocator = await allocatorContract.new(addressConfig.address, {
 				from: deployer
 			})

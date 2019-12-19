@@ -4,6 +4,7 @@ import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
@@ -11,6 +12,7 @@ import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 
 contract Withdraw is Pausable, UsingConfig {
 	using SafeMath for uint256;
+	using Decimals for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -67,7 +69,7 @@ contract Withdraw is Pausable, UsingConfig {
 			msg.sender,
 			config().allocator()
 		);
-		uint256 priceValue = _allocationResult.div(
+		uint256 priceValue = _allocationResult.outOf(
 			ERC20(_property).totalSupply()
 		);
 		getStorage().increment(_property, _allocationResult, priceValue);
@@ -90,6 +92,7 @@ contract Withdraw is Pausable, UsingConfig {
 		(uint256 totalLimit, uint256 balanceLimit) = getStorage()
 			.getWithdrawalLimit(_property, _user);
 		uint256 price = getStorage().getCumulativePrice(_property);
+		price = price.div(Decimals.basis());
 		uint256 priceGap = price - _last;
 		uint256 balance = ERC20(_property).balanceOf(_user);
 		uint256 total = getStorage().getRewardsAmount(_property);
