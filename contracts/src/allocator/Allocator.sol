@@ -82,11 +82,15 @@ contract Allocator is Killable, Ownable, UsingConfig {
 			assets,
 			totalAssets
 		);
-		uint256 holders = policy.holdersShare(result, lockupValue);
-		uint256 interest = result.sub(holders);
-		Withdraw(config().withdraw()).increment(metrics.property(), holders);
-		Lockup(config().lockup()).increment(metrics.property(), interest);
+		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
+	}
+
+	function increment(address _property, uint256 _reward, uint256 _lockup) private {
+		uint256 holders = Policy(config().policy()).holdersShare(_reward, _lockup);
+		uint256 interest = _reward.sub(holders);
+		Withdraw(config().withdraw()).increment(_property, holders);
+		Lockup(config().lockup()).increment(_property, interest);
 	}
 
 	function beforeBalanceChange(address _property, address _from, address _to)

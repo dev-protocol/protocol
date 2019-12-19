@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {IntValidator} from "contracts/src/common/validate/IntValidator.sol";
@@ -100,7 +101,7 @@ contract Lockup is Pausable, UsingConfig {
 			msg.sender,
 			config().allocator()
 		);
-		uint256 priceValue = _interestResult.div(getPropertyValue(_property));
+		uint256 priceValue = _interestResult.div(getStorage().getPropertyValue(_property));
 		getStorage().incrementInterest(_property, priceValue);
 	}
 
@@ -129,7 +130,7 @@ contract Lockup is Pausable, UsingConfig {
 	}
 
 	function withdrawInterest(address _property) public {
-		uint256 value = calculateWithdrawableInterestAmount(_property, _user);
+		uint256 value = calculateWithdrawableInterestAmount(_property, msg.sender);
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		erc20.mint(msg.sender, value);
