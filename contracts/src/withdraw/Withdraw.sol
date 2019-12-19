@@ -92,7 +92,6 @@ contract Withdraw is Pausable, UsingConfig {
 		(uint256 totalLimit, uint256 balanceLimit) = getStorage()
 			.getWithdrawalLimit(_property, _user);
 		uint256 price = getStorage().getCumulativePrice(_property);
-		price = price.div(Decimals.basis());
 		uint256 priceGap = price - _last;
 		uint256 balance = ERC20(_property).balanceOf(_user);
 		uint256 total = getStorage().getRewardsAmount(_property);
@@ -100,7 +99,7 @@ contract Withdraw is Pausable, UsingConfig {
 			balance = balanceLimit;
 		}
 		uint256 value = priceGap * balance;
-		return value;
+		return value.div(Decimals.basis());
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {
