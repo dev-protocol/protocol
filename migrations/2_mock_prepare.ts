@@ -49,7 +49,6 @@ const handler = function(deployer, network) {
 
 	// DummyDev
 	deployer.deploy(artifacts.require('VoteTimesStorage'))
-
 } as Truffle.Migration
 
 export = handler
