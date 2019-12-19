@@ -5,16 +5,22 @@ const handler = function(deployer, network) {
 
 	const {address} = artifacts.require('AddressConfig')
 
+	// Library
+	deployer.deploy(artifacts.require('Decimals'))
+
 	// Allocator
+	deployer.link(artifacts.require('Decimals'), artifacts.require('Allocator'))
 	deployer.deploy(artifacts.require('Allocator'), address)
 	deployer.deploy(artifacts.require('AllocationBlockNumber'), address)
 	deployer.deploy(artifacts.require('PendingIncrement'), address)
 
 	// Withdraw
+	deployer.link(artifacts.require('Decimals'), artifacts.require('Withdraw'))
 	deployer.deploy(artifacts.require('Withdraw'), address)
 	deployer.deploy(artifacts.require('WithdrawStorage'), address)
 
 	// Lockup
+	deployer.link(artifacts.require('Decimals'), artifacts.require('Lockup'))
 	deployer.deploy(artifacts.require('Lockup'), address)
 	deployer.deploy(artifacts.require('LockupStorage'), address)
 
