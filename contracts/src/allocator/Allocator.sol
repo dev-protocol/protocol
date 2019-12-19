@@ -138,10 +138,13 @@ contract Allocator is Killable, Ownable, UsingConfig {
 		uint256 _assets,
 		uint256 _totalAssets
 	) public pure returns (uint256) {
-		(uint256 aShare, uint256 aBasis) = _assets.outOf(_totalAssets);
-		(uint256 vShare, uint256 vBasis) = _value.outOf(_marketValue);
+		uint256 aShare = _assets.outOf(_totalAssets);
+		uint256 vShare = _value.outOf(_marketValue);
 		uint256 mint = _mint.mul(_blocks);
-		return mint.mul(aShare).mul(vShare).div(aBasis).div(vBasis);
+		return
+			mint.mul(aShare).mul(vShare).div(Decimals.basis()).div(
+				Decimals.basis()
+			);
 	}
 
 	function validateTargetPeriod(address _metrics) private {
