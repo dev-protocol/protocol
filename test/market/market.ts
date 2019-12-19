@@ -65,9 +65,7 @@ contract('MarketTest', ([deployer]) => {
 		let policyGroup: any
 		let policySet: any
 		beforeEach(async () => {
-			dummyDEV = await dummyDEVContract.new('Dev', 'DEV', 18, 10000, {
-				from: deployer
-			})
+			dummyDEV = await dummyDEVContract.new({from: deployer})
 			addressConfig = await addressConfigContract.new({from: deployer})
 			await addressConfig.setToken(dummyDEV.address, {from: deployer})
 			marketFactory = await marketFactoryContract.new(addressConfig.address, {
