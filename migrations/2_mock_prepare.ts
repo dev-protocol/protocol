@@ -29,8 +29,8 @@ const handler = function(deployer, network) {
 	deployer.deploy(artifacts.require('MarketGroup'), address)
 
 	// Metrics
-	deployer.deploy(artifacts.require('MetricsGroup'), address)
 	deployer.deploy(artifacts.require('MetricsFactory'), address)
+	deployer.deploy(artifacts.require('MetricsGroup'), address)
 
 	// Policy
 	deployer.deploy(artifacts.require('PolicyFactory'), address)
@@ -43,7 +43,13 @@ const handler = function(deployer, network) {
 
 	// Vote
 	deployer.deploy(artifacts.require('VoteCounter'), address)
+	deployer.deploy(artifacts.require('VoteCounterStorage'), address)
 	deployer.deploy(artifacts.require('VoteTimes'), address)
+	deployer.deploy(artifacts.require('VoteTimesStorage'), address)
+
+	// DummyDev
+	deployer.deploy(artifacts.require('VoteTimesStorage'))
+
 } as Truffle.Migration
 
 export = handler
