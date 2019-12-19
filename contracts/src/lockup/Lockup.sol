@@ -4,6 +4,7 @@ import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {IntValidator} from "contracts/src/common/validate/IntValidator.sol";
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
@@ -14,6 +15,7 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 
 contract Lockup is Pausable, UsingConfig {
 	using SafeMath for uint256;
+	using Decimals for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -101,7 +103,7 @@ contract Lockup is Pausable, UsingConfig {
 			msg.sender,
 			config().allocator()
 		);
-		uint256 priceValue = _interestResult.div(
+		uint256 priceValue = _interestResult.outOf(
 			getStorage().getPropertyValue(_property)
 		);
 		getStorage().incrementInterest(_property, priceValue);
@@ -117,7 +119,7 @@ contract Lockup is Pausable, UsingConfig {
 		uint256 priceGap = price - _last;
 		uint256 lockupedValue = getStorage().getValue(_property, _user);
 		uint256 value = priceGap * lockupedValue;
-		return value;
+		return value.div(Decimals.basis());
 	}
 
 	function calculateWithdrawableInterestAmount(
