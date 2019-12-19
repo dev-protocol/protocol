@@ -121,4 +121,101 @@ contract LockupStorage is UsingConfig, UsingStorage {
 				abi.encodePacked("_withdrawalStatus", _property, _sender)
 			);
 	}
+
+	function incrementInterest(address _property, uint256 _priceValue)
+		external
+	{
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
+
+		bytes32 pricesKey = getInterestPriceKey(_property);
+
+		uint256 price = eternalStorage().getUint(pricesKey);
+		eternalStorage().setUint(pricesKey, price.add(_priceValue));
+	}
+
+	function getInterestPrice(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getInterestPriceKey(_property));
+	}
+
+	function getInterestPriceKey(address _property)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_interestTotals", _property));
+	}
+
+	//LastInterestPrice
+	function setLastInterestPrice(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(
+			getLastInterestPriceKey(_property, _user),
+			_value
+		);
+	}
+
+	function getLastInterestPrice(address _property, address _user)
+		external
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(getLastInterestPriceKey(_property, _user));
+	}
+
+	function getLastInterestPriceKey(address _property, address _user)
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(
+				abi.encodePacked("_lastLastInterestPrice", _property, _user)
+			);
+	}
+
+	//PendingWithdrawal
+	function setPendingInterestWithdrawal(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		new AddressValidator().validateAddress(msg.sender, config().withdraw());
+
+		eternalStorage().setUint(
+			getPendingInterestWithdrawalKey(_property, _user),
+			_value
+		);
+	}
+
+	function getPendingInterestWithdrawal(address _property, address _user)
+		external
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getPendingInterestWithdrawalKey(_property, _user)
+			);
+	}
+
+	function getPendingInterestWithdrawalKey(address _property, address _user)
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(
+				abi.encodePacked("_pendingInterestWithdrawal", _property, _user)
+			);
+	}
 }

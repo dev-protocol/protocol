@@ -85,6 +85,7 @@ contract('MarketTest', ([deployer]) => {
 			await addressConfig.setAllocator(allocator.address, {
 				from: deployer
 			})
+			await lockupContract.link('Decimals', decimals.address)
 			lockup = await lockupContract.new(addressConfig.address, {from: deployer})
 			await addressConfig.setLockup(lockup.address, {
 				from: deployer

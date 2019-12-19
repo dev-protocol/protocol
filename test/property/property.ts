@@ -6,6 +6,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 	const addressConfigContract = artifacts.require('AddressConfig')
 	const voteTimesContract = artifacts.require('VoteTimes')
 	const voteTimesStorageContract = artifacts.require('VoteTimesStorage')
+	const decimalsLibrary = artifacts.require('Decimals')
 	describe('Property; withdrawDev', () => {
 		let propertyFactory: any
 		let propertyGroup: any
@@ -16,6 +17,8 @@ contract('PropertyTest', ([deployer, ui]) => {
 		let property: any
 		beforeEach(async () => {
 			addressConfig = await addressConfigContract.new({from: deployer})
+			const decimals = await decimalsLibrary.new({from: deployer})
+			await lockupContract.link('Decimals', decimals.address)
 			lockup = await lockupContract.new(addressConfig.address)
 			voteTimes = await voteTimesContract.new(addressConfig.address, {
 				from: deployer
