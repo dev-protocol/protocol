@@ -101,7 +101,9 @@ contract Lockup is Pausable, UsingConfig {
 			msg.sender,
 			config().allocator()
 		);
-		uint256 priceValue = _interestResult.div(getStorage().getPropertyValue(_property));
+		uint256 priceValue = _interestResult.div(
+			getStorage().getPropertyValue(_property)
+		);
 		getStorage().incrementInterest(_property, priceValue);
 	}
 
@@ -130,7 +132,10 @@ contract Lockup is Pausable, UsingConfig {
 	}
 
 	function withdrawInterest(address _property) public {
-		uint256 value = calculateWithdrawableInterestAmount(_property, msg.sender);
+		uint256 value = calculateWithdrawableInterestAmount(
+			_property,
+			msg.sender
+		);
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		erc20.mint(msg.sender, value);
