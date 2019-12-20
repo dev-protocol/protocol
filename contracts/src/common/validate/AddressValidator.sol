@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
 contract AddressValidator {
-
 	string constant errorMessage = "this address is not proper";
 
 	function validateDefault(address _addr) external pure {
