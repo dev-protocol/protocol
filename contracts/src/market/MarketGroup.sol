@@ -22,4 +22,8 @@ contract MarketGroup is UsingConfig, UsingStorage, IGroup {
 	function isGroup(address _addr) external view returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
+
+	function name() external pure returns (string memory) {
+		return "market";
+	}
 }

@@ -29,4 +29,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 
+	function name() external pure returns (string memory) {
+		return "policy";
+	}
 }
