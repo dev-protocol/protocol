@@ -44,9 +44,8 @@ async function createProperty(): Promise<void> {
 		console.log(`account:${address}`)
 	}
 
-	// eslint-disable-next-line padding-line-between-statements
+	// eslint-disable-next-line no-undef
 	const userAddresses = await web3.eth.getAccounts()
-	// eslint-disable-next-line @typescript-eslint/prefer-for-of
 	for (let i = 0; i < userAddresses.length; i++) {
 		// eslint-disable-next-line no-await-in-loop
 		await create(userAddresses[i], i)
@@ -56,7 +55,6 @@ async function createProperty(): Promise<void> {
 async function createStorage(): Promise<void> {
 	async function create(contractName: string): Promise<void> {
 		const contract = artifacts.require(contractName)
-		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const contractInstance = await contract.at(contract.address)
 		await contractInstance.createStorage()
 		const storageAddress = await contractInstance.getStorageAddress()

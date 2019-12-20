@@ -19,7 +19,6 @@ contract AddressValidator {
 		require(group.isGroup(_addr), message);
 	}
 
-
 	function validateGroup(
 		address _addr,
 		address _groupAddr1,
@@ -83,8 +82,8 @@ contract AddressValidator {
 
 	function toString(address x) private pure returns (string memory) {
 		bytes memory b = new bytes(20);
-		for (uint i = 0; i < 20; i++)
-			b[i] = byte(uint8(uint(x) / (2**(8*(19 - i)))));
+		for (uint256 i = 0; i < 20; i++)
+			b[i] = bytes1(uint8(uint256(x) / (2 ** (8 * (19 - i)))));
 		return string(b);
 	}
 }
