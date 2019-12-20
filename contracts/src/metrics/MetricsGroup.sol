@@ -32,8 +32,4 @@ contract MetricsGroup is UsingConfig, UsingStorage, IGroup {
 	function getTotalCountKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_totalCount"));
 	}
-
-	function name() external pure returns (string memory) {
-		return "metrics";
-	}
 }
