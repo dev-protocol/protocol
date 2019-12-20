@@ -70,12 +70,12 @@ contract AddressConfig is Ownable {
 		policyFactory = _addr;
 	}
 
-	function setPolicySet(address _addr) external onlyOwner {
-		policySet = _addr;
-	}
-
 	function setPolicyGroup(address _addr) external onlyOwner {
 		policyGroup = _addr;
+	}
+
+	function setPolicySet(address _addr) external onlyOwner {
+		policySet = _addr;
 	}
 
 	function setPolicy(address _addr) external {
@@ -91,7 +91,7 @@ contract AddressConfig is Ownable {
 		lockup = _addr;
 	}
 
-	function setlockupStorage(address _addr) external onlyOwner {
+	function setLockupStorage(address _addr) external onlyOwner {
 		lockupStorage = _addr;
 	}
 
