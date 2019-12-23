@@ -7,7 +7,7 @@ export async function setAddressConfig(
 	// Allocator
 	await addressConfig.setAllocator(artifacts.require('Allocator').address)
 	await addressConfig.setAllocatorStorage(
-		artifacts.require('AllocationBlockNumber').address
+		artifacts.require('AllocatorStorage').address
 	)
 
 	// Withdraw
