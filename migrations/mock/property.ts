@@ -25,11 +25,10 @@ export async function createProperty(
 		console.log(`account:${address}`)
 		propertyAddresses.push(propertyAddress)
 	}
-	// eslint-disable-next-line no-undef
 	const userAddresses = await web3.eth.getAccounts()
 	//* **Three do not hold a property contract***
 	for (let i = 0; i < userAddresses.length - 3; i++) {
-		//  eslint-disable-next-line no-await-in-loop
+		// eslint-disable-next-line no-await-in-loop
 		await create(userAddresses[i], i)
 	}
 
