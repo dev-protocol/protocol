@@ -50,6 +50,11 @@ const handler = function(deployer, network) {
 
 	// DummyDev
 	deployer.deploy(artifacts.require('DummyDEV'))
+
+	// Market
+	deployer.deploy(artifacts.require('MarketTest1'), address)
+	deployer.deploy(artifacts.require('MarketTest2'), address)
+	deployer.deploy(artifacts.require('MarketTest3'), address)
 } as Truffle.Migration
 
 export = handler
