@@ -1,9 +1,13 @@
+interface AddressInfo {
+	account: string
+	property?: string
+}
+
 export async function createProperty(
 	artifacts: Truffle.Artifacts,
 	web3: Web3
-): Promise<string[]> {
-	const propertyAddresses: string[] = []
-	async function create(address: string, index: number): Promise<void> {
+): Promise<AddressInfo[]> {
+	async function create(address: string, index: number): Promise<string> {
 		const propertyFactoryContract = artifacts.require('PropertyFactory')
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const propertyFactory = await propertyFactoryContract.at(
@@ -23,15 +27,25 @@ export async function createProperty(
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 		console.log(`contract address:${propertyAddress}`)
 		console.log(`account:${address}`)
-		propertyAddresses.push(propertyAddress)
+		return propertyAddress
 	}
-
+	// eslint-disable-next-line padding-line-between-statements
+	const result: AddressInfo[] = new Array<AddressInfo>()
 	const userAddresses = await web3.eth.getAccounts()
 	//* **Three do not hold a property contract***
-	for (let i = 0; i < userAddresses.length - 3; i++) {
-		// eslint-disable-next-line no-await-in-loop
-		await create(userAddresses[i], i)
+	for (let i = 0; i < userAddresses.length; i++) {
+		let propertyAddress
+		if (i < userAddresses.length - 3) {
+			// eslint-disable-next-line no-await-in-loop
+			propertyAddress = await create(userAddresses[i], i)
+		}
+		// eslint-disable-next-line padding-line-between-statements
+		const addressInfo: AddressInfo = {
+			account: userAddresses[i],
+			property: propertyAddress
+		}
+		result.push(addressInfo)
 	}
-
-	return propertyAddresses
+	// eslint-disable-next-line padding-line-between-statements
+	return result
 }
