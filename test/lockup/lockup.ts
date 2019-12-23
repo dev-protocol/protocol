@@ -1,11 +1,44 @@
-contract('LockupTest', () => {
+contract('LockupTest', ([deployer, propertyFactory, property]) => {
+	const addressConfigContract = artifacts.require('AddressConfig')
+	const lockupContract = artifacts.require('Lockup')
+	const lockupStorageContract = artifacts.require('LockupStorage')
+	const propertyGroupContract = artifacts.require('PropertyGroup')
+	const decimalsLibrary = artifacts.require('Decimals')
+	const dummyDEVContract = artifacts.require('DummyDEV')
 	describe('Lockup; cancel', () => {})
 	describe('Lockup; lockup', () => {
 		it('address is not property contract', async () => {})
 		it('lockup is already canceled', async () => {})
 		it('insufficient balance', async () => {})
 		it('transfer was failed', async () => {})
-		it('success', async () => {})
+		it('success', async () => {
+			const addressConfig = await addressConfigContract.new({from: deployer})
+			const propertyGroup = await propertyGroupContract.new(
+				addressConfig.address,
+				{from: deployer}
+			)
+			await propertyGroup.createStorage()
+			await addressConfig.setPropertyGroup(propertyGroup.address)
+			await addressConfig.setPropertyFactory(propertyFactory)
+			await propertyGroup.addGroup(property, {from: propertyFactory})
+			const lockupStorage = await lockupStorageContract.new(
+				addressConfig.address,
+				{from: deployer}
+			)
+			await lockupStorage.createStorage()
+			await addressConfig.setLockupStorage(lockupStorage.address)
+			const dummyDEV = await dummyDEVContract.new({from: deployer})
+			await addressConfig.setToken(dummyDEV.address, {from: deployer})
+			const decimals = await decimalsLibrary.new({from: deployer})
+			await lockupContract.link('Decimals', decimals.address)
+			const lockup = await lockupContract.new(addressConfig.address, {
+				from: deployer
+			})
+			await addressConfig.setLockup(lockup.address, {from: deployer})
+			await lockup.lockup(property, 1, {from: deployer})
+			// eslint-disable-next-line no-warning-comments
+			// TODO assert
+		})
 	})
 	describe('Lockup; withdraw', () => {
 		it('address is not property contract', async () => {})
