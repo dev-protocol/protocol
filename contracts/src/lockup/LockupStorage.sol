@@ -189,7 +189,7 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		address _user,
 		uint256 _value
 	) external {
-		new AddressValidator().validateAddress(msg.sender, config().withdraw());
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(
 			getPendingInterestWithdrawalKey(_property, _user),
