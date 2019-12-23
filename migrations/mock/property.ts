@@ -25,6 +25,7 @@ export async function createProperty(
 		console.log(`account:${address}`)
 		propertyAddresses.push(propertyAddress)
 	}
+
 	const userAddresses = await web3.eth.getAccounts()
 	//* **Three do not hold a property contract***
 	for (let i = 0; i < userAddresses.length - 3; i++) {
