@@ -6,7 +6,7 @@ contract AddressValidator {
 	string constant errorMessage = "this address is not proper";
 
 	function validateDefault(address _addr) external pure {
-		require(_addr != address(0), errorMessage);
+		require(_addr != address(0), "address is initial value");
 	}
 
 	function validateGroup(address _addr, address _groupAddr) external view {

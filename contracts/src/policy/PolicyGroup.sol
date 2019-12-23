@@ -28,5 +28,4 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 	function isGroup(address _addr) external view returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
-
 }

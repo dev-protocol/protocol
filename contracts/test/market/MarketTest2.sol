@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";
 
-contract MarketTest1 is IMarket {
+contract MarketTest2 is IMarket {
 	string public schema = "[]";
 
 	// solium-disable-next-line no-empty-blocks
@@ -26,7 +26,7 @@ contract MarketTest1 is IMarket {
 		external
 		returns (bool)
 	{
-		Allocator(config().allocator()).calculatedCallback(_metrics, 100);
+		Allocator(config().allocator()).calculatedCallback(_metrics, 200);
 		return true;
 	}
 }
