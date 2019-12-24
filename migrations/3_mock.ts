@@ -3,6 +3,7 @@ import {createStorage} from './mock/storage'
 import {createPolicy} from './mock/policy'
 import {createProperty} from './mock/property'
 import {changeBalance} from './mock/token'
+import {lockup} from './mock/lockup'
 
 const handler = async function(deployer, network) {
 	if (network !== 'mock') {
@@ -24,6 +25,9 @@ const handler = async function(deployer, network) {
 	console.log('---finish---')
 	console.log('[balance adjustment]')
 	await changeBalance(artifacts, addressInfo)
+	console.log('---finish---')
+	console.log('[lockup]')
+	await lockup(artifacts, addressInfo)
 	console.log('---finish---')
 } as Truffle.Migration
 

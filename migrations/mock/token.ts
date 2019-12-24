@@ -21,7 +21,8 @@ export async function changeBalance(
 		// eslint-disable-next-line no-await-in-loop
 		await dummyDev.transfer(address, new BigNumber(value * decimals))
 		// eslint-disable-next-line no-await-in-loop
-		const balance = await dummyDev.balanceOf(address)
+		const tmp = await dummyDev.balanceOf(address)
+		const balance = new BigNumber(tmp).dividedBy(new BigNumber(decimals))
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 		console.log(`${address}: ${balance}`)
 	}
