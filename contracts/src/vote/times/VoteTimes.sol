@@ -9,7 +9,7 @@ contract VoteTimes is UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addVoteCount() external {
+	function addVoteTime() external {
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().marketFactory(),
