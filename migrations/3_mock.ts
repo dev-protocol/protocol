@@ -2,6 +2,7 @@ import {setAddressConfig} from './mock/config'
 import {createStorage} from './mock/storage'
 import {createPolicy} from './mock/policy'
 import {createProperty} from './mock/property'
+import {changeBalance} from './mock/token'
 
 const handler = async function(deployer, network) {
 	if (network !== 'mock') {
@@ -19,7 +20,10 @@ const handler = async function(deployer, network) {
 	console.log('---finish---')
 	console.log('[create property]')
 	// eslint-disable-next-line no-undef
-	await createProperty(artifacts, web3)
+	const addressInfo = await createProperty(artifacts, web3)
+	console.log('---finish---')
+	console.log('[balance adjustment]')
+	await changeBalance(artifacts, addressInfo)
 	console.log('---finish---')
 } as Truffle.Migration
 

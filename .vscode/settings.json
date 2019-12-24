@@ -7,7 +7,7 @@
 		"javascript",
 		{
 			"language": "typescript",
-			"autoFix": true
+			"autoFix": false
 		}
 	],
 	"editor.codeActionsOnSave": {

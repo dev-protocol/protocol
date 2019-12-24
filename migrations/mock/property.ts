@@ -1,7 +1,4 @@
-interface AddressInfo {
-	account: string
-	property?: string
-}
+import {AddressInfo} from './interface'
 
 export async function createProperty(
 	artifacts: Truffle.Artifacts,
