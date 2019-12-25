@@ -26,7 +26,7 @@ contract PolicyFactory is Pausable, UsingConfig {
 		if (policySet.count() == 1) {
 			config().setPolicy(policyAddress);
 		} else {
-			VoteTimes(config().voteTimes()).addVoteCount();
+			VoteTimes(config().voteTimes()).addVoteTime();
 		}
 		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
 		policyGroup.addGroup(policyAddress);

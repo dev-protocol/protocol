@@ -37,16 +37,8 @@ contract Lockup is Pausable, UsingConfig {
 		ERC20 devToken = ERC20(config().token());
 		uint256 balance = devToken.balanceOf(msg.sender);
 		require(_value <= balance, "insufficient balance");
-		// solium-disable-next-line security/no-low-level-calls
-		(bool success, bytes memory data) = address(devToken).delegatecall(
-			abi.encodeWithSignature(
-				"transfer(address,uint256)",
-				_property,
-				_value
-			)
-		);
+		bool success = devToken.transferFrom(msg.sender, _property, _value);
 		require(success, "transfer was failed");
-		require(abi.decode(data, (bool)), "transfer was failed");
 		getStorage().addValue(_property, msg.sender, _value);
 		getStorage().addPropertyValue(_property, _value);
 		getStorage().setLastInterestPrice(

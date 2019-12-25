@@ -21,7 +21,7 @@ contract MarketFactory is Pausable, UsingConfig {
 		address marketAddr = address(market);
 		MarketGroup(config().marketGroup()).addGroup(marketAddr);
 		emit Create(msg.sender, marketAddr);
-		VoteTimes(config().voteTimes()).addVoteCount();
+		VoteTimes(config().voteTimes()).addVoteTime();
 		return marketAddr;
 	}
 }
