@@ -35,7 +35,8 @@ contract('LockupTest', ([deployer, propertyFactory, property]) => {
 				from: deployer
 			})
 			await addressConfig.setLockup(lockup.address, {from: deployer})
-			await lockup.lockup(property, 1, {from: deployer})
+			await dummyDEV.approve(lockup.address, 10000, {from: deployer})
+			await lockup.lockup(property, 100, {from: deployer})
 			// eslint-disable-next-line no-warning-comments
 			// TODO assert
 		})
