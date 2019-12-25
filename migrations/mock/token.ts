@@ -1,5 +1,5 @@
 import {DummyDEVInstance} from '../../types/truffle-contracts'
-import {AddressInfo} from './interface'
+import {AddressInfo, createInstance} from './common'
 import BigNumber from 'bignumber.js'
 
 export async function changeBalance(
@@ -10,7 +10,7 @@ export async function changeBalance(
 	const transferAddressIndex = [1, 3, 5, 7, 8, 9]
 	const transferValue = [50000, 200000, 30000, 1000, 100000, 10000]
 
-	const dummyDev = await getDummyDevInstance(artifacts)
+	const dummyDev = await createInstance<DummyDEVInstance>('DummyDEV', artifacts)
 	const tmp = await dummyDev.decimals()
 	const decimals = 10 ** tmp.toNumber()
 	console.log('dummy dev token balance infomation')
@@ -26,12 +26,4 @@ export async function changeBalance(
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 		console.log(`${address}: ${balance}`)
 	}
-}
-
-export async function getDummyDevInstance(
-	artifacts: Truffle.Artifacts
-): Promise<DummyDEVInstance> {
-	const DummyDevContract = artifacts.require('DummyDev')
-	const instance = await DummyDevContract.at(DummyDevContract.address)
-	return instance
 }

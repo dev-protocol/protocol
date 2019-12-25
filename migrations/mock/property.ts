@@ -1,14 +1,14 @@
-import {AddressInfo} from './interface'
+import {PropertyFactoryInstance} from '../../types/truffle-contracts'
+import {AddressInfo, createInstance} from './common'
 
 export async function createProperty(
 	artifacts: Truffle.Artifacts,
 	web3: Web3
 ): Promise<AddressInfo[]> {
 	async function create(address: string, index: number): Promise<string> {
-		const propertyFactoryContract = artifacts.require('PropertyFactory')
-		// eslint-disable-next-line @typescript-eslint/await-thenable
-		const propertyFactory = await propertyFactoryContract.at(
-			propertyFactoryContract.address
+		const propertyFactory = await createInstance<PropertyFactoryInstance>(
+			'PropertyFactory',
+			artifacts
 		)
 		const eventLog = await propertyFactory.create(
 			`NAME${index}`,

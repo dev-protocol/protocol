@@ -1,16 +1,22 @@
-import {getAddressConfigInstance} from './config'
+import {
+	AddressConfigInstance,
+	PolicyFactoryInstance
+} from '../../types/truffle-contracts'
+import {createInstance} from './common'
 
 export async function createPolicy(
 	artifacts: Truffle.Artifacts
 ): Promise<void> {
-	const policyFactoryContract = artifacts.require('PolicyFactory')
-	// eslint-disable-next-line @typescript-eslint/await-thenable
-	const policyFactory = await policyFactoryContract.at(
-		policyFactoryContract.address
+	const policyFactory = await createInstance<PolicyFactoryInstance>(
+		'PolicyFactory',
+		artifacts
 	)
 	const policyContract = artifacts.require('PolicyTest1')
 	await policyFactory.create(policyContract.address)
-	const addressConfig = await getAddressConfigInstance(artifacts)
+	const addressConfig = await createInstance<AddressConfigInstance>(
+		'AddressConfig',
+		artifacts
+	)
 	const policyAddress = await addressConfig.policy()
 	console.log(`policy address:${policyAddress}`)
 }
