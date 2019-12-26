@@ -72,16 +72,21 @@ contract Market is UsingConfig {
 			);
 	}
 
-	function getAuthenticationFee(address _property) public view returns (uint256) {
+	function getAuthenticationFee(address _property)
+		private
+		view
+		returns (uint256)
+	{
 		uint256 tokenValue = Lockup(config().lockup()).getPropertyValue(
 			_property
 		);
 		Policy policy = Policy(config().policy());
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
-		return policy.authenticationFee(
-			metricsGroup.totalIssuedMetrics(),
-			tokenValue
-		);
+		return
+			policy.authenticationFee(
+				metricsGroup.totalIssuedMetrics(),
+				tokenValue
+			);
 	}
 
 	function authenticatedCallback(address _property)
