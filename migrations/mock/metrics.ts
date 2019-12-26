@@ -1,9 +1,9 @@
 import {
 	MarketInstance,
-	DummyDEVInstance//,
-	//MarketTest1Instance,
-	//MarketTest2Instance,
-	//MarketTest3Instance
+	DummyDEVInstance // ,
+	// MarketTest1Instance,
+	// MarketTest2Instance,
+	// MarketTest3Instance
 } from '../../types/truffle-contracts'
 import {createInstance, AddressInfo, createInstanceByAddress} from './common'
 
