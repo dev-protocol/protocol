@@ -57,4 +57,51 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect(await dev.isMinter(user1)).to.equal(false)
 		})
 	})
+	describe('Dev; burn', () => {
+		it('decrease the balance by running the burn', async () => {
+			const dev = await createDev()
+			await dev.mint(deployer, 100)
+			expect((await dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+			await dev.burn(50)
+			expect((await dev.totalSupply()).toNumber()).to.equal(50)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
+		})
+		it('fail to decrease the balance when sent from no balance account', async () => {
+			const dev = await createDev()
+			await dev.mint(deployer, 100)
+			expect((await dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+			const res = await dev.burn(50, {from: user1}).catch((err: Error) => err)
+			expect((await dev.totalSupply()).toNumber()).to.equal(100)
+			expect(res).to.be.an.instanceof(Error)
+		})
+		it('decrease the balance by running the burnFrom from another account after approved', async () => {
+			const dev = await createDev()
+			await dev.mint(deployer, 100)
+			expect((await dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+			await dev.approve(user1, 50)
+			await dev.burnFrom(deployer, 50, {from: user1})
+			expect((await dev.totalSupply()).toNumber()).to.equal(50)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
+		})
+		it('fail to if over decrease the balance by running the burnFrom from another account after approved', async () => {
+			const dev = await createDev()
+			await dev.mint(deployer, 100)
+			expect((await dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+			await dev.approve(user1, 50)
+			const res = await dev
+				.burnFrom(deployer, 51, {from: user1})
+				.catch((err: Error) => err)
+			expect((await dev.totalSupply()).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect(res).to.be.an.instanceof(Error)
+		})
+	})
 })
