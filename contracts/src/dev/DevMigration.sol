@@ -15,6 +15,7 @@ contract DevMigration {
 		ERC20Burnable _legacy = ERC20Burnable(legacy);
 		ERC20Mintable _next = ERC20Mintable(next);
 		uint256 balance = _legacy.balanceOf(msg.sender);
+		_legacy.transferFrom(msg.sender, address(this), balance);
 		_legacy.burn(balance);
 		_next.mint(msg.sender, balance);
 		return true;
