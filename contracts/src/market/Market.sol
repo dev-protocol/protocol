@@ -72,6 +72,23 @@ contract Market is UsingConfig {
 			);
 	}
 
+	function getAuthenticationFee(address _property)
+		private
+		view
+		returns (uint256)
+	{
+		uint256 tokenValue = Lockup(config().lockup()).getPropertyValue(
+			_property
+		);
+		Policy policy = Policy(config().policy());
+		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
+		return
+			policy.authenticationFee(
+				metricsGroup.totalIssuedMetrics(),
+				tokenValue
+			);
+	}
+
 	function authenticatedCallback(address _property)
 		external
 		returns (address)
@@ -84,21 +101,13 @@ contract Market is UsingConfig {
 			config().metricsFactory()
 		);
 		address metrics = metricsFactory.create(_property);
-		uint256 tokenValue = Lockup(config().lockup()).getPropertyValue(
-			_property
-		);
-		Policy policy = Policy(config().policy());
-		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
-		uint256 authenticationFee = policy.authenticationFee(
-			metricsGroup.totalIssuedMetrics(),
-			tokenValue
-		);
+		uint256 authenticationFee = getAuthenticationFee(_property);
 		ERC20 devToken = ERC20(config().token());
 		uint256 balance = devToken.balanceOf(sender);
 		require(authenticationFee <= balance, "insufficient balance");
 		bool success = devToken.transferFrom(
 			sender,
-			_property,
+			address(this),
 			authenticationFee
 		);
 		require(success, "transfer was failed");

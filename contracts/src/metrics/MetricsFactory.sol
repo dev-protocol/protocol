@@ -15,7 +15,7 @@ contract MetricsFactory is Pausable, UsingConfig {
 
 	function create(address _property) external returns (address) {
 		require(paused() == false, "You cannot use that");
-		new AddressValidator().validateAddress(
+		new AddressValidator().validateGroup(
 			msg.sender,
 			config().marketGroup()
 		);
