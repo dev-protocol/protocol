@@ -1,9 +1,13 @@
 import {AddressConfigInstance} from '../../types/truffle-contracts'
+import {createInstance} from './common'
 
 export async function setAddressConfig(
 	artifacts: Truffle.Artifacts
 ): Promise<void> {
-	const addressConfig = await getAddressConfigInstance(artifacts)
+	const addressConfig = await createInstance<AddressConfigInstance>(
+		'AddressConfig',
+		artifacts
+	)
 	// Allocator
 	await addressConfig.setAllocator(artifacts.require('Allocator').address)
 	await addressConfig.setAllocatorStorage(
@@ -61,13 +65,4 @@ export async function setAddressConfig(
 
 	// DummyDev
 	await addressConfig.setToken(artifacts.require('DummyDEV').address)
-}
-
-export async function getAddressConfigInstance(
-	artifacts: Truffle.Artifacts
-): Promise<AddressConfigInstance> {
-	const AddressConfigContract = artifacts.require('AddressConfig')
-	// eslint-disable-next-line @typescript-eslint/await-thenable
-	const instance = await AddressConfigContract.at(AddressConfigContract.address)
-	return instance
 }
