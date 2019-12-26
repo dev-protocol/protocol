@@ -12,7 +12,7 @@ export async function createMarket(
 	addressInfo: AddressInfo[]
 ): Promise<string[]> {
 	const marketAddresses = await create(artifacts)
-	await vote(marketAddresses, addressInfo, artifacts)
+	await vote(artifacts, addressInfo, marketAddresses)
 	return marketAddresses
 }
 
@@ -48,9 +48,9 @@ async function create(artifacts: Truffle.Artifacts): Promise<string[]> {
 }
 
 async function vote(
-	marketAddresses: string[],
+	artifacts: Truffle.Artifacts,
 	addressInfo: AddressInfo[],
-	artifacts: Truffle.Artifacts
+	marketAddresses: string[]
 ): Promise<void> {
 	async function enabled(marketIndex: number): Promise<void> {
 		const market = await createInstanceByAddress<MarketInstance>(

@@ -5,6 +5,7 @@ import {createProperty} from './mock/property'
 import {changeBalance} from './mock/token'
 import {lockup} from './mock/lockup'
 import {createMarket} from './mock/market'
+import {createMetrics} from './mock/metrics'
 
 const handler = async function(deployer, network) {
 	if (network !== 'mock') {
@@ -31,8 +32,9 @@ const handler = async function(deployer, network) {
 	await lockup(artifacts, addressInfo)
 	console.log('---finish---')
 	console.log('[create market]')
-	await createMarket(artifacts, addressInfo)
+	const marketAddresses = await createMarket(artifacts, addressInfo)
 	console.log('---finish---')
+	await createMetrics(artifacts, addressInfo, marketAddresses)
 } as Truffle.Migration
 
 export = handler
