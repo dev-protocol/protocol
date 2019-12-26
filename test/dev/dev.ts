@@ -35,7 +35,7 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 		})
-		it('fail to run mint when sent from other than minter', async () => {
+		it('should fail to run mint when sent from other than minter', async () => {
 			const dev = await createDev()
 			await dev.mint(deployer, 100, {from: user1}).catch((err: Error) => err)
 			expect((await dev.totalSupply()).toNumber()).to.equal(0)
@@ -68,7 +68,7 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.totalSupply()).toNumber()).to.equal(50)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
 		})
-		it('fail to decrease the balance when sent from no balance account', async () => {
+		it('should fail to decrease the balance when sent from no balance account', async () => {
 			const dev = await createDev()
 			await dev.mint(deployer, 100)
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
@@ -89,7 +89,7 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect((await dev.totalSupply()).toNumber()).to.equal(50)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
 		})
-		it('fail to if over decrease the balance by running the burnFrom from another account after approved', async () => {
+		it('should fail to if over decrease the balance by running the burnFrom from another account after approved', async () => {
 			const dev = await createDev()
 			await dev.mint(deployer, 100)
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
@@ -101,6 +101,101 @@ contract('Dev', ([deployer, user1, user2]) => {
 				.catch((err: Error) => err)
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect(res).to.be.an.instanceof(Error)
+		})
+	})
+	describe('Dev; transfer', () => {
+		const createMintedDev = async (): Promise<DevInstance> => {
+			const addressConfig = await addressConfigContract.new({from: deployer})
+			const dev = await devContract.new(addressConfig.address)
+			await dev.mint(deployer, 100)
+			return dev
+		}
+
+		it('transfer token from user-to-user', async () => {
+			const dev = await createMintedDev()
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+
+			await dev.transfer(user1, 50)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(50)
+		})
+		it('should fail to transfer token when sent from no balance account', async () => {
+			const dev = await createMintedDev()
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
+
+			const res = await dev
+				.transfer(user2, 50, {from: user1})
+				.catch((err: Error) => err)
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
+			expect(res).to.be.an.instanceof(Error)
+		})
+		it('should fail to transfer token when sent from an insufficient balance account', async () => {
+			const dev = await createMintedDev()
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+
+			const res = await dev.transfer(user1, 101).catch((err: Error) => err)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+			expect(res).to.be.an.instanceof(Error)
+		})
+		it('transfer token from user-to-user by running the transferFrom from another account after approved', async () => {
+			const dev = await createMintedDev()
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+
+			await dev.approve(user1, 50)
+			await dev.transferFrom(deployer, user2, 50, {from: user1})
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
+			expect((await dev.balanceOf(user2)).toNumber()).to.equal(50)
+		})
+		it('should fail to transfer token from user-to-user when running the transferFrom of over than approved amount from another account after approved', async () => {
+			const dev = await createMintedDev()
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+
+			await dev.approve(user1, 50)
+			const res = await dev
+				.transferFrom(deployer, user2, 51, {from: user1})
+				.catch((err: Error) => err)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
+			expect(res).to.be.an.instanceof(Error)
+		})
+		it('increase the approved amount after approved', async () => {
+			const dev = await createMintedDev()
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+
+			await dev.approve(user1, 50)
+			const res = await dev
+				.transferFrom(deployer, user2, 51, {from: user1})
+				.catch((err: Error) => err)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
+			expect(res).to.be.an.instanceof(Error)
+
+			await dev.increaseAllowance(user1, 1)
+			await dev.transferFrom(deployer, user2, 50, {from: user1})
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
+			expect((await dev.balanceOf(user2)).toNumber()).to.equal(50)
+		})
+		it('decrease the approved amount after approved', async () => {
+			const dev = await createMintedDev()
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+
+			await dev.approve(user1, 50)
+			await dev.decreaseAllowance(user1, 1)
+			const res = await dev
+				.transferFrom(deployer, user2, 50, {from: user1})
+				.catch((err: Error) => err)
+			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
 			expect(res).to.be.an.instanceof(Error)
 		})
 	})
