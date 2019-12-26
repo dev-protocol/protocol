@@ -1,15 +1,18 @@
 contract('MarketTest', ([deployer]) => {
-	// Const marketContract = artifacts.require('merket/Market')
+	const marketContract = artifacts.require('Market')
 	const marketFactoryContract = artifacts.require('MarketFactory')
 	const marketGroupContract = artifacts.require('MarketGroup')
+	const marketTest1Contract = artifacts.require('MarketTest1')
 	const dummyDEVContract = artifacts.require('DummyDEV')
 	const addressConfigContract = artifacts.require('AddressConfig')
 	const policyContract = artifacts.require('PolicyTest1')
 	const policyFactoryContract = artifacts.require('PolicyFactory')
 	const voteTimesContract = artifacts.require('VoteTimes')
+	const voteTimesStorageContract = artifacts.require('VoteTimesStorage')
 	const propertyFactoryContract = artifacts.require('PropertyFactory')
 	const propertyGroupContract = artifacts.require('PropertyGroup')
 	const lockupContract = artifacts.require('Lockup')
+	const lockupStorageContract = artifacts.require('LockupStorage')
 	const allocatorContract = artifacts.require('Allocator')
 	const policyGroupContract = artifacts.require('PolicyGroup')
 	const policySetContract = artifacts.require('PolicySet')
@@ -52,19 +55,23 @@ contract('MarketTest', ([deployer]) => {
 		let marketFactory: any
 		let marketGroup: any
 		let dummyDEV: any
-		// Let market: any
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		let market: any
 		let addressConfig: any
 		let policy: any
 		let policyFactory: any
 		let voteTimes: any
+		let voteTimesStorage: any
 		let propertyFactory: any
 		let propertyGroup: any
-		// Let propertyAddress: any
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		let propertyAddress: any
+		let behavior: any
 		let allocator: any
 		let lockup: any
 		let policyGroup: any
 		let policySet: any
-		beforeEach(async () => {
+		before(async () => {
 			dummyDEV = await dummyDEVContract.new({from: deployer})
 			addressConfig = await addressConfigContract.new({from: deployer})
 			await addressConfig.setToken(dummyDEV.address, {from: deployer})
@@ -88,7 +95,25 @@ contract('MarketTest', ([deployer]) => {
 			await addressConfig.setLockup(lockup.address, {
 				from: deployer
 			})
+			const lockupStorage = await lockupStorageContract.new(
+				addressConfig.address,
+				{from: deployer}
+			)
+			await lockupStorage.createStorage()
+			await addressConfig.setLockupStorage(lockupStorage.address, {
+				from: deployer
+			})
 			voteTimes = await voteTimesContract.new(addressConfig.address, {
+				from: deployer
+			})
+			voteTimesStorage = await voteTimesStorageContract.new(
+				addressConfig.address,
+				{
+					from: deployer
+				}
+			)
+			await voteTimesStorage.createStorage()
+			await addressConfig.setVoteTimesStorage(voteTimesStorage.address, {
 				from: deployer
 			})
 			await addressConfig.setMarketFactory(marketFactory.address, {
@@ -108,6 +133,7 @@ contract('MarketTest', ([deployer]) => {
 			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
 				from: deployer
 			})
+			await propertyGroup.createStorage()
 			await addressConfig.setPropertyGroup(propertyGroup.address, {
 				from: deployer
 			})
@@ -134,24 +160,30 @@ contract('MarketTest', ([deployer]) => {
 				from: deployer
 			})
 			await policyFactory.create(policy.address)
-			// Let result = await marketFactory.createMarket(behavior)
-			// const marketAddress = await result.logs.filter(
-			// 	(e: {event: string}) => e.event === 'Create'
-			// )[0].args._market
-			// market = await marketContract.at(marketAddress)
-			// result = await propertyFactory.createProperty('sample', 'SAMPLE', {
-			// 	from: deployer
-			// })
-			// propertyAddress = await result.logs.filter(
-			// 	(e: {event: string}) => e.event === 'Create'
-			// )[0].args._property
+			behavior = await marketTest1Contract.new(addressConfig.address, {
+				from: deployer
+			})
+			let result = await marketFactory.create(behavior.address)
+			const marketAddress = await result.logs.filter(
+				(e: {event: string}) => e.event === 'Create'
+			)[0].args._market
+			// eslint-disable-next-line @typescript-eslint/await-thenable
+			market = await marketContract.at(marketAddress)
+			result = await propertyFactory.create('sample', 'SAMPLE', {
+				from: deployer
+			})
+			propertyAddress = await result.logs.filter(
+				(e: {event: string}) => e.event === 'Create'
+			)[0].args._property
 		})
 
 		it('Total value of votes for and against, votes are the number of sent DEVs', async () => {})
 		it('Creating a market contract from other than a factory results in an error', async () => {})
 
 		it('When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled', async () => {
-			// Await dummyDEV.approve(lockup.address, 10000, {from: deployer})
+			// eslint-disable-next-line no-warning-comments
+			// TODO PolicyTest1, VoteCounter, VoteCounterStorage
+			// await dummyDEV.approve(lockup.address, 10000, {from: deployer})
 			// await lockup.lockup(propertyAddress, 10000, {from: deployer})
 			// await market.vote(propertyAddress, true, {from: deployer})
 			// const isEnable = await market.enabled({from: deployer})

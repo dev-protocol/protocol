@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";
+import {Market} from "contracts/src/market/Market.sol";
 
 contract MarketTest2 is IMarket {
 	string public schema = "[]";
@@ -15,11 +16,11 @@ contract MarketTest2 is IMarket {
 		string calldata,
 		string calldata,
 		string calldata,
+		string calldata,
 		// solium-disable-next-line no-trailing-whitespace
-		string calldata
-	) external returns (bool) {
-		authenticatedCallback(_prop);
-		return true;
+		address market
+	) external returns (address) {
+		return Market(market).authenticatedCallback(_prop);
 	}
 
 	function calculate(address _metrics, uint256, uint256)
