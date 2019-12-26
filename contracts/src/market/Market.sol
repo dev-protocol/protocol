@@ -13,7 +13,6 @@ import {MetricsFactory} from "contracts/src/metrics/MetricsFactory.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 
-
 contract Market is UsingConfig {
 	using SafeMath for uint256;
 	bool public enabled;
@@ -78,10 +77,7 @@ contract Market is UsingConfig {
 		returns (address)
 	{
 		AddressValidator validator = new AddressValidator();
-		validator.validateAddress(
-			msg.sender,
-			behavior
-		);
+		validator.validateAddress(msg.sender, behavior);
 
 		address sender = Property(_property).author();
 		MetricsFactory metricsFactory = MetricsFactory(
@@ -100,7 +96,11 @@ contract Market is UsingConfig {
 		ERC20 devToken = ERC20(config().token());
 		uint256 balance = devToken.balanceOf(sender);
 		require(authenticationFee <= balance, "insufficient balance");
-		bool success = devToken.transferFrom(sender, _property, authenticationFee);
+		bool success = devToken.transferFrom(
+			sender,
+			_property,
+			authenticationFee
+		);
 		require(success, "transfer was failed");
 		ERC20Burnable(config().token()).burn(authenticationFee);
 		issuedMetrics += 1;
