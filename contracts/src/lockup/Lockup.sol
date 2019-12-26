@@ -31,8 +31,7 @@ contract Lockup is Pausable, UsingConfig {
 		bool isWaiting = getStorage().getWithdrawalStatus(
 				_property,
 				msg.sender
-			) !=
-			0;
+			) != 0;
 		require(isWaiting == false, "lockup is already canceled");
 		ERC20 devToken = ERC20(config().token());
 		uint256 balance = devToken.balanceOf(msg.sender);
