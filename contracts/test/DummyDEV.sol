@@ -7,4 +7,7 @@ contract DummyDEV is ERC20Burnable, ERC20Detailed {
 	constructor() public ERC20Detailed("Dev", "DEV", 18) {
 		_mint(msg.sender, 11416661000000000000000000);
 	}
+	function burnFrom(address, uint256) public {
+		revert("no implemented");
+	}
 }
