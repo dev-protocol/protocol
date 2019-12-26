@@ -34,11 +34,6 @@ contract Lockup is Pausable, UsingConfig {
 			) !=
 			0;
 		require(isWaiting == false, "lockup is already canceled");
-		ERC20 devToken = ERC20(config().token());
-		uint256 balance = devToken.balanceOf(msg.sender);
-		require(_value <= balance, "insufficient balance");
-		bool success = devToken.transferFrom(msg.sender, _property, _value);
-		require(success, "transfer was failed");
 		getStorage().addValue(_property, msg.sender, _value);
 		getStorage().addPropertyValue(_property, _value);
 		getStorage().setLastInterestPrice(
