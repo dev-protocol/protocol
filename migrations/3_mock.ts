@@ -34,7 +34,9 @@ const handler = async function(deployer, network) {
 	console.log('[create market]')
 	const marketAddresses = await createMarket(artifacts, addressInfo)
 	console.log('---finish---')
+	console.log('[create metrics]')
 	await createMetrics(artifacts, addressInfo, marketAddresses)
+	console.log('---finish---')
 } as Truffle.Migration
 
 export = handler
