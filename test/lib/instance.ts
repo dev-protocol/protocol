@@ -3,7 +3,8 @@ import {
 	VoteTimesInstance,
 	VoteTimesStorageInstance,
 	PropertyGroupInstance,
-	EternalStorageInstance
+	EternalStorageInstance,
+	StringValidatorInstance
 } from '../../types/truffle-contracts'
 
 export class DevProtpcolInstance {
@@ -11,6 +12,7 @@ export class DevProtpcolInstance {
 
 	private _addressConfig!: AddressConfigInstance
 	private _eternalStorage!: EternalStorageInstance
+	private _stringValidator!: StringValidatorInstance
 	private _voteTimes!: VoteTimesInstance
 	private _voteTimesStorage!: VoteTimesStorageInstance
 	private _propertyGroup!: PropertyGroupInstance
@@ -25,6 +27,10 @@ export class DevProtpcolInstance {
 
 	public get eternalStorage(): EternalStorageInstance {
 		return this._eternalStorage
+	}
+
+	public get stringValidator(): StringValidatorInstance {
+		return this._stringValidator
 	}
 
 	public get voteTimes(): VoteTimesInstance {
@@ -47,6 +53,11 @@ export class DevProtpcolInstance {
 	public async generateEternalStorage(): Promise<void> {
 		const contract = artifacts.require('EternalStorage')
 		this._eternalStorage = await contract.new({from: this._deployer})
+	}
+
+	public async generateStringValidator(): Promise<void> {
+		const contract = artifacts.require('StringValidator')
+		this._stringValidator = await contract.new({from: this._deployer})
 	}
 
 	public async generateVoteTimes(): Promise<void> {
