@@ -20,7 +20,7 @@ contract Lockup is Pausable, UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function lockup(address _property, uint256 _value) external {
+	function lockup(address _from, address _property, uint256 _value) external {
 		require(paused() == false, "You cannot use that");
 		new AddressValidator().validateAddress(msg.sender, config().token());
 		new AddressValidator().validateGroup(
@@ -29,23 +29,20 @@ contract Lockup is Pausable, UsingConfig {
 		);
 		new IntValidator().validateEmpty(_value);
 
-		bool isWaiting = getStorage().getWithdrawalStatus(
-				_property,
-				msg.sender
-			) !=
+		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
 			0;
 		require(isWaiting == false, "lockup is already canceled");
-		getStorage().addValue(_property, msg.sender, _value);
+		getStorage().addValue(_property, _from, _value);
 		getStorage().addPropertyValue(_property, _value);
 		getStorage().setLastInterestPrice(
 			_property,
-			msg.sender,
+			_from,
 			getStorage().getInterestPrice(_property)
 		);
 		getStorage().setPendingInterestWithdrawal(
 			_property,
-			msg.sender,
-			calculateInterestAmount(_property, msg.sender)
+			_from,
+			calculateInterestAmount(_property, _from)
 		);
 	}
 

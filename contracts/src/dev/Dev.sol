@@ -16,7 +16,16 @@ contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig {
 
 	function deposit(address _to, uint256 _amount) public returns (bool) {
 		transfer(_to, _amount);
-		Lockup(config().lockup()).lockup(_to, _amount);
+		lock(msg.sender, _to, _amount);
+		return true;
+	}
+
+	function depositFrom(address _from, address _to, uint256 _amount)
+		public
+		returns (bool)
+	{
+		transferFrom(_from, _to, _amount);
+		lock(_from, _to, _amount);
 		return true;
 	}
 
@@ -27,5 +36,9 @@ contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig {
 		);
 		_burn(_from, _amount);
 		return true;
+	}
+
+	function lock(address _from, address _to, uint256 _amount) private {
+		Lockup(config().lockup()).lockup(_from, _to, _amount);
 	}
 }
