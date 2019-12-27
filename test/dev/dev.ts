@@ -218,4 +218,10 @@ contract('Dev', ([deployer, user1, user2]) => {
 			'should fail to lockup token when running the depositFrom of over than approved amount from another account after approved'
 		)
 	})
+	describe('Dev; fee', () => {
+		it('burn token as a fee')
+		it('should fail to burn when sent from no balance account')
+		it('should fail to burn when sent from an insufficient balance account')
+		it('should fail to burn when sent from other than market contract')
+	})
 })
