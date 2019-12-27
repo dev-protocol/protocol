@@ -21,7 +21,10 @@ contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig {
 	}
 
 	function fee(address _from, uint256 _amount) public returns (bool) {
-		new AddressValidator().validateGroup(msg.sender, config().marketGroup());
+		new AddressValidator().validateGroup(
+			msg.sender,
+			config().marketGroup()
+		);
 		_burn(_from, _amount);
 		return true;
 	}
