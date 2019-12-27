@@ -22,7 +22,7 @@ contract Lockup is Pausable, UsingConfig {
 
 	function lockup(address _property, uint256 _value) external {
 		require(paused() == false, "You cannot use that");
-		new AddressValidator().validateGroup(msg.sender, config().token());
+		new AddressValidator().validateAddress(msg.sender, config().token());
 		new AddressValidator().validateGroup(
 			_property,
 			config().propertyGroup()
