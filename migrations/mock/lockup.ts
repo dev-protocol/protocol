@@ -1,4 +1,4 @@
-import {LockupInstance, DummyDEVInstance} from '../../types/truffle-contracts'
+import {LockupInstance, DevInstance} from '../../types/truffle-contracts'
 import {AddressInfo, createInstance} from './common'
 import BigNumber from 'bignumber.js'
 
@@ -12,8 +12,7 @@ export async function lockup(
 		value: number
 	): Promise<void> {
 		const bigValue = new BigNumber(value * decimals)
-		await dummyDev.approve(lockup.address, bigValue, {from: account})
-		await lockup.lockup(propertyAddress, bigValue, {from: account})
+		await dev.deposit(propertyAddress, bigValue, {from: account})
 		const resultValue = await lockup.getValue(propertyAddress, account)
 		const lockupValue = new BigNumber(resultValue).dividedBy(
 			new BigNumber(decimals)
@@ -24,8 +23,8 @@ export async function lockup(
 	}
 
 	const lockup = await createInstance<LockupInstance>('Lockup', artifacts)
-	const dummyDev = await createInstance<DummyDEVInstance>('DummyDEV', artifacts)
-	const tmp = await dummyDev.decimals()
+	const dev = await createInstance<DevInstance>('Dev', artifacts)
+	const tmp = await dev.decimals()
 	const decimals = 10 ** tmp.toNumber()
 
 	console.log('account:' + addressInfo[0].account)
