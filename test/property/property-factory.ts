@@ -43,6 +43,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 			await addressConfig.setPropertyFactory(propertyFactory.address, {
 				from: deployer
 			})
+			// eslint-disable-next-line no-warning-comments
 			// TODO multi byte string
 			const result = await propertyFactory.create('sample', 'SAMPLE')
 			expectedPropertyAddress = await result.logs.filter(
@@ -50,7 +51,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 			)[0].args._property
 		})
 
-		it('Create a new Property Contract and emit Create Event telling created property address', async () => {
+		it('Create a new Property Contract and emit Create Event tel Ling created property address', async () => {
 			//  eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedProperty = await propertyContract.at(
 				expectedPropertyAddress
