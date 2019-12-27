@@ -63,6 +63,6 @@ export async function setAddressConfig(
 		artifacts.require('VoteCounterStorage').address
 	)
 
-	// DummyDev
-	await addressConfig.setToken(artifacts.require('DummyDEV').address)
+	// Dev
+	await addressConfig.setToken(artifacts.require('Dev').address)
 }

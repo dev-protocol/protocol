@@ -1,4 +1,4 @@
-import {MarketInstance, DummyDEVInstance} from '../../types/truffle-contracts'
+import {MarketInstance, DevInstance} from '../../types/truffle-contracts'
 import {createInstance, AddressInfo, createInstanceByAddress} from './common'
 
 export async function createMetrics(
@@ -12,13 +12,13 @@ export async function createMetrics(
 	): Promise<void> {
 		// eslint-disable-next-line no-warning-comments
 		// TODO
-		const balance = await dummyDev.balanceOf(addressInfo[accountIndex].account)
+		const balance = await dev.balanceOf(addressInfo[accountIndex].account)
 		const market = await createInstanceByAddress<MarketInstance>(
 			'Market',
 			marketAddresses[marketIndex],
 			artifacts
 		)
-		await dummyDev.approve(market.address, balance, {
+		await dev.approve(market.address, balance, {
 			from: addressInfo[accountIndex].account
 		})
 		await market.authenticate(
@@ -36,7 +36,7 @@ export async function createMetrics(
 		)
 	}
 
-	const dummyDev = await createInstance<DummyDEVInstance>('DummyDEV', artifacts)
+	const dev = await createInstance<DevInstance>('Dev', artifacts)
 	await createMetrics(0, 0)
 	await createMetrics(3, 0)
 	await createMetrics(5, 0)
