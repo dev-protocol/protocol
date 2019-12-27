@@ -48,8 +48,8 @@ const handler = function(deployer, network) {
 	deployer.deploy(artifacts.require('VoteTimes'), address)
 	deployer.deploy(artifacts.require('VoteTimesStorage'), address)
 
-	// DummyDev
-	deployer.deploy(artifacts.require('DummyDEV'))
+	// Dev
+	deployer.deploy(artifacts.require('Dev'), address)
 
 	// Market
 	deployer.deploy(artifacts.require('MarketTest1'), address)

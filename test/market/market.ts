@@ -3,7 +3,7 @@ contract('MarketTest', ([deployer]) => {
 	const marketFactoryContract = artifacts.require('MarketFactory')
 	const marketGroupContract = artifacts.require('MarketGroup')
 	const marketTest1Contract = artifacts.require('MarketTest1')
-	const dummyDEVContract = artifacts.require('DummyDEV')
+	const DevContract = artifacts.require('Dev')
 	const addressConfigContract = artifacts.require('AddressConfig')
 	const policyContract = artifacts.require('PolicyTest1')
 	const policyFactoryContract = artifacts.require('PolicyFactory')
@@ -54,7 +54,7 @@ contract('MarketTest', ([deployer]) => {
 	describe('Market; vote', () => {
 		let marketFactory: any
 		let marketGroup: any
-		let dummyDEV: any
+		let dev: any
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		let market: any
 		let addressConfig: any
@@ -72,9 +72,9 @@ contract('MarketTest', ([deployer]) => {
 		let policyGroup: any
 		let policySet: any
 		before(async () => {
-			dummyDEV = await dummyDEVContract.new({from: deployer})
 			addressConfig = await addressConfigContract.new({from: deployer})
-			await addressConfig.setToken(dummyDEV.address, {from: deployer})
+			dev = await DevContract.new(addressConfig.address, {from: deployer})
+			await addressConfig.setToken(dev.address, {from: deployer})
 			marketFactory = await marketFactoryContract.new(addressConfig.address, {
 				from: deployer
 			})

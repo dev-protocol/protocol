@@ -1,10 +1,9 @@
-contract('LockupTest', ([deployer, propertyFactory, property]) => {
+contract('LockupTest', ([deployer, propertyFactory, property, devToken]) => {
 	const addressConfigContract = artifacts.require('AddressConfig')
 	const lockupContract = artifacts.require('Lockup')
 	const lockupStorageContract = artifacts.require('LockupStorage')
 	const propertyGroupContract = artifacts.require('PropertyGroup')
 	const decimalsLibrary = artifacts.require('Decimals')
-	const dummyDEVContract = artifacts.require('DummyDEV')
 	describe('Lockup; cancel', () => {})
 	describe('Lockup; lockup', () => {
 		it('address is not property contract', async () => {})
@@ -27,16 +26,14 @@ contract('LockupTest', ([deployer, propertyFactory, property]) => {
 			)
 			await lockupStorage.createStorage()
 			await addressConfig.setLockupStorage(lockupStorage.address)
-			const dummyDEV = await dummyDEVContract.new({from: deployer})
-			await addressConfig.setToken(dummyDEV.address, {from: deployer})
+			await addressConfig.setToken(devToken, {from: deployer})
 			const decimals = await decimalsLibrary.new({from: deployer})
 			await lockupContract.link('Decimals', decimals.address)
 			const lockup = await lockupContract.new(addressConfig.address, {
 				from: deployer
 			})
 			await addressConfig.setLockup(lockup.address, {from: deployer})
-			await dummyDEV.approve(lockup.address, 10000, {from: deployer})
-			await lockup.lockup(property, 100, {from: deployer})
+			await lockup.lockup(deployer, property, 100, {from: devToken})
 			// eslint-disable-next-line no-warning-comments
 			// TODO assert
 		})
