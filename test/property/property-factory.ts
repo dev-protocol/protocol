@@ -43,6 +43,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 			await addressConfig.setPropertyFactory(propertyFactory.address, {
 				from: deployer
 			})
+			// TODO multi byte string
 			const result = await propertyFactory.create('sample', 'SAMPLE')
 			expectedPropertyAddress = await result.logs.filter(
 				(e: {event: string}) => e.event === 'Create'
@@ -50,7 +51,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 		})
 
 		it('Create a new Property Contract and emit Create Event telling created property address', async () => {
-			// eslint-disable-next-line @typescript-eslint/await-thenable
+			//  eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedProperty = await propertyContract.at(
 				expectedPropertyAddress
 			)

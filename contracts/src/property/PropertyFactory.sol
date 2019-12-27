@@ -19,8 +19,8 @@ contract PropertyFactory is Pausable, UsingConfig {
 	{
 		require(paused() == false, "You cannot use that");
 		StringValidator validator = new StringValidator();
-		validator.validateEmpty(_name);
-		validator.validateEmpty(_symbol);
+		validator.validatePropertyName(_name);
+		validator.validatePropertySymbol(_symbol);
 
 		Property property = new Property(
 			address(config()),
