@@ -2,13 +2,15 @@ import {
 	AddressConfigInstance,
 	VoteTimesInstance,
 	VoteTimesStorageInstance,
-	PropertyGroupInstance
+	PropertyGroupInstance,
+	EternalStorageInstance
 } from '../../types/truffle-contracts'
 
 export class DevProtpcolInstance {
 	private readonly _deployer: string
 
 	private _addressConfig!: AddressConfigInstance
+	private _eternalStorage!: EternalStorageInstance
 	private _voteTimes!: VoteTimesInstance
 	private _voteTimesStorage!: VoteTimesStorageInstance
 	private _propertyGroup!: PropertyGroupInstance
@@ -19,6 +21,10 @@ export class DevProtpcolInstance {
 
 	public get addressConfig(): AddressConfigInstance {
 		return this._addressConfig
+	}
+
+	public get eternalStorage(): EternalStorageInstance {
+		return this._eternalStorage
 	}
 
 	public get voteTimes(): VoteTimesInstance {
@@ -36,6 +42,11 @@ export class DevProtpcolInstance {
 	public async generateAddressConfig(): Promise<void> {
 		const contract = artifacts.require('AddressConfig')
 		this._addressConfig = await contract.new({from: this._deployer})
+	}
+
+	public async generateEternalStorage(): Promise<void> {
+		const contract = artifacts.require('EternalStorage')
+		this._eternalStorage = await contract.new({from: this._deployer})
 	}
 
 	public async generateVoteTimes(): Promise<void> {
