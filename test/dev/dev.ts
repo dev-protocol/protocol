@@ -199,4 +199,19 @@ contract('Dev', ([deployer, user1, user2]) => {
 			expect(res).to.be.an.instanceof(Error)
 		})
 	})
+	describe('Dev; deposit', () => {
+		it('lockup tokens to properties')
+		it('should fail to lockup tokens when sent from no balance account')
+		it(
+			'should fail to lockup tokens when sent from an insufficient balance account'
+		)
+		it(
+			'should fail to lockup tokens when the destination is other than property'
+		)
+		it('should fail to lockup tokens when the protocol is paused')
+		it('should fail to lockup tokens when the lockup amount is 0')
+		it(
+			'should fail to lockup tokens when the sender is waiting for withdrawing'
+		)
+	})
 })
