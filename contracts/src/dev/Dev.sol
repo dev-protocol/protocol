@@ -3,8 +3,8 @@ pragma solidity ^0.5.0;
 import {ERC20Detailed} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import {ERC20Burnable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {Lockup} from "contracts/src/lockup/Lockup.sol";
+import {UsingConfig} from "../common/config/UsingConfig.sol";
+import {Lockup} from "../lockup/Lockup.sol";
 
 contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig {
 	constructor(address _config)
