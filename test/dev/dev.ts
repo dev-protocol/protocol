@@ -200,18 +200,22 @@ contract('Dev', ([deployer, user1, user2]) => {
 		})
 	})
 	describe('Dev; deposit', () => {
-		it('lockup tokens to properties')
-		it('should fail to lockup tokens when sent from no balance account')
+		it('lockup token to properties')
+		it('should fail to lockup token when sent from no balance account')
 		it(
-			'should fail to lockup tokens when sent from an insufficient balance account'
+			'should fail to lockup token when sent from an insufficient balance account'
 		)
 		it(
-			'should fail to lockup tokens when the destination is other than property'
+			'should fail to lockup token when the destination is other than property'
 		)
-		it('should fail to lockup tokens when the protocol is paused')
-		it('should fail to lockup tokens when the lockup amount is 0')
+		it('should fail to lockup token when the protocol is paused')
+		it('should fail to lockup token when the lockup amount is 0')
+		it('should fail to lockup token when the sender is waiting for withdrawing')
 		it(
-			'should fail to lockup tokens when the sender is waiting for withdrawing'
+			'lockup token by running the depositFrom from another account after approved'
+		)
+		it(
+			'should fail to lockup token when running the depositFrom of over than approved amount from another account after approved'
 		)
 	})
 })
