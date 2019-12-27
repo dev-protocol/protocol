@@ -51,7 +51,7 @@ contract('PropertyFactoryTest', ([deployer]) => {
 			)[0].args._property
 		})
 
-		it('Create a new Property Contract and emit Create Event tel Ling created property address', async () => {
+		it('Create a new Property Contract and emit Create Event telling created property address', async () => {
 			//  eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedProperty = await propertyContract.at(
 				expectedPropertyAddress
