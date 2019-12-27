@@ -13,7 +13,7 @@ export async function changeBalance(
 	const dummyDev = await createInstance<DummyDEVInstance>('DummyDEV', artifacts)
 	const tmp = await dummyDev.decimals()
 	const decimals = 10 ** tmp.toNumber()
-	console.log('dummy dev token balance infomation')
+	console.log('dev token balance infomation')
 	for (let i = 0; i < transferAddressIndex.length; i++) {
 		const idx = transferAddressIndex[i]
 		const address = addressInfo[idx].account

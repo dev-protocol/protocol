@@ -1,11 +1,12 @@
+import {DevProtpcolInstance} from './../lib/instance'
 import {DevInstance} from '../../types/truffle-contracts'
 
 contract('Dev', ([deployer, user1, user2]) => {
-	const devContract = artifacts.require('Dev')
-	const addressConfigContract = artifacts.require('AddressConfig')
 	const createDev = async (): Promise<DevInstance> => {
-		const addressConfig = await addressConfigContract.new({from: deployer})
-		return devContract.new(addressConfig.address)
+		const dev = new DevProtpcolInstance(deployer)
+		await dev.generateAddressConfig()
+		await dev.generateDev()
+		return dev.dev
 	}
 
 	describe('Dev; detail', () => {
@@ -106,8 +107,7 @@ contract('Dev', ([deployer, user1, user2]) => {
 	})
 	describe('Dev; transfer', () => {
 		const createMintedDev = async (): Promise<DevInstance> => {
-			const addressConfig = await addressConfigContract.new({from: deployer})
-			const dev = await devContract.new(addressConfig.address)
+			const dev = await createDev()
 			await dev.mint(deployer, 100)
 			return dev
 		}

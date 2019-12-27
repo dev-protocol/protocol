@@ -1,8 +1,6 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import {ERC20Burnable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
-import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
@@ -12,6 +10,7 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {MetricsFactory} from "contracts/src/metrics/MetricsFactory.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
+import {Dev} from "contracts/src/dev/Dev.sol";
 
 contract Market is UsingConfig {
 	using SafeMath for uint256;
@@ -102,16 +101,7 @@ contract Market is UsingConfig {
 		);
 		address metrics = metricsFactory.create(_property);
 		uint256 authenticationFee = getAuthenticationFee(_property);
-		ERC20 devToken = ERC20(config().token());
-		uint256 balance = devToken.balanceOf(sender);
-		require(authenticationFee <= balance, "insufficient balance");
-		bool success = devToken.transferFrom(
-			sender,
-			address(this),
-			authenticationFee
-		);
-		require(success, "transfer was failed");
-		ERC20Burnable(config().token()).burn(authenticationFee);
+		Dev(config().token()).fee(sender, authenticationFee);
 		issuedMetrics += 1;
 		return metrics;
 	}
