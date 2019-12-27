@@ -1,19 +1,18 @@
+import {DevProtpcolInstance} from './../../lib/instance'
+
 contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
-	const addressConfigTestContract = artifacts.require('AddressConfig')
+	const dev = new DevProtpcolInstance(deployer)
 	describe('AddressConfig; getter/setter', () => {
-		let addressConfigTest: any
-		beforeEach(async () => {
-			addressConfigTest = await addressConfigTestContract.new({
-				from: deployer
-			})
+		before(async () => {
+			await dev.generateAddressConfig()
 		})
 		it('Value set by owner(allocator)', async () => {
-			await addressConfigTest.setAllocator(setAddress1, {from: deployer})
-			const addresss = await addressConfigTest.allocator()
+			await dev.addressConfig.setAllocator(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.allocator()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by non-owner(allocator)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setAllocator(setAddress1, {
 					from: other
 				})
@@ -22,13 +21,58 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
 			)
 		})
+		it('Value set by owner(allocatorStorage)', async () => {
+			await dev.addressConfig.setAllocatorStorage(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.allocatorStorage()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(allocatorStorage)', async () => {
+			const result = await dev.addressConfig
+				.setAllocatorStorage(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
+		it('Value set by owner(withdraw)', async () => {
+			await dev.addressConfig.setWithdraw(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.withdraw()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(withdraw)', async () => {
+			const result = await dev.addressConfig
+				.setWithdraw(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
+		it('Value set by owner(withdrawStorage)', async () => {
+			await dev.addressConfig.setWithdrawStorage(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.withdrawStorage()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(withdrawStorage)', async () => {
+			const result = await dev.addressConfig
+				.setWithdrawStorage(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
 		it('Value set by owner(marketFactory)', async () => {
-			await addressConfigTest.setMarketFactory(setAddress1, {from: deployer})
-			const addresss = await addressConfigTest.marketFactory()
+			await dev.addressConfig.setMarketFactory(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.marketFactory()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by non-owner(marketFactory)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setMarketFactory(setAddress1, {
 					from: other
 				})
@@ -38,12 +82,12 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			)
 		})
 		it('Value set by owner(marketGroup)', async () => {
-			await addressConfigTest.setMarketGroup(setAddress1, {from: deployer})
-			const addresss = await addressConfigTest.marketGroup()
+			await dev.addressConfig.setMarketGroup(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.marketGroup()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by non-owner(marketGroup)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setMarketGroup(setAddress1, {
 					from: other
 				})
@@ -53,12 +97,12 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			)
 		})
 		it('Value set by owner(propertyFactory)', async () => {
-			await addressConfigTest.setPropertyFactory(setAddress1, {from: deployer})
-			const addresss = await addressConfigTest.propertyFactory()
+			await dev.addressConfig.setPropertyFactory(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.propertyFactory()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by onon-wner(propertyFactory)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setPropertyFactory(setAddress1, {
 					from: other
 				})
@@ -68,12 +112,12 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			)
 		})
 		it('Value set by owner(propertyGroup)', async () => {
-			await addressConfigTest.setPropertyGroup(setAddress1, {from: deployer})
-			const addresss = await addressConfigTest.propertyGroup()
+			await dev.addressConfig.setPropertyGroup(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.propertyGroup()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by non-owner(propertyGroup)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setPropertyGroup(setAddress1, {
 					from: other
 				})
@@ -82,13 +126,28 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
 			)
 		})
+		it('Value set by owner(metricsFactory)', async () => {
+			await dev.addressConfig.setMetricsFactory(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.metricsFactory()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(metricsFactory)', async () => {
+			const result = await dev.addressConfig
+				.setMetricsFactory(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
 		it('Value set by owner(metricsGroup)', async () => {
-			await addressConfigTest.setMetricsGroup(setAddress1, {from: deployer})
-			const addresss = await addressConfigTest.metricsGroup()
+			await dev.addressConfig.setMetricsGroup(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.metricsGroup()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by non-owner(metricsGroup)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setMetricsGroup(setAddress1, {
 					from: other
 				})
@@ -98,12 +157,12 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			)
 		})
 		it('Value set by owner(policyFactory)', async () => {
-			await addressConfigTest.setPolicyFactory(setAddress1, {from: deployer})
-			const addresss = await addressConfigTest.policyFactory()
+			await dev.addressConfig.setPolicyFactory(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.policyFactory()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by non-owner(policyFactory)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setPolicyFactory(setAddress1, {
 					from: other
 				})
@@ -112,13 +171,43 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
 			)
 		})
+		it('Value set by owner(policyGroup)', async () => {
+			await dev.addressConfig.setPolicyGroup(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.policyGroup()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(policyGroup)', async () => {
+			const result = await dev.addressConfig
+				.setPolicyGroup(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
+		it('Value set by owner(policySet)', async () => {
+			await dev.addressConfig.setPolicySet(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.policySet()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(policySet)', async () => {
+			const result = await dev.addressConfig
+				.setPolicySet(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
 		it('Value set by owner(token)', async () => {
-			await addressConfigTest.setToken(setAddress1, {from: deployer})
-			const addresss = await addressConfigTest.token()
+			await dev.addressConfig.setToken(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.token()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by non-owner(token)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setToken(setAddress1, {
 					from: other
 				})
@@ -128,12 +217,12 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			)
 		})
 		it('Value set by owner(lockup)', async () => {
-			await addressConfigTest.setLockup(setAddress1, {from: deployer})
-			const addresss = await addressConfigTest.lockup()
+			await dev.addressConfig.setLockup(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.lockup()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by non-owner(lockup)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setLockup(setAddress1, {
 					from: other
 				})
@@ -142,15 +231,30 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
 			)
 		})
+		it('Value set by owner(lockupStorage)', async () => {
+			await dev.addressConfig.setLockupStorage(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.lockupStorage()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(lockupStorage)', async () => {
+			const result = await dev.addressConfig
+				.setLockupStorage(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
 		it('Value set by owner(voteTimes)', async () => {
-			await addressConfigTest.setVoteTimes(setAddress1, {
+			await dev.addressConfig.setVoteTimes(setAddress1, {
 				from: deployer
 			})
-			const addresss = await addressConfigTest.voteTimes()
+			const addresss = await dev.addressConfig.voteTimes()
 			expect(addresss).to.be.equal(setAddress1)
 		})
 		it('Value set by non-owner(voteTimes)', async () => {
-			const result = await addressConfigTest
+			const result = await dev.addressConfig
 				.setVoteTimes(setAddress1, {
 					from: other
 				})
@@ -159,52 +263,80 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
 			)
 		})
-		it('Value set by owner(lockupValue)', async () => {})
-		it('Value set by non-owner(lockupValue)', async () => {})
-		it('Value set by owner(lockupPropertyValue)', async () => {})
-		it('Value set by non-owner(lockupPropertyValue)', async () => {})
-		it('Value set by owner(lockupWithdrawalStatus)', async () => {})
-		it('Value set by non-owner(lockupWithdrawalStatus)', async () => {})
-		it('Value set by owner(policyGroup)', async () => {})
-		it('Value set by non-owner(policyGroup)', async () => {})
-		it('Value set by owner(allocation)', async () => {})
-		it('Value set by non-owner(allocation)', async () => {})
-		it('Value set by owner(lastWithdrawalPrice)', async () => {})
-		it('Value set by non-owner(lastWithdrawalPrice)', async () => {})
-		it('Value set by owner(pendingWithdrawal)', async () => {})
-		it('Value set by non-owner(pendingWithdrawal)', async () => {})
-		it('Value set by owner(voteCounter)', async () => {})
-		it('Value set by non-owner(voteCounter)', async () => {})
-	})
-	describe('AddressConfig; setPolicy', () => {
-		let addressConfigTest: any
-		beforeEach(async () => {
-			addressConfigTest = await addressConfigTestContract.new({
+		it('Value set by owner(voteTimesStorage)', async () => {
+			await dev.addressConfig.setVoteTimesStorage(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.voteTimesStorage()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(voteTimesStorage)', async () => {
+			const result = await dev.addressConfig
+				.setVoteTimesStorage(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
+		it('Value set by owner(voteCounter)', async () => {
+			await dev.addressConfig.setVoteCounter(setAddress1, {from: deployer})
+			const addresss = await dev.addressConfig.voteCounter()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(voteCounter)', async () => {
+			const result = await dev.addressConfig
+				.setVoteCounter(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
+		it('Value set by owner(voteCounterStorage)', async () => {
+			await dev.addressConfig.setVoteCounterStorage(setAddress1, {
 				from: deployer
 			})
+			const addresss = await dev.addressConfig.voteCounterStorage()
+			expect(addresss).to.be.equal(setAddress1)
+		})
+		it('Value set by non-owner(voteCounterStorage)', async () => {
+			const result = await dev.addressConfig
+				.setVoteCounterStorage(setAddress1, {
+					from: other
+				})
+				.catch((err: Error) => err)
+			expect((result as Error).message).to.be.equal(
+				'Returned error: VM Exception while processing transaction: revert Ownable: caller is not the owner -- Reason given: Ownable: caller is not the owner.'
+			)
+		})
+	})
+	describe('AddressConfig; setPolicy', () => {
+		before(async () => {
+			await dev.generateAddressConfig()
 		})
 		it('Value set by PolicyFactory', async () => {
-			await addressConfigTest.setPolicyFactory(setAddress1, {from: deployer})
-			await addressConfigTest.setPolicy(setAddress2, {from: setAddress1})
-			const addresss = await addressConfigTest.policy()
+			await dev.addressConfig.setPolicyFactory(setAddress1, {from: deployer})
+			await dev.addressConfig.setPolicy(setAddress2, {from: setAddress1})
+			const addresss = await dev.addressConfig.policy()
 			expect(addresss).to.be.equal(setAddress2)
 		})
 		it('Value set by owner', async () => {
-			await addressConfigTest.setPolicyFactory(setAddress1, {from: deployer})
-			const result = await addressConfigTest
+			await dev.addressConfig.setPolicyFactory(setAddress1, {from: deployer})
+			const result = await dev.addressConfig
 				.setPolicy(setAddress2, {from: deployer})
 				.catch((err: Error) => err)
 			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert only policy factory contract -- Reason given: only policy factory contract.'
+				'Returned error: VM Exception while processing transaction: revert this address is not proper -- Reason given: this address is not proper.'
 			)
 		})
 		it('Value set by non-owner', async () => {
-			await addressConfigTest.setPolicyFactory(setAddress1, {from: deployer})
-			const result = await addressConfigTest
+			await dev.addressConfig.setPolicyFactory(setAddress1, {from: deployer})
+			const result = await dev.addressConfig
 				.setPolicy(setAddress2, {from: other})
 				.catch((err: Error) => err)
 			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert only policy factory contract -- Reason given: only policy factory contract.'
+				'Returned error: VM Exception while processing transaction: revert this address is not proper -- Reason given: this address is not proper.'
 			)
 		})
 	})
