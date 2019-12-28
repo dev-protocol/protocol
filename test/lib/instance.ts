@@ -13,16 +13,12 @@ import {
 	DecimalsInstance,
 	PolicyFactoryInstance,
 	PolicySetInstance,
-	PolicyGroupInstance
+	PolicyGroupInstance,
+	MarketFactoryInstance,
+	MarketGroupInstance
 } from '../../types/truffle-contracts'
-import {ReturnTypeArtifactsRequire, ArtifactsName} from './artifacts-require'
 
-const generateContract = <T extends ArtifactsName>(
-	name: T
-): ReturnTypeArtifactsRequire<T> => {
-	const contract = artifacts.require<ReturnTypeArtifactsRequire<T>>(name)
-	return contract
-}
+const contract = artifacts.require
 
 export class DevProtpcolInstance {
 	private readonly _deployer: string
@@ -40,9 +36,15 @@ export class DevProtpcolInstance {
 	private _policyFactory!: PolicyFactoryInstance
 	private _policySet!: PolicySetInstance
 	private _policyGroup!: PolicyGroupInstance
+	private _marketFactory!: MarketFactoryInstance
+	private _marketGroup!: MarketGroupInstance
 
 	constructor(deployer: string) {
 		this._deployer = deployer
+	}
+
+	public get fromDeployer(): {from: string} {
+		return {from: this._deployer}
 	}
 
 	public get addressConfig(): AddressConfigInstance {
@@ -97,27 +99,31 @@ export class DevProtpcolInstance {
 		return this._policyGroup
 	}
 
-	public get fromDeployer(): {from: string} {
-		return {from: this._deployer}
+	public get marketFactory(): MarketFactoryInstance {
+		return this._marketFactory
+	}
+
+	public get marketGroup(): MarketGroupInstance {
+		return this._marketGroup
 	}
 
 	public async generateAddressConfig(): Promise<void> {
-		const contract = artifacts.require('AddressConfig')
-		this._addressConfig = await contract.new(this.fromDeployer)
+		const instance = contract('AddressConfig')
+		this._addressConfig = await instance.new(this.fromDeployer)
 	}
 
 	public async generateEternalStorage(): Promise<void> {
-		const contract = artifacts.require('EternalStorage')
-		this._eternalStorage = await contract.new(this.fromDeployer)
+		const instance = contract('EternalStorage')
+		this._eternalStorage = await instance.new(this.fromDeployer)
 	}
 
 	public async generateStringValidator(): Promise<void> {
-		const contract = artifacts.require('StringValidator')
-		this._stringValidator = await contract.new(this.fromDeployer)
+		const instance = contract('StringValidator')
+		this._stringValidator = await instance.new(this.fromDeployer)
 	}
 
 	public async generateDev(): Promise<void> {
-		this._dev = await generateContract('Dev').new(
+		this._dev = await contract('Dev').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
@@ -131,12 +137,12 @@ export class DevProtpcolInstance {
 				await this.generateDecimals().then(x => x.address)
 			)
 			return x.new(this.addressConfig.address, this.fromDeployer)
-		})(generateContract('Lockup'))
+		})(contract('Lockup'))
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 	}
 
 	public async generateLockupStorage(): Promise<void> {
-		this._lockupStorage = await generateContract('LockupStorage').new(
+		this._lockupStorage = await contract('LockupStorage').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
@@ -148,7 +154,7 @@ export class DevProtpcolInstance {
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
-		this._propertyFactory = await generateContract('PropertyFactory').new(
+		this._propertyFactory = await contract('PropertyFactory').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
@@ -159,7 +165,7 @@ export class DevProtpcolInstance {
 	}
 
 	public async generateVoteTimes(): Promise<void> {
-		this._voteTimes = await generateContract('VoteTimes').new(
+		this._voteTimes = await contract('VoteTimes').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
@@ -170,7 +176,7 @@ export class DevProtpcolInstance {
 	}
 
 	public async generateVoteTimesStorage(): Promise<void> {
-		this._voteTimesStorage = await generateContract('VoteTimesStorage').new(
+		this._voteTimesStorage = await contract('VoteTimesStorage').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
@@ -182,7 +188,7 @@ export class DevProtpcolInstance {
 	}
 
 	public async generatePropertyGroup(): Promise<void> {
-		this._propertyGroup = await generateContract('PropertyGroup').new(
+		this._propertyGroup = await contract('PropertyGroup').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
@@ -194,7 +200,7 @@ export class DevProtpcolInstance {
 	}
 
 	public async generatePolicyFactory(): Promise<void> {
-		this._policyFactory = await generateContract('PolicyFactory').new(
+		this._policyFactory = await contract('PolicyFactory').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
@@ -205,7 +211,7 @@ export class DevProtpcolInstance {
 	}
 
 	public async generatePolicySet(): Promise<void> {
-		this._policySet = await generateContract('PolicySet').new(
+		this._policySet = await contract('PolicySet').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
@@ -216,12 +222,34 @@ export class DevProtpcolInstance {
 	}
 
 	public async generatePolicyGroup(): Promise<void> {
-		this._policyGroup = await generateContract('PolicyGroup').new(
+		this._policyGroup = await contract('PolicyGroup').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
 		await this._addressConfig.setPolicyGroup(
 			this._policyFactory.address,
+			this.fromDeployer
+		)
+	}
+
+	public async generateMarketFactory(): Promise<void> {
+		this._marketFactory = await contract('MarketFactory').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setMarketFactory(
+			this._marketFactory.address,
+			this.fromDeployer
+		)
+	}
+
+	public async generateMarketGroup(): Promise<void> {
+		this._marketGroup = await contract('MarketGroup').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setMarketGroup(
+			this._marketGroup.address,
 			this.fromDeployer
 		)
 	}
