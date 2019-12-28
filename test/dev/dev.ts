@@ -200,7 +200,19 @@ contract('Dev', ([deployer, user1, user2]) => {
 		})
 	})
 	describe('Dev; deposit', () => {
-		it('lockup token to properties')
+		it('lockup token to properties', async () => {
+			const dev = new DevProtpcolInstance(deployer)
+			await dev.generateAddressConfig()
+			await dev.generateDev()
+			await dev.generateLockup()
+			await dev.generateLockupStorage()
+			await dev.generatePropertyFactory()
+			const prop = await dev.propertyFactory.create('test', 'test')
+			await dev.dev.mint(user1, 100)
+			await dev.dev.deposit(prop.toString(), 50)
+			const balance = await dev.dev.balanceOf(user1)
+			expect(balance.toNumber()).to.be.equal(50)
+		})
 		it('should fail to lockup token when sent from no balance account')
 		it(
 			'should fail to lockup token when sent from an insufficient balance account'
