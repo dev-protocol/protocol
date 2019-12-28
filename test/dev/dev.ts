@@ -200,7 +200,7 @@ contract('Dev', ([deployer, user1, user2]) => {
 		})
 	})
 	describe('Dev; deposit', () => {
-		it('lockup token to properties', async () => {
+		const generateEnv = async (): Promise<DevProtpcolInstance> => {
 			const dev = new DevProtpcolInstance(deployer)
 			await dev.generateAddressConfig()
 			await dev.generateDev()
@@ -210,6 +210,11 @@ contract('Dev', ([deployer, user1, user2]) => {
 			await dev.generatePropertyGroup()
 			await dev.generateVoteTimes()
 			await dev.generateVoteTimesStorage()
+			return dev
+		}
+
+		it('lockup token to properties', async () => {
+			const dev = await generateEnv()
 			const prop = await dev.propertyFactory
 				.create('test', 'test')
 				.then(res => res.logs.find(x => x.event === 'Create')?.args._property)
