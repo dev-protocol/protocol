@@ -298,11 +298,12 @@ contract('Dev', ([deployer, user1, user2]) => {
 		})
 		it('should fail to lockup token when the sender is waiting for withdrawing', async () => {
 			const dev = await generateEnv()
+			const prop = await createProperty(dev)
 			const lockupStorage = await artifacts
 				.require('LockupStorage')
 				.new(dev.addressConfig.address)
+			await lockupStorage.createStorage()
 			await dev.addressConfig.setLockupStorage(lockupStorage.address)
-			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
 			await dev.dev.deposit(prop, 50, {from: user1})
 			await lockupStorage.setWithdrawalStatus(prop, user1, 9999999999999)
