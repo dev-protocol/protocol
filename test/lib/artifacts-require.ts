@@ -14,7 +14,9 @@ import {
 	VoteTimesContract,
 	VoteTimesStorageContract,
 	PropertyGroupContract,
-	DecimalsContract
+	DecimalsContract,
+	PolicySetContract,
+	PolicyGroupContract
 } from '../../types/truffle-contracts'
 
 export type ArtifactsName =
@@ -26,8 +28,9 @@ export type ArtifactsName =
 	| 'MetricsFactory'
 	| 'Policy'
 	| 'PolicyFactory'
+	| 'PolicySet'
+	| 'PolicyGroup'
 	| 'Property'
-	| 'PolicyFactory'
 	| 'Property'
 	| 'PropertyFactory'
 	| 'MarketFactory'
@@ -57,6 +60,10 @@ export type ReturnTypeArtifactsRequire<
 	? PolicyContract
 	: T extends 'PolicyFactory'
 	? PolicyFactoryContract
+	: T extends 'PolicySet'
+	? PolicySetContract
+	: T extends 'PolicyGroup'
+	? PolicyGroupContract
 	: T extends 'Property'
 	? PropertyContract
 	: T extends 'PropertyFactory'

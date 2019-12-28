@@ -213,11 +213,14 @@ contract('Dev', ([deployer, user1, user2]) => {
 			return dev
 		}
 
-		it('lockup token to properties', async () => {
-			const dev = await generateEnv()
-			const prop = await dev.propertyFactory
+		const createProperty = async (dev: DevProtpcolInstance): Promise<string> =>
+			dev.propertyFactory
 				.create('test', 'test')
 				.then(res => res.logs.find(x => x.event === 'Create')?.args._property)
+
+		it('lockup token to properties', async () => {
+			const dev = await generateEnv()
+			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
 			await dev.dev.deposit(prop, 50, {from: user1})
 			const balance = await dev.dev.balanceOf(user1)
@@ -227,22 +230,121 @@ contract('Dev', ([deployer, user1, user2]) => {
 				50
 			)
 		})
-		it('should fail to lockup token when sent from no balance account')
-		it(
-			'should fail to lockup token when sent from an insufficient balance account'
-		)
-		it(
-			'should fail to lockup token when the destination is other than property'
-		)
-		it('should fail to lockup token when the protocol is paused')
-		it('should fail to lockup token when the lockup amount is 0')
-		it('should fail to lockup token when the sender is waiting for withdrawing')
-		it(
-			'lockup token by running the depositFrom from another account after approved'
-		)
-		it(
-			'should fail to lockup token when running the depositFrom of over than approved amount from another account after approved'
-		)
+		it('should fail to lockup token when sent from no balance account', async () => {
+			const dev = await generateEnv()
+			const prop = await createProperty(dev)
+			const res = await dev.dev
+				.deposit(prop, 100, {from: user1})
+				.catch((err: Error) => err)
+			const balance = await dev.dev.balanceOf(user1)
+
+			expect(balance.toNumber()).to.be.equal(0)
+			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(res).to.be.an.instanceOf(Error)
+		})
+		it('should fail to lockup token when sent from an insufficient balance account', async () => {
+			const dev = await generateEnv()
+			const prop = await createProperty(dev)
+			await dev.dev.mint(user1, 100)
+			const res = await dev.dev
+				.deposit(prop, 101, {from: user1})
+				.catch((err: Error) => err)
+			const balance = await dev.dev.balanceOf(user1)
+
+			expect(balance.toNumber()).to.be.equal(100)
+			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(res).to.be.an.instanceOf(Error)
+		})
+		it('should fail to lockup token when the destination is other than property', async () => {
+			const dev = await generateEnv()
+			const prop = await createProperty(dev)
+			await dev.dev.mint(user1, 100)
+			const res = await dev.dev
+				.deposit(user2, 50, {from: user1})
+				.catch((err: Error) => err)
+			const balance = await dev.dev.balanceOf(user1)
+
+			expect(balance.toNumber()).to.be.equal(100)
+			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(res).to.be.an.instanceOf(Error)
+		})
+		it('should fail to lockup token when the protocol is paused', async () => {
+			const dev = await generateEnv()
+			const prop = await createProperty(dev)
+			await dev.dev.mint(user1, 100)
+			await dev.lockup.pause()
+			const res = await dev.dev
+				.deposit(prop, 50, {from: user1})
+				.catch((err: Error) => err)
+			const balance = await dev.dev.balanceOf(user1)
+
+			expect(balance.toNumber()).to.be.equal(100)
+			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(await dev.lockup.paused()).to.be.equal(true)
+			expect(res).to.be.an.instanceOf(Error)
+		})
+		it('should fail to lockup token when the lockup amount is 0', async () => {
+			const dev = await generateEnv()
+			const prop = await createProperty(dev)
+			await dev.dev.mint(user1, 100)
+			const res = await dev.dev
+				.deposit(prop, 0, {from: user1})
+				.catch((err: Error) => err)
+			const balance = await dev.dev.balanceOf(user1)
+
+			expect(balance.toNumber()).to.be.equal(100)
+			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(res).to.be.an.instanceOf(Error)
+		})
+		it('should fail to lockup token when the sender is waiting for withdrawing', async () => {
+			const dev = await generateEnv()
+			const lockupStorage = await artifacts
+				.require('LockupStorage')
+				.new(dev.addressConfig.address)
+			await dev.addressConfig.setLockupStorage(lockupStorage.address)
+			const prop = await createProperty(dev)
+			await dev.dev.mint(user1, 100)
+			await dev.dev.deposit(prop, 50, {from: user1})
+			await lockupStorage.setWithdrawalStatus(prop, user1, 9999999999999)
+
+			const res = await dev.dev
+				.deposit(prop, 1, {from: user1})
+				.catch((err: Error) => err)
+			const balance = await dev.dev.balanceOf(user1)
+
+			expect(balance.toNumber()).to.be.equal(50)
+			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(
+				50
+			)
+			expect(res).to.be.an.instanceOf(Error)
+		})
+		it('lockup token by running the depositFrom from another account after approved', async () => {
+			const dev = await generateEnv()
+			const prop = await createProperty(dev)
+			await dev.dev.mint(user1, 100)
+			await dev.dev.approve(user2, 50, {from: user1})
+			await dev.dev.depositFrom(user1, prop, 50, {from: user2})
+			const balance = await dev.dev.balanceOf(user1)
+
+			expect(balance.toNumber()).to.be.equal(50)
+			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(
+				50
+			)
+		})
+		it('should fail to lockup token when running the depositFrom of over than approved amount from another account after approved', async () => {
+			const dev = await generateEnv()
+			const prop = await createProperty(dev)
+			await dev.dev.mint(user1, 100)
+			await dev.dev.approve(user2, 50, {from: user1})
+			const res = await dev.dev
+				.depositFrom(user1, prop, 51, {from: user2})
+				.catch((err: Error) => err)
+			const balance = await dev.dev.balanceOf(user1)
+
+			expect(balance.toNumber()).to.be.equal(100)
+			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(res).to.be.an.instanceOf(Error)
+		})
 	})
 	describe('Dev; fee', () => {
 		it('burn token as a fee')

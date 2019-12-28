@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-readonly */
 import {
 	AddressConfigInstance,
 	VoteTimesInstance,
@@ -9,7 +10,10 @@ import {
 	LockupInstance,
 	LockupStorageInstance,
 	PropertyFactoryInstance,
-	DecimalsInstance
+	DecimalsInstance,
+	PolicyFactoryInstance,
+	PolicySetInstance,
+	PolicyGroupInstance
 } from '../../types/truffle-contracts'
 import {ReturnTypeArtifactsRequire, ArtifactsName} from './artifacts-require'
 
@@ -33,6 +37,9 @@ export class DevProtpcolInstance {
 	private _voteTimes!: VoteTimesInstance
 	private _voteTimesStorage!: VoteTimesStorageInstance
 	private _propertyGroup!: PropertyGroupInstance
+	private _policyFactory!: PolicyFactoryInstance
+	private _policySet!: PolicySetInstance
+	private _policyGroup!: PolicyGroupInstance
 
 	constructor(deployer: string) {
 		this._deployer = deployer
@@ -76,6 +83,18 @@ export class DevProtpcolInstance {
 
 	public get propertyGroup(): PropertyGroupInstance {
 		return this._propertyGroup
+	}
+
+	public get policyFactory(): PolicyFactoryInstance {
+		return this._policyFactory
+	}
+
+	public get policySet(): PolicySetInstance {
+		return this._policySet
+	}
+
+	public get policyGroup(): PolicyGroupInstance {
+		return this._policyGroup
 	}
 
 	public get fromDeployer(): {from: string} {
@@ -170,6 +189,39 @@ export class DevProtpcolInstance {
 		await this._propertyGroup.createStorage({from: this._deployer})
 		await this._addressConfig.setPropertyGroup(
 			this._propertyGroup.address,
+			this.fromDeployer
+		)
+	}
+
+	public async generatePolicyFactory(): Promise<void> {
+		this._policyFactory = await generateContract('PolicyFactory').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setPolicyFactory(
+			this._policyFactory.address,
+			this.fromDeployer
+		)
+	}
+
+	public async generatePolicySet(): Promise<void> {
+		this._policySet = await generateContract('PolicySet').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setPolicyGroup(
+			this._policySet.address,
+			this.fromDeployer
+		)
+	}
+
+	public async generatePolicyGroup(): Promise<void> {
+		this._policyGroup = await generateContract('PolicyGroup').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setPolicyGroup(
+			this._policyFactory.address,
 			this.fromDeployer
 		)
 	}
