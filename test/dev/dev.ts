@@ -207,11 +207,20 @@ contract('Dev', ([deployer, user1, user2]) => {
 			await dev.generateLockup()
 			await dev.generateLockupStorage()
 			await dev.generatePropertyFactory()
-			const prop = await dev.propertyFactory.create('test', 'test')
+			await dev.generatePropertyGroup()
+			await dev.generateVoteTimes()
+			await dev.generateVoteTimesStorage()
+			const prop = await dev.propertyFactory
+				.create('test', 'test')
+				.then(res => res.logs.find(x => x.event === 'Create')?.args._property)
 			await dev.dev.mint(user1, 100)
-			await dev.dev.deposit(prop.toString(), 50)
+			await dev.dev.deposit(prop, 50, {from: user1})
 			const balance = await dev.dev.balanceOf(user1)
+
 			expect(balance.toNumber()).to.be.equal(50)
+			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(
+				50
+			)
 		})
 		it('should fail to lockup token when sent from no balance account')
 		it(
