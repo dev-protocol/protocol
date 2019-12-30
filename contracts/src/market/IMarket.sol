@@ -1,25 +1,30 @@
 pragma solidity ^0.5.0;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-
-contract IMarket is UsingConfig {
-	string public schema;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function authenticate(
-		address _prop,
-		string calldata _args1,
-		string calldata _args2,
-		string calldata _args3,
-		string calldata _args4,
-		string calldata _args5,
-		address market
-		// solium-disable-next-line indentation
-	) external returns (address);
-
+contract IMarket {
 	function calculate(address _metrics, uint256 _start, uint256 _end)
 		external
 		returns (bool);
+
+	function authenticate(
+		address _prop,
+		string memory _args1,
+		string memory _args2,
+		string memory _args3,
+		string memory _args4,
+		string memory _args5
+		// solium-disable-next-line indentation
+	) public returns (address);
+
+	function getAuthenticationFee(address _property)
+		private
+		view
+		returns (uint256);
+
+	function authenticatedCallback(address _property)
+		external
+		returns (address);
+
+	function vote(address _property, bool _agree) external;
+
+	function schema() external view returns (string memory);
 }

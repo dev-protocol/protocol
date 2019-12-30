@@ -3,6 +3,7 @@ pragma solidity ^0.5.0;
 import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
@@ -16,7 +17,7 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
-contract Allocator is Killable, Ownable, UsingConfig {
+contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
