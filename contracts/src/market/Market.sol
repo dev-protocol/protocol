@@ -6,13 +6,14 @@ import {AddressValidator} from "contracts/src/common/validate/AddressValidator.s
 import {Property} from "contracts/src/property/Property.sol";
 import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
+import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {MetricsFactory} from "contracts/src/metrics/MetricsFactory.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {Dev} from "contracts/src/dev/Dev.sol";
 
-contract Market is UsingConfig {
+contract Market is UsingConfig, IMarket {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
@@ -44,7 +45,7 @@ contract Market is UsingConfig {
 			config().allocator()
 		);
 
-		return IMarket(behavior).calculate(_metrics, _start, _end);
+		return IMarketBehavior(behavior).calculate(_metrics, _start, _end);
 	}
 
 	function authenticate(
@@ -60,7 +61,7 @@ contract Market is UsingConfig {
 			Property(_prop).author()
 		);
 		return
-			IMarket(behavior).authenticate(
+			IMarketBehavior(behavior).authenticate(
 				_prop,
 				_args1,
 				_args2,
@@ -126,6 +127,6 @@ contract Market is UsingConfig {
 	}
 
 	function schema() external view returns (string memory) {
-		return IMarket(behavior).schema();
+		return IMarketBehavior(behavior).schema();
 	}
 }

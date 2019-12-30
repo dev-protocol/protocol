@@ -1,14 +1,15 @@
 pragma solidity ^0.5.0;
 
-import {IMarket} from "contracts/src/market/IMarket.sol";
+import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";
 import {Market} from "contracts/src/market/Market.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
-contract MarketTest3 is IMarket {
+contract MarketTest3 is IMarketBehavior, UsingConfig {
 	string public schema = "[]";
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public IMarket(_config) {}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function authenticate(
 		address _prop,
@@ -27,7 +28,7 @@ contract MarketTest3 is IMarket {
 		external
 		returns (bool)
 	{
-		Allocator(config().allocator()).calculatedCallback(_metrics, 300);
+		Allocator(config().allocator()).calculatedCallback(_metrics, 100);
 		return true;
 	}
 }
