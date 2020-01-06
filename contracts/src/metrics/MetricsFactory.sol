@@ -20,7 +20,7 @@ contract MetricsFactory is Pausable, UsingConfig {
 			config().marketGroup()
 		);
 
-		Metrics metrics = new Metrics(_property);
+		Metrics metrics = new Metrics(msg.sender, _property);
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
 		address metricsAddress = address(metrics);
 		metricsGroup.addGroup(metricsAddress);
