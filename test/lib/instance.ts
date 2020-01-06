@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-readonly */
 import {
 	AddressConfigInstance,
 	VoteTimesInstance,
