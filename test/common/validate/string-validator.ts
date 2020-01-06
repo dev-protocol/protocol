@@ -1,7 +1,7 @@
-import {DevProtpcolInstance} from './../../lib/instance'
+import {DevProtocolInstance} from './../../lib/instance'
 
 contract('StringValidatorTest', ([deployer]) => {
-	const dev = new DevProtpcolInstance(deployer)
+	const dev = new DevProtocolInstance(deployer)
 	before(async () => {
 		await dev.generateStringValidator()
 	})

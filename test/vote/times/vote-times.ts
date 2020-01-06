@@ -1,4 +1,4 @@
-import {DevProtpcolInstance} from './../../lib/instance'
+import {DevProtocolInstance} from './../../lib/instance'
 import {VoteTimesStorageInstance} from '../../../types/truffle-contracts'
 
 contract(
@@ -11,7 +11,7 @@ contract(
 		dummyProperty,
 		voteCounter
 	]) => {
-		const dev = new DevProtpcolInstance(deployer)
+		const dev = new DevProtocolInstance(deployer)
 		describe('VoteTimes; addVoteTimes, addVoteTimesByProperty, resetVoteTimesByProperty', () => {
 			before(async () => {
 				await dev.generateAddressConfig()

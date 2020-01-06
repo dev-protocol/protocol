@@ -1,10 +1,10 @@
-import {DevProtpcolInstance} from './../../lib/instance'
+import {DevProtocolInstance} from './../../lib/instance'
 import {VoteTimesStorageInstance} from '../../../types/truffle-contracts'
 
 contract(
 	'VoteTimesStorageTest',
 	([deployer, voteTimes, property, property2]) => {
-		const dev = new DevProtpcolInstance(deployer)
+		const dev = new DevProtocolInstance(deployer)
 		before(async () => {
 			await dev.generateAddressConfig()
 			await dev.generateVoteTimesStorage()

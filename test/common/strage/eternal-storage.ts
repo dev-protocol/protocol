@@ -1,7 +1,7 @@
-import {DevProtpcolInstance} from './../../lib/instance'
+import {DevProtocolInstance} from './../../lib/instance'
 
 contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
-	const dev = new DevProtpcolInstance(deployer)
+	const dev = new DevProtocolInstance(deployer)
 	describe('EternalStorage; getter,setter,deleter', () => {
 		// eslint-disable-next-line no-undef
 		const key = web3.utils.keccak256('key')
