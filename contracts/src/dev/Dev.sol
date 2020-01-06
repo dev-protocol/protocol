@@ -14,14 +14,14 @@ contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig {
 		UsingConfig(_config)
 	{}
 
-	function deposit(address _to, uint256 _amount) public returns (bool) {
+	function deposit(address _to, uint256 _amount) external returns (bool) {
 		transfer(_to, _amount);
 		lock(msg.sender, _to, _amount);
 		return true;
 	}
 
 	function depositFrom(address _from, address _to, uint256 _amount)
-		public
+		external
 		returns (bool)
 	{
 		transferFrom(_from, _to, _amount);
@@ -29,7 +29,7 @@ contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig {
 		return true;
 	}
 
-	function fee(address _from, uint256 _amount) public returns (bool) {
+	function fee(address _from, uint256 _amount) external returns (bool) {
 		new AddressValidator().validateGroup(
 			msg.sender,
 			config().marketGroup()
