@@ -1,3 +1,5 @@
+import {validateErrorMessage} from '../lib/error-utils'
+
 contract('PropertyTest', ([deployer, ui]) => {
 	const lockupContract = artifacts.require('Lockup')
 	const propertyFactoryContract = artifacts.require('PropertyFactory')
@@ -67,9 +69,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 			const result = await property
 				.withdrawDev(ui, {from: deployer})
 				.catch((err: Error) => err)
-			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert this address is not proper -- Reason given: this address is not proper.'
-			)
+			validateErrorMessage(result as Error, 'this address is not proper')
 		})
 		it('When lockup value is 0', async () => {})
 		it('When withdrawn successfully', async () => {})

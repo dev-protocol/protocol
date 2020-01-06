@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import {validateErrorMessage} from '../../lib/error-utils'
 
 contract('DecimalsTest', ([deployer]) => {
 	const decimalsTestContract = artifacts.require('DecimalsTest')
@@ -22,9 +23,7 @@ contract('DecimalsTest', ([deployer]) => {
 				.outOf(28, '700000000000000000000000000000000000000')
 				.catch((err: Error) => err)
 			expect(err).to.be.an.instanceof(Error)
-			expect((err as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert the denominator is too big'
-			)
+			validateErrorMessage(err as Error, 'the denominator is too big', false)
 		})
 	})
 })
