@@ -11,7 +11,7 @@ contract DevMigration {
 		next = _next;
 	}
 
-	function migrate() public returns (bool) {
+	function migrate() external returns (bool) {
 		ERC20Burnable _legacy = ERC20Burnable(legacy);
 		ERC20Mintable _next = ERC20Mintable(next);
 		uint256 balance = _legacy.balanceOf(msg.sender);

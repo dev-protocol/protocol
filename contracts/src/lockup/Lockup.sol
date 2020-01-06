@@ -118,7 +118,7 @@ contract Lockup is Pausable, UsingConfig {
 		return calculateInterestAmount(_property, _user).add(pending);
 	}
 
-	function withdrawInterest(address _property) public {
+	function withdrawInterest(address _property) private {
 		uint256 value = calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
