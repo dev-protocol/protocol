@@ -1,4 +1,5 @@
 import {DevProtocolInstance} from './../../lib/instance'
+import {validateErrorMessage} from '../../lib/error-utils'
 
 contract('StringValidatorTest', ([deployer]) => {
 	const dev = new DevProtocolInstance(deployer)
@@ -10,8 +11,10 @@ contract('StringValidatorTest', ([deployer]) => {
 			const result = await dev.stringValidator
 				.validatePropertyName('ab')
 				.catch((err: Error) => err)
-			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert name must be at least 3 and no more than 10 characters'
+			validateErrorMessage(
+				result as Error,
+				'name must be at least 3 and no more than 10 characters',
+				false
 			)
 		})
 		it('3 characters do not cause an error.', async () => {
@@ -24,8 +27,10 @@ contract('StringValidatorTest', ([deployer]) => {
 			const result = await dev.stringValidator
 				.validatePropertyName('abcdefghijk')
 				.catch((err: Error) => err)
-			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert name must be at least 3 and no more than 10 characters'
+			validateErrorMessage(
+				result as Error,
+				'name must be at least 3 and no more than 10 characters',
+				false
 			)
 		})
 	})
@@ -34,8 +39,10 @@ contract('StringValidatorTest', ([deployer]) => {
 			const result = await dev.stringValidator
 				.validatePropertySymbol('ab')
 				.catch((err: Error) => err)
-			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert symbol must be at least 3 and no more than 10 characters'
+			validateErrorMessage(
+				result as Error,
+				'symbol must be at least 3 and no more than 10 characters',
+				false
 			)
 		})
 		it('3 characters do not cause an error.', async () => {
@@ -48,8 +55,10 @@ contract('StringValidatorTest', ([deployer]) => {
 			const result = await dev.stringValidator
 				.validatePropertySymbol('abcdefghijk')
 				.catch((err: Error) => err)
-			expect((result as Error).message).to.be.equal(
-				'Returned error: VM Exception while processing transaction: revert symbol must be at least 3 and no more than 10 characters'
+			validateErrorMessage(
+				result as Error,
+				'symbol must be at least 3 and no more than 10 characters',
+				false
 			)
 		})
 	})
