@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import {validateErrorMessage} from '../../lib/error-utils'
+import {validateErrorMessage} from '../../test-lib/error-utils'
 
 contract('DecimalsTest', ([deployer]) => {
 	const decimalsTestContract = artifacts.require('DecimalsTest')

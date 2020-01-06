@@ -3,8 +3,6 @@ import {
 	VoteTimesInstance,
 	VoteTimesStorageInstance,
 	PropertyGroupInstance,
-	EternalStorageInstance,
-	StringValidatorInstance,
 	DevInstance,
 	LockupInstance,
 	LockupStorageInstance,
@@ -23,8 +21,6 @@ export class DevProtocolInstance {
 	private readonly _deployer: string
 
 	private _addressConfig!: AddressConfigInstance
-	private _eternalStorage!: EternalStorageInstance
-	private _stringValidator!: StringValidatorInstance
 	private _dev!: DevInstance
 	private _lockup!: LockupInstance
 	private _lockupStorage!: LockupStorageInstance
@@ -48,14 +44,6 @@ export class DevProtocolInstance {
 
 	public get addressConfig(): AddressConfigInstance {
 		return this._addressConfig
-	}
-
-	public get eternalStorage(): EternalStorageInstance {
-		return this._eternalStorage
-	}
-
-	public get stringValidator(): StringValidatorInstance {
-		return this._stringValidator
 	}
 
 	public get dev(): DevInstance {
@@ -109,16 +97,6 @@ export class DevProtocolInstance {
 	public async generateAddressConfig(): Promise<void> {
 		const instance = contract('AddressConfig')
 		this._addressConfig = await instance.new(this.fromDeployer)
-	}
-
-	public async generateEternalStorage(): Promise<void> {
-		const instance = contract('EternalStorage')
-		this._eternalStorage = await instance.new(this.fromDeployer)
-	}
-
-	public async generateStringValidator(): Promise<void> {
-		const instance = contract('StringValidator')
-		this._stringValidator = await instance.new(this.fromDeployer)
 	}
 
 	public async generateDev(): Promise<void> {
