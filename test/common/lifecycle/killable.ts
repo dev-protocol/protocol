@@ -3,7 +3,7 @@ import {validateErrorMessage} from '../../test-lib/error-utils'
 contract('KillableTest', ([deployer, user]) => {
 	const killableTestContract = artifacts.require('KillableTest')
 	describe('Killable; kill', () => {
-		it('コントラクトがkillされて関数が実行d系なくなる', async () => {
+		it('The contract is killed and the function cannot be executed', async () => {
 			const killableTest = await killableTestContract.new({
 				from: deployer
 			})
@@ -15,7 +15,7 @@ contract('KillableTest', ([deployer, user]) => {
 				"Returned values aren't valid, did it run Out of Gas?"
 			)
 		})
-		it('デプロイしたアカウントしかkillできない', async () => {
+		it('Only deployed accounts can be killed', async () => {
 			const killableTest = await killableTestContract.new({
 				from: deployer
 			})
