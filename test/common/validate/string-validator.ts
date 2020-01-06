@@ -1,14 +1,17 @@
-import {DevProtocolInstance} from './../../lib/instance'
-import {validateErrorMessage} from '../../lib/error-utils'
+import {validateErrorMessage} from '../../test-lib/error-utils'
+import {StringValidatorInstance} from '../../../types/truffle-contracts'
 
 contract('StringValidatorTest', ([deployer]) => {
-	const dev = new DevProtocolInstance(deployer)
+	let stringValidator: StringValidatorInstance
 	before(async () => {
-		await dev.generateStringValidator()
+		const stringValidatorContract = artifacts.require('StringValidator')
+		stringValidator = await stringValidatorContract.new({
+			from: deployer
+		})
 	})
 	describe('StringValidator; validatePropertyName', () => {
 		it('2 characters cause an error.', async () => {
-			const result = await dev.stringValidator
+			const result = await stringValidator
 				.validatePropertyName('ab')
 				.catch((err: Error) => err)
 			validateErrorMessage(
@@ -18,13 +21,13 @@ contract('StringValidatorTest', ([deployer]) => {
 			)
 		})
 		it('3 characters do not cause an error.', async () => {
-			await dev.stringValidator.validatePropertyName('abc')
+			await stringValidator.validatePropertyName('abc')
 		})
 		it('10 characters cause an error.', async () => {
-			await dev.stringValidator.validatePropertyName('abcdefghij')
+			await stringValidator.validatePropertyName('abcdefghij')
 		})
 		it('11 characters cause an error.', async () => {
-			const result = await dev.stringValidator
+			const result = await stringValidator
 				.validatePropertyName('abcdefghijk')
 				.catch((err: Error) => err)
 			validateErrorMessage(
@@ -36,7 +39,7 @@ contract('StringValidatorTest', ([deployer]) => {
 	})
 	describe('StringValidator; validatePropertySymbol', () => {
 		it('2 characters cause an error.', async () => {
-			const result = await dev.stringValidator
+			const result = await stringValidator
 				.validatePropertySymbol('ab')
 				.catch((err: Error) => err)
 			validateErrorMessage(
@@ -46,13 +49,13 @@ contract('StringValidatorTest', ([deployer]) => {
 			)
 		})
 		it('3 characters do not cause an error.', async () => {
-			await dev.stringValidator.validatePropertySymbol('abc')
+			await stringValidator.validatePropertySymbol('abc')
 		})
 		it('10 characters cause an error.', async () => {
-			await dev.stringValidator.validatePropertySymbol('abcdefghij')
+			await stringValidator.validatePropertySymbol('abcdefghij')
 		})
 		it('11 characters cause an error.', async () => {
-			const result = await dev.stringValidator
+			const result = await stringValidator
 				.validatePropertySymbol('abcdefghijk')
 				.catch((err: Error) => err)
 			validateErrorMessage(

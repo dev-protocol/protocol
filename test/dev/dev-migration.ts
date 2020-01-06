@@ -1,4 +1,4 @@
-import {DevProtocolInstance} from './../lib/instance'
+import {DevProtocolInstance} from '../test-lib/instance'
 import {DevInstance} from '../../types/truffle-contracts'
 
 contract('DevMigration', ([deployer, user1, user2]) => {

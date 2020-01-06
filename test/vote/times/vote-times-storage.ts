@@ -1,4 +1,4 @@
-import {DevProtocolInstance} from './../../lib/instance'
+import {DevProtocolInstance} from '../../test-lib/instance'
 import {VoteTimesStorageInstance} from '../../../types/truffle-contracts'
 
 contract(
