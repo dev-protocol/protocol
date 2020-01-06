@@ -1,10 +1,10 @@
-import {DevProtpcolInstance} from './../lib/instance'
+import {DevProtocolInstance} from './../lib/instance'
 import {DevInstance} from '../../types/truffle-contracts'
 
 contract('DevMigration', ([deployer, user1, user2]) => {
 	const devMigrationContract = artifacts.require('DevMigration')
 	const createDev = async (): Promise<DevInstance> => {
-		const dev = new DevProtpcolInstance(deployer)
+		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
 		return dev.dev

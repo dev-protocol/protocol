@@ -1,7 +1,7 @@
-import {DevProtpcolInstance} from './../../lib/instance'
+import {DevProtocolInstance} from './../../lib/instance'
 
 contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
-	const dev = new DevProtpcolInstance(deployer)
+	const dev = new DevProtocolInstance(deployer)
 	describe('AddressConfig; getter/setter', () => {
 		before(async () => {
 			await dev.generateAddressConfig()

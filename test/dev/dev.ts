@@ -1,9 +1,9 @@
-import {DevProtpcolInstance} from './../lib/instance'
+import {DevProtocolInstance} from './../lib/instance'
 import {DevInstance} from '../../types/truffle-contracts'
 
 contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 	const createDev = async (): Promise<DevInstance> => {
-		const dev = new DevProtpcolInstance(deployer)
+		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
 		return dev.dev
@@ -200,8 +200,8 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		})
 	})
 	describe('Dev; deposit', () => {
-		const generateEnv = async (): Promise<DevProtpcolInstance> => {
-			const dev = new DevProtpcolInstance(deployer)
+		const generateEnv = async (): Promise<DevProtocolInstance> => {
+			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressConfig()
 			await dev.generateDev()
 			await dev.generateLockup()
@@ -213,7 +213,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			return dev
 		}
 
-		const createProperty = async (dev: DevProtpcolInstance): Promise<string> =>
+		const createProperty = async (dev: DevProtocolInstance): Promise<string> =>
 			dev.propertyFactory
 				.create('test', 'test')
 				.then(res => res.logs.find(x => x.event === 'Create')?.args._property)
@@ -348,8 +348,8 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		})
 	})
 	describe('Dev; fee', () => {
-		const generateEnv = async (): Promise<DevProtpcolInstance> => {
-			const dev = new DevProtpcolInstance(deployer)
+		const generateEnv = async (): Promise<DevProtocolInstance> => {
+			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressConfig()
 			await dev.generateDev()
 			await dev.generateMarketGroup()

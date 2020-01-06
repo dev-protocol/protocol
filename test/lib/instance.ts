@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-readonly */
 import {
 	AddressConfigInstance,
 	VoteTimesInstance,
@@ -20,7 +19,7 @@ import {
 
 const contract = artifacts.require
 
-export class DevProtpcolInstance {
+export class DevProtocolInstance {
 	private readonly _deployer: string
 
 	private _addressConfig!: AddressConfigInstance
