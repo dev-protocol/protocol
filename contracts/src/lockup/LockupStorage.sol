@@ -98,6 +98,8 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		address _from,
 		uint256 _value
 	) external {
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
+
 		bytes32 key = getWithdrawalStatusKey(_property, _from);
 		eternalStorage().setUint(key, _value);
 	}
