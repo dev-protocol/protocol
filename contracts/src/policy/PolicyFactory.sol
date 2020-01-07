@@ -28,6 +28,8 @@ contract PolicyFactory is Pausable, UsingConfig {
 		}
 		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
 		policyGroup.addGroup(policyAddress);
+		PolicySet policySet = PolicySet(config().policySet());
+		policySet.addSet(policyAddress);
 		return policyAddress;
 	}
 

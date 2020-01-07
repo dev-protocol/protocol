@@ -12,14 +12,14 @@ contract PolicySet is UsingConfig, UsingStorage {
 	function addSet(address _addr) external {
 		new AddressValidator().validateAddress(
 			msg.sender,
-			config().policyGroup()
+			config().policyFactory()
 		);
 
-		uint256 index = eternalStorage().getUint(getPlicySetIndex());
+		uint256 index = eternalStorage().getUint(getPlicySetIndexKey());
 		bytes32 key = getIndexKey(index);
 		eternalStorage().setAddress(key, _addr);
 		index++;
-		eternalStorage().setUint(getPlicySetIndex(), index);
+		eternalStorage().setUint(getPlicySetIndexKey(), index);
 	}
 
 	function deleteAll() external {
@@ -28,16 +28,16 @@ contract PolicySet is UsingConfig, UsingStorage {
 			config().policyFactory()
 		);
 
-		uint256 index = eternalStorage().getUint(getPlicySetIndex());
+		uint256 index = eternalStorage().getUint(getPlicySetIndexKey());
 		for (uint256 i = 0; i < index; i++) {
-			bytes32 key = getIndexKey(index);
+			bytes32 key = getIndexKey(i);
 			eternalStorage().setAddress(key, address(0));
 		}
-		eternalStorage().setUint(getPlicySetIndex(), 0);
+		eternalStorage().setUint(getPlicySetIndexKey(), 0);
 	}
 
 	function count() external view returns (uint256) {
-		return eternalStorage().getUint(getPlicySetIndex());
+		return eternalStorage().getUint(getPlicySetIndexKey());
 	}
 
 	function get(uint256 _index) external view returns (address) {
@@ -49,7 +49,7 @@ contract PolicySet is UsingConfig, UsingStorage {
 		return keccak256(abi.encodePacked("_index", _index));
 	}
 
-	function getPlicySetIndex() private pure returns (bytes32) {
+	function getPlicySetIndexKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_policySetIndex"));
 	}
 }
