@@ -21,9 +21,7 @@ contract PolicyFactory is Pausable, UsingConfig {
 		Policy policy = new Policy(address(config()), _newPolicyAddress);
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress);
-		PolicySet policySet = PolicySet(config().policySet());
-		policySet.addSet(policyAddress);
-		if (policySet.count() == 1) {
+		if (config().policy() == address(0)) {
 			config().setPolicy(policyAddress);
 		} else {
 			VoteTimes(config().voteTimes()).addVoteTime();
