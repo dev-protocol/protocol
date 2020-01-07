@@ -1,30 +1,24 @@
+import {DevProtocolInstance} from '../test-lib/instance'
+
 contract(
 	'MarketGroupTest',
 	([deployer, marketFactory, market, dummyMarket]) => {
-		const marketGroupContract = artifacts.require('MarketGroup')
-		const addressConfigContract = artifacts.require('AddressConfig')
+		const dev = new DevProtocolInstance(deployer)
 		describe('MarketGroup validateMarketAddress', () => {
-			let marketGroup: any
-			beforeEach(async () => {
-				const addressConfig = await addressConfigContract.new({
+			before(async () => {
+				await dev.generateAddressConfig()
+				await dev.generateMarketGroup()
+				await dev.addressConfig.setMarketFactory(marketFactory, {
 					from: deployer
 				})
-				marketGroup = await marketGroupContract.new(addressConfig.address, {
-					from: deployer
-				})
-				await marketGroup.createStorage()
-				await addressConfig.setMarketGroup(marketGroup.address, {
-					from: deployer
-				})
-				await addressConfig.setMarketFactory(marketFactory, {from: deployer})
-				await marketGroup.addGroup(market, {from: marketFactory})
+				await dev.marketGroup.addGroup(market, {from: marketFactory})
 			})
 			it('When a market address is specified', async () => {
-				const result = await marketGroup.isGroup(market)
+				const result = await dev.marketGroup.isGroup(market)
 				expect(result).to.be.equal(true)
 			})
 			it('When the market address is not specified', async () => {
-				const result = await marketGroup.isGroup(dummyMarket)
+				const result = await dev.marketGroup.isGroup(dummyMarket)
 				expect(result).to.be.equal(false)
 			})
 		})

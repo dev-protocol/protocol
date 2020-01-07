@@ -229,6 +229,7 @@ export class DevProtocolInstance {
 			this._marketGroup.address,
 			this.fromDeployer
 		)
+		await this._marketGroup.createStorage(this.fromDeployer)
 	}
 
 	public async generateDecimals(): Promise<DecimalsInstance> {
