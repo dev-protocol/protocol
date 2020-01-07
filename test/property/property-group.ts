@@ -3,7 +3,13 @@ import {validateErrorMessage} from '../test-lib/error-utils'
 
 contract(
 	'PrpertyGroupTest',
-	([deployer, propertyFactory, property, dummyProperty]) => {
+	([
+		deployer,
+		propertyFactory,
+		dummyPropertyFactory,
+		property,
+		dummyProperty
+	]) => {
 		const dev = new DevProtocolInstance(deployer)
 		describe('PrpertyGroup; addGroup, isGroup', () => {
 			before(async () => {
@@ -31,6 +37,14 @@ contract(
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result as Error, 'already enabled')
+			})
+			it('Can not execute addGroup without propertyFactory address', async () => {
+				const result = await dev.propertyGroup
+					.addGroup(dummyProperty, {
+						from: dummyPropertyFactory
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'this address is not proper')
 			})
 		})
 	}

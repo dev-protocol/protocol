@@ -3,7 +3,7 @@ import {validateErrorMessage} from '../test-lib/error-utils'
 
 contract(
 	'MarketGroupTest',
-	([deployer, marketFactory, market, dummyMarket]) => {
+	([deployer, marketFactory, dummyMarketFactory, market, dummyMarket]) => {
 		const dev = new DevProtocolInstance(deployer)
 		describe('MarketGroup addGroup, isGroup', () => {
 			before(async () => {
@@ -29,6 +29,14 @@ contract(
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result as Error, 'already enabled')
+			})
+			it('Can not execute addGroup without marketFactory address', async () => {
+				const result = await dev.marketGroup
+					.addGroup(dummyMarket, {
+						from: dummyMarketFactory
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'this address is not proper')
 			})
 		})
 	}
