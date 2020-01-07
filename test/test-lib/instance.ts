@@ -198,7 +198,7 @@ export class DevProtocolInstance {
 			this.addressConfig.address,
 			this.fromDeployer
 		)
-		await this._policySet.createStorage({from: this._deployer})
+		await this._policySet.createStorage(this.fromDeployer)
 		await this._addressConfig.setPolicySet(
 			this._policySet.address,
 			this.fromDeployer
