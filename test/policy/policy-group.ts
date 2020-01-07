@@ -3,7 +3,7 @@ import {validateErrorMessage} from '../test-lib/error-utils'
 
 contract(
 	'PolicyGroupTest',
-	([deployer, policyFactory, policy, dummyPolicy]) => {
+	([deployer, policyFactory, dummyPolicyFactory, policy, dummyPolicy]) => {
 		const dev = new DevProtocolInstance(deployer)
 		before(async () => {
 			await dev.generateAddressConfig()
@@ -30,6 +30,14 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result as Error, 'already enabled')
 			})
+			it('Can not execute addGroup without policyFactory address', async () => {
+				const result = await dev.policyGroup
+					.addGroup(dummyPolicy, {
+						from: dummyPolicyFactory
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'this address is not proper')
+			})
 		})
 		describe('PolicyGroup; deleteGroup', () => {
 			it('Existing addresses can be deleted', async () => {
@@ -42,6 +50,14 @@ contract(
 					.deleteGroup(policy, {from: policyFactory})
 					.catch((err: Error) => err)
 				validateErrorMessage(result as Error, 'not enabled')
+			})
+			it('Can not execute deleteGroup without policyFactory address', async () => {
+				const result = await dev.policyGroup
+					.deleteGroup(policy, {
+						from: dummyPolicyFactory
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'this address is not proper')
 			})
 		})
 	}

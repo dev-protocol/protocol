@@ -3,7 +3,14 @@ import {validateErrorMessage} from '../test-lib/error-utils'
 
 contract(
 	'MetricsGroupTest',
-	([deployer, metricsFactory, metrics1, metrics2, dummyMetrics]) => {
+	([
+		deployer,
+		metricsFactory,
+		dummyMetricsFactory,
+		metrics1,
+		metrics2,
+		dummyMetrics
+	]) => {
 		const dev = new DevProtocolInstance(deployer)
 		before(async () => {
 			await dev.generateAddressConfig()
@@ -33,6 +40,14 @@ contract(
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result as Error, 'already enabled')
+			})
+			it('Can not execute addGroup without metricsFactory address', async () => {
+				const result = await dev.metricsGroup
+					.addGroup(dummyMetrics, {
+						from: dummyMetricsFactory
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'this address is not proper')
 			})
 		})
 		describe('MetricsGroup; totalIssuedMetrics', () => {
