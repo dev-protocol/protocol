@@ -380,7 +380,6 @@ contract(
 			it('burn token as a fee', async () => {
 				const dev = await generateEnv()
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				await dev.marketGroup.createStorage()
 				await dev.marketGroup.addGroup(market, {from: marketFactory})
 				await dev.dev.mint(user1, 100)
 				await dev.dev.fee(user1, 1, {from: market})
@@ -390,7 +389,6 @@ contract(
 			it('should fail to burn when sent from no balance account', async () => {
 				const dev = await generateEnv()
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				await dev.marketGroup.createStorage()
 				await dev.marketGroup.addGroup(market, {from: marketFactory})
 				const balance = await dev.dev.balanceOf(user1)
 				const res = await dev.dev
@@ -402,7 +400,6 @@ contract(
 			it('should fail to burn when sent from an insufficient balance account', async () => {
 				const dev = await generateEnv()
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				await dev.marketGroup.createStorage()
 				await dev.marketGroup.addGroup(market, {from: marketFactory})
 				await dev.dev.mint(user1, 100)
 				const res = await dev.dev
@@ -415,7 +412,6 @@ contract(
 			it('should fail to burn when sent from other than market contract', async () => {
 				const dev = await generateEnv()
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				await dev.marketGroup.createStorage()
 				await dev.marketGroup.addGroup(market, {from: marketFactory})
 				await dev.dev.mint(user1, 100)
 				const res = await dev.dev
