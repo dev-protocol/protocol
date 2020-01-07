@@ -12,7 +12,7 @@ contract PolicySet is UsingConfig, UsingStorage {
 	function addSet(address _addr) external {
 		new AddressValidator().validateAddress(
 			msg.sender,
-			config().policyFactory()
+			config().policyGroup()
 		);
 
 		uint256 index = eternalStorage().getUint(getPlicySetIndex());
