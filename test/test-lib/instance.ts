@@ -12,7 +12,8 @@ import {
 	PolicySetInstance,
 	PolicyGroupInstance,
 	MarketFactoryInstance,
-	MarketGroupInstance
+	MarketGroupInstance,
+	MetricsGroupInstance
 } from '../../types/truffle-contracts'
 
 const contract = artifacts.require
@@ -33,6 +34,7 @@ export class DevProtocolInstance {
 	private _policyGroup!: PolicyGroupInstance
 	private _marketFactory!: MarketFactoryInstance
 	private _marketGroup!: MarketGroupInstance
+	private _metricsGroup!: MetricsGroupInstance
 
 	constructor(deployer: string) {
 		this._deployer = deployer
@@ -92,6 +94,10 @@ export class DevProtocolInstance {
 
 	public get marketGroup(): MarketGroupInstance {
 		return this._marketGroup
+	}
+
+	public get metricsGroup(): MetricsGroupInstance {
+		return this._metricsGroup
 	}
 
 	public async generateAddressConfig(): Promise<void> {
@@ -230,6 +236,18 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this._marketGroup.createStorage(this.fromDeployer)
+	}
+
+	public async generateMetricsGroup(): Promise<void> {
+		this._metricsGroup = await contract('MetricsGroup').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setMetricsGroup(
+			this._metricsGroup.address,
+			this.fromDeployer
+		)
+		await this._metricsGroup.createStorage(this.fromDeployer)
 	}
 
 	public async generateDecimals(): Promise<DecimalsInstance> {

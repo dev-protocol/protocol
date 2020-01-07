@@ -15,13 +15,14 @@ contract MetricsGroup is UsingConfig, UsingStorage, IGroup {
 			config().metricsFactory()
 		);
 
+		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		totalCount++;
 		eternalStorage().setUint(getTotalCountKey(), totalCount);
 	}
 
-	function isGroup(address _addr) external view returns (bool) {
+	function isGroup(address _addr) public view returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 

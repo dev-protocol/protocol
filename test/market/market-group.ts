@@ -4,7 +4,7 @@ contract(
 	'MarketGroupTest',
 	([deployer, marketFactory, market, dummyMarket]) => {
 		const dev = new DevProtocolInstance(deployer)
-		describe('MarketGroup validateMarketAddress', () => {
+		describe('MarketGroup addGroup, isGroup', () => {
 			before(async () => {
 				await dev.generateAddressConfig()
 				await dev.generateMarketGroup()
