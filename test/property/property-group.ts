@@ -24,7 +24,7 @@ contract(
 				const result = await dev.propertyGroup.isGroup(dummyProperty)
 				expect(result).to.be.equal(false)
 			})
-			it('Existing metrics cannot be added', async () => {
+			it('Existing property cannot be added', async () => {
 				const result = await dev.propertyGroup
 					.addGroup(property, {
 						from: propertyFactory

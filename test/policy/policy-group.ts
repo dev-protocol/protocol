@@ -1,5 +1,48 @@
-contract('PolicyGroupTest', () => {
-	describe('PolicyGroup; addGroup', () => {})
-	describe('PolicyGroup; isGroup', () => {})
-	describe('PolicyGroup; deleteGroup', () => {})
-})
+import {DevProtocolInstance} from '../test-lib/instance'
+import {validateErrorMessage} from '../test-lib/error-utils'
+
+contract(
+	'PolicyGroupTest',
+	([deployer, policyFactory, policy, dummyPolicy]) => {
+		const dev = new DevProtocolInstance(deployer)
+		before(async () => {
+			await dev.generateAddressConfig()
+			await dev.generatePolicyGroup()
+			await dev.addressConfig.setPolicyFactory(policyFactory, {
+				from: deployer
+			})
+			await dev.policyGroup.addGroup(policy, {from: policyFactory})
+		})
+		describe('PolicyGroup; addGroup, isGroup', () => {
+			it('When a policy address is specified', async () => {
+				const result = await dev.policyGroup.isGroup(policy)
+				expect(result).to.be.equal(true)
+			})
+			it('When the policy address is not specified', async () => {
+				const result = await dev.policyGroup.isGroup(dummyPolicy)
+				expect(result).to.be.equal(false)
+			})
+			it('Existing policy cannot be added', async () => {
+				const result = await dev.policyGroup
+					.addGroup(policy, {
+						from: policyFactory
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'already enabled')
+			})
+		})
+		describe('PolicyGroup; deleteGroup', () => {
+			it('Existing addresses can be deleted', async () => {
+				await dev.policyGroup.deleteGroup(policy, {from: policyFactory})
+				const result = await dev.policyGroup.isGroup(policy)
+				expect(result).to.be.equal(false)
+			})
+			it('Non-existent addresses cannot be deleted', async () => {
+				const result = await dev.policyGroup
+					.deleteGroup(policy, {from: policyFactory})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'not enabled')
+			})
+		})
+	}
+)
