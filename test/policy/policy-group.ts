@@ -8,6 +8,7 @@ contract(
 		before(async () => {
 			await dev.generateAddressConfig()
 			await dev.generatePolicyGroup()
+			await dev.generatePolicySet()
 			await dev.addressConfig.setPolicyFactory(policyFactory, {
 				from: deployer
 			})
