@@ -22,7 +22,7 @@ contract(
 				const result = await dev.marketGroup.isGroup(dummyMarket)
 				expect(result).to.be.equal(false)
 			})
-			it('Existing metrics cannot be added', async () => {
+			it('Existing market cannot be added', async () => {
 				const result = await dev.marketGroup
 					.addGroup(market, {
 						from: marketFactory

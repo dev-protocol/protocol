@@ -14,6 +14,8 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 			msg.sender,
 			config().policyFactory()
 		);
+
+		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
 	}
 
@@ -22,10 +24,12 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 			msg.sender,
 			config().policyFactory()
 		);
+
+		require(isGroup(_addr), "not enabled");
 		return eternalStorage().setBool(getGroupKey(_addr), false);
 	}
 
-	function isGroup(address _addr) external view returns (bool) {
+	function isGroup(address _addr) public view returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 }
