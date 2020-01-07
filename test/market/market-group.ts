@@ -1,4 +1,5 @@
 import {DevProtocolInstance} from '../test-lib/instance'
+import {validateErrorMessage} from '../test-lib/error-utils'
 
 contract(
 	'MarketGroupTest',
@@ -20,6 +21,14 @@ contract(
 			it('When the market address is not specified', async () => {
 				const result = await dev.marketGroup.isGroup(dummyMarket)
 				expect(result).to.be.equal(false)
+			})
+			it('Existing metrics cannot be added', async () => {
+				const result = await dev.marketGroup
+					.addGroup(market, {
+						from: marketFactory
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'already enabled')
 			})
 		})
 	}
