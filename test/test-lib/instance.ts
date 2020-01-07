@@ -202,6 +202,7 @@ export class DevProtocolInstance {
 			this._policySet.address,
 			this.fromDeployer
 		)
+		await this._policySet.createStorage(this.fromDeployer)
 	}
 
 	public async generatePolicyGroup(): Promise<void> {
