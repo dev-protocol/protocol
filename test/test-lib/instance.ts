@@ -1,5 +1,7 @@
 import {
 	AddressConfigInstance,
+	AllocatorInstance,
+	AllocatorStorageInstance,
 	VoteTimesInstance,
 	VoteTimesStorageInstance,
 	PropertyGroupInstance,
@@ -22,6 +24,8 @@ export class DevProtocolInstance {
 	private readonly _deployer: string
 
 	private _addressConfig!: AddressConfigInstance
+	private _allocator!: AllocatorInstance
+	private _allocatorStorage!: AllocatorStorageInstance
 	private _dev!: DevInstance
 	private _lockup!: LockupInstance
 	private _lockupStorage!: LockupStorageInstance
@@ -46,6 +50,14 @@ export class DevProtocolInstance {
 
 	public get addressConfig(): AddressConfigInstance {
 		return this._addressConfig
+	}
+
+	public get allocator(): AllocatorInstance {
+		return this._allocator
+	}
+
+	public get allocatorStorage(): AllocatorStorageInstance {
+		return this._allocatorStorage
 	}
 
 	public get dev(): DevInstance {
@@ -111,6 +123,32 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this._addressConfig.setToken(this._dev.address, this.fromDeployer)
+	}
+
+	public async generateAllocator(): Promise<void> {
+		this._allocator = await (async x => {
+			;(x as any).link(
+				'Decimals',
+				await this.generateDecimals().then(x => x.address)
+			)
+			return x.new(this.addressConfig.address, this.fromDeployer)
+		})(contract('Allocator'))
+		await this._addressConfig.setAllocator(
+			this._allocator.address,
+			this.fromDeployer
+		)
+	}
+
+	public async generateAllocatorStorage(): Promise<void> {
+		this._allocatorStorage = await contract('AllocatorStorage').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setAllocatorStorage(
+			this._allocatorStorage.address,
+			this.fromDeployer
+		)
+		await this._allocatorStorage.createStorage(this.fromDeployer)
 	}
 
 	public async generateLockup(): Promise<void> {

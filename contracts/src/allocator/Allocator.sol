@@ -37,7 +37,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 			getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
-		getStorage().setAllocationBlockNumberWithNow(_metrics);
+		getStorage().setLastBlockNumber(_metrics, block.number);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) external {
@@ -164,7 +164,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 			notTargetBlockNumber < block.number,
 			"outside the target period"
 		);
-		getStorage().setAllocationBlockNumber(_metrics, notTargetBlockNumber);
+		getStorage().setLastBlockNumber(_metrics, notTargetBlockNumber);
 		voteTimes.resetVoteTimesByProperty(property);
 	}
 
@@ -175,7 +175,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 		uint256 blockNumber = getStorage().getLastBlockNumber(_metrics);
 		uint256 baseBlockNumber = getStorage().getBaseBlockNumber();
 		if (baseBlockNumber == 0) {
-			getStorage().setBaseBlockNumber();
+			getStorage().setBaseBlockNumber(block.number);
 		}
 		uint256 lastAllocationBlockNumber = blockNumber > 0
 			? blockNumber
