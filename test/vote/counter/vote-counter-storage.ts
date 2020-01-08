@@ -21,12 +21,9 @@ contract(
 				expect(result).to.be.equal(false)
 			})
 			it('The set value can be taken as it is.', async () => {
-				await dev.voteCounterStorage.setAlreadyVoteFlg(
-					user,
-					sender,
-					property,
-					{from: voteCounter}
-				)
+				await dev.voteCounterStorage.setAlreadyVoteFlg(user, sender, property, {
+					from: voteCounter
+				})
 				const result = await dev.voteCounterStorage.getAlreadyVoteFlg(
 					user,
 					sender,
@@ -44,22 +41,18 @@ contract(
 		})
 		describe('VoteCounterStorage; getAgreeCount, setAgreeCount', () => {
 			it('Initial value is 0.', async () => {
-				const result = await dev.voteCounterStorage.getAgreeCount(
-					sender,
-					{from: voteCounter}
-				)
+				const result = await dev.voteCounterStorage.getAgreeCount(sender, {
+					from: voteCounter
+				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
-				await dev.voteCounterStorage.setAgreeCount(
-					sender,
-					10,
-					{from: voteCounter}
-				)
-				const result = await dev.voteCounterStorage.getAgreeCount(
-					sender,
-					{from: voteCounter}
-				)
+				await dev.voteCounterStorage.setAgreeCount(sender, 10, {
+					from: voteCounter
+				})
+				const result = await dev.voteCounterStorage.getAgreeCount(sender, {
+					from: voteCounter
+				})
 				expect(result.toNumber()).to.be.equal(10)
 			})
 			it('Cannot rewrite data from other than votecounter.', async () => {
@@ -71,22 +64,18 @@ contract(
 		})
 		describe('VoteCounterStorage; getOppositeCount, setOppositeCount', () => {
 			it('Initial value is 0.', async () => {
-				const result = await dev.voteCounterStorage.getOppositeCount(
-					sender,
-					{from: voteCounter}
-				)
+				const result = await dev.voteCounterStorage.getOppositeCount(sender, {
+					from: voteCounter
+				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
-				await dev.voteCounterStorage.setOppositeCount(
-					sender,
-					10,
-					{from: voteCounter}
-				)
-				const result = await dev.voteCounterStorage.getOppositeCount(
-					sender,
-					{from: voteCounter}
-				)
+				await dev.voteCounterStorage.setOppositeCount(sender, 10, {
+					from: voteCounter
+				})
+				const result = await dev.voteCounterStorage.getOppositeCount(sender, {
+					from: voteCounter
+				})
 				expect(result.toNumber()).to.be.equal(10)
 			})
 			it('Cannot rewrite data from other than votecounter.', async () => {
