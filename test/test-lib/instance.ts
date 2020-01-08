@@ -2,6 +2,7 @@ import {
 	AddressConfigInstance,
 	AllocatorInstance,
 	AllocatorStorageInstance,
+	VoteCounterStorageInstance,
 	VoteTimesInstance,
 	VoteTimesStorageInstance,
 	PropertyGroupInstance,
@@ -30,6 +31,7 @@ export class DevProtocolInstance {
 	private _lockup!: LockupInstance
 	private _lockupStorage!: LockupStorageInstance
 	private _propertyFactory!: PropertyFactoryInstance
+	private _voteCounterStorage!: VoteCounterStorageInstance
 	private _voteTimes!: VoteTimesInstance
 	private _voteTimesStorage!: VoteTimesStorageInstance
 	private _propertyGroup!: PropertyGroupInstance
@@ -74,6 +76,10 @@ export class DevProtocolInstance {
 
 	public get propertyFactory(): PropertyFactoryInstance {
 		return this._propertyFactory
+	}
+
+	public get voteCounterStorage(): VoteCounterStorageInstance {
+		return this._voteCounterStorage
 	}
 
 	public get voteTimes(): VoteTimesInstance {
@@ -183,6 +189,18 @@ export class DevProtocolInstance {
 			this._propertyFactory.address,
 			this.fromDeployer
 		)
+	}
+
+	public async generateVoteCounterStorage(): Promise<void> {
+		this._voteCounterStorage = await contract('VoteCounterStorage').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setVoteCounterStorage(
+			this._voteCounterStorage.address,
+			this.fromDeployer
+		)
+		await this._voteCounterStorage.createStorage(this.fromDeployer)
 	}
 
 	public async generateVoteTimes(): Promise<void> {
