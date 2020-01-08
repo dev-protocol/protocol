@@ -7,10 +7,8 @@ import {AddressValidator} from "contracts/src/common/validate/AddressValidator.s
 contract AllocatorStorage is UsingStorage, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
-	// Allocation Block Number
-	function setAllocationBlockNumber(address _metrics, uint256 _blocks)
-		external
-	{
+	// Last Block Number
+	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().allocator()
@@ -19,42 +17,38 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 		eternalStorage().setUint(getLastBlockNumberKey(_metrics), _blocks);
 	}
 
-	function setAllocationBlockNumberWithNow(address _metrics) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
-		);
-
-		eternalStorage().setUint(getLastBlockNumberKey(_metrics), block.number);
+	function getLastBlockNumber(address _metrics)
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getLastBlockNumberKey(_metrics));
 	}
 
-	function setBaseBlockNumber() external {
+	function getLastBlockNumberKey(address _metrics)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_lastBlockNumber", _metrics));
+	}
+
+	// Base Block Number
+	function setBaseBlockNumber(uint256 _blockNumber) external {
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().allocator()
 		);
 
-		eternalStorage().setUint(getBaseBlockNumberKey(), block.number);
+		eternalStorage().setUint(getBaseBlockNumberKey(), _blockNumber);
 	}
 
 	function getBaseBlockNumber() external view returns (uint256) {
 		return eternalStorage().getUint(getBaseBlockNumberKey());
 	}
 
-	function getLastBlockNumber(address _addr) external view returns (uint256) {
-		return eternalStorage().getUint(getLastBlockNumberKey(_addr));
-	}
-
 	function getBaseBlockNumberKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_baseBlockNumber"));
-	}
-
-	function getLastBlockNumberKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_lastBlockNumber", _addr));
 	}
 
 	// PendingIncrement
@@ -75,12 +69,12 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 		return eternalStorage().getBool(getPendingIncrementKey(_metrics));
 	}
 
-	function getPendingIncrementKey(address _addr)
+	function getPendingIncrementKey(address _metrics)
 		private
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_pendingIncrement", _addr));
+		return keccak256(abi.encodePacked("_pendingIncrement", _metrics));
 	}
 
 	// LastAllocationBlockEachMetrics
