@@ -7,15 +7,11 @@ contract UsingStorageTest is UsingStorage {
 		eternalStorage().setUint(getUintKey(), _value);
 	}
 
-	function getUInt() external view returns (uint256){
+	function getUInt() external view returns (uint256) {
 		return eternalStorage().getUint(getUintKey());
 	}
 
-	function getUintKey()
-		private
-		pure
-		returns (bytes32)
-	{
+	function getUintKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_uint"));
 	}
 }
