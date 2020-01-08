@@ -8,9 +8,7 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	// Last Block Number
-	function setLastBlockNumber(address _metrics, uint256 _blocks)
-		external
-	{
+	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().allocator()
@@ -19,7 +17,11 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 		eternalStorage().setUint(getLastBlockNumberKey(_metrics), _blocks);
 	}
 
-	function getLastBlockNumber(address _metrics) external view returns (uint256) {
+	function getLastBlockNumber(address _metrics)
+		external
+		view
+		returns (uint256)
+	{
 		return eternalStorage().getUint(getLastBlockNumberKey(_metrics));
 	}
 
