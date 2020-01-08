@@ -19,7 +19,7 @@ contract VoteCounter is UsingConfig {
 	function addVoteCount(address _user, address _property, bool _agree)
 		external
 	{
-		new AddressValidator().validateGroup(
+		new AddressValidator().validateGroups(
 			msg.sender,
 			config().marketGroup(),
 			config().policyGroup()
