@@ -1,9 +1,9 @@
 import {DevProtocolInstance} from '../../test-lib/instance'
-import {VoteTimesStorageInstance} from '../../../types/truffle-contracts'
+import {validateErrorMessage} from '../../test-lib/error-utils'
 
 contract(
 	'VoteTimesStorageTest',
-	([deployer, voteTimes, property, property2]) => {
+	([deployer, voteTimes, dummyVoteTimes, property, property2]) => {
 		const dev = new DevProtocolInstance(deployer)
 		before(async () => {
 			await dev.generateAddressConfig()
@@ -23,6 +23,12 @@ contract(
 					from: voteTimes
 				})
 				expect(result.toNumber()).to.be.equal(3)
+			})
+			it('Cannot rewrite data from other than votetimes.', async () => {
+				const result = await dev.voteTimesStorage
+					.setVoteTimes(2, {from: dummyVoteTimes})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'this address is not proper')
 			})
 		})
 		describe('VoteTimesStorage; getVoteTimesByProperty, setVoteTimesByProperty', () => {
@@ -50,22 +56,11 @@ contract(
 				)
 				expect(result.toNumber()).to.be.equal(0)
 			})
-		})
-		describe('VoteTimesStorage; getStorageAddress, setStorage, changeOwner', () => {
-			it('Value is inherited.', async () => {
-				const newVoteTimesStorage = await dev.generateInstance<
-					VoteTimesStorageInstance
-				>('VoteTimesStorage')
-				const storageAddress = await dev.voteTimesStorage.getStorageAddress()
-				await newVoteTimesStorage.setStorage(storageAddress, {from: deployer})
-				await dev.voteTimesStorage.changeOwner(newVoteTimesStorage.address, {
-					from: deployer
-				})
-				const result = await newVoteTimesStorage.getVoteTimesByProperty(
-					property,
-					{from: voteTimes}
-				)
-				expect(result.toNumber()).to.be.equal(3)
+			it('Cannot rewrite data from other than votetimes.', async () => {
+				const result = await dev.voteTimesStorage
+					.setVoteTimesByProperty(property, 3, {from: dummyVoteTimes})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'this address is not proper')
 			})
 		})
 	}
