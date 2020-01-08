@@ -28,10 +28,11 @@ contract AddressValidator {
 		require(_addr == _target, errorMessage);
 	}
 
-	function validateAddresses(address _addr, address _target1, address _target2)
-		external
-		pure
-	{
+	function validateAddresses(
+		address _addr,
+		address _target1,
+		address _target2
+	) external pure {
 		if (_addr == _target1) {
 			return;
 		}
