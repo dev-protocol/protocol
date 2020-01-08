@@ -13,7 +13,7 @@ contract AddressValidator {
 		require(IGroup(_groupAddr).isGroup(_addr), errorMessage);
 	}
 
-	function validateGroup(
+	function validateGroups(
 		address _addr,
 		address _groupAddr1,
 		address _groupAddr2
@@ -28,10 +28,11 @@ contract AddressValidator {
 		require(_addr == _target, errorMessage);
 	}
 
-	function validateAddress(address _addr, address _target1, address _target2)
-		external
-		pure
-	{
+	function validateAddresses(
+		address _addr,
+		address _target1,
+		address _target2
+	) external pure {
 		if (_addr == _target1) {
 			return;
 		}
