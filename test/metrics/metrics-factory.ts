@@ -1,0 +1,77 @@
+import {DevProtocolInstance} from '../test-lib/instance'
+import {
+	validateErrorMessage,
+	getMetricsAddress
+} from '../test-lib/utils'
+
+contract('MetricsFactoryTest', ([deployer, user, market, marketFactory, property1, property2]) => {
+	const dev = new DevProtocolInstance(deployer)
+	describe('MetircsFactory; create', () => {
+		let metricsAddress: string
+		before(async () => {
+			await dev.generateAddressConfig()
+			await dev.generateMarketGroup()
+			await dev.generateMetricsFactory()
+			await dev.generateMetricsGroup()
+			await dev.addressConfig.setMarketFactory(marketFactory)
+			await dev.marketGroup.addGroup(market, {from: marketFactory})
+			const metricsFactoryResult = await dev.metricsFactory.create(property1, {from: market})
+			metricsAddress = getMetricsAddress(metricsFactoryResult)
+		})
+
+		it('Adds a new metrics contract address to state contract,', async () => {
+			const result = await dev.metricsGroup.isGroup(metricsAddress, {
+				from: deployer
+			})
+			expect(result).to.be.equal(true)
+		})
+
+		it('Cannot be executed from other than market contract.', async () => {
+			const result = await dev.metricsFactory
+				.create(property2, {
+					from: user
+				})
+				.catch((err: Error) => err)
+			validateErrorMessage(result as Error, 'this address is not proper')
+		})
+		it('Pause and release of pause can only be executed by deployer.', async () => {
+			let result = await dev.metricsFactory
+				.pause({from: user})
+				.catch((err: Error) => err)
+			validateErrorMessage(
+				result as Error,
+				'PauserRole: caller does not have the Pauser role'
+			)
+			await dev.metricsFactory.pause({from: deployer})
+			result = await dev.metricsFactory
+				.unpause({from: user})
+				.catch((err: Error) => err)
+			validateErrorMessage(
+				result as Error,
+				'PauserRole: caller does not have the Pauser role'
+			)
+			await dev.metricsFactory.unpause({from: deployer})
+		})
+		it('Cannot run if paused.', async () => {
+			await dev.metricsFactory.pause({from: deployer})
+			const result = await dev.metricsFactory
+				.create(property2, {
+					from: market
+				})
+				.catch((err: Error) => err)
+			validateErrorMessage(result as Error, 'You cannot use that')
+		})
+		it('Can be executed when pause is released', async () => {
+			await dev.metricsFactory.unpause({from: deployer})
+			let createResult = await dev.metricsFactory.create(property2, {
+				from: market
+			})
+			const tmpMetricsAddress = getMetricsAddress(createResult)
+			const result = await dev.metricsGroup.isGroup(tmpMetricsAddress, {
+				from: deployer
+			})
+			expect(result).to.be.equal(true)
+		})
+	})
+})
+
