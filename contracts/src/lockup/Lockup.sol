@@ -52,10 +52,7 @@ contract Lockup is Pausable, UsingConfig {
 			config().propertyGroup()
 		);
 
-		require(
-			hasValue(_property, msg.sender),
-			"dev token is not locked"
-		);
+		require(hasValue(_property, msg.sender), "dev token is not locked");
 		bool isWaiting = getStorage().getWithdrawalStatus(
 				_property,
 				msg.sender
@@ -144,13 +141,19 @@ contract Lockup is Pausable, UsingConfig {
 		return getStorage().getValue(_property, _sender);
 	}
 
-	function addValue(address _property, address _sender, uint256 _value) private {
+	function addValue(address _property, address _sender, uint256 _value)
+		private
+	{
 		uint256 value = getStorage().getValue(_property, _sender);
 		value = value.add(_value);
 		getStorage().setValue(_property, _sender, value);
 	}
 
-	function hasValue(address _property, address _sender) private view returns (bool) {
+	function hasValue(address _property, address _sender)
+		private
+		view
+		returns (bool)
+	{
 		uint256 value = getStorage().getValue(_property, _sender);
 		return value != 0;
 	}
@@ -167,9 +170,7 @@ contract Lockup is Pausable, UsingConfig {
 		getStorage().setPropertyValue(_property, value);
 	}
 
-	function incrementInterest(address _property, uint256 _priceValue)
-		private
-	{
+	function incrementInterest(address _property, uint256 _priceValue) private {
 		uint256 price = getStorage().getInterestPrice(_property);
 		getStorage().setInterestPrice(_property, price.add(_priceValue));
 	}
