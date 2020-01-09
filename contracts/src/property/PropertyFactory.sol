@@ -13,10 +13,11 @@ contract PropertyFactory is Pausable, UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function create(string calldata _name, string calldata _symbol)
-		external
-		returns (address)
-	{
+	function create(
+		string calldata _name,
+		string calldata _symbol,
+		address _author
+	) external returns (address) {
 		require(paused() == false, "You cannot use that");
 		StringValidator validator = new StringValidator();
 		validator.validatePropertyName(_name);
@@ -24,7 +25,7 @@ contract PropertyFactory is Pausable, UsingConfig {
 
 		Property property = new Property(
 			address(config()),
-			msg.sender,
+			_author,
 			_name,
 			_symbol
 		);

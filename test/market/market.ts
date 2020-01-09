@@ -169,7 +169,7 @@ contract('MarketTest', ([deployer]) => {
 			)[0].args._market
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			market = await marketContract.at(marketAddress)
-			result = await propertyFactory.create('sample', 'SAMPLE', {
+			result = await propertyFactory.create('sample', 'SAMPLE', deployer, {
 				from: deployer
 			})
 			propertyAddress = await result.logs.filter(
