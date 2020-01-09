@@ -56,7 +56,11 @@ contract Withdraw is Pausable, UsingConfig {
 		uint256 total = getStorage().getRewardsAmount(_property);
 		if (totalLimit != total) {
 			getStorage().setWithdrawalLimitTotal(_property, _to, total);
-			getStorage().setWithdrawalLimitBalance(_property, _to, ERC20(_property).balanceOf(_to));
+			getStorage().setWithdrawalLimitBalance(
+				_property,
+				_to,
+				ERC20(_property).balanceOf(_to)
+			);
 		}
 	}
 
@@ -88,8 +92,14 @@ contract Withdraw is Pausable, UsingConfig {
 		returns (uint256)
 	{
 		uint256 _last = getStorage().getLastWithdrawalPrice(_property, _user);
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(_property, _user);
-		uint256 balanceLimit = getStorage().getWithdrawalLimitBalance(_property, _user);
+		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
+			_property,
+			_user
+		);
+		uint256 balanceLimit = getStorage().getWithdrawalLimitBalance(
+			_property,
+			_user
+		);
 		uint256 price = getStorage().getCumulativePrice(_property);
 		uint256 priceGap = price - _last;
 		uint256 balance = ERC20(_property).balanceOf(_user);

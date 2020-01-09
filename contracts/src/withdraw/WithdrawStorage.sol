@@ -6,7 +6,6 @@ import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
 contract WithdrawStorage is UsingStorage, UsingConfig {
-
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -60,15 +59,17 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 	}
 
 	// WithdrawalLimitTotal
-	function setWithdrawalLimitTotal(address _property, address _user, uint256 _value)
-		external
-	{
+	function setWithdrawalLimitTotal(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
 		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(
-				getWithdrawalLimitTotalKey(_property, _user),
-				_value
-			);
+			getWithdrawalLimitTotalKey(_property, _user),
+			_value
+		);
 	}
 
 	function getWithdrawalLimitTotal(address _property, address _user)
@@ -94,15 +95,17 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 	}
 
 	// WithdrawalLimitBalance
-	function setWithdrawalLimitBalance(address _property, address _user, uint256 _value)
-		external
-	{
+	function setWithdrawalLimitBalance(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
 		new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(
-				getWithdrawalLimitBalanceKey(_property, _user),
-				_value
-			);
+			getWithdrawalLimitBalanceKey(_property, _user),
+			_value
+		);
 	}
 
 	function getWithdrawalLimitBalance(address _property, address _user)
