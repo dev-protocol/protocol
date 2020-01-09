@@ -13,9 +13,7 @@ export async function createProperty(
 		const eventLog = await propertyFactory.create(
 			`NAME${index}`,
 			`SYMBOL${index}`,
-			{
-				from: address
-			}
+			address
 		)
 		const propertyAddress = await eventLog.logs.filter(
 			(e: {event: string}) => e.event === 'Create'

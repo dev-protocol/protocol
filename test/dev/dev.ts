@@ -219,7 +219,7 @@ contract(
 				dev: DevProtocolInstance
 			): Promise<string> =>
 				dev.propertyFactory
-					.create('test', 'test')
+					.create('test', 'test', deployer)
 					.then(res => res.logs.find(x => x.event === 'Create')?.args._property)
 
 			it('lockup token to properties', async () => {
