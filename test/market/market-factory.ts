@@ -9,7 +9,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 	const dev = new DevProtocolInstance(deployer)
 	const userInstance = new UserInstance(dev, user)
 	const marketContract = artifacts.require('Market')
-	describe('MarketFactory; createMarket', () => {
+	describe('MarketFactory; create', () => {
 		let marketAddress: string
 		let marketBehaviorAddress: string
 		before(async () => {
@@ -31,7 +31,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 			marketAddress = getMarketAddress(result)
 		})
 
-		it('Create a new Market Contract and emit C Reate Event telling created mark Et address,', async () => {
+		it('Create a new market contract and emit create event telling created market address,', async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(marketAddress)
 			const behaviorAddress = await deployedMarket.behavior({from: deployer})
