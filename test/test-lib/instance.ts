@@ -17,7 +17,9 @@ import {
 	MarketFactoryInstance,
 	MarketGroupInstance,
 	MetricsGroupInstance,
-	WithdrawStorageInstance
+	WithdrawStorageInstance,
+	IPolicyInstance,
+	IMarketInstance
 } from '../../types/truffle-contracts'
 
 const contract = artifacts.require
@@ -328,5 +330,34 @@ export class DevProtocolInstance {
 
 	public async generateDecimals(): Promise<DecimalsInstance> {
 		return artifacts.require('Decimals').new(this.fromDeployer)
+	}
+}
+
+export class UserInstance {
+	private readonly _user: string
+	private readonly _dev: DevProtocolInstance
+	constructor(dev: DevProtocolInstance, user: string) {
+		this._user = user
+		this._dev = dev
+	}
+
+	public async getPolicy(contractName: string): Promise<IPolicyInstance> {
+		const tmp = await (async x => {
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+			;(x as any).link(
+				'Decimals',
+				await this._dev.generateDecimals().then(x => x.address)
+			)
+			return x.new({from: this._user})
+		})(contract(contractName))
+		return tmp
+	}
+
+	public async getMarket(contractName: string): Promise<IMarketInstance> {
+		const tmp = await contract(contractName).new(
+			this._dev.addressConfig.address,
+			{from: this._user}
+		)
+		return tmp
 	}
 }

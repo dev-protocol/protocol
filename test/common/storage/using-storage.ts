@@ -1,5 +1,5 @@
 import {UsingStorageTestInstance} from '../../../types/truffle-contracts'
-import {validateErrorMessage} from '../../test-lib/error-utils'
+import {validateErrorMessage} from '../../test-lib/utils'
 
 contract('UsingStorageTest', ([deployer]) => {
 	const UsingStorageTestContract = artifacts.require('UsingStorageTest')

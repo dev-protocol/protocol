@@ -1,5 +1,5 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {validateErrorMessage} from '../test-lib/error-utils'
+import {validateErrorMessage, DEFAULT_ADDRESS} from '../test-lib/utils'
 
 contract(
 	'PolicySetTest',
@@ -49,9 +49,9 @@ contract(
 			it('Can not get setted policy using index', async () => {
 				await dev.policySet.deleteAll({from: policyFactory})
 				let result = await dev.policySet.get(0)
-				expect(result).to.be.equal('0x0000000000000000000000000000000000000000')
+				expect(result).to.be.equal(DEFAULT_ADDRESS)
 				result = await dev.policySet.get(1)
-				expect(result).to.be.equal('0x0000000000000000000000000000000000000000')
+				expect(result).to.be.equal(DEFAULT_ADDRESS)
 			})
 			it('Can not execute deleteAll without policyFactory address', async () => {
 				const result = await dev.policySet

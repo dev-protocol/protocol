@@ -1,4 +1,4 @@
-import {validateErrorMessage} from '../test-lib/error-utils'
+import {validateErrorMessage} from '../test-lib/utils'
 
 contract('PropertyTest', ([deployer, ui]) => {
 	const lockupContract = artifacts.require('Lockup')

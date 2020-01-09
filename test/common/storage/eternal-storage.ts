@@ -1,4 +1,4 @@
-import {validateErrorMessage} from '../../test-lib/error-utils'
+import {validateErrorMessage, DEFAULT_ADDRESS} from '../../test-lib/utils'
 import {EternalStorageInstance} from '../../../types/truffle-contracts'
 
 contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
@@ -173,11 +173,11 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 			it('delete.', async () => {
 				await eternalStorage.deleteAddress(key)
 				const result = await eternalStorage.getAddress(key)
-				expect(result).to.be.equal('0x0000000000000000000000000000000000000000')
+				expect(result).to.be.equal(DEFAULT_ADDRESS)
 			})
 			it('get initial value.', async () => {
 				const result = await eternalStorage.getAddress(unsetKey)
-				expect(result).to.be.equal('0x0000000000000000000000000000000000000000')
+				expect(result).to.be.equal(DEFAULT_ADDRESS)
 			})
 			it('cannot be set to other than the owner.', async () => {
 				const result = await eternalStorage

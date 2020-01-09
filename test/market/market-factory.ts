@@ -1,89 +1,109 @@
-contract('MarketFactoryTest', ([deployer, policyFactory]) => {
-	const marketFactoryContract = artifacts.require('MarketFactory')
+import {DevProtocolInstance, UserInstance} from '../test-lib/instance'
+import {
+	validateErrorMessage,
+	getMarketAddress,
+	DEFAULT_ADDRESS
+} from '../test-lib/utils'
+
+contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
+	const dev = new DevProtocolInstance(deployer)
+	const userInstance = new UserInstance(dev, user)
 	const marketContract = artifacts.require('Market')
-	const marketGroupContract = artifacts.require('MarketGroup')
-	const addressConfigContract = artifacts.require('AddressConfig')
-	const marketTest1Contract = artifacts.require('MarketTest1')
-	const policyContract = artifacts.require('Policy')
-	const policyTest1Contract = artifacts.require('PolicyTest1')
-	const voteTimesContract = artifacts.require('VoteTimes')
-	const voteTimesStorageContract = artifacts.require('VoteTimesStorage')
-	const decimalsLibrary = artifacts.require('Decimals')
 	describe('MarketFactory; createMarket', () => {
-		let market: any
-		let marketGroup: any
-		let expectedMarketAddress: any
-		beforeEach(async () => {
-			const addressConfig = await addressConfigContract.new({from: deployer})
-			await addressConfig.setPolicyFactory(policyFactory, {
-				from: deployer
+		let marketAddress: string
+		let marketBehaviorAddress: string
+		before(async () => {
+			await dev.generateAddressConfig()
+			await dev.generatePolicyGroup()
+			await dev.generatePolicySet()
+			await dev.generatePolicyFactory()
+			await dev.generateVoteTimes()
+			await dev.generateVoteTimesStorage()
+			await dev.generateMarketFactory()
+			await dev.generateMarketGroup()
+			const policy = await userInstance.getPolicy('PolicyTest1')
+			await dev.policyFactory.create(policy.address, {from: user})
+			const market = await userInstance.getMarket('MarketTest1')
+			marketBehaviorAddress = market.address
+			const result = await dev.marketFactory.create(market.address, {
+				from: user
 			})
-			const marketFactory = await marketFactoryContract.new(
-				addressConfig.address,
-				{
-					from: deployer
-				}
-			)
-			await addressConfig.setMarketFactory(marketFactory.address, {
-				from: deployer
-			})
-			marketGroup = await marketGroupContract.new(addressConfig.address, {
-				from: deployer
-			})
-			await marketGroup.createStorage()
-			await addressConfig.setMarketGroup(marketGroup.address, {from: deployer})
-			const voteTimes = await voteTimesContract.new(addressConfig.address, {
-				from: deployer
-			})
-			await addressConfig.setVoteTimes(voteTimes.address, {
-				from: deployer
-			})
-			const voteTimesStorage = await voteTimesStorageContract.new(
-				addressConfig.address,
-				{
-					from: deployer
-				}
-			)
-			await voteTimesStorage.createStorage()
-			await addressConfig.setVoteTimesStorage(voteTimesStorage.address, {
-				from: deployer
-			})
-			const decimals = await decimalsLibrary.new({from: deployer})
-			await policyTest1Contract.link('Decimals', decimals.address)
-			const policyTest1 = await policyTest1Contract.new({
-				from: deployer
-			})
-			const policy = await policyContract.new(
-				addressConfig.address,
-				policyTest1.address,
-				{
-					from: policyFactory
-				}
-			)
-			await addressConfig.setPolicy(policy.address, {
-				from: policyFactory
-			})
-			market = await marketTest1Contract.new(addressConfig.address, {
-				from: deployer
-			})
-			const result = await marketFactory.create(market.address, {
-				from: deployer
-			})
-			expectedMarketAddress = await result.logs.filter(
-				(e: {event: string}) => e.event === 'Create'
-			)[0].args._market
+			marketAddress = getMarketAddress(result)
 		})
 
-		it('Create a new Market Contract and emit C Reate Event telling created mark Et address', async () => {
+		it('Create a new Market Contract and emit C Reate Event telling created mark Et address,', async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
-			const deployedMarket = await marketContract.at(expectedMarketAddress)
+			const deployedMarket = await marketContract.at(marketAddress)
 			const behaviorAddress = await deployedMarket.behavior({from: deployer})
-
-			expect(behaviorAddress).to.be.equal(market.address)
+			expect(behaviorAddress).to.be.equal(marketBehaviorAddress)
 		})
 
-		it('Adds a new Market Contract address to State Contract', async () => {
-			const result = await marketGroup.isGroup(expectedMarketAddress, {
+		it('Adds a new Market Contract address to State Contract,', async () => {
+			const result = await dev.marketGroup.isGroup(marketAddress, {
+				from: deployer
+			})
+			expect(result).to.be.equal(true)
+		})
+
+		it('A freshly created market is not enabled,', async () => {
+			// eslint-disable-next-line @typescript-eslint/await-thenable
+			const deployedMarket = await marketContract.at(marketAddress)
+			expect(await deployedMarket.enabled()).to.be.equal(false)
+		})
+		it('The maximum number of votes is incremented.', async () => {
+			let times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
+			expect(times.toNumber()).to.be.equal(1)
+			const market = await userInstance.getMarket('MarketTest2')
+			await dev.marketFactory.create(market.address, {
+				from: user
+			})
+			times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
+			expect(times.toNumber()).to.be.equal(2)
+		})
+		it('An error occurs if the default address is specified.', async () => {
+			const result = await dev.marketFactory
+				.create(DEFAULT_ADDRESS, {
+					from: user
+				})
+				.catch((err: Error) => err)
+			validateErrorMessage(result as Error, 'address is initial value')
+		})
+		it('Pause and release of pause can only be executed by deployer.', async () => {
+			let result = await dev.marketFactory
+				.pause({from: user})
+				.catch((err: Error) => err)
+			validateErrorMessage(
+				result as Error,
+				'PauserRole: caller does not have the Pauser role'
+			)
+			await dev.marketFactory.pause({from: deployer})
+			result = await dev.marketFactory
+				.unpause({from: user})
+				.catch((err: Error) => err)
+			validateErrorMessage(
+				result as Error,
+				'PauserRole: caller does not have the Pauser role'
+			)
+			await dev.marketFactory.unpause({from: deployer})
+		})
+		it('Cannot run if paused.', async () => {
+			await dev.marketFactory.pause({from: deployer})
+			const market = await userInstance.getMarket('MarketTest3')
+			const result = await dev.marketFactory
+				.create(market.address, {
+					from: user
+				})
+				.catch((err: Error) => err)
+			validateErrorMessage(result as Error, 'You cannot use that')
+		})
+		it('Can be executed when pause is released', async () => {
+			await dev.marketFactory.unpause({from: deployer})
+			const market = await userInstance.getMarket('MarketTest3')
+			let createResult = await dev.marketFactory.create(market.address, {
+				from: user
+			})
+			const tmpMarketAddress = getMarketAddress(createResult)
+			const result = await dev.marketGroup.isGroup(tmpMarketAddress, {
 				from: deployer
 			})
 			expect(result).to.be.equal(true)

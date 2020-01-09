@@ -1,4 +1,4 @@
-import {validateErrorMessage} from '../../test-lib/error-utils'
+import {validateErrorMessage, DEFAULT_ADDRESS} from '../../test-lib/utils'
 import {AddressValidatorInstance} from '../../../types/truffle-contracts'
 import {DevProtocolInstance} from '../../test-lib/instance'
 
@@ -29,7 +29,7 @@ contract(
 			})
 			it('default address cause an error.', async () => {
 				const result = await addressValidator
-					.validateDefault('0x0000000000000000000000000000000000000000')
+					.validateDefault(DEFAULT_ADDRESS)
 					.catch((err: Error) => err)
 				validateErrorMessage(result as Error, 'address is initial value', false)
 			})
