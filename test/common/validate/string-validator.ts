@@ -1,4 +1,4 @@
-import {validateErrorMessage} from '../../test-lib/error-utils'
+import {validateErrorMessage} from '../../test-lib/utils'
 import {StringValidatorInstance} from '../../../types/truffle-contracts'
 
 contract('StringValidatorTest', ([deployer]) => {
