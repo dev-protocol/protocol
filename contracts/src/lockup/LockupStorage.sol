@@ -1,42 +1,22 @@
 pragma solidity ^0.5.0;
 
-import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 
 contract LockupStorage is UsingConfig, UsingStorage {
-	using SafeMath for uint256;
-
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	//Value
-	function addValue(address _property, address _sender, uint256 _value)
+	function setValue(address _property, address _sender, uint256 _value)
 		external
+		returns (uint256)
 	{
 		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getValueKey(_property, _sender);
-		uint256 value = eternalStorage().getUint(key);
-		value = value.add(_value);
-		eternalStorage().setUint(key, value);
-	}
-
-	function clearValue(address _property, address _sender) external {
-		new AddressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getValueKey(_property, _sender);
-		eternalStorage().setUint(key, 0);
-	}
-
-	function hasValue(address _property, address _sender)
-		external
-		view
-		returns (bool)
-	{
-		bytes32 key = getValueKey(_property, _sender);
-		return eternalStorage().getUint(key) != 0;
+		eternalStorage().setUint(key, _value);
 	}
 
 	function getValue(address _property, address _sender)
@@ -57,22 +37,14 @@ contract LockupStorage is UsingConfig, UsingStorage {
 	}
 
 	//PropertyValue
-	function addPropertyValue(address _property, uint256 _value) external {
+	function setPropertyValue(address _property, uint256 _value)
+		external
+		returns (uint256)
+	{
 		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getPropertyValueKey(_property);
-		uint256 value = eternalStorage().getUint(key);
-		value = value.add(_value);
-		eternalStorage().setUint(key, value);
-	}
-
-	function subPropertyValue(address _property, uint256 _value) external {
-		new AddressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getPropertyValueKey(_property);
-		uint256 value = eternalStorage().getUint(key);
-		value = value.sub(_value);
-		eternalStorage().setUint(key, value);
+		eternalStorage().setUint(key, _value);
 	}
 
 	function getPropertyValue(address _property)
@@ -124,15 +96,14 @@ contract LockupStorage is UsingConfig, UsingStorage {
 			);
 	}
 
-	function incrementInterest(address _property, uint256 _priceValue)
+	//InterestPrice
+	function setInterestPrice(address _property, uint256 _value)
 		external
+		returns (uint256)
 	{
 		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
-		bytes32 pricesKey = getInterestPriceKey(_property);
-
-		uint256 price = eternalStorage().getUint(pricesKey);
-		eternalStorage().setUint(pricesKey, price.add(_priceValue));
+		eternalStorage().setUint(getInterestPriceKey(_property), _value);
 	}
 
 	function getInterestPrice(address _property)

@@ -32,8 +32,8 @@ contract Lockup is Pausable, UsingConfig {
 		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
 			0;
 		require(isWaiting == false, "lockup is already canceled");
-		getStorage().addValue(_property, _from, _value);
-		getStorage().addPropertyValue(_property, _value);
+		addValue(_property, _from, _value);
+		addPropertyValue(_property, _value);
 		getStorage().setLastInterestPrice(
 			_property,
 			_from,
@@ -52,10 +52,7 @@ contract Lockup is Pausable, UsingConfig {
 			config().propertyGroup()
 		);
 
-		require(
-			getStorage().hasValue(_property, msg.sender),
-			"dev token is not locked"
-		);
+		require(hasValue(_property, msg.sender), "dev token is not locked");
 		bool isWaiting = getStorage().getWithdrawalStatus(
 				_property,
 				msg.sender
@@ -78,8 +75,8 @@ contract Lockup is Pausable, UsingConfig {
 		require(lockupedValue == 0, "dev token is not locked");
 		Property(_property).withdrawDev(msg.sender);
 		withdrawInterest(_property);
-		getStorage().clearValue(_property, msg.sender);
-		getStorage().subPropertyValue(_property, lockupedValue);
+		getStorage().setValue(_property, msg.sender, 0);
+		subPropertyValue(_property, lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
@@ -91,7 +88,7 @@ contract Lockup is Pausable, UsingConfig {
 		uint256 priceValue = _interestResult.outOf(
 			getStorage().getPropertyValue(_property)
 		);
-		getStorage().incrementInterest(_property, priceValue);
+		incrementInterest(_property, priceValue);
 	}
 
 	function calculateInterestAmount(address _property, address _user)
@@ -142,6 +139,40 @@ contract Lockup is Pausable, UsingConfig {
 		returns (uint256)
 	{
 		return getStorage().getValue(_property, _sender);
+	}
+
+	function addValue(address _property, address _sender, uint256 _value)
+		private
+	{
+		uint256 value = getStorage().getValue(_property, _sender);
+		value = value.add(_value);
+		getStorage().setValue(_property, _sender, value);
+	}
+
+	function hasValue(address _property, address _sender)
+		private
+		view
+		returns (bool)
+	{
+		uint256 value = getStorage().getValue(_property, _sender);
+		return value != 0;
+	}
+
+	function addPropertyValue(address _property, uint256 _value) private {
+		uint256 value = getStorage().getPropertyValue(_property);
+		value = value.add(_value);
+		getStorage().setPropertyValue(_property, value);
+	}
+
+	function subPropertyValue(address _property, uint256 _value) private {
+		uint256 value = getStorage().getPropertyValue(_property);
+		value = value.sub(_value);
+		getStorage().setPropertyValue(_property, value);
+	}
+
+	function incrementInterest(address _property, uint256 _priceValue) private {
+		uint256 price = getStorage().getInterestPrice(_property);
+		getStorage().setInterestPrice(_property, price.add(_priceValue));
 	}
 
 	function possible(address _property, address _from)
