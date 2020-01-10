@@ -38,4 +38,13 @@ export function getMetricsAddress(
 	return tmp
 }
 
+export function getPropertyAddress(
+	transaction: Truffle.TransactionResponse
+): string {
+	const tmp = transaction.logs.filter(
+		(e: {event: string}) => e.event === 'Create'
+	)[0].args._property
+	return tmp
+}
+
 export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000'
