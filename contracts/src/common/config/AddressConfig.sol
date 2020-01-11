@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+// prettier-ignore
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 
 contract AddressConfig is Ownable {
