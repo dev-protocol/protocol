@@ -4,7 +4,9 @@ contract('LockupTest', ([deployer, propertyFactory, property, devToken]) => {
 	const lockupStorageContract = artifacts.require('LockupStorage')
 	const propertyGroupContract = artifacts.require('PropertyGroup')
 	const decimalsLibrary = artifacts.require('Decimals')
-	describe('Lockup; cancel')
+	describe('Lockup; cancel', () => {
+		// TODO
+	})
 	describe('Lockup; lockup', () => {
 		it('address is not property contract')
 		it('lockup is already canceled')
