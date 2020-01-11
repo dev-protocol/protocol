@@ -1,11 +1,13 @@
 pragma solidity ^0.5.0;
 
 import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+// prettier-ignore
 import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+// prettier-ignore
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";

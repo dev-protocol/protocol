@@ -3,6 +3,7 @@ pragma solidity ^0.5.0;
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
+// prettier-ignore
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";

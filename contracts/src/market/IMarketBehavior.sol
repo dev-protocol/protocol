@@ -11,8 +11,12 @@ contract IMarketBehavior {
 		string calldata _args4,
 		string calldata _args5,
 		address market
-		// solium-disable-next-line indentation
-	) external returns (address);
+	)
+		external
+		returns (
+			// solium-disable-next-line indentation
+			address
+		);
 
 	function calculate(address _metrics, uint256 _start, uint256 _end)
 		external

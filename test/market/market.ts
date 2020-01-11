@@ -177,8 +177,12 @@ contract('MarketTest', ([deployer]) => {
 			)[0].args._property
 		})
 
-		it('Total value of votes for and against, votes are the number of sent DEVs', async () => {})
-		it('Creating a market contract from other than a factory results in an error', async () => {})
+		it(
+			'Total value of votes for and against, votes are the number of sent DEVs'
+		)
+		it(
+			'Creating a market contract from other than a factory results in an error'
+		)
 
 		it('When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled', async () => {
 			// eslint-disable-next-line no-warning-comments
@@ -216,6 +220,6 @@ contract('MarketTest', ([deployer]) => {
 			// const DEVsTotalSupply = await dummyDEV.totalSupply({from: deployer})
 			// expect(DEVsTotalSupply.toNumber()).to.be.equal(9900)
 		})
-		it('voting deadline is over', async () => {})
+		it('voting deadline is over')
 	})
 })
