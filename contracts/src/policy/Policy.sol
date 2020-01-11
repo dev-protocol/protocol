@@ -27,6 +27,10 @@ contract Policy is Killable, UsingConfig {
 		setVotingEndBlockNumber();
 	}
 
+	function voting() public view returns (bool) {
+		return block.number <= _votingEndBlockNumber;
+	}
+
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view
@@ -96,10 +100,7 @@ contract Policy is Killable, UsingConfig {
 		validator.validateGroup(_property, config().propertyGroup());
 
 		require(config().policy() != address(this), "this policy is current");
-		require(
-			block.number <= _votingEndBlockNumber,
-			"voting deadline is over"
-		);
+		require(voting(), "voting deadline is over");
 		VoteCounter voteCounter = VoteCounter(config().voteCounter());
 		voteCounter.addVoteCount(msg.sender, _property, _agree);
 		bool result = Policy(config().policy()).policyApproval(
