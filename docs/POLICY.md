@@ -50,7 +50,13 @@ function rewards(uint _lockups, uint _assets) public view returns(uint256) {
 
 ## holdersShare
 
-This value is still under consideration.
+Property Contract holders receive a reward share is 95%.
+
+```solidity
+function holdersShare(uint reward, uint lockups) public pure returns(uint) {
+	return reward * 95 / 100;
+}
+```
 
 ## assetValue
 
@@ -66,7 +72,13 @@ function assetValue(uint lockups, uint value) public pure returns(uint) {
 
 ## authenticationFee
 
-This value is still under consideration.
+Property Contract author pays `authenticationFee` is multiplies the number of assets by `0.00025` and subtracts 1/1,000,000 of the number of stakes.
+
+```solidity
+function authenticationFee(uint total_assets, uint total_lockups) public pure returns(uint) {
+	return total_assets * 250000000000000 - total_lockups / 1000000;
+}
+```
 
 ## marketApproval
 
