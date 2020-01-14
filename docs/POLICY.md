@@ -15,9 +15,7 @@ As lockups increase, rewards decrease, and inflation rates decrease. As assets i
 
 The following formula illustrates the basic concept:
 
-$$
-Rewards = Max*(1-StakingRate)^{(12-(StakingRate*10))/2}
-$$
+![Rewards = Max*(1-StakingRate)^((12-(StakingRate*10))/2)](https://latex.codecogs.com/svg.latex?%5Cdpi%7B200%7D%20Rewards%20%3D%20Max*%281-StakingRate%29%5E%7B%2812-%28StakingRate*10%29%29/2%7D)
 
 In Solidity:
 
