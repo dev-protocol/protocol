@@ -19,17 +19,6 @@ A clear and concise description of what you want to happen.
 
 A clear and concise description of any alternative solutions or features you've considered.
 
-# Dev Challenge
-
-Entry to [Dev Challenge](https://github.com/dev-protocol/repository-token/blob/master/docs/DEV_CHALLENGE.md).
-
-- [ ] I entry to Dev Challenge with this issue
-- [ ] I don't enter to Dev Challenge with this issue
-
-If you enter, please edit the following sections.
-
-## Address
-
 [ Please write here your wallet address(supports ERC-20) ]
 
 # Code of Conduct
