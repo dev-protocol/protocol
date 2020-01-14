@@ -24,7 +24,7 @@ uint120 private constant basis = 10000000000000000000000000;
 uint120 private constant power_basis = 10000000000;
 uint64 private constant mint_per_block_and_aseet = 250000000000000;
 
-function calc(uint _lockups, uint _assets) public view returns(uint256) {
+function rewards(uint _lockups, uint _assets) public view returns(uint256) {
 	uint256 max = _assets * mint_per_block_and_aseet;
 	uint256 t = ERC20(token).totalSupply();
 	uint256 l = _lockups * basis / t;
