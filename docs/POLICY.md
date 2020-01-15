@@ -27,9 +27,9 @@ uint64 private constant mint_per_block_and_aseet = 250000000000000;
 function rewards(uint _lockups, uint _assets) public view returns(uint256) {
 	uint256 max = _assets * mint_per_block_and_aseet;
 	uint256 t = ERC20(token).totalSupply();
-	uint256 l = _lockups * basis / t;
-	uint256 _d = basis - l;
-	uint256 _p = ((12 * power_basis) - l / (basis / (10 * power_basis))) / 2;
+	uint256 s = _lockups * basis / t;
+	uint256 _d = basis - s;
+	uint256 _p = ((12 * power_basis) - s / (basis / (10 * power_basis))) / 2;
 	uint256 p = _p / power_basis;
 	uint256 rp = p + 1;
 	uint256 f = _p - p * power_basis;
@@ -53,7 +53,7 @@ function rewards(uint _lockups, uint _assets) public view returns(uint256) {
 Property Contract holders receive a reward share is 95%.
 
 ```solidity
-function holdersShare(uint reward, uint lockups) public pure returns(uint) {
+function holdersShare(uint reward, uint lockups) public view returns(uint) {
 	return reward * 95 / 100;
 }
 ```
@@ -65,18 +65,18 @@ The calculation method for an asset value called `assetValue` is determined to m
 This formula indicates that asset scores and lockups have equal influence.
 
 ```solidity
-function assetValue(uint lockups, uint value) public pure returns(uint) {
-	return lockups * value;
+function assetValue(uint _value, uint _lockups) public view returns(uint) {
+	return _lockups * _value;
 }
 ```
 
 ## authenticationFee
 
-Property Contract author pays `authenticationFee` is multiplies the number of assets by `0.00025` and subtracts 1/1,000,000 of the number of stakes.
+Property Contract author pays `authenticationFee` is multiplies the number of assets by `0.00025` and subtracts 1/1000 of the number of stakes to the Property.
 
 ```solidity
-function authenticationFee(uint total_assets, uint total_lockups) public pure returns(uint) {
-	return total_assets * 250000000000000 - total_lockups / 1000000;
+function authenticationFee(uint total_assets, uint property_lockups) public view returns(uint) {
+	return total_assets * 250000000000000 - property_lockups / 1000;
 }
 ```
 
@@ -85,7 +85,7 @@ function authenticationFee(uint total_assets, uint total_lockups) public pure re
 The number of votes required before a new Market is approved is called `marketApproval` is requires 10 or more votes in favor, and more than 10 times more votes than negative votes.
 
 ```solidity
-function marketApproval(uint up_votes, uint negative_votes) public pure returns(bool) {
+function marketApproval(uint up_votes, uint negative_votes) public view returns(bool) {
 	return up_votes - 10000000000000000000 > negative_votes * 10;
 }
 ```
@@ -95,7 +95,7 @@ function marketApproval(uint up_votes, uint negative_votes) public pure returns(
 The number of votes required before a new Policy is approved is called `policyApproval` is requires 10 or more votes in favor, and more than 10 times more votes than negative votes.
 
 ```solidity
-function policyApproval(uint up_votes, uint negative_votes) public pure returns(bool) {
+function policyApproval(uint up_votes, uint negative_votes) public view returns(bool) {
 	return up_votes - 10000000000000000000 > negative_votes * 10;
 }
 ```
@@ -121,7 +121,7 @@ uint public policyVotingBlocks = 525600;
 The abstainers' penalty called `abstentionPenalty` impose an exclusion penalty of 175200 blocks (equals 1 month) on 9 times or more abstainers.
 
 ```solidity
-function abstentionPenalty(uint abstentions) public pure returns(uint) {
+function abstentionPenalty(uint abstentions) public view returns(uint) {
 	uint penalty = 0;
 	if (abstentions > 9) {
 		penalty = 175200;
