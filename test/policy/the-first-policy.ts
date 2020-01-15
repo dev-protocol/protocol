@@ -66,7 +66,7 @@ contract('TheFirstPolicy', ([deployer]) => {
 		it('Returns 0 when the staking rate is 100%', async () => {
 			const policy = await create()
 			const stake = new BigNumber(1e18).times(10000000)
-			const result = await policy.rewards(stake, 0)
+			const result = await policy.rewards(stake, 99999)
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
