@@ -15,10 +15,31 @@ contract('TheFirstPolicy', ([deployer]) => {
 	}
 
 	describe('TheFirstPolicy; rewards', () => {
+		const rewards = (stake: number): BigNumber => {
+			// Rewards = Max*(1-StakingRate)^((12-(StakingRate*10))/2+1)
+			const max = 250000000000000
+			const totalSupply = 10000
+			const stakingRate = new BigNumber(stake).div(totalSupply)
+			const _d = new BigNumber(1).minus(stakingRate)
+			const _p = new BigNumber(12)
+				.minus(stakingRate.times(10))
+				.div(2)
+				.plus(1)
+			const p = ~~_p.toNumber()
+			const f = _p.minus(p)
+			const d1 = _d.pow(p)
+			const d2 = _d.pow(p + 1)
+			const g = d1.minus(d2).times(f)
+			const d = d1.minus(g)
+			const expected = new BigNumber(max).times(d)
+			return expected
+		}
+
 		it('Returns the total number of mint per block when the total number of lockups and the total number of assets is passed', async () => {
 			const policy = await create()
-			const result = await policy.rewards(5000, 1)
-			expect(result.toString()).to.be.equal('11718750000000')
+			const result = await policy.rewards(2200, 1)
+			const expected = rewards(2200)
+			expect(result.toString()).to.be.equal(expected.toString())
 		})
 	})
 	describe('TheFirstPolicy; holdersShare', () => {

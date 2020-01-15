@@ -22,24 +22,23 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	{
 		uint256 max = _assets * mint_per_block_and_aseet;
 		uint256 t = ERC20(config().token()).totalSupply();
-		uint256 s = (_lockups * basis) / t;
+		uint256 s = _lockups * basis / t;
 		uint256 _d = basis - s;
-		uint256 _p = ((12 * power_basis) - s / (basis / (10 * power_basis))) /
-			2;
+		uint256 _p = ((12 * power_basis) - s / (basis / (10 * power_basis))) / 2;
 		uint256 p = _p / power_basis;
 		uint256 rp = p + 1;
 		uint256 f = _p - p * power_basis;
 		uint256 d1 = _d;
 		uint256 d2 = _d;
-		for (uint256 i = 1; i < rp; i++) {
-			d1 = (d1 * _d) / basis;
+		for (uint i = 0; i<p; i++) {
+			d1 = d1 * _d / basis;
 		}
-		for (uint256 i = 1; i < rp + 1; i++) {
-			d2 = (d2 * _d) / basis;
+		for (uint i = 0; i<rp; i++) {
+			d2 = d2 * _d / basis;
 		}
-		uint256 g = ((d1 - d2) * f) / power_basis;
+		uint256 g = (d1 - d2) * f / power_basis;
 		uint256 d = d1 - g;
-		uint256 mint = (max * d) / basis;
+		uint256 mint = max * d / basis;
 		return mint;
 	}
 
