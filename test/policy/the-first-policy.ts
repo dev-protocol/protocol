@@ -26,9 +26,10 @@ contract('TheFirstPolicy', ([deployer]) => {
 				.div(2)
 				.plus(1)
 			const p = ~~_p.toNumber()
+			const rp = p + 1
 			const f = _p.minus(p)
 			const d1 = _d.pow(p)
-			const d2 = _d.pow(p + 1)
+			const d2 = _d.pow(rp)
 			const g = d1.minus(d2).times(f)
 			const d = d1.minus(g)
 			const expected = new BigNumber(max).times(d)
