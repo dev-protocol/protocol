@@ -85,8 +85,12 @@ function authenticationFee(uint total_assets, uint property_lockups) public view
 The number of votes required before a new Market is approved is called `marketApproval` is requires 10 or more votes in favor, and more than 10 times more votes than negative votes.
 
 ```solidity
-function marketApproval(uint up_votes, uint negative_votes) public view returns(bool) {
-	return up_votes - 10000000000000000000 > negative_votes * 10;
+function marketApproval(uint256 _up_votes, uint256 _negative_votes) public view returns (bool) {
+	if (_up_votes < 9999999999999999999) {
+		return false;
+	}
+	uint256 negative_votes = _negative_votes > 0 ? _negative_votes : 1000000000000000000;
+	return _up_votes > negative_votes * 10;
 }
 ```
 
@@ -95,8 +99,12 @@ function marketApproval(uint up_votes, uint negative_votes) public view returns(
 The number of votes required before a new Policy is approved is called `policyApproval` is requires 10 or more votes in favor, and more than 10 times more votes than negative votes.
 
 ```solidity
-function policyApproval(uint up_votes, uint negative_votes) public view returns(bool) {
-	return up_votes - 10000000000000000000 > negative_votes * 10;
+function policyApproval(uint256 _up_votes, uint256 _negative_votes) public view returns (bool) {
+	if (_up_votes < 9999999999999999999) {
+		return false;
+	}
+	uint256 negative_votes = _negative_votes > 0 ? _negative_votes : 1000000000000000000;
+	return _up_votes > negative_votes * 10;
 }
 ```
 
