@@ -82,24 +82,58 @@ function authenticationFee(uint total_assets, uint total_lockups) public pure re
 
 ## marketApproval
 
-This value is still under consideration.
+The number of votes required before a new Market is approved is called `marketApproval` is requires 10 or more votes in favor, and more than 10 times more votes than negative votes.
+
+```solidity
+function marketApproval(uint up_votes, uint negative_votes) public pure returns(bool) {
+	return up_votes - 10000000000000000000 > negative_votes * 10;
+}
+```
 
 ## policyApproval
 
-This value is still under consideration.
+The number of votes required before a new Policy is approved is called `policyApproval` is requires 10 or more votes in favor, and more than 10 times more votes than negative votes.
+
+```solidity
+function policyApproval(uint up_votes, uint negative_votes) public pure returns(bool) {
+	return up_votes - 10000000000000000000 > negative_votes * 10;
+}
+```
 
 ## marketVotingBlocks
 
-This value is still under consideration.
+The voting period for a new Market called `marketVotingBlocks` is 525600 blocks equals 3 months.
+
+```solidity
+uint public marketVotingBlocks = 525600;
+```
 
 ## policyVotingBlocks
 
-This value is still under consideration.
+The voting period for a new Policy called `policyVotingBlocks` is 525600 blocks equals 3 months.
+
+```solidity
+uint public policyVotingBlocks = 525600;
+```
 
 ## abstentionPenalty
 
-This value is still under consideration.
+The abstainers' penalty called `abstentionPenalty` impose an exclusion penalty of 175200 blocks (equals 1 month) on 9 times or more abstainers.
+
+```solidity
+function abstentionPenalty(uint abstentions) public pure returns(uint) {
+	uint penalty = 0;
+	if (abstentions > 9) {
+		penalty = 175200;
+	}
+	return penalty;
+}
+```
 
 ## lockUpBlocks
 
-This value is still under consideration.
+The lock-up period from the request for cancellation of staking until the withdrawal becomes possible is 175200 blocks equals 1 month.
+
+```solidity
+uint public lockUpBlocks = 175200;
+```
