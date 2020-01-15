@@ -7,7 +7,7 @@ contract('TheFirstPolicy', ([deployer]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
-		await dev.dev.mint(deployer, '10000')
+		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const theFirstPolicyContract = await artifacts
 			.require('TheFirstPolicy')
 			.new(dev.addressConfig.address)
@@ -15,10 +15,10 @@ contract('TheFirstPolicy', ([deployer]) => {
 	}
 
 	describe('TheFirstPolicy; rewards', () => {
-		const rewards = (stake: number): BigNumber => {
+		const rewards = (stake: BigNumber, asset: BigNumber): BigNumber => {
 			// Rewards = Max*(1-StakingRate)^((12-(StakingRate*10))/2+1)
-			const max = 250000000000000
-			const totalSupply = 10000
+			const max = new BigNumber('250000000000000').times(asset)
+			const totalSupply = new BigNumber(1e18).times(10000000)
 			const stakingRate = new BigNumber(stake).div(totalSupply)
 			const _d = new BigNumber(1).minus(stakingRate)
 			const _p = new BigNumber(12)
@@ -33,14 +33,41 @@ contract('TheFirstPolicy', ([deployer]) => {
 			const g = d1.minus(d2).times(f)
 			const d = d1.minus(g)
 			const expected = new BigNumber(max).times(d)
-			return expected
+			return expected.integerValue()
 		}
 
 		it('Returns the total number of mint per block when the total number of lockups and the total number of assets is passed', async () => {
 			const policy = await create()
-			const result = await policy.rewards(2200, 1)
-			const expected = rewards(2200)
+			const stake = new BigNumber(1e18).times(220000)
+			const result = await policy.rewards(stake, 1)
+			const expected = rewards(stake, new BigNumber(1))
 			expect(result.toString()).to.be.equal(expected.toString())
+		})
+		it('Doubling the number of assets doubles the result', async () => {
+			const policy = await create()
+			const stake = new BigNumber(1e18).times(220000)
+			const result1 = await policy.rewards(stake, 1)
+			const result2 = await policy.rewards(stake, 2)
+			const result = new BigNumber(result2).div(2)
+			expect(result.toString()).to.be.equal(result1.toString())
+		})
+		it('When a number of stakes are 0', async () => {
+			const policy = await create()
+			const result = await policy.rewards(0, 99999)
+			const expected = rewards(new BigNumber(0), new BigNumber(99999))
+			expect(result.toString()).to.be.equal(expected.toString())
+		})
+		it('Returns 0 when the number of assets is 0', async () => {
+			const policy = await create()
+			const stake = new BigNumber(1e18).times(220000)
+			const result = await policy.rewards(stake, 0)
+			expect(result.toString()).to.be.equal('0')
+		})
+		it('Returns 0 when the staking rate is 100%', async () => {
+			const policy = await create()
+			const stake = new BigNumber(1e18).times(10000000)
+			const result = await policy.rewards(stake, 0)
+			expect(result.toString()).to.be.equal('0')
 		})
 	})
 	describe('TheFirstPolicy; holdersShare', () => {
