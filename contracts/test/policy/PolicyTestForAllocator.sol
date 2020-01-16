@@ -16,7 +16,7 @@ contract PolicyTestForAllocator is IPolicy {
 		view
 		returns (uint256)
 	{
-		return _lockups > 0 ? _amount * 90 / 100 : _amount;
+		return _lockups > 0 ? (_amount * 90) / 100 : _amount;
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
@@ -24,8 +24,8 @@ contract PolicyTestForAllocator is IPolicy {
 		view
 		returns (uint256)
 	{
-		uint v = _value > 0 ? _value : 1;
-		uint u = _lockups > 0 ? _lockups : 1;
+		uint256 v = _value > 0 ? _value : 1;
+		uint256 u = _lockups > 0 ? _lockups : 1;
 		return v * u;
 	}
 

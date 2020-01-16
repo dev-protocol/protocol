@@ -39,7 +39,10 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		external
 		returns (uint256)
 	{
-		require(msg.sender == config().withdraw(), "this address is not Withdraw Contract");
+		require(
+			msg.sender == config().withdraw(),
+			"this address is not Withdraw Contract"
+		);
 		// TODO
 		// Not working for some reason("require" is working instead):
 		// new AddressValidator().validateAddress(msg.sender, config().withdraw());

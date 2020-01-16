@@ -54,7 +54,10 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 
 	// PendingIncrement
 	function setPendingIncrement(address _metrics, bool value) external {
-		require(msg.sender == config().allocator(), "this address is not Allocator Contract");
+		require(
+			msg.sender == config().allocator(),
+			"this address is not Allocator Contract"
+		);
 		// TODO
 		// Not working for some reason("require" is working instead):
 		// new AddressValidator().validateAddress(msg.sender, config().allocator());
