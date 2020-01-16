@@ -12,8 +12,12 @@ contract IMarket {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
-		// solium-disable-next-line indentation
-	) public returns (address);
+	)
+		public
+		returns (
+			// solium-disable-next-line indentation
+			address
+		);
 
 	function getAuthenticationFee(address _property)
 		private

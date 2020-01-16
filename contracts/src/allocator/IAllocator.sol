@@ -22,7 +22,12 @@ contract IAllocator {
 		uint256 _marketValue,
 		uint256 _assets,
 		uint256 _totalAssets
-		// solium-disable-next-line indentation
-	) public pure returns (uint256);
+	)
+		public
+		pure
+		returns (
+			// solium-disable-next-line indentation
+			uint256
+		);
 
 }

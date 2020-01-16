@@ -3,7 +3,9 @@ pragma solidity ^0.5.0;
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {
+	AddressValidator
+} from "contracts/src/common/validate/AddressValidator.sol";
 import {VoteTimesStorage} from "contracts/src/vote/times/VoteTimesStorage.sol";
 
 contract VoteTimes is UsingConfig {

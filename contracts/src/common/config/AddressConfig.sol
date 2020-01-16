@@ -1,7 +1,9 @@
 pragma solidity ^0.5.0;
 
 import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {
+	AddressValidator
+} from "contracts/src/common/validate/AddressValidator.sol";
 
 contract AddressConfig is Ownable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;

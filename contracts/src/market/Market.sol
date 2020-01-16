@@ -2,7 +2,9 @@ pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {
+	AddressValidator
+} from "contracts/src/common/validate/AddressValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
