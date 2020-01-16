@@ -111,6 +111,7 @@ contract Policy is Killable, UsingConfig {
 			return;
 		}
 		PolicyFactory(config().policyFactory()).convergePolicy(address(this));
+		_votingEndBlockNumber = 0;
 	}
 
 	function setVotingEndBlockNumber() private {
