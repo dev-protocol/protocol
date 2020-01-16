@@ -1,10 +1,88 @@
+import {DevProtocolInstance} from '../test-lib/instance'
+import BigNumber from 'bignumber.js'
+import {
+	getPropertyAddress,
+	getMarketAddress,
+	watch,
+	waitForEvent
+} from '../test-lib/utils'
+import {MetricsInstance, MarketInstance} from '../../types/truffle-contracts'
+const uri = 'ws://localhost:7545'
+
 contract('Allocator', ([deployer]) => {
 	const addressConfigContract = artifacts.require('AddressConfig')
 	const allocatorContract = artifacts.require('Allocator')
 	const decimalsLibrary = artifacts.require('Decimals')
+	const init = async (): Promise<[
+		DevProtocolInstance,
+		MarketInstance,
+		MetricsInstance
+	]> => {
+		const dev = new DevProtocolInstance(deployer)
+		await dev.generateAddressConfig()
+		await Promise.all([
+			dev.generateAllocator(),
+			dev.generateAllocatorStorage(),
+			dev.generateMarketFactory(),
+			dev.generateMarketGroup(),
+			dev.generateMetricsFactory(),
+			dev.generateMetricsGroup(),
+			dev.generateLockup(),
+			dev.generateLockupStorage(),
+			dev.generateWithdraw(),
+			dev.generateWithdrawStorage(),
+			dev.generatePropertyFactory(),
+			dev.generatePropertyGroup(),
+			dev.generateVoteTimes(),
+			dev.generateVoteTimesStorage(),
+			dev.generatePolicyFactory(),
+			dev.generatePolicyGroup(),
+			dev.generatePolicySet(),
+			dev.generateDev()
+		])
+		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
+		const policy = await artifacts.require('PolicyTestForAllocator').new()
+
+		await dev.policyFactory.create(policy.address)
+		const propertyAddress = getPropertyAddress(
+			await dev.propertyFactory.create('test', 'TEST', deployer)
+		)
+		const [property] = await Promise.all([
+			artifacts.require('Property').at(propertyAddress)
+		])
+		const marketBehavior = await artifacts
+			.require('MarketTest1')
+			.new(dev.addressConfig.address)
+		const marketAddress = getMarketAddress(
+			await dev.marketFactory.create(marketBehavior.address)
+		)
+		const [market] = await Promise.all([
+			artifacts.require('Market').at(marketAddress)
+		])
+		await market.authenticate(property.address, '', '', '', '', '')
+		const metricsAddress = await new Promise<string>(resolve => {
+			market.authenticate(property.address, '', '', '', '', '')
+			watch(dev.metricsFactory, uri)('Create', (_, values) =>
+				resolve(values._metrics)
+			)
+		})
+		const [metrics] = await Promise.all([
+			artifacts.require('Metrics').at(metricsAddress)
+		])
+		return [dev, market, metrics]
+	}
 
 	describe('Allocator; allocate', () => {
-		it("Calls Market Contract's calculate function mapped to Metrics Contract")
+		it("Calls Market Contract's calculate function mapped to Metrics Contract", async () => {
+			const [dev, market, metrics] = await init()
+			const behavior = await market.behavior()
+			const [marketBehavior] = await Promise.all([
+				artifacts.require('MarketTest1').at(behavior)
+			])
+			dev.allocator.allocate(metrics.address)
+			await waitForEvent(marketBehavior, uri)('LogCalculate')
+			expect(1).to.be.eq(1)
+		})
 
 		it('Should fail to call when other than Metrics address is passed')
 

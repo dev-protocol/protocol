@@ -39,7 +39,10 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		external
 		returns (uint256)
 	{
-		new AddressValidator().validateAddress(msg.sender, config().withdraw());
+		require(msg.sender == config().withdraw(), "this address is not Withdraw Contract");
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
 	}

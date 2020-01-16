@@ -102,7 +102,10 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		external
 		returns (uint256)
 	{
-		new AddressValidator().validateAddress(msg.sender, config().lockup());
+		require(msg.sender == config().lockup(), "this address is not Lockup Contract");
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(getInterestPriceKey(_property), _value);
 	}

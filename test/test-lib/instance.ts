@@ -20,7 +20,8 @@ import {
 	MetricsGroupInstance,
 	WithdrawStorageInstance,
 	IPolicyInstance,
-	IMarketInstance
+	IMarketInstance,
+	WithdrawInstance
 } from '../../types/truffle-contracts'
 
 const contract = artifacts.require
@@ -46,6 +47,7 @@ export class DevProtocolInstance {
 	private _marketGroup!: MarketGroupInstance
 	private _metricsFactory!: MetricsFactoryInstance
 	private _metricsGroup!: MetricsGroupInstance
+	private _withdraw!: WithdrawInstance
 	private _withdrawStorage!: WithdrawStorageInstance
 
 	constructor(deployer: string) {
@@ -126,6 +128,10 @@ export class DevProtocolInstance {
 
 	public get metricsGroup(): MetricsGroupInstance {
 		return this._metricsGroup
+	}
+
+	public get withdraw(): WithdrawInstance {
+		return this._withdraw
 	}
 
 	public get withdrawStorage(): WithdrawStorageInstance {
@@ -331,6 +337,20 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this._metricsGroup.createStorage(this.fromDeployer)
+	}
+
+	public async generateWithdraw(): Promise<void> {
+		this._withdraw = await (async x => {
+			;(x as any).link(
+				'Decimals',
+				await this.generateDecimals().then(x => x.address)
+			)
+			return x.new(this.addressConfig.address, this.fromDeployer)
+		})(contract('Withdraw'))
+		await this._addressConfig.setWithdraw(
+			this._withdraw.address,
+			this.fromDeployer
+		)
 	}
 
 	public async generateWithdrawStorage(): Promise<void> {

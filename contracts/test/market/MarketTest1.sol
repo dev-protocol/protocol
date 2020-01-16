@@ -7,6 +7,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
 contract MarketTest1 is IMarketBehavior, UsingConfig {
 	string public schema = "[]";
+	event LogCalculate(address _metrics);
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -28,6 +29,7 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		external
 		returns (bool)
 	{
+		emit LogCalculate(_metrics);
 		Allocator(config().allocator()).calculatedCallback(_metrics, 100);
 		return true;
 	}
