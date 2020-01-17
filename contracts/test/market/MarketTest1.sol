@@ -39,7 +39,7 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		return true;
 	}
 
-	function blockNumber() public view returns(uint256) {
+	function blockNumber() public view returns (uint256) {
 		return block.number;
 	}
 }
