@@ -29,10 +29,6 @@ Finally, run the following command to deploy a mock.
 > dev-protocol mock --host 127.0.0.1 --port 7545
 ```
 
-## Dev Challenge
-
-The developer reward program for this project is taking place. [Check the details.](https://github.com/dev-protocol/protocol/blob/master/docs/DEV_CHALLENGE.md)
-
 ## How to contribute:
 
 Read the [contributing guide](https://github.com/dev-protocol/protocol/blob/master/.github/CONTRIBUTING.md), and create PR when you have time. 🧚✨

@@ -1,11 +1,9 @@
 pragma solidity ^0.5.0;
 
-import {
-	ERC20Mintable
-} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import {
-	AddressValidator
-} from "contracts/src/common/validate/AddressValidator.sol";
+// prettier-ignore
+import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+// prettier-ignore
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 

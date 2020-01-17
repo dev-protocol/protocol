@@ -1,9 +1,9 @@
 contract('WithdrawTest', () => {
 	describe('Withdraw; withdraw', () => {
-		// Will be described later
+		// TODO
 	})
 	describe('Withdraw; beforeBalanceChange', () => {
-		// Will be described later
+		// TODO
 	})
 	// Etc...
 })

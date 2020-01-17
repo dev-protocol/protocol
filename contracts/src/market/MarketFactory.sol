@@ -2,9 +2,8 @@ pragma solidity ^0.5.0;
 
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {
-	AddressValidator
-} from "contracts/src/common/validate/AddressValidator.sol";
+// prettier-ignore
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {MarketGroup} from "contracts/src/market/MarketGroup.sol";

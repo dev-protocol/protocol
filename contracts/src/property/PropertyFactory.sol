@@ -2,9 +2,8 @@ pragma solidity ^0.5.0;
 
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {
-	StringValidator
-} from "contracts/src/common/validate/StringValidator.sol";
+// prettier-ignore
+import {StringValidator} from "contracts/src/common/validate/StringValidator.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";

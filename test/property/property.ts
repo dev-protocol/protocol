@@ -71,11 +71,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 				.catch((err: Error) => err)
 			validateErrorMessage(result as Error, 'this address is not proper')
 		})
-		it('When lockup value is 0', async () => {
-			// Will be described later
-		})
-		it('When withdrawn successfully', async () => {
-			// Will be described later
-		})
+		it('When lockup value is 0')
+		it('When withdrawn successfully')
 	})
 })

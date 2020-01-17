@@ -5,21 +5,13 @@ contract('LockupTest', ([deployer, propertyFactory, property, devToken]) => {
 	const propertyGroupContract = artifacts.require('PropertyGroup')
 	const decimalsLibrary = artifacts.require('Decimals')
 	describe('Lockup; cancel', () => {
-		// Will be described later
+		// TODO
 	})
 	describe('Lockup; lockup', () => {
-		it('address is not property contract', async () => {
-			// Will be described later
-		})
-		it('lockup is already canceled', async () => {
-			// Will be described later
-		})
-		it('insufficient balance', async () => {
-			// Will be described later
-		})
-		it('transfer was failed', async () => {
-			// Will be described later
-		})
+		it('address is not property contract')
+		it('lockup is already canceled')
+		it('insufficient balance')
+		it('transfer was failed')
 		it('success', async () => {
 			const addressConfig = await addressConfigContract.new({from: deployer})
 			const propertyGroup = await propertyGroupContract.new(
@@ -49,21 +41,11 @@ contract('LockupTest', ([deployer, propertyFactory, property, devToken]) => {
 		})
 	})
 	describe('Lockup; withdraw', () => {
-		it('address is not property contract', async () => {
-			// Will be described later
-		})
-		it('lockup is not canceled', async () => {
-			// Will be described later
-		})
-		it('waiting for release', async () => {
-			// Will be described later
-		})
-		it('dev token is not locked', async () => {
-			// Will be described later
-		})
-		it('success', async () => {
-			// Will be described later
-		})
+		it('address is not property contract')
+		it('lockup is not canceled')
+		it('waiting for release')
+		it('dev token is not locked')
+		it('success')
 	})
 	describe('Lockup: withdrawInterest', () => {
 		it(`mints 0 DEV when sender's lockup is 0 DEV`)

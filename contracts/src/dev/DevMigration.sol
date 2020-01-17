@@ -1,11 +1,9 @@
 pragma solidity ^0.5.0;
 
-import {
-	ERC20Mintable
-} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import {
-	ERC20Burnable
-} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
+// prettier-ignore
+import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+// prettier-ignore
+import {ERC20Burnable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 
 contract DevMigration {
 	address public legacy;

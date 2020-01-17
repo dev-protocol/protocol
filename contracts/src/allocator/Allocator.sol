@@ -2,15 +2,13 @@ pragma solidity ^0.5.0;
 
 import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import {
-	ERC20Mintable
-} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+// prettier-ignore
+import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {
-	AddressValidator
-} from "contracts/src/common/validate/AddressValidator.sol";
+// prettier-ignore
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";

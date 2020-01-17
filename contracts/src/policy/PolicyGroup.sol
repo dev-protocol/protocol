@@ -2,9 +2,8 @@ pragma solidity ^0.5.0;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {
-	AddressValidator
-} from "contracts/src/common/validate/AddressValidator.sol";
+// prettier-ignore
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
 contract PolicyGroup is UsingConfig, UsingStorage, IGroup {

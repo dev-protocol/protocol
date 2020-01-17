@@ -3,9 +3,8 @@ pragma solidity ^0.5.0;
 import {MarketGroup} from "contracts/src/market/MarketGroup.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {
-	AddressValidator
-} from "contracts/src/common/validate/AddressValidator.sol";
+// prettier-ignore
+import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 
 contract PolicySet is UsingConfig, UsingStorage {
 	// solium-disable-next-line no-empty-blocks
