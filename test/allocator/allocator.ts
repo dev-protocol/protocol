@@ -127,7 +127,17 @@ contract('Allocator', ([deployer]) => {
 				expect(res).to.be.equal(metrics.address)
 			})
 
-			it('The second argument is last run block number')
+			it('The second argument is last run block number', async () => {
+				const [dev, market, metrics] = await init()
+				const behavior = await getMarketBehavior(market)
+				dev.allocator.allocate(metrics.address)
+				const baseBlock = await dev.allocatorStorage.getBaseBlockNumber()
+				const res = await getEventValue(behavior, uri)(
+					'LogCalculate',
+					'_lastBlock'
+				)
+				expect(res.toString()).to.be.equal(baseBlock.toString())
+			})
 
 			it(
 				'The second argument is the block number of the end of the abstention penalty if the Metrics linked Property was the targeted of the abstention penalty'
