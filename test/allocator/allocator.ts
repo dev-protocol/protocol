@@ -294,11 +294,8 @@ contract('Allocator', ([deployer]) => {
 					.then(toBigNumber)
 			])
 			const assetValue = await policy
-				.assetValue(lockUpValue, 100)
+				.assetValue(100, lockUpValue)
 				.then(toBigNumber)
-			const marketValue = new BigNumber(marketLastValue)
-				.minus(metricsLastValue)
-				.plus(assetValue)
 			const mint = await policy
 				.rewards(lockUpValue, totalAssets)
 				.then(toBigNumber)
@@ -313,6 +310,9 @@ contract('Allocator', ([deployer]) => {
 				.div(block)
 				.toString()
 				.replace(/(.*)\..*/, '$1')
+			const marketValue = marketLastValue
+				.minus(metricsLastValue)
+				.plus(new BigNumber(value))
 
 			dev.allocator.allocate(metrics.address)
 			const [
@@ -343,12 +343,12 @@ contract('Allocator', ([deployer]) => {
 				})
 			})
 
-			expect(_blocks.toString()).to.be.equal(block.toFixed())
-			expect(_mint.toString()).to.be.equal(mint.toFixed())
+			expect(_blocks.toString()).to.be.equal(block.toString())
+			expect(_mint.toString()).to.be.equal(mint.toString())
 			expect(_value.toString()).to.be.equal(value)
-			expect(_marketValue.toString()).to.be.equal(marketValue.toFixed())
-			expect(_assets.toString()).to.be.equal(assets.toFixed())
-			expect(_totalAssets.toString()).to.be.equal(totalAssets.toFixed())
+			expect(_marketValue.toString()).to.be.equal(marketValue.toString())
+			expect(_assets.toString()).to.be.equal(assets.toString())
+			expect(_totalAssets.toString()).to.be.equal(totalAssets.toString())
 		})
 
 		it(

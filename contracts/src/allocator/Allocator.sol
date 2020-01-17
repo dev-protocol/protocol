@@ -72,7 +72,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 		uint256 blocks = block.number -
 			getStorage().getLastAllocationBlockEachMetrics(_metrics);
 		uint256 mint = policy.rewards(lockupValue, totalAssets);
-		uint256 value = (policy.assetValue(lockupValue, _value) * basis) /
+		uint256 value = (policy.assetValue(_value, lockupValue) * basis) /
 			blocks;
 		uint256 marketValue = getStorage().getLastAssetValueEachMarketPerBlock(
 			metrics.market()
