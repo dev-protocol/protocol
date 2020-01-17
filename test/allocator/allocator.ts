@@ -188,8 +188,6 @@ contract('Allocator', ([deployer]) => {
 				expect(res.toString()).to.be.equal(expected.toString())
 			})
 		})
-
-		it('Return ETH to the sender when sent it')
 	})
 
 	describe('Allocator; allocation', () => {
