@@ -72,6 +72,8 @@ contract('Allocator', ([deployer]) => {
 		return [dev, market, metrics]
 	}
 
+	const err = (error: Error): Error => error
+
 	describe('Allocator; allocate', () => {
 		it("Calls Market Contract's calculate function mapped to Metrics Contract", async () => {
 			const [dev, market, metrics] = await init()
@@ -84,7 +86,11 @@ contract('Allocator', ([deployer]) => {
 			expect(1).to.be.eq(1)
 		})
 
-		it('Should fail to call when other than Metrics address is passed')
+		it('Should fail to call when other than Metrics address is passed', async () => {
+			const [dev] = await init()
+			const res = await dev.allocator.allocate(dev.dev.address).catch(err)
+			expect(res).to.be.instanceOf(Error)
+		})
 
 		it(
 			'Should fail to call when the Metrics linked Property is the target of the abstention penalty'
