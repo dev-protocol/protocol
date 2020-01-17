@@ -79,4 +79,20 @@ export const waitForEvent = (deployedContract: any, uri: string) => async (
 		})
 	})
 
+export const getEventValue = (deployedContract: any, uri: string) => async (
+	name: string,
+	arg: string,
+	timeout = 10000
+): Promise<Error | string> =>
+	new Promise((resolve, reject) => {
+		setTimeout(() => reject(new Error()), timeout)
+		watch(deployedContract, uri)(name, (err, values) => {
+			if (err) {
+				return reject(err)
+			}
+
+			resolve(values[arg])
+		})
+	})
+
 export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000'

@@ -5,9 +5,14 @@ import {
 	getMarketAddress,
 	watch,
 	waitForEvent,
-	validateErrorMessage
+	validateErrorMessage,
+	getEventValue
 } from '../test-lib/utils'
-import {MetricsInstance, MarketInstance} from '../../types/truffle-contracts'
+import {
+	MetricsInstance,
+	MarketInstance,
+	MarketTest1Instance
+} from '../../types/truffle-contracts'
 const uri = 'ws://localhost:7545'
 
 contract('Allocator', ([deployer]) => {
@@ -74,16 +79,22 @@ contract('Allocator', ([deployer]) => {
 	}
 
 	const err = (error: Error): Error => error
+	const getMarketBehavior = async (
+		market: MarketInstance
+	): Promise<MarketTest1Instance> => {
+		const behavior = await market.behavior()
+		const [marketBehavior] = await Promise.all([
+			artifacts.require('MarketTest1').at(behavior)
+		])
+		return marketBehavior
+	}
 
 	describe('Allocator; allocate', () => {
 		it("Calls Market Contract's calculate function mapped to Metrics Contract", async () => {
 			const [dev, market, metrics] = await init()
-			const behavior = await market.behavior()
-			const [marketBehavior] = await Promise.all([
-				artifacts.require('MarketTest1').at(behavior)
-			])
+			const behavior = await getMarketBehavior(market)
 			dev.allocator.allocate(metrics.address)
-			await waitForEvent(marketBehavior, uri)('LogCalculate')
+			await waitForEvent(behavior, uri)('LogCalculate')
 			expect(1).to.be.eq(1)
 		})
 
@@ -105,7 +116,16 @@ contract('Allocator', ([deployer]) => {
 		})
 
 		describe('Allocator; Arguments to pass to calculate', () => {
-			it('The first argument is the address of Metrics Contract')
+			it('The first argument is the address of Metrics Contract', async () => {
+				const [dev, market, metrics] = await init()
+				const behavior = await getMarketBehavior(market)
+				dev.allocator.allocate(metrics.address)
+				const res = await getEventValue(behavior, uri)(
+					'LogCalculate',
+					'_metrics'
+				)
+				expect(res).to.be.equal(metrics.address)
+			})
 
 			it('The second argument is last run block number')
 
