@@ -179,7 +179,7 @@ contract('Allocator', ([deployer]) => {
 				const [dev, market, metrics] = await init()
 				const behavior = await getMarketBehavior(market)
 				const blockNumber = await behavior.blockNumber()
-				const expected = blockNumber.plus(1)
+				const expected = new BigNumber(blockNumber.toString()).plus(1)
 				dev.allocator.allocate(metrics.address)
 				const res = await getEventValue(behavior, uri)(
 					'LogCalculate',
