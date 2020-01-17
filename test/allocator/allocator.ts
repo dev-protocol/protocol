@@ -11,7 +11,9 @@ import {
 import {
 	MetricsInstance,
 	MarketInstance,
-	MarketTest1Instance
+	MarketTest1Instance,
+	AddressConfigInstance,
+	IPolicyInstance
 } from '../../types/truffle-contracts'
 const uri = 'ws://localhost:7545'
 
@@ -84,6 +86,16 @@ contract('Allocator', ([deployer]) => {
 			artifacts.require('MarketTest1').at(behavior)
 		])
 		return marketBehavior
+	}
+
+	const getPolicy = async (
+		addressConfig: AddressConfigInstance
+	): Promise<IPolicyInstance> => {
+		const policyAddress = await addressConfig.policy()
+		const [policy] = await Promise.all([
+			artifacts.require('IPolicy').at(policyAddress)
+		])
+		return policy
 	}
 
 	describe('Allocator; allocate', () => {
@@ -258,6 +270,85 @@ contract('Allocator', ([deployer]) => {
 					.integerValue()
 					.toFixed()
 			)
+		})
+
+		it('values passed to `allocation` is correct', async () => {
+			const [dev, market, metrics] = await init()
+			const toBigNumber = (x: string | BigNumber): BigNumber =>
+				new BigNumber(x.toString())
+			const policy = await getPolicy(dev.addressConfig)
+			const property = await metrics.property()
+			const totalAssets = await dev.metricsGroup
+				.totalIssuedMetrics()
+				.then(toBigNumber)
+			const assets = await market.issuedMetrics().then(toBigNumber)
+			const lockUpValue = await dev.lockup
+				.getPropertyValue(property)
+				.then(toBigNumber)
+			const [marketLastValue, metricsLastValue] = await Promise.all([
+				dev.allocatorStorage
+					.getLastAssetValueEachMarketPerBlock(market.address)
+					.then(toBigNumber),
+				dev.allocatorStorage
+					.getLastAssetValueEachMetrics(metrics.address)
+					.then(toBigNumber)
+			])
+			const assetValue = await policy
+				.assetValue(lockUpValue, 100)
+				.then(toBigNumber)
+			const marketValue = new BigNumber(marketLastValue)
+				.minus(metricsLastValue)
+				.plus(assetValue)
+			const mint = await policy
+				.rewards(lockUpValue, totalAssets)
+				.then(toBigNumber)
+			const lastBlock = await dev.allocatorStorage
+				.getLastAllocationBlockEachMetrics(metrics.address)
+				.then(toBigNumber)
+			const util = await artifacts.require('Util').new()
+			const currentBlock = await util.blockNumber().then(toBigNumber)
+			const block = currentBlock.plus(1).minus(lastBlock)
+			const value = assetValue
+				.times(new BigNumber('1000000000000000000'))
+				.div(block)
+				.toString()
+				.replace(/(.*)\..*/, '$1')
+
+			dev.allocator.allocate(metrics.address)
+			const [
+				_blocks,
+				_mint,
+				_value,
+				_marketValue,
+				_assets,
+				_totalAssets
+			] = await new Promise<BigNumber[]>(resolve => {
+				watch(dev.allocator, uri)('BeforeAllocation', (_, values) => {
+					const {
+						_blocks,
+						_mint,
+						_value,
+						_marketValue,
+						_assets,
+						_totalAssets
+					} = values
+					resolve([
+						new BigNumber(_blocks),
+						new BigNumber(_mint),
+						new BigNumber(_value),
+						new BigNumber(_marketValue),
+						new BigNumber(_assets),
+						new BigNumber(_totalAssets)
+					])
+				})
+			})
+
+			expect(_blocks.toString()).to.be.equal(block.toFixed())
+			expect(_mint.toString()).to.be.equal(mint.toFixed())
+			expect(_value.toString()).to.be.equal(value)
+			expect(_marketValue.toString()).to.be.equal(marketValue.toFixed())
+			expect(_assets.toString()).to.be.equal(assets.toFixed())
+			expect(_totalAssets.toString()).to.be.equal(totalAssets.toFixed())
 		})
 
 		it(
