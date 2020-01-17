@@ -16,9 +16,6 @@ import {
 const uri = 'ws://localhost:7545'
 
 contract('Allocator', ([deployer]) => {
-	const addressConfigContract = artifacts.require('AddressConfig')
-	const allocatorContract = artifacts.require('Allocator')
-	const decimalsLibrary = artifacts.require('Decimals')
 	const init = async (): Promise<[
 		DevProtocolInstance,
 		MarketInstance,
@@ -203,13 +200,8 @@ contract('Allocator', ([deployer]) => {
 				50000 *
 				(300 / 7406907) *
 				(48568 / 547568)}`, async () => {
-			const addressConfig = await addressConfigContract.new({from: deployer})
-			const decimals = await decimalsLibrary.new({from: deployer})
-			await allocatorContract.link('Decimals', decimals.address)
-			const allocator = await allocatorContract.new(addressConfig.address, {
-				from: deployer
-			})
-			const result = await allocator.allocation(
+			const [dev] = await init()
+			const result = await dev.allocator.allocation(
 				5760,
 				50000,
 				300,
@@ -224,14 +216,49 @@ contract('Allocator', ([deployer]) => {
 	})
 
 	describe('Allocator; calculatedCallback', () => {
-		it(`
-			last allocation block is 5760,
-			mint per block is 50000,
-			calculated asset value per block is 300,
-			Market's total asset value per block is 7406907,
-			number of assets per Market is 48568,
-			number of assets total all Market is 547568;
-			the incremented result is ${5760 * 50000 * (300 / 7406907) * (48568 / 547568)}`)
+		it('store the result of allocation as RewardsAmount', async () => {
+			const [dev, , metrics] = await init()
+			const property = await metrics.property()
+
+			dev.allocator.allocate(metrics.address)
+			const [
+				_blocks,
+				_mint,
+				_value,
+				_marketValue,
+				_assets,
+				_totalAssets
+			] = await new Promise<BigNumber[]>(resolve => {
+				watch(dev.allocator, uri)('BeforeAllocation', (_, values) => {
+					const {
+						_blocks,
+						_mint,
+						_value,
+						_marketValue,
+						_assets,
+						_totalAssets
+					} = values
+					resolve([
+						new BigNumber(_blocks),
+						new BigNumber(_mint),
+						new BigNumber(_value),
+						new BigNumber(_marketValue),
+						new BigNumber(_assets),
+						new BigNumber(_totalAssets)
+					])
+				})
+			})
+			const result = await dev.withdraw.getRewardsAmount(property)
+
+			expect(result.toString()).to.be.equal(
+				_blocks
+					.times(_mint)
+					.times(_value.div(_marketValue))
+					.times(_assets.div(_totalAssets))
+					.integerValue()
+					.toFixed()
+			)
+		})
 
 		it(
 			'When after increment, update the value of `lastAssetValueEachMarketPerBlock`'

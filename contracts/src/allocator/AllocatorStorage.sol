@@ -152,29 +152,28 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 	}
 
 	// lastAssetValueEachMarketPerBlock
-	function setLastAssetValueEachMarketPerBlock(
-		address _metrics,
-		uint256 value
-	) external {
+	function setLastAssetValueEachMarketPerBlock(address _market, uint256 value)
+		external
+	{
 		new AddressValidator().validateAddress(
 			msg.sender,
 			config().allocator()
 		);
 
 		eternalStorage().setUint(
-			getLastAssetValueEachMarketPerBlockKey(_metrics),
+			getLastAssetValueEachMarketPerBlockKey(_market),
 			value
 		);
 	}
 
-	function getLastAssetValueEachMarketPerBlock(address _metrics)
+	function getLastAssetValueEachMarketPerBlock(address _market)
 		external
 		view
 		returns (uint256)
 	{
 		return
 			eternalStorage().getUint(
-				getLastAssetValueEachMarketPerBlockKey(_metrics)
+				getLastAssetValueEachMarketPerBlockKey(_market)
 			);
 	}
 

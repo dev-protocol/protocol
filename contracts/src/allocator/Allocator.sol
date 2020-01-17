@@ -22,6 +22,14 @@ import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	event BeforeAllocation(
+		uint256 _blocks,
+		uint256 _mint,
+		uint256 _value,
+		uint256 _marketValue,
+		uint256 _assets,
+		uint256 _totalAssets
+	);
 
 	uint64 private constant basis = 1000000000000000000;
 
@@ -77,6 +85,14 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 		getStorage().setLastAssetValueEachMarketPerBlock(
 			metrics.market(),
 			marketValue
+		);
+		emit BeforeAllocation(
+			blocks,
+			mint,
+			value,
+			marketValue,
+			assets,
+			totalAssets
 		);
 		uint256 result = allocation(
 			blocks,
