@@ -4,7 +4,8 @@ import {
 	getPropertyAddress,
 	getMarketAddress,
 	watch,
-	waitForEvent
+	waitForEvent,
+	validateErrorMessage
 } from '../test-lib/utils'
 import {MetricsInstance, MarketInstance} from '../../types/truffle-contracts'
 const uri = 'ws://localhost:7545'
@@ -92,9 +93,16 @@ contract('Allocator', ([deployer]) => {
 			expect(res).to.be.instanceOf(Error)
 		})
 
-		it(
-			'Should fail to call when the Metrics linked Property is the target of the abstention penalty'
-		)
+		it('Should fail to call when the Metrics linked Property is the target of the abstention penalty', async () => {
+			const [dev, , metrics] = await init()
+			const marketBehavior = await artifacts
+				.require('MarketTest2')
+				.new(dev.addressConfig.address)
+			await dev.marketFactory.create(marketBehavior.address)
+			const res = await dev.allocator.allocate(metrics.address).catch(err)
+			validateErrorMessage(res as Error, 'outside the target period')
+			expect(res).to.be.instanceOf(Error)
+		})
 
 		describe('Allocator; Arguments to pass to calculate', () => {
 			it('The first argument is the address of Metrics Contract')

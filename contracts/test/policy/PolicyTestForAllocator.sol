@@ -68,7 +68,7 @@ contract PolicyTestForAllocator is IPolicy {
 	}
 
 	function abstentionPenalty(uint256 _count) external view returns (uint256) {
-		return 0;
+		return _count - 1;
 	}
 
 	function lockUpBlocks() external view returns (uint256) {
