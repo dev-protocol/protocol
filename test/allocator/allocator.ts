@@ -175,7 +175,18 @@ contract('Allocator', ([deployer]) => {
 				expect(res.toString()).to.be.equal(expected.toString())
 			})
 
-			it('The third argument is current block number')
+			it('The third argument is current block number', async () => {
+				const [dev, market, metrics] = await init()
+				const behavior = await getMarketBehavior(market)
+				const blockNumber = await behavior.blockNumber()
+				const expected = blockNumber.plus(1)
+				dev.allocator.allocate(metrics.address)
+				const res = await getEventValue(behavior, uri)(
+					'LogCalculate',
+					'_currentBlock'
+				)
+				expect(res.toString()).to.be.equal(expected.toString())
+			})
 		})
 
 		it('Return ETH to the sender when sent it')
