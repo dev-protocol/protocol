@@ -139,9 +139,41 @@ contract('Allocator', ([deployer]) => {
 				expect(res.toString()).to.be.equal(baseBlock.toString())
 			})
 
-			it(
-				'The second argument is the block number of the end of the abstention penalty if the Metrics linked Property was the targeted of the abstention penalty'
-			)
+			it('The second argument is the block number of the end of the abstention penalty if the Metrics linked Property was the targeted of the abstention penalty', async () => {
+				const [dev, market, metrics] = await init()
+				const behavior = await getMarketBehavior(market)
+				await dev.allocator.allocate(metrics.address)
+				const lastBlock = await dev.allocatorStorage.getLastBlockNumber(
+					metrics.address
+				)
+				const m1 = await artifacts
+					.require('MarketTest2')
+					.new(dev.addressConfig.address)
+				const m2 = await artifacts
+					.require('MarketTest3')
+					.new(dev.addressConfig.address)
+				await dev.marketFactory.create(m1.address)
+				await dev.marketFactory.create(m2.address)
+
+				// Increase block number
+				await Promise.all([
+					dev.dev.mint(deployer, 1),
+					dev.dev.mint(deployer, 1),
+					dev.dev.mint(deployer, 1),
+					dev.dev.mint(deployer, 1),
+					dev.dev.mint(deployer, 1)
+				])
+
+				const expected = lastBlock.toNumber() + 2
+
+				dev.allocator.allocate(metrics.address)
+				watch(dev.allocator, uri)('Log', (_, value) => console.log(value))
+				const res = await getEventValue(behavior, uri)(
+					'LogCalculate',
+					'_lastBlock'
+				)
+				expect(res.toString()).to.be.equal(expected.toString())
+			})
 
 			it('The third argument is current block number')
 		})

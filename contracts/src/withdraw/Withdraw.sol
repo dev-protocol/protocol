@@ -67,10 +67,13 @@ contract Withdraw is Pausable, UsingConfig {
 	}
 
 	function increment(address _property, uint256 _allocationResult) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not Allocator Contract"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 		uint256 priceValue = _allocationResult.outOf(
 			ERC20(_property).totalSupply()
 		);
