@@ -178,7 +178,8 @@ contract('Allocator', ([deployer]) => {
 			it('The third argument is current block number', async () => {
 				const [dev, market, metrics] = await init()
 				const behavior = await getMarketBehavior(market)
-				const blockNumber = await behavior.blockNumber()
+				const util = await artifacts.require('Util').new()
+				const blockNumber = await util.blockNumber()
 				const expected = new BigNumber(blockNumber.toString()).plus(1)
 				dev.allocator.allocate(metrics.address)
 				const res = await getEventValue(behavior, uri)(

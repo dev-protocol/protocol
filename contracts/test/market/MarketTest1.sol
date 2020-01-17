@@ -38,8 +38,4 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		Allocator(config().allocator()).calculatedCallback(_metrics, 100);
 		return true;
 	}
-
-	function blockNumber() public view returns (uint256) {
-		return block.number;
-	}
 }
