@@ -79,7 +79,7 @@ contract VoteCounter is UsingConfig {
 	function addOppositeCount(address _target, uint256 _voteCount) private {
 		uint256 oppositeCount = getStorage().getOppositeCount(_target);
 		oppositeCount = oppositeCount.add(_voteCount);
-		getStorage().setAgreeCount(_target, oppositeCount);
+		getStorage().setOppositeCount(_target, oppositeCount);
 	}
 
 	function getStorage() private view returns (VoteCounterStorage) {
