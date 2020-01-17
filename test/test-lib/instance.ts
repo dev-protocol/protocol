@@ -2,6 +2,7 @@ import {
 	AddressConfigInstance,
 	AllocatorInstance,
 	AllocatorStorageInstance,
+	VoteCounterInstance,
 	VoteCounterStorageInstance,
 	VoteTimesInstance,
 	VoteTimesStorageInstance,
@@ -18,6 +19,7 @@ import {
 	MarketGroupInstance,
 	MetricsFactoryInstance,
 	MetricsGroupInstance,
+	WithdrawInstance,
 	WithdrawStorageInstance,
 	IPolicyInstance,
 	IMarketInstance
@@ -35,6 +37,7 @@ export class DevProtocolInstance {
 	private _lockup!: LockupInstance
 	private _lockupStorage!: LockupStorageInstance
 	private _propertyFactory!: PropertyFactoryInstance
+	private _voteCounter!: VoteCounterInstance
 	private _voteCounterStorage!: VoteCounterStorageInstance
 	private _voteTimes!: VoteTimesInstance
 	private _voteTimesStorage!: VoteTimesStorageInstance
@@ -46,6 +49,7 @@ export class DevProtocolInstance {
 	private _marketGroup!: MarketGroupInstance
 	private _metricsFactory!: MetricsFactoryInstance
 	private _metricsGroup!: MetricsGroupInstance
+	private _withdraw!: WithdrawInstance
 	private _withdrawStorage!: WithdrawStorageInstance
 
 	constructor(deployer: string) {
@@ -82,6 +86,10 @@ export class DevProtocolInstance {
 
 	public get propertyFactory(): PropertyFactoryInstance {
 		return this._propertyFactory
+	}
+
+	public get voteCounter(): VoteCounterInstance {
+		return this._voteCounter
 	}
 
 	public get voteCounterStorage(): VoteCounterStorageInstance {
@@ -126,6 +134,10 @@ export class DevProtocolInstance {
 
 	public get metricsGroup(): MetricsGroupInstance {
 		return this._metricsGroup
+	}
+
+	public get withdraw(): WithdrawInstance {
+		return this._withdraw
 	}
 
 	public get withdrawStorage(): WithdrawStorageInstance {
@@ -201,6 +213,17 @@ export class DevProtocolInstance {
 		)
 		await this._addressConfig.setPropertyFactory(
 			this._propertyFactory.address,
+			this.fromDeployer
+		)
+	}
+
+	public async generateVoteCounter(): Promise<void> {
+		this._voteCounter = await contract('VoteCounter').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setVoteCounter(
+			this._voteCounter.address,
 			this.fromDeployer
 		)
 	}
@@ -331,6 +354,20 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this._metricsGroup.createStorage(this.fromDeployer)
+	}
+
+	public async generateWithdraw(): Promise<void> {
+		this._withdraw = await (async x => {
+			;(x as any).link(
+				'Decimals',
+				await this.generateDecimals().then(x => x.address)
+			)
+			return x.new(this.addressConfig.address, this.fromDeployer)
+		})(contract('Withdraw'))
+		await this._addressConfig.setWithdraw(
+			this._withdraw.address,
+			this.fromDeployer
+		)
 	}
 
 	public async generateWithdrawStorage(): Promise<void> {
