@@ -240,13 +240,10 @@ contract(
 				expect(times.toNumber()).to.be.equal(0)
 			})
 			it('VoteTimes votes will not be added when a vote by other than Property owner voted for.', async () => {
-				// 不動産所有者以外の投票が投票された場合、VoteTimes投票は追加されません。
 				let times = await dev.voteTimes.getAbstentionTimes(
 					createdPropertyAddress
 				)
-				console.log(1)
 				expect(times.toNumber()).to.be.equal(0)
-				console.log(2)
 				const second = await userInstance.getPolicy('PolicyTest1')
 				const result = await dev.policyFactory.create(second.address, {
 					from: user1
@@ -256,43 +253,175 @@ contract(
 				const secondPolicyInstance = await policyContract.at(
 					secondPolicyAddress
 				)
+				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
+				expect(times.toNumber()).to.be.equal(1)
 				await dev.dev.deposit(createdPropertyAddress, 100, {from: user1})
 				await secondPolicyInstance.vote(createdPropertyAddress, true, {
 					from: user1
 				})
 				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
-				console.log(3)
-				expect(times.toNumber()).to.be.equal(0)
-				console.log(4)
+				expect(times.toNumber()).to.be.equal(1)
 			})
-
-			// It('The number of lock-ups for it Property and the accumulated Market reward will be added to the vote against when a Property owner votes against.', async () => {
-			// 	// 不動産所有者が反対票を投じると、その資産のロックアップ数と累積市場報酬が反対票に追加されます
-			// })
-			// it('The number of votes VoteCounter is added when the Property owner votes against.', async () => {
-			// 	// 所有者が反対票を投じると、投票数VoteCounterが追加されます。
-			// })
-			// it('VoteCounter votes will not be added when a vote by other than Property owner voted against.', async () => {
-			// 	// 物件所有者以外の投票が反対票を投じた場合、VoteCounter投票は追加されません。
-			// })
-
-			// it('When an account of other than Property owner votes for, the number of lock-ups in the Property by its account will be added to the vote.', async () => {
-			// 	// プロパティ所有者以外のアカウントが投票する場合、そのアカウントによるプロパティのロックアップの数が投票に追加されます。
-			// })
+			it('The number of lock-ups for it Property and the accumulated Market reward will be added to the vote against when a Property owner votes against.', async () => {
+				const second = await userInstance.getPolicy('PolicyTest1')
+				const result = await dev.policyFactory.create(second.address, {
+					from: user1
+				})
+				const secondPolicyAddress = getPolicyAddress(result)
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const secondPolicyInstance = await policyContract.at(
+					secondPolicyAddress
+				)
+				let agreeCount = await dev.voteCounter.getAgreeCount(
+					secondPolicyAddress
+				)
+				expect(agreeCount.toNumber()).to.be.equal(0)
+				await dev.dev.deposit(createdPropertyAddress, 100, {from: user1})
+				await dev.dev.deposit(createdPropertyAddress, 100, {from: user2})
+				await secondPolicyInstance.vote(createdPropertyAddress, false, {
+					from: propertyAuther
+				})
+				agreeCount = await dev.voteCounter.getOppositeCount(secondPolicyAddress)
+				expect(agreeCount.toNumber()).to.be.equal(200)
+			})
+			it('The number of votes VoteTimes is added when the Property owner votes against.', async () => {
+				let times = await dev.voteTimes.getAbstentionTimes(
+					createdPropertyAddress
+				)
+				expect(times.toNumber()).to.be.equal(0)
+				const second = await userInstance.getPolicy('PolicyTest1')
+				const result = await dev.policyFactory.create(second.address, {
+					from: user1
+				})
+				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
+				expect(times.toNumber()).to.be.equal(1)
+				const secondPolicyAddress = getPolicyAddress(result)
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const secondPolicyInstance = await policyContract.at(
+					secondPolicyAddress
+				)
+				await dev.dev.deposit(createdPropertyAddress, 100, {from: user1})
+				await secondPolicyInstance.vote(createdPropertyAddress, false, {
+					from: propertyAuther
+				})
+				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
+				expect(times.toNumber()).to.be.equal(0)
+			})
+			it('VoteCounter votes will not be added when a vote by other than Property owner voted against.', async () => {
+				let times = await dev.voteTimes.getAbstentionTimes(
+					createdPropertyAddress
+				)
+				expect(times.toNumber()).to.be.equal(0)
+				const second = await userInstance.getPolicy('PolicyTest1')
+				const result = await dev.policyFactory.create(second.address, {
+					from: user1
+				})
+				const secondPolicyAddress = getPolicyAddress(result)
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const secondPolicyInstance = await policyContract.at(
+					secondPolicyAddress
+				)
+				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
+				expect(times.toNumber()).to.be.equal(1)
+				await dev.dev.deposit(createdPropertyAddress, 100, {from: user1})
+				await secondPolicyInstance.vote(createdPropertyAddress, false, {
+					from: user1
+				})
+				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
+				expect(times.toNumber()).to.be.equal(1)
+			})
+			it('When an account of other than Property owner votes for, the number of lock-ups in the Property by its account will be added to the vote.', async () => {
+				const second = await userInstance.getPolicy('PolicyTest1')
+				const result = await dev.policyFactory.create(second.address, {
+					from: user1
+				})
+				const secondPolicyAddress = getPolicyAddress(result)
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const secondPolicyInstance = await policyContract.at(
+					secondPolicyAddress
+				)
+				let agreeCount = await dev.voteCounter.getAgreeCount(
+					secondPolicyAddress
+				)
+				expect(agreeCount.toNumber()).to.be.equal(0)
+				await dev.dev.deposit(createdPropertyAddress, 100, {from: user1})
+				await dev.dev.deposit(createdPropertyAddress, 100, {from: user2})
+				await secondPolicyInstance.vote(createdPropertyAddress, true, {
+					from: user1
+				})
+				agreeCount = await dev.voteCounter.getAgreeCount(secondPolicyAddress)
+				expect(agreeCount.toNumber()).to.be.equal(100)
+			})
 		})
-		// Describe('PolicyFactory; convergePolicy', () => {
-		// 	it('Calling `convergePolicy` method when approved by Policy.policyApproval.', async () => {
-		// 		// Policy.policyApprovalによって承認されたときに `convergePolicy`メソッドを呼び出す
-		// 	})
-		// 	it('Change the current Policy by passing a Policy.', async () => {
-		// 		// ポリシーを渡すことにより、現在のポリシーを変更します。
-		// 	})
-		// 	it('Killing another Policy when changing Policy.', async () => {
-		// 		// ポリシーを変更するときに別のポリシーを強制終了する
-		// 	})
-		// 	it('Should fail when a call from other than Policy.', async () => {
-		// 		// ポリシー以外からの呼び出し時に失敗する必要があります
-		// 	})
-		// })
+		describe('PolicyFactory; convergePolicy', () => {
+			const policyContract = artifacts.require('Policy')
+			let firstPolicyInstance: PolicyInstance
+			let createdPropertyAddress: string
+			beforeEach(async () => {
+				await dev.generateAddressConfig()
+				await dev.generatePolicyGroup()
+				await dev.generatePolicySet()
+				await dev.generatePolicyFactory()
+				await dev.generateVoteTimes()
+				await dev.generateVoteTimesStorage()
+				await dev.generateVoteCounter()
+				await dev.generateVoteCounterStorage()
+				await dev.generateMarketFactory()
+				await dev.generateMarketGroup()
+				await dev.generatePropertyGroup()
+				await dev.generatePropertyFactory()
+				await dev.generateLockup()
+				await dev.generateLockupStorage()
+				await dev.generateAllocator()
+				await dev.generateAllocatorStorage()
+				await dev.generateWithdraw()
+				await dev.generateWithdrawStorage()
+				await dev.generateDev()
+				await dev.dev.mint(user1, 10000, {from: deployer})
+				policy = await userInstance.getPolicy('PolicyTest1')
+				const policyCreateResult = await dev.policyFactory.create(
+					policy.address,
+					{from: user1}
+				)
+				const firstPolicyAddress = getPolicyAddress(policyCreateResult)
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				firstPolicyInstance = await policyContract.at(firstPolicyAddress)
+				const propertyCreateResult = await dev.propertyFactory.create(
+					'test',
+					'TST',
+					propertyAuther
+				)
+				createdPropertyAddress = getPropertyAddress(propertyCreateResult)
+			})
+			it('Calling `convergePolicy` method when approved by Policy.policyApproval.', async () => {
+				const second = await userInstance.getPolicy('PolicyTest1')
+				const createResult = await dev.policyFactory.create(second.address, {
+					from: user1
+				})
+				const secondPolicyAddress = getPolicyAddress(createResult)
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const secondPolicyInstance = await policyContract.at(
+					secondPolicyAddress
+				)
+				await dev.dev.deposit(createdPropertyAddress, 10000, {from: user1})
+				await secondPolicyInstance.vote(createdPropertyAddress, true, {
+					from: user1
+				})
+				const nextPolicyAddress = await dev.addressConfig.policy()
+				expect(nextPolicyAddress).to.be.equal(secondPolicyAddress)
+				const voteResult = await firstPolicyInstance
+					.marketVotingBlocks()
+					.catch((err: Error) => err)
+				expect((voteResult as Error).message).to.be.equal(
+					"Returned values aren't valid, did it run Out of Gas?"
+				)
+			})
+			it('Should fail when a call from other than Policy.', async () => {
+				const result = await dev.policyFactory
+					.convergePolicy(policy.address, {from: deployer})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'this address is not proper')
+			})
+		})
 	}
 )

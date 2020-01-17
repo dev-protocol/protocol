@@ -35,7 +35,7 @@ contract PolicyFactory is Pausable, UsingConfig {
 	}
 
 	function convergePolicy(address _currentPolicyAddress) external {
-		new AddressValidator().validateAddress(
+		new AddressValidator().validateGroup(
 			msg.sender,
 			config().policyGroup()
 		);
