@@ -17,7 +17,7 @@ import {
 } from '../../types/truffle-contracts'
 const uri = 'ws://localhost:7545'
 
-contract('Allocator', ([deployer]) => {
+contract('Allocator', ([deployer, user1]) => {
 	const init = async (): Promise<[
 		DevProtocolInstance,
 		MarketInstance,
@@ -410,8 +410,13 @@ contract('Allocator', ([deployer]) => {
 			expect(res).to.be.an.instanceOf(Error)
 		})
 
-		it(
-			'Should fail to destruct this contract when sent from the non-owner account'
-		)
+		it('Should fail to destruct this contract when sent from the non-owner account', async () => {
+			const [dev] = await init()
+			const res = await dev.allocator
+				.kill({from: user1})
+				.catch((err: Error) => err)
+
+			expect(res).to.be.an.instanceOf(Error)
+		})
 	})
 })
