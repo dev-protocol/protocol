@@ -368,9 +368,14 @@ contract('Allocator', ([deployer]) => {
 			expect(before.toString()).to.be.not.equal(after.toString())
 		})
 
-		it(
-			'Should fail to call the function when sent from other than Behavior Contract mapped to Metrics Contract'
-		)
+		it('Should fail to call the function when sent from other than Behavior Contract mapped to Metrics Contract', async () => {
+			const [dev, , metrics] = await init()
+			const res = await dev.allocator
+				.calculatedCallback(metrics.address, 9999)
+				.catch((err: Error) => err)
+
+			expect(res).to.be.an.instanceOf(Error)
+		})
 
 		it(
 			'Should fail to call the function when it does not call in advance `allocate` function'
