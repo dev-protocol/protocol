@@ -36,7 +36,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function allocate(address _metrics) external {
+	function allocate(address _metrics) public {
 		new AddressValidator().validateGroup(_metrics, config().metricsGroup());
 
 		validateTargetPeriod(_metrics);
@@ -131,15 +131,6 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 			_from,
 			_to
 		);
-	}
-
-	function withdraw(address _property) external {
-		new AddressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
-
-		return Withdraw(config().withdraw()).withdraw(_property);
 	}
 
 	function getRewardsAmount(address _property)

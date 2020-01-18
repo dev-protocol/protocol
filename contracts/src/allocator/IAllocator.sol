@@ -1,14 +1,12 @@
 pragma solidity ^0.5.0;
 
 contract IAllocator {
-	function allocate(address _metrics) external;
+	function allocate(address _metrics) public;
 
 	function calculatedCallback(address _metrics, uint256 _value) external;
 
 	function beforeBalanceChange(address _property, address _from, address _to)
 		external;
-
-	function withdraw(address _property) external;
 
 	function getRewardsAmount(address _property)
 		external

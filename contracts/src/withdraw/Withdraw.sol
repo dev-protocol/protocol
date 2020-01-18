@@ -19,11 +19,11 @@ contract Withdraw is Pausable, UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function withdraw(address _property) external {
+	function withdraw(address _property) public {
 		require(paused() == false, "You cannot use that");
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
 		);
 
 		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
