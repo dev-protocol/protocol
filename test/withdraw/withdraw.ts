@@ -8,7 +8,7 @@ import {
 } from '../test-lib/utils'
 const uri = 'ws://localhost:7545'
 
-contract('WithdrawTest', ([deployer]) => {
+contract('WithdrawTest', ([deployer, user1]) => {
 	const init = async (): Promise<[
 		DevProtocolInstance,
 		MetricsInstance,
@@ -91,9 +91,32 @@ contract('WithdrawTest', ([deployer]) => {
 		})
 
 		describe('Withdraw; Withdrawable amount', () => {
-			it(
-				'The withdrawable amount each holder is the number multiplied the balance of the price per Property Contract and the Property Contract of the sender'
-			)
+			it('The withdrawable amount each holder is the number multiplied the balance of the price per Property Contract and the Property Contract of the sender', async () => {
+				const [dev, metrics, property] = await init()
+				const totalSupply = await property.totalSupply().then(toBigNumber)
+
+				await property.transfer(user1, totalSupply.times(0.2), {
+					from: deployer
+				})
+
+				await dev.allocator.allocate(metrics.address)
+
+				const totalAmount = await dev.withdrawStorage
+					.getRewardsAmount(property.address)
+					.then(toBigNumber)
+				const amount1 = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, deployer)
+					.then(toBigNumber)
+				const amount2 = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, user1)
+					.then(toBigNumber)
+
+				expect(totalAmount.toFixed()).to.be.equal(
+					amount1.plus(amount2).toFixed()
+				)
+				expect(totalAmount.times(0.8).toFixed()).to.be.equal(amount1.toFixed())
+				expect(totalAmount.times(0.2).toFixed()).to.be.equal(amount2.toFixed())
+			})
 
 			it(
 				'The withdrawal amount is always the full amount of the withdrawable amount'

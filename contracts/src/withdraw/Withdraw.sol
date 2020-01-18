@@ -26,9 +26,7 @@ contract Withdraw is Pausable, UsingConfig {
 			config().propertyGroup()
 		);
 
-		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
-		uint256 value = _value +
-			getStorage().getPendingWithdrawal(_property, msg.sender);
+		uint256 value = calculateWithdrawableAmount(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
 		uint256 price = getStorage().getCumulativePrice(_property);
 		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
@@ -48,7 +46,7 @@ contract Withdraw is Pausable, UsingConfig {
 		uint256 price = getStorage().getCumulativePrice(_property);
 		getStorage().setLastWithdrawalPrice(_property, _from, price);
 		getStorage().setLastWithdrawalPrice(_property, _to, price);
-		uint256 amount = calculateWithdrawableAmount(_property, _from);
+		uint256 amount = calculateAmount(_property, _from);
 		uint256 tmp = getStorage().getPendingWithdrawal(_property, _from);
 		getStorage().setPendingWithdrawal(_property, _from, tmp + amount);
 		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
@@ -91,8 +89,8 @@ contract Withdraw is Pausable, UsingConfig {
 		return getStorage().getRewardsAmount(_property);
 	}
 
-	function calculateWithdrawableAmount(address _property, address _user)
-		private
+	function calculateAmount(address _property, address _user)
+		public
 		view
 		returns (uint256)
 	{
@@ -114,6 +112,17 @@ contract Withdraw is Pausable, UsingConfig {
 		}
 		uint256 value = priceGap * balance;
 		return value.div(Decimals.basis());
+	}
+
+	function calculateWithdrawableAmount(address _property, address _user)
+		public
+		view
+		returns (uint256)
+	{
+		uint256 _value = calculateAmount(_property, _user);
+		uint256 value = _value +
+			getStorage().getPendingWithdrawal(_property, _user);
+		return value;
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {
