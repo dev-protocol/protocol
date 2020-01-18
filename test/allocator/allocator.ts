@@ -402,7 +402,13 @@ contract('Allocator', ([deployer]) => {
 	})
 
 	describe('Allocator; kill', () => {
-		it('Destruct this contract')
+		it('Destruct this contract', async () => {
+			const [dev] = await init()
+			await dev.allocator.kill()
+			const res = await dev.allocator.basis().catch((err: Error) => err)
+
+			expect(res).to.be.an.instanceOf(Error)
+		})
 
 		it(
 			'Should fail to destruct this contract when sent from the non-owner account'
