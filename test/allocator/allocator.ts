@@ -370,16 +370,35 @@ contract('Allocator', ([deployer]) => {
 
 		it('Should fail to call the function when sent from other than Behavior Contract mapped to Metrics Contract', async () => {
 			const [dev, , metrics] = await init()
+
+			await dev.addressConfig.setMetricsFactory(deployer)
+			await dev.metricsGroup.addGroup(deployer)
+
 			const res = await dev.allocator
 				.calculatedCallback(metrics.address, 9999)
 				.catch((err: Error) => err)
 
+			await dev.addressConfig.setMetricsFactory(dev.metricsFactory.address)
+
 			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(
+				res as Error,
+				`don't call from other than market behavior`
+			)
 		})
 
-		it(
-			'Should fail to call the function when it does not call in advance `allocate` function'
-		)
+		it('Should fail to call the function when it does not call in advance `allocate` function', async () => {
+			const [dev, , metrics] = await init()
+			const pending = await dev.allocatorStorage.getPendingIncrement(
+				metrics.address
+			)
+			const res = await dev.allocator
+				.calculatedCallback(metrics.address, 9999)
+				.catch((err: Error) => err)
+
+			expect(pending).to.be.equal(false)
+			expect(res).to.be.an.instanceOf(Error)
+		})
 	})
 
 	describe('Allocator; withdraw', () => {
