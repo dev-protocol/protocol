@@ -19,7 +19,6 @@ import {
 	MarketGroupInstance,
 	MetricsFactoryInstance,
 	MetricsGroupInstance,
-	WithdrawInstance,
 	WithdrawStorageInstance,
 	IPolicyInstance,
 	IMarketInstance,
