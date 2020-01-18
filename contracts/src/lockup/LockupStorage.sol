@@ -14,7 +14,10 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		external
 		returns (uint256)
 	{
-		new AddressValidator().validateAddress(msg.sender, config().lockup());
+		require(msg.sender == config().lockup(), "this address is not proper");
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getValueKey(_property, _sender);
 		eternalStorage().setUint(key, _value);
@@ -42,7 +45,10 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		external
 		returns (uint256)
 	{
-		new AddressValidator().validateAddress(msg.sender, config().lockup());
+		require(msg.sender == config().lockup(), "this address is not proper");
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getPropertyValueKey(_property);
 		eternalStorage().setUint(key, _value);
@@ -71,7 +77,10 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		address _from,
 		uint256 _value
 	) external {
-		new AddressValidator().validateAddress(msg.sender, config().lockup());
+		require(msg.sender == config().lockup(), "this address is not proper");
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getWithdrawalStatusKey(_property, _from);
 		eternalStorage().setUint(key, _value);
@@ -135,7 +144,10 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		address _user,
 		uint256 _value
 	) external {
-		new AddressValidator().validateAddress(msg.sender, config().lockup());
+		require(msg.sender == config().lockup(), "this address is not proper");
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(
 			getLastInterestPriceKey(_property, _user),
@@ -169,7 +181,10 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		address _user,
 		uint256 _value
 	) external {
-		new AddressValidator().validateAddress(msg.sender, config().lockup());
+		require(msg.sender == config().lockup(), "this address is not proper");
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(
 			getPendingInterestWithdrawalKey(_property, _user),

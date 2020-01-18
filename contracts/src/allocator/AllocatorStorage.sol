@@ -10,10 +10,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 
 	// Last Block Number
 	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 
 		eternalStorage().setUint(getLastBlockNumberKey(_metrics), _blocks);
 	}
@@ -36,10 +39,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 
 	// Base Block Number
 	function setBaseBlockNumber(uint256 _blockNumber) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 
 		eternalStorage().setUint(getBaseBlockNumberKey(), _blockNumber);
 	}
@@ -86,10 +92,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 		address _metrics,
 		uint256 blockNumber
 	) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 
 		eternalStorage().setUint(
 			getLastAllocationBlockEachMetricsKey(_metrics),
@@ -123,10 +132,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 	function setLastAssetValueEachMetrics(address _metrics, uint256 value)
 		external
 	{
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 
 		eternalStorage().setUint(
 			getLastAssetValueEachMetricsKey(_metrics),
@@ -155,10 +167,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 	function setLastAssetValueEachMarketPerBlock(address _market, uint256 value)
 		external
 	{
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator();
 
 		eternalStorage().setUint(
 			getLastAssetValueEachMarketPerBlockKey(_market),
