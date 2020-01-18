@@ -351,9 +351,22 @@ contract('Allocator', ([deployer]) => {
 			expect(_totalAssets.toString()).to.be.equal(totalAssets.toString())
 		})
 
-		it(
-			'When after increment, update the value of `lastAssetValueEachMarketPerBlock`'
-		)
+		it('When after increment, update the value of `lastAssetValueEachMarketPerBlock`', async () => {
+			const [dev, market, metrics] = await init()
+			const toBigNumber = (x: string | BigNumber): BigNumber =>
+				new BigNumber(x.toString())
+			const before = await dev.allocatorStorage
+				.getLastAssetValueEachMarketPerBlock(market.address)
+				.then(toBigNumber)
+
+			await dev.allocator.allocate(metrics.address)
+
+			const after = await dev.allocatorStorage
+				.getLastAssetValueEachMarketPerBlock(market.address)
+				.then(toBigNumber)
+
+			expect(before.toString()).to.be.not.equal(after.toString())
+		})
 
 		it(
 			'Should fail to call the function when sent from other than Behavior Contract mapped to Metrics Contract'
