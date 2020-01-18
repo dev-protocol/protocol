@@ -118,9 +118,37 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				expect(totalAmount.times(0.2).toFixed()).to.be.equal(amount2.toFixed())
 			})
 
-			it(
-				'The withdrawal amount is always the full amount of the withdrawable amount'
-			)
+			it('The withdrawal amount is always the full amount of the withdrawable amount', async () => {
+				const [dev, metrics, property] = await init()
+				const totalSupply = await property.totalSupply().then(toBigNumber)
+				const prevBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const prevBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
+
+				await property.transfer(user1, totalSupply.times(0.2), {
+					from: deployer
+				})
+
+				await dev.allocator.allocate(metrics.address)
+
+				const amount1 = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, deployer)
+					.then(toBigNumber)
+				const amount2 = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, user1)
+					.then(toBigNumber)
+				await dev.withdraw.withdraw(property.address, {from: deployer})
+				await dev.withdraw.withdraw(property.address, {from: user1})
+
+				const nextBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const nextBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
+
+				expect(prevBalance1.plus(amount1).toFixed()).to.be.equal(
+					nextBalance1.toFixed()
+				)
+				expect(prevBalance2.plus(amount2).toFixed()).to.be.equal(
+					nextBalance2.toFixed()
+				)
+			})
 
 			it('When the withdrawable amount is 0, the withdrawal amount is 0')
 		})
