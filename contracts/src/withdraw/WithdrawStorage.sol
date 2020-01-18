@@ -13,7 +13,13 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 
 	// RewardsAmount
 	function setRewardsAmount(address _property, uint256 _value) external {
-		new AddressValidator().validateAddress(msg.sender, config().withdraw());
+		require(
+			msg.sender == config().withdraw(),
+			"this address is not proper"
+		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getRewardsAmountKey(_property), _value);
 	}
@@ -39,7 +45,13 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		external
 		returns (uint256)
 	{
-		new AddressValidator().validateAddress(msg.sender, config().withdraw());
+		require(
+			msg.sender == config().withdraw(),
+			"this address is not proper"
+		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
 	}
@@ -66,7 +78,13 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		address _user,
 		uint256 _value
 	) external {
-		new AddressValidator().validateAddress(msg.sender, config().withdraw());
+		require(
+			msg.sender == config().withdraw(),
+			"this address is not proper"
+		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(
 			getWithdrawalLimitTotalKey(_property, _user),
@@ -102,7 +120,13 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		address _user,
 		uint256 _value
 	) external {
-		new AddressValidator().validateAddress(msg.sender, config().withdraw());
+		require(
+			msg.sender == config().withdraw(),
+			"this address is not proper"
+		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(
 			getWithdrawalLimitBalanceKey(_property, _user),
@@ -138,7 +162,13 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		address _user,
 		uint256 _value
 	) external {
-		new AddressValidator().validateAddress(msg.sender, config().withdraw());
+		require(
+			msg.sender == config().withdraw(),
+			"this address is not proper"
+		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(
 			getLastWithdrawalPriceKey(_property, _user),
@@ -174,7 +204,13 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 		address _user,
 		uint256 _value
 	) external {
-		new AddressValidator().validateAddress(msg.sender, config().withdraw());
+		require(
+			msg.sender == config().withdraw(),
+			"this address is not proper"
+		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(
 			getPendingWithdrawalKey(_property, _user),

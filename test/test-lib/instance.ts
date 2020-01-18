@@ -19,10 +19,10 @@ import {
 	MarketGroupInstance,
 	MetricsFactoryInstance,
 	MetricsGroupInstance,
-	WithdrawInstance,
 	WithdrawStorageInstance,
 	IPolicyInstance,
-	IMarketInstance
+	IMarketInstance,
+	WithdrawInstance
 } from '../../types/truffle-contracts'
 
 const contract = artifacts.require

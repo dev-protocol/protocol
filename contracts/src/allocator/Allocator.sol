@@ -22,8 +22,16 @@ import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	event BeforeAllocation(
+		uint256 _blocks,
+		uint256 _mint,
+		uint256 _value,
+		uint256 _marketValue,
+		uint256 _assets,
+		uint256 _totalAssets
+	);
 
-	uint64 private constant basis = 1000000000000000000;
+	uint64 public constant basis = 1000000000000000000;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -64,7 +72,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 		uint256 blocks = block.number -
 			getStorage().getLastAllocationBlockEachMetrics(_metrics);
 		uint256 mint = policy.rewards(lockupValue, totalAssets);
-		uint256 value = (policy.assetValue(lockupValue, _value) * basis) /
+		uint256 value = (policy.assetValue(_value, lockupValue) * basis) /
 			blocks;
 		uint256 marketValue = getStorage().getLastAssetValueEachMarketPerBlock(
 			metrics.market()
@@ -77,6 +85,14 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 		getStorage().setLastAssetValueEachMarketPerBlock(
 			metrics.market(),
 			marketValue
+		);
+		emit BeforeAllocation(
+			blocks,
+			mint,
+			value,
+			marketValue,
+			assets,
+			totalAssets
 		);
 		uint256 result = allocation(
 			blocks,
@@ -142,8 +158,12 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 		uint256 _assets,
 		uint256 _totalAssets
 	) public pure returns (uint256) {
-		uint256 aShare = _assets.outOf(_totalAssets);
-		uint256 vShare = _value.outOf(_marketValue);
+		uint256 aShare = _totalAssets > 0
+			? _assets.outOf(_totalAssets)
+			: Decimals.basis();
+		uint256 vShare = _marketValue > 0
+			? _value.outOf(_marketValue)
+			: Decimals.basis();
 		uint256 mint = _mint.mul(_blocks);
 		return
 			mint.mul(aShare).mul(vShare).div(Decimals.basis()).div(

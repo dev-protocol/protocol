@@ -83,10 +83,13 @@ contract Lockup is Pausable, UsingConfig {
 	}
 
 	function increment(address _property, uint256 _interestResult) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 		uint256 priceValue = _interestResult.outOf(
 			getStorage().getPropertyValue(_property)
 		);

@@ -10,10 +10,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 
 	// Last Block Number
 	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 
 		eternalStorage().setUint(getLastBlockNumberKey(_metrics), _blocks);
 	}
@@ -36,10 +39,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 
 	// Base Block Number
 	function setBaseBlockNumber(uint256 _blockNumber) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 
 		eternalStorage().setUint(getBaseBlockNumberKey(), _blockNumber);
 	}
@@ -54,10 +60,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 
 	// PendingIncrement
 	function setPendingIncrement(address _metrics, bool value) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 
 		eternalStorage().setBool(getPendingIncrementKey(_metrics), value);
 	}
@@ -83,10 +92,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 		address _metrics,
 		uint256 blockNumber
 	) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 
 		eternalStorage().setUint(
 			getLastAllocationBlockEachMetricsKey(_metrics),
@@ -120,10 +132,13 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 	function setLastAssetValueEachMetrics(address _metrics, uint256 value)
 		external
 	{
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator());
 
 		eternalStorage().setUint(
 			getLastAssetValueEachMetricsKey(_metrics),
@@ -149,29 +164,31 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 	}
 
 	// lastAssetValueEachMarketPerBlock
-	function setLastAssetValueEachMarketPerBlock(
-		address _metrics,
-		uint256 value
-	) external {
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+	function setLastAssetValueEachMarketPerBlock(address _market, uint256 value)
+		external
+	{
+		require(
+			msg.sender == config().allocator(),
+			"this address is not proper"
 		);
+		// TODO
+		// Not working for some reason("require" is working instead):
+		// new AddressValidator().validateAddress(msg.sender, config().allocator();
 
 		eternalStorage().setUint(
-			getLastAssetValueEachMarketPerBlockKey(_metrics),
+			getLastAssetValueEachMarketPerBlockKey(_market),
 			value
 		);
 	}
 
-	function getLastAssetValueEachMarketPerBlock(address _metrics)
+	function getLastAssetValueEachMarketPerBlock(address _market)
 		external
 		view
 		returns (uint256)
 	{
 		return
 			eternalStorage().getUint(
-				getLastAssetValueEachMarketPerBlockKey(_metrics)
+				getLastAssetValueEachMarketPerBlockKey(_market)
 			);
 	}
 
