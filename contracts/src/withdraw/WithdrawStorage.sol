@@ -47,7 +47,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig {
 	{
 		require(
 			msg.sender == config().withdraw(),
-			"this address is not Withdraw Contract"
+			"this address is not proper"
 		);
 		// TODO
 		// Not working for some reason("require" is working instead):

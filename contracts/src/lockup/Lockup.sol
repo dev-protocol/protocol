@@ -85,7 +85,7 @@ contract Lockup is Pausable, UsingConfig {
 	function increment(address _property, uint256 _interestResult) external {
 		require(
 			msg.sender == config().allocator(),
-			"this address is not Allocator Contract"
+			"this address is not this address is not proper"
 		);
 		// TODO
 		// Not working for some reason("require" is working instead):

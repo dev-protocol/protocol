@@ -111,10 +111,7 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		external
 		returns (uint256)
 	{
-		require(
-			msg.sender == config().lockup(),
-			"this address is not Lockup Contract"
-		);
+		require(msg.sender == config().lockup(), "this address is not proper");
 		// TODO
 		// Not working for some reason("require" is working instead):
 		// new AddressValidator().validateAddress(msg.sender, config().lockup());

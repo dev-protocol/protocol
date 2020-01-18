@@ -62,7 +62,7 @@ contract AllocatorStorage is UsingStorage, UsingConfig {
 	function setPendingIncrement(address _metrics, bool value) external {
 		require(
 			msg.sender == config().allocator(),
-			"this address is not Allocator Contract"
+			"this address is not proper"
 		);
 		// TODO
 		// Not working for some reason("require" is working instead):
