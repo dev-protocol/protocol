@@ -50,7 +50,11 @@ contract Withdraw is Pausable, UsingConfig {
 		getStorage().setLastWithdrawalPrice(_property, _to, price);
 		uint256 pendFrom = getStorage().getPendingWithdrawal(_property, _from);
 		uint256 pendTo = getStorage().getPendingWithdrawal(_property, _to);
-		getStorage().setPendingWithdrawal(_property, _from, pendFrom + amountFrom);
+		getStorage().setPendingWithdrawal(
+			_property,
+			_from,
+			pendFrom + amountFrom
+		);
 		getStorage().setPendingWithdrawal(_property, _to, pendTo + amountTo);
 		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
 			_property,
@@ -84,11 +88,7 @@ contract Withdraw is Pausable, UsingConfig {
 		getStorage().setCumulativePrice(_property, price.add(priceValue));
 	}
 
-	function getRewardsAmount(address _property)
-		public
-		view
-		returns (uint256)
-	{
+	function getRewardsAmount(address _property) public view returns (uint256) {
 		return getStorage().getRewardsAmount(_property);
 	}
 
