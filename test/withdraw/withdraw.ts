@@ -171,14 +171,57 @@ contract('WithdrawTest', ([deployer, user1]) => {
 			})
 		})
 
-		describe('Withdraw; Alice has sent 800 out of 1000 tokens to Bob. Bob has increased from 200 tokens to 1000 tokens. Price is 100', () => {
-			describe('Withdraw; Before increment', () => {
-				it(`Alice's withdrawable amount is ${1000 * 100}`)
+		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			let metrics: MetricsInstance
+			const alice = deployer
+			const bob = user1
 
-				it(`Bob's withdrawable amount is ${200 * 100}`)
+			before(async () => {
+				;[dev, metrics, property] = await init()
+
+				const totalSupply = await property.totalSupply().then(toBigNumber)
+				await property.transfer(bob, totalSupply.times(0.2), {
+					from: alice
+				})
+				await dev.allocator.allocate(metrics.address)
+				await property.transfer(bob, totalSupply.times(0.1), {
+					from: alice
+				})
 			})
 
-			describe('Withdraw; After increment; New price is 120', () => {
+			describe('Withdraw; Before increment', () => {
+				it(`Alice's withdrawable amount is 80% of reward`, async () => {
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const totalAmount = await dev.withdraw
+						.getRewardsAmount(property.address)
+						.then(toBigNumber)
+
+					// 1 or less is within the error range.
+					expect(
+						aliceAmount.minus(totalAmount.times(0.8).integerValue()).toNumber()
+					).to.be.within(-1, 1)
+				})
+
+				it(`Bob's withdrawable amount is 20% of reward`, async () => {
+					const bobAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, bob)
+						.then(toBigNumber)
+					const totalAmount = await dev.withdraw
+						.getRewardsAmount(property.address)
+						.then(toBigNumber)
+
+					// 1 or less is within the error range.
+					expect(
+						bobAmount.minus(totalAmount.times(0.2).integerValue()).toNumber()
+					).to.be.within(-1, 1)
+				})
+			})
+
+			describe('Withdraw; After increment', () => {
 				it(`Alice's withdrawable amount is ${1000 * 100 + 200 * 120}`)
 
 				it(`Bob's withdrawable amount is ${200 * 100 + 1000 * 120}`)
