@@ -4,7 +4,8 @@ import BigNumber from 'bignumber.js'
 import {
 	getPropertyAddress,
 	getMarketAddress,
-	getEventValue
+	getEventValue,
+	validateErrorMessage
 } from '../test-lib/utils'
 const uri = 'ws://localhost:7545'
 
@@ -150,7 +151,24 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				)
 			})
 
-			it('When the withdrawable amount is 0, the withdrawal amount is 0')
+			it('should fail to withdraw when the withdrawable amount is 0', async () => {
+				const [dev, metrics, property] = await init()
+				const prevBalance = await dev.dev.balanceOf(user1).then(toBigNumber)
+
+				await dev.allocator.allocate(metrics.address)
+
+				const amount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, user1)
+					.then(toBigNumber)
+				const res = await dev.withdraw
+					.withdraw(property.address, {from: user1})
+					.catch((err: Error) => err)
+				const afterBalance = await dev.dev.balanceOf(user1).then(toBigNumber)
+
+				expect(amount.toFixed()).to.be.equal('0')
+				expect(prevBalance.toFixed()).to.be.equal(afterBalance.toFixed())
+				validateErrorMessage(res as Error, 'withdraw value is 0')
+			})
 		})
 
 		describe('Withdraw; Alice has sent 800 out of 1000 tokens to Bob. Bob has increased from 200 tokens to 1000 tokens. Price is 100', () => {
