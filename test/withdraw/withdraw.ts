@@ -170,7 +170,8 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				validateErrorMessage(res as Error, 'withdraw value is 0')
 			})
 		})
-
+	})
+	describe('Withdraw; beforeBalanceChange', () => {
 		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
@@ -231,9 +232,6 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				'Should fail to call `beforeBalanceChange` when sent from other than Property Contract address'
 			)
 		})
-	})
-	describe('Withdraw; beforeBalanceChange', () => {
-		// TODO
 	})
 	// Etc...
 })
