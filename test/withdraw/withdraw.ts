@@ -232,6 +232,8 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				'Should fail to call `beforeBalanceChange` when sent from other than Property Contract address'
 			)
 		})
+		it(
+			'should fail to call the function when sent from other than Allocator Contract'
+		)
 	})
-	// Etc...
 })
