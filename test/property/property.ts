@@ -1,77 +1,71 @@
-import {validateAddressErrorMessage} from '../test-lib/utils'
+import {DevProtocolInstance} from '../test-lib/instance'
+import {
+	validateAddressErrorMessage,
+	getPropertyAddress
+} from '../test-lib/utils'
 
-contract('PropertyTest', ([deployer, ui]) => {
-	const lockupContract = artifacts.require('Lockup')
-	const propertyFactoryContract = artifacts.require('PropertyFactory')
+contract('PropertyTest', ([deployer, author, user, propertyFactory]) => {
 	const propertyContract = artifacts.require('Property')
-	const propertyGroupContract = artifacts.require('PropertyGroup')
-	const addressConfigContract = artifacts.require('AddressConfig')
-	const voteTimesContract = artifacts.require('VoteTimes')
-	const voteTimesStorageContract = artifacts.require('VoteTimesStorage')
-	const decimalsLibrary = artifacts.require('Decimals')
-	describe('Property; withdrawDev', () => {
-		let propertyFactory: any
-		let propertyGroup: any
-		let addressConfig: any
-		let propertyAddress: any
-		let voteTimes: any
-		let lockup: any
-		let property: any
-		beforeEach(async () => {
-			addressConfig = await addressConfigContract.new({from: deployer})
-			const decimals = await decimalsLibrary.new({from: deployer})
-			await lockupContract.link('Decimals', decimals.address)
-			lockup = await lockupContract.new(addressConfig.address)
-			voteTimes = await voteTimesContract.new(addressConfig.address, {
-				from: deployer
-			})
-			await addressConfig.setVoteTimes(voteTimes.address, {
-				from: deployer
-			})
-			const voteTimesStorage = await voteTimesStorageContract.new(
-				addressConfig.address,
-				{
-					from: deployer
-				}
-			)
-			await voteTimesStorage.createStorage()
-			await addressConfig.setVoteTimesStorage(voteTimesStorage.address, {
-				from: deployer
-			})
-			propertyGroup = await propertyGroupContract.new(addressConfig.address, {
-				from: deployer
-			})
-			propertyGroup.createStorage()
-			await addressConfig.setPropertyGroup(propertyGroup.address, {
-				from: deployer
-			})
-
-			await addressConfig.setLockup(lockup.address, {
-				from: deployer
-			})
-			propertyFactory = await propertyFactoryContract.new(
-				addressConfig.address,
-				{from: deployer}
-			)
-			await addressConfig.setPropertyFactory(propertyFactory.address, {
-				from: deployer
-			})
-			const result = await propertyFactory.create('sample', 'SAMPLE', ui, {
-				from: ui
-			})
-			propertyAddress = await result.logs.filter(
-				(e: {event: string}) => e.event === 'Create'
-			)[0].args._property
+	describe('Property; constructor', () => {
+		const dev = new DevProtocolInstance(deployer)
+		before(async () => {
+			await dev.generateAddressConfig()
 		})
-		it('When executed from other than the lockup address', async () => {
-			// eslint-disable-next-line @typescript-eslint/await-thenable
-			property = await propertyContract.at(propertyAddress)
-			const result = await property
-				.withdrawDev(ui, {from: deployer})
+		it('Cannot be created from other than factory', async () => {
+			const result = await propertyContract
+				.new(dev.addressConfig.address, author, 'sample', 'SAMPLE', {
+					from: deployer
+				})
 				.catch((err: Error) => err)
 			validateAddressErrorMessage(result as Error)
 		})
-		it('When lockup value is 0')
+		it('The author, decimal places, and number of issues are fixed values', async () => {
+			await dev.addressConfig.setPropertyFactory(propertyFactory)
+			const propertyInstance = await propertyContract.new(
+				dev.addressConfig.address,
+				author,
+				'sample',
+				'SAMPLE',
+				{
+					from: propertyFactory
+				}
+			)
+			expect(await propertyInstance.author()).to.be.equal(author)
+			expect((await propertyInstance.decimals()).toNumber()).to.be.equal(18)
+			expect((await propertyInstance.balanceOf(author)).toNumber()).to.be.equal(
+				10000000
+			)
+		})
+	})
+	describe('Property; withdrawDev', () => {
+		const dev = new DevProtocolInstance(deployer)
+		let propertyAddress: string
+		beforeEach(async () => {
+			await dev.generateAddressConfig()
+			await dev.generateLockup()
+			await dev.generateLockupStorage()
+			await dev.generateVoteTimes()
+			await dev.generateVoteTimesStorage()
+			await dev.generatePropertyGroup()
+			await dev.generatePropertyFactory()
+			const result = await dev.propertyFactory.create(
+				'sample',
+				'SAMPLE',
+				author,
+				{
+					from: user
+				}
+			)
+			propertyAddress = getPropertyAddress(result)
+		})
+		it('When executed from other than the lockup address', async () => {
+			// eslint-disable-next-line @typescript-eslint/await-thenable
+			const property = await propertyContract.at(propertyAddress)
+			const result = await property
+				.withdrawDev(user, {from: deployer})
+				.catch((err: Error) => err)
+			validateAddressErrorMessage(result as Error)
+		})
 		it('When withdrawn successfully')
 	})
 })
