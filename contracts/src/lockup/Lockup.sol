@@ -36,16 +36,7 @@ contract Lockup is Pausable, UsingConfig {
 		require(isWaiting == false, "lockup is already canceled");
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
-		getStorage().setLastInterestPrice(
-			_property,
-			_from,
-			getStorage().getInterestPrice(_property)
-		);
-		getStorage().setPendingInterestWithdrawal(
-			_property,
-			_from,
-			_calculateInterestAmount(_property, _from)
-		);
+		updateInterest(_property, _from, getStorage().getInterestPrice(_property), _calculateInterestAmount(_property, _from));
 	}
 
 	function cancel(address _property) external {
@@ -136,12 +127,18 @@ contract Lockup is Pausable, UsingConfig {
 	}
 
 	function withdrawInterest(address _property) external {
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
+		);
+
 		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
 		);
 		require(value > 0, "your interest amount is 0");
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
+		updateInterest(_property, msg.sender, getStorage().getInterestPrice(_property), 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		erc20.mint(msg.sender, value);
 	}
@@ -213,5 +210,18 @@ contract Lockup is Pausable, UsingConfig {
 
 	function getStorage() private view returns (LockupStorage) {
 		return LockupStorage(config().lockupStorage());
+	}
+
+	function updateInterest(address _property, address _from, uint256 _price, uint256 _pend) private {
+		getStorage().setLastInterestPrice(
+			_property,
+			_from,
+			_price
+		);
+		getStorage().setPendingInterestWithdrawal(
+			_property,
+			_from,
+			_pend
+		);
 	}
 }
