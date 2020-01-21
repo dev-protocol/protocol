@@ -201,10 +201,12 @@ contract('WithdrawTest', ([deployer, user1]) => {
 						.getRewardsAmount(property.address)
 						.then(toBigNumber)
 
-					// 1 or less is within the error range.
-					expect(
-						aliceAmount.minus(totalAmount.times(0.8).integerValue()).toNumber()
-					).to.be.within(-1, 1)
+					expect(aliceAmount.toFixed()).to.be.equal(
+						totalAmount
+							.times(0.8)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.toFixed()
+					)
 				})
 
 				it(`Bob's withdrawable amount is 20% of reward`, async () => {
@@ -215,10 +217,12 @@ contract('WithdrawTest', ([deployer, user1]) => {
 						.getRewardsAmount(property.address)
 						.then(toBigNumber)
 
-					// 1 or less is within the error range.
-					expect(
-						bobAmount.minus(totalAmount.times(0.2).integerValue()).toNumber()
-					).to.be.within(-1, 1)
+					expect(bobAmount.toFixed()).to.be.equal(
+						totalAmount
+							.times(0.2)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.toFixed()
+					)
 				})
 			})
 
