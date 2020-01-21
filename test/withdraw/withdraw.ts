@@ -255,9 +255,25 @@ contract('WithdrawTest', ([deployer, user1]) => {
 					)
 				})
 
-				it(
-					`Bob's withdrawable amount is 20% of prev reward and 30% of current reward`
-				)
+				it(`Bob's withdrawable amount is 20% of prev reward and 30% of current reward`, async () => {
+					const bobAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, bob)
+						.then(toBigNumber)
+					const increased = (
+						await dev.withdraw
+							.getRewardsAmount(property.address)
+							.then(toBigNumber)
+					).minus(prev)
+
+					expect(bobAmount.toFixed()).to.be.equal(
+						prev
+							.times(0.2)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.plus(increased.times(0.3))
+							.integerValue(BigNumber.ROUND_DOWN)
+							.toFixed()
+					)
+				})
 			})
 
 			it(
