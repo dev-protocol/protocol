@@ -223,9 +223,37 @@ contract('WithdrawTest', ([deployer, user1]) => {
 			})
 
 			describe('Withdraw; After increment', () => {
-				it(`Alice's withdrawable amount is ${1000 * 100 + 200 * 120}`)
+				let prev: BigNumber
+				before(async () => {
+					prev = await dev.withdraw
+						.getRewardsAmount(property.address)
+						.then(toBigNumber)
+					await dev.allocator.allocate(metrics.address)
+				})
 
-				it(`Bob's withdrawable amount is ${200 * 100 + 1000 * 120}`)
+				it(`Alice's withdrawable amount is 80% of prev reward and 70% of current reward`, async () => {
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const increased = (
+						await dev.withdraw
+							.getRewardsAmount(property.address)
+							.then(toBigNumber)
+					).minus(prev)
+
+					expect(aliceAmount.toFixed()).to.be.equal(
+						prev
+							.times(0.8)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.plus(increased.times(0.7))
+							.integerValue(BigNumber.ROUND_DOWN)
+							.toFixed()
+					)
+				})
+
+				it(
+					`Bob's withdrawable amount is 20% of prev reward and 30% of current reward`
+				)
 			})
 
 			it(
