@@ -19,7 +19,7 @@ contract Withdraw is Pausable, UsingConfig {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function withdraw(address _property) public {
+	function withdraw(address _property) external {
 		require(paused() == false, "You cannot use that");
 		new AddressValidator().validateGroup(
 			_property,
@@ -88,7 +88,11 @@ contract Withdraw is Pausable, UsingConfig {
 		getStorage().setCumulativePrice(_property, price.add(priceValue));
 	}
 
-	function getRewardsAmount(address _property) public view returns (uint256) {
+	function getRewardsAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
 		return getStorage().getRewardsAmount(_property);
 	}
 
