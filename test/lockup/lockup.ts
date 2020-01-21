@@ -79,6 +79,7 @@ contract('LockupTest', ([deployer]) => {
 		it('transfer was failed')
 		it('success', async () => {
 			const [dev, , , property] = await init()
+			await dev.addressConfig.setToken(deployer)
 			await dev.lockup.lockup(deployer, property.address, 100)
 			// eslint-disable-next-line no-warning-comments
 			// TODO assert
