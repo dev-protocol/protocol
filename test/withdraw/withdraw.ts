@@ -301,8 +301,5 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				validateErrorMessage(res as Error, 'this address is not proper')
 			})
 		})
-		it(
-			'should fail to call the function when sent from other than Allocator Contract'
-		)
 	})
 })
