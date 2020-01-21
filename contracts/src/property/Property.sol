@@ -42,4 +42,17 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 		_transfer(msg.sender, _to, _value);
 		return true;
 	}
+
+
+	function withdrawDev(address _sender) external {
+		new AddressValidator().validateAddress(msg.sender, config().lockup());
+
+		uint256 value = Lockup(config().lockup()).getValue(
+			address(this),
+			_sender
+		);
+		require(value != 0, "your deposit is 0");
+		ERC20 devToken = ERC20(config().token());
+		devToken.transfer(_sender, value);
+	}
 }

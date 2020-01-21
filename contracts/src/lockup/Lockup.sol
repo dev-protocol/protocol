@@ -74,9 +74,7 @@ contract Lockup is Pausable, UsingConfig {
 
 		require(possible(_property, msg.sender), "waiting for release");
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
-		require(lockupedValue > 0, "dev token is not locked");
-		ERC20 token = ERC20(config().token());
-		token.transfer(msg.sender, lockupedValue);
+		Property(_property).withdrawDev(msg.sender);
 		getStorage().setValue(_property, msg.sender, 0);
 		subPropertyValue(_property, lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
