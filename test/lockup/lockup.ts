@@ -97,14 +97,14 @@ contract('LockupTest', ([deployer, user1]) => {
 				.lockup(deployer, property.address, 10000)
 				.catch(err)
 			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this address is not proper')
+			validateErrorMessage(res as Error, 'this is illegal address')
 		})
 		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
 
 			const res = await dev.lockup.lockup(deployer, user1, 10000).catch(err)
 			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this address is not proper')
+			validateErrorMessage(res as Error, 'this is illegal address')
 		})
 		it('should fail to call when lockup is canceling', async () => {
 			const [dev, , property] = await init()
@@ -132,7 +132,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				.lockup(deployer, property.address, 0)
 				.catch(err)
 			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this int is not proper')
+			validateErrorMessage(res as Error, 'illegal lockup value')
 		})
 		it(`should fail to call when token's transfer was failed`, async () => {
 			const [dev, , property] = await init()
@@ -178,7 +178,7 @@ contract('LockupTest', ([deployer, user1]) => {
 
 			const res = await dev.lockup.withdraw(deployer).catch(err)
 			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this address is not proper')
+			validateErrorMessage(res as Error, 'this is illegal address')
 		})
 		it('should fail to call when waiting for released', async () => {
 			const [dev, , property] = await init()
@@ -225,7 +225,7 @@ contract('LockupTest', ([deployer, user1]) => {
 
 			const res = await dev.lockup.withdrawInterest(deployer).catch(err)
 			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this address is not proper')
+			validateErrorMessage(res as Error, 'this is illegal address')
 		})
 		it(`should fail to call when hasn't withdrawable interest amount`, async () => {
 			const [dev, , property] = await init()
