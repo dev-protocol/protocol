@@ -2,16 +2,15 @@ pragma solidity ^0.5.0;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
-contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
+contract PolicyGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);
@@ -21,7 +20,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IGroup {
 	}
 
 	function deleteGroup(address _addr) external {
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);

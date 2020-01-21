@@ -1,5 +1,5 @@
 import {DevProtocolInstance} from '../../test-lib/instance'
-import {validateErrorMessage} from '../../test-lib/utils'
+import {validateAddressErrorMessage} from '../../test-lib/utils'
 
 contract(
 	'VoteCounterStorageTest',
@@ -36,7 +36,7 @@ contract(
 				const result = await dev.voteCounterStorage
 					.setAlreadyVoteFlg(user, sender, property, {from: dummyVoteCounter})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('VoteCounterStorage; getAgreeCount, setAgreeCount', () => {
@@ -59,7 +59,7 @@ contract(
 				const result = await dev.voteCounterStorage
 					.setAgreeCount(sender, 10, {from: dummyVoteCounter})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('VoteCounterStorage; getOppositeCount, setOppositeCount', () => {
@@ -82,7 +82,7 @@ contract(
 				const result = await dev.voteCounterStorage
 					.setOppositeCount(sender, 10, {from: dummyVoteCounter})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 	}

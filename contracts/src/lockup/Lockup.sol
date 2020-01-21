@@ -6,16 +6,14 @@ import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mi
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {IntValidator} from "contracts/src/common/validate/IntValidator.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 
-contract Lockup is Pausable, UsingConfig {
+contract Lockup is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -24,12 +22,9 @@ contract Lockup is Pausable, UsingConfig {
 
 	function lockup(address _from, address _property, uint256 _value) external {
 		require(paused() == false, "You cannot use that");
-		new AddressValidator().validateAddress(msg.sender, config().token());
-		new AddressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
-		new IntValidator().validateEmpty(_value);
+		addressValidator().validateAddress(msg.sender, config().token());
+		addressValidator().validateGroup(_property, config().propertyGroup());
+		require(_value != 0, "illegal lockup value");
 
 		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
 			0;
@@ -49,10 +44,7 @@ contract Lockup is Pausable, UsingConfig {
 	}
 
 	function cancel(address _property) external {
-		new AddressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(hasValue(_property, msg.sender), "dev token is not locked");
 		bool isWaiting = getStorage().getWithdrawalStatus(
@@ -67,10 +59,7 @@ contract Lockup is Pausable, UsingConfig {
 	}
 
 	function withdraw(address _property) external {
-		new AddressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(possible(_property, msg.sender), "waiting for release");
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
@@ -83,13 +72,7 @@ contract Lockup is Pausable, UsingConfig {
 	}
 
 	function increment(address _property, uint256 _interestResult) external {
-		require(
-			msg.sender == config().allocator(),
-			"this address is not this address is not proper"
-		);
-		// TODO
-		// Not working for some reason("require" is working instead):
-		// new AddressValidator().validateAddress(msg.sender, config().allocator());
+		addressValidator().validateAddress(msg.sender, config().allocator());
 		uint256 priceValue = _interestResult.outOf(
 			getStorage().getPropertyValue(_property)
 		);

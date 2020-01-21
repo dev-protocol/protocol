@@ -7,8 +7,7 @@ import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mi
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
@@ -19,7 +18,13 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
-contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
+contract Allocator is
+	Killable,
+	Ownable,
+	UsingConfig,
+	IAllocator,
+	UsingValidator
+{
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event BeforeAllocation(
@@ -37,7 +42,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function allocate(address _metrics) external {
-		new AddressValidator().validateGroup(_metrics, config().metricsGroup());
+		addressValidator().validateGroup(_metrics, config().metricsGroup());
 
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
@@ -51,7 +56,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) external {
-		new AddressValidator().validateGroup(_metrics, config().metricsGroup());
+		addressValidator().validateGroup(_metrics, config().metricsGroup());
 
 		Metrics metrics = Metrics(_metrics);
 		Market market = Market(metrics.market());
@@ -121,10 +126,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 	function beforeBalanceChange(address _property, address _from, address _to)
 		external
 	{
-		new AddressValidator().validateGroup(
-			msg.sender,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(msg.sender, config().propertyGroup());
 
 		Withdraw(config().withdraw()).beforeBalanceChange(
 			_property,

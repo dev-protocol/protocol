@@ -2,10 +2,9 @@ pragma solidity ^0.5.0;
 
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
-contract LockupStorage is UsingConfig, UsingStorage {
+contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -14,10 +13,7 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		external
 		returns (uint256)
 	{
-		require(msg.sender == config().lockup(), "this address is not proper");
-		// TODO
-		// Not working for some reason("require" is working instead):
-		// new AddressValidator().validateAddress(msg.sender, config().lockup());
+		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getValueKey(_property, _sender);
 		eternalStorage().setUint(key, _value);
@@ -45,10 +41,7 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		external
 		returns (uint256)
 	{
-		require(msg.sender == config().lockup(), "this address is not proper");
-		// TODO
-		// Not working for some reason("require" is working instead):
-		// new AddressValidator().validateAddress(msg.sender, config().lockup());
+		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getPropertyValueKey(_property);
 		eternalStorage().setUint(key, _value);
@@ -77,10 +70,7 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		address _from,
 		uint256 _value
 	) external {
-		require(msg.sender == config().lockup(), "this address is not proper");
-		// TODO
-		// Not working for some reason("require" is working instead):
-		// new AddressValidator().validateAddress(msg.sender, config().lockup());
+		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getWithdrawalStatusKey(_property, _from);
 		eternalStorage().setUint(key, _value);
@@ -111,10 +101,7 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		external
 		returns (uint256)
 	{
-		require(msg.sender == config().lockup(), "this address is not proper");
-		// TODO
-		// Not working for some reason("require" is working instead):
-		// new AddressValidator().validateAddress(msg.sender, config().lockup());
+		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(getInterestPriceKey(_property), _value);
 	}
@@ -141,10 +128,7 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		address _user,
 		uint256 _value
 	) external {
-		require(msg.sender == config().lockup(), "this address is not proper");
-		// TODO
-		// Not working for some reason("require" is working instead):
-		// new AddressValidator().validateAddress(msg.sender, config().lockup());
+		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(
 			getLastInterestPriceKey(_property, _user),
@@ -178,10 +162,7 @@ contract LockupStorage is UsingConfig, UsingStorage {
 		address _user,
 		uint256 _value
 	) external {
-		require(msg.sender == config().lockup(), "this address is not proper");
-		// TODO
-		// Not working for some reason("require" is working instead):
-		// new AddressValidator().validateAddress(msg.sender, config().lockup());
+		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(
 			getPendingInterestWithdrawalKey(_property, _user),

@@ -9,6 +9,13 @@ export function validateErrorMessage(
 	expect(result.message).to.include(message)
 }
 
+export function validateAddressErrorMessage(
+	result: Error,
+	reason = true
+): void {
+	validateErrorMessage(result, 'this is illegal address', reason)
+}
+
 export function getPolicyAddress(
 	transaction: Truffle.TransactionResponse
 ): string {
@@ -30,7 +37,6 @@ export function getMarketAddress(
 export function getMetricsAddress(
 	transaction: Truffle.TransactionResponse
 ): string {
-	console.log(transaction.logs)
 	const tmp = transaction.logs.filter(
 		(e: {event: string}) => e.event === 'Create'
 	)[0].args._metrics
