@@ -4,7 +4,6 @@ import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 // prettier-ignore
 import {ERC20Detailed} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IntValidator} from "contracts/src/common/validate/IntValidator.sol";
 // prettier-ignore
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";
@@ -32,7 +31,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		new AddressValidator().validateDefault(_to);
-		new IntValidator().validateEmpty(_value);
+		require(_value != 0, "illegal transfer value");
 
 		Allocator(config().allocator()).beforeBalanceChange(
 			address(this),

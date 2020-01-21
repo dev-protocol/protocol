@@ -6,7 +6,6 @@ import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mi
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {IntValidator} from "contracts/src/common/validate/IntValidator.sol";
 // prettier-ignore
 import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
@@ -29,7 +28,7 @@ contract Lockup is Pausable, UsingConfig {
 			_property,
 			config().propertyGroup()
 		);
-		new IntValidator().validateEmpty(_value);
+		require(_value != 0, "illegal lockup value");
 
 		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
 			0;
