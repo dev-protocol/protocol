@@ -44,7 +44,7 @@ contract Lockup is Pausable, UsingConfig {
 		getStorage().setPendingInterestWithdrawal(
 			_property,
 			_from,
-			calculateInterestAmount(_property, _from)
+			_calculateInterestAmount(_property, _from)
 		);
 	}
 
@@ -96,7 +96,7 @@ contract Lockup is Pausable, UsingConfig {
 		incrementInterest(_property, priceValue);
 	}
 
-	function calculateInterestAmount(address _property, address _user)
+	function _calculateInterestAmount(address _property, address _user)
 		private
 		view
 		returns (uint256)
@@ -109,7 +109,15 @@ contract Lockup is Pausable, UsingConfig {
 		return value.div(Decimals.basis());
 	}
 
-	function calculateWithdrawableInterestAmount(
+	function calculateInterestAmount(address _property, address _user)
+		external
+		view
+		returns (uint256)
+	{
+		return _calculateInterestAmount(_property, _user);
+	}
+
+	function _calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
 	) private view returns (uint256) {
@@ -117,11 +125,18 @@ contract Lockup is Pausable, UsingConfig {
 			_property,
 			_user
 		);
-		return calculateInterestAmount(_property, _user).add(pending);
+		return _calculateInterestAmount(_property, _user).add(pending);
+	}
+
+	function calculateWithdrawableInterestAmount(
+		address _property,
+		address _user
+	) external view returns (uint256) {
+		return _calculateWithdrawableInterestAmount(_property, _user);
 	}
 
 	function withdrawInterest(address _property) private {
-		uint256 value = calculateWithdrawableInterestAmount(
+		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
 		);

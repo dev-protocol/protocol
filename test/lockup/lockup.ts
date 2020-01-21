@@ -89,22 +89,29 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('dev token is not locked')
 		it('success')
 	})
-	describe('Lockup: withdrawInterest', () => {
-		it(`mints 0 DEV when sender's lockup is 0 DEV`)
+	describe('Lockup: increment', () => {
 		let dev: DevProtocolInstance
 		let property: PropertyInstance
-		let metrics: MetricsInstance
 		const alice = deployer
 		const bob = user1
 
+		it('should fail to increment when sent from other than Allocator Contract', async () => {
+			;[dev, , property] = await init()
+			const res = await dev.lockup
+				.increment(property.address, 5000000)
+				.catch((err: Error) => err)
+			expect(res).to.be.an.instanceOf(Error)
+		})
+
 		describe('scenario; single lockup', () => {
 			before(async () => {
-				;[dev, metrics, property] = await init()
+				;[dev, , property] = await init()
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.addressConfig.setToken(deployer)
+				await dev.addressConfig.setAllocator(deployer)
 				await dev.lockup.lockup(alice, property.address, 10000)
-				await dev.allocator.allocate(metrics.address)
+				await dev.lockup.increment(property.address, 5000000)
 			})
 			describe('before second allocation', () => {
 				it(`Alice does staking 100% of the Property's total lockups`, async () => {
@@ -116,37 +123,102 @@ contract('LockupTest', ([deployer, user1]) => {
 						.then(toBigNumber)
 					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
 				})
-				it(`Alice's withdrawable interest is 100% of the Property's interest`)
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(aliceAmount.toFixed()).to.be.equal('5000000')
+				})
 			})
 			describe('after second allocation', () => {
-				it(`Alice's withdrawable interest is 100% of the Property's interest`)
-				it(`mints 0 DEV when after the withdrawal`)
+				before(async () => {
+					await dev.lockup.increment(property.address, 3000000)
+				})
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(aliceAmount.toFixed()).to.be.equal('8000000')
+				})
 			})
 		})
 
 		describe('scenario: multiple lockup', () => {
 			before(async () => {
-				;[dev, metrics, property] = await init()
+				;[dev, , property] = await init()
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.addressConfig.setToken(deployer)
+				await dev.addressConfig.setAllocator(deployer)
 				await dev.lockup.lockup(alice, property.address, 10000)
-				await dev.allocator.allocate(metrics.address)
+				await dev.lockup.increment(property.address, 5000000)
 			})
 			describe('before second allocation', () => {
-				it(`Alice does staking 100% of the Property's total lockups`)
-				it(
-					`Bob does staking 20% of the Property's total lockups, Alice's share become 80%`
-				)
-				it(`Alice's withdrawable interest is 100% of the Property's interest`)
-				it(`Bob's withdrawable interest is 0 yet`)
+				it(`Alice does staking 100% of the Property's total lockups`, async () => {
+					const total = await dev.lockup
+						.getPropertyValue(property.address)
+						.then(toBigNumber)
+					const aliceBalance = await dev.lockup
+						.getValue(property.address, alice)
+						.then(toBigNumber)
+					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
+				})
+				it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
+					await dev.lockup.lockup(bob, property.address, 10000 * 0.25)
+					const total = await dev.lockup
+						.getPropertyValue(property.address)
+						.then(toBigNumber)
+					const aliceBalance = await dev.lockup
+						.getValue(property.address, alice)
+						.then(toBigNumber)
+					const bobBalance = await dev.lockup
+						.getValue(property.address, bob)
+						.then(toBigNumber)
+
+					expect(aliceBalance.toFixed()).to.be.equal(
+						total
+							.times(0.8)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.toFixed()
+					)
+					expect(bobBalance.toFixed()).to.be.equal(
+						total
+							.times(0.2)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.toFixed()
+					)
+				})
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(aliceAmount.toFixed()).to.be.equal('5000000')
+				})
+				it(`Bob's withdrawable interest is 0 yet`, async () => {
+					const bobAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					expect(bobAmount.toFixed()).to.be.equal('0')
+				})
 			})
 			describe('after second allocation', () => {
-				it(
-					`Alice's withdrawable interest is 100% of prev interest and 20% of current interest`
-				)
-				it(`Bob's withdrawable interest is 80% of current interest`)
-				it(`mints 0 DEV when after the withdrawal`)
+				before(async () => {
+					await dev.lockup.increment(property.address, 3000000)
+				})
+				it(`Alice's withdrawable interest is 100% of prev interest and 80% of current interest`, async () => {
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+
+					expect(aliceAmount.toNumber()).to.be.equal(5000000 + 3000000 * 0.8)
+				})
+				it(`Bob's withdrawable interest is 25% of current interest`, async () => {
+					const bobAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+
+					expect(bobAmount.toNumber()).to.be.equal(3000000 * 0.2)
+				})
 			})
 		})
 	})
