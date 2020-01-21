@@ -115,8 +115,18 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				expect(totalAmount.toFixed()).to.be.equal(
 					amount1.plus(amount2).toFixed()
 				)
-				expect(totalAmount.times(0.8).toFixed()).to.be.equal(amount1.toFixed())
-				expect(totalAmount.times(0.2).toFixed()).to.be.equal(amount2.toFixed())
+				expect(
+					totalAmount
+						.times(0.8)
+						.integerValue(BigNumber.ROUND_DOWN)
+						.toFixed()
+				).to.be.equal(amount1.toFixed())
+				expect(
+					totalAmount
+						.times(0.2)
+						.integerValue(BigNumber.ROUND_DOWN)
+						.toFixed()
+				).to.be.equal(amount2.toFixed())
 			})
 
 			it('The withdrawal amount is always the full amount of the withdrawable amount', async () => {
