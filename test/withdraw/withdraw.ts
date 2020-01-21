@@ -112,6 +112,12 @@ contract('WithdrawTest', ([deployer, user1]) => {
 					.calculateWithdrawableAmount(property.address, user1)
 					.then(toBigNumber)
 
+				console.log(totalAmount.toFixed())
+				console.log(
+					amount1.toFixed(),
+					amount2.toFixed(),
+					amount1.plus(amount2).toFixed()
+				)
 				expect(totalAmount.toFixed()).to.be.equal(
 					amount1.plus(amount2).toFixed()
 				)
