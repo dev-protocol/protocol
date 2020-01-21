@@ -5,7 +5,9 @@ import {
 	getPropertyAddress,
 	getMarketAddress,
 	watch,
-	validateErrorMessage
+	validateErrorMessage,
+	waitForEvent,
+	getEventValue
 } from '../test-lib/utils'
 const uri = 'ws://localhost:7545'
 
@@ -77,262 +79,339 @@ contract('LockupTest', ([deployer, user1]) => {
 		// TODO
 	})
 	describe('Lockup; lockup', () => {
-		it('address is not property contract')
-		it('lockup is already canceled')
-		it('insufficient balance')
-		it('transfer was failed')
-		it('success', async () => {
+		it('should fail to call when paused', async () => {
 			const [dev, , property] = await init()
-			await dev.addressConfig.setToken(deployer)
-			await dev.lockup.lockup(deployer, property.address, 100)
-			// eslint-disable-next-line no-warning-comments
-			// TODO assert
-		})
-	})
-	describe('Lockup; withdraw', () => {
-		it('should fail to call when passed address is not property contract', async () => {
-			const [dev] = await init()
 
-			const res = await dev.lockup.withdraw(deployer).catch(err)
+			await dev.lockup.pause()
+
+			const res = await dev.lockup
+				.lockup(deployer, property.address, 10000)
+				.catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'You cannot use that')
+		})
+		it('should fail to call when sent from other than Dev Contract', async () => {
+			const [dev, , property] = await init()
+
+			const res = await dev.lockup
+				.lockup(deployer, property.address, 10000)
+				.catch(err)
 			expect(res).to.be.an.instanceOf(Error)
 			validateErrorMessage(res as Error, 'this address is not proper')
 		})
-		it('should fail to call when waiting for released', async () => {
-			const [dev, , property] = await init()
+		it('should fail to call when passed address is not property contract', async () => {
+			const [dev] = await init()
 
-			const res = await dev.lockup.withdraw(property.address).catch(err)
+			const res = await dev.lockup.lockup(deployer, user1, 10000).catch(err)
 			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'waiting for release')
+			validateErrorMessage(res as Error, 'this address is not proper')
 		})
-		it('should fail to call when dev token is not locked', async () => {
+		it('should fail to call when lockup is canceling', async () => {
 			const [dev, , property] = await init()
 
-			await dev.addressConfig.setLockup(deployer)
+			await dev.addressConfig.setToken(deployer)
 			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-			await dev.addressConfig.setLockup(dev.lockup.address)
 
-			const res = await dev.lockup.withdraw(property.address).catch(err)
+			const res = await dev.lockup
+				.lockup(deployer, property.address, 10000)
+				.catch(err)
 			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'your deposit is 0')
+			validateErrorMessage(res as Error, 'lockup is already canceled')
 		})
-		it(`withdrawing sender's withdrawable full amount`, async () => {
+		it('should fail to call when a passed value is 0', async () => {
 			const [dev, , property] = await init()
-			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-			await dev.dev.deposit(property.address, 10000)
-			await dev.addressConfig.setLockup(deployer)
+			await dev.addressConfig.setToken(deployer)
 			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-			await dev.addressConfig.setLockup(dev.lockup.address)
 
-			await dev.lockup.withdraw(property.address)
+			const res = await dev.lockup
+				.lockup(deployer, property.address, 0)
+				.catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'this int is not proper')
+		})
+		it(`should fail to call when token's transfer was failed`, async () => {
+			const [dev, , property] = await init()
 
-			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
-			expect(afterTotalSupply.toFixed()).to.be.equal(
-				beforeTotalSupply.toFixed()
+			const res = await dev.dev
+				.deposit(property.address, 10000, {from: user1})
+				.catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(
+				res as Error,
+				'ERC20: transfer amount exceeds balance'
 			)
 		})
-	})
-	describe('Lockup; withdrawInterest', () => {
-		it('should fail to call when passed address is not property contract', async () => {
-			const [dev] = await init()
-
-			const res = await dev.lockup.withdrawInterest(deployer).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this address is not proper')
-		})
-		it(`should fail to call when hasn't withdrawable interest amount`, async () => {
+		it('record transferred token as a lockup', async () => {
 			const [dev, , property] = await init()
 
-			const res = await dev.lockup.withdrawInterest(property.address).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'your interest amount is 0')
+			dev.dev.deposit(property.address, 10000).catch(err)
+			await waitForEvent(dev.lockup, uri)('Lockedup')
+
+			const lockedupAmount = await dev.lockup
+				.getValue(property.address, deployer)
+				.then(toBigNumber)
+			expect(lockedupAmount.toFixed()).to.be.equal('10000')
 		})
-		describe('withdrawing interest amount', () => {
-			let dev: DevProtocolInstance
-			let property: PropertyInstance
+		it('emit an event that notifies token locked-up', async () => {
+			const [dev, , property] = await init()
 
-			before(async () => {
-				;[dev, , property] = await init()
-				await dev.addressConfig.setToken(deployer)
-				await dev.addressConfig.setAllocator(deployer)
-				await dev.lockup.lockup(deployer, property.address, 10000)
-				await dev.lockup.increment(property.address, 500000)
-				await dev.addressConfig.setToken(dev.dev.address)
-				await dev.addressConfig.setAllocator(dev.allocator.address)
-				await dev.addressConfig.setLockup(deployer)
-				await dev.lockupStorage.setWithdrawalStatus(
-					property.address,
-					deployer,
-					1
-				)
-				await dev.addressConfig.setLockup(dev.lockup.address)
-			})
+			dev.dev.deposit(property.address, 10000).catch(err)
+			const [_from, _property, _value] = await Promise.all([
+				getEventValue(dev.lockup, uri)('Lockedup', '_from'),
+				getEventValue(dev.lockup, uri)('Lockedup', '_property'),
+				getEventValue(dev.lockup, uri)('Lockedup', '_value')
+			])
 
-			it(`withdrawing sender's withdrawable interest full amount`, async () => {
-				const beforeBalance = await dev.dev
-					.balanceOf(deployer)
-					.then(toBigNumber)
-				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-				const amount = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, deployer)
-					.then(toBigNumber)
-
-				await dev.lockup.withdrawInterest(property.address)
-
-				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-				expect(amount.toFixed()).to.be.equal('500000')
-				expect(afterBalance.toFixed()).to.be.equal(
-					beforeBalance.plus(amount).toFixed()
-				)
-				expect(afterTotalSupply.toFixed()).to.be.equal(
-					beforeTotalSupply.plus(amount).toFixed()
-				)
-			})
-			it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
-				const amount = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, deployer)
-					.then(toBigNumber)
-				expect(amount.toFixed()).to.be.equal('0')
-			})
+			expect(_from).to.be.equal(deployer)
+			expect(_property).to.be.equal(property.address)
+			expect(_value).to.be.equal('10000')
 		})
 	})
-	describe('Lockup: increment', () => {
-		let dev: DevProtocolInstance
-		let property: PropertyInstance
-		const alice = deployer
-		const bob = user1
+	// Describe('Lockup; withdraw', () => {
+	// 	it('should fail to call when passed address is not property contract', async () => {
+	// 		const [dev] = await init()
 
-		it('should fail to increment when sent from other than Allocator Contract', async () => {
-			;[dev, , property] = await init()
-			const res = await dev.lockup
-				.increment(property.address, 5000000)
-				.catch((err: Error) => err)
-			expect(res).to.be.an.instanceOf(Error)
-		})
+	// 		const res = await dev.lockup.withdraw(deployer).catch(err)
+	// 		expect(res).to.be.an.instanceOf(Error)
+	// 		validateErrorMessage(res as Error, 'this address is not proper')
+	// 	})
+	// 	it('should fail to call when waiting for released', async () => {
+	// 		const [dev, , property] = await init()
 
-		describe('scenario; single lockup', () => {
-			before(async () => {
-				;[dev, , property] = await init()
-				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
-				await dev.dev.mint(bob, aliceBalance)
-				await dev.addressConfig.setToken(deployer)
-				await dev.addressConfig.setAllocator(deployer)
-				await dev.lockup.lockup(alice, property.address, 10000)
-				await dev.lockup.increment(property.address, 5000000)
-			})
-			describe('before second allocation', () => {
-				it(`Alice does staking 100% of the Property's total lockups`, async () => {
-					const total = await dev.lockup
-						.getPropertyValue(property.address)
-						.then(toBigNumber)
-					const aliceBalance = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
-				})
-				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					expect(aliceAmount.toFixed()).to.be.equal('5000000')
-				})
-			})
-			describe('after second allocation', () => {
-				before(async () => {
-					await dev.lockup.increment(property.address, 3000000)
-				})
-				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					expect(aliceAmount.toFixed()).to.be.equal('8000000')
-				})
-			})
-		})
+	// 		const res = await dev.lockup.withdraw(property.address).catch(err)
+	// 		expect(res).to.be.an.instanceOf(Error)
+	// 		validateErrorMessage(res as Error, 'waiting for release')
+	// 	})
+	// 	it('should fail to call when dev token is not locked', async () => {
+	// 		const [dev, , property] = await init()
 
-		describe('scenario: multiple lockup', () => {
-			before(async () => {
-				;[dev, , property] = await init()
-				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
-				await dev.dev.mint(bob, aliceBalance)
-				await dev.addressConfig.setToken(deployer)
-				await dev.addressConfig.setAllocator(deployer)
-				await dev.lockup.lockup(alice, property.address, 10000)
-				await dev.lockup.increment(property.address, 5000000)
-			})
-			describe('before second allocation', () => {
-				it(`Alice does staking 100% of the Property's total lockups`, async () => {
-					const total = await dev.lockup
-						.getPropertyValue(property.address)
-						.then(toBigNumber)
-					const aliceBalance = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
-				})
-				it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
-					await dev.lockup.lockup(bob, property.address, 10000 * 0.25)
-					const total = await dev.lockup
-						.getPropertyValue(property.address)
-						.then(toBigNumber)
-					const aliceBalance = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					const bobBalance = await dev.lockup
-						.getValue(property.address, bob)
-						.then(toBigNumber)
+	// 		await dev.addressConfig.setLockup(deployer)
+	// 		await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
+	// 		await dev.addressConfig.setLockup(dev.lockup.address)
 
-					expect(aliceBalance.toFixed()).to.be.equal(
-						total
-							.times(0.8)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.toFixed()
-					)
-					expect(bobBalance.toFixed()).to.be.equal(
-						total
-							.times(0.2)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.toFixed()
-					)
-				})
-				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
-					expect(aliceAmount.toFixed()).to.be.equal('5000000')
-				})
-				it(`Bob's withdrawable interest is 0 yet`, async () => {
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, bob)
-						.then(toBigNumber)
-					expect(bobAmount.toFixed()).to.be.equal('0')
-				})
-			})
-			describe('after second allocation', () => {
-				before(async () => {
-					await dev.lockup.increment(property.address, 3000000)
-				})
-				it(`Alice's withdrawable interest is 100% of prev interest and 80% of current interest`, async () => {
-					const aliceAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, alice)
-						.then(toBigNumber)
+	// 		const res = await dev.lockup.withdraw(property.address).catch(err)
+	// 		expect(res).to.be.an.instanceOf(Error)
+	// 		validateErrorMessage(res as Error, 'your deposit is 0')
+	// 	})
+	// 	it(`withdrawing sender's withdrawable full amount`, async () => {
+	// 		const [dev, , property] = await init()
+	// 		const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-					expect(aliceAmount.toNumber()).to.be.equal(5000000 + 3000000 * 0.8)
-				})
-				it(`Bob's withdrawable interest is 25% of current interest`, async () => {
-					const bobAmount = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, bob)
-						.then(toBigNumber)
+	// 		await dev.dev.deposit(property.address, 10000)
+	// 		await dev.addressConfig.setLockup(deployer)
+	// 		await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
+	// 		await dev.addressConfig.setLockup(dev.lockup.address)
 
-					expect(bobAmount.toNumber()).to.be.equal(3000000 * 0.2)
-				})
-			})
-		})
-	})
+	// 		await dev.lockup.withdraw(property.address)
+
+	// 		const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 		const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+	// 		expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
+	// 		expect(afterTotalSupply.toFixed()).to.be.equal(
+	// 			beforeTotalSupply.toFixed()
+	// 		)
+	// 	})
+	// })
+	// describe('Lockup; withdrawInterest', () => {
+	// 	it('should fail to call when passed address is not property contract', async () => {
+	// 		const [dev] = await init()
+
+	// 		const res = await dev.lockup.withdrawInterest(deployer).catch(err)
+	// 		expect(res).to.be.an.instanceOf(Error)
+	// 		validateErrorMessage(res as Error, 'this address is not proper')
+	// 	})
+	// 	it(`should fail to call when hasn't withdrawable interest amount`, async () => {
+	// 		const [dev, , property] = await init()
+
+	// 		const res = await dev.lockup.withdrawInterest(property.address).catch(err)
+	// 		expect(res).to.be.an.instanceOf(Error)
+	// 		validateErrorMessage(res as Error, 'your interest amount is 0')
+	// 	})
+	// 	describe('withdrawing interest amount', () => {
+	// 		let dev: DevProtocolInstance
+	// 		let property: PropertyInstance
+
+	// 		before(async () => {
+	// 			;[dev, , property] = await init()
+	// 			await dev.addressConfig.setToken(deployer)
+	// 			await dev.addressConfig.setAllocator(deployer)
+	// 			await dev.lockup.lockup(deployer, property.address, 10000)
+	// 			await dev.lockup.increment(property.address, 500000)
+	// 			await dev.addressConfig.setToken(dev.dev.address)
+	// 			await dev.addressConfig.setAllocator(dev.allocator.address)
+	// 			await dev.addressConfig.setLockup(deployer)
+	// 			await dev.lockupStorage.setWithdrawalStatus(
+	// 				property.address,
+	// 				deployer,
+	// 				1
+	// 			)
+	// 			await dev.addressConfig.setLockup(dev.lockup.address)
+	// 		})
+
+	// 		it(`withdrawing sender's withdrawable interest full amount`, async () => {
+	// 			const beforeBalance = await dev.dev
+	// 				.balanceOf(deployer)
+	// 				.then(toBigNumber)
+	// 			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+	// 			const amount = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, deployer)
+	// 				.then(toBigNumber)
+
+	// 			await dev.lockup.withdrawInterest(property.address)
+
+	// 			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+	// 			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+	// 			expect(amount.toFixed()).to.be.equal('500000')
+	// 			expect(afterBalance.toFixed()).to.be.equal(
+	// 				beforeBalance.plus(amount).toFixed()
+	// 			)
+	// 			expect(afterTotalSupply.toFixed()).to.be.equal(
+	// 				beforeTotalSupply.plus(amount).toFixed()
+	// 			)
+	// 		})
+	// 		it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
+	// 			const amount = await dev.lockup
+	// 				.calculateWithdrawableInterestAmount(property.address, deployer)
+	// 				.then(toBigNumber)
+	// 			expect(amount.toFixed()).to.be.equal('0')
+	// 		})
+	// 	})
+	// })
+	// describe('Lockup: increment', () => {
+	// 	let dev: DevProtocolInstance
+	// 	let property: PropertyInstance
+	// 	const alice = deployer
+	// 	const bob = user1
+
+	// 	it('should fail to increment when sent from other than Allocator Contract', async () => {
+	// 		;[dev, , property] = await init()
+	// 		const res = await dev.lockup
+	// 			.increment(property.address, 5000000)
+	// 			.catch((err: Error) => err)
+	// 		expect(res).to.be.an.instanceOf(Error)
+	// 	})
+
+	// 	describe('scenario; single lockup', () => {
+	// 		before(async () => {
+	// 			;[dev, , property] = await init()
+	// 			const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+	// 			await dev.dev.mint(bob, aliceBalance)
+	// 			await dev.addressConfig.setToken(deployer)
+	// 			await dev.addressConfig.setAllocator(deployer)
+	// 			await dev.lockup.lockup(alice, property.address, 10000)
+	// 			await dev.lockup.increment(property.address, 5000000)
+	// 		})
+	// 		describe('before second allocation', () => {
+	// 			it(`Alice does staking 100% of the Property's total lockups`, async () => {
+	// 				const total = await dev.lockup
+	// 					.getPropertyValue(property.address)
+	// 					.then(toBigNumber)
+	// 				const aliceBalance = await dev.lockup
+	// 					.getValue(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				expect(aliceAmount.toFixed()).to.be.equal('5000000')
+	// 			})
+	// 		})
+	// 		describe('after second allocation', () => {
+	// 			before(async () => {
+	// 				await dev.lockup.increment(property.address, 3000000)
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				expect(aliceAmount.toFixed()).to.be.equal('8000000')
+	// 			})
+	// 		})
+	// 	})
+
+	// 	describe('scenario: multiple lockup', () => {
+	// 		before(async () => {
+	// 			;[dev, , property] = await init()
+	// 			const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+	// 			await dev.dev.mint(bob, aliceBalance)
+	// 			await dev.addressConfig.setToken(deployer)
+	// 			await dev.addressConfig.setAllocator(deployer)
+	// 			await dev.lockup.lockup(alice, property.address, 10000)
+	// 			await dev.lockup.increment(property.address, 5000000)
+	// 		})
+	// 		describe('before second allocation', () => {
+	// 			it(`Alice does staking 100% of the Property's total lockups`, async () => {
+	// 				const total = await dev.lockup
+	// 					.getPropertyValue(property.address)
+	// 					.then(toBigNumber)
+	// 				const aliceBalance = await dev.lockup
+	// 					.getValue(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
+	// 			})
+	// 			it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
+	// 				await dev.lockup.lockup(bob, property.address, 10000 * 0.25)
+	// 				const total = await dev.lockup
+	// 					.getPropertyValue(property.address)
+	// 					.then(toBigNumber)
+	// 				const aliceBalance = await dev.lockup
+	// 					.getValue(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				const bobBalance = await dev.lockup
+	// 					.getValue(property.address, bob)
+	// 					.then(toBigNumber)
+
+	// 				expect(aliceBalance.toFixed()).to.be.equal(
+	// 					total
+	// 						.times(0.8)
+	// 						.integerValue(BigNumber.ROUND_DOWN)
+	// 						.toFixed()
+	// 				)
+	// 				expect(bobBalance.toFixed()).to.be.equal(
+	// 					total
+	// 						.times(0.2)
+	// 						.integerValue(BigNumber.ROUND_DOWN)
+	// 						.toFixed()
+	// 				)
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+	// 				expect(aliceAmount.toFixed()).to.be.equal('5000000')
+	// 			})
+	// 			it(`Bob's withdrawable interest is 0 yet`, async () => {
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, bob)
+	// 					.then(toBigNumber)
+	// 				expect(bobAmount.toFixed()).to.be.equal('0')
+	// 			})
+	// 		})
+	// 		describe('after second allocation', () => {
+	// 			before(async () => {
+	// 				await dev.lockup.increment(property.address, 3000000)
+	// 			})
+	// 			it(`Alice's withdrawable interest is 100% of prev interest and 80% of current interest`, async () => {
+	// 				const aliceAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, alice)
+	// 					.then(toBigNumber)
+
+	// 				expect(aliceAmount.toNumber()).to.be.equal(5000000 + 3000000 * 0.8)
+	// 			})
+	// 			it(`Bob's withdrawable interest is 25% of current interest`, async () => {
+	// 				const bobAmount = await dev.lockup
+	// 					.calculateWithdrawableInterestAmount(property.address, bob)
+	// 					.then(toBigNumber)
+
+	// 				expect(bobAmount.toNumber()).to.be.equal(3000000 * 0.2)
+	// 			})
+	// 		})
+	// 	})
+	// })
 })
