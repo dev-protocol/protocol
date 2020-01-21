@@ -43,7 +43,6 @@ contract Property is ERC20, ERC20Detailed, UsingConfig {
 		return true;
 	}
 
-
 	function withdrawDev(address _sender) external {
 		new AddressValidator().validateAddress(msg.sender, config().lockup());
 
