@@ -1,7 +1,12 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {MetricsInstance, PropertyInstance} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
-import {getPropertyAddress, getMarketAddress, watch} from '../test-lib/utils'
+import {
+	getPropertyAddress,
+	getMarketAddress,
+	watch,
+	validateErrorMessage
+} from '../test-lib/utils'
 const uri = 'ws://localhost:7545'
 
 contract('LockupTest', ([deployer, user1]) => {
@@ -61,10 +66,12 @@ contract('LockupTest', ([deployer, user1]) => {
 		const [metrics] = await Promise.all([
 			artifacts.require('Metrics').at(metricsAddress)
 		])
+		await dev.dev.addMinter(dev.lockup.address)
 		return [dev, metrics, property]
 	}
 
 	const toBigNumber = (v: string | BigNumber): BigNumber => new BigNumber(v)
+	const err = (error: Error): Error => error
 
 	describe('Lockup; cancel', () => {
 		// TODO
@@ -83,11 +90,52 @@ contract('LockupTest', ([deployer, user1]) => {
 		})
 	})
 	describe('Lockup; withdraw', () => {
-		it('address is not property contract')
-		it('lockup is not canceled')
-		it('waiting for release')
-		it('dev token is not locked')
-		it('success')
+		it('should fail to call when passed address is not property contract', async () => {
+			const [dev] = await init()
+
+			const res = await dev.lockup.withdraw(deployer).catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'this address is not proper')
+		})
+		it('should fail to call when waiting for released', async () => {
+			const [dev, , property] = await init()
+
+			const res = await dev.lockup.withdraw(property.address).catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'waiting for release')
+		})
+		it('should fail to call when dev token is not locked', async () => {
+			const [dev, , property] = await init()
+
+			await dev.addressConfig.setLockup(deployer)
+			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
+			await dev.addressConfig.setLockup(dev.lockup.address)
+
+			const res = await dev.lockup.withdraw(property.address).catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'dev token is not locked')
+		})
+		it(`withdrawing sender's withdrawable full amount`, async () => {
+			const [dev, , property] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			await dev.addressConfig.setToken(deployer)
+			await dev.lockup.lockup(deployer, property.address, 10000)
+			await dev.addressConfig.setLockup(deployer)
+			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
+			await dev.addressConfig.setLockup(dev.lockup.address)
+
+			await dev.lockup.withdraw(property.address)
+
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.toFixed()
+			)
+		})
 	})
 	describe('Lockup: increment', () => {
 		let dev: DevProtocolInstance

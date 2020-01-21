@@ -74,9 +74,9 @@ contract Lockup is Pausable, UsingConfig {
 
 		require(possible(_property, msg.sender), "waiting for release");
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
-		require(lockupedValue == 0, "dev token is not locked");
-		Property(_property).withdrawDev(msg.sender);
-		withdrawInterest(_property);
+		require(lockupedValue > 0, "dev token is not locked");
+		ERC20 token = ERC20(config().token());
+		token.transfer(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
 		subPropertyValue(_property, lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
@@ -135,11 +135,12 @@ contract Lockup is Pausable, UsingConfig {
 		return _calculateWithdrawableInterestAmount(_property, _user);
 	}
 
-	function withdrawInterest(address _property) private {
+	function withdrawInterest(address _property) external {
 		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
 		);
+		require(value > 0, "your interest amount is 0");
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		erc20.mint(msg.sender, value);
