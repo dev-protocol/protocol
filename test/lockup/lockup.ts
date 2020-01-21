@@ -91,56 +91,62 @@ contract('LockupTest', ([deployer, user1]) => {
 	})
 	describe('Lockup: withdrawInterest', () => {
 		it(`mints 0 DEV when sender's lockup is 0 DEV`)
-		describe(`Lockup; Alice stakings 20% of the Property's total lockups after stakings 100% of the Property's total.`, () => {
-			let dev: DevProtocolInstance
-			let property: PropertyInstance
-			let metrics: MetricsInstance
-			const alice = deployer
-			const bob = user1
+		let dev: DevProtocolInstance
+		let property: PropertyInstance
+		let metrics: MetricsInstance
+		const alice = deployer
+		const bob = user1
 
-			describe('scenario; single lockup', () => {
-				before(async () => {
-					;[dev, metrics, property] = await init()
-					const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
-					await dev.dev.mint(bob, aliceBalance)
-					await dev.addressConfig.setToken(deployer)
-					await dev.lockup.lockup(alice, property.address, 10000)
-					await dev.allocator.allocate(metrics.address)
-				})
-				describe('before second allocation', () => {
-					it(`Alice does staking 100% of the Property's total lockups`)
-					it(`Alice's withdrawable interest is 100% of the Property's interest`)
-				})
-				describe('after second allocation', () => {
-					it(`Alice's withdrawable interest is 100% of the Property's interest`)
-					it(`mints 0 DEV when after the withdrawal`)
-				})
+		describe('scenario; single lockup', () => {
+			before(async () => {
+				;[dev, metrics, property] = await init()
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+				await dev.addressConfig.setToken(deployer)
+				await dev.lockup.lockup(alice, property.address, 10000)
+				await dev.allocator.allocate(metrics.address)
 			})
+			describe('before second allocation', () => {
+				it(`Alice does staking 100% of the Property's total lockups`, async () => {
+					const total = await dev.lockup
+						.getPropertyValue(property.address)
+						.then(toBigNumber)
+					const aliceBalance = await dev.lockup
+						.getValue(property.address, alice)
+						.then(toBigNumber)
+					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
+				})
+				it(`Alice's withdrawable interest is 100% of the Property's interest`)
+			})
+			describe('after second allocation', () => {
+				it(`Alice's withdrawable interest is 100% of the Property's interest`)
+				it(`mints 0 DEV when after the withdrawal`)
+			})
+		})
 
-			describe('scenario: multiple lockup', () => {
-				before(async () => {
-					;[dev, metrics, property] = await init()
-					const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
-					await dev.dev.mint(bob, aliceBalance)
-					await dev.addressConfig.setToken(deployer)
-					await dev.lockup.lockup(alice, property.address, 10000)
-					await dev.allocator.allocate(metrics.address)
-				})
-				describe('before second allocation', () => {
-					it(`Alice does staking 100% of the Property's total lockups`)
-					it(
-						`Bob does staking 20% of the Property's total lockups, Alice's share become 80%`
-					)
-					it(`Alice's withdrawable interest is 100% of the Property's interest`)
-					it(`Bob's withdrawable interest is 0 yet`)
-				})
-				describe('after second allocation', () => {
-					it(
-						`Alice's withdrawable interest is 100% of prev interest and 20% of current interest`
-					)
-					it(`Bob's withdrawable interest is 80% of current interest`)
-					it(`mints 0 DEV when after the withdrawal`)
-				})
+		describe('scenario: multiple lockup', () => {
+			before(async () => {
+				;[dev, metrics, property] = await init()
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+				await dev.addressConfig.setToken(deployer)
+				await dev.lockup.lockup(alice, property.address, 10000)
+				await dev.allocator.allocate(metrics.address)
+			})
+			describe('before second allocation', () => {
+				it(`Alice does staking 100% of the Property's total lockups`)
+				it(
+					`Bob does staking 20% of the Property's total lockups, Alice's share become 80%`
+				)
+				it(`Alice's withdrawable interest is 100% of the Property's interest`)
+				it(`Bob's withdrawable interest is 0 yet`)
+			})
+			describe('after second allocation', () => {
+				it(
+					`Alice's withdrawable interest is 100% of prev interest and 20% of current interest`
+				)
+				it(`Bob's withdrawable interest is 80% of current interest`)
+				it(`mints 0 DEV when after the withdrawal`)
 			})
 		})
 	})
