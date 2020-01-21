@@ -26,7 +26,7 @@ contract Withdraw is Pausable, UsingConfig {
 			config().propertyGroup()
 		);
 
-		uint256 value = calculateWithdrawableAmount(_property, msg.sender);
+		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
 		uint256 price = getStorage().getCumulativePrice(_property);
 		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
@@ -44,8 +44,8 @@ contract Withdraw is Pausable, UsingConfig {
 		);
 
 		uint256 price = getStorage().getCumulativePrice(_property);
-		uint256 amountFrom = calculateAmount(_property, _from);
-		uint256 amountTo = calculateAmount(_property, _to);
+		uint256 amountFrom = _calculateAmount(_property, _from);
+		uint256 amountTo = _calculateAmount(_property, _to);
 		getStorage().setLastWithdrawalPrice(_property, _from, price);
 		getStorage().setLastWithdrawalPrice(_property, _to, price);
 		uint256 pendFrom = getStorage().getPendingWithdrawal(_property, _from);
@@ -96,8 +96,8 @@ contract Withdraw is Pausable, UsingConfig {
 		return getStorage().getRewardsAmount(_property);
 	}
 
-	function calculateAmount(address _property, address _user)
-		public
+	function _calculateAmount(address _property, address _user)
+		private
 		view
 		returns (uint256)
 	{
@@ -121,15 +121,31 @@ contract Withdraw is Pausable, UsingConfig {
 		return value.div(Decimals.basis());
 	}
 
-	function calculateWithdrawableAmount(address _property, address _user)
-		public
+	function calculateAmount(address _property, address _user)
+		external
 		view
 		returns (uint256)
 	{
-		uint256 _value = calculateAmount(_property, _user);
+		return _calculateAmount(_property, _user);
+	}
+
+	function _calculateWithdrawableAmount(address _property, address _user)
+		private
+		view
+		returns (uint256)
+	{
+		uint256 _value = _calculateAmount(_property, _user);
 		uint256 value = _value +
 			getStorage().getPendingWithdrawal(_property, _user);
 		return value;
+	}
+
+	function calculateWithdrawableAmount(address _property, address _user)
+		external
+		view
+		returns (uint256)
+	{
+		return _calculateWithdrawableAmount(_property, _user);
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {
