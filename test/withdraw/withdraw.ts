@@ -274,6 +274,20 @@ contract('WithdrawTest', ([deployer, user1]) => {
 							.toFixed()
 					)
 				})
+
+				it('Become 0 withdrawable amount when after withdrawing', async () => {
+					await dev.withdraw.withdraw(property.address, {from: alice})
+					await dev.withdraw.withdraw(property.address, {from: bob})
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const bobAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, bob)
+						.then(toBigNumber)
+
+					expect(aliceAmount.toFixed()).to.be.equal('0')
+					expect(bobAmount.toFixed()).to.be.equal('0')
+				})
 			})
 
 			it(
