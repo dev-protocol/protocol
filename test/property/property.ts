@@ -1,4 +1,4 @@
-import {validateErrorMessage} from '../test-lib/utils'
+import {validateAddressErrorMessage} from '../test-lib/utils'
 
 contract('PropertyTest', ([deployer, ui]) => {
 	const lockupContract = artifacts.require('Lockup')
@@ -69,7 +69,7 @@ contract('PropertyTest', ([deployer, ui]) => {
 			const result = await property
 				.withdrawDev(ui, {from: deployer})
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'this address is not proper')
+			validateAddressErrorMessage(result as Error)
 		})
 		it('When lockup value is 0')
 		it('When withdrawn successfully')

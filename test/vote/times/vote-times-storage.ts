@@ -1,5 +1,5 @@
 import {DevProtocolInstance} from '../../test-lib/instance'
-import {validateErrorMessage} from '../../test-lib/utils'
+import {validateAddressErrorMessage} from '../../test-lib/utils'
 
 contract(
 	'VoteTimesStorageTest',
@@ -28,7 +28,7 @@ contract(
 				const result = await dev.voteTimesStorage
 					.setVoteTimes(2, {from: dummyVoteTimes})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('VoteTimesStorage; getVoteTimesByProperty, setVoteTimesByProperty', () => {
@@ -60,7 +60,7 @@ contract(
 				const result = await dev.voteTimesStorage
 					.setVoteTimesByProperty(property, 3, {from: dummyVoteTimes})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 	}

@@ -1,5 +1,5 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {validateErrorMessage, DEFAULT_ADDRESS} from '../test-lib/utils'
+import {validateAddressErrorMessage, DEFAULT_ADDRESS} from '../test-lib/utils'
 
 contract(
 	'PolicySetTest',
@@ -28,7 +28,7 @@ contract(
 						from: dummyPolicyFactory
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('PolicySet; count', () => {
@@ -57,7 +57,7 @@ contract(
 				const result = await dev.policySet
 					.deleteAll({from: dummyPolicyFactory})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 	}

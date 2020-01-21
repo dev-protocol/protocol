@@ -1,5 +1,8 @@
 import {DevProtocolInstance} from '../../test-lib/instance'
-import {validateErrorMessage} from '../../test-lib/utils'
+import {
+	validateErrorMessage,
+	validateAddressErrorMessage
+} from '../../test-lib/utils'
 
 contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 	const dev = new DevProtocolInstance(deployer)
@@ -287,14 +290,14 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			const result = await dev.addressConfig
 				.setPolicy(setAddress2, {from: deployer})
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'this address is not proper')
+			validateAddressErrorMessage(result as Error)
 		})
 		it('Value set by non-owner', async () => {
 			await dev.addressConfig.setPolicyFactory(setAddress1, {from: deployer})
 			const result = await dev.addressConfig
 				.setPolicy(setAddress2, {from: other})
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'this address is not proper')
+			validateAddressErrorMessage(result as Error)
 		})
 	})
 })

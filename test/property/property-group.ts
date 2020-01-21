@@ -1,5 +1,8 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {validateErrorMessage} from '../test-lib/utils'
+import {
+	validateErrorMessage,
+	validateAddressErrorMessage
+} from '../test-lib/utils'
 
 contract(
 	'PrpertyGroupTest',
@@ -44,7 +47,7 @@ contract(
 						from: dummyPropertyFactory
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 	}

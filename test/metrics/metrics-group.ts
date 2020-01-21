@@ -1,5 +1,8 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {validateErrorMessage} from '../test-lib/utils'
+import {
+	validateErrorMessage,
+	validateAddressErrorMessage
+} from '../test-lib/utils'
 
 contract(
 	'MetricsGroupTest',
@@ -47,7 +50,7 @@ contract(
 						from: dummyMetricsFactory
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('MetricsGroup; totalIssuedMetrics', () => {

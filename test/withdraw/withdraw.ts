@@ -5,7 +5,8 @@ import {
 	getPropertyAddress,
 	getMarketAddress,
 	getEventValue,
-	validateErrorMessage
+	validateErrorMessage,
+	validateAddressErrorMessage
 } from '../test-lib/utils'
 const uri = 'ws://localhost:7545'
 
@@ -303,9 +304,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 						from: deployer
 					})
 					.catch((err: Error) => err)
-
-				expect(res).to.be.an.instanceOf(Error)
-				validateErrorMessage(res as Error, 'this address is not proper')
+				validateAddressErrorMessage(res as Error)
 			})
 		})
 	})

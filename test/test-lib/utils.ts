@@ -9,6 +9,13 @@ export function validateErrorMessage(
 	expect(result.message).to.include(message)
 }
 
+export function validateAddressErrorMessage(
+	result: Error,
+	reason = true
+): void {
+	validateErrorMessage(result, 'this is illegal address', reason)
+}
+
 export function getPolicyAddress(
 	transaction: Truffle.TransactionResponse
 ): string {
