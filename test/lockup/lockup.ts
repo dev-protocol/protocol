@@ -1,9 +1,74 @@
-contract('LockupTest', ([deployer, propertyFactory, property, devToken]) => {
-	const addressConfigContract = artifacts.require('AddressConfig')
-	const lockupContract = artifacts.require('Lockup')
-	const lockupStorageContract = artifacts.require('LockupStorage')
-	const propertyGroupContract = artifacts.require('PropertyGroup')
-	const decimalsLibrary = artifacts.require('Decimals')
+import {DevProtocolInstance} from '../test-lib/instance'
+import {
+	MarketInstance,
+	MetricsInstance,
+	PropertyInstance
+} from '../../types/truffle-contracts'
+import BigNumber from 'bignumber.js'
+import {getPropertyAddress, getMarketAddress, watch} from '../test-lib/utils'
+const uri = 'ws://localhost:7545'
+
+contract('LockupTest', ([deployer]) => {
+	const init = async (): Promise<[
+		DevProtocolInstance,
+		MarketInstance,
+		MetricsInstance,
+		PropertyInstance
+	]> => {
+		const dev = new DevProtocolInstance(deployer)
+		await dev.generateAddressConfig()
+		await Promise.all([
+			dev.generateAllocator(),
+			dev.generateAllocatorStorage(),
+			dev.generateMarketFactory(),
+			dev.generateMarketGroup(),
+			dev.generateMetricsFactory(),
+			dev.generateMetricsGroup(),
+			dev.generateLockup(),
+			dev.generateLockupStorage(),
+			dev.generateWithdraw(),
+			dev.generateWithdrawStorage(),
+			dev.generatePropertyFactory(),
+			dev.generatePropertyGroup(),
+			dev.generateVoteTimes(),
+			dev.generateVoteTimesStorage(),
+			dev.generatePolicyFactory(),
+			dev.generatePolicyGroup(),
+			dev.generatePolicySet(),
+			dev.generateDev()
+		])
+		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
+		const policy = await artifacts.require('PolicyTestForAllocator').new()
+
+		await dev.policyFactory.create(policy.address)
+		const propertyAddress = getPropertyAddress(
+			await dev.propertyFactory.create('test', 'TEST', deployer)
+		)
+		const [property] = await Promise.all([
+			artifacts.require('Property').at(propertyAddress)
+		])
+		const marketBehavior = await artifacts
+			.require('MarketTest1')
+			.new(dev.addressConfig.address)
+		const marketAddress = getMarketAddress(
+			await dev.marketFactory.create(marketBehavior.address)
+		)
+		const [market] = await Promise.all([
+			artifacts.require('Market').at(marketAddress)
+		])
+		await market.authenticate(property.address, '', '', '', '', '')
+		const metricsAddress = await new Promise<string>(resolve => {
+			market.authenticate(property.address, '', '', '', '', '')
+			watch(dev.metricsFactory, uri)('Create', (_, values) =>
+				resolve(values._metrics)
+			)
+		})
+		const [metrics] = await Promise.all([
+			artifacts.require('Metrics').at(metricsAddress)
+		])
+		return [dev, market, metrics, property]
+	}
+
 	describe('Lockup; cancel', () => {
 		// TODO
 	})
@@ -13,29 +78,8 @@ contract('LockupTest', ([deployer, propertyFactory, property, devToken]) => {
 		it('insufficient balance')
 		it('transfer was failed')
 		it('success', async () => {
-			const addressConfig = await addressConfigContract.new({from: deployer})
-			const propertyGroup = await propertyGroupContract.new(
-				addressConfig.address,
-				{from: deployer}
-			)
-			await propertyGroup.createStorage()
-			await addressConfig.setPropertyGroup(propertyGroup.address)
-			await addressConfig.setPropertyFactory(propertyFactory)
-			await propertyGroup.addGroup(property, {from: propertyFactory})
-			const lockupStorage = await lockupStorageContract.new(
-				addressConfig.address,
-				{from: deployer}
-			)
-			await lockupStorage.createStorage()
-			await addressConfig.setLockupStorage(lockupStorage.address)
-			await addressConfig.setToken(devToken, {from: deployer})
-			const decimals = await decimalsLibrary.new({from: deployer})
-			await lockupContract.link('Decimals', decimals.address)
-			const lockup = await lockupContract.new(addressConfig.address, {
-				from: deployer
-			})
-			await addressConfig.setLockup(lockup.address, {from: deployer})
-			await lockup.lockup(deployer, property, 100, {from: devToken})
+			const [dev, , , property] = await init()
+			await dev.lockup.lockup(deployer, property.address, 100)
 			// eslint-disable-next-line no-warning-comments
 			// TODO assert
 		})
