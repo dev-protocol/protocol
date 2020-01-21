@@ -1,17 +1,12 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {
-	MarketInstance,
-	MetricsInstance,
-	PropertyInstance
-} from '../../types/truffle-contracts'
+import {MetricsInstance, PropertyInstance} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {getPropertyAddress, getMarketAddress, watch} from '../test-lib/utils'
 const uri = 'ws://localhost:7545'
 
-contract('LockupTest', ([deployer]) => {
+contract('LockupTest', ([deployer, user1]) => {
 	const init = async (): Promise<[
 		DevProtocolInstance,
-		MarketInstance,
 		MetricsInstance,
 		PropertyInstance
 	]> => {
@@ -66,8 +61,10 @@ contract('LockupTest', ([deployer]) => {
 		const [metrics] = await Promise.all([
 			artifacts.require('Metrics').at(metricsAddress)
 		])
-		return [dev, market, metrics, property]
+		return [dev, metrics, property]
 	}
+
+	const toBigNumber = (v: string | BigNumber): BigNumber => new BigNumber(v)
 
 	describe('Lockup; cancel', () => {
 		// TODO
@@ -78,7 +75,7 @@ contract('LockupTest', ([deployer]) => {
 		it('insufficient balance')
 		it('transfer was failed')
 		it('success', async () => {
-			const [dev, , , property] = await init()
+			const [dev, , property] = await init()
 			await dev.addressConfig.setToken(deployer)
 			await dev.lockup.lockup(deployer, property.address, 100)
 			// eslint-disable-next-line no-warning-comments
@@ -94,30 +91,57 @@ contract('LockupTest', ([deployer]) => {
 	})
 	describe('Lockup: withdrawInterest', () => {
 		it(`mints 0 DEV when sender's lockup is 0 DEV`)
-		describe('scenario: single lockup', () => {
-			// Should use the same Lockup instance each tests because this is a series of scenarios.
-			it(`the sender locks up 500 DEV when the property's total lockup is 1000`)
-			it(`the property increments interest 1000000`)
-			it(
-				`withdrawInterestmints mints ${(1000000 * 500) /
-					(500 + 1000)} DEV to the sender`
-			)
-			it(`mints 0 DEV when after the withdrawal`)
-		})
-		describe('scenario: multiple lockup', () => {
-			// Should use the same Lockup instance each tests because this is a series of scenarios.
-			it(`the sender locks up 500 DEV when the property's total lockup is 1000`)
-			it(`the property increments interest 1000000`)
-			it(`the sender locks up 800 DEV`)
-			it(`the property increments interest 2000000`)
-			it(
-				`withdrawInterestmints mints ${(() => {
-					const firstPrice = 1000000 / (500 + 1000)
-					const secondPrice = 2000000 / (800 + 500 + 1000)
-					return firstPrice * 500 + (secondPrice - firstPrice) * 800
-				})()} DEV to the sender`
-			)
-			it(`mints 0 DEV when after the withdrawal`)
+		describe(`Lockup; Alice stakings 20% of the Property's total lockups after stakings 100% of the Property's total.`, () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			let metrics: MetricsInstance
+			const alice = deployer
+			const bob = user1
+
+			describe('scenario; single lockup', () => {
+				before(async () => {
+					;[dev, metrics, property] = await init()
+					const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+					await dev.dev.mint(bob, aliceBalance)
+					await dev.addressConfig.setToken(deployer)
+					await dev.lockup.lockup(alice, property.address, 10000)
+					await dev.allocator.allocate(metrics.address)
+				})
+				describe('before second allocation', () => {
+					it(`Alice does staking 100% of the Property's total lockups`)
+					it(`Alice's withdrawable interest is 100% of the Property's interest`)
+				})
+				describe('after second allocation', () => {
+					it(`Alice's withdrawable interest is 100% of the Property's interest`)
+					it(`mints 0 DEV when after the withdrawal`)
+				})
+			})
+
+			describe('scenario: multiple lockup', () => {
+				before(async () => {
+					;[dev, metrics, property] = await init()
+					const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+					await dev.dev.mint(bob, aliceBalance)
+					await dev.addressConfig.setToken(deployer)
+					await dev.lockup.lockup(alice, property.address, 10000)
+					await dev.allocator.allocate(metrics.address)
+				})
+				describe('before second allocation', () => {
+					it(`Alice does staking 100% of the Property's total lockups`)
+					it(
+						`Bob does staking 20% of the Property's total lockups, Alice's share become 80%`
+					)
+					it(`Alice's withdrawable interest is 100% of the Property's interest`)
+					it(`Bob's withdrawable interest is 0 yet`)
+				})
+				describe('after second allocation', () => {
+					it(
+						`Alice's withdrawable interest is 100% of prev interest and 20% of current interest`
+					)
+					it(`Bob's withdrawable interest is 80% of current interest`)
+					it(`mints 0 DEV when after the withdrawal`)
+				})
+			})
 		})
 	})
 })
