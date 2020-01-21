@@ -48,7 +48,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 			address(this),
 			_sender
 		);
-		require(value != 0, "your token is 0");
+		require(value != 0, "your deposit is 0");
 		ERC20 devToken = ERC20(config().token());
 		devToken.transfer(_sender, value);
 	}

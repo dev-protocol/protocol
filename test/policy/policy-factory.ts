@@ -5,12 +5,16 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 	mine,
-	getPropertyAddress
+	getPropertyAddress,
+	collectsEth
 } from '../test-lib/utils'
 
 contract(
 	'PolicyFactory',
-	([deployer, user1, user2, dummyProperty, propertyAuther]) => {
+	([deployer, user1, user2, dummyProperty, propertyAuther, ...accounts]) => {
+		before(async () => {
+			await collectsEth(deployer)(accounts)
+		})
 		const dev = new DevProtocolInstance(deployer)
 		const userInstance = new UserInstance(dev, user1)
 		let policy: IPolicyInstance
