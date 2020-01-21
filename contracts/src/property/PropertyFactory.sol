@@ -2,8 +2,6 @@ pragma solidity ^0.5.0;
 
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-// prettier-ignore
-import {StringValidator} from "contracts/src/common/validate/StringValidator.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
@@ -20,9 +18,8 @@ contract PropertyFactory is Pausable, UsingConfig {
 		address _author
 	) external returns (address) {
 		require(paused() == false, "You cannot use that");
-		StringValidator validator = new StringValidator();
-		validator.validatePropertyName(_name);
-		validator.validatePropertySymbol(_symbol);
+		validatePropertyName(_name);
+		validatePropertySymbol(_symbol);
 
 		Property property = new Property(
 			address(config()),
@@ -37,4 +34,29 @@ contract PropertyFactory is Pausable, UsingConfig {
 		);
 		return address(property);
 	}
+
+	function validatePropertyName(string memory _name) private pure {
+		uint256 len = bytes(_name).length;
+		require(
+			len >= 3,
+			"name must be at least 3 and no more than 10 characters"
+		);
+		require(
+			len <= 10,
+			"name must be at least 3 and no more than 10 characters"
+		);
+	}
+
+	function validatePropertySymbol(string memory _symbol) private pure {
+		uint256 len = bytes(_symbol).length;
+		require(
+			len >= 3,
+			"symbol must be at least 3 and no more than 10 characters"
+		);
+		require(
+			len <= 10,
+			"symbol must be at least 3 and no more than 10 characters"
+		);
+	}
+
 }

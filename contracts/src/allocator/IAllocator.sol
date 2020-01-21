@@ -8,8 +8,6 @@ contract IAllocator {
 	function beforeBalanceChange(address _property, address _from, address _to)
 		external;
 
-	function withdraw(address _property) external;
-
 	function getRewardsAmount(address _property)
 		external
 		view

@@ -3,6 +3,7 @@ import {DevProtocolInstance, UserInstance} from '../test-lib/instance'
 import {
 	getPolicyAddress,
 	validateErrorMessage,
+	validateAddressErrorMessage,
 	mine,
 	getPropertyAddress
 } from '../test-lib/utils'
@@ -135,7 +136,7 @@ contract(
 				const result = await firstPolicyInstance
 					.vote(dummyProperty, true)
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 			it('Should fail voting to the already enable Policy.', async () => {
 				const result = await firstPolicyInstance
@@ -420,7 +421,7 @@ contract(
 				const result = await dev.policyFactory
 					.convergePolicy(policy.address, {from: deployer})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 	}

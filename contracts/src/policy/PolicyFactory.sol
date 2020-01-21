@@ -2,14 +2,13 @@ pragma solidity ^0.5.0;
 
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {PolicySet} from "contracts/src/policy/PolicySet.sol";
 import {PolicyGroup} from "contracts/src/policy/PolicyGroup.sol";
 
-contract PolicyFactory is Pausable, UsingConfig {
+contract PolicyFactory is Pausable, UsingConfig, UsingValidator {
 	event Create(address indexed _from, address _policy);
 
 	// solium-disable-next-line no-empty-blocks
@@ -17,7 +16,7 @@ contract PolicyFactory is Pausable, UsingConfig {
 
 	function create(address _newPolicyAddress) external returns (address) {
 		require(paused() == false, "You cannot use that");
-		new AddressValidator().validateDefault(_newPolicyAddress);
+		addressValidator().validateIllegalAddress(_newPolicyAddress);
 
 		Policy policy = new Policy(address(config()), _newPolicyAddress);
 		address policyAddress = address(policy);
@@ -35,10 +34,7 @@ contract PolicyFactory is Pausable, UsingConfig {
 	}
 
 	function convergePolicy(address _currentPolicyAddress) external {
-		new AddressValidator().validateGroup(
-			msg.sender,
-			config().policyGroup()
-		);
+		addressValidator().validateGroup(msg.sender, config().policyGroup());
 
 		config().setPolicy(_currentPolicyAddress);
 		PolicySet policySet = PolicySet(config().policySet());

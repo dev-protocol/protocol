@@ -1,5 +1,9 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {validateErrorMessage, getMetricsAddress} from '../test-lib/utils'
+import {
+	validateErrorMessage,
+	validateAddressErrorMessage,
+	getMetricsAddress
+} from '../test-lib/utils'
 
 contract(
 	'MetricsFactoryTest',
@@ -34,7 +38,7 @@ contract(
 						from: user
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 			it('Pause and release of pause can only be executed by deployer.', async () => {
 				let result = await dev.metricsFactory

@@ -1,4 +1,7 @@
-import {validateErrorMessage, DEFAULT_ADDRESS} from '../../test-lib/utils'
+import {
+	validateAddressErrorMessage,
+	DEFAULT_ADDRESS
+} from '../../test-lib/utils'
 import {AddressValidatorInstance} from '../../../types/truffle-contracts'
 import {DevProtocolInstance} from '../../test-lib/instance'
 
@@ -23,15 +26,15 @@ contract(
 				from: deployer
 			})
 		})
-		describe('AddressValidator; validateDefault', () => {
+		describe('AddressValidator; validateIllegal', () => {
 			it('normal address do not cause an error.', async () => {
-				await addressValidator.validateDefault(validatedAddress)
+				await addressValidator.validateIllegal(validatedAddress)
 			})
 			it('default address cause an error.', async () => {
 				const result = await addressValidator
-					.validateDefault(DEFAULT_ADDRESS)
+					.validateIllegal(DEFAULT_ADDRESS)
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'address is initial value', false)
+				validateAddressErrorMessage(result as Error, false)
 			})
 		})
 		describe('AddressValidator; validateGroup, validateGroups', () => {
@@ -59,11 +62,7 @@ contract(
 				const result = await addressValidator
 					.validateGroup(property, dev.marketGroup.address)
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result as Error,
-					'this address is not proper',
-					false
-				)
+				validateAddressErrorMessage(result as Error, false)
 			})
 			it('No error occurs if the address belongs to a property group.', async () => {
 				await addressValidator.validateGroup(
@@ -75,11 +74,7 @@ contract(
 				const result = await addressValidator
 					.validateGroup(metrics, dev.propertyGroup.address)
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result as Error,
-					'this address is not proper',
-					false
-				)
+				validateAddressErrorMessage(result as Error, false)
 			})
 			it('No error occurs if the address belongs to a metrics group.', async () => {
 				await addressValidator.validateGroup(metrics, dev.metricsGroup.address)
@@ -88,11 +83,7 @@ contract(
 				const result = await addressValidator
 					.validateGroup(policy, dev.metricsGroup.address)
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result as Error,
-					'this address is not proper',
-					false
-				)
+				validateAddressErrorMessage(result as Error, false)
 			})
 			it('No error occurs if the address belongs to a policy group.', async () => {
 				await addressValidator.validateGroup(policy, dev.policyGroup.address)
@@ -101,11 +92,7 @@ contract(
 				const result = await addressValidator
 					.validateGroup(market, dev.policyGroup.address)
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result as Error,
-					'this address is not proper',
-					false
-				)
+				validateAddressErrorMessage(result as Error, false)
 			})
 			it('No error occurs if you belong to either group(ver1).', async () => {
 				await addressValidator.validateGroups(
@@ -129,11 +116,7 @@ contract(
 						dev.metricsGroup.address
 					)
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result as Error,
-					'this address is not proper',
-					false
-				)
+				validateAddressErrorMessage(result as Error, false)
 			})
 		})
 		describe('AddressValidator; validateAddress, validateAddresses', () => {
@@ -144,11 +127,7 @@ contract(
 				const result = await addressValidator
 					.validateAddress(market, policy)
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result as Error,
-					'this address is not proper',
-					false
-				)
+				validateAddressErrorMessage(result as Error, false)
 			})
 			it('No error if either address is the same(ver1).', async () => {
 				await addressValidator.validateAddresses(market, market, policy)
@@ -160,11 +139,7 @@ contract(
 				const result = await addressValidator
 					.validateAddresses(market, policy, metrics)
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result as Error,
-					'this address is not proper',
-					false
-				)
+				validateAddressErrorMessage(result as Error, false)
 			})
 		})
 	}

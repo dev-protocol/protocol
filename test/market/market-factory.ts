@@ -1,6 +1,7 @@
 import {DevProtocolInstance, UserInstance} from '../test-lib/instance'
 import {
 	validateErrorMessage,
+	validateAddressErrorMessage,
 	getMarketAddress,
 	DEFAULT_ADDRESS
 } from '../test-lib/utils'
@@ -66,7 +67,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 					from: user
 				})
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'address is initial value')
+			validateAddressErrorMessage(result as Error)
 		})
 		it('Pause and release of pause can only be executed by deployer.', async () => {
 			let result = await dev.marketFactory

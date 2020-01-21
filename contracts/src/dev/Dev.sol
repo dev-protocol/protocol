@@ -6,11 +6,17 @@ import {ERC20Detailed} from "openzeppelin-solidity/contracts/token/ERC20/ERC20De
 import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 // prettier-ignore
 import {ERC20Burnable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
-import {AddressValidator} from "../common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "../common/config/UsingConfig.sol";
 import {Lockup} from "../lockup/Lockup.sol";
 
-contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig {
+contract Dev is
+	ERC20Detailed,
+	ERC20Mintable,
+	ERC20Burnable,
+	UsingConfig,
+	UsingValidator
+{
 	constructor(address _config)
 		public
 		ERC20Detailed("Dev", "DEV", 18)
@@ -33,10 +39,7 @@ contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig {
 	}
 
 	function fee(address _from, uint256 _amount) external returns (bool) {
-		new AddressValidator().validateGroup(
-			msg.sender,
-			config().marketGroup()
-		);
+		addressValidator().validateGroup(msg.sender, config().marketGroup());
 		_burn(_from, _amount);
 		return true;
 	}

@@ -2,8 +2,7 @@ pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
@@ -14,7 +13,7 @@ import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {Dev} from "contracts/src/dev/Dev.sol";
 
-contract Market is UsingConfig, IMarket {
+contract Market is UsingConfig, IMarket, UsingValidator {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
@@ -25,7 +24,7 @@ contract Market is UsingConfig, IMarket {
 		public
 		UsingConfig(_config)
 	{
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().marketFactory()
 		);
@@ -41,10 +40,7 @@ contract Market is UsingConfig, IMarket {
 		external
 		returns (bool)
 	{
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
-		);
+		addressValidator().validateAddress(msg.sender, config().allocator());
 
 		return IMarketBehavior(behavior).calculate(_metrics, _start, _end);
 	}
@@ -57,7 +53,7 @@ contract Market is UsingConfig, IMarket {
 		string memory _args4,
 		string memory _args5
 	) public returns (address) {
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			Property(_prop).author()
 		);
@@ -94,8 +90,7 @@ contract Market is UsingConfig, IMarket {
 		external
 		returns (address)
 	{
-		AddressValidator validator = new AddressValidator();
-		validator.validateAddress(msg.sender, behavior);
+		addressValidator().validateAddress(msg.sender, behavior);
 
 		address sender = Property(_property).author();
 		MetricsFactory metricsFactory = MetricsFactory(
@@ -109,10 +104,7 @@ contract Market is UsingConfig, IMarket {
 	}
 
 	function vote(address _property, bool _agree) external {
-		new AddressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(enabled == false, "market is already enabled");
 		require(
 			block.number <= _votingEndBlockNumber,

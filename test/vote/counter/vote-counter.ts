@@ -1,5 +1,9 @@
 import {DevProtocolInstance} from '../../test-lib/instance'
-import {validateErrorMessage, getPropertyAddress} from '../../test-lib/utils'
+import {
+	validateErrorMessage,
+	validateAddressErrorMessage,
+	getPropertyAddress
+} from '../../test-lib/utils'
 
 contract(
 	'VoteCounterTest',
@@ -52,11 +56,7 @@ contract(
 				const result = await dev.voteCounter
 					.addVoteCount(user1, propertyAddress, true, {from: deployer})
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result as Error,
-					'this address is not proper',
-					false
-				)
+				validateAddressErrorMessage(result as Error, false)
 			})
 			it('Cannot be executed when lockup is 0.', async () => {
 				const result = await dev.voteCounter

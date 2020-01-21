@@ -2,18 +2,17 @@ pragma solidity ^0.5.0;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
-contract MarketGroup is UsingConfig, UsingStorage, IGroup {
+contract MarketGroup is UsingConfig, UsingStorage, IGroup, UsingValidator {
 	mapping(address => bool) private _markets;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	function addGroup(address _addr) external {
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().marketFactory()
 		);

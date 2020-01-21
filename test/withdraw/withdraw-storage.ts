@@ -1,5 +1,5 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {validateErrorMessage} from '../test-lib/utils'
+import {validateAddressErrorMessage} from '../test-lib/utils'
 
 contract(
 	'WithdrawStorageTest',
@@ -30,7 +30,7 @@ contract(
 				const result = await dev.withdrawStorage
 					.setRewardsAmount(property, 5, {from: dummyWithdraw})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('WithdrawStorageTest; setCumulativePrice, getCumulativePrice', () => {
@@ -53,7 +53,7 @@ contract(
 				const result = await dev.withdrawStorage
 					.setCumulativePrice(property, 50, {from: dummyWithdraw})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('WithdrawStorageTest; setWithdrawalLimitTotal, getWithdrawalLimitTotal', () => {
@@ -84,7 +84,7 @@ contract(
 				const result = await dev.withdrawStorage
 					.setWithdrawalLimitTotal(property, user, 500, {from: dummyWithdraw})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('WithdrawStorageTest; setWithdrawalLimitBalance, getWithdrawalLimitBalance', () => {
@@ -122,7 +122,7 @@ contract(
 						from: dummyWithdraw
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('WithdrawStorageTest; setLastWithdrawalPrice, getLastWithdrawalPrice', () => {
@@ -158,7 +158,7 @@ contract(
 				const result = await dev.withdrawStorage
 					.setLastWithdrawalPrice(property, user, 50000, {from: dummyWithdraw})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 		describe('WithdrawStorageTest; setPendingWithdrawal, getPendingWithdrawal', () => {
@@ -189,7 +189,7 @@ contract(
 				const result = await dev.withdrawStorage
 					.setPendingWithdrawal(property, user, 500000, {from: dummyWithdraw})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this address is not proper')
+				validateAddressErrorMessage(result as Error)
 			})
 		})
 	}
