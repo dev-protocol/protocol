@@ -133,15 +133,6 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator {
 		);
 	}
 
-	function withdraw(address _property) external {
-		new AddressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
-
-		return Withdraw(config().withdraw()).withdraw(_property);
-	}
-
 	function getRewardsAmount(address _property)
 		external
 		view

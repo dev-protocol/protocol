@@ -21,14 +21,12 @@ contract Withdraw is Pausable, UsingConfig {
 
 	function withdraw(address _property) external {
 		require(paused() == false, "You cannot use that");
-		new AddressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
+		new AddressValidator().validateGroup(
+			_property,
+			config().propertyGroup()
 		);
 
-		uint256 _value = calculateWithdrawableAmount(_property, msg.sender);
-		uint256 value = _value +
-			getStorage().getPendingWithdrawal(_property, msg.sender);
+		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
 		uint256 price = getStorage().getCumulativePrice(_property);
 		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
@@ -46,11 +44,18 @@ contract Withdraw is Pausable, UsingConfig {
 		);
 
 		uint256 price = getStorage().getCumulativePrice(_property);
+		uint256 amountFrom = _calculateAmount(_property, _from);
+		uint256 amountTo = _calculateAmount(_property, _to);
 		getStorage().setLastWithdrawalPrice(_property, _from, price);
 		getStorage().setLastWithdrawalPrice(_property, _to, price);
-		uint256 amount = calculateWithdrawableAmount(_property, _from);
-		uint256 tmp = getStorage().getPendingWithdrawal(_property, _from);
-		getStorage().setPendingWithdrawal(_property, _from, tmp + amount);
+		uint256 pendFrom = getStorage().getPendingWithdrawal(_property, _from);
+		uint256 pendTo = getStorage().getPendingWithdrawal(_property, _to);
+		getStorage().setPendingWithdrawal(
+			_property,
+			_from,
+			pendFrom + amountFrom
+		);
+		getStorage().setPendingWithdrawal(_property, _to, pendTo + amountTo);
 		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
 			_property,
 			_to
@@ -91,7 +96,7 @@ contract Withdraw is Pausable, UsingConfig {
 		return getStorage().getRewardsAmount(_property);
 	}
 
-	function calculateWithdrawableAmount(address _property, address _user)
+	function _calculateAmount(address _property, address _user)
 		private
 		view
 		returns (uint256)
@@ -114,6 +119,33 @@ contract Withdraw is Pausable, UsingConfig {
 		}
 		uint256 value = priceGap * balance;
 		return value.div(Decimals.basis());
+	}
+
+	function calculateAmount(address _property, address _user)
+		external
+		view
+		returns (uint256)
+	{
+		return _calculateAmount(_property, _user);
+	}
+
+	function _calculateWithdrawableAmount(address _property, address _user)
+		private
+		view
+		returns (uint256)
+	{
+		uint256 _value = _calculateAmount(_property, _user);
+		uint256 value = _value +
+			getStorage().getPendingWithdrawal(_property, _user);
+		return value;
+	}
+
+	function calculateWithdrawableAmount(address _property, address _user)
+		external
+		view
+		returns (uint256)
+	{
+		return _calculateWithdrawableAmount(_property, _user);
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {
