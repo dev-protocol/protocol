@@ -290,9 +290,16 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				})
 			})
 
-			it(
-				'Should fail to call `beforeBalanceChange` when sent from other than Property Contract address'
-			)
+			it('Should fail to call `beforeBalanceChange` when sent from other than Property Contract address', async () => {
+				const res = await dev.withdraw
+					.beforeBalanceChange(property.address, deployer, user1, {
+						from: deployer
+					})
+					.catch((err: Error) => err)
+
+				expect(res).to.be.an.instanceOf(Error)
+				validateErrorMessage(res as Error, 'this address is not proper')
+			})
 		})
 		it(
 			'should fail to call the function when sent from other than Allocator Contract'
