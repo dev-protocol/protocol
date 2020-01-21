@@ -119,10 +119,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	}
 
 	function withdrawInterest(address _property) external {
-		addressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
