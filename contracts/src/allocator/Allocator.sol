@@ -18,7 +18,13 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
-contract Allocator is Killable, Ownable, UsingConfig, IAllocator, UsingValidator {
+contract Allocator is
+	Killable,
+	Ownable,
+	UsingConfig,
+	IAllocator,
+	UsingValidator
+{
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event BeforeAllocation(
@@ -120,10 +126,7 @@ contract Allocator is Killable, Ownable, UsingConfig, IAllocator, UsingValidator
 	function beforeBalanceChange(address _property, address _from, address _to)
 		external
 	{
-		addressValidator().validateGroup(
-			msg.sender,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(msg.sender, config().propertyGroup());
 
 		Withdraw(config().withdraw()).beforeBalanceChange(
 			_property,

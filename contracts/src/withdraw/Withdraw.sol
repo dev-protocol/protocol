@@ -20,10 +20,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 
 	function withdraw(address _property) external {
 		require(paused() == false, "You cannot use that");
-		addressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
@@ -37,10 +34,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	function beforeBalanceChange(address _property, address _from, address _to)
 		external
 	{
-		addressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
-		);
+		addressValidator().validateAddress(msg.sender, config().allocator());
 
 		uint256 price = getStorage().getCumulativePrice(_property);
 		uint256 amountFrom = _calculateAmount(_property, _from);

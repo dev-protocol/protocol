@@ -40,10 +40,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		external
 		returns (bool)
 	{
-		addressValidator().validateAddress(
-			msg.sender,
-			config().allocator()
-		);
+		addressValidator().validateAddress(msg.sender, config().allocator());
 
 		return IMarketBehavior(behavior).calculate(_metrics, _start, _end);
 	}
@@ -107,10 +104,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	}
 
 	function vote(address _property, bool _agree) external {
-		addressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(enabled == false, "market is already enabled");
 		require(
 			block.number <= _votingEndBlockNumber,

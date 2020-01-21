@@ -34,10 +34,7 @@ contract PolicyFactory is Pausable, UsingConfig, UsingValidator {
 	}
 
 	function convergePolicy(address _currentPolicyAddress) external {
-		addressValidator().validateGroup(
-			msg.sender,
-			config().policyGroup()
-		);
+		addressValidator().validateGroup(msg.sender, config().policyGroup());
 
 		config().setPolicy(_currentPolicyAddress);
 		PolicySet policySet = PolicySet(config().policySet());

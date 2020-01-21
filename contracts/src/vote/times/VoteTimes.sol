@@ -25,10 +25,7 @@ contract VoteTimes is UsingConfig, UsingValidator {
 	}
 
 	function addVoteTimesByProperty(address _property) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().voteCounter()
-		);
+		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(
 			_property

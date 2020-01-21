@@ -14,10 +14,7 @@ contract VoteTimesStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 
 	function setVoteTimes(uint256 times) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().voteTimes()
-		);
+		addressValidator().validateAddress(msg.sender, config().voteTimes());
 
 		return eternalStorage().setUint(getVoteTimesKey(), times);
 	}
@@ -36,10 +33,7 @@ contract VoteTimesStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 
 	function setVoteTimesByProperty(address _property, uint256 times) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().voteTimes()
-		);
+		addressValidator().validateAddress(msg.sender, config().voteTimes());
 
 		return
 			eternalStorage().setUint(

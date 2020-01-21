@@ -23,10 +23,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	function lockup(address _from, address _property, uint256 _value) external {
 		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(msg.sender, config().token());
-		addressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(_value != 0, "illegal lockup value");
 
 		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
@@ -47,10 +44,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	}
 
 	function cancel(address _property) external {
-		addressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(hasValue(_property, msg.sender), "dev token is not locked");
 		bool isWaiting = getStorage().getWithdrawalStatus(
@@ -65,10 +59,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	}
 
 	function withdraw(address _property) external {
-		addressValidator().validateGroup(
-			_property,
-			config().propertyGroup()
-		);
+		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(possible(_property, msg.sender), "waiting for release");
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);

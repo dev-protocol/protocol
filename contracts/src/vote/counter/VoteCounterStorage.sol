@@ -14,10 +14,7 @@ contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
 		address _sender,
 		address _property
 	) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().voteCounter()
-		);
+		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
 		return eternalStorage().setBool(alreadyVoteKey, true);
@@ -51,10 +48,7 @@ contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
 		external
 		returns (uint256)
 	{
-		addressValidator().validateAddress(
-			msg.sender,
-			config().voteCounter()
-		);
+		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		eternalStorage().setUint(getAgreeVoteCountKey(_sender), count);
 	}
@@ -76,10 +70,7 @@ contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
 		external
 		returns (uint256)
 	{
-		addressValidator().validateAddress(
-			msg.sender,
-			config().voteCounter()
-		);
+		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		eternalStorage().setUint(getOppositeVoteCountKey(_sender), count);
 	}
