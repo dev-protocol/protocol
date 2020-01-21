@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+import BigNumber from 'bignumber.js'
 
 export function validateErrorMessage(
 	result: Error,
@@ -117,6 +118,35 @@ export async function mine(count: number): Promise<void> {
 			)
 		})
 	}
+}
+
+export const toBigNumber = (v: string | BigNumber | number): BigNumber =>
+	new BigNumber(v)
+
+export const collectsEth = (to: string, uri = 'ws://localhost:7545') => async (
+	accounts: Truffle.Accounts,
+	min = 50,
+	rate = 0.5
+): Promise<void> => {
+	const getBalance = async (address: string): Promise<BigNumber> =>
+		web3.eth.getBalance(address).then(toBigNumber)
+	const web3 = new Web3(new Web3.providers.WebsocketProvider(uri))
+	const minimum = toBigNumber(Web3.utils.toWei(`${min}`, 'ether'))
+	accounts.map(async account => {
+		const [balance, value] = await Promise.all([
+			getBalance(to),
+			getBalance(account)
+		])
+		if (balance.isLessThan(minimum)) {
+			await web3.eth
+				.sendTransaction({
+					to,
+					from: account,
+					value: value.times(rate).toFixed()
+				})
+				.catch((err: Error) => err)
+		}
+	})
 }
 
 export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000'
