@@ -3,15 +3,14 @@ pragma solidity ^0.5.0;
 import {MarketGroup} from "contracts/src/market/MarketGroup.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
-contract PolicySet is UsingConfig, UsingStorage {
+contract PolicySet is UsingConfig, UsingStorage, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addSet(address _addr) external {
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);
@@ -24,7 +23,7 @@ contract PolicySet is UsingConfig, UsingStorage {
 	}
 
 	function deleteAll() external {
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);

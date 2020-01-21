@@ -23,15 +23,15 @@ contract(
 				from: deployer
 			})
 		})
-		describe('AddressValidator; validateDefault', () => {
+		describe('AddressValidator; validateIllegal', () => {
 			it('normal address do not cause an error.', async () => {
-				await addressValidator.validateDefault(validatedAddress)
+				await addressValidator.validateIllegal(validatedAddress)
 			})
 			it('default address cause an error.', async () => {
 				const result = await addressValidator
-					.validateDefault(DEFAULT_ADDRESS)
+					.validateIllegal(DEFAULT_ADDRESS)
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'address is initial value', false)
+				validateErrorMessage(result as Error, 'this is illegal address', false)
 			})
 		})
 		describe('AddressValidator; validateGroup, validateGroups', () => {

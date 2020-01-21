@@ -30,7 +30,6 @@ export function getMarketAddress(
 export function getMetricsAddress(
 	transaction: Truffle.TransactionResponse
 ): string {
-	console.log(transaction.logs)
 	const tmp = transaction.logs.filter(
 		(e: {event: string}) => e.event === 'Create'
 	)[0].args._metrics

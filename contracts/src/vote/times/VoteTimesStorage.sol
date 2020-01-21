@@ -2,10 +2,9 @@ pragma solidity ^0.5.0;
 
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
-contract VoteTimesStorage is UsingStorage, UsingConfig {
+contract VoteTimesStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -15,7 +14,7 @@ contract VoteTimesStorage is UsingStorage, UsingConfig {
 	}
 
 	function setVoteTimes(uint256 times) external {
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().voteTimes()
 		);
@@ -37,7 +36,7 @@ contract VoteTimesStorage is UsingStorage, UsingConfig {
 	}
 
 	function setVoteTimesByProperty(address _property, uint256 times) external {
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().voteTimes()
 		);

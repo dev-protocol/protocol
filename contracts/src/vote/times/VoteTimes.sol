@@ -3,18 +3,17 @@ pragma solidity ^0.5.0;
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {VoteTimesStorage} from "contracts/src/vote/times/VoteTimesStorage.sol";
 
-contract VoteTimes is UsingConfig {
+contract VoteTimes is UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addVoteTime() external {
-		new AddressValidator().validateAddresses(
+		addressValidator().validateAddresses(
 			msg.sender,
 			config().marketFactory(),
 			config().policyFactory()
@@ -26,7 +25,7 @@ contract VoteTimes is UsingConfig {
 	}
 
 	function addVoteTimesByProperty(address _property) external {
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().voteCounter()
 		);
@@ -39,7 +38,7 @@ contract VoteTimes is UsingConfig {
 	}
 
 	function resetVoteTimesByProperty(address _property) external {
-		new AddressValidator().validateAddresses(
+		addressValidator().validateAddresses(
 			msg.sender,
 			config().allocator(),
 			config().propertyFactory()

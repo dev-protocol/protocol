@@ -1,10 +1,9 @@
 pragma solidity ^0.5.0;
 
 import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
-contract AddressConfig is Ownable {
+contract AddressConfig is Ownable, UsingValidator {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
 	address public allocatorStorage;
@@ -80,7 +79,7 @@ contract AddressConfig is Ownable {
 	}
 
 	function setPolicy(address _addr) external {
-		new AddressValidator().validateAddress(msg.sender, policyFactory);
+		addressValidator().validateAddress(msg.sender, policyFactory);
 		policy = _addr;
 	}
 

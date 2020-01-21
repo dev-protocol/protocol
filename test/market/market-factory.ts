@@ -66,7 +66,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 					from: user
 				})
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'address is initial value')
+			validateErrorMessage(result as Error, 'this is illegal address')
 		})
 		it('Pause and release of pause can only be executed by deployer.', async () => {
 			let result = await dev.marketFactory

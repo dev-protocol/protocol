@@ -3,14 +3,13 @@ pragma solidity ^0.5.0;
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {PolicyFactory} from "contracts/src/policy/PolicyFactory.sol";
 
-contract Policy is Killable, UsingConfig {
+contract Policy is Killable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	IPolicy private _policy;
 	uint256 private _votingEndBlockNumber;
@@ -19,7 +18,7 @@ contract Policy is Killable, UsingConfig {
 		public
 		UsingConfig(_config)
 	{
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);
@@ -97,8 +96,7 @@ contract Policy is Killable, UsingConfig {
 	}
 
 	function vote(address _property, bool _agree) external {
-		AddressValidator validator = new AddressValidator();
-		validator.validateGroup(_property, config().propertyGroup());
+		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(config().policy() != address(this), "this policy is current");
 		require(voting(), "voting deadline is over");

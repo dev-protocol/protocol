@@ -7,12 +7,11 @@ import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-// prettier-ignore
-import {AddressValidator} from "contracts/src/common/validate/AddressValidator.sol";
+import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 
-contract Withdraw is Pausable, UsingConfig {
+contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -21,7 +20,7 @@ contract Withdraw is Pausable, UsingConfig {
 
 	function withdraw(address _property) external {
 		require(paused() == false, "You cannot use that");
-		new AddressValidator().validateGroup(
+		addressValidator().validateGroup(
 			_property,
 			config().propertyGroup()
 		);
@@ -38,7 +37,7 @@ contract Withdraw is Pausable, UsingConfig {
 	function beforeBalanceChange(address _property, address _from, address _to)
 		external
 	{
-		new AddressValidator().validateAddress(
+		addressValidator().validateAddress(
 			msg.sender,
 			config().allocator()
 		);
@@ -72,13 +71,7 @@ contract Withdraw is Pausable, UsingConfig {
 	}
 
 	function increment(address _property, uint256 _allocationResult) external {
-		require(
-			msg.sender == config().allocator(),
-			"this address is not Allocator Contract"
-		);
-		// TODO
-		// Not working for some reason("require" is working instead):
-		// new AddressValidator().validateAddress(msg.sender, config().allocator());
+		addressValidator().validateAddress(msg.sender, config().allocator());
 		uint256 priceValue = _allocationResult.outOf(
 			ERC20(_property).totalSupply()
 		);

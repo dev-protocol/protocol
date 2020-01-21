@@ -5,8 +5,8 @@ import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 contract AddressValidator {
 	string constant errorMessage = "this address is not proper";
 
-	function validateDefault(address _addr) external pure {
-		require(_addr != address(0), "address is initial value");
+	function validateIllegalAddress(address _addr) external pure {
+		require(_addr != address(0), "this is illegal address");
 	}
 
 	function validateGroup(address _addr, address _groupAddr) external view {
