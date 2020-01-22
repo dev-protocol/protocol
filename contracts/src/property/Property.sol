@@ -38,7 +38,6 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 			_to
 		);
 		_transfer(msg.sender, _to, _value);
-		return true;
 	}
 
 	function withdraw(address _sender, uint256 _value) external {

@@ -2,12 +2,13 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	validateAddressErrorMessage,
 	validateErrorMessage,
-	getPropertyAddress
+	getPropertyAddress,
+	DEFAULT_ADDRESS
 } from '../test-lib/utils'
 
 contract(
 	'PropertyTest',
-	([deployer, author, user, propertyFactory, lockup]) => {
+	([deployer, author, user, propertyFactory, lockup, transfer]) => {
 		const propertyContract = artifacts.require('Property')
 		describe('Property; constructor', () => {
 			const dev = new DevProtocolInstance(deployer)
@@ -86,6 +87,51 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				await property.withdraw(user, 10, {from: lockup})
+			})
+		})
+		describe('Property; transfer', () => {
+			const dev = new DevProtocolInstance(deployer)
+			let propertyAddress: string
+			beforeEach(async () => {
+				await dev.generateAddressConfig()
+				await dev.generateAllocator()
+				await dev.generateAllocatorStorage()
+				await dev.generateWithdraw()
+				await dev.generateWithdrawStorage()
+				await dev.generateVoteTimes()
+				await dev.generateVoteTimesStorage()
+				await dev.generatePropertyGroup()
+				await dev.generatePropertyFactory()
+				const result = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author,
+					{
+						from: user
+					}
+				)
+				propertyAddress = getPropertyAddress(result)
+			})
+			it('An error occurs if the address is invalid', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const property = await propertyContract.at(propertyAddress)
+				const result = await property
+					.transfer(DEFAULT_ADDRESS, 10, {from: user})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result as Error)
+			})
+			it('An error occurs if the value is invalid', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const property = await propertyContract.at(propertyAddress)
+				const result = await property
+					.transfer(transfer, 0, {from: user})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'illegal transfer value')
+			})
+			it('transfer success', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const property = await propertyContract.at(propertyAddress)
+				await property.transfer(transfer, 10, {from: author})
 			})
 		})
 	}
