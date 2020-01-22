@@ -196,7 +196,7 @@ contract('LockupTest', ([deployer, user1]) => {
 
 			const res = await dev.lockup.withdraw(property.address).catch(err)
 			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'your deposit is 0')
+			validateErrorMessage(res as Error, 'dev token is not locked')
 		})
 		it(`withdrawing sender's withdrawable full amount`, async () => {
 			const [dev, , property] = await init()
