@@ -16,6 +16,7 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 contract Lockup is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	event Lockedup(address _from, address _property, uint256 _value);
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -39,8 +40,9 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		getStorage().setPendingInterestWithdrawal(
 			_property,
 			_from,
-			calculateInterestAmount(_property, _from)
+			_calculateInterestAmount(_property, _from)
 		);
+		emit Lockedup(_from, _property, _value);
 	}
 
 	function cancel(address _property) external {
@@ -63,11 +65,8 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 
 		require(possible(_property, msg.sender), "waiting for release");
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
-		require(lockupedValue == 0, "dev token is not locked");
-		uint256 value = getStorage().getValue(_property, msg.sender);
-		require(value != 0, "your token is 0");
-		Property(_property).withdrawDev(msg.sender, value);
-		withdrawInterest(_property);
+		require(lockupedValue != 0, "dev token is not locked");
+		Property(_property).withdraw(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
 		subPropertyValue(_property, lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
@@ -81,7 +80,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		incrementInterest(_property, priceValue);
 	}
 
-	function calculateInterestAmount(address _property, address _user)
+	function _calculateInterestAmount(address _property, address _user)
 		private
 		view
 		returns (uint256)
@@ -94,7 +93,15 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		return value.div(Decimals.basis());
 	}
 
-	function calculateWithdrawableInterestAmount(
+	function calculateInterestAmount(address _property, address _user)
+		external
+		view
+		returns (uint256)
+	{
+		return _calculateInterestAmount(_property, _user);
+	}
+
+	function _calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
 	) private view returns (uint256) {
@@ -102,13 +109,29 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			_property,
 			_user
 		);
-		return calculateInterestAmount(_property, _user).add(pending);
+		return _calculateInterestAmount(_property, _user).add(pending);
 	}
 
-	function withdrawInterest(address _property) private {
-		uint256 value = calculateWithdrawableInterestAmount(
+	function calculateWithdrawableInterestAmount(
+		address _property,
+		address _user
+	) external view returns (uint256) {
+		return _calculateWithdrawableInterestAmount(_property, _user);
+	}
+
+	function withdrawInterest(address _property) external {
+		addressValidator().validateGroup(_property, config().propertyGroup());
+
+		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
+		);
+		require(value > 0, "your interest amount is 0");
+		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
+		getStorage().setLastInterestPrice(
+			_property,
+			msg.sender,
+			getStorage().getInterestPrice(_property)
 		);
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
