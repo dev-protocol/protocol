@@ -7,9 +7,9 @@ import {
 	watch,
 	validateErrorMessage,
 	waitForEvent,
-	getEventValue
+	getEventValue,
+	WEB3_URI
 } from '../test-lib/utils'
-const uri = 'ws://localhost:7545'
 
 contract('LockupTest', ([deployer, user1]) => {
 	const init = async (): Promise<[
@@ -61,7 +61,7 @@ contract('LockupTest', ([deployer, user1]) => {
 		await market.authenticate(property.address, '', '', '', '', '')
 		const metricsAddress = await new Promise<string>(resolve => {
 			market.authenticate(property.address, '', '', '', '', '')
-			watch(dev.metricsFactory, uri)('Create', (_, values) =>
+			watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 				resolve(values._metrics)
 			)
 		})
@@ -150,7 +150,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const [dev, , property] = await init()
 
 			dev.dev.deposit(property.address, 10000).catch(err)
-			await waitForEvent(dev.lockup, uri)('Lockedup')
+			await waitForEvent(dev.lockup, WEB3_URI)('Lockedup')
 
 			const lockedupAmount = await dev.lockup
 				.getValue(property.address, deployer)
@@ -162,9 +162,9 @@ contract('LockupTest', ([deployer, user1]) => {
 
 			dev.dev.deposit(property.address, 10000).catch(err)
 			const [_from, _property, _value] = await Promise.all([
-				getEventValue(dev.lockup, uri)('Lockedup', '_from'),
-				getEventValue(dev.lockup, uri)('Lockedup', '_property'),
-				getEventValue(dev.lockup, uri)('Lockedup', '_value')
+				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_from'),
+				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_property'),
+				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_value')
 			])
 
 			expect(_from).to.be.equal(deployer)

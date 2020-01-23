@@ -123,7 +123,7 @@ export async function mine(count: number): Promise<void> {
 export const toBigNumber = (v: string | BigNumber | number): BigNumber =>
 	new BigNumber(v)
 
-export const collectsEth = (to: string, uri = 'ws://localhost:7545') => async (
+export const collectsEth = (to: string, uri = WEB3_URI) => async (
 	accounts: Truffle.Accounts,
 	min = 50,
 	rate = 0.5
@@ -150,3 +150,4 @@ export const collectsEth = (to: string, uri = 'ws://localhost:7545') => async (
 }
 
 export const DEFAULT_ADDRESS = '0x0000000000000000000000000000000000000000'
+export const WEB3_URI = 'ws://localhost:7545'

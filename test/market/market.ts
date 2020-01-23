@@ -1,5 +1,9 @@
 import {DevProtocolInstance, UserInstance} from '../test-lib/instance'
-import {validateAddressErrorMessage} from '../test-lib/utils'
+import {
+	validateAddressErrorMessage,
+	waitForEvent,
+	WEB3_URI
+} from '../test-lib/utils'
 
 contract(
 	'MarketTest',
@@ -78,10 +82,10 @@ contract(
 					{from: marketFactory}
 				)
 				await dev.addressConfig.setAllocator(allocator)
-				const result = await market.calculate(metrics, 0, 100, {
+				await market.calculate(metrics, 0, 100, {
 					from: allocator
 				})
-				console.log(result.receipt.rawLogs)
+				await waitForEvent(behavuor, WEB3_URI)('LogCalculate')
 			})
 		})
 		describe('Market; authenticate', () => {

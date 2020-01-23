@@ -6,9 +6,9 @@ import {
 	getMarketAddress,
 	getEventValue,
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
+	WEB3_URI
 } from '../test-lib/utils'
-const uri = 'ws://localhost:7545'
 
 contract('WithdrawTest', ([deployer, user1]) => {
 	const init = async (): Promise<[
@@ -60,7 +60,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 		await market.authenticate(property.address, '', '', '', '', '')
 		const metricsAddress = await (async () => {
 			market.authenticate(property.address, '', '', '', '', '')
-			return getEventValue(dev.metricsFactory, uri)('Create', '_metrics')
+			return getEventValue(dev.metricsFactory, WEB3_URI)('Create', '_metrics')
 		})()
 		const [metrics] = await Promise.all([
 			artifacts.require('Metrics').at(metricsAddress as string)
