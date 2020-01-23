@@ -1,13 +1,25 @@
 import {DevProtocolInstance, UserInstance} from '../test-lib/instance'
 import {
+	validateErrorMessage,
 	validateAddressErrorMessage,
 	waitForEvent,
-	WEB3_URI
+	getMarketAddress,
+	getPropertyAddress,
+	WEB3_URI,
+	mine
 } from '../test-lib/utils'
 
 contract(
 	'MarketTest',
-	([deployer, marketFactory, behavuor, user, metrics, allocator]) => {
+	([
+		deployer,
+		marketFactory,
+		behavuor,
+		user,
+		metrics,
+		allocator,
+		propertyAuther
+	]) => {
 		const marketContract = artifacts.require('Market')
 		describe('Market; constructor', () => {
 			const dev = new DevProtocolInstance(deployer)
@@ -112,132 +124,41 @@ contract(
 			)
 		})
 
-		// eslint-disable-next-line no-warning-comments
-		// TODO vote interface wa changed, I will create this test case later
 		describe('Market; vote', () => {
-			// Let marketFactory: any
-			// let marketGroup: any
-			// let dev: any
-			// // eslint-disable-next-line @typescript-eslint/no-unused-vars
-			// let market: any
-			// let addressConfig: any
-			// let policy: any
-			// let policyFactory: any
-			// let voteTimes: any
-			// let voteTimesStorage: any
-			// let propertyFactory: any
-			// let propertyGroup: any
-			// // eslint-disable-next-line @typescript-eslint/no-unused-vars
-			// let propertyAddress: any
-			// let behavior: any
-			// let allocator: any
-			// let lockup: any
-			// let policyGroup: any
-			// let policySet: any
-			before(async () => {
-				// AddressConfig = await addressConfigContract.new({from: deployer})
-				// dev = await DevContract.new(addressConfig.address, {from: deployer})
-				// await addressConfig.setToken(dev.address, {from: deployer})
-				// marketFactory = await marketFactoryContract.new(addressConfig.address, {
-				// 	from: deployer
-				// })
-				// marketGroup = await marketGroupContract.new(addressConfig.address, {
-				// 	from: deployer
-				// })
-				// await marketGroup.createStorage()
-				// const decimals = await decimalsLibrary.new({from: deployer})
-				// await allocatorContract.link('Decimals', decimals.address)
-				// allocator = await allocatorContract.new(addressConfig.address, {
-				// 	from: deployer
-				// })
-				// await addressConfig.setAllocator(allocator.address, {
-				// 	from: deployer
-				// })
-				// await lockupContract.link('Decimals', decimals.address)
-				// lockup = await lockupContract.new(addressConfig.address, {from: deployer})
-				// await addressConfig.setLockup(lockup.address, {
-				// 	from: deployer
-				// })
-				// const lockupStorage = await lockupStorageContract.new(
-				// 	addressConfig.address,
-				// 	{from: deployer}
-				// )
-				// await lockupStorage.createStorage()
-				// await addressConfig.setLockupStorage(lockupStorage.address, {
-				// 	from: deployer
-				// })
-				// voteTimes = await voteTimesContract.new(addressConfig.address, {
-				// 	from: deployer
-				// })
-				// voteTimesStorage = await voteTimesStorageContract.new(
-				// 	addressConfig.address,
-				// 	{
-				// 		from: deployer
-				// 	}
-				// )
-				// await voteTimesStorage.createStorage()
-				// await addressConfig.setVoteTimesStorage(voteTimesStorage.address, {
-				// 	from: deployer
-				// })
-				// await addressConfig.setMarketFactory(marketFactory.address, {
-				// 	from: deployer
-				// })
-				// await addressConfig.setMarketGroup(marketGroup.address, {from: deployer})
-				// await addressConfig.setVoteTimes(voteTimes.address, {
-				// 	from: deployer
-				// })
-				// propertyFactory = await propertyFactoryContract.new(
-				// 	addressConfig.address,
-				// 	{from: deployer}
-				// )
-				// await addressConfig.setPropertyFactory(propertyFactory.address, {
-				// 	from: deployer
-				// })
-				// propertyGroup = await propertyGroupContract.new(addressConfig.address, {
-				// 	from: deployer
-				// })
-				// await propertyGroup.createStorage()
-				// await addressConfig.setPropertyGroup(propertyGroup.address, {
-				// 	from: deployer
-				// })
-				// await policyContract.link('Decimals', decimals.address)
-				// policy = await policyContract.new({from: deployer})
-				// policyGroup = await policyGroupContract.new(addressConfig.address, {
-				// 	from: deployer
-				// })
-				// policyGroup.createStorage()
-				// await addressConfig.setPolicyGroup(policyGroup.address, {
-				// 	from: deployer
-				// })
-				// policySet = await policySetContract.new(addressConfig.address, {
-				// 	from: deployer
-				// })
-				// policySet.createStorage()
-				// await addressConfig.setPolicySet(policySet.address, {
-				// 	from: deployer
-				// })
-				// policyFactory = await policyFactoryContract.new(addressConfig.address, {
-				// 	from: deployer
-				// })
-				// await addressConfig.setPolicyFactory(policyFactory.address, {
-				// 	from: deployer
-				// })
-				// await policyFactory.create(policy.address)
-				// behavior = await marketTest1Contract.new(addressConfig.address, {
-				// 	from: deployer
-				// })
-				// let result = await marketFactory.create(behavior.address)
-				// const marketAddress = await result.logs.filter(
-				// 	(e: {event: string}) => e.event === 'Create'
-				// )[0].args._market
-				// // eslint-disable-next-line @typescript-eslint/await-thenable
-				// market = await marketContract.at(marketAddress)
-				// result = await propertyFactory.create('sample', 'SAMPLE', deployer, {
-				// 	from: deployer
-				// })
-				// propertyAddress = await result.logs.filter(
-				// 	(e: {event: string}) => e.event === 'Create'
-				// )[0].args._property
+			const dev = new DevProtocolInstance(deployer)
+			const userInstance = new UserInstance(dev, user)
+			let marketAddress: string
+			let propertyAddress: string
+			const iPolicyContract = artifacts.require('IPolicy')
+			beforeEach(async () => {
+				await dev.generateAddressConfig()
+				await Promise.all([
+					dev.generateMarketFactory(),
+					dev.generateMarketGroup(),
+					dev.generateVoteTimes(),
+					dev.generateVoteTimesStorage(),
+					dev.generatePolicyFactory(),
+					dev.generatePolicyGroup(),
+					dev.generatePolicySet(),
+					dev.generateVoteCounter(),
+					dev.generateVoteCounterStorage(),
+					dev.generatePropertyFactory(),
+					dev.generatePropertyGroup(),
+					dev.generateLockup(),
+					dev.generateLockupStorage(),
+					dev.generateDev()
+				])
+				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
+				await dev.policyFactory.create(iPolicyInstance.address)
+				const createMarketResult = await dev.marketFactory.create(behavuor)
+				marketAddress = getMarketAddress(createMarketResult)
+				const createPropertyResult = await dev.propertyFactory.create(
+					'test',
+					'TEST',
+					propertyAuther
+				)
+				propertyAddress = getPropertyAddress(createPropertyResult)
+				await dev.dev.mint(user, 10000, {from: deployer})
 			})
 
 			it(
@@ -258,16 +179,15 @@ contract(
 			})
 
 			it('Should fail to vote when already determined enabled', async () => {
-				// Await dummyDEV.approve(market.address, 100000, {from: deployer})
-				// await market.vote(10000, {from: deployer})
-				// const isEnable = await market.enabled({from: deployer})
-				// expect(isEnable).to.be.equal(true)
-				// const result = await market
-				// 	.vote(100, {from: deployer})
-				// 	.catch((err: Error) => err)
-				// expect((result as Error).message).to.be.equal(
-				// 	'Returned error: VM Exception while processing transaction: revert market is already enabled -- Reason given: market is already enabled.'
-				// )
+				await dev.dev.deposit(propertyAddress, 10000, {from: user})
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress)
+				await marketInstance.vote(propertyAddress, true, {from: user})
+				expect(await marketInstance.enabled()).to.be.equal(true)
+				const result = await marketInstance
+					.vote(propertyAddress, true, {from: user})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'market is already enabled')
 			})
 
 			it('Vote decrease the number of sent DEVs from voter owned DEVs', async () => {
@@ -283,7 +203,20 @@ contract(
 				// const DEVsTotalSupply = await dummyDEV.totalSupply({from: deployer})
 				// expect(DEVsTotalSupply.toNumber()).to.be.equal(9900)
 			})
-			it('voting deadline is over')
+			it('voting deadline is over', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const iPolicyInstance = await iPolicyContract.at(
+					await dev.addressConfig.policy()
+				)
+				const marketVotingBlocks = await iPolicyInstance.marketVotingBlocks()
+				await mine(marketVotingBlocks.toNumber())
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress)
+				const result = await marketInstance
+					.vote(propertyAddress, true)
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'voting deadline is over')
+			})
 		})
 	}
 )
