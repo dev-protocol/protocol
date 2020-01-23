@@ -57,6 +57,8 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 			msg.sender,
 			Property(_prop).author()
 		);
+		require(enabled, "market is not enabled");
+
 		return
 			IMarketBehavior(behavior).authenticate(
 				_prop,
@@ -91,6 +93,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		returns (address)
 	{
 		addressValidator().validateAddress(msg.sender, behavior);
+		require(enabled, "market is not enabled");
 
 		address sender = Property(_property).author();
 		MetricsFactory metricsFactory = MetricsFactory(
