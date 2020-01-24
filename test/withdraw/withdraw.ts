@@ -64,9 +64,8 @@ contract('WithdrawTest', ([deployer, user1]) => {
 		])
 		await dev.dev.deposit(propertyAddress2, 10000)
 		await market.vote(propertyAddress2, true)
-		await market.authenticate(property.address, '', '', '', '', '')
 		const metricsAddress = await (async () => {
-			market.authenticate(property.address, '', '', '', '', '')
+			market.authenticate(property.address, 'id1', '', '', '', '')
 			return getEventValue(dev.metricsFactory, uri)('Create', '_metrics')
 		})()
 		const [metrics] = await Promise.all([
