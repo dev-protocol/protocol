@@ -40,6 +40,8 @@ contract('Allocator', ([deployer, user1]) => {
 			dev.generatePropertyGroup(),
 			dev.generateVoteTimes(),
 			dev.generateVoteTimesStorage(),
+			dev.generateVoteCounter(),
+			dev.generateVoteCounterStorage(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
 			dev.generatePolicySet(),
@@ -51,6 +53,9 @@ contract('Allocator', ([deployer, user1]) => {
 		await dev.policyFactory.create(policy.address)
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', deployer)
+		)
+		const propertyAddress2 = getPropertyAddress(
+			await dev.propertyFactory.create('test2', 'TEST2', deployer)
 		)
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress)
@@ -64,9 +69,10 @@ contract('Allocator', ([deployer, user1]) => {
 		const [market] = await Promise.all([
 			artifacts.require('Market').at(marketAddress)
 		])
-		await market.authenticate(property.address, '', '', '', '', '')
+		await dev.dev.deposit(propertyAddress2, 10000)
+		await market.vote(propertyAddress2, true)
 		const metricsAddress = await new Promise<string>(resolve => {
-			market.authenticate(property.address, '', '', '', '', '')
+			market.authenticate(property.address, 'id1', '', '', '', '')
 			watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 				resolve(values._metrics)
 			)

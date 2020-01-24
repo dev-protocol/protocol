@@ -19,6 +19,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	address public behavior;
 	uint256 private _votingEndBlockNumber;
 	uint256 public issuedMetrics;
+	mapping(bytes32 => bool) private idMap;
 
 	constructor(address _config, address _behavior)
 		public
@@ -57,6 +58,11 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 			msg.sender,
 			Property(_prop).author()
 		);
+		require(enabled, "market is not enabled");
+
+		uint256 len = bytes(_args1).length;
+		require(len > 0, "id is required");
+
 		return
 			IMarketBehavior(behavior).authenticate(
 				_prop,
@@ -86,12 +92,15 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 			);
 	}
 
-	function authenticatedCallback(address _property)
+	function authenticatedCallback(address _property, bytes32 _idHash)
 		external
 		returns (address)
 	{
 		addressValidator().validateAddress(msg.sender, behavior);
+		require(enabled, "market is not enabled");
 
+		require(idMap[_idHash] == false, "id is duplicated");
+		idMap[_idHash] = true;
 		address sender = Property(_property).author();
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
