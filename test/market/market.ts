@@ -161,47 +161,13 @@ contract(
 				await dev.dev.mint(user, 10000, {from: deployer})
 			})
 
-			it(
-				'Total value of votes for and against, votes are the number of sent DEVs'
-			)
-			it(
-				'Creating a market contract from other than a factory results in an error'
-			)
-
-			it('When total votes for more than 10% of the total supply of DEV are obtained, this Market Contract is enabled', async () => {
-				// eslint-disable-next-line no-warning-comments
-				// TODO PolicyTest1, VoteCounter, VoteCounterStorage
-				// await dummyDEV.approve(lockup.address, 10000, {from: deployer})
-				// await lockup.lockup(propertyAddress, 10000, {from: deployer})
-				// await market.vote(propertyAddress, true, {from: deployer})
-				// const isEnable = await market.enabled({from: deployer})
-				// expect(isEnable).to.be.equal(true)
-			})
-
-			it('Should fail to vote when already determined enabled', async () => {
-				await dev.dev.deposit(propertyAddress, 10000, {from: user})
+			it('An error occurs if anything other than property address is specified', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress)
-				await marketInstance.vote(propertyAddress, true, {from: user})
-				expect(await marketInstance.enabled()).to.be.equal(true)
 				const result = await marketInstance
-					.vote(propertyAddress, true, {from: user})
+					.vote(deployer, true, {from: user})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'market is already enabled')
-			})
-
-			it('Vote decrease the number of sent DEVs from voter owned DEVs', async () => {
-				// Await dummyDEV.approve(market.address, 100, {from: deployer})
-				// await market.vote(100, {from: deployer})
-				// const ownedDEVs = await dummyDEV.balanceOf(deployer, {from: deployer})
-				// expect(ownedDEVs.toNumber()).to.be.equal(9900)
-			})
-
-			it('Vote decrease the number of sent DEVs from DEVtoken totalSupply', async () => {
-				// Await dummyDEV.approve(market.address, 100, {from: deployer})
-				// await market.vote(100, {from: deployer})
-				// const DEVsTotalSupply = await dummyDEV.totalSupply({from: deployer})
-				// expect(DEVsTotalSupply.toNumber()).to.be.equal(9900)
+				validateAddressErrorMessage(result as Error)
 			})
 			it('voting deadline is over', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -216,6 +182,58 @@ contract(
 					.vote(propertyAddress, true)
 					.catch((err: Error) => err)
 				validateErrorMessage(result as Error, 'voting deadline is over')
+			})
+			it('Should fail to vote when already determined enabled', async () => {
+				await dev.dev.deposit(propertyAddress, 10000, {from: user})
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress)
+				await marketInstance.vote(propertyAddress, true, {from: user})
+				expect(await marketInstance.enabled()).to.be.equal(true)
+				const result = await marketInstance
+					.vote(propertyAddress, true, {from: user})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'market is already enabled')
+			})
+
+			it('If you specify true, it becomes a valid vote.', async () => {
+				await dev.dev.deposit(propertyAddress, 10000, {from: user})
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress)
+				await marketInstance.vote(propertyAddress, true, {from: user})
+				const agreeCount = await dev.voteCounter.getAgreeCount(marketAddress)
+				const oppositeCount = await dev.voteCounter.getOppositeCount(
+					marketAddress
+				)
+				expect(agreeCount.toNumber()).to.be.equal(10000)
+				expect(oppositeCount.toNumber()).to.be.equal(0)
+			})
+
+			it('If false is specified, it becomes an invalid vote.', async () => {
+				await dev.dev.deposit(propertyAddress, 10000, {from: user})
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress)
+				await marketInstance.vote(propertyAddress, false, {from: user})
+				const agreeCount = await dev.voteCounter.getAgreeCount(marketAddress)
+				const oppositeCount = await dev.voteCounter.getOppositeCount(
+					marketAddress
+				)
+				expect(agreeCount.toNumber()).to.be.equal(0)
+				expect(oppositeCount.toNumber()).to.be.equal(10000)
+			})
+
+			it('If the number of valid votes is not enough, it remains invalid.', async () => {
+				await dev.dev.deposit(propertyAddress, 9000, {from: user})
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress)
+				await marketInstance.vote(propertyAddress, true, {from: user})
+				expect(await marketInstance.enabled()).to.be.equal(false)
+			})
+			it('Becomes valid when the number of valid votes exceeds the specified number.', async () => {
+				await dev.dev.deposit(propertyAddress, 10000, {from: user})
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress)
+				await marketInstance.vote(propertyAddress, true, {from: user})
+				expect(await marketInstance.enabled()).to.be.equal(true)
 			})
 		})
 	}
