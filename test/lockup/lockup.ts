@@ -65,9 +65,8 @@ contract('LockupTest', ([deployer, user1]) => {
 		])
 		await dev.dev.deposit(propertyAddress2, 10000)
 		await market.vote(propertyAddress2, true)
-		await market.authenticate(property.address, '', '', '', '', '')
 		const metricsAddress = await new Promise<string>(resolve => {
-			market.authenticate(property.address, '', '', '', '', '')
+			market.authenticate(property.address, 'id1', '', '', '', '')
 			watch(dev.metricsFactory, uri)('Create', (_, values) =>
 				resolve(values._metrics)
 			)

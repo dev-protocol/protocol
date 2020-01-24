@@ -24,7 +24,7 @@ contract IMarket {
 		view
 		returns (uint256);
 
-	function authenticatedCallback(address _property)
+	function authenticatedCallback(address _property, bytes32 _idHash)
 		external
 		returns (address);
 

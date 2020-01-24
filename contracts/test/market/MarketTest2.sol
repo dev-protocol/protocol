@@ -13,7 +13,7 @@ contract MarketTest2 is IMarketBehavior, UsingConfig {
 
 	function authenticate(
 		address _prop,
-		string calldata,
+		string calldata _args1,
 		string calldata,
 		string calldata,
 		string calldata,
@@ -21,7 +21,8 @@ contract MarketTest2 is IMarketBehavior, UsingConfig {
 		// solium-disable-next-line no-trailing-whitespace
 		address market
 	) external returns (address) {
-		return Market(market).authenticatedCallback(_prop);
+		bytes32 idHash = keccak256(abi.encodePacked(_args1));
+		return Market(market).authenticatedCallback(_prop, idHash);
 	}
 
 	function calculate(address _metrics, uint256, uint256)
