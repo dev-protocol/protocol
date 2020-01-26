@@ -343,6 +343,23 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(aliceAmount.toFixed()).to.be.equal('8000000')
 				})
 			})
+			describe('after withdrawal', () => {
+				before(async () => {
+					await dev.lockup.withdraw(property.address, {
+						from: alice
+					})
+				})
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					const aliceLockup = await dev.lockup
+						.getValue(property.address, alice)
+						.then(toBigNumber)
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(aliceLockup.toFixed()).to.be.equal('0')
+					expect(aliceAmount.toFixed()).to.be.equal('8000000')
+				})
+			})
 		})
 
 		describe('scenario: multiple lockup', () => {
@@ -419,6 +436,38 @@ contract('LockupTest', ([deployer, user1]) => {
 						.calculateWithdrawableInterestAmount(property.address, bob)
 						.then(toBigNumber)
 
+					expect(bobAmount.toNumber()).to.be.equal(3000000 * 0.2)
+				})
+			})
+			describe('after withdrawal', () => {
+				before(async () => {
+					await dev.lockup.withdraw(property.address, {
+						from: alice
+					})
+					await dev.lockup.withdraw(property.address, {
+						from: bob
+					})
+				})
+				it(`Alice's withdrawable interest is 100% of prev interest and 80% of current interest`, async () => {
+					const aliceLockup = await dev.lockup
+						.getValue(property.address, alice)
+						.then(toBigNumber)
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+
+					expect(aliceLockup.toFixed()).to.be.equal('0')
+					expect(aliceAmount.toNumber()).to.be.equal(5000000 + 3000000 * 0.8)
+				})
+				it(`Bob's withdrawable interest is 25% of current interest`, async () => {
+					const bobLockup = await dev.lockup
+						.getValue(property.address, bob)
+						.then(toBigNumber)
+					const bobAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+
+					expect(bobLockup.toFixed()).to.be.equal('0')
 					expect(bobAmount.toNumber()).to.be.equal(3000000 * 0.2)
 				})
 			})
