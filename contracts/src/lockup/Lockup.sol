@@ -30,6 +30,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
 			0;
 		require(isWaiting == false, "lockup is already canceled");
+		updatePendingInterestWithdrawal(_property, _from);
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
 		getStorage().setLastInterestPrice(
@@ -37,7 +38,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			_from,
 			getStorage().getInterestPrice(_property)
 		);
-		updatePendingInterestWithdrawal(_property, _from);
 		emit Lockedup(_from, _property, _value);
 	}
 
