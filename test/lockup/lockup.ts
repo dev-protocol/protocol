@@ -345,6 +345,13 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
+					await dev.addressConfig.setLockup(deployer)
+					await dev.lockupStorage.setWithdrawalStatus(
+						property.address,
+						alice,
+						1
+					)
+					await dev.addressConfig.setLockup(dev.lockup.address)
 					await dev.lockup.withdraw(property.address, {
 						from: alice
 					})
@@ -441,6 +448,14 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
+					await dev.addressConfig.setLockup(deployer)
+					await dev.lockupStorage.setWithdrawalStatus(
+						property.address,
+						alice,
+						1
+					)
+					await dev.lockupStorage.setWithdrawalStatus(property.address, bob, 1)
+					await dev.addressConfig.setLockup(dev.lockup.address)
 					await dev.lockup.withdraw(property.address, {
 						from: alice
 					})
