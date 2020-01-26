@@ -184,7 +184,9 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		getStorage().setInterestPrice(_property, price.add(_priceValue));
 	}
 
-	function updatePendingInterestWithdrawal(address _property, address _user) private {
+	function updatePendingInterestWithdrawal(address _property, address _user)
+		private
+	{
 		uint256 pending = getStorage().getPendingInterestWithdrawal(
 			_property,
 			_user

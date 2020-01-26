@@ -310,9 +310,8 @@ contract('LockupTest', ([deployer, user1]) => {
 				;[dev, , property] = await init()
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
-				await dev.addressConfig.setToken(deployer)
 				await dev.addressConfig.setAllocator(deployer)
-				await dev.lockup.lockup(alice, property.address, 10000)
+				await dev.dev.deposit(property.address, 10000, {from: alice})
 				await dev.lockup.increment(property.address, 5000000)
 			})
 			describe('before second allocation', () => {
@@ -368,9 +367,8 @@ contract('LockupTest', ([deployer, user1]) => {
 				;[dev, , property] = await init()
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
-				await dev.addressConfig.setToken(deployer)
 				await dev.addressConfig.setAllocator(deployer)
-				await dev.lockup.lockup(alice, property.address, 10000)
+				await dev.dev.deposit(property.address, 10000, {from: alice})
 				await dev.lockup.increment(property.address, 5000000)
 			})
 			describe('before second allocation', () => {
@@ -384,7 +382,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
 				})
 				it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
-					await dev.lockup.lockup(bob, property.address, 10000 * 0.25)
+					await dev.dev.deposit(property.address, 10000 * 0.25, {from: bob})
 					const total = await dev.lockup
 						.getPropertyValue(property.address)
 						.then(toBigNumber)
