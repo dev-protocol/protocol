@@ -1,8 +1,4 @@
-const handler = function(deployer, network) {
-	if (network !== 'mock') {
-		return
-	}
-
+const handler = function(deployer, _) {
 	deployer.deploy(artifacts.require('AddressConfig'))
 } as Truffle.Migration
 
