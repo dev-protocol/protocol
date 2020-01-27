@@ -101,11 +101,54 @@ contract(
 			})
 		})
 		describe('Market; authenticate', () => {
+			const dev = new DevProtocolInstance(deployer)
+			const userInstance = new UserInstance(dev, user)
+			let marketAddress: string
+			let propertyAddress: string
+			// Const iPolicyContract = artifacts.require('IPolicy')
+			beforeEach(async () => {
+				await dev.generateAddressConfig()
+				await Promise.all([
+					dev.generateMarketFactory(),
+					dev.generateMarketGroup(),
+					dev.generateVoteTimes(),
+					dev.generateVoteTimesStorage(),
+					dev.generatePolicyFactory(),
+					dev.generatePolicyGroup(),
+					dev.generatePolicySet(),
+					// Dev.generateVoteCounter(),
+					// dev.generateVoteCounterStorage(),
+					dev.generatePropertyFactory(),
+					dev.generatePropertyGroup(),
+					dev.generateLockup(),
+					dev.generateLockupStorage(),
+					dev.generateDev()
+				])
+				const behavuor = await userInstance.getMarket('MarketTest3')
+				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
+				await dev.policyFactory.create(iPolicyInstance.address)
+				const createMarketResult = await dev.marketFactory.create(
+					behavuor.address
+				)
+				marketAddress = getMarketAddress(createMarketResult)
+				const createPropertyResult = await dev.propertyFactory.create(
+					'test',
+					'TEST',
+					propertyAuther
+				)
+				propertyAddress = getPropertyAddress(createPropertyResult)
+				// Await dev.dev.mint(user, 10000, {from: deployer})
+			})
 			it('Proxy to mapped Behavior Contract')
 
-			it(
-				'Should fail to run when sent from other than the owner of Property Contract'
-			)
+			it('Should fail to run when sent from other than the owner of Property Contract', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress)
+				const result = await marketInstance
+					.authenticate(propertyAddress, '', '', '', '', '')
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result as Error)
+			})
 
 			it(
 				'Should fail to the transaction if the second argument as ID and a Metrics Contract exists with the same ID.'
