@@ -6,7 +6,8 @@ import {
 	watch,
 	waitForEvent,
 	validateErrorMessage,
-	getEventValue
+	getEventValue,
+	WEB3_URI
 } from '../test-lib/utils'
 import {
 	MetricsInstance,
@@ -15,7 +16,6 @@ import {
 	AddressConfigInstance,
 	IPolicyInstance
 } from '../../types/truffle-contracts'
-const uri = 'ws://localhost:7545'
 
 contract('Allocator', ([deployer, user1]) => {
 	const init = async (): Promise<[
@@ -68,7 +68,7 @@ contract('Allocator', ([deployer, user1]) => {
 		])
 		const metricsAddress = await new Promise<string>(resolve => {
 			market.authenticate(property.address, 'id1', '', '', '', '')
-			watch(dev.metricsFactory, uri)('Create', (_, values) =>
+			watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 				resolve(values._metrics)
 			)
 		})
@@ -104,7 +104,7 @@ contract('Allocator', ([deployer, user1]) => {
 			const [dev, market, metrics] = await init()
 			const behavior = await getMarketBehavior(market)
 			dev.allocator.allocate(metrics.address)
-			await waitForEvent(behavior, uri)('LogCalculate')
+			await waitForEvent(behavior, WEB3_URI)('LogCalculate')
 			expect(1).to.be.eq(1)
 		})
 
@@ -130,7 +130,7 @@ contract('Allocator', ([deployer, user1]) => {
 				const [dev, market, metrics] = await init()
 				const behavior = await getMarketBehavior(market)
 				dev.allocator.allocate(metrics.address)
-				const res = await getEventValue(behavior, uri)(
+				const res = await getEventValue(behavior, WEB3_URI)(
 					'LogCalculate',
 					'_metrics'
 				)
@@ -142,7 +142,7 @@ contract('Allocator', ([deployer, user1]) => {
 				const behavior = await getMarketBehavior(market)
 				dev.allocator.allocate(metrics.address)
 				const baseBlock = await dev.allocatorStorage.getBaseBlockNumber()
-				const res = await getEventValue(behavior, uri)(
+				const res = await getEventValue(behavior, WEB3_URI)(
 					'LogCalculate',
 					'_lastBlock'
 				)
@@ -177,8 +177,8 @@ contract('Allocator', ([deployer, user1]) => {
 				const expected = lastBlock.toNumber() + 2
 
 				dev.allocator.allocate(metrics.address)
-				watch(dev.allocator, uri)('Log', (_, value) => console.log(value))
-				const res = await getEventValue(behavior, uri)(
+				watch(dev.allocator, WEB3_URI)('Log', (_, value) => console.log(value))
+				const res = await getEventValue(behavior, WEB3_URI)(
 					'LogCalculate',
 					'_lastBlock'
 				)
@@ -192,7 +192,7 @@ contract('Allocator', ([deployer, user1]) => {
 				const blockNumber = await util.blockNumber()
 				const expected = new BigNumber(blockNumber.toString()).plus(1)
 				dev.allocator.allocate(metrics.address)
-				const res = await getEventValue(behavior, uri)(
+				const res = await getEventValue(behavior, WEB3_URI)(
 					'LogCalculate',
 					'_currentBlock'
 				)
@@ -242,7 +242,7 @@ contract('Allocator', ([deployer, user1]) => {
 				_assets,
 				_totalAssets
 			] = await new Promise<BigNumber[]>(resolve => {
-				watch(dev.allocator, uri)('BeforeAllocation', (_, values) => {
+				watch(dev.allocator, WEB3_URI)('BeforeAllocation', (_, values) => {
 					const {
 						_blocks,
 						_mint,
@@ -324,7 +324,7 @@ contract('Allocator', ([deployer, user1]) => {
 				_assets,
 				_totalAssets
 			] = await new Promise<BigNumber[]>(resolve => {
-				watch(dev.allocator, uri)('BeforeAllocation', (_, values) => {
+				watch(dev.allocator, WEB3_URI)('BeforeAllocation', (_, values) => {
 					const {
 						_blocks,
 						_mint,

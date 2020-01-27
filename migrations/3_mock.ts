@@ -8,6 +8,10 @@ import {createMarket} from './mock/market'
 import {createMetrics} from './mock/metrics'
 
 const handler = async function(deployer, network) {
+	if (network === 'test') {
+		return
+	}
+
 	console.log('[set contract address to AddressConfig]')
 	await setAddressConfig(artifacts)
 	console.log('---finish---')
