@@ -48,7 +48,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		view
 		returns (uint256)
 	{
-		return (_reward * 95) / 100;
+		return _lockups > 0 ? (_reward * 95) / 100 : _reward;
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
@@ -56,7 +56,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		view
 		returns (uint256)
 	{
-		return _lockups * _value;
+		return (_lockups + 1) * _value;
 	}
 
 	function authenticationFee(uint256 total_assets, uint256 property_lockups)
