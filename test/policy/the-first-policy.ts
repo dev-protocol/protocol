@@ -76,12 +76,46 @@ contract('TheFirstPolicy', ([deployer]) => {
 			const result = await policy.holdersShare(1000000, 10000)
 			expect(result.toString()).to.be.equal('950000')
 		})
+		it('The share is 95%', async () => {
+			const policy = await create()
+			const result = await policy.holdersShare(1000000, 1)
+			expect(result.toString()).to.be.equal(
+				new BigNumber(1000000).times(0.95).toString()
+			)
+		})
+		it('The share is 100% when lockup is 0', async () => {
+			const policy = await create()
+			const result = await policy.holdersShare(1000000, 0)
+			expect(result.toString()).to.be.equal('1000000')
+		})
+		it('Returns 0 when a passed reward is 0', async () => {
+			const policy = await create()
+			const result = await policy.holdersShare(0, 99999999)
+			expect(result.toString()).to.be.equal('0')
+		})
 	})
 	describe('TheFirstPolicy; assetValue', () => {
 		it('Returns the asset value when the value of index calculated by Market and the number of lockups is passed', async () => {
 			const policy = await create()
 			const result = await policy.assetValue(543666, 6788)
-			expect(result.toString()).to.be.equal('3690404808')
+			expect(result.toString()).to.be.equal('3690948474')
+		})
+		it('Returns value multiplied by calculated value and locked-ups + 1', async () => {
+			const policy = await create()
+			const result = await policy.assetValue(645734, 4634)
+			expect(result.toString()).to.be.equal(
+				new BigNumber(645734).times(4634 + 1).toString()
+			)
+		})
+		it('The lockup is 1 by default', async () => {
+			const policy = await create()
+			const result = await policy.assetValue(543666, 0)
+			expect(result.toString()).to.be.equal('543666')
+		})
+		it('Returns 0 when a passed calculated value is 0', async () => {
+			const policy = await create()
+			const result = await policy.assetValue(0, 99999999)
+			expect(result.toString()).to.be.equal('0')
 		})
 	})
 	describe('TheFirstPolicy; authenticationFee', () => {
