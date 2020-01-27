@@ -30,17 +30,13 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
 			0;
 		require(isWaiting == false, "lockup is already canceled");
+		updatePendingInterestWithdrawal(_property, _from);
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
 		getStorage().setLastInterestPrice(
 			_property,
 			_from,
 			getStorage().getInterestPrice(_property)
-		);
-		getStorage().setPendingInterestWithdrawal(
-			_property,
-			_from,
-			_calculateInterestAmount(_property, _from)
 		);
 		emit Lockedup(_from, _property, _value);
 	}
@@ -66,6 +62,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		require(possible(_property, msg.sender), "waiting for release");
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
 		require(lockupedValue != 0, "dev token is not locked");
+		updatePendingInterestWithdrawal(_property, msg.sender);
 		Property(_property).withdraw(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
 		subPropertyValue(_property, lockupedValue);
@@ -127,7 +124,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			msg.sender
 		);
 		require(value > 0, "your interest amount is 0");
-		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		getStorage().setLastInterestPrice(
 			_property,
 			msg.sender,
@@ -186,6 +182,20 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	function incrementInterest(address _property, uint256 _priceValue) private {
 		uint256 price = getStorage().getInterestPrice(_property);
 		getStorage().setInterestPrice(_property, price.add(_priceValue));
+	}
+
+	function updatePendingInterestWithdrawal(address _property, address _user)
+		private
+	{
+		uint256 pending = getStorage().getPendingInterestWithdrawal(
+			_property,
+			_user
+		);
+		getStorage().setPendingInterestWithdrawal(
+			_property,
+			_user,
+			_calculateInterestAmount(_property, _user).add(pending)
+		);
 	}
 
 	function possible(address _property, address _from)

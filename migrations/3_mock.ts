@@ -8,16 +8,16 @@ import {createMarket} from './mock/market'
 import {createMetrics} from './mock/metrics'
 
 const handler = async function(deployer, network) {
-	if (network !== 'mock') {
-		return
-	}
-
 	console.log('[set contract address to AddressConfig]')
 	await setAddressConfig(artifacts)
 	console.log('---finish---')
 	console.log('[create storage]')
 	await createStorage(artifacts)
 	console.log('---finish---')
+	if (network !== 'mock') {
+		return
+	}
+
 	console.log('[create policy]')
 	await createPolicy(artifacts)
 	console.log('---finish---')
