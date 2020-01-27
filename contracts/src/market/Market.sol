@@ -37,6 +37,14 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		_votingEndBlockNumber = block.number + marketVotingBlocks;
 	}
 
+	function toEnable() external {
+		addressValidator().validateAddress(
+			msg.sender,
+			config().marketFactory()
+		);
+		enabled = true;
+	}
+
 	function calculate(address _metrics, uint256 _start, uint256 _end)
 		external
 		returns (bool)
