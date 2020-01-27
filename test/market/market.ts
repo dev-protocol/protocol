@@ -1,4 +1,5 @@
 import {DevProtocolInstance, UserInstance} from '../test-lib/instance'
+import {MarketInstance} from '../../types/truffle-contracts'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -6,7 +7,8 @@ import {
 	getMarketAddress,
 	getPropertyAddress,
 	WEB3_URI,
-	mine
+	mine,
+	watch
 } from '../test-lib/utils'
 
 contract(
@@ -50,6 +52,33 @@ contract(
 				)
 				expect(await market.behavior()).to.be.equal(behavuor)
 				expect(await market.enabled()).to.be.equal(false)
+			})
+		})
+		describe('Market; toEnable', () => {
+			const dev = new DevProtocolInstance(deployer)
+			const userInstance = new UserInstance(dev, user)
+			let market: MarketInstance
+			beforeEach(async () => {
+				await dev.generateAddressConfig()
+				await Promise.all([
+					dev.generatePolicyFactory(),
+					dev.generatePolicyGroup(),
+					dev.generatePolicySet()
+				])
+				await dev.addressConfig.setMarketFactory(marketFactory)
+				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
+				await dev.policyFactory.create(iPolicyInstance.address)
+				market = await marketContract.new(dev.addressConfig.address, behavuor, {
+					from: marketFactory
+				})
+			})
+			it('market factory以外からは有効化できない', async () => {
+				const result = await market.toEnable().catch((err: Error) => err)
+				validateAddressErrorMessage(result as Error)
+			})
+			it('market factoryから有効化できる', async () => {
+				await market.toEnable({from: marketFactory})
+				expect(await market.enabled()).to.be.equal(true)
 			})
 		})
 		describe('Market; schema', () => {
@@ -100,71 +129,119 @@ contract(
 				await waitForEvent(behavuor, WEB3_URI)('LogCalculate')
 			})
 		})
-		describe('Market; authenticate', () => {
+		describe('Market; authenticate, authenticatedCallback', () => {
 			const dev = new DevProtocolInstance(deployer)
 			const userInstance = new UserInstance(dev, user)
-			let marketAddress: string
+			let marketAddress1: string
+			let marketAddress2: string
 			let propertyAddress: string
-			// Const iPolicyContract = artifacts.require('IPolicy')
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMarketGroup(),
+					dev.generateMetricsFactory(),
+					dev.generateMetricsGroup(),
 					dev.generateVoteTimes(),
 					dev.generateVoteTimesStorage(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 					dev.generatePolicySet(),
-					// Dev.generateVoteCounter(),
-					// dev.generateVoteCounterStorage(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateLockupStorage(),
 					dev.generateDev()
 				])
-				const behavuor = await userInstance.getMarket('MarketTest3')
+				const behavuor1 = await userInstance.getMarket('MarketTest3')
+				const behavuor2 = await userInstance.getMarket('MarketTest3')
 				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
 				await dev.policyFactory.create(iPolicyInstance.address)
-				const createMarketResult = await dev.marketFactory.create(
-					behavuor.address
+				let createMarketResult = await dev.marketFactory.create(
+					behavuor1.address
 				)
-				marketAddress = getMarketAddress(createMarketResult)
+				marketAddress1 = getMarketAddress(createMarketResult)
+				createMarketResult = await dev.marketFactory.create(behavuor2.address)
+				marketAddress2 = getMarketAddress(createMarketResult)
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
 					propertyAuther
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
-				// Await dev.dev.mint(user, 10000, {from: deployer})
+				await dev.dev.mint(propertyAuther, 10000000000, {from: deployer})
 			})
-			it('Proxy to mapped Behavior Contract')
-
+			it('Proxy to mapped Behavior Contract', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress1)
+				const metricsAddress = await new Promise<string>(resolve => {
+					marketInstance.authenticate(
+						propertyAddress,
+						'id-key',
+						'',
+						'',
+						'',
+						'',
+						{from: propertyAuther}
+					)
+					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
+						resolve(values._metrics)
+					)
+				})
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const metrics = await artifacts.require('Metrics').at(metricsAddress)
+				expect(await metrics.market()).to.be.equal(marketAddress1)
+				expect(await metrics.property()).to.be.equal(propertyAddress)
+				const tmp = await dev.dev.balanceOf(propertyAuther)
+				console.log(tmp.toNumber())
+			})
+			it('Market that is not enabled generates an error when performing authentication function.', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress2)
+				const result = await marketInstance
+					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
+						from: propertyAuther
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'market is not enabled')
+			})
+			it('Error occurs if id is not set.', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress1)
+				const result = await marketInstance
+					.authenticate(propertyAddress, '', '', '', '', '', {
+						from: propertyAuther
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'id is required')
+			})
 			it('Should fail to run when sent from other than the owner of Property Contract', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress)
+				const marketInstance = await marketContract.at(marketAddress1)
 				const result = await marketInstance
-					.authenticate(propertyAddress, '', '', '', '', '')
+					.authenticate(propertyAddress, 'id-key', '', '', '', '')
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result as Error)
 			})
-
-			it(
-				'Should fail to the transaction if the second argument as ID and a Metrics Contract exists with the same ID.'
-			)
-		})
-
-		describe('Market; authenticatedCallback', () => {
-			it('Create a new Metrics Contract')
-
-			it(
-				'Market Contract address and Property Contract address are mapped to the created Metrics Contract'
-			)
-
-			it(
-				'Should fail to create a new Metrics Contract when sent from non-Behavior Contract'
-			)
+			it('同一のidを指定するとエラーになる', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress1)
+				await marketInstance.authenticate(
+					propertyAddress,
+					'id-key',
+					'',
+					'',
+					'',
+					'',
+					{from: propertyAuther}
+				)
+				const result = await marketInstance
+					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
+						from: propertyAuther
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result as Error, 'id is duplicated')
+			})
 		})
 
 		describe('Market; vote', () => {
@@ -213,6 +290,8 @@ contract(
 				validateAddressErrorMessage(result as Error)
 			})
 			it('voting deadline is over', async () => {
+				const createMarketResult = await dev.marketFactory.create(behavuor)
+				marketAddress = getMarketAddress(createMarketResult)
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const iPolicyInstance = await iPolicyContract.at(
 					await dev.addressConfig.policy()
@@ -230,7 +309,7 @@ contract(
 				await dev.dev.deposit(propertyAddress, 10000, {from: user})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress)
-				await marketInstance.vote(propertyAddress, true, {from: user})
+				// Await marketInstance.vote(propertyAddress, true, {from: user})
 				expect(await marketInstance.enabled()).to.be.equal(true)
 				const result = await marketInstance
 					.vote(propertyAddress, true, {from: user})
@@ -239,6 +318,8 @@ contract(
 			})
 
 			it('If you specify true, it becomes a valid vote.', async () => {
+				const createMarketResult = await dev.marketFactory.create(behavuor)
+				marketAddress = getMarketAddress(createMarketResult)
 				await dev.dev.deposit(propertyAddress, 10000, {from: user})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress)
@@ -252,6 +333,8 @@ contract(
 			})
 
 			it('If false is specified, it becomes an invalid vote.', async () => {
+				const createMarketResult = await dev.marketFactory.create(behavuor)
+				marketAddress = getMarketAddress(createMarketResult)
 				await dev.dev.deposit(propertyAddress, 10000, {from: user})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress)
@@ -265,6 +348,8 @@ contract(
 			})
 
 			it('If the number of valid votes is not enough, it remains invalid.', async () => {
+				const createMarketResult = await dev.marketFactory.create(behavuor)
+				marketAddress = getMarketAddress(createMarketResult)
 				await dev.dev.deposit(propertyAddress, 9000, {from: user})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress)
@@ -272,6 +357,8 @@ contract(
 				expect(await marketInstance.enabled()).to.be.equal(false)
 			})
 			it('Becomes valid when the number of valid votes exceeds the specified number.', async () => {
+				const createMarketResult = await dev.marketFactory.create(behavuor)
+				marketAddress = getMarketAddress(createMarketResult)
 				await dev.dev.deposit(propertyAddress, 10000, {from: user})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress)
