@@ -19,7 +19,7 @@ The following formula illustrates the basic concept:
 
 The number of reward vs. staking rate will as follows curve:
 
-![Reward curve](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/policy/Staking-ratevs-Mint-amount.svg)
+![Reward curve](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/policy/Staking-ratevs-Mint-amount.svg?sanitize=true)
 
 In Solidity:
 
