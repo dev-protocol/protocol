@@ -1,8 +1,4 @@
-const handler = function(deployer, network) {
-	if (network !== 'mock') {
-		return
-	}
-
+const handler = function(deployer, _) {
 	const {address} = artifacts.require('AddressConfig')
 
 	// Library

@@ -23,13 +23,14 @@ export async function createMetrics(
 		})
 		await market.authenticate(
 			addressInfo[accountIndex].property!,
-			'arg1',
+			'arg1' + idIndex.toString(),
 			'arg2',
 			'arg3',
 			'arg4',
 			'arg5',
 			{from: addressInfo[accountIndex].account}
 		)
+		idIndex++
 		console.log(
 			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 			`metrics:  market:${marketAddresses[marketIndex]},property:${addressInfo[accountIndex].property}`
@@ -37,6 +38,7 @@ export async function createMetrics(
 	}
 
 	const dev = await createInstance<DevInstance>('Dev', artifacts)
+	let idIndex = 0
 	await createMetrics(0, 0)
 	await createMetrics(3, 0)
 	await createMetrics(5, 0)

@@ -68,6 +68,5 @@ async function vote(
 		)
 	}
 
-	await enabled(0)
 	await enabled(1)
 }
