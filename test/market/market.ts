@@ -36,7 +36,7 @@ contract(
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result as Error)
 			})
-			it('各プロパティがセットされている', async () => {
+			it('Each property is set.', async () => {
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
@@ -72,11 +72,11 @@ contract(
 					from: marketFactory
 				})
 			})
-			it('market factory以外からは有効化できない', async () => {
+			it('Cannot be enabled from other than market factory', async () => {
 				const result = await market.toEnable().catch((err: Error) => err)
 				validateAddressErrorMessage(result as Error)
 			})
-			it('market factoryから有効化できる', async () => {
+			it('Can be enabled from the market factory', async () => {
 				await market.toEnable({from: marketFactory})
 				expect(await market.enabled()).to.be.equal(true)
 			})
@@ -106,7 +106,7 @@ contract(
 		describe('Market; calculate', () => {
 			const dev = new DevProtocolInstance(deployer)
 			const userInstance = new UserInstance(dev, user)
-			it('Proxy to mapped Behavior Contract', async () => {
+			it('Proxy to mapped Behavior Contract.', async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
 					dev.generatePolicyFactory(),
@@ -171,7 +171,8 @@ contract(
 				propertyAddress = getPropertyAddress(createPropertyResult)
 				await dev.dev.mint(propertyAuther, 10000000000, {from: deployer})
 			})
-			it('Proxy to mapped Behavior Contract', async () => {
+			it('Proxy to mapped Behavior Contract.', async () => {
+				await dev.dev.deposit(propertyAddress, 100000, {from: propertyAuther})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const metricsAddress = await new Promise<string>(resolve => {
@@ -193,7 +194,7 @@ contract(
 				expect(await metrics.market()).to.be.equal(marketAddress1)
 				expect(await metrics.property()).to.be.equal(propertyAddress)
 				const tmp = await dev.dev.balanceOf(propertyAuther)
-				console.log(tmp.toNumber())
+				expect(tmp.toNumber()).to.be.equal(9999800000)
 			})
 			it('Market that is not enabled generates an error when performing authentication function.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -215,7 +216,7 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result as Error, 'id is required')
 			})
-			it('Should fail to run when sent from other than the owner of Property Contract', async () => {
+			it('Should fail to run when sent from other than the owner of Property Contract.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const result = await marketInstance
@@ -223,7 +224,7 @@ contract(
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result as Error)
 			})
-			it('同一のidを指定するとエラーになる', async () => {
+			it('An error occurs if the same id is specified.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticate(
@@ -281,7 +282,7 @@ contract(
 				await dev.dev.mint(user, 10000, {from: deployer})
 			})
 
-			it('An error occurs if anything other than property address is specified', async () => {
+			it('An error occurs if anything other than property address is specified.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress)
 				const result = await marketInstance
@@ -289,7 +290,7 @@ contract(
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result as Error)
 			})
-			it('voting deadline is over', async () => {
+			it('voting deadline is over.', async () => {
 				const createMarketResult = await dev.marketFactory.create(behavuor)
 				marketAddress = getMarketAddress(createMarketResult)
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -305,7 +306,7 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result as Error, 'voting deadline is over')
 			})
-			it('Should fail to vote when already determined enabled', async () => {
+			it('Should fail to vote when already determined enabled.', async () => {
 				await dev.dev.deposit(propertyAddress, 10000, {from: user})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress)
