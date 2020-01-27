@@ -1,5 +1,6 @@
 import {TheFirstPolicyInstance} from '../../types/truffle-contracts'
 import {DevProtocolInstance} from '../test-lib/instance'
+import {toBigNumber} from '../test-lib/utils'
 import BigNumber from 'bignumber.js'
 
 contract('TheFirstPolicy', ([deployer]) => {
@@ -33,7 +34,7 @@ contract('TheFirstPolicy', ([deployer]) => {
 			const g = d1.minus(d2).times(f)
 			const d = d1.minus(g)
 			const expected = new BigNumber(max).times(d)
-			return expected.integerValue()
+			return expected.integerValue(BigNumber.ROUND_DOWN)
 		}
 
 		it('Returns the total number of mint per block when the total number of lockups and the total number of assets is passed', async () => {
@@ -50,6 +51,23 @@ contract('TheFirstPolicy', ([deployer]) => {
 			const result2 = await policy.rewards(stake, 2)
 			const result = new BigNumber(result2).div(2)
 			expect(result.toString()).to.be.equal(result1.toString())
+		})
+		it('Will be correct curve', async () => {
+			const policy = await create()
+			const one = new BigNumber(1)
+			const per199 = new BigNumber(1e18).times(1990000)
+			const per200 = new BigNumber(1e18).times(2000000)
+			const per201 = new BigNumber(1e18).times(2010000)
+			const result1 = await policy.rewards(per199, 1).then(toBigNumber)
+			const result2 = await policy.rewards(per200, 1).then(toBigNumber)
+			const result3 = await policy.rewards(per201, 1).then(toBigNumber)
+
+			expect(result1.toString()).to.be.equal('65963359649131')
+			expect(result2.toString()).to.be.equal('65536000000000')
+			expect(result3.toString()).to.be.equal('65127829767191')
+			expect(rewards(per199, one).toString()).to.be.equal('65963359649131')
+			expect(rewards(per200, one).toString()).to.be.equal('65536000000000')
+			expect(rewards(per201, one).toString()).to.be.equal('65127829767191')
 		})
 		it('When a number of stakes are 0', async () => {
 			const policy = await create()
