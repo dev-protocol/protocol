@@ -46,20 +46,24 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 			expect(result).to.be.equal(true)
 		})
 
-		it('A freshly created market is not enabled,', async () => {
+		it('A freshly created market is enabled,', async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(marketAddress)
-			expect(await deployedMarket.enabled()).to.be.equal(false)
+			expect(await deployedMarket.enabled()).to.be.equal(true)
 		})
 		it('The maximum number of votes is incremented.', async () => {
 			let times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
 			expect(times.toNumber()).to.be.equal(1)
 			const market = await userInstance.getMarket('MarketTest2')
-			await dev.marketFactory.create(market.address, {
+			const result = await dev.marketFactory.create(market.address, {
 				from: user
 			})
 			times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
 			expect(times.toNumber()).to.be.equal(2)
+			const tmpMarketAddress = getMarketAddress(result)
+			// eslint-disable-next-line @typescript-eslint/await-thenable
+			const deployedMarket = await marketContract.at(tmpMarketAddress)
+			expect(await deployedMarket.enabled()).to.be.equal(false)
 		})
 		it('An error occurs if the default address is specified.', async () => {
 			const result = await dev.marketFactory
