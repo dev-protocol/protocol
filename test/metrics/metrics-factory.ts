@@ -1,9 +1,9 @@
 import {DevProtocolInstance} from '../test-lib/instance'
+import {getMetricsAddress} from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage,
-	getMetricsAddress
-} from '../test-lib/utils'
+	validateAddressErrorMessage
+} from '../test-lib/utils/error'
 
 contract(
 	'MetricsFactoryTest',

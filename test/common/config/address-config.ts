@@ -2,7 +2,7 @@ import {DevProtocolInstance} from '../../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage
-} from '../../test-lib/utils'
+} from '../../test-lib/utils/error'
 
 contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 	const dev = new DevProtocolInstance(deployer)

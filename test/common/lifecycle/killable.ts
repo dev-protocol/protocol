@@ -1,4 +1,4 @@
-import {validateErrorMessage} from '../../test-lib/utils'
+import {validateErrorMessage} from '../../test-lib/utils/error'
 
 contract('KillableTest', ([deployer, user]) => {
 	const killableTestContract = artifacts.require('KillableTest')

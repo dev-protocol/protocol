@@ -1,5 +1,6 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {validateAddressErrorMessage, DEFAULT_ADDRESS} from '../test-lib/utils'
+import {validateAddressErrorMessage} from '../test-lib/utils/error'
+import {DEFAULT_ADDRESS} from '../test-lib/const'
 
 contract(
 	'PolicySetTest',

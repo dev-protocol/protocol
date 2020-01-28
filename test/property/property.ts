@@ -1,10 +1,10 @@
 import {DevProtocolInstance} from '../test-lib/instance'
+import {getPropertyAddress} from '../test-lib/utils/log'
 import {
-	validateAddressErrorMessage,
 	validateErrorMessage,
-	getPropertyAddress,
-	DEFAULT_ADDRESS
-} from '../test-lib/utils'
+	validateAddressErrorMessage
+} from '../test-lib/utils/error'
+import {DEFAULT_ADDRESS} from '../test-lib/const'
 
 contract(
 	'PropertyTest',

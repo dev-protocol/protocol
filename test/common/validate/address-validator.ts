@@ -1,7 +1,5 @@
-import {
-	validateAddressErrorMessage,
-	DEFAULT_ADDRESS
-} from '../../test-lib/utils'
+import {validateAddressErrorMessage} from '../../test-lib/utils/error'
+import {DEFAULT_ADDRESS} from '../../test-lib/const'
 import {AddressValidatorInstance} from '../../../types/truffle-contracts'
 import {DevProtocolInstance} from '../../test-lib/instance'
 

@@ -1,4 +1,5 @@
-import {validateErrorMessage, DEFAULT_ADDRESS} from '../../test-lib/utils'
+import {validateErrorMessage} from '../../test-lib/utils/error'
+import {DEFAULT_ADDRESS} from '../../test-lib/const'
 import {EternalStorageInstance} from '../../../types/truffle-contracts'
 
 contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {

@@ -1,15 +1,13 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {MarketInstance} from '../../types/truffle-contracts'
+import {mine} from '../test-lib/utils/common'
+import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
+import {watch, waitForEvent} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage,
-	waitForEvent,
-	getMarketAddress,
-	getPropertyAddress,
-	WEB3_URI,
-	mine,
-	watch
-} from '../test-lib/utils'
+	validateAddressErrorMessage
+} from '../test-lib/utils/error'
+import {WEB3_URI} from '../test-lib/const'
 
 contract(
 	'MarketTest',

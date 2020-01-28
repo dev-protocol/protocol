@@ -1,14 +1,14 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {MetricsInstance, PropertyInstance} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
+import {toBigNumber} from '../test-lib/utils/common'
+import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
+import {getEventValue} from '../test-lib/utils/event'
 import {
-	getPropertyAddress,
-	getMarketAddress,
-	getEventValue,
 	validateErrorMessage,
-	validateAddressErrorMessage,
-	WEB3_URI
-} from '../test-lib/utils'
+	validateAddressErrorMessage
+} from '../test-lib/utils/error'
+import {WEB3_URI} from '../test-lib/const'
 
 contract('WithdrawTest', ([deployer, user1]) => {
 	const init = async (): Promise<[
@@ -69,8 +69,6 @@ contract('WithdrawTest', ([deployer, user1]) => {
 		await dev.dev.addMinter(dev.withdraw.address)
 		return [dev, metrics, property]
 	}
-
-	const toBigNumber = (v: string | BigNumber): BigNumber => new BigNumber(v)
 
 	describe('Withdraw; withdraw', () => {
 		describe('Withdraw; Withdraw is mint', () => {

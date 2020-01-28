@@ -1,10 +1,10 @@
 import {DevProtocolInstance} from '../test-lib/instance'
+import {getMarketAddress} from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage,
-	getMarketAddress,
-	DEFAULT_ADDRESS
-} from '../test-lib/utils'
+	validateAddressErrorMessage
+} from '../test-lib/utils/error'
+import {DEFAULT_ADDRESS} from '../test-lib/const'
 
 contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 	const dev = new DevProtocolInstance(deployer)
