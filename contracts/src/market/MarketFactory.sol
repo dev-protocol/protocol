@@ -21,7 +21,7 @@ contract MarketFactory is Pausable, UsingConfig, UsingValidator {
 		address marketAddr = address(market);
 		MarketGroup marketGroup = MarketGroup(config().marketGroup());
 		marketGroup.addGroup(marketAddr);
-		if (marketGroup.getNumber() == 1) {
+		if (marketGroup.getCount() == 1) {
 			market.toEnable();
 		}
 		emit Create(msg.sender, marketAddr);
