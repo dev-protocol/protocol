@@ -31,7 +31,7 @@ contract(
 						from: policyFactory
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'already enabled')
+				validateErrorMessage(result, 'already enabled')
 			})
 			it('Can not execute addGroup without policyFactory address', async () => {
 				const result = await dev.policyGroup
@@ -39,7 +39,7 @@ contract(
 						from: dummyPolicyFactory
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('PolicyGroup; deleteGroup', () => {
@@ -52,7 +52,7 @@ contract(
 				const result = await dev.policyGroup
 					.deleteGroup(policy, {from: policyFactory})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'not enabled')
+				validateErrorMessage(result, 'not enabled')
 			})
 			it('Can not execute deleteGroup without policyFactory address', async () => {
 				const result = await dev.policyGroup
@@ -60,7 +60,7 @@ contract(
 						from: dummyPolicyFactory
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 	}

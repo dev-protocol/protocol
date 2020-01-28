@@ -45,7 +45,7 @@ contract(
 						from: marketFactory
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'already enabled')
+				validateErrorMessage(result, 'already enabled')
 			})
 			it('Can not execute addGroup without marketFactory address', async () => {
 				const result = await dev.marketGroup
@@ -53,7 +53,7 @@ contract(
 						from: dummyMarketFactory
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 	}

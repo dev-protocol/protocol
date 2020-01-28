@@ -58,13 +58,13 @@ contract(
 				const result = await dev.voteCounter
 					.addVoteCount(user1, propertyAddress, true, {from: deployer})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error, false)
+				validateAddressErrorMessage(result, false)
 			})
 			it('Cannot be executed when lockup is 0.', async () => {
 				const result = await dev.voteCounter
 					.addVoteCount(user1, propertyAddress, true, {from: market1})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'revert vote count is 0', false)
+				validateErrorMessage(result, 'revert vote count is 0', false)
 			})
 			it('If it is not the author of the property, the locked value is voted.', async () => {
 				let result = await dev.voteCounter.getAgreeCount(market1)
@@ -129,7 +129,7 @@ contract(
 				const result = await dev.voteCounter
 					.addVoteCount(propertyAuther, propertyAddress, true, {from: policy})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'revert already vote', false)
+				validateErrorMessage(result, 'revert already vote', false)
 			})
 		})
 	}

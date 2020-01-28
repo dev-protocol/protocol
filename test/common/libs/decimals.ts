@@ -22,8 +22,7 @@ contract('DecimalsTest', ([deployer]) => {
 			const err = await decimalsTest
 				.outOf(28, '700000000000000000000000000000000000000')
 				.catch((err: Error) => err)
-			expect(err).to.be.an.instanceof(Error)
-			validateErrorMessage(err as Error, 'the denominator is too big', false)
+			validateErrorMessage(err, 'the denominator is too big', false)
 		})
 	})
 })

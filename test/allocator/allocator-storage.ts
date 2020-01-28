@@ -22,7 +22,7 @@ contract(
 				const result = await dev.allocatorStorage
 					.setLastBlockNumber(metrics, 100, {from: dummyAllocator})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('AllocatorStorage; setBaseBlockNumber, getBaseBlockNumber', () => {
@@ -35,7 +35,7 @@ contract(
 				const result = await dev.allocatorStorage
 					.setBaseBlockNumber(1000, {from: dummyAllocator})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('AllocatorStorage; setPendingIncrement, getPendingIncrement', () => {
@@ -50,7 +50,7 @@ contract(
 				const result = await dev.allocatorStorage
 					.setPendingIncrement(metrics, true, {from: dummyAllocator})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('AllocatorStorage; setLastAllocationBlockEachMetrics, getLastAllocationBlockEachMetrics', () => {
@@ -71,7 +71,7 @@ contract(
 						from: dummyAllocator
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('AllocatorStorage; setLastAssetValueEachMarketPerBlock, getLastAssetValueEachMarketPerBlock', () => {
@@ -92,7 +92,7 @@ contract(
 						from: dummyAllocator
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 	}

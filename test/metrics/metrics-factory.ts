@@ -40,14 +40,14 @@ contract(
 						from: user
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 			it('Pause and release of pause can only be executed by deployer.', async () => {
 				let result = await dev.metricsFactory
 					.pause({from: user})
 					.catch((err: Error) => err)
 				validateErrorMessage(
-					result as Error,
+					result,
 					'PauserRole: caller does not have the Pauser role'
 				)
 				await dev.metricsFactory.pause({from: deployer})
@@ -55,7 +55,7 @@ contract(
 					.unpause({from: user})
 					.catch((err: Error) => err)
 				validateErrorMessage(
-					result as Error,
+					result,
 					'PauserRole: caller does not have the Pauser role'
 				)
 				await dev.metricsFactory.unpause({from: deployer})
@@ -67,7 +67,7 @@ contract(
 						from: market
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'You cannot use that')
+				validateErrorMessage(result, 'You cannot use that')
 			})
 			it('Can be executed when pause is released', async () => {
 				await dev.metricsFactory.unpause({from: deployer})

@@ -48,7 +48,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(
-				result as Error,
+				result,
 				'name must be at least 3 and no more than 10 characters'
 			)
 		})
@@ -82,7 +82,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(
-				result as Error,
+				result,
 				'name must be at least 3 and no more than 10 characters'
 			)
 		})
@@ -93,7 +93,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(
-				result as Error,
+				result,
 				'symbol must be at least 3 and no more than 10 characters'
 			)
 		})
@@ -127,7 +127,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(
-				result as Error,
+				result,
 				'symbol must be at least 3 and no more than 10 characters'
 			)
 		})
@@ -140,7 +140,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				.pause({from: user})
 				.catch((err: Error) => err)
 			validateErrorMessage(
-				result as Error,
+				result,
 				'PauserRole: caller does not have the Pauser role'
 			)
 			await dev.propertyFactory.pause({from: deployer})
@@ -148,7 +148,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				.unpause({from: user})
 				.catch((err: Error) => err)
 			validateErrorMessage(
-				result as Error,
+				result,
 				'PauserRole: caller does not have the Pauser role'
 			)
 			await dev.propertyFactory.unpause({from: deployer})
@@ -160,7 +160,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 					from: user2
 				})
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'You cannot use that')
+			validateErrorMessage(result, 'You cannot use that')
 		})
 		it('Can be executed when pause is released', async () => {
 			await dev.propertyFactory.unpause({from: deployer})

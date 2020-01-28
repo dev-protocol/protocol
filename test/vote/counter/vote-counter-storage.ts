@@ -36,7 +36,7 @@ contract(
 				const result = await dev.voteCounterStorage
 					.setAlreadyVoteFlg(user, sender, property, {from: dummyVoteCounter})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('VoteCounterStorage; getAgreeCount, setAgreeCount', () => {
@@ -59,7 +59,7 @@ contract(
 				const result = await dev.voteCounterStorage
 					.setAgreeCount(sender, 10, {from: dummyVoteCounter})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('VoteCounterStorage; getOppositeCount, setOppositeCount', () => {
@@ -82,7 +82,7 @@ contract(
 				const result = await dev.voteCounterStorage
 					.setOppositeCount(sender, 10, {from: dummyVoteCounter})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 	}

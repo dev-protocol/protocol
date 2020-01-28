@@ -28,7 +28,7 @@ contract(
 						from: dummyPolicyFactory
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('PolicySet; count', () => {
@@ -57,7 +57,7 @@ contract(
 				const result = await dev.policySet
 					.deleteAll({from: dummyPolicyFactory})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 	}

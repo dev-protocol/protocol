@@ -11,7 +11,8 @@ contract('KillableTest', ([deployer, user]) => {
 			expect(value.toNumber()).to.be.equal(1)
 			await killableTest.kill({from: deployer})
 			const result = await killableTest.getValue().catch((err: Error) => err)
-			expect(result.message).to.be.equal(
+			validateErrorMessage(
+				result,
 				"Returned values aren't valid, did it run Out of Gas?"
 			)
 		})
@@ -22,7 +23,7 @@ contract('KillableTest', ([deployer, user]) => {
 			const result = await killableTest
 				.kill({from: user})
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'only owner method')
+			validateErrorMessage(result, 'only owner method')
 		})
 	})
 })

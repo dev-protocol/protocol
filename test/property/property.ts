@@ -21,7 +21,7 @@ contract(
 						from: deployer
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 			it('The author, decimal places, and number of issues are fixed values', async () => {
 				await dev.addressConfig.setPropertyFactory(propertyFactory)
@@ -69,7 +69,7 @@ contract(
 				const result = await property
 					.withdraw(user, 10, {from: deployer})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 			it('Dev token balance does not exist in property contract', async () => {
 				await dev.addressConfig.setLockup(lockup)
@@ -78,10 +78,7 @@ contract(
 				const result = await property
 					.withdraw(user, 10, {from: lockup})
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result as Error,
-					'ERC20: transfer amount exceeds balance'
-				)
+				validateErrorMessage(result, 'ERC20: transfer amount exceeds balance')
 			})
 			it('Dev token balance does not exist in property contract', async () => {
 				await dev.addressConfig.setLockup(lockup)
@@ -122,7 +119,7 @@ contract(
 				const result = await property
 					.transfer(DEFAULT_ADDRESS, 10, {from: user})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 			it('An error occurs if the value is invalid', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -130,7 +127,7 @@ contract(
 				const result = await property
 					.transfer(transfer, 0, {from: user})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'illegal transfer value')
+				validateErrorMessage(result, 'illegal transfer value')
 			})
 			it('transfer success', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable

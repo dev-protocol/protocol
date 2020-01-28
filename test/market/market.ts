@@ -34,7 +34,7 @@ contract(
 				const result = await marketContract
 					.new(dev.addressConfig.address, behavuor, {from: deployer})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 			it('Each property is set.', async () => {
 				await Promise.all([
@@ -74,7 +74,7 @@ contract(
 			})
 			it('Cannot be enabled from other than market factory', async () => {
 				const result = await market.toEnable().catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 			it('Can be enabled from the market factory', async () => {
 				await market.toEnable({from: marketFactory})
@@ -204,7 +204,7 @@ contract(
 						from: propertyAuther
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'market is not enabled')
+				validateErrorMessage(result, 'market is not enabled')
 			})
 			it('Error occurs if id is not set.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -214,7 +214,7 @@ contract(
 						from: propertyAuther
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'id is required')
+				validateErrorMessage(result, 'id is required')
 			})
 			it('Should fail to run when sent from other than the owner of Property Contract.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -222,7 +222,7 @@ contract(
 				const result = await marketInstance
 					.authenticate(propertyAddress, 'id-key', '', '', '', '')
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 			it('An error occurs if the same id is specified.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -241,7 +241,7 @@ contract(
 						from: propertyAuther
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'id is duplicated')
+				validateErrorMessage(result, 'id is duplicated')
 			})
 		})
 
@@ -288,7 +288,7 @@ contract(
 				const result = await marketInstance
 					.vote(deployer, true, {from: user})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 			it('voting deadline is over.', async () => {
 				const createMarketResult = await dev.marketFactory.create(behavuor)
@@ -304,7 +304,7 @@ contract(
 				const result = await marketInstance
 					.vote(propertyAddress, true)
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'voting deadline is over')
+				validateErrorMessage(result, 'voting deadline is over')
 			})
 			it('Should fail to vote when already determined enabled.', async () => {
 				await dev.dev.deposit(propertyAddress, 10000, {from: user})
@@ -315,7 +315,7 @@ contract(
 				const result = await marketInstance
 					.vote(propertyAddress, true, {from: user})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'market is already enabled')
+				validateErrorMessage(result, 'market is already enabled')
 			})
 
 			it('If you specify true, it becomes a valid vote.', async () => {
