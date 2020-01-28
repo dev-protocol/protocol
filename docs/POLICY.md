@@ -19,7 +19,7 @@ The following formula illustrates the basic concept:
 
 The number of reward vs. staking rate will as follows curve:
 
-![Reward curve](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/policy/Staking-ratevs-Mint-amount.svg)
+![Reward curve](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/policy/Staking-ratevs-Mint-amount.svg?sanitize=true)
 
 In Solidity:
 
@@ -80,7 +80,7 @@ Property Contract author pays `authenticationFee` is multiplies the number of as
 
 ```solidity
 function authenticationFee(uint256 total_assets, uint256 property_lockups) public view returns (uint256) {
-	return total_assets * 250000000000000 - property_lockups / 1000;
+	return total_assets / 10000 - property_lockups / 100000000000000000000000;
 }
 ```
 

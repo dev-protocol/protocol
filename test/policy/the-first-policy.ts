@@ -140,12 +140,41 @@ contract('TheFirstPolicy', ([deployer]) => {
 		it('Returns the authentication fee when the total number of assets and the number of lockups is passed', async () => {
 			const policy = await create()
 			const result = await policy.authenticationFee(
-				new BigNumber(20000 * 1e18),
-				new BigNumber(500 * 1e18)
+				20000,
+				new BigNumber(100000 * 1e18)
 			)
-			expect(result.toString()).to.be.equal(
-				'4999999999999999999500000000000000000'
+			expect(result.toString()).to.be.equal('1')
+		})
+		it('Returns 1 when the number of assets is 10000, locked-ups is 0', async () => {
+			const policy = await create()
+			const result = await policy.authenticationFee(10000, 0)
+			expect(result.toString()).to.be.equal('1')
+		})
+		it('Returns 0 when the number of assets is 9999, locked-ups is 0', async () => {
+			const policy = await create()
+			const result = await policy.authenticationFee(9999, 0)
+			expect(result.toString()).to.be.equal('0')
+		})
+		it('Returns 500 when the number of assets is 5000000, locked-ups is 0', async () => {
+			const policy = await create()
+			const result = await policy.authenticationFee(5000000, 0)
+			expect(result.toString()).to.be.equal('500')
+		})
+		it('Returns 430 when the number of assets is 5000000, locked-ups is 7000000', async () => {
+			const policy = await create()
+			const result = await policy.authenticationFee(
+				5000000,
+				new BigNumber(7000000 * 1e18)
 			)
+			expect(result.toString()).to.be.equal('430')
+		})
+		it('Returns 0 when the number of assets is 5000000, locked-ups is 50000000', async () => {
+			const policy = await create()
+			const result = await policy.authenticationFee(
+				5000000,
+				new BigNumber(50000000 * 1e18)
+			)
+			expect(result.toString()).to.be.equal('0')
 		})
 	})
 	describe('TheFirstPolicy; marketApproval', () => {
