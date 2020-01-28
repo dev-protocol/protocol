@@ -21,13 +21,15 @@ contract(
 		describe('PolicyFactory; createPolicy', () => {
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
-				await dev.generatePolicyGroup()
-				await dev.generatePolicySet()
-				await dev.generatePolicyFactory()
-				await dev.generateVoteTimes()
-				await dev.generateVoteTimesStorage()
-				await dev.generateMarketFactory()
-				await dev.generateMarketGroup()
+				await Promise.all([
+					dev.generatePolicyGroup(),
+					dev.generatePolicySet(),
+					dev.generatePolicyFactory(),
+					dev.generateVoteTimes(),
+					dev.generateVoteTimesStorage(),
+					dev.generateMarketFactory(),
+					dev.generateMarketGroup()
+				])
 			})
 			it('Returns the new Policy address when Policy implementation is passed.', async () => {
 				policy = await userInstance.getPolicy('PolicyTest1')
@@ -100,8 +102,8 @@ contract(
 			let firstPolicyInstance: PolicyInstance
 			let createdPropertyAddress: string
 			beforeEach(async () => {
+				await dev.generateAddressConfig()
 				await Promise.all([
-					dev.generateAddressConfig(),
 					dev.generatePolicyGroup(),
 					dev.generatePolicySet(),
 					dev.generatePolicyFactory(),
