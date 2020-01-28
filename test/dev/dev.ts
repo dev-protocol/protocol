@@ -280,7 +280,7 @@ contract(
 					0
 				)
 				expect(res).to.be.an.instanceOf(Error)
-				validateErrorMessage(res as Error, 'illegal lockup value')
+				validateErrorMessage(res, 'illegal lockup value')
 			})
 			it('should fail to lockup token when sent from no balance account', async () => {
 				const dev = await generateEnv()
