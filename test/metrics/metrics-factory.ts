@@ -13,9 +13,11 @@ contract(
 			let metricsAddress: string
 			before(async () => {
 				await dev.generateAddressConfig()
-				await dev.generateMarketGroup()
-				await dev.generateMetricsFactory()
-				await dev.generateMetricsGroup()
+				await Promise.all([
+					dev.generateMarketGroup(),
+					dev.generateMetricsFactory(),
+					dev.generateMetricsGroup()
+				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				await dev.marketGroup.addGroup(market, {from: marketFactory})
 				const metricsFactoryResult = await dev.metricsFactory.create(

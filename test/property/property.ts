@@ -46,11 +46,13 @@ contract(
 			let propertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
-				await dev.generateVoteTimes()
-				await dev.generateVoteTimesStorage()
-				await dev.generatePropertyGroup()
-				await dev.generatePropertyFactory()
-				await dev.generateDev()
+				await Promise.all([
+					dev.generateVoteTimes(),
+					dev.generateVoteTimesStorage(),
+					dev.generatePropertyGroup(),
+					dev.generatePropertyFactory(),
+					dev.generateDev()
+				])
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -94,14 +96,16 @@ contract(
 			let propertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
-				await dev.generateAllocator()
-				await dev.generateAllocatorStorage()
-				await dev.generateWithdraw()
-				await dev.generateWithdrawStorage()
-				await dev.generateVoteTimes()
-				await dev.generateVoteTimesStorage()
-				await dev.generatePropertyGroup()
-				await dev.generatePropertyFactory()
+				await Promise.all([
+					dev.generateAllocator(),
+					dev.generateAllocatorStorage(),
+					dev.generateWithdraw(),
+					dev.generateWithdrawStorage(),
+					dev.generateVoteTimes(),
+					dev.generateVoteTimesStorage(),
+					dev.generatePropertyGroup(),
+					dev.generatePropertyFactory()
+				])
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',

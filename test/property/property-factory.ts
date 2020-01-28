@@ -8,10 +8,12 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		let propertyAddress: string
 		before(async () => {
 			await dev.generateAddressConfig()
-			await dev.generatePropertyFactory()
-			await dev.generatePropertyGroup()
-			await dev.generateVoteTimes()
-			await dev.generateVoteTimesStorage()
+			await Promise.all([
+				dev.generatePropertyFactory(),
+				dev.generatePropertyGroup(),
+				dev.generateVoteTimes(),
+				dev.generateVoteTimesStorage()
+			])
 			await dev.addressConfig.setMarketFactory(marketFactory)
 			const result = await dev.propertyFactory.create(
 				'sample',

@@ -15,13 +15,15 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 		let marketBehaviorAddress: string
 		before(async () => {
 			await dev.generateAddressConfig()
-			await dev.generatePolicyGroup()
-			await dev.generatePolicySet()
-			await dev.generatePolicyFactory()
-			await dev.generateVoteTimes()
-			await dev.generateVoteTimesStorage()
-			await dev.generateMarketFactory()
-			await dev.generateMarketGroup()
+			await Promise.all([
+				dev.generatePolicyGroup(),
+				dev.generatePolicySet(),
+				dev.generatePolicyFactory(),
+				dev.generateVoteTimes(),
+				dev.generateVoteTimesStorage(),
+				dev.generateMarketFactory(),
+				dev.generateMarketGroup()
+			])
 			const policy = await userInstance.getPolicy('PolicyTest1')
 			await dev.policyFactory.create(policy.address, {from: user})
 			const market = await userInstance.getMarket('MarketTest1')

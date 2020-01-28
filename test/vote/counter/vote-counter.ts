@@ -23,21 +23,23 @@ contract(
 		describe('VoteCounter; addVoteCount', () => {
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
-				await dev.generateVoteCounter()
-				await dev.generateVoteCounterStorage()
-				await dev.generateVoteTimes()
-				await dev.generateVoteTimesStorage()
-				await dev.generateAllocator()
-				await dev.generateAllocatorStorage()
-				await dev.generateLockup()
-				await dev.generateLockupStorage()
-				await dev.generateWithdraw()
-				await dev.generateWithdrawStorage()
-				await dev.generateMarketGroup()
-				await dev.generatePolicyGroup()
-				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
-				await dev.generateDev()
+				await Promise.all([
+					dev.generateVoteCounter(),
+					dev.generateVoteCounterStorage(),
+					dev.generateVoteTimes(),
+					dev.generateVoteTimesStorage(),
+					dev.generateAllocator(),
+					dev.generateAllocatorStorage(),
+					dev.generateLockup(),
+					dev.generateLockupStorage(),
+					dev.generateWithdraw(),
+					dev.generateWithdrawStorage(),
+					dev.generateMarketGroup(),
+					dev.generatePolicyGroup(),
+					dev.generatePropertyFactory(),
+					dev.generatePropertyGroup(),
+					dev.generateDev()
+				])
 				await dev.dev.mint(user1, 100, {from: deployer})
 				await dev.dev.mint(user2, 100, {from: deployer})
 				const propertyCreateResult = await dev.propertyFactory.create(

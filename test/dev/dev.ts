@@ -205,13 +205,15 @@ contract(
 			const generateEnv = async (): Promise<DevProtocolInstance> => {
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
-				await dev.generateDev()
-				await dev.generateLockup()
-				await dev.generateLockupStorage()
-				await dev.generatePropertyFactory()
-				await dev.generatePropertyGroup()
-				await dev.generateVoteTimes()
-				await dev.generateVoteTimesStorage()
+				await Promise.all([
+					dev.generateDev(),
+					dev.generateLockup(),
+					dev.generateLockupStorage(),
+					dev.generatePropertyFactory(),
+					dev.generatePropertyGroup(),
+					dev.generateVoteTimes(),
+					dev.generateVoteTimesStorage()
+				])
 				return dev
 			}
 
