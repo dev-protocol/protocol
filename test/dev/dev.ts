@@ -1,5 +1,6 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {DevInstance} from '../../types/truffle-contracts'
+import {validateErrorMessage} from '../test-lib/utils'
 
 contract(
 	'Dev',
@@ -38,6 +39,16 @@ contract(
 				expect((await dev.totalSupply()).toNumber()).to.equal(100)
 				expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			})
+			it('running with 0', async () => {
+				const dev = await createDev()
+				await dev.mint(deployer, 100)
+				expect((await dev.totalSupply()).toNumber()).to.equal(100)
+				expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+				await dev.mint(deployer, 0)
+				expect((await dev.totalSupply()).toNumber()).to.equal(100)
+				expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+			})
 			it('should fail to run mint when sent from other than minter', async () => {
 				const dev = await createDev()
 				await dev.mint(deployer, 100, {from: user1}).catch((err: Error) => err)
@@ -70,6 +81,16 @@ contract(
 				await dev.burn(50)
 				expect((await dev.totalSupply()).toNumber()).to.equal(50)
 				expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
+			})
+			it('running with 0', async () => {
+				const dev = await createDev()
+				await dev.mint(deployer, 100)
+				expect((await dev.totalSupply()).toNumber()).to.equal(100)
+				expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+
+				await dev.burn(0)
+				expect((await dev.totalSupply()).toNumber()).to.equal(100)
+				expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			})
 			it('should fail to decrease the balance when sent from no balance account', async () => {
 				const dev = await createDev()
@@ -122,6 +143,15 @@ contract(
 				await dev.transfer(user1, 50)
 				expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
 				expect((await dev.balanceOf(user1)).toNumber()).to.equal(50)
+			})
+			it('transfer 0 tokens from user-to-user', async () => {
+				const dev = await createMintedDev()
+				expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+				expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
+
+				await dev.transfer(user1, 0)
+				expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
+				expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
 			})
 			it('should fail to transfer token when sent from no balance account', async () => {
 				const dev = await createMintedDev()
@@ -235,6 +265,22 @@ contract(
 				expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(
 					50
 				)
+			})
+			it('should fail to lock up token when 0 amount', async () => {
+				const dev = await generateEnv()
+				const prop = await createProperty(dev)
+				await dev.dev.mint(user1, 100)
+				const res = await dev.dev
+					.deposit(prop, 0, {from: user1})
+					.catch((err: Error) => err)
+				const balance = await dev.dev.balanceOf(user1)
+
+				expect(balance.toNumber()).to.be.equal(100)
+				expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(
+					0
+				)
+				expect(res).to.be.an.instanceOf(Error)
+				validateErrorMessage(res as Error, 'illegal lockup value')
 			})
 			it('should fail to lockup token when sent from no balance account', async () => {
 				const dev = await generateEnv()
@@ -387,6 +433,15 @@ contract(
 				await dev.dev.fee(user1, 1, {from: market})
 				const balance = await dev.dev.balanceOf(user1)
 				expect(balance.toNumber()).to.be.equal(99)
+			})
+			it('burn 0 tokens as a fee', async () => {
+				const dev = await generateEnv()
+				await dev.addressConfig.setMarketFactory(marketFactory)
+				await dev.marketGroup.addGroup(market, {from: marketFactory})
+				await dev.dev.mint(user1, 100)
+				await dev.dev.fee(user1, 0, {from: market})
+				const balance = await dev.dev.balanceOf(user1)
+				expect(balance.toNumber()).to.be.equal(100)
 			})
 			it('should fail to burn when sent from no balance account', async () => {
 				const dev = await generateEnv()
