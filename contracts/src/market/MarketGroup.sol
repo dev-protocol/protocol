@@ -28,14 +28,14 @@ contract MarketGroup is UsingConfig, UsingStorage, IGroup, UsingValidator {
 	}
 
 	function addCount() private {
-		bytes32 key = getNumberKey();
+		bytes32 key = getCountKey();
 		uint256 number = eternalStorage().getUint(key);
 		number = number.add(1);
 		eternalStorage().setUint(key, number);
 	}
 
 	function getCount() external view returns (uint256) {
-		bytes32 key = getNumberKey();
+		bytes32 key = getCountKey();
 		return eternalStorage().getUint(key);
 	}
 
