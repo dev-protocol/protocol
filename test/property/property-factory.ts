@@ -1,5 +1,6 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {validateErrorMessage, getPropertyAddress} from '../test-lib/utils'
+import {getPropertyAddress} from '../test-lib/utils/log'
+import {validateErrorMessage} from '../test-lib/utils/error'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 	const dev = new DevProtocolInstance(deployer)

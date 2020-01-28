@@ -1,13 +1,11 @@
 import {IPolicyInstance, PolicyInstance} from '../../types/truffle-contracts'
 import {DevProtocolInstance} from '../test-lib/instance'
+import {mine, collectsEth} from '../test-lib/utils/common'
+import {getPropertyAddress, getPolicyAddress} from '../test-lib/utils/log'
 import {
-	getPolicyAddress,
 	validateErrorMessage,
-	validateAddressErrorMessage,
-	mine,
-	getPropertyAddress,
-	collectsEth
-} from '../test-lib/utils'
+	validateAddressErrorMessage
+} from '../test-lib/utils/error'
 
 contract(
 	'PolicyFactory',

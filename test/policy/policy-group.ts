@@ -2,7 +2,7 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage
-} from '../test-lib/utils'
+} from '../test-lib/utils/error'
 
 contract(
 	'PolicyGroupTest',

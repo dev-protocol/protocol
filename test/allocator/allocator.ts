@@ -1,14 +1,11 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
-import {
-	getPropertyAddress,
-	getMarketAddress,
-	watch,
-	waitForEvent,
-	validateErrorMessage,
-	getEventValue,
-	WEB3_URI
-} from '../test-lib/utils'
+import {toBigNumber} from '../test-lib/utils/common'
+import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
+import {watch, waitForEvent, getEventValue} from '../test-lib/utils/event'
+import {validateErrorMessage} from '../test-lib/utils/error'
+
+import {WEB3_URI} from '../test-lib/const'
 import {
 	MetricsInstance,
 	MarketInstance,
@@ -274,8 +271,6 @@ contract('Allocator', ([deployer, user1]) => {
 
 		it('values passed to `allocation` is correct', async () => {
 			const [dev, market, metrics] = await init()
-			const toBigNumber = (x: string | BigNumber): BigNumber =>
-				new BigNumber(x.toString())
 			const policy = await getPolicy(dev.addressConfig)
 			const property = await metrics.property()
 			const totalAssets = await dev.metricsGroup
@@ -353,8 +348,6 @@ contract('Allocator', ([deployer, user1]) => {
 
 		it('When after increment, update the value of `lastAssetValueEachMarketPerBlock`', async () => {
 			const [dev, market, metrics] = await init()
-			const toBigNumber = (x: string | BigNumber): BigNumber =>
-				new BigNumber(x.toString())
 			const before = await dev.allocatorStorage
 				.getLastAssetValueEachMarketPerBlock(market.address)
 				.then(toBigNumber)

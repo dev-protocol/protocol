@@ -1,16 +1,11 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {MetricsInstance, PropertyInstance} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
-import {
-	getPropertyAddress,
-	getMarketAddress,
-	watch,
-	validateErrorMessage,
-	waitForEvent,
-	getEventValue,
-	mine,
-	WEB3_URI
-} from '../test-lib/utils'
+import {mine, toBigNumber} from '../test-lib/utils/common'
+import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
+import {watch, waitForEvent, getEventValue} from '../test-lib/utils/event'
+import {validateErrorMessage} from '../test-lib/utils/error'
+import {WEB3_URI} from '../test-lib/const'
 
 contract('LockupTest', ([deployer, user1]) => {
 	const init = async (): Promise<[
@@ -74,7 +69,6 @@ contract('LockupTest', ([deployer, user1]) => {
 		return [dev, metrics, property]
 	}
 
-	const toBigNumber = (v: string | BigNumber): BigNumber => new BigNumber(v)
 	const err = (error: Error): Error => error
 
 	describe('Lockup; cancel', () => {
