@@ -1,4 +1,4 @@
-import {DevProtocolInstance, UserInstance} from '../test-lib/instance'
+import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -8,7 +8,6 @@ import {
 
 contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 	const dev = new DevProtocolInstance(deployer)
-	const userInstance = new UserInstance(dev, user)
 	const marketContract = artifacts.require('Market')
 	describe('MarketFactory; create', () => {
 		let marketAddress: string
@@ -24,9 +23,9 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 				dev.generateMarketFactory(),
 				dev.generateMarketGroup()
 			])
-			const policy = await userInstance.getPolicy('PolicyTest1')
+			const policy = await dev.getPolicy('PolicyTest1', user)
 			await dev.policyFactory.create(policy.address, {from: user})
-			const market = await userInstance.getMarket('MarketTest1')
+			const market = await dev.getMarket('MarketTest1', user)
 			marketBehaviorAddress = market.address
 			const result = await dev.marketFactory.create(market.address, {
 				from: user
@@ -56,7 +55,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 		it('The maximum number of votes is incremented.', async () => {
 			let times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
 			expect(times.toNumber()).to.be.equal(1)
-			const market = await userInstance.getMarket('MarketTest2')
+			const market = await dev.getMarket('MarketTest2', user)
 			const result = await dev.marketFactory.create(market.address, {
 				from: user
 			})
@@ -95,7 +94,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 		})
 		it('Cannot run if paused.', async () => {
 			await dev.marketFactory.pause({from: deployer})
-			const market = await userInstance.getMarket('MarketTest3')
+			const market = await dev.getMarket('MarketTest3', user)
 			const result = await dev.marketFactory
 				.create(market.address, {
 					from: user
@@ -105,7 +104,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 		})
 		it('Can be executed when pause is released', async () => {
 			await dev.marketFactory.unpause({from: deployer})
-			const market = await userInstance.getMarket('MarketTest3')
+			const market = await dev.getMarket('MarketTest3', user)
 			let createResult = await dev.marketFactory.create(market.address, {
 				from: user
 			})

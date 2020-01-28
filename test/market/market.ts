@@ -1,4 +1,4 @@
-import {DevProtocolInstance, UserInstance} from '../test-lib/instance'
+import {DevProtocolInstance} from '../test-lib/instance'
 import {MarketInstance} from '../../types/truffle-contracts'
 import {
 	validateErrorMessage,
@@ -25,7 +25,6 @@ contract(
 		const marketContract = artifacts.require('Market')
 		describe('Market; constructor', () => {
 			const dev = new DevProtocolInstance(deployer)
-			const userInstance = new UserInstance(dev, user)
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
 			})
@@ -43,7 +42,7 @@ contract(
 					dev.generatePolicySet()
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
+				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
 				const market = await marketContract.new(
 					dev.addressConfig.address,
@@ -56,7 +55,6 @@ contract(
 		})
 		describe('Market; toEnable', () => {
 			const dev = new DevProtocolInstance(deployer)
-			const userInstance = new UserInstance(dev, user)
 			let market: MarketInstance
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
@@ -66,7 +64,7 @@ contract(
 					dev.generatePolicySet()
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
+				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
 				market = await marketContract.new(dev.addressConfig.address, behavuor, {
 					from: marketFactory
@@ -83,7 +81,6 @@ contract(
 		})
 		describe('Market; schema', () => {
 			const dev = new DevProtocolInstance(deployer)
-			const userInstance = new UserInstance(dev, user)
 			it('Get Schema of mapped Behavior Contract', async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
@@ -92,9 +89,9 @@ contract(
 					dev.generatePolicySet()
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
+				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
-				const behavuor = await userInstance.getMarket('MarketTest1')
+				const behavuor = await dev.getMarket('MarketTest1', user)
 				const market = await marketContract.new(
 					dev.addressConfig.address,
 					behavuor.address,
@@ -105,7 +102,6 @@ contract(
 		})
 		describe('Market; calculate', () => {
 			const dev = new DevProtocolInstance(deployer)
-			const userInstance = new UserInstance(dev, user)
 			it('Proxy to mapped Behavior Contract.', async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
@@ -114,9 +110,9 @@ contract(
 					dev.generatePolicySet()
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
+				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
-				const behavuor = await userInstance.getMarket('MarketTest3')
+				const behavuor = await dev.getMarket('MarketTest3', user)
 				const market = await marketContract.new(
 					dev.addressConfig.address,
 					behavuor.address,
@@ -131,7 +127,6 @@ contract(
 		})
 		describe('Market; authenticate, authenticatedCallback', () => {
 			const dev = new DevProtocolInstance(deployer)
-			const userInstance = new UserInstance(dev, user)
 			let marketAddress1: string
 			let marketAddress2: string
 			let propertyAddress: string
@@ -153,9 +148,9 @@ contract(
 					dev.generateLockupStorage(),
 					dev.generateDev()
 				])
-				const behavuor1 = await userInstance.getMarket('MarketTest3')
-				const behavuor2 = await userInstance.getMarket('MarketTest3')
-				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
+				const behavuor1 = await dev.getMarket('MarketTest3', user)
+				const behavuor2 = await dev.getMarket('MarketTest3', user)
+				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
 				let createMarketResult = await dev.marketFactory.create(
 					behavuor1.address
@@ -247,7 +242,6 @@ contract(
 
 		describe('Market; vote', () => {
 			const dev = new DevProtocolInstance(deployer)
-			const userInstance = new UserInstance(dev, user)
 			let marketAddress: string
 			let propertyAddress: string
 			const iPolicyContract = artifacts.require('IPolicy')
@@ -269,7 +263,7 @@ contract(
 					dev.generateLockupStorage(),
 					dev.generateDev()
 				])
-				const iPolicyInstance = await userInstance.getPolicy('PolicyTest1')
+				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
 				const createMarketResult = await dev.marketFactory.create(behavuor)
 				marketAddress = getMarketAddress(createMarketResult)
