@@ -425,7 +425,8 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(
 					voteResult,
-					"Returned values aren't valid, did it run Out of Gas?"
+					"Returned values aren't valid, did it run Out of Gas?",
+					false
 				)
 			})
 			it('Should fail when a call from other than Policy.', async () => {
