@@ -30,7 +30,7 @@ contract(
 				const result = await dev.lockupStorage
 					.setValue(property, sender, 3, {from: dummyLockup})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('LockupStorageStorage; setPropertyValue, getPropertyValue', () => {
@@ -53,7 +53,7 @@ contract(
 				const result = await dev.lockupStorage
 					.setPropertyValue(property, 30, {from: dummyLockup})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('LockupStorageStorage; setWithdrawalStatus, getWithdrawalStatus', () => {
@@ -80,7 +80,7 @@ contract(
 				const result = await dev.lockupStorage
 					.setWithdrawalStatus(property, user, 30, {from: dummyLockup})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('LockupStorageStorage; setInterestPrice, getInterestPrice', () => {
@@ -103,7 +103,7 @@ contract(
 				const result = await dev.lockupStorage
 					.setInterestPrice(property, 3000, {from: dummyLockup})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('LockupStorageStorage; setLastInterestPrice, getLastInterestPrice', () => {
@@ -130,7 +130,7 @@ contract(
 				const result = await dev.lockupStorage
 					.setLastInterestPrice(property, user, 30000, {from: dummyLockup})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('LockupStorageStorage; setPendingInterestWithdrawal, getPendingInterestWithdrawal', () => {
@@ -164,7 +164,7 @@ contract(
 						from: dummyLockup
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 	}

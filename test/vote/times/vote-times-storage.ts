@@ -28,7 +28,7 @@ contract(
 				const result = await dev.voteTimesStorage
 					.setVoteTimes(2, {from: dummyVoteTimes})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('VoteTimesStorage; getVoteTimesByProperty, setVoteTimesByProperty', () => {
@@ -60,7 +60,7 @@ contract(
 				const result = await dev.voteTimesStorage
 					.setVoteTimesByProperty(property, 3, {from: dummyVoteTimes})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 	}

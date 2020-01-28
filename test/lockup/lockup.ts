@@ -81,28 +81,24 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('An error occurs if you specify something other than a property address', async () => {
 			const [dev, ,] = await init()
 			const res = await dev.lockup.cancel(user1).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this is illegal address')
+			validateErrorMessage(res, 'this is illegal address')
 		})
 		it('An error occurs if you specify something other than a property address', async () => {
 			const [dev, , property] = await init()
 			const res = await dev.lockup.cancel(property.address).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'dev token is not locked')
+			validateErrorMessage(res, 'dev token is not locked')
 		})
 		it('An error will occur if not locked up.', async () => {
 			const [dev, , property] = await init()
 			const res = await dev.lockup.cancel(property.address).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'dev token is not locked')
+			validateErrorMessage(res, 'dev token is not locked')
 		})
 		it('Cannot be canceled during cancellation.', async () => {
 			const [dev, , property] = await init()
 			await dev.dev.deposit(property.address, 10000)
 			await dev.lockup.cancel(property.address)
 			const res = await dev.lockup.cancel(property.address).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'lockup is already canceled')
+			validateErrorMessage(res, 'lockup is already canceled')
 		})
 		it('If you stand for a certain time after canceling, withdraw ends normally.', async () => {
 			const [dev, , property] = await init()
@@ -118,8 +114,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			mine(1)
 			await dev.lockup.withdraw(property.address)
 			const res = await dev.lockup.cancel(property.address).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'dev token is not locked')
+			validateErrorMessage(res, 'dev token is not locked')
 		})
 	})
 	describe('Lockup; lockup', () => {
@@ -131,8 +126,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 10000)
 				.catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'You cannot use that')
+			validateErrorMessage(res, 'You cannot use that')
 		})
 		it('should fail to call when sent from other than Dev Contract', async () => {
 			const [dev, , property] = await init()
@@ -140,15 +134,13 @@ contract('LockupTest', ([deployer, user1]) => {
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 10000)
 				.catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this is illegal address')
+			validateErrorMessage(res, 'this is illegal address')
 		})
 		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
 
 			const res = await dev.lockup.lockup(deployer, user1, 10000).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this is illegal address')
+			validateErrorMessage(res, 'this is illegal address')
 		})
 		it('should fail to call when lockup is canceling', async () => {
 			const [dev, , property] = await init()
@@ -161,8 +153,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 10000)
 				.catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'lockup is already canceled')
+			validateErrorMessage(res, 'lockup is already canceled')
 		})
 		it('should fail to call when a passed value is 0', async () => {
 			const [dev, , property] = await init()
@@ -175,8 +166,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 0)
 				.catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'illegal lockup value')
+			validateErrorMessage(res, 'illegal lockup value')
 		})
 		it(`should fail to call when token's transfer was failed`, async () => {
 			const [dev, , property] = await init()
@@ -184,11 +174,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const res = await dev.dev
 				.deposit(property.address, 10000, {from: user1})
 				.catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(
-				res as Error,
-				'ERC20: transfer amount exceeds balance'
-			)
+			validateErrorMessage(res, 'ERC20: transfer amount exceeds balance')
 		})
 		it('record transferred token as a lockup', async () => {
 			const [dev, , property] = await init()
@@ -221,15 +207,13 @@ contract('LockupTest', ([deployer, user1]) => {
 			const [dev] = await init()
 
 			const res = await dev.lockup.withdraw(deployer).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this is illegal address')
+			validateErrorMessage(res, 'this is illegal address')
 		})
 		it('should fail to call when waiting for released', async () => {
 			const [dev, , property] = await init()
 
 			const res = await dev.lockup.withdraw(property.address).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'waiting for release')
+			validateErrorMessage(res, 'waiting for release')
 		})
 		it('should fail to call when dev token is not locked', async () => {
 			const [dev, , property] = await init()
@@ -239,8 +223,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			await dev.addressConfig.setLockup(dev.lockup.address)
 
 			const res = await dev.lockup.withdraw(property.address).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'dev token is not locked')
+			validateErrorMessage(res, 'dev token is not locked')
 		})
 		it(`withdrawing sender's withdrawable full amount`, async () => {
 			const [dev, , property] = await init()
@@ -268,15 +251,13 @@ contract('LockupTest', ([deployer, user1]) => {
 			const [dev] = await init()
 
 			const res = await dev.lockup.withdrawInterest(deployer).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'this is illegal address')
+			validateErrorMessage(res, 'this is illegal address')
 		})
 		it(`should fail to call when hasn't withdrawable interest amount`, async () => {
 			const [dev, , property] = await init()
 
 			const res = await dev.lockup.withdrawInterest(property.address).catch(err)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res as Error, 'your interest amount is 0')
+			validateErrorMessage(res, 'your interest amount is 0')
 		})
 		describe('withdrawing interest amount', () => {
 			let dev: DevProtocolInstance

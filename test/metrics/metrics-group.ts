@@ -42,7 +42,7 @@ contract(
 						from: metricsFactory
 					})
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'already enabled')
+				validateErrorMessage(result, 'already enabled')
 			})
 			it('Can not execute addGroup without metricsFactory address', async () => {
 				const result = await dev.metricsGroup
@@ -50,7 +50,7 @@ contract(
 						from: dummyMetricsFactory
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 		describe('MetricsGroup; totalIssuedMetrics', () => {

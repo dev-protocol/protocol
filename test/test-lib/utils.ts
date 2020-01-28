@@ -2,18 +2,16 @@ import Web3 from 'web3'
 import BigNumber from 'bignumber.js'
 
 export function validateErrorMessage(
-	result: Error,
+	result: any,
 	errorMessage: string,
 	reason = true
 ): void {
 	const message = reason ? `Reason given: ${errorMessage}` : errorMessage
-	expect(result.message).to.include(message)
+	expect(result).to.be.an.instanceOf(Error)
+	expect((result as Error).message).to.include(message)
 }
 
-export function validateAddressErrorMessage(
-	result: Error,
-	reason = true
-): void {
+export function validateAddressErrorMessage(result: any, reason = true): void {
 	validateErrorMessage(result, 'this is illegal address', reason)
 }
 

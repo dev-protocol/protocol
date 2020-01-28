@@ -121,8 +121,7 @@ contract('Allocator', ([deployer, user1]) => {
 				.new(dev.addressConfig.address)
 			await dev.marketFactory.create(marketBehavior.address)
 			const res = await dev.allocator.allocate(metrics.address).catch(err)
-			validateErrorMessage(res as Error, 'outside the target period')
-			expect(res).to.be.instanceOf(Error)
+			validateErrorMessage(res, 'outside the target period')
 		})
 
 		describe('Allocator; Arguments to pass to calculate', () => {
@@ -380,12 +379,7 @@ contract('Allocator', ([deployer, user1]) => {
 				.catch((err: Error) => err)
 
 			await dev.addressConfig.setMetricsFactory(dev.metricsFactory.address)
-
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(
-				res as Error,
-				`don't call from other than market behavior`
-			)
+			validateErrorMessage(res, `don't call from other than market behavior`)
 		})
 
 		it('Should fail to call the function when it does not call in advance `allocate` function', async () => {

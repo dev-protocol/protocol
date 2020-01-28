@@ -176,7 +176,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 
 				expect(amount.toFixed()).to.be.equal('0')
 				expect(prevBalance.toFixed()).to.be.equal(afterBalance.toFixed())
-				validateErrorMessage(res as Error, 'withdraw value is 0')
+				validateErrorMessage(res, 'withdraw value is 0')
 			})
 		})
 	})
@@ -305,7 +305,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 						from: deployer
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(res as Error)
+				validateAddressErrorMessage(res)
 			})
 		})
 	})

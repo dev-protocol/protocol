@@ -144,13 +144,13 @@ contract(
 				const result = await firstPolicyInstance
 					.vote(dummyProperty, true)
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 			it('Should fail voting to the already enable Policy.', async () => {
 				const result = await firstPolicyInstance
 					.vote(createdPropertyAddress, true)
 					.catch((err: Error) => err)
-				validateErrorMessage(result as Error, 'this policy is current')
+				validateErrorMessage(result, 'this policy is current')
 			})
 			it('Should fail to vote when after the voting period.', async () => {
 				const second = await userInstance.getPolicy('PolicyTest1')
@@ -167,7 +167,7 @@ contract(
 				const voteResult = await secondPolicyInstance
 					.vote(createdPropertyAddress, true)
 					.catch((err: Error) => err)
-				validateErrorMessage(voteResult as Error, 'voting deadline is over')
+				validateErrorMessage(voteResult, 'voting deadline is over')
 			})
 			it('Should fail to vote when the number of lockups and the market reward is 0.', async () => {
 				const second = await userInstance.getPolicy('PolicyTest1')
@@ -182,7 +182,7 @@ contract(
 				const voteResult = await secondPolicyInstance
 					.vote(createdPropertyAddress, true)
 					.catch((err: Error) => err)
-				validateErrorMessage(voteResult as Error, 'vote count is 0')
+				validateErrorMessage(voteResult, 'vote count is 0')
 			})
 			it('Should fail to vote when already voted.', async () => {
 				const second = await userInstance.getPolicy('PolicyTest1')
@@ -201,7 +201,7 @@ contract(
 				const voteResult = await secondPolicyInstance
 					.vote(createdPropertyAddress, true, {from: user1})
 					.catch((err: Error) => err)
-				validateErrorMessage(voteResult as Error, 'already vote')
+				validateErrorMessage(voteResult, 'already vote')
 			})
 			it('The number of lock-ups for it Property and the accumulated Market reward will be added to the vote when a Property owner votes for.', async () => {
 				const second = await userInstance.getPolicy('PolicyTest1')
@@ -423,7 +423,8 @@ contract(
 				const voteResult = await firstPolicyInstance
 					.marketVotingBlocks()
 					.catch((err: Error) => err)
-				expect((voteResult as Error).message).to.be.equal(
+				validateErrorMessage(
+					voteResult,
 					"Returned values aren't valid, did it run Out of Gas?"
 				)
 			})
@@ -431,7 +432,7 @@ contract(
 				const result = await dev.policyFactory
 					.convergePolicy(policy.address, {from: deployer})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result as Error)
+				validateAddressErrorMessage(result)
 			})
 		})
 	}

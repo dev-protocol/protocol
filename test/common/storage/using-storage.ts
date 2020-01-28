@@ -14,11 +14,11 @@ contract('UsingStorageTest', ([deployer]) => {
 			const result = await usingStorageTest
 				.getStorageAddress()
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'storage is not setted', false)
+			validateErrorMessage(result, 'storage is not setted', false)
 		})
 		it('If storage has not been created, an error will occur when accessing storage.', async () => {
 			const result = await usingStorageTest.getUInt().catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'storage is not setted', false)
+			validateErrorMessage(result, 'storage is not setted', false)
 		})
 		it('If storage has been created, the storage address can be obtained.', async () => {
 			await usingStorageTest.createStorage()
@@ -34,7 +34,7 @@ contract('UsingStorageTest', ([deployer]) => {
 			const result = await usingStorageTest
 				.createStorage()
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'storage is setted')
+			validateErrorMessage(result, 'storage is setted')
 		})
 	})
 
@@ -60,13 +60,13 @@ contract('UsingStorageTest', ([deployer]) => {
 			const result = await usingStorageTestNext
 				.setUInt(2)
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'not current owner')
+			validateErrorMessage(result, 'not current owner')
 		})
 		it('Delegation of authority is not possible from the delegate.', async () => {
 			const result = await usingStorageTestNext
 				.changeOwner(usingStorageTestNext.address)
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'not current owner')
+			validateErrorMessage(result, 'not current owner')
 		})
 		it('When delegating authority, the delegate can write to storage', async () => {
 			await usingStorageTest.changeOwner(usingStorageTestNext.address)
@@ -78,7 +78,7 @@ contract('UsingStorageTest', ([deployer]) => {
 			const result = await usingStorageTest
 				.setUInt(2)
 				.catch((err: Error) => err)
-			validateErrorMessage(result as Error, 'not current owner')
+			validateErrorMessage(result, 'not current owner')
 		})
 	})
 })
