@@ -28,11 +28,11 @@ contract(
 		})
 		describe('AddressValidator; validateIllegal', () => {
 			it('normal address do not cause an error.', async () => {
-				await addressValidator.validateIllegal(validatedAddress)
+				await addressValidator.validateIllegalAddress(validatedAddress)
 			})
 			it('default address cause an error.', async () => {
 				const result = await addressValidator
-					.validateIllegal(DEFAULT_ADDRESS)
+					.validateIllegalAddress(DEFAULT_ADDRESS)
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result as Error, false)
 			})
@@ -42,18 +42,24 @@ contract(
 			before(async () => {
 				dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
-				await dev.generatePropertyGroup()
-				await dev.generateMarketGroup()
-				await dev.generateMetricsGroup()
-				await dev.generatePolicyGroup()
-				await dev.addressConfig.setPropertyFactory(propertyFactory)
-				await dev.addressConfig.setMarketFactory(marketFactory)
-				await dev.addressConfig.setMetricsFactory(metricsFactory)
-				await dev.addressConfig.setPolicyFactory(policyFactory)
-				await dev.propertyGroup.addGroup(property, {from: propertyFactory})
-				await dev.marketGroup.addGroup(market, {from: marketFactory})
-				await dev.metricsGroup.addGroup(metrics, {from: metricsFactory})
-				await dev.policyGroup.addGroup(policy, {from: policyFactory})
+				await Promise.all([
+					dev.generatePropertyGroup(),
+					dev.generateMarketGroup(),
+					dev.generateMetricsGroup(),
+					dev.generatePolicyGroup()
+				])
+				await Promise.all([
+					dev.addressConfig.setPropertyFactory(propertyFactory),
+					dev.addressConfig.setMarketFactory(marketFactory),
+					dev.addressConfig.setMetricsFactory(metricsFactory),
+					dev.addressConfig.setPolicyFactory(policyFactory)
+				])
+				await Promise.all([
+					dev.propertyGroup.addGroup(property, {from: propertyFactory}),
+					dev.marketGroup.addGroup(market, {from: marketFactory}),
+					dev.metricsGroup.addGroup(metrics, {from: metricsFactory}),
+					dev.policyGroup.addGroup(policy, {from: policyFactory})
+				])
 			})
 			it('No error occurs if the address belongs to a market group.', async () => {
 				await addressValidator.validateGroup(market, dev.marketGroup.address)

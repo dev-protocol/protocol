@@ -368,24 +368,26 @@ contract(
 			let createdPropertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
-				await dev.generatePolicyGroup()
-				await dev.generatePolicySet()
-				await dev.generatePolicyFactory()
-				await dev.generateVoteTimes()
-				await dev.generateVoteTimesStorage()
-				await dev.generateVoteCounter()
-				await dev.generateVoteCounterStorage()
-				await dev.generateMarketFactory()
-				await dev.generateMarketGroup()
-				await dev.generatePropertyGroup()
-				await dev.generatePropertyFactory()
-				await dev.generateLockup()
-				await dev.generateLockupStorage()
-				await dev.generateAllocator()
-				await dev.generateAllocatorStorage()
-				await dev.generateWithdraw()
-				await dev.generateWithdrawStorage()
-				await dev.generateDev()
+				await Promise.all([
+					dev.generatePolicyGroup(),
+					dev.generatePolicySet(),
+					dev.generatePolicyFactory(),
+					dev.generateVoteTimes(),
+					dev.generateVoteTimesStorage(),
+					dev.generateVoteCounter(),
+					dev.generateVoteCounterStorage(),
+					dev.generateMarketFactory(),
+					dev.generateMarketGroup(),
+					dev.generatePropertyGroup(),
+					dev.generatePropertyFactory(),
+					dev.generateLockup(),
+					dev.generateLockupStorage(),
+					dev.generateAllocator(),
+					dev.generateAllocatorStorage(),
+					dev.generateWithdraw(),
+					dev.generateWithdrawStorage(),
+					dev.generateDev()
+				])
 				await dev.dev.mint(user1, 10000, {from: deployer})
 				policy = await userInstance.getPolicy('PolicyTest1')
 				const policyCreateResult = await dev.policyFactory.create(

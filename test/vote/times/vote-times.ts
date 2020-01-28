@@ -1,5 +1,4 @@
 import {DevProtocolInstance} from '../../test-lib/instance'
-import {VoteTimesStorageInstance} from '../../../types/truffle-contracts'
 
 contract(
 	'VoteTimesTest',
@@ -12,12 +11,15 @@ contract(
 		voteCounter
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
+
 		describe('VoteTimes; addVoteTimes, addVoteTimesByProperty, resetVoteTimesByProperty', () => {
 			before(async () => {
 				await dev.generateAddressConfig()
-				await dev.generateVoteTimes()
-				await dev.generateVoteTimesStorage()
-				await dev.generatePropertyGroup()
+				await Promise.all([
+					dev.generateVoteTimes(),
+					dev.generateVoteTimesStorage(),
+					dev.generatePropertyGroup()
+				])
 				await dev.addressConfig.setMarketFactory(marketFactory, {
 					from: deployer
 				})
@@ -51,9 +53,9 @@ contract(
 				const storageAddress = await dev.voteTimesStorage.getStorageAddress({
 					from: deployer
 				})
-				const newVoteTimesStorage = await dev.generateInstance<
-					VoteTimesStorageInstance
-				>('VoteTimesStorage')
+				const newVoteTimesStorage = await artifacts
+					.require('VoteTimesStorage')
+					.new(dev.addressConfig.address)
 				await newVoteTimesStorage.setStorage(storageAddress, {
 					from: deployer
 				})
