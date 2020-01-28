@@ -20,26 +20,26 @@ contract MarketGroup is UsingConfig, UsingStorage, IGroup, UsingValidator {
 
 		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
-		addNumber();
+		addCount();
 	}
 
 	function isGroup(address _addr) public view returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 
-	function addNumber() private {
+	function addCount() private {
 		bytes32 key = getNumberKey();
 		uint256 number = eternalStorage().getUint(key);
 		number = number.add(1);
 		eternalStorage().setUint(key, number);
 	}
 
-	function getNumber() external view returns (uint256) {
+	function getCount() external view returns (uint256) {
 		bytes32 key = getNumberKey();
 		return eternalStorage().getUint(key);
 	}
 
-	function getNumberKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_number"));
+	function getCountKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_count"));
 	}
 }

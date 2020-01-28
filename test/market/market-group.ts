@@ -29,10 +29,10 @@ contract(
 				expect(result).to.be.equal(true)
 			})
 			it('The number increases as you add addresses', async () => {
-				let result = await dev.marketGroup.getNumber()
+				let result = await dev.marketGroup.getCount()
 				expect(result.toNumber()).to.be.equal(1)
 				await dev.marketGroup.addGroup(market2, {from: marketFactory})
-				result = await dev.marketGroup.getNumber()
+				result = await dev.marketGroup.getCount()
 				expect(result.toNumber()).to.be.equal(2)
 			})
 			it('When the market address is not specified', async () => {
