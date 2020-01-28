@@ -8,6 +8,7 @@ import {
 	validateErrorMessage,
 	waitForEvent,
 	getEventValue,
+	mine,
 	WEB3_URI
 } from '../test-lib/utils'
 
@@ -77,7 +78,49 @@ contract('LockupTest', ([deployer, user1]) => {
 	const err = (error: Error): Error => error
 
 	describe('Lockup; cancel', () => {
-		// TODO
+		it('An error occurs if you specify something other than a property address', async () => {
+			const [dev, ,] = await init()
+			const res = await dev.lockup.cancel(user1).catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'this is illegal address')
+		})
+		it('An error occurs if you specify something other than a property address', async () => {
+			const [dev, , property] = await init()
+			const res = await dev.lockup.cancel(property.address).catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'dev token is not locked')
+		})
+		it('An error will occur if not locked up.', async () => {
+			const [dev, , property] = await init()
+			const res = await dev.lockup.cancel(property.address).catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'dev token is not locked')
+		})
+		it('Cannot be canceled during cancellation.', async () => {
+			const [dev, , property] = await init()
+			await dev.dev.deposit(property.address, 10000)
+			await dev.lockup.cancel(property.address)
+			const res = await dev.lockup.cancel(property.address).catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'lockup is already canceled')
+		})
+		it('If you stand for a certain time after canceling, withdraw ends normally.', async () => {
+			const [dev, , property] = await init()
+			await dev.dev.deposit(property.address, 10000)
+			await dev.lockup.cancel(property.address)
+			mine(1)
+			await dev.lockup.withdraw(property.address)
+		})
+		it('Cannot be canceled after withdraw ends normally.', async () => {
+			const [dev, , property] = await init()
+			await dev.dev.deposit(property.address, 10000)
+			await dev.lockup.cancel(property.address)
+			mine(1)
+			await dev.lockup.withdraw(property.address)
+			const res = await dev.lockup.cancel(property.address).catch(err)
+			expect(res).to.be.an.instanceOf(Error)
+			validateErrorMessage(res as Error, 'dev token is not locked')
+		})
 	})
 	describe('Lockup; lockup', () => {
 		it('should fail to call when paused', async () => {
