@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`2.1.3`**
+Version: **`2.1.4`**
 
 _There is a possibility that this white paper will be updated. When there is an update, the version number will increase according to [Semantic Versioning](https://semver.org/)._
 
@@ -21,7 +21,7 @@ Individuals produce value through activities. Dev Protocol possesses market, sta
 
 Staking is a new form of trading money that uses the inflation mechanism. Through staking, the sustainability of users’ activities is secured, and users receive value at zero real cost. This is a mechanism that provides profit for all properties that had previously been released for free. Dev Protocol aims for a total value staked that surpasses donation activities that have been taking place through legal tender.
 
-Dev Protocol transfers the formulation of its policy, which serves as the guiding principle for its governance, to the community so that it can be updated depending on the circumstances. Users can freely propose a new policy through the protocol. In order for a policy to take effect, approval must be granted through a vote of property holders. Formulation of the initial policy related to a decision on the inflation rate is in progress.
+Dev Protocol transfers the formulation of its policy, which serves as the guiding principle for its governance, to the community so that it can be updated depending on the circumstances. Users can freely propose a new policy through the protocol. In order for a policy to take effect, approval must be granted through a vote of property holders. A policy is related to a decision on the inflation rate and more. The initial policy is [here](./POLICY.md).
 
 ## Market
 
