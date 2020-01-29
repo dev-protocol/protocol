@@ -46,9 +46,9 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		getStorage().setPendingWithdrawal(
 			_property,
 			_from,
-			pendFrom + amountFrom
+			pendFrom.add(amountFrom)
 		);
-		getStorage().setPendingWithdrawal(_property, _to, pendTo + amountTo);
+		getStorage().setPendingWithdrawal(_property, _to, pendTo.add(amountTo));
 		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
 			_property,
 			_to
@@ -98,13 +98,13 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 			_user
 		);
 		uint256 price = getStorage().getCumulativePrice(_property);
-		uint256 priceGap = price - _last;
+		uint256 priceGap = price.sub(_last);
 		uint256 balance = ERC20(_property).balanceOf(_user);
 		uint256 total = getStorage().getRewardsAmount(_property);
 		if (totalLimit == total) {
 			balance = balanceLimit;
 		}
-		uint256 value = priceGap * balance;
+		uint256 value = priceGap.mul(balance);
 		return value.div(Decimals.basis());
 	}
 
@@ -122,8 +122,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		returns (uint256)
 	{
 		uint256 _value = _calculateAmount(_property, _user);
-		uint256 value = _value +
-			getStorage().getPendingWithdrawal(_property, _user);
+		uint256 value = _value.add(getStorage().getPendingWithdrawal(_property, _user));
 		return value;
 	}
 

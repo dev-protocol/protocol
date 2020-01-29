@@ -84,9 +84,9 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	{
 		uint256 _last = getStorage().getLastInterestPrice(_property, _user);
 		uint256 price = getStorage().getInterestPrice(_property);
-		uint256 priceGap = price - _last;
+		uint256 priceGap = price.sub(_last);
 		uint256 lockupedValue = getStorage().getValue(_property, _user);
-		uint256 value = priceGap * lockupedValue;
+		uint256 value = priceGap.mul(lockupedValue);
 		return value.div(Decimals.basis());
 	}
 

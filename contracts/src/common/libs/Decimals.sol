@@ -1,6 +1,9 @@
 pragma solidity ^0.5.0;
 
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 library Decimals {
+	using SafeMath for uint256;
 	uint120 private constant basisValue = 1000000000000000000;
 
 	function outOf(uint256 _a, uint256 _b)
@@ -11,9 +14,9 @@ library Decimals {
 		if (_a == 0) {
 			return 0;
 		}
-		uint256 a = _a * basisValue;
+		uint256 a = _a.mul(basisValue);
 		require(a > _b, "the denominator is too big");
-		return (a / _b);
+		return (a.div(_b));
 
 	}
 	function basis() external pure returns (uint120) {

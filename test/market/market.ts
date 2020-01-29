@@ -26,7 +26,7 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
 			})
-			it('market factory以外からは作成できない', async () => {
+			it('Cannot be created from other than market factory', async () => {
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const result = await marketContract
 					.new(dev.addressConfig.address, behavuor, {from: deployer})

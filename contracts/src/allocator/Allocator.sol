@@ -74,16 +74,12 @@ contract Allocator is
 		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
 			metrics.property()
 		);
-		uint256 blocks = block.number -
-			getStorage().getLastAllocationBlockEachMetrics(_metrics);
+		uint256 blocks = block.number.sub(getStorage().getLastAllocationBlockEachMetrics(_metrics));
 		uint256 mint = policy.rewards(lockupValue, totalAssets);
-		uint256 value = (policy.assetValue(_value, lockupValue) * basis) /
-			blocks;
+		uint256 value = (policy.assetValue(_value, lockupValue).mul(basis)).div(blocks);
 		uint256 marketValue = getStorage().getLastAssetValueEachMarketPerBlock(
 			metrics.market()
-		) -
-			getStorage().getLastAssetValueEachMetrics(_metrics) +
-			value;
+		).sub(getStorage().getLastAssetValueEachMetrics(_metrics)).add(value);
 		uint256 assets = market.issuedMetrics();
 		getStorage().setLastAllocationBlockEachMetrics(_metrics, block.number);
 		getStorage().setLastAssetValueEachMetrics(_metrics, value);
@@ -175,7 +171,7 @@ contract Allocator is
 			return;
 		}
 		uint256 blockNumber = getLastAllocationBlockNumber(_metrics);
-		uint256 notTargetBlockNumber = blockNumber + notTargetPeriod;
+		uint256 notTargetBlockNumber = blockNumber.add(notTargetPeriod);
 		require(
 			notTargetBlockNumber < block.number,
 			"outside the target period"
