@@ -137,7 +137,7 @@ contract IMarket {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
-	) external returns (bool);
+	) public returns (bool);
 
 	function calculate(address _metrics, uint256 _start, uint256 _end)
 		external
