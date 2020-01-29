@@ -122,7 +122,9 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		returns (uint256)
 	{
 		uint256 _value = _calculateAmount(_property, _user);
-		uint256 value = _value.add(getStorage().getPendingWithdrawal(_property, _user));
+		uint256 value = _value.add(
+			getStorage().getPendingWithdrawal(_property, _user)
+		);
 		return value;
 	}
 

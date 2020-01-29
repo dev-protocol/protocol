@@ -26,7 +26,10 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		uint256 t = ERC20(config().token()).totalSupply();
 		uint256 s = (_lockups.mul(basis)).div(t);
 		uint256 _d = basis.sub(s);
-		uint256 _p = ((power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))).div(2);
+		uint256 _p = (
+			(power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))
+		)
+			.div(2);
 		uint256 p = _p.div(power_basis);
 		uint256 rp = p.add(1);
 		uint256 f = _p.sub(p.mul(power_basis));
@@ -66,7 +69,10 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		view
 		returns (uint256)
 	{
-		return (total_assets.div(10000)).sub((property_lockups.div(100000000000000000000000)));
+		return
+			(total_assets.div(10000)).sub(
+				(property_lockups.div(100000000000000000000000))
+			);
 	}
 
 	function marketApproval(uint256 _up_votes, uint256 _negative_votes)
