@@ -14,10 +14,8 @@ const handler = function(deployer, network) {
 	deployer.deploy(artifacts.require('Allocator'), address)
 	deployer.deploy(artifacts.require('AllocatorStorage'), address)
 
-	// Withdraw
-	deployer.link(decimals, artifacts.require('Withdraw'))
-	deployer.deploy(artifacts.require('Withdraw'), address)
-	deployer.deploy(artifacts.require('WithdrawStorage'), address)
+	// Dev
+	deployer.deploy(artifacts.require('Dev'), address)
 
 	// Lockup
 	deployer.link(decimals, artifacts.require('Lockup'))
@@ -47,8 +45,10 @@ const handler = function(deployer, network) {
 	deployer.deploy(artifacts.require('VoteTimes'), address)
 	deployer.deploy(artifacts.require('VoteTimesStorage'), address)
 
-	// Dev
-	deployer.deploy(artifacts.require('Dev'), address)
+	// Withdraw
+	deployer.link(decimals, artifacts.require('Withdraw'))
+	deployer.deploy(artifacts.require('Withdraw'), address)
+	deployer.deploy(artifacts.require('WithdrawStorage'), address)
 } as Truffle.Migration
 
 export = handler
