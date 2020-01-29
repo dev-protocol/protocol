@@ -31,7 +31,9 @@ module.exports = {
 					ETHEREUM_WALLET_MNEMONIC,
 					ETHEREUM_PROVIDERS_MAINNET
 				),
-			network_id: 1
+			network_id: 1,
+			gas: 4000000,
+			gasPrice: 10000000000
 		},
 		ropsten: {
 			provider: () =>
@@ -39,7 +41,9 @@ module.exports = {
 					ETHEREUM_WALLET_MNEMONIC,
 					ETHEREUM_PROVIDERS_ROPSTEN
 				),
-			network_id: 3
+			network_id: 3,
+			gas: 4000000,
+			gasPrice: 10000000000
 		},
 		mock: {
 			host: ETHEREUM_MOCK_HOST,
