@@ -15,7 +15,7 @@
 		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
 		"prepack": "npm run build",
 		"build": "tsc -p tsconfig.build.json",
-		"prebuild": "npm run generate"
+		"prebuild": "rm migrations/*.js && rm migrations/*/*.js && npm run generate"
 	},
 	"bin": {
 		"dev-protocol": "cli/index.js"
