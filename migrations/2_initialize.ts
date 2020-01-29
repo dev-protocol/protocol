@@ -4,22 +4,21 @@ const handler = function(deployer, network) {
 	}
 
 	const {address} = artifacts.require('AddressConfig')
+	const decimals = artifacts.require('Decimals')
 
 	// Library
-	deployer.deploy(artifacts.require('Decimals'))
+	deployer.deploy(decimals)
 
 	// Allocator
-	deployer.link(artifacts.require('Decimals'), artifacts.require('Allocator'))
+	deployer.link(decimals, artifacts.require('Allocator'))
 	deployer.deploy(artifacts.require('Allocator'), address)
 	deployer.deploy(artifacts.require('AllocatorStorage'), address)
 
-	// Withdraw
-	deployer.link(artifacts.require('Decimals'), artifacts.require('Withdraw'))
-	deployer.deploy(artifacts.require('Withdraw'), address)
-	deployer.deploy(artifacts.require('WithdrawStorage'), address)
+	// Dev
+	deployer.deploy(artifacts.require('Dev'), address)
 
 	// Lockup
-	deployer.link(artifacts.require('Decimals'), artifacts.require('Lockup'))
+	deployer.link(decimals, artifacts.require('Lockup'))
 	deployer.deploy(artifacts.require('Lockup'), address)
 	deployer.deploy(artifacts.require('LockupStorage'), address)
 
@@ -35,8 +34,6 @@ const handler = function(deployer, network) {
 	deployer.deploy(artifacts.require('PolicyFactory'), address)
 	deployer.deploy(artifacts.require('PolicyGroup'), address)
 	deployer.deploy(artifacts.require('PolicySet'), address)
-	deployer.link(artifacts.require('Decimals'), artifacts.require('PolicyTest1'))
-	deployer.deploy(artifacts.require('PolicyTest1')) // First policy
 
 	// Property
 	deployer.deploy(artifacts.require('PropertyFactory'), address)
@@ -48,13 +45,10 @@ const handler = function(deployer, network) {
 	deployer.deploy(artifacts.require('VoteTimes'), address)
 	deployer.deploy(artifacts.require('VoteTimesStorage'), address)
 
-	// Dev
-	deployer.deploy(artifacts.require('Dev'), address)
-
-	// Market
-	deployer.deploy(artifacts.require('MarketTest1'), address)
-	deployer.deploy(artifacts.require('MarketTest2'), address)
-	deployer.deploy(artifacts.require('MarketTest3'), address)
+	// Withdraw
+	deployer.link(decimals, artifacts.require('Withdraw'))
+	deployer.deploy(artifacts.require('Withdraw'), address)
+	deployer.deploy(artifacts.require('WithdrawStorage'), address)
 } as Truffle.Migration
 
 export = handler
