@@ -16,7 +16,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function rewards(uint256 _lockups, uint256 _assets)
-		public
+		external
 		view
 		returns (uint256)
 	{
@@ -44,7 +44,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function holdersShare(uint256 _reward, uint256 _lockups)
-		public
+		external
 		view
 		returns (uint256)
 	{
@@ -52,7 +52,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
-		public
+		external
 		view
 		returns (uint256)
 	{
@@ -60,7 +60,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function authenticationFee(uint256 total_assets, uint256 property_lockups)
-		public
+		external
 		view
 		returns (uint256)
 	{
@@ -69,7 +69,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function marketApproval(uint256 _up_votes, uint256 _negative_votes)
-		public
+		external
 		view
 		returns (bool)
 	{
@@ -83,7 +83,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function policyApproval(uint256 _up_votes, uint256 _negative_votes)
-		public
+		external
 		view
 		returns (bool)
 	{
@@ -97,7 +97,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function abstentionPenalty(uint256 abstentions)
-		public
+		external
 		view
 		returns (uint256)
 	{

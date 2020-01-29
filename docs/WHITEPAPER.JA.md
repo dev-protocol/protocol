@@ -146,7 +146,7 @@ contract IMarket {
 	) public returns (bool);
 
 	function calculate(address _metrics, uint256 _start, uint256 _end)
-		public
+		external
 		returns (bool);
 }
 ```
