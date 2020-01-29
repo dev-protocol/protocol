@@ -43,10 +43,10 @@ const handler = function(deployer, network) {
 
 	// The First Policy
 	const theFirstPolicy = artifacts.require('TheFirstPolicy')
-
-	artifacts
-		.require('AddressConfig')
-		.deployed()
+	;((deployer as unknown) as Promise<void>)
+		.then(async () => {
+			return artifacts.require('AddressConfig').deployed()
+		})
 		.then(async addressConfig => {
 			return Promise.all([
 				addressConfig.setAllocator(allocator.address),
