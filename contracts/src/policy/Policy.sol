@@ -118,6 +118,6 @@ contract Policy is Killable, UsingConfig, UsingValidator {
 			return;
 		}
 		uint256 tmp = Policy(config().policy()).policyVotingBlocks();
-		_votingEndBlockNumber = block.number + tmp;
+		_votingEndBlockNumber = block.number.add(tmp);
 	}
 }

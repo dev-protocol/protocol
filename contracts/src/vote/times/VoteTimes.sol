@@ -20,7 +20,7 @@ contract VoteTimes is UsingConfig, UsingValidator {
 		);
 
 		uint256 voteTimes = getStorage().getVoteTimes();
-		voteTimes++;
+		voteTimes = voteTimes.add(1);
 		getStorage().setVoteTimes(voteTimes);
 	}
 

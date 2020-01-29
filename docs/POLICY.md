@@ -24,30 +24,34 @@ The number of reward vs. staking rate will as follows curve:
 In Solidity:
 
 ```solidity
+using SafeMath for uint256;
 uint120 private constant basis = 10000000000000000000000000;
 uint120 private constant power_basis = 10000000000;
 uint64 private constant mint_per_block_and_aseet = 250000000000000;
 
 function rewards(uint256 _lockups, uint256 _assets) external view returns(uint256) {
-	uint256 max = _assets * mint_per_block_and_aseet;
-	uint256 t = ERC20(token).totalSupply();
-	uint256 s = (_lockups * basis) / t;
-	uint256 _d = basis - s;
-	uint256 _p = ((12 * power_basis) - s / (basis / (10 * power_basis))) / 2;
-	uint256 p = _p / power_basis;
-	uint256 rp = p + 1;
-	uint256 f = _p - p * power_basis;
+	uint256 max = _assets.mul(mint_per_block_and_aseet);
+	uint256 t = ERC20(config().token()).totalSupply();
+	uint256 s = (_lockups.mul(basis)).div(t);
+	uint256 _d = basis.sub(s);
+	uint256 _p = (
+		(power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))
+	).div(2);
+	uint256 p = _p.div(power_basis);
+	uint256 rp = p.add(1);
+	uint256 f = _p.sub(p.mul(power_basis));
 	uint256 d1 = _d;
 	uint256 d2 = _d;
 	for (uint256 i = 0; i < p; i++) {
-		d1 = (d1 * _d) / basis;
+		d1 = (d1.mul(_d)).div(basis);
 	}
 	for (uint256 i = 0; i < rp; i++) {
-		d2 = (d2 * _d) / basis;
+		d2 = (d2.mul(_d)).div(basis);
 	}
-	uint256 g = ((d1 - d2) * f) / power_basis;
-	uint256 d = d1 - g;
-	uint256 mint = (max * d) / basis;
+	uint256 g = ((d1.sub(d2)).mul(f)).div(power_basis);
+	uint256 d = d1.sub(g);
+	uint256 mint = max.mul(d);
+	mint = mint.div(basis);
 	return mint;
 }
 ```
@@ -58,7 +62,7 @@ Property Contract holders receive a reward share is 95%.
 
 ```solidity
 function holdersShare(uint256 _reward, uint256 _lockups) external view returns (uint256) {
-	return _lockups > 0 ? (_reward * 95) / 100 : _reward;
+	return _lockups > 0 ? (_reward.mul(95)).div(100) : _reward;
 }
 ```
 
@@ -70,7 +74,7 @@ This formula indicates that asset scores and lockups have equal influence.
 
 ```solidity
 function assetValue(uint256 _value, uint256 _lockups) external view returns (uint256) {
-	return (_lockups + 1) * _value;
+	return (_lockups.add(1)).mul(_value);
 }
 ```
 
@@ -80,7 +84,7 @@ Property Contract author pays `authenticationFee` is multiplies the number of as
 
 ```solidity
 function authenticationFee(uint256 total_assets, uint256 property_lockups) external view returns (uint256) {
-	return total_assets / 10000 - property_lockups / 100000000000000000000000;
+		return (total_assets.div(10000)).sub((property_lockups.div(100000000000000000000000)));
 }
 ```
 

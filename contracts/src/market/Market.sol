@@ -34,7 +34,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		enabled = false;
 		uint256 marketVotingBlocks = Policy(config().policy())
 			.marketVotingBlocks();
-		_votingEndBlockNumber = block.number + marketVotingBlocks;
+		_votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
 
 	function toEnable() external {
@@ -116,7 +116,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		address metrics = metricsFactory.create(_property);
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		Dev(config().token()).fee(sender, authenticationFee);
-		issuedMetrics += 1;
+		issuedMetrics = issuedMetrics.add(1);
 		return metrics;
 	}
 

@@ -1,11 +1,13 @@
 pragma solidity ^0.5.0;
 
+import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
 contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
+	using SafeMath for uint256;
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -18,7 +20,7 @@ contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
-		totalCount++;
+		totalCount = totalCount.add(1);
 		eternalStorage().setUint(getTotalCountKey(), totalCount);
 	}
 
