@@ -40,9 +40,6 @@ const handler = function(deployer, network) {
 	// Withdraw
 	const withdraw = artifacts.require('Withdraw')
 	const withdrawStorage = artifacts.require('WithdrawStorage')
-
-	// The First Policy
-	const theFirstPolicy = artifacts.require('TheFirstPolicy')
 	;((deployer as unknown) as Promise<void>)
 		.then(async () => {
 			return artifacts.require('AddressConfig').deployed()
@@ -90,24 +87,10 @@ const handler = function(deployer, network) {
 		.then(async storages => {
 			return Promise.all(storages.map(async x => x.createStorage()))
 		})
-		.then(async () => {
+		.then(() => {
 			console.log(
 				'*** Storage creation for all storage contracts are completed ***'
 			)
-
-			return artifacts.require('PolicyFactory').deployed()
-		})
-		.then(async factory => {
-			return factory.create(theFirstPolicy.address)
-		})
-		.then(async () => {
-			return artifacts.require('AddressConfig').deployed()
-		})
-		.then(async addressConfig => {
-			return addressConfig.policy()
-		})
-		.then(x => {
-			console.log('*** The First Policy ***', x)
 		})
 		.catch(err => {
 			console.error('*** ERROR! ***', err)

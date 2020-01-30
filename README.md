@@ -69,3 +69,19 @@ EditorConfig
 vscode-eslint
 solidity
 ```
+
+## How to publish the first policy
+
+First, deploy this protocol:
+
+```bash
+npm run deploy <network>
+```
+
+Then, calling `PolicyFactory.create` using Truffle console:
+
+```bash
+npx truffle console --network <network>
+# Truffle console is launched
+> Promise.all([PolicyFactory.deployed(), TheFirstPolicy.deployed()]).then(([factory, policy]) => factory.create(policy.address))
+```
