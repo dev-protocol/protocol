@@ -5,7 +5,12 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
-contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator, Killable {
+contract WithdrawStorage is
+	UsingStorage,
+	UsingConfig,
+	UsingValidator,
+	Killable
+{
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
