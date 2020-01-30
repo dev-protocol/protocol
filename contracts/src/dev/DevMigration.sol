@@ -17,7 +17,10 @@ contract DevMigration {
 		ERC20Burnable _legacy = ERC20Burnable(legacy);
 		ERC20Mintable _next = ERC20Mintable(next);
 		uint256 balance = _legacy.balanceOf(msg.sender);
-		require(_legacy.transferFrom(msg.sender, address(this), balance), "legacy dev transferFrom failed");
+		require(
+			_legacy.transferFrom(msg.sender, address(this), balance),
+			"legacy dev transferFrom failed"
+		);
 		_legacy.burn(balance);
 		require(_next.mint(msg.sender, balance), "next dev mint failed");
 		return true;
