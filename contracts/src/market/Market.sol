@@ -115,7 +115,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		);
 		address metrics = metricsFactory.create(_property);
 		uint256 authenticationFee = getAuthenticationFee(_property);
-		Dev(config().token()).fee(sender, authenticationFee);
+		require(Dev(config().token()).fee(sender, authenticationFee), "dev fee failed");
 		issuedMetrics = issuedMetrics.add(1);
 		return metrics;
 	}

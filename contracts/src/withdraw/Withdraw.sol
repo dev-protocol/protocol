@@ -28,7 +28,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
 		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		erc20.mint(msg.sender, value);
+		require(erc20.mint(msg.sender, value), "dev mint failed");
 	}
 
 	function beforeBalanceChange(address _property, address _from, address _to)
