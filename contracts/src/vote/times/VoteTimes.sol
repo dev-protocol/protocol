@@ -1,12 +1,13 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {VoteTimesStorage} from "contracts/src/vote/times/VoteTimesStorage.sol";
 
-contract VoteTimes is UsingConfig, UsingValidator {
+contract VoteTimes is UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks

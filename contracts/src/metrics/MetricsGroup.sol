@@ -1,12 +1,13 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
-contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
+contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup, Killable {
 	using SafeMath for uint256;
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
