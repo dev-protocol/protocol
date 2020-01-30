@@ -6,12 +6,13 @@ import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mi
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
+import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 
-contract Withdraw is Pausable, UsingConfig, UsingValidator {
+contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
