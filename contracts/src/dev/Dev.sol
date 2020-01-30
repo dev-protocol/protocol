@@ -24,7 +24,7 @@ contract Dev is
 	{}
 
 	function deposit(address _to, uint256 _amount) external returns (bool) {
-		transfer(_to, _amount);
+		require(transfer(_to, _amount), "dev transfer failed");
 		lock(msg.sender, _to, _amount);
 		return true;
 	}
@@ -33,7 +33,7 @@ contract Dev is
 		external
 		returns (bool)
 	{
-		transferFrom(_from, _to, _amount);
+		require(transferFrom(_from, _to, _amount), "dev transferFrom failed");
 		lock(_from, _to, _amount);
 		return true;
 	}
