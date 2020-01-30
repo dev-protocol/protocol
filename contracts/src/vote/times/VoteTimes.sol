@@ -30,7 +30,7 @@ contract VoteTimes is UsingConfig, UsingValidator {
 		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(
 			_property
 		);
-		voteTimesByProperty++;
+		voteTimesByProperty = voteTimesByProperty.add(1);
 		getStorage().setVoteTimesByProperty(_property, voteTimesByProperty);
 	}
 
