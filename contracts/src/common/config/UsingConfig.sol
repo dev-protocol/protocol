@@ -13,4 +13,8 @@ contract UsingConfig {
 	function config() internal view returns (AddressConfig) {
 		return _config;
 	}
+
+	function configAddress() external view returns (address) {
+		return address(_config);
+	}
 }

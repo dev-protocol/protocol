@@ -17,4 +17,15 @@ contract('UsingConfigTest', ([deployer]) => {
 			expect(config).to.be.equal(dev.addressConfig.address)
 		})
 	})
+	describe('UsingConfig; configAddress', () => {
+		it('You can get the address of config .', async () => {
+			const usingConfigTest = await usingConfigContract.new(
+				dev.addressConfig.address,
+				{from: deployer}
+			)
+			const configAddress = await usingConfigTest.configAddress()
+
+			expect(configAddress).to.be.equal(dev.addressConfig.address)
+		})
+	})
 })
