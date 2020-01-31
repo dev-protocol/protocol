@@ -5,6 +5,7 @@ import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
+
 contract VoteCounterStorage is
 	UsingStorage,
 	UsingConfig,
@@ -34,6 +35,7 @@ contract VoteCounterStorage is
 		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
 		return eternalStorage().getBool(alreadyVoteKey);
 	}
+
 	function getAlreadyVoteKey(
 		address _sender,
 		address _target,

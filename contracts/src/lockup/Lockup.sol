@@ -14,6 +14,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 
+
 contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
 	using Decimals for uint256;

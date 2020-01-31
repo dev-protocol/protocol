@@ -12,6 +12,7 @@ import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 // prettier-ignore
 import {VoteCounterStorage} from "contracts/src/vote/counter/VoteCounterStorage.sol";
 
+
 contract VoteCounter is UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
 

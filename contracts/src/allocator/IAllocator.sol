@@ -1,5 +1,6 @@
 pragma solidity ^0.5.0;
 
+
 contract IAllocator {
 	function allocate(address _metrics) external;
 
@@ -27,5 +28,4 @@ contract IAllocator {
 			// solium-disable-next-line indentation
 			uint256
 		);
-
 }

@@ -10,6 +10,7 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "../common/config/UsingConfig.sol";
 import {Lockup} from "../lockup/Lockup.sol";
 
+
 contract Dev is
 	ERC20Detailed,
 	ERC20Mintable,
