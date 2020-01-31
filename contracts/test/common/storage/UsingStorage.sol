@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
+
 contract UsingStorageTest is UsingStorage {
 	function setUInt(uint256 _value) external {
 		eternalStorage().setUint(getUintKey(), _value);

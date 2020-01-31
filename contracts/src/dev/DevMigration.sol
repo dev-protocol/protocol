@@ -5,9 +5,11 @@ import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mi
 // prettier-ignore
 import {ERC20Burnable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 
+
 contract DevMigration {
 	address public legacy;
 	address public next;
+
 	constructor(address _legacy, address _next) public {
 		legacy = _legacy;
 		next = _next;

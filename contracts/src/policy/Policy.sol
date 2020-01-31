@@ -9,6 +9,7 @@ import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {PolicyFactory} from "contracts/src/policy/PolicyFactory.sol";
 
+
 contract Policy is Killable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	IPolicy private _policy;

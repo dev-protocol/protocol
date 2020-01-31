@@ -6,6 +6,7 @@ import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
+
 contract PolicyGroup is
 	UsingConfig,
 	UsingStorage,

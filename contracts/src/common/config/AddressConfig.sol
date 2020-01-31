@@ -4,6 +4,7 @@ import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
+
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;

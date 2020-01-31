@@ -7,6 +7,7 @@ import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 
+
 contract PropertyFactory is Pausable, UsingConfig, Killable {
 	event Create(address indexed _from, address _property);
 
@@ -59,5 +60,4 @@ contract PropertyFactory is Pausable, UsingConfig, Killable {
 			"symbol must be at least 3 and no more than 10 characters"
 		);
 	}
-
 }

@@ -5,6 +5,7 @@ import {Allocator} from "contracts/src/allocator/Allocator.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
+
 contract MarketTest3 is IMarketBehavior, UsingConfig {
 	string public schema = "[]";
 	event LogCalculate(

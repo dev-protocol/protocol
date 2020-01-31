@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
+
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
 
