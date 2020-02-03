@@ -1,5 +1,3 @@
-import {setAddressConfig} from './mock/config'
-import {createStorage} from './mock/storage'
 import {createPolicy} from './mock/policy'
 import {createProperty} from './mock/property'
 import {changeBalance} from './mock/token'
@@ -8,16 +6,6 @@ import {createMarket} from './mock/market'
 import {createMetrics} from './mock/metrics'
 
 const handler = async function(deployer, network) {
-	if (network !== 'mock') {
-		return
-	}
-
-	console.log('[set contract address to AddressConfig]')
-	await setAddressConfig(artifacts)
-	console.log('---finish---')
-	console.log('[create storage]')
-	await createStorage(artifacts)
-	console.log('---finish---')
 	if (network !== 'mock') {
 		return
 	}
@@ -32,10 +20,10 @@ const handler = async function(deployer, network) {
 	console.log('[balance adjustment]')
 	await changeBalance(artifacts, addressInfo)
 	console.log('---finish---')
-	console.log('[lockup]')
+	console.log('[locku P]')
 	await lockup(artifacts, addressInfo)
 	console.log('---finish---')
-	console.log('[create market]')
+	console.log('[crea Te market]')
 	const marketAddresses = await createMarket(artifacts, addressInfo)
 	console.log('---finish---')
 	console.log('[create metrics]')
