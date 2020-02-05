@@ -3,7 +3,6 @@ const handler = function(deployer, network) {
 		return
 	}
 
-
 	const lockup = artifacts.require('Lockup')
 	const devMigration = artifacts.require('DevMigration')
 	const withdraw = artifacts.require('Withdraw')

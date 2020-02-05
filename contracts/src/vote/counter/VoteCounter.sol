@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
