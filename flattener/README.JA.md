@@ -1,13 +1,16 @@
 # 説明
-このフォルダはEtherscanのコントラクト情報を登録するためのSolidity結合ファイル(以下結合ファイル)が配置されている。
+
+このフォルダは Etherscan のコントラクト情報を登録するための Solidity 結合ファイル(以下結合ファイル)が配置されている。
 
 # ツール
+
 結合ファイルは[Solidity Flattener](https://github.com/bokkypoobah/SolidityFlattener)を使って作成する。
 
-[truffle-flattener](https://www.npmjs.com/package/truffle-flattener)というツールも存在するが、このツールを使って結合ファイルを作成したところ、循環参照エラーが発生したので、Solidity Flattenerを使っている
+[truffle-flattener](https://www.npmjs.com/package/truffle-flattener)というツールも存在するが、このツールを使って結合ファイルを作成したところ、循環参照エラーが発生したので、Solidity Flattener を使っている
 
 ## 準備
- [Solidity Flattenerインストール手順](https://github.com/bokkypoobah/SolidityFlattener#installation)を参考にしてplファイルを配置し、権限設定を行う
+
+[Solidity Flattener インストール手順](https://github.com/bokkypoobah/SolidityFlattener#installation)を参考にして pl ファイルを配置し、権限設定を行う
 
 ## 実行手順
 
@@ -16,8 +19,8 @@ cd ~/frame00/protpcol
 solidityFlattener.pl --mainsol=src/metrics/MetricsGroup.sol --outputsol=flattener/metrics/MetricsGroup.flattener --verbose
 ```
 
---verboseオプションをつけると詳細なログがでてくるので、おすすめ。
-Solidity FlattenerがSolidity推奨のimport記述形式に対応していないため。エラーがでたところを順に修正していくこととなる。
+--verbose オプションをつけると詳細なログがでてくるので、おすすめ。
+Solidity Flattener が Solidity 推奨の import 記述形式に対応していないため。エラーがでたところを順に修正していくこととなる。
 
 ```
 import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
@@ -27,18 +30,22 @@ import "../../../node_midules/openzeppelin-solidity/contracts/token/ERC20/ERC20.
 import "../common/lifecycle/Killable.sol";
 ```
 
-# Etherscan登録
-(注：画面UI、Version番号、アドレス等は予告なく変更される場合があります)
+# Etherscan 登録
+
+(注：画面 UI、Version 番号、アドレス等は予告なく変更される場合があります)
 
 コントラクトアドレスの設定画面で、
+
 ```
 Compiler Type->Solidity(Single File)
 Compiler Version->0.5.16
 License Type->MPL-2.0
 ```
+
 を選択する。
 
 登録画面で、
+
 ```
 Optimization->yes
 Enter the Solidity Contract Code below->作成した結合ファイルの中身を貼り付け
