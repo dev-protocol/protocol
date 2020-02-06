@@ -272,14 +272,11 @@ contract('Allocator', ([deployer, user1]) => {
 		it('values passed to `allocation` is correct', async () => {
 			const [dev, market, metrics] = await init()
 			const policy = await getPolicy(dev.addressConfig)
-			const property = await metrics.property()
 			const totalAssets = await dev.metricsGroup
 				.totalIssuedMetrics()
 				.then(toBigNumber)
 			const assets = await market.issuedMetrics().then(toBigNumber)
-			const lockUpValue = await dev.lockup
-				.getPropertyValue(property)
-				.then(toBigNumber)
+			const lockUpValue = await dev.lockup.getAllValue().then(toBigNumber)
 			const [marketLastValue, metricsLastValue] = await Promise.all([
 				dev.allocatorStorage
 					.getLastAssetValueEachMarketPerBlock(market.address)
