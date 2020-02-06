@@ -154,9 +154,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		return getStorage().getValue(_property, _sender);
 	}
 
-	function addAllValue(uint256 _value)
-		private
-	{
+	function addAllValue(uint256 _value) private {
 		uint256 value = getStorage().getAllValue();
 		value = value.add(_value);
 		getStorage().setAllValue(value);
