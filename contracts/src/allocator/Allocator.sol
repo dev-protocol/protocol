@@ -70,13 +70,13 @@ contract Allocator is
 		Policy policy = Policy(config().policy());
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
-		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
-			metrics.property()
-		);
+		Lockup lockup = Lockup(config().lockup());
+		uint256 lockupValue = lockup.getPropertyValue(metrics.property());
+		uint256 allValue = lockup.getAllValue();
 		uint256 blocks = block.number.sub(
 			getStorage().getLastAllocationBlockEachMetrics(_metrics)
 		);
-		uint256 mint = policy.rewards(lockupValue, totalAssets);
+		uint256 mint = policy.rewards(allValue, totalAssets);
 		uint256 value = (policy.assetValue(_value, lockupValue).mul(basis)).div(
 			blocks
 		);

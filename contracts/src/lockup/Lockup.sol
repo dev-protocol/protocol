@@ -35,6 +35,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		updatePendingInterestWithdrawal(_property, _from);
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
+		addAllValue(_value);
 		getStorage().setLastInterestPrice(
 			_property,
 			_from,
@@ -68,6 +69,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		Property(_property).withdraw(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
 		subPropertyValue(_property, lockupedValue);
+		subAllValue(lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
@@ -152,6 +154,20 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		return getStorage().getValue(_property, _sender);
 	}
 
+	function addAllValue(uint256 _value)
+		private
+	{
+		uint256 value = getStorage().getAllValue();
+		value = value.add(_value);
+		getStorage().setAllValue(value);
+	}
+
+	function subAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.sub(_value);
+		getStorage().setAllValue(value);
+	}
+
 	function addValue(address _property, address _sender, uint256 _value)
 		private
 	{
@@ -217,5 +233,9 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 
 	function getStorage() private view returns (LockupStorage) {
 		return LockupStorage(config().lockupStorage());
+	}
+
+	function setAllValue(uint256 _value) external {
+		getStorage().setAllValue(value);
 	}
 }
