@@ -1,5 +1,6 @@
 pragma solidity ^0.5.0;
 
+
 // This file should delete after fixes to #321.
 
 contract INpmMarket {
