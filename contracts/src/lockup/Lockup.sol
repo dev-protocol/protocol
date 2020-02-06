@@ -138,6 +138,22 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 	}
 
+	function getAllValue() external returns (uint256) {
+		return getStorage().getAllValue();
+	}
+
+	function addAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.add(_value);
+		getStorage().setAllValue(value);
+	}
+
+	function subAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.sub(_value);
+		getStorage().setAllValue(value);
+	}
+
 	function getPropertyValue(address _property)
 		external
 		view
@@ -152,18 +168,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		returns (uint256)
 	{
 		return getStorage().getValue(_property, _sender);
-	}
-
-	function addAllValue(uint256 _value) private {
-		uint256 value = getStorage().getAllValue();
-		value = value.add(_value);
-		getStorage().setAllValue(value);
-	}
-
-	function subAllValue(uint256 _value) private {
-		uint256 value = getStorage().getAllValue();
-		value = value.sub(_value);
-		getStorage().setAllValue(value);
 	}
 
 	function addValue(address _property, address _sender, uint256 _value)
@@ -234,6 +238,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 	}
 
 	function setAllValue(uint256 _value) external {
-		getStorage().setAllValue(value);
+		// delete later....
+		getStorage().setAllValue(_value);
 	}
 }
