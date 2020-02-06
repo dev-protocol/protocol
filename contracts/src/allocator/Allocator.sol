@@ -69,14 +69,20 @@ contract Allocator is
 		);
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
-		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(metrics.property());
+		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
+			metrics.property()
+		);
 		uint256 blocks = block.number.sub(
 			getStorage().getLastAllocationBlockEachMetrics(_metrics)
 		);
-		uint256 mint = Policy(config().policy()).rewards(Lockup(config().lockup()).getAllValue(), totalAssets);
-		uint256 value = (Policy(config().policy()).assetValue(_value, lockupValue).mul(basis)).div(
-			blocks
+		uint256 mint = Policy(config().policy()).rewards(
+			Lockup(config().lockup()).getAllValue(),
+			totalAssets
 		);
+		uint256 value = (
+			Policy(config().policy()).assetValue(_value, lockupValue).mul(basis)
+		)
+			.div(blocks);
 		uint256 marketValue = getStorage()
 			.getLastAssetValueEachMarketPerBlock(metrics.market())
 			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))
