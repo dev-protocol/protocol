@@ -236,9 +236,4 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 	function getStorage() private view returns (LockupStorage) {
 		return LockupStorage(config().lockupStorage());
 	}
-
-	function setAllValue(uint256 _value) external {
-		// delete later....
-		getStorage().setAllValue(_value);
-	}
 }

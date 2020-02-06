@@ -10,6 +10,23 @@ contract(
 			await dev.generateLockupStorage()
 			await dev.addressConfig.setLockup(lockup, {from: deployer})
 		})
+		describe('LockupStorageStorage; setAllValue, getAllValue', () => {
+			it('Initial value is 0.', async () => {
+				const result = await dev.lockupStorage.getAllValue({from: lockup})
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('The set value can be taken as it is.', async () => {
+				await dev.lockupStorage.setAllValue(3, {from: lockup})
+				const result = await dev.lockupStorage.getAllValue({from: lockup})
+				expect(result.toNumber()).to.be.equal(3)
+			})
+			it('Cannot rewrite data from other than lockup.', async () => {
+				const result = await dev.lockupStorage
+					.setAllValue(3, {from: dummyLockup})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
 		describe('LockupStorageStorage; setValue, getValue', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.lockupStorage.getValue(property, sender, {
