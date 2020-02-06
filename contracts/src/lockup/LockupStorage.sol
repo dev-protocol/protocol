@@ -210,4 +210,10 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 				abi.encodePacked("_pendingInterestWithdrawal", _property, _user)
 			);
 	}
+
+	function __setAllValue(uint256 _value) external onlyOwner {
+		// delete later...
+		bytes32 key = getAllValueKey();
+		eternalStorage().setUint(key, _value);
+	}
 }

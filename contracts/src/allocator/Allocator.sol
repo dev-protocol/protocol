@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
@@ -19,7 +18,6 @@ import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
 contract Allocator is
 	Killable,
-	Ownable,
 	UsingConfig,
 	IAllocator,
 	UsingValidator
