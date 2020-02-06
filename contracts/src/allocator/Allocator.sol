@@ -16,12 +16,7 @@ import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
 
-contract Allocator is
-	Killable,
-	UsingConfig,
-	IAllocator,
-	UsingValidator
-{
+contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event BeforeAllocation(
