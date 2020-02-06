@@ -180,6 +180,8 @@ contract('LockupTest', ([deployer, user1]) => {
 				.getValue(property.address, deployer)
 				.then(toBigNumber)
 			expect(lockedupAmount.toFixed()).to.be.equal('10000')
+			const lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
 		})
 		it('emit an event that notifies token locked-up', async () => {
 			const [dev, , property] = await init()
@@ -225,12 +227,15 @@ contract('LockupTest', ([deployer, user1]) => {
 			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
 			await dev.dev.deposit(property.address, 10000)
+			let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
 			await dev.addressConfig.setLockup(deployer)
 			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
 			await dev.addressConfig.setLockup(dev.lockup.address)
 
 			await dev.lockup.withdraw(property.address)
-
+			lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			expect(lockedupAllAmount.toFixed()).to.be.equal('0')
 			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
