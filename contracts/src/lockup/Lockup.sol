@@ -138,7 +138,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 	}
 
-	function getAllValue() external returns (uint256) {
+	function getAllValue() external view returns (uint256) {
 		return getStorage().getAllValue();
 	}
 
