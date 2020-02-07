@@ -1,106 +1,6 @@
 pragma solidity ^0.5.0;
 
 
-
-/*
- * @dev Provides information about the current execution context, including the
- * sender of the transaction and its data. While these are generally available
- * via msg.sender and msg.data, they should not be accessed in such a direct
- * manner, since when dealing with GSN meta-transactions the account sending and
- * paying for execution may not be the actual sender (as far as an application
- * is concerned).
- *
- * This contract is only required for intermediate, library-like contracts.
- */
-contract Context {
-    // Empty internal constructor, to prevent people from mistakenly deploying
-    // an instance of this contract, which should be used via inheritance.
-    constructor () internal { }
-    // solhint-disable-previous-line no-empty-blocks
-
-    function _msgSender() internal view returns (address payable) {
-        return msg.sender;
-    }
-
-    function _msgData() internal view returns (bytes memory) {
-        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
-        return msg.data;
-    }
-}
-/**
- * @dev Contract module which provides a basic access control mechanism, where
- * there is an account (an owner) that can be granted exclusive access to
- * specific functions.
- *
- * This module is used through inheritance. It will make available the modifier
- * `onlyOwner`, which can be applied to your functions to restrict their use to
- * the owner.
- */
-contract Ownable is Context {
-    address private _owner;
-
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
-    /**
-     * @dev Initializes the contract setting the deployer as the initial owner.
-     */
-    constructor () internal {
-        _owner = _msgSender();
-        emit OwnershipTransferred(address(0), _owner);
-    }
-
-    /**
-     * @dev Returns the address of the current owner.
-     */
-    function owner() public view returns (address) {
-        return _owner;
-    }
-
-    /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() {
-        require(isOwner(), "Ownable: caller is not the owner");
-        _;
-    }
-
-    /**
-     * @dev Returns true if the caller is the current owner.
-     */
-    function isOwner() public view returns (bool) {
-        return _msgSender() == _owner;
-    }
-
-    /**
-     * @dev Leaves the contract without owner. It will not be possible to call
-     * `onlyOwner` functions anymore. Can only be called by the current owner.
-     *
-     * NOTE: Renouncing ownership will leave the contract without an owner,
-     * thereby removing any functionality that is only available to the owner.
-     */
-    function renounceOwnership() public onlyOwner {
-        emit OwnershipTransferred(_owner, address(0));
-        _owner = address(0);
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     * Can only be called by the current owner.
-     */
-    function transferOwnership(address newOwner) public onlyOwner {
-        _transferOwnership(newOwner);
-    }
-
-    /**
-     * @dev Transfers ownership of the contract to a new account (`newOwner`).
-     */
-    function _transferOwnership(address newOwner) internal {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
-        emit OwnershipTransferred(_owner, newOwner);
-        _owner = newOwner;
-    }
-}
-
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
  * checks.
@@ -391,6 +291,106 @@ contract UsingValidator {
 }
 
 
+
+
+/*
+ * @dev Provides information about the current execution context, including the
+ * sender of the transaction and its data. While these are generally available
+ * via msg.sender and msg.data, they should not be accessed in such a direct
+ * manner, since when dealing with GSN meta-transactions the account sending and
+ * paying for execution may not be the actual sender (as far as an application
+ * is concerned).
+ *
+ * This contract is only required for intermediate, library-like contracts.
+ */
+contract Context {
+    // Empty internal constructor, to prevent people from mistakenly deploying
+    // an instance of this contract, which should be used via inheritance.
+    constructor () internal { }
+    // solhint-disable-previous-line no-empty-blocks
+
+    function _msgSender() internal view returns (address payable) {
+        return msg.sender;
+    }
+
+    function _msgData() internal view returns (bytes memory) {
+        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        return msg.data;
+    }
+}
+/**
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
+ *
+ * This module is used through inheritance. It will make available the modifier
+ * `onlyOwner`, which can be applied to your functions to restrict their use to
+ * the owner.
+ */
+contract Ownable is Context {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    constructor () internal {
+        _owner = _msgSender();
+        emit OwnershipTransferred(address(0), _owner);
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(isOwner(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    /**
+     * @dev Returns true if the caller is the current owner.
+     */
+    function isOwner() public view returns (bool) {
+        return _msgSender() == _owner;
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     */
+    function _transferOwnership(address newOwner) internal {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
+    }
+}
 
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
@@ -1260,6 +1260,23 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	//AllValue
+	function setAllValue(uint256 _value) external returns (uint256) {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		bytes32 key = getAllValueKey();
+		eternalStorage().setUint(key, _value);
+	}
+
+	function getAllValue() external view returns (uint256) {
+		bytes32 key = getAllValueKey();
+		return eternalStorage().getUint(key);
+	}
+
+	function getAllValueKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_allValue"));
+	}
+
 	//Value
 	function setValue(address _property, address _sender, uint256 _value)
 		external
@@ -2082,6 +2099,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		updatePendingInterestWithdrawal(_property, _from);
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
+		addAllValue(_value);
 		getStorage().setLastInterestPrice(
 			_property,
 			_from,
@@ -2115,6 +2133,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		Property(_property).withdraw(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
 		subPropertyValue(_property, lockupedValue);
+		subAllValue(lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
@@ -2181,6 +2200,22 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+	}
+
+	function getAllValue() external view returns (uint256) {
+		return getStorage().getAllValue();
+	}
+
+	function addAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.add(_value);
+		getStorage().setAllValue(value);
+	}
+
+	function subAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.sub(_value);
+		getStorage().setAllValue(value);
 	}
 
 	function getPropertyValue(address _property)
@@ -3144,13 +3179,7 @@ contract AllocatorStorage is
 }
 
 
-contract Allocator is
-	Killable,
-	Ownable,
-	UsingConfig,
-	IAllocator,
-	UsingValidator
-{
+contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event BeforeAllocation(
@@ -3194,7 +3223,6 @@ contract Allocator is
 			getStorage().getPendingIncrement(_metrics),
 			"not asking for an indicator"
 		);
-		Policy policy = Policy(config().policy());
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
@@ -3203,10 +3231,14 @@ contract Allocator is
 		uint256 blocks = block.number.sub(
 			getStorage().getLastAllocationBlockEachMetrics(_metrics)
 		);
-		uint256 mint = policy.rewards(lockupValue, totalAssets);
-		uint256 value = (policy.assetValue(_value, lockupValue).mul(basis)).div(
-			blocks
+		uint256 mint = Policy(config().policy()).rewards(
+			Lockup(config().lockup()).getAllValue(),
+			totalAssets
 		);
+		uint256 value = (
+			Policy(config().policy()).assetValue(_value, lockupValue).mul(basis)
+		)
+			.div(blocks);
 		uint256 marketValue = getStorage()
 			.getLastAssetValueEachMarketPerBlock(metrics.market())
 			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))
