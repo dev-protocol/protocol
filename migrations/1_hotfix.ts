@@ -5,14 +5,6 @@ const handler = function(deployer, network) {
 		return
 	}
 
-	const decimals = artifacts.require('Decimals')
-
-	deployer.deploy(decimals)
-	deployer.link(decimals, artifacts.require('Allocator'))
-	deployer.link(decimals, artifacts.require('Lockup'))
-
-	deployer.deploy(artifacts.require('Allocator'), ADDRESS_CONFIG)
-	deployer.deploy(artifacts.require('Lockup'), ADDRESS_CONFIG)
 	deployer.deploy(artifacts.require('LockupStorage'), ADDRESS_CONFIG)
 } as Truffle.Migration
 
