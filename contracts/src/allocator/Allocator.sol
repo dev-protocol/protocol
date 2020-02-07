@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
@@ -17,13 +16,7 @@ import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
 
-contract Allocator is
-	Killable,
-	Ownable,
-	UsingConfig,
-	IAllocator,
-	UsingValidator
-{
+contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event BeforeAllocation(
@@ -67,7 +60,6 @@ contract Allocator is
 			getStorage().getPendingIncrement(_metrics),
 			"not asking for an indicator"
 		);
-		Policy policy = Policy(config().policy());
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
@@ -76,10 +68,14 @@ contract Allocator is
 		uint256 blocks = block.number.sub(
 			getStorage().getLastAllocationBlockEachMetrics(_metrics)
 		);
-		uint256 mint = policy.rewards(lockupValue, totalAssets);
-		uint256 value = (policy.assetValue(_value, lockupValue).mul(basis)).div(
-			blocks
+		uint256 mint = Policy(config().policy()).rewards(
+			Lockup(config().lockup()).getAllValue(),
+			totalAssets
 		);
+		uint256 value = (
+			Policy(config().policy()).assetValue(_value, lockupValue).mul(basis)
+		)
+			.div(blocks);
 		uint256 marketValue = getStorage()
 			.getLastAssetValueEachMarketPerBlock(metrics.market())
 			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))

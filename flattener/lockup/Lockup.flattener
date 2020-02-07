@@ -1086,9 +1086,7 @@ contract IAllocator {
 }
 
 
-//import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
-//import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
 
 
@@ -2708,13 +2706,7 @@ contract AllocatorStorage is
 }
 
 
-contract Allocator is
-	Killable,
-	Ownable,
-	UsingConfig,
-	IAllocator,
-	UsingValidator
-{
+contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event BeforeAllocation(
@@ -2758,7 +2750,6 @@ contract Allocator is
 			getStorage().getPendingIncrement(_metrics),
 			"not asking for an indicator"
 		);
-		Policy policy = Policy(config().policy());
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
@@ -2767,10 +2758,14 @@ contract Allocator is
 		uint256 blocks = block.number.sub(
 			getStorage().getLastAllocationBlockEachMetrics(_metrics)
 		);
-		uint256 mint = policy.rewards(lockupValue, totalAssets);
-		uint256 value = (policy.assetValue(_value, lockupValue).mul(basis)).div(
-			blocks
+		uint256 mint = Policy(config().policy()).rewards(
+			Lockup(config().lockup()).getAllValue(),
+			totalAssets
 		);
+		uint256 value = (
+			Policy(config().policy()).assetValue(_value, lockupValue).mul(basis)
+		)
+			.div(blocks);
 		uint256 marketValue = getStorage()
 			.getLastAssetValueEachMarketPerBlock(metrics.market())
 			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))
@@ -2941,6 +2936,23 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
+
+	//AllValue
+	function setAllValue(uint256 _value) external returns (uint256) {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		bytes32 key = getAllValueKey();
+		eternalStorage().setUint(key, _value);
+	}
+
+	function getAllValue() external view returns (uint256) {
+		bytes32 key = getAllValueKey();
+		return eternalStorage().getUint(key);
+	}
+
+	function getAllValueKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_allValue"));
+	}
 
 	//Value
 	function setValue(address _property, address _sender, uint256 _value)
@@ -3148,6 +3160,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		updatePendingInterestWithdrawal(_property, _from);
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
+		addAllValue(_value);
 		getStorage().setLastInterestPrice(
 			_property,
 			_from,
@@ -3181,6 +3194,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		Property(_property).withdraw(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
 		subPropertyValue(_property, lockupedValue);
+		subAllValue(lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
@@ -3247,6 +3261,22 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+	}
+
+	function getAllValue() external view returns (uint256) {
+		return getStorage().getAllValue();
+	}
+
+	function addAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.add(_value);
+		getStorage().setAllValue(value);
+	}
+
+	function subAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.sub(_value);
+		getStorage().setAllValue(value);
 	}
 
 	function getPropertyValue(address _property)

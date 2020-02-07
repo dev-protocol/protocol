@@ -35,6 +35,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		updatePendingInterestWithdrawal(_property, _from);
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
+		addAllValue(_value);
 		getStorage().setLastInterestPrice(
 			_property,
 			_from,
@@ -68,6 +69,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		Property(_property).withdraw(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
 		subPropertyValue(_property, lockupedValue);
+		subAllValue(lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
@@ -134,6 +136,22 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+	}
+
+	function getAllValue() external view returns (uint256) {
+		return getStorage().getAllValue();
+	}
+
+	function addAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.add(_value);
+		getStorage().setAllValue(value);
+	}
+
+	function subAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.sub(_value);
+		getStorage().setAllValue(value);
 	}
 
 	function getPropertyValue(address _property)

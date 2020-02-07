@@ -456,6 +456,23 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	//AllValue
+	function setAllValue(uint256 _value) external returns (uint256) {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		bytes32 key = getAllValueKey();
+		eternalStorage().setUint(key, _value);
+	}
+
+	function getAllValue() external view returns (uint256) {
+		bytes32 key = getAllValueKey();
+		return eternalStorage().getUint(key);
+	}
+
+	function getAllValueKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_allValue"));
+	}
+
 	//Value
 	function setValue(address _property, address _sender, uint256 _value)
 		external
