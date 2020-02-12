@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`2.1.4`**
+Version: **`2.1.5`**
 
 _There is a possibility that this white paper will be updated. When there is an update, the version number will increase according to [Semantic Versioning](https://semver.org/)._
 
@@ -124,7 +124,7 @@ The `calculate` function calculates the property value to decide the market rewa
 
 The Market Factory Contract generates a new Market Contract.
 
-The generation of a Market Contract is carried out by executing the create `function. The` create` function receives the address for the contract with the next interface and generates a new Market Contract.
+The generation of a Market Contract is carried out by executing the `create` function. The `create` function receives the address for the contract with the next interface and generates a new Market Contract.
 
 ```solidity
 contract IMarket {
