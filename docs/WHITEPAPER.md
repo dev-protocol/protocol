@@ -376,6 +376,6 @@ Dev Protocol is OSS, and anybody can participate in its development.
 - GitHub: https://github.com/dev-protocol/protocol
 - Discord: https://discord.gg/VwJp4KM
 - Spectrum: https://spectrum.chat/devtoken
-- Twitter: https://twitter.com/devtoken_rocks
+- Twitter: https://twitter.com/devprtcl
 - Blog: https://medium.com/devtoken
-- Web site: https://devtoken.rocks
+- Web site: https://devprtcl.com
