@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`2.1.5`**
+Version: **`2.1.6`**
 
 _There is a possibility that this white paper will be updated. When there is an update, the version number will increase according to [Semantic Versioning](https://semver.org/)._
 
@@ -367,7 +367,8 @@ The State Contract is a contract that makes the state of the other contracts per
 ## DEV
 
 DEV is the ERC20 token that serves as the key currency for Dev Protocol.
-https://etherscan.io/token/0x98626e2c9231f03504273d55f397409defd4a093
+
+https://etherscan.io/token/0x5cAf454Ba92e6F2c929DF14667Ee360eD9fD5b26
 
 ## Develop Dev Protocol
 
