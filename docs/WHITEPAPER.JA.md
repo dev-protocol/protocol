@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`2.1.4`**
+Version: **`2.1.6`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -377,7 +377,7 @@ State Contract は他のコントラクトの状態を永続化するための�
 
 DEV は Dev Protocol において基軸通貨となる ERC20 トークンである。
 
-https://etherscan.io/token/0x98626e2c9231f03504273d55f397409defd4a093
+https://etherscan.io/token/0x5cAf454Ba92e6F2c929DF14667Ee360eD9fD5b26
 
 ## Develop Dev Protocol
 
@@ -386,6 +386,6 @@ Dev Protocol は OSS であり、誰でもその開発に参加できる。
 - GitHub: https://github.com/dev-protocol/protocol
 - Discord: https://discord.gg/VwJp4KM
 - Spectrum: https://spectrum.chat/devtoken
-- Twitter: https://twitter.com/devtoken_rocks
+- Twitter: https://twitter.com/devprtcl
 - Blog: https://medium.com/devtoken
-- Web site: https://devtoken.rocks
+- Web site: https://devprtcl.com
