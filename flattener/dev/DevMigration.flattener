@@ -1,9 +1,5 @@
 pragma solidity ^0.5.0;
-
 // prettier-ignore
-
-
-
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -19,17 +15,14 @@ contract Context {
     // an instance of this contract, which should be used via inheritance.
     constructor () internal { }
     // solhint-disable-previous-line no-empty-blocks
-
     function _msgSender() internal view returns (address payable) {
         return msg.sender;
     }
-
     function _msgData() internal view returns (bytes memory) {
         this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
         return msg.data;
     }
 }
-
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
  * the optional functions; to access them see {ERC20Detailed}.
@@ -39,12 +32,10 @@ interface IERC20 {
      * @dev Returns the amount of tokens in existence.
      */
     function totalSupply() external view returns (uint256);
-
     /**
      * @dev Returns the amount of tokens owned by `account`.
      */
     function balanceOf(address account) external view returns (uint256);
-
     /**
      * @dev Moves `amount` tokens from the caller's account to `recipient`.
      *
@@ -53,7 +44,6 @@ interface IERC20 {
      * Emits a {Transfer} event.
      */
     function transfer(address recipient, uint256 amount) external returns (bool);
-
     /**
      * @dev Returns the remaining number of tokens that `spender` will be
      * allowed to spend on behalf of `owner` through {transferFrom}. This is
@@ -62,7 +52,6 @@ interface IERC20 {
      * This value changes when {approve} or {transferFrom} are called.
      */
     function allowance(address owner, address spender) external view returns (uint256);
-
     /**
      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
      *
@@ -78,7 +67,6 @@ interface IERC20 {
      * Emits an {Approval} event.
      */
     function approve(address spender, uint256 amount) external returns (bool);
-
     /**
      * @dev Moves `amount` tokens from `sender` to `recipient` using the
      * allowance mechanism. `amount` is then deducted from the caller's
@@ -89,7 +77,6 @@ interface IERC20 {
      * Emits a {Transfer} event.
      */
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
      * another (`to`).
@@ -97,14 +84,12 @@ interface IERC20 {
      * Note that `value` may be zero.
      */
     event Transfer(address indexed from, address indexed to, uint256 value);
-
     /**
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to {approve}. `value` is the new allowance.
      */
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
-
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
  * checks.
@@ -131,10 +116,8 @@ library SafeMath {
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         require(c >= a, "SafeMath: addition overflow");
-
         return c;
     }
-
     /**
      * @dev Returns the subtraction of two unsigned integers, reverting on
      * overflow (when the result is negative).
@@ -147,7 +130,6 @@ library SafeMath {
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         return sub(a, b, "SafeMath: subtraction overflow");
     }
-
     /**
      * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
      * overflow (when the result is negative).
@@ -162,10 +144,8 @@ library SafeMath {
     function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
         require(b <= a, errorMessage);
         uint256 c = a - b;
-
         return c;
     }
-
     /**
      * @dev Returns the multiplication of two unsigned integers, reverting on
      * overflow.
@@ -182,13 +162,10 @@ library SafeMath {
         if (a == 0) {
             return 0;
         }
-
         uint256 c = a * b;
         require(c / a == b, "SafeMath: multiplication overflow");
-
         return c;
     }
-
     /**
      * @dev Returns the integer division of two unsigned integers. Reverts on
      * division by zero. The result is rounded towards zero.
@@ -203,7 +180,6 @@ library SafeMath {
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         return div(a, b, "SafeMath: division by zero");
     }
-
     /**
      * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
      * division by zero. The result is rounded towards zero.
@@ -222,10 +198,8 @@ library SafeMath {
         require(b > 0, errorMessage);
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-
         return c;
     }
-
     /**
      * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
      * Reverts when dividing by zero.
@@ -240,7 +214,6 @@ library SafeMath {
     function mod(uint256 a, uint256 b) internal pure returns (uint256) {
         return mod(a, b, "SafeMath: modulo by zero");
     }
-
     /**
      * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
      * Reverts with custom message when dividing by zero.
@@ -259,7 +232,6 @@ library SafeMath {
         return a % b;
     }
 }
-
 /**
  * @dev Implementation of the {IERC20} interface.
  *
@@ -286,27 +258,21 @@ library SafeMath {
  */
 contract ERC20 is Context, IERC20 {
     using SafeMath for uint256;
-
     mapping (address => uint256) private _balances;
-
     mapping (address => mapping (address => uint256)) private _allowances;
-
     uint256 private _totalSupply;
-
     /**
      * @dev See {IERC20-totalSupply}.
      */
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
-
     /**
      * @dev See {IERC20-balanceOf}.
      */
     function balanceOf(address account) public view returns (uint256) {
         return _balances[account];
     }
-
     /**
      * @dev See {IERC20-transfer}.
      *
@@ -319,14 +285,12 @@ contract ERC20 is Context, IERC20 {
         _transfer(_msgSender(), recipient, amount);
         return true;
     }
-
     /**
      * @dev See {IERC20-allowance}.
      */
     function allowance(address owner, address spender) public view returns (uint256) {
         return _allowances[owner][spender];
     }
-
     /**
      * @dev See {IERC20-approve}.
      *
@@ -338,7 +302,6 @@ contract ERC20 is Context, IERC20 {
         _approve(_msgSender(), spender, amount);
         return true;
     }
-
     /**
      * @dev See {IERC20-transferFrom}.
      *
@@ -356,7 +319,6 @@ contract ERC20 is Context, IERC20 {
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
         return true;
     }
-
     /**
      * @dev Atomically increases the allowance granted to `spender` by the caller.
      *
@@ -373,7 +335,6 @@ contract ERC20 is Context, IERC20 {
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
         return true;
     }
-
     /**
      * @dev Atomically decreases the allowance granted to `spender` by the caller.
      *
@@ -392,7 +353,6 @@ contract ERC20 is Context, IERC20 {
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
         return true;
     }
-
     /**
      * @dev Moves tokens `amount` from `sender` to `recipient`.
      *
@@ -410,12 +370,10 @@ contract ERC20 is Context, IERC20 {
     function _transfer(address sender, address recipient, uint256 amount) internal {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
-
         _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
         _balances[recipient] = _balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
     }
-
     /** @dev Creates `amount` tokens and assigns them to `account`, increasing
      * the total supply.
      *
@@ -427,12 +385,10 @@ contract ERC20 is Context, IERC20 {
      */
     function _mint(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: mint to the zero address");
-
         _totalSupply = _totalSupply.add(amount);
         _balances[account] = _balances[account].add(amount);
         emit Transfer(address(0), account, amount);
     }
-
      /**
      * @dev Destroys `amount` tokens from `account`, reducing the
      * total supply.
@@ -446,12 +402,10 @@ contract ERC20 is Context, IERC20 {
      */
     function _burn(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: burn from the zero address");
-
         _balances[account] = _balances[account].sub(amount, "ERC20: burn amount exceeds balance");
         _totalSupply = _totalSupply.sub(amount);
         emit Transfer(account, address(0), amount);
     }
-
     /**
      * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
      *
@@ -468,11 +422,9 @@ contract ERC20 is Context, IERC20 {
     function _approve(address owner, address spender, uint256 amount) internal {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
-
         _allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
     }
-
     /**
      * @dev Destroys `amount` tokens from `account`.`amount` is then deducted
      * from the caller's allowance.
@@ -484,8 +436,6 @@ contract ERC20 is Context, IERC20 {
         _approve(account, _msgSender(), _allowances[account][_msgSender()].sub(amount, "ERC20: burn amount exceeds allowance"));
     }
 }
-
-
 /**
  * @title Roles
  * @dev Library for managing addresses assigned to a Role.
@@ -494,7 +444,6 @@ library Roles {
     struct Role {
         mapping (address => bool) bearer;
     }
-
     /**
      * @dev Give an account access to this role.
      */
@@ -502,7 +451,6 @@ library Roles {
         require(!has(role, account), "Roles: account already has role");
         role.bearer[account] = true;
     }
-
     /**
      * @dev Remove an account's access to this role.
      */
@@ -510,7 +458,6 @@ library Roles {
         require(has(role, account), "Roles: account does not have role");
         role.bearer[account] = false;
     }
-
     /**
      * @dev Check if an account has this role.
      * @return bool
@@ -520,47 +467,36 @@ library Roles {
         return role.bearer[account];
     }
 }
-
 contract MinterRole is Context {
     using Roles for Roles.Role;
-
     event MinterAdded(address indexed account);
     event MinterRemoved(address indexed account);
-
     Roles.Role private _minters;
-
     constructor () internal {
         _addMinter(_msgSender());
     }
-
     modifier onlyMinter() {
         require(isMinter(_msgSender()), "MinterRole: caller does not have the Minter role");
         _;
     }
-
     function isMinter(address account) public view returns (bool) {
         return _minters.has(account);
     }
-
     function addMinter(address account) public onlyMinter {
         _addMinter(account);
     }
-
     function renounceMinter() public {
         _removeMinter(_msgSender());
     }
-
     function _addMinter(address account) internal {
         _minters.add(account);
         emit MinterAdded(account);
     }
-
     function _removeMinter(address account) internal {
         _minters.remove(account);
         emit MinterRemoved(account);
     }
 }
-
 /**
  * @dev Extension of {ERC20} that adds a set of accounts with the {MinterRole},
  * which have permission to mint (create) new tokens as they see fit.
@@ -581,8 +517,6 @@ contract ERC20Mintable is ERC20, MinterRole {
     }
 }
 // prettier-ignore
-
-
 /**
  * @dev Extension of {ERC20} that allows token holders to destroy both their own
  * tokens and those that they have an allowance for, in a way that can be
@@ -597,7 +531,6 @@ contract ERC20Burnable is Context, ERC20 {
     function burn(uint256 amount) public {
         _burn(_msgSender(), amount);
     }
-
     /**
      * @dev See {ERC20-_burnFrom}.
      */
@@ -605,17 +538,13 @@ contract ERC20Burnable is Context, ERC20 {
         _burnFrom(account, amount);
     }
 }
-
-
 contract DevMigration {
 	address public legacy;
 	address public next;
-
 	constructor(address _legacy, address _next) public {
 		legacy = _legacy;
 		next = _next;
 	}
-
 	function migrate() external returns (bool) {
 		ERC20Burnable _legacy = ERC20Burnable(legacy);
 		ERC20Mintable _next = ERC20Mintable(next);
