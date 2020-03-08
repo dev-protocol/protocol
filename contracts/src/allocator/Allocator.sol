@@ -7,6 +7,7 @@ import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Market} from "contracts/src/market/Market.sol";
+import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
@@ -39,7 +40,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		getStorage().setPendingIncrement(_metrics, true);
-		Market(market).calculate(
+		IMarketBehavior(Market(market).behavior()).calculate(
 			_metrics,
 			getLastAllocationBlockNumber(_metrics),
 			block.number
