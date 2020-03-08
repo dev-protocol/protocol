@@ -1353,6 +1353,54 @@ contract Metrics {
 }
 
 
+contract UsingStorage is Ownable {
+	address private _storage;
+
+	modifier hasStorage() {
+		require(_storage != address(0), "storage is not setted");
+		_;
+	}
+
+	function eternalStorage()
+		internal
+		view
+		hasStorage
+		returns (EternalStorage)
+	{
+		return EternalStorage(_storage);
+	}
+
+	function getStorageAddress() external view hasStorage returns (address) {
+		return _storage;
+	}
+
+	function createStorage() external onlyOwner {
+		require(_storage == address(0), "storage is setted");
+		EternalStorage tmp = new EternalStorage();
+		_storage = address(tmp);
+	}
+
+	function setStorage(address _storageAddress) external onlyOwner {
+		_storage = _storageAddress;
+	}
+
+	function changeOwner(address newOwner) external onlyOwner {
+		EternalStorage(_storage).changeOwner(newOwner);
+	}
+}
+
+
+contract IGroup {
+	function isGroup(address _addr) public view returns (bool);
+
+	function addGroup(address _addr) external;
+
+	function getGroupKey(address _addr) internal pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_group", _addr));
+	}
+}
+
+
 contract MetricsGroup is
 	UsingConfig,
 	UsingStorage,
@@ -1804,54 +1852,6 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 
 	function schema() external view returns (string memory) {
 		return IMarketBehavior(behavior).schema();
-	}
-}
-
-
-contract UsingStorage is Ownable {
-	address private _storage;
-
-	modifier hasStorage() {
-		require(_storage != address(0), "storage is not setted");
-		_;
-	}
-
-	function eternalStorage()
-		internal
-		view
-		hasStorage
-		returns (EternalStorage)
-	{
-		return EternalStorage(_storage);
-	}
-
-	function getStorageAddress() external view hasStorage returns (address) {
-		return _storage;
-	}
-
-	function createStorage() external onlyOwner {
-		require(_storage == address(0), "storage is setted");
-		EternalStorage tmp = new EternalStorage();
-		_storage = address(tmp);
-	}
-
-	function setStorage(address _storageAddress) external onlyOwner {
-		_storage = _storageAddress;
-	}
-
-	function changeOwner(address newOwner) external onlyOwner {
-		EternalStorage(_storage).changeOwner(newOwner);
-	}
-}
-
-
-contract IGroup {
-	function isGroup(address _addr) public view returns (bool);
-
-	function addGroup(address _addr) external;
-
-	function getGroupKey(address _addr) internal pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
 
