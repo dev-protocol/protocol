@@ -170,7 +170,7 @@ contract('Allocator', ([deployer, user1]) => {
 					dev.dev.mint(deployer, 1)
 				])
 
-				const expected = lastBlock.toNumber() + 2
+				const expected = (lastBlock.toNumber() as number) + 2
 
 				dev.allocator.allocate(metrics.address)
 				watch(dev.allocator, WEB3_URI)('Log', (_, value) => console.log(value))
