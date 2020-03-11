@@ -1943,8 +1943,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		bool isWaiting = getStorage().getWithdrawalStatus(
 			_property,
 			msg.sender
-		) !=
-			0;
+		) != 0;
 		require(isWaiting == false, "lockup is already canceled");
 		uint256 blockNumber = Policy(config().policy()).lockUpBlocks();
 		blockNumber = blockNumber.add(block.number);

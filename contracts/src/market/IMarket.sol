@@ -2,10 +2,6 @@ pragma solidity ^0.5.0;
 
 
 contract IMarket {
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool);
-
 	function authenticate(
 		address _prop,
 		string memory _args1,

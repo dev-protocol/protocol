@@ -46,15 +46,6 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		enabled = true;
 	}
 
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool)
-	{
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		return IMarketBehavior(behavior).calculate(_metrics, _start, _end);
-	}
-
 	function authenticate(
 		address _prop,
 		string memory _args1,

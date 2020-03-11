@@ -2,7 +2,7 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import {MarketInstance} from '../../types/truffle-contracts'
 import {mine} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {watch, waitForEvent} from '../test-lib/utils/event'
+import {watch} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage
@@ -11,15 +11,7 @@ import {WEB3_URI} from '../test-lib/const'
 
 contract(
 	'MarketTest',
-	([
-		deployer,
-		marketFactory,
-		behavuor,
-		user,
-		metrics,
-		allocator,
-		propertyAuther
-	]) => {
+	([deployer, marketFactory, behavuor, user, propertyAuther]) => {
 		const marketContract = artifacts.require('Market')
 		describe('Market; constructor', () => {
 			const dev = new DevProtocolInstance(deployer)
@@ -96,31 +88,6 @@ contract(
 					{from: marketFactory}
 				)
 				expect(await market.schema()).to.be.equal('[]')
-			})
-		})
-		describe('Market; calculate', () => {
-			const dev = new DevProtocolInstance(deployer)
-			it('Proxy to mapped Behavior Contract.', async () => {
-				await dev.generateAddressConfig()
-				await Promise.all([
-					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
-					dev.generatePolicySet()
-				])
-				await dev.addressConfig.setMarketFactory(marketFactory)
-				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
-				await dev.policyFactory.create(iPolicyInstance.address)
-				const behavuor = await dev.getMarket('MarketTest3', user)
-				const market = await marketContract.new(
-					dev.addressConfig.address,
-					behavuor.address,
-					{from: marketFactory}
-				)
-				await dev.addressConfig.setAllocator(allocator)
-				await market.calculate(metrics, 0, 100, {
-					from: allocator
-				})
-				await waitForEvent(behavuor, WEB3_URI)('LogCalculate')
 			})
 		})
 		describe('Market; authenticate, authenticatedCallback', () => {
