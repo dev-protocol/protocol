@@ -67,7 +67,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			metrics.property()
 		);
 		uint256 blocks = block.number.sub(
-			getStorage().getLastAllocationBlockEachMetrics(_metrics)
+			getLastAllocationBlockNumber(_metrics)
 		);
 		uint256 mint = Policy(config().policy()).rewards(
 			Lockup(config().lockup()).getAllValue(),
@@ -82,7 +82,6 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))
 			.add(value);
 		uint256 assets = market.issuedMetrics();
-		getStorage().setLastAllocationBlockEachMetrics(_metrics, block.number);
 		getStorage().setLastAssetValueEachMetrics(_metrics, value);
 		getStorage().setLastAssetValueEachMarketPerBlock(
 			metrics.market(),
