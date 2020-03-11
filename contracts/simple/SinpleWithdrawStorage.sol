@@ -4,7 +4,7 @@ import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
 
-contract WithdrawStorage is UsingStorage, Killable {
+contract SimpleWithdrawStorage is UsingStorage, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 

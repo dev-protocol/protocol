@@ -4,7 +4,7 @@ import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
 
-contract AllocatorStorage is UsingStorage, Killable {
+contract SimpleAllocatorStorage is UsingStorage, Killable {
 	constructor(address _config) public UsingStorage() {}
 
 	// lastAssetValueEachMarketPerBlock
