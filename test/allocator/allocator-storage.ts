@@ -53,27 +53,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
-		describe('AllocatorStorage; setLastAllocationBlockEachMetrics, getLastAllocationBlockEachMetrics', () => {
-			it('Can get setted value.', async () => {
-				await dev.allocatorStorage.setLastAllocationBlockEachMetrics(
-					metrics,
-					10000,
-					{from: allocator}
-				)
-				const result = await dev.allocatorStorage.getLastAllocationBlockEachMetrics(
-					metrics
-				)
-				expect(result.toNumber()).to.be.equal(10000)
-			})
-			it('Cannot rewrite data from other than allocator.', async () => {
-				const result = await dev.allocatorStorage
-					.setLastAllocationBlockEachMetrics(metrics, 10000, {
-						from: dummyAllocator
-					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
-			})
-		})
 		describe('AllocatorStorage; setLastAssetValueEachMarketPerBlock, getLastAssetValueEachMarketPerBlock', () => {
 			it('Can get setted value.', async () => {
 				await dev.allocatorStorage.setLastAssetValueEachMarketPerBlock(
