@@ -4,10 +4,7 @@ import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
 
-contract WithdrawStorage is
-	UsingStorage,
-	Killable
-{
+contract WithdrawStorage is UsingStorage, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -37,7 +34,6 @@ contract WithdrawStorage is
 		external
 		returns (uint256)
 	{
-
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
 	}
 
