@@ -2338,10 +2338,6 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 
 
 contract IMarket {
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool);
-
 	function authenticate(
 		address _prop,
 		string memory _args1,
@@ -2559,14 +2555,6 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 			config().marketFactory()
 		);
 		enabled = true;
-	}
-
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool)
-	{
-		addressValidator().validateAddress(msg.sender, config().allocator());
-		return IMarketBehavior(behavior).calculate(_metrics, _start, _end);
 	}
 
 	function authenticate(
@@ -3146,7 +3134,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		getStorage().setPendingIncrement(_metrics, true);
-		Market(market).calculate(
+		IMarketBehavior(Market(market).behavior()).calculate(
 			_metrics,
 			getLastAllocationBlockNumber(_metrics),
 			block.number
