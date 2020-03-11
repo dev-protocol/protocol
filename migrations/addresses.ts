@@ -1,0 +1,2 @@
+export const addressConfig = '0x1D415aa39D647834786EB9B5a333A50e9935b796'
+export const property = '0x05BC991269a9730232a65ea7C471ABcC7D86A5B3'
