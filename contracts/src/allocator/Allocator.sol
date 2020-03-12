@@ -93,20 +93,9 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			metrics.market(),
 			marketValue
 		);
-		uint256 eventKey = getStorage().getBeforeAllocationEventId();
-		emit BeforeAllocation(
-			eventKey,
-			blocks,
-			mint,
-			value,
-			marketValue
-		);
-		emit BeforeAllocationAssets(
-			eventKey,
-			assets,
-			totalAssets,
-			_metrics
-		);
+		uint256 eventKey = getEventKey();
+		emit BeforeAllocation(eventKey, blocks, mint, value, marketValue);
+		emit BeforeAllocationAssets(eventKey, assets, totalAssets, _metrics);
 		uint256 result = allocation(
 			blocks,
 			mint,
@@ -117,6 +106,13 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
+	}
+
+	function getEventKey() private returns(uint256) {
+		uint256 eventKey = getStorage().getBeforeAllocationEventId();
+		eventKey++;
+		getStorage().setBeforeAllocationEventId(eventKey);
+		return eventKey;
 	}
 
 	function increment(address _property, uint256 _reward, uint256 _lockup)

@@ -14,21 +14,19 @@ contract AllocatorStorage is
 {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 	// Before Allocation Event Key
-	function getBeforeAllocationEventId()
-		external
-		returns (uint256)
-	{
-		uint256 idKey = eternalStorage().getUint(getBeforeAllocationEventIdKey());
-		idKey++;
-		eternalStorage().setUint(getBeforeAllocationEventIdKey(), idKey);
-		return idKey;
+	function setBeforeAllocationEventId(uint256 _id) external {
+		addressValidator().validateAddress(msg.sender, config().allocator());
+
+		eternalStorage().setUint(getBeforeAllocationEventIdKey(), _id);
 	}
 
-	function getBeforeAllocationEventIdKey()
-		private
-		pure
-		returns (bytes32)
-	{
+	function getBeforeAllocationEventId() external returns (uint256) {
+		return eternalStorage().getUint(
+			getBeforeAllocationEventIdKey()
+		);
+	}
+
+	function getBeforeAllocationEventIdKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_beforeAllocationEvent"));
 	}
 
