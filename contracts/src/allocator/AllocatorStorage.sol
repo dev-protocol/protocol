@@ -13,6 +13,24 @@ contract AllocatorStorage is
 	Killable
 {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
+	// Before Allocation Event Key
+	function getBeforeAllocationEventId()
+		external
+		returns (uint256)
+	{
+		uint256 idKey = eternalStorage().getUint(getBeforeAllocationEventIdKey());
+		idKey++;
+		eternalStorage().setUint(getBeforeAllocationEventIdKey(), idKey);
+		return idKey;
+	}
+
+	function getBeforeAllocationEventIdKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_beforeAllocationEvent"));
+	}
 
 	// Last Block Number
 	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
