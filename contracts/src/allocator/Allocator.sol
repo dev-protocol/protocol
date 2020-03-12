@@ -26,7 +26,8 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		uint256 _value,
 		uint256 _marketValue,
 		uint256 _assets,
-		uint256 _totalAssets
+		uint256 _totalAssets,
+		address _metrics
 	);
 
 	uint64 public constant basis = 1000000000000000000;
@@ -93,7 +94,8 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			value,
 			marketValue,
 			assets,
-			totalAssets
+			totalAssets,
+			_metrics
 		);
 		uint256 result = allocation(
 			blocks,

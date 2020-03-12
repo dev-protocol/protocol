@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import {addressConfig, property} from './addresses'
+import {addressConfig, property, market, metrics} from './addresses'
 import {toBigNumber} from '../test/test-lib/utils/common'
 import BigNumber from 'bignumber.js'
 
@@ -10,13 +10,20 @@ const expected = {
 	totalLockedValue: toBigNumber('467000000000000000000'),
 	totalAssets: toBigNumber('1571'),
 	allocationResult: toBigNumber('15135211357674806527948'),
-	IncorrectAllocationResult: toBigNumber('3787821725082588096476872')
+	incorrectAllocationResult: toBigNumber('3787821725082588096476872'),
+	incorrectMarketValue: toBigNumber('29230412980127'),
+	correctMarketValue: toBigNumber('7315364860307660')
 }
 
 const createRewardsAmountKey = (prop: string): string =>
 	Web3.utils.keccak256(`_rewardsAmount${prop}`)
 const createCumulativePriceKey = (prop: string): string =>
 	Web3.utils.keccak256(`_cumulativePrice${prop}`)
+const lastAssetValueEachMarketPerBlockKey = (prop: string): string =>
+	Web3.utils.keccak256(`_lastAssetValueEachMarketPerBlock${prop}`)
+const lastAssetValueEachMetricsKey = (prop: string): string =>
+	Web3.utils.keccak256(`_lastAssetValueEachMetrics${prop}`)
+
 const price = (value: BigNumber): BigNumber =>
 	value.times(toBigNumber('1000000000000000000')).div(10000000)
 
@@ -122,16 +129,26 @@ const handler = function(deployer, network, [owner]) {
 				throw new Error('unexpected allocation result')
 			}
 
-			/* Get the EthernalStorage address from the WithdrawStorage
-			 * WithdrawStorage から EthernalStorage のアドレスを取得
+			/* Get the EthernalStorage address from the Each Storage
+			 * 各Storage から EthernalStorage のアドレスを取得
 			 */
-			const EternalStorageAddress = await withdrawStorageInstanse.getStorageAddress()
+			const [
+				WithdrawEternalStorageAddress,
+				AllocatorEternalStorageAddress
+			] = await Promise.all([
+				withdrawStorageInstanse.getStorageAddress(),
+				allocatorStorageInstance.getStorageAddress()
+			])
 
 			/* Create the EthernalStorage instance from the address
 			 * アドレスから EthernalStorage インスタンスを作成
 			 */
-			const [eternalStorageInstance] = await Promise.all([
-				artifacts.require('EternalStorage').at(EternalStorageAddress)
+			const [
+				withdrawEternalStorageInstance,
+				allocatorEternalStorageInstance
+			] = await Promise.all([
+				artifacts.require('EternalStorage').at(WithdrawEternalStorageAddress),
+				artifacts.require('EternalStorage').at(AllocatorEternalStorageAddress)
 			])
 
 			/* Get the incorrect states
@@ -139,13 +156,21 @@ const handler = function(deployer, network, [owner]) {
 			 */
 			const [
 				originalRewardsAmount,
-				originalCumulativePrice
+				originalCumulativePrice,
+				originalLastAssetValueEachMarketPerBlock,
+				originalLastAssetValueEachMetricsKey
 			] = await Promise.all([
-				eternalStorageInstance
+				withdrawEternalStorageInstance
 					.getUint(createRewardsAmountKey(property))
 					.then(toBigNumber),
-				eternalStorageInstance
+				withdrawEternalStorageInstance
 					.getUint(createCumulativePriceKey(property))
+					.then(toBigNumber),
+				allocatorEternalStorageInstance
+					.getUint(lastAssetValueEachMarketPerBlockKey(market))
+					.then(toBigNumber),
+				allocatorEternalStorageInstance
+					.getUint(lastAssetValueEachMetricsKey(metrics))
 					.then(toBigNumber)
 			])
 
@@ -153,9 +178,15 @@ const handler = function(deployer, network, [owner]) {
 			 * 誤った状態が事前に取得した誤った状態と等しいことを確認
 			 */
 			if (
-				!originalRewardsAmount.isEqualTo(expected.IncorrectAllocationResult) &&
+				!originalRewardsAmount.isEqualTo(expected.incorrectAllocationResult) &&
 				!originalCumulativePrice.isEqualTo(
-					price(expected.IncorrectAllocationResult)
+					price(expected.incorrectAllocationResult)
+				) &&
+				!originalLastAssetValueEachMarketPerBlock.isEqualTo(
+					expected.incorrectMarketValue
+				) &&
+				!originalLastAssetValueEachMetricsKey.isEqualTo(
+					expected.incorrectAllocationResult
 				)
 			) {
 				throw new Error('got an unexpected value')
@@ -163,16 +194,18 @@ const handler = function(deployer, network, [owner]) {
 
 			const correctRewardsAmount = allocationResult.toFixed()
 			const correctCumulativePrice = price(allocationResult).toFixed()
+			const correctMarketValue = expected.correctMarketValue.toFixed()
 
 			/* Change the owner to rewrite states
 			 * 状態を書き換えるためにオーナーを変更
 			 */
 			await withdrawStorageInstanse.changeOwner(owner)
+			await allocatorStorageInstance.changeOwner(owner)
 
 			/* Rewrite the RewardsAmount with the correct value
 			 * 正しい値で RewardsAmount を書き換える
 			 */
-			await eternalStorageInstance.setUint(
+			await withdrawEternalStorageInstance.setUint(
 				createRewardsAmountKey(property),
 				correctRewardsAmount
 			)
@@ -180,15 +213,32 @@ const handler = function(deployer, network, [owner]) {
 			/* Rewrite the CumulativePrice with the correct value
 			 * 正しい値で CumulativePrice を書き換える
 			 */
-			await eternalStorageInstance.setUint(
+			await withdrawEternalStorageInstance.setUint(
 				createCumulativePriceKey(property),
 				correctCumulativePrice
+			)
+
+			/* Rewrite the LastAssetValueEachMarketPerBlockKey with the correct value
+			 * 正しい値で LastAssetValueEachMarketPerBlockKey を書き換える
+			 */
+			await allocatorEternalStorageInstance.setUint(
+				lastAssetValueEachMarketPerBlockKey(metrics),
+				correctMarketValue
+			)
+
+			/* Rewrite the lastAssetValueEachMetricsKey with the correct value
+			 * 正しい値で lastAssetValueEachMetricsKey を書き換える
+			 */
+			await allocatorEternalStorageInstance.setUint(
+				lastAssetValueEachMetricsKey(market),
+				correctRewardsAmount
 			)
 
 			/* Revert the owner
 			 * オーナーを元に戻す
 			 */
-			await withdrawStorageInstanse.changeOwner(withdrawStorageAddress)
+			await withdrawEternalStorageInstance.changeOwner(withdrawStorageAddress)
+			await allocatorEternalStorageInstance.changeOwner(allocatorStorageAddress)
 		})
 		.then(() => {
 			console.error('*** COMPLETED! ***')
