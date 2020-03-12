@@ -20,11 +20,16 @@ import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+
 	event BeforeAllocation(
+		uint256 _id,
 		uint256 _blocks,
 		uint256 _mint,
 		uint256 _value,
-		uint256 _marketValue,
+		uint256 _marketValue
+	);
+	event BeforeAllocationAssets(
+		uint256 _id,
 		uint256 _assets,
 		uint256 _totalAssets,
 		address _metrics
@@ -88,11 +93,16 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			metrics.market(),
 			marketValue
 		);
+		uint256 eventKey = getStorage().getBeforeAllocationEventId();
 		emit BeforeAllocation(
+			eventKey,
 			blocks,
 			mint,
 			value,
-			marketValue,
+			marketValue
+		);
+		emit BeforeAllocationAssets(
+			eventKey,
 			assets,
 			totalAssets,
 			_metrics
