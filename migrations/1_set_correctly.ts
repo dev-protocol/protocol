@@ -40,6 +40,10 @@ const handler = function(deployer, network, [owner]) {
 			const [addressConfigInstance] = await Promise.all([
 				artifacts.require('AddressConfig').at(addressConfig)
 			])
+			console.log(
+				'*** Created the AddressConfig instanse ***',
+				addressConfigInstance.address
+			)
 
 			/* Verify the current sender is the correct owner
 			 * msg.sender が正しいオーナーであることを確認
@@ -47,6 +51,8 @@ const handler = function(deployer, network, [owner]) {
 			if ((await addressConfigInstance._owner()) !== owner) {
 				throw new Error('executing by unexpected owner')
 			}
+
+			console.log('*** The AddressConfig owner is myself ***')
 
 			/* Get contract addresses
 			 * コントラクトアドレスを取得
@@ -62,6 +68,7 @@ const handler = function(deployer, network, [owner]) {
 				addressConfigInstance.policy(),
 				addressConfigInstance.allocator()
 			])
+			console.log('*** Got addresses ***')
 
 			/* Create contract instances from addresses
 			 * コントラクトアドレスからインスタンスを作成
@@ -77,6 +84,7 @@ const handler = function(deployer, network, [owner]) {
 				artifacts.require('Policy').at(policyAddress),
 				artifacts.require('Allocator').at(allocatorAddress)
 			])
+			console.log('*** Created contract instances from the addresses ***')
 
 			/* Calculate the correct allocation amount
 			 * 正しい allocation 値を計算
@@ -91,6 +99,7 @@ const handler = function(deployer, network, [owner]) {
 						.then(toBigNumber)
 					return expected.endBlock.minus(baseBlock)
 				})()
+				console.log('*** Calculated the correct blocks ***', blocks.toFixed())
 
 				/* Calculate the mintable amount
 				 * ミント可能な値を計算
@@ -98,6 +107,7 @@ const handler = function(deployer, network, [owner]) {
 				const mint = await policyInstance
 					.rewards(expected.totalLockedValue, expected.totalAssets)
 					.then(toBigNumber)
+				console.log('*** Calculated the mintable amount ***', mint.toFixed())
 
 				/* Calculate the correct asset value
 				 * 正しい資産価値を計算
@@ -109,6 +119,10 @@ const handler = function(deployer, network, [owner]) {
 					const basis = await allocatorInstance.basis().then(toBigNumber)
 					return assetValue.times(basis).div(blocks)
 				})()
+				console.log(
+					'*** Calculated the correct asset value ***',
+					value.toFixed()
+				)
 
 				const marketValue = value
 				const assets = expected.totalAssets
@@ -121,6 +135,10 @@ const handler = function(deployer, network, [owner]) {
 					.allocation(blocks, mint, value, marketValue, assets, totalAssets)
 					.then(toBigNumber)
 			})()
+			console.log(
+				'*** Calculated the correct allocation value ***',
+				allocationResult.toFixed()
+			)
 
 			/* Verify the result equals expected value
 			 * 正しい allocation 値が事前の計算通りであることを確認
@@ -128,6 +146,8 @@ const handler = function(deployer, network, [owner]) {
 			if (!allocationResult.isEqualTo(expected.allocationResult)) {
 				throw new Error('unexpected allocation result')
 			}
+
+			console.log('*** The allocation value is correctly ***')
 
 			/* Get the EthernalStorage address from the Each Storage
 			 * 各Storage から EthernalStorage のアドレスを取得
@@ -139,6 +159,9 @@ const handler = function(deployer, network, [owner]) {
 				withdrawStorageInstanse.getStorageAddress(),
 				allocatorStorageInstance.getStorageAddress()
 			])
+			console.log(
+				'*** Got each EternalStorage addresses used in WithdrawStorage and AllocatorStorage ***'
+			)
 
 			/* Create the EthernalStorage instance from the address
 			 * アドレスから EthernalStorage インスタンスを作成
@@ -150,6 +173,7 @@ const handler = function(deployer, network, [owner]) {
 				artifacts.require('EternalStorage').at(WithdrawEternalStorageAddress),
 				artifacts.require('EternalStorage').at(AllocatorEternalStorageAddress)
 			])
+			console.log('*** Created the contract instances from the addresses ***')
 
 			/* Get the incorrect states
 			 * 誤った状態を取得
@@ -173,6 +197,13 @@ const handler = function(deployer, network, [owner]) {
 					.getUint(lastAssetValueEachMetricsKey(metrics))
 					.then(toBigNumber)
 			])
+			console.log(
+				'*** Got the incorrect states ***',
+				originalRewardsAmount.toFixed(),
+				originalCumulativePrice.toFixed(),
+				originalLastAssetValueEachMarketPerBlock.toFixed(),
+				originalLastAssetValueEachMetricsKey.toFixed()
+			)
 
 			/* Verify the incorrect states are equals to the incorrect states that expected
 			 * 誤った状態が事前に取得した誤った状態と等しいことを確認
@@ -192,21 +223,34 @@ const handler = function(deployer, network, [owner]) {
 				throw new Error('got an unexpected value')
 			}
 
+			console.log('*** The incorrect states are correctly expected value ***')
+
 			const correctRewardsAmount = allocationResult.toFixed()
 			const correctCumulativePrice = price(allocationResult).toFixed()
 			const correctMarketValue = expected.correctMarketValue.toFixed()
+			console.log(
+				'*** Created the correct values ***',
+				correctRewardsAmount,
+				correctCumulativePrice,
+				correctMarketValue
+			)
 
 			/* Change the owner to rewrite states
 			 * 状態を書き換えるためにオーナーを変更
 			 */
 			await withdrawStorageInstanse.changeOwner(owner)
 			await allocatorStorageInstance.changeOwner(owner)
+			console.log('*** Changed the owner to rewrite states ***')
 
 			/* Rewrite the RewardsAmount with the correct value
 			 * 正しい値で RewardsAmount を書き換える
 			 */
 			await withdrawEternalStorageInstance.setUint(
 				createRewardsAmountKey(property),
+				correctRewardsAmount
+			)
+			console.log(
+				'*** Updated `rewardsAmount` to the correct value ***',
 				correctRewardsAmount
 			)
 
@@ -217,12 +261,20 @@ const handler = function(deployer, network, [owner]) {
 				createCumulativePriceKey(property),
 				correctCumulativePrice
 			)
+			console.log(
+				'*** Updated `cumulativePrice` to the correct value ***',
+				correctCumulativePrice
+			)
 
 			/* Rewrite the LastAssetValueEachMarketPerBlockKey with the correct value
 			 * 正しい値で LastAssetValueEachMarketPerBlockKey を書き換える
 			 */
 			await allocatorEternalStorageInstance.setUint(
 				lastAssetValueEachMarketPerBlockKey(metrics),
+				correctMarketValue
+			)
+			console.log(
+				'*** Updated `lastAssetValueEachMarketPerBlock` to the correct value ***',
 				correctMarketValue
 			)
 
@@ -233,12 +285,17 @@ const handler = function(deployer, network, [owner]) {
 				lastAssetValueEachMetricsKey(market),
 				correctRewardsAmount
 			)
+			console.log(
+				'*** Updated `lastAssetValueEachMetrics` to the correct value ***',
+				correctRewardsAmount
+			)
 
 			/* Revert the owner
 			 * オーナーを元に戻す
 			 */
 			await withdrawEternalStorageInstance.changeOwner(withdrawStorageAddress)
 			await allocatorEternalStorageInstance.changeOwner(allocatorStorageAddress)
+			console.log('*** Revert to the original owner ***')
 		})
 		.then(() => {
 			console.error('*** COMPLETED! ***')
