@@ -384,6 +384,37 @@ contract('Allocator', ([deployer, user1]) => {
 			expect(pending).to.be.equal(false)
 			expect(res).to.be.an.instanceOf(Error)
 		})
+		it('dispatch events', async () => {
+			const [dev, market, metrics] = await init()
+
+			dev.allocator.allocate(metrics.address)
+			const [[id1, _assets, _totalAssets, _metrics], id2] = await Promise.all([
+				new Promise<[BigNumber, BigNumber, BigNumber, string]>(resolve =>
+					watch(dev.allocator, WEB3_URI)(
+						'BeforeAllocationAssets',
+						(_, values) => {
+							const {_id, _assets, _totalAssets, _metrics} = values
+							resolve([
+								new BigNumber(_id),
+								new BigNumber(_assets),
+								new BigNumber(_totalAssets),
+								_metrics
+							])
+						}
+					)
+				),
+				getEventValue(dev.allocator, WEB3_URI)('BeforeAllocation', '_id')
+			])
+			const issuedMetrics = await market.issuedMetrics().then(toBigNumber)
+			const totalIssuedMetrics = await dev.metricsGroup
+				.totalIssuedMetrics()
+				.then(toBigNumber)
+
+			expect(id1).to.be.equal(id2)
+			expect(_assets.toString()).to.be.equal(issuedMetrics.toString())
+			expect(_totalAssets.toString()).to.be.equal(totalIssuedMetrics.toString())
+			expect(_metrics).to.be.equal(metrics.address)
+		})
 	})
 
 	describe('Allocator; kill', () => {
