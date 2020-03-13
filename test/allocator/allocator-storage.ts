@@ -10,6 +10,23 @@ contract(
 			await dev.generateAllocatorStorage()
 			await dev.addressConfig.setAllocator(allocator)
 		})
+		describe('AllocatorStorage; setBeforeAllocationEventId, getBeforeAllocationEventId', () => {
+			it('Can get setted value.', async () => {
+				await dev.allocatorStorage.setBeforeAllocationEventId(10000, {
+					from: allocator
+				})
+				const result = await dev.allocatorStorage.getBeforeAllocationEventId()
+				expect(result.toNumber()).to.be.equal(10000)
+			})
+			it('Cannot rewrite data from other than allocator.', async () => {
+				const result = await dev.allocatorStorage
+					.setBeforeAllocationEventId(10000, {
+						from: dummyAllocator
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
 		describe('AllocatorStorage; setAllocationBlockNumber, getLastBlockNumber', () => {
 			it('Can get setted value.', async () => {
 				await dev.allocatorStorage.setLastBlockNumber(metrics, 100, {

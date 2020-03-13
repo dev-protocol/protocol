@@ -108,7 +108,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		getStorage().setPendingIncrement(_metrics, false);
 	}
 
-	function getEventKey() private returns(uint256) {
+	function getEventKey() private returns (uint256) {
 		uint256 eventKey = getStorage().getBeforeAllocationEventId();
 		eventKey++;
 		getStorage().setBeforeAllocationEventId(eventKey);

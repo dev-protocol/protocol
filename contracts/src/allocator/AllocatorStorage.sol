@@ -13,6 +13,7 @@ contract AllocatorStorage is
 	Killable
 {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
+
 	// Before Allocation Event Key
 	function setBeforeAllocationEventId(uint256 _id) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
@@ -20,10 +21,8 @@ contract AllocatorStorage is
 		eternalStorage().setUint(getBeforeAllocationEventIdKey(), _id);
 	}
 
-	function getBeforeAllocationEventId() external returns (uint256) {
-		return eternalStorage().getUint(
-			getBeforeAllocationEventIdKey()
-		);
+	function getBeforeAllocationEventId() external view returns (uint256) {
+		return eternalStorage().getUint(getBeforeAllocationEventIdKey());
 	}
 
 	function getBeforeAllocationEventIdKey() private pure returns (bytes32) {
