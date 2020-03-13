@@ -3084,7 +3084,6 @@ contract AllocatorStorage is
 }
 
 
-
 contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
@@ -3165,7 +3164,14 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			metrics.market(),
 			marketValue
 		);
-		emit BeforeAllocation(blocks, mint, value, marketValue, assets, totalAssets);
+		emit BeforeAllocation(
+			blocks,
+			mint,
+			value,
+			marketValue,
+			assets,
+			totalAssets
+		);
 		uint256 result = allocation(
 			blocks,
 			mint,
@@ -3174,7 +3180,14 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			assets,
 			totalAssets
 		);
-		emit AllocationResult(_metrics, _value, metrics.market(), metrics.property(), lockupValue, result);
+		emit AllocationResult(
+			_metrics,
+			_value,
+			metrics.market(),
+			metrics.property(),
+			lockupValue,
+			result
+		);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
 	}
