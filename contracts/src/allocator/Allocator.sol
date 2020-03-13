@@ -75,6 +75,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		uint256 blocks = block.number.sub(
 			getLastAllocationBlockNumber(_metrics)
 		);
+		blocks = blocks > 0 ? blocks : 1;
 		uint256 mint = Policy(config().policy()).rewards(
 			Lockup(config().lockup()).getAllValue(),
 			totalAssets
