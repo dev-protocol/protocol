@@ -23,6 +23,8 @@ const lastAssetValueEachMarketPerBlockKey = (prop: string): string =>
 	Web3.utils.keccak256(`_lastAssetValueEachMarketPerBlock${prop}`)
 const lastAssetValueEachMetricsKey = (prop: string): string =>
 	Web3.utils.keccak256(`_lastAssetValueEachMetrics${prop}`)
+const beforeAllocationEventKey = (): string =>
+	Web3.utils.keccak256(`_beforeAllocationEvent`)
 
 const price = (value: BigNumber): BigNumber =>
 	value.times(toBigNumber('1000000000000000000')).div(10000000)
@@ -264,6 +266,18 @@ const handler = function(deployer, network, [owner]) {
 			console.log(
 				'*** Updated `cumulativePrice` to the correct value ***',
 				correctCumulativePrice
+			)
+
+			/* Rewrite the beforeAllocationEventKey with the correct value
+			 * 正しい値で beforeAllocationEventKey を書き換える
+			 */
+			await allocatorEternalStorageInstance.setUint(
+				beforeAllocationEventKey(),
+				1
+			)
+			console.log(
+				'*** Updated `beforeAllocationEvent` to the correct value ***',
+				1
 			)
 
 			/* Rewrite the LastAssetValueEachMarketPerBlockKey with the correct value
