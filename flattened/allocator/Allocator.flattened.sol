@@ -2958,21 +2958,6 @@ contract AllocatorStorage is
 {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
-	// Before Allocation Event Key
-	function setBeforeAllocationEventId(uint256 _id) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		eternalStorage().setUint(getBeforeAllocationEventIdKey(), _id);
-	}
-
-	function getBeforeAllocationEventId() external view returns (uint256) {
-		return eternalStorage().getUint(getBeforeAllocationEventIdKey());
-	}
-
-	function getBeforeAllocationEventIdKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_beforeAllocationEvent"));
-	}
-
 	// Last Block Number
 	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
@@ -3099,22 +3084,26 @@ contract AllocatorStorage is
 }
 
 
+
 contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
 	event BeforeAllocation(
-		uint256 _id,
 		uint256 _blocks,
 		uint256 _mint,
 		uint256 _value,
-		uint256 _marketValue
-	);
-	event BeforeAllocationAssets(
-		uint256 _id,
+		uint256 _marketValue,
 		uint256 _assets,
-		uint256 _totalAssets,
-		address _metrics
+		uint256 _totalAssets
+	);
+	event AllocationResult(
+		address _metrics,
+		uint256 _value,
+		address _market,
+		address _property,
+		uint256 _lockupValue,
+		uint256 _result
 	);
 
 	uint64 public constant basis = 1000000000000000000;
@@ -3176,9 +3165,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			metrics.market(),
 			marketValue
 		);
-		uint256 eventKey = getEventKey();
-		emit BeforeAllocation(eventKey, blocks, mint, value, marketValue);
-		emit BeforeAllocationAssets(eventKey, assets, totalAssets, _metrics);
+		emit BeforeAllocation(blocks, mint, value, marketValue, assets, totalAssets);
 		uint256 result = allocation(
 			blocks,
 			mint,
@@ -3187,15 +3174,9 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			assets,
 			totalAssets
 		);
+		emit AllocationResult(_metrics, _value, metrics.market(), metrics.property(), lockupValue, result);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
-	}
-
-	function getEventKey() private returns (uint256) {
-		uint256 eventKey = getStorage().getBeforeAllocationEventId();
-		eventKey++;
-		getStorage().setBeforeAllocationEventId(eventKey);
-		return eventKey;
 	}
 
 	function increment(address _property, uint256 _reward, uint256 _lockup)

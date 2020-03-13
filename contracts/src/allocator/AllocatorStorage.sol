@@ -14,21 +14,6 @@ contract AllocatorStorage is
 {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
-	// Before Allocation Event Key
-	function setBeforeAllocationEventId(uint256 _id) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		eternalStorage().setUint(getBeforeAllocationEventIdKey(), _id);
-	}
-
-	function getBeforeAllocationEventId() external view returns (uint256) {
-		return eternalStorage().getUint(getBeforeAllocationEventIdKey());
-	}
-
-	function getBeforeAllocationEventIdKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_beforeAllocationEvent"));
-	}
-
 	// Last Block Number
 	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());

@@ -230,40 +230,61 @@ contract('Allocator', ([deployer, user1]) => {
 			const property = await metrics.property()
 
 			dev.allocator.allocate(metrics.address)
-			const [, _blocks, _mint, _value, _marketValue] = await new Promise<
-				BigNumber[]
-			>(resolve => {
+			const [
+				_blocks,
+				_mint,
+				_value,
+				_marketValue,
+				_assets,
+				_totalAssets
+			] = await new Promise<BigNumber[]>(resolve => {
 				watch(dev.allocator, WEB3_URI)('BeforeAllocation', (_, values) => {
-					const {_id, _blocks, _mint, _value, _marketValue} = values
+					const {
+						_blocks,
+						_mint,
+						_value,
+						_marketValue,
+						_assets,
+						_totalAssets
+					} = values
 					resolve([
-						new BigNumber(_id),
 						new BigNumber(_blocks),
 						new BigNumber(_mint),
 						new BigNumber(_value),
-						new BigNumber(_marketValue)
+						new BigNumber(_marketValue),
+						new BigNumber(_assets),
+						new BigNumber(_totalAssets)
 					])
 				})
 			})
-			const [, _assets, _totalAssets, _metrics] = await new Promise<any[]>(
-				resolve => {
-					watch(dev.allocator, WEB3_URI)(
-						'BeforeAllocationAssets',
-						(_, values) => {
-							const {_id, _assets, _totalAssets, _metrics} = values
-							resolve([
-								new BigNumber(_id),
-								new BigNumber(_assets),
-								new BigNumber(_totalAssets),
-								_metrics
-							])
-						}
-					)
-				}
-			)
+			const [
+				_metrics,
+				_argValue,
+				_market,
+				_property,
+				_lockupValue
+			] = await new Promise<any[]>(resolve => {
+				watch(dev.allocator, WEB3_URI)('AllocationResult', (_, values) => {
+					const {
+						_metrics,
+						_value,
+						_market,
+						_property,
+						_lockupValue,
+						_result
+					} = values
+					resolve([
+						_metrics,
+						new BigNumber(_value),
+						_market,
+						_property,
+						new BigNumber(_lockupValue),
+						new BigNumber(_result)
+					])
+				})
+			})
 
 			const result = await dev.withdraw.getRewardsAmount(property)
-
-			expect(metrics.address).to.be.equal(_metrics)
 			expect(result.toString()).to.be.equal(
 				_blocks
 					.times(_mint)
@@ -271,6 +292,13 @@ contract('Allocator', ([deployer, user1]) => {
 					.times(_assets.div(_totalAssets))
 					.integerValue()
 					.toFixed()
+			)
+			expect(_metrics).to.be.equal(metrics.address)
+			expect(_market).to.be.equal(await metrics.market())
+			expect(_property).to.be.equal(property)
+			expect(_argValue.toNumber()).to.be.equal(100)
+			expect(_lockupValue.toNumber()).to.be.equal(
+				(await dev.lockup.getPropertyValue(property)).toNumber()
 			)
 		})
 
@@ -308,36 +336,59 @@ contract('Allocator', ([deployer, user1]) => {
 
 			dev.allocator.allocate(metrics.address)
 
-			const [, _blocks, _mint, _value, _marketValue] = await new Promise<
-				BigNumber[]
-			>(resolve => {
+			const [
+				_blocks,
+				_mint,
+				_value,
+				_marketValue,
+				_assets,
+				_totalAssets
+			] = await new Promise<BigNumber[]>(resolve => {
 				watch(dev.allocator, WEB3_URI)('BeforeAllocation', (_, values) => {
-					const {_id, _blocks, _mint, _value, _marketValue} = values
+					const {
+						_blocks,
+						_mint,
+						_value,
+						_marketValue,
+						_assets,
+						_totalAssets
+					} = values
 					resolve([
-						new BigNumber(_id),
 						new BigNumber(_blocks),
 						new BigNumber(_mint),
 						new BigNumber(_value),
-						new BigNumber(_marketValue)
+						new BigNumber(_marketValue),
+						new BigNumber(_assets),
+						new BigNumber(_totalAssets)
 					])
 				})
 			})
-			const [, _assets, _totalAssets, _metrics] = await new Promise<any[]>(
-				resolve => {
-					watch(dev.allocator, WEB3_URI)(
-						'BeforeAllocationAssets',
-						(_, values) => {
-							const {_id, _assets, _totalAssets, _metrics} = values
-							resolve([
-								new BigNumber(_id),
-								new BigNumber(_assets),
-								new BigNumber(_totalAssets),
-								_metrics
-							])
-						}
-					)
-				}
-			)
+			const [
+				_metrics,
+				_argValue,
+				_market,
+				_property,
+				_lockupValue
+			] = await new Promise<any[]>(resolve => {
+				watch(dev.allocator, WEB3_URI)('AllocationResult', (_, values) => {
+					const {
+						_metrics,
+						_value,
+						_market,
+						_property,
+						_lockupValue,
+						_result
+					} = values
+					resolve([
+						_metrics,
+						new BigNumber(_value),
+						_market,
+						_property,
+						new BigNumber(_lockupValue),
+						new BigNumber(_result)
+					])
+				})
+			})
 
 			expect(_blocks.toString()).to.be.equal(block.toString())
 			expect(_mint.toString()).to.be.equal(mint.toString())
@@ -346,6 +397,12 @@ contract('Allocator', ([deployer, user1]) => {
 			expect(_assets.toString()).to.be.equal(assets.toString())
 			expect(_totalAssets.toString()).to.be.equal(totalAssets.toString())
 			expect(_metrics).to.be.equal(metrics.address)
+			expect(_argValue.toNumber()).to.be.equal(100)
+			expect(_market).to.be.equal(await metrics.market())
+			expect(_property).to.be.equal(await metrics.property())
+			expect(_lockupValue.toNumber()).to.be.equal(
+				(await dev.lockup.getPropertyValue(await metrics.property())).toNumber()
+			)
 		})
 
 		it('When after increment, update the value of `lastAssetValueEachMarketPerBlock`', async () => {
@@ -393,30 +450,53 @@ contract('Allocator', ([deployer, user1]) => {
 			const [dev, market, metrics] = await init()
 
 			dev.allocator.allocate(metrics.address)
-			const [[id1, _assets, _totalAssets, _metrics], id2] = await Promise.all([
-				new Promise<[BigNumber, BigNumber, BigNumber, string]>(resolve =>
-					watch(dev.allocator, WEB3_URI)(
-						'BeforeAllocationAssets',
-						(_, values) => {
-							const {_id, _assets, _totalAssets, _metrics} = values
-							resolve([
-								new BigNumber(_id),
-								new BigNumber(_assets),
-								new BigNumber(_totalAssets),
-								_metrics
-							])
-						}
-					)
-				),
-				getEventValue(dev.allocator, WEB3_URI)('BeforeAllocation', '_id')
-			])
+			const [, , , , _assets, _totalAssets] = await new Promise<BigNumber[]>(
+				resolve => {
+					watch(dev.allocator, WEB3_URI)('BeforeAllocation', (_, values) => {
+						const {
+							_blocks,
+							_mint,
+							_value,
+							_marketValue,
+							_assets,
+							_totalAssets
+						} = values
+						resolve([
+							new BigNumber(_blocks),
+							new BigNumber(_mint),
+							new BigNumber(_value),
+							new BigNumber(_marketValue),
+							new BigNumber(_assets),
+							new BigNumber(_totalAssets)
+						])
+					})
+				}
+			)
+			const [_metrics] = await new Promise<any[]>(resolve => {
+				watch(dev.allocator, WEB3_URI)('AllocationResult', (_, values) => {
+					const {
+						_metrics,
+						_value,
+						_market,
+						_property,
+						_lockupValue,
+						_result
+					} = values
+					resolve([
+						_metrics,
+						new BigNumber(_value),
+						_market,
+						_property,
+						new BigNumber(_lockupValue),
+						new BigNumber(_result)
+					])
+				})
+			})
+
 			const issuedMetrics = await market.issuedMetrics().then(toBigNumber)
 			const totalIssuedMetrics = await dev.metricsGroup
 				.totalIssuedMetrics()
 				.then(toBigNumber)
-			expect(id1.toNumber()).to.be.equal(
-				new BigNumber(id2 as string).toNumber()
-			)
 			expect(_assets.toString()).to.be.equal(issuedMetrics.toString())
 			expect(_totalAssets.toString()).to.be.equal(totalIssuedMetrics.toString())
 			expect(_metrics).to.be.equal(metrics.address)
