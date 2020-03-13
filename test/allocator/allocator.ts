@@ -403,7 +403,9 @@ contract('Allocator', ([deployer, user1]) => {
 						}
 					)
 				),
-				getEventValue(dev.allocator, WEB3_URI)('BeforeAllocation', '_id')
+				getEventValue(dev.allocator, WEB3_URI)('BeforeAllocation', '_id').then(
+					toBigNumber
+				)
 			])
 			const issuedMetrics = await market.issuedMetrics().then(toBigNumber)
 			const totalIssuedMetrics = await dev.metricsGroup
