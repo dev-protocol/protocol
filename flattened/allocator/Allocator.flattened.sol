@@ -3099,7 +3099,6 @@ contract AllocatorStorage is
 }
 
 
-
 contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
