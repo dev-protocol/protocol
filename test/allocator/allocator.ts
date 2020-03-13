@@ -296,12 +296,7 @@ contract('Allocator', ([deployer, user1]) => {
 			const mint = await policy
 				.rewards(lockUpValue, totalAssets)
 				.then(toBigNumber)
-			const lastBlock = await dev.allocatorStorage
-				.getLastAllocationBlockEachMetrics(metrics.address)
-				.then(toBigNumber)
-			const util = await artifacts.require('Util').new()
-			const currentBlock = await util.blockNumber().then(toBigNumber)
-			const block = currentBlock.plus(1).minus(lastBlock)
+			const block = 1
 			const value = assetValue
 				.times(new BigNumber('1000000000000000000'))
 				.div(block)
@@ -312,33 +307,37 @@ contract('Allocator', ([deployer, user1]) => {
 				.plus(new BigNumber(value))
 
 			dev.allocator.allocate(metrics.address)
-			const [
-				_blocks,
-				_mint,
-				_value,
-				_marketValue,
-				_assets,
-				_totalAssets
-			] = await new Promise<BigNumber[]>(resolve => {
+
+			const [, _blocks, _mint, _value, _marketValue] = await new Promise<
+				BigNumber[]
+			>(resolve => {
 				watch(dev.allocator, WEB3_URI)('BeforeAllocation', (_, values) => {
-					const {
-						_blocks,
-						_mint,
-						_value,
-						_marketValue,
-						_assets,
-						_totalAssets
-					} = values
+					const {_id, _blocks, _mint, _value, _marketValue} = values
 					resolve([
+						new BigNumber(_id),
 						new BigNumber(_blocks),
 						new BigNumber(_mint),
 						new BigNumber(_value),
-						new BigNumber(_marketValue),
-						new BigNumber(_assets),
-						new BigNumber(_totalAssets)
+						new BigNumber(_marketValue)
 					])
 				})
 			})
+			const [, _assets, _totalAssets, _metrics] = await new Promise<any[]>(
+				resolve => {
+					watch(dev.allocator, WEB3_URI)(
+						'BeforeAllocationAssets',
+						(_, values) => {
+							const {_id, _assets, _totalAssets, _metrics} = values
+							resolve([
+								new BigNumber(_id),
+								new BigNumber(_assets),
+								new BigNumber(_totalAssets),
+								_metrics
+							])
+						}
+					)
+				}
+			)
 
 			expect(_blocks.toString()).to.be.equal(block.toString())
 			expect(_mint.toString()).to.be.equal(mint.toString())
@@ -346,6 +345,7 @@ contract('Allocator', ([deployer, user1]) => {
 			expect(_marketValue.toString()).to.be.equal(marketValue.toString())
 			expect(_assets.toString()).to.be.equal(assets.toString())
 			expect(_totalAssets.toString()).to.be.equal(totalAssets.toString())
+			expect(_metrics).to.be.equal(metrics.address)
 		})
 
 		it('When after increment, update the value of `lastAssetValueEachMarketPerBlock`', async () => {
