@@ -403,16 +403,15 @@ contract('Allocator', ([deployer, user1]) => {
 						}
 					)
 				),
-				getEventValue(dev.allocator, WEB3_URI)('BeforeAllocation', '_id').then(
-					toBigNumber
-				)
+				getEventValue(dev.allocator, WEB3_URI)('BeforeAllocation', '_id')
 			])
 			const issuedMetrics = await market.issuedMetrics().then(toBigNumber)
 			const totalIssuedMetrics = await dev.metricsGroup
 				.totalIssuedMetrics()
 				.then(toBigNumber)
-
-			expect(id1).to.be.equal(id2)
+			expect(id1.toNumber()).to.be.equal(
+				new BigNumber(id2 as string).toNumber()
+			)
 			expect(_assets.toString()).to.be.equal(issuedMetrics.toString())
 			expect(_totalAssets.toString()).to.be.equal(totalIssuedMetrics.toString())
 			expect(_metrics).to.be.equal(metrics.address)
