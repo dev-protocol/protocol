@@ -6,6 +6,7 @@ const toBigNumber = (v: string | BigNumber | number): BigNumber =>
 	new BigNumber(v)
 const expected = {
 	endBlock: toBigNumber('9647486'),
+	blocks: toBigNumber('38549'),
 	calclatedResult: toBigNumber('282'),
 	lockedValue: toBigNumber('0'),
 	totalLockedValue: toBigNumber('467000000000000000000'),
@@ -103,6 +104,13 @@ const handler = function(deployer, network, [owner]) {
 					return expected.endBlock.minus(baseBlock)
 				})()
 				console.log('*** Calculated the correct blocks ***', blocks.toFixed())
+
+				/* Verify the blocks equals expected value
+				 * 正しい blocks 値であることを確認
+				 */
+				if (!blocks.isEqualTo(expected.blocks)) {
+					throw new Error('unexpected blocks')
+				}
 
 				/* Calculate the mintable amount
 				 * ミント可能な値を計算
