@@ -43,8 +43,24 @@ const handler = function(deployer, network) {
 				artifacts.require('AllocatorStorage').at(prevAllocatorStorage)
 			])
 		})
-		.then(async ([allocator, allocatorStorage]) => {
+		.then(async ([prevAllocator, prevAllocatorStorage]) => {
 			console.log('*** DONE: Created the instances ***')
+			console.log('*** Update the storage address in AllocatorStorage ***')
+
+			const [eternalStorageAddress, allocatorStorage] = await Promise.all([
+				prevAllocatorStorage.getStorageAddress(),
+				artifacts
+					.require('AllocatorStorage')
+					.at(artifacts.require('AllocatorStorage').address)
+			])
+			return Promise.all([
+				prevAllocator,
+				prevAllocatorStorage,
+				allocatorStorage.setStorage(eternalStorageAddress)
+			])
+		})
+		.then(async ([allocator, allocatorStorage]) => {
+			console.log('*** DONE: Updated the storage address ***')
 			console.log('*** Kill no longer used Allocator and AllocatorStorage ***')
 
 			return Promise.all([allocator.kill(), allocatorStorage.kill()])
