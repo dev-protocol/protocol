@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 
+
 contract Killable {
 	address payable public _owner;
 
@@ -15,6 +16,7 @@ contract Killable {
 }
 
 
+
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -26,11 +28,11 @@ contract Killable {
  * This contract is only required for intermediate, library-like contracts.
  */
 contract Context {
-	// Empty internal constructor, to prevent people from mistakenly deploying
-	// an instance of this contract, which should be used via inheritance.
-	constructor() internal {}
+    // Empty internal constructor, to prevent people from mistakenly deploying
+    // an instance of this contract, which should be used via inheritance.
+	constructor () internal { }
+    // solhint-disable-previous-line no-empty-blocks
 
-	// solhint-disable-previous-line no-empty-blocks
 	function _msgSender() internal view returns (address payable) {
 		return msg.sender;
 	}
@@ -40,8 +42,6 @@ contract Context {
 		return msg.data;
 	}
 }
-
-
 /**
  * @dev Contract module which provides a basic access control mechanism, where
  * there is an account (an owner) that can be granted exclusive access to
@@ -53,69 +53,65 @@ contract Context {
  */
 contract Ownable is Context {
 	address private _owner;
-	event OwnershipTransferred(
-		address indexed previousOwner,
-		address indexed newOwner
-	);
 
-	/**
-	 * @dev Initializes the contract setting the deployer as the initial owner.
-	 */
-	constructor() internal {
-		_owner = _msgSender();
-		emit OwnershipTransferred(address(0), _owner);
+	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+	constructor () internal {
+		address msgSender = _msgSender();
+		_owner = msgSender;
+		emit OwnershipTransferred(address(0), msgSender);
 	}
 
-	/**
-	 * @dev Returns the address of the current owner.
-	 */
+    /**
+     * @dev Returns the address of the current owner.
+     */
 	function owner() public view returns (address) {
 		return _owner;
 	}
 
-	/**
-	 * @dev Throws if called by any account other than the owner.
-	 */
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
 	modifier onlyOwner() {
 		require(isOwner(), "Ownable: caller is not the owner");
 		_;
 	}
 
-	/**
-	 * @dev Returns true if the caller is the current owner.
-	 */
+    /**
+     * @dev Returns true if the caller is the current owner.
+     */
 	function isOwner() public view returns (bool) {
 		return _msgSender() == _owner;
 	}
 
-	/**
-	 * @dev Leaves the contract without owner. It will not be possible to call
-	 * `onlyOwner` functions anymore. Can only be called by the current owner.
-	 *
-	 * NOTE: Renouncing ownership will leave the contract without an owner,
-	 * thereby removing any functionality that is only available to the owner.
-	 */
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
 	function renounceOwnership() public onlyOwner {
 		emit OwnershipTransferred(_owner, address(0));
 		_owner = address(0);
 	}
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 * Can only be called by the current owner.
-	 */
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
 	function transferOwnership(address newOwner) public onlyOwner {
 		_transferOwnership(newOwner);
 	}
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 */
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     */
 	function _transferOwnership(address newOwner) internal {
-		require(
-			newOwner != address(0),
-			"Ownable: new owner is the zero address"
-		);
+		require(newOwner != address(0), "Ownable: new owner is the zero address");
 		emit OwnershipTransferred(_owner, newOwner);
 		_owner = newOwner;
 	}
@@ -124,12 +120,14 @@ contract Ownable is Context {
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
+
 	mapping(bytes32 => uint256) private uIntStorage;
 	mapping(bytes32 => string) private stringStorage;
 	mapping(bytes32 => address) private addressStorage;
 	mapping(bytes32 => bytes32) private bytesStorage;
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
+
 	modifier onlyCurrentOwner() {
 		require(msg.sender == currentOwner, "not current owner");
 		_;
@@ -225,6 +223,7 @@ contract EternalStorage {
 
 contract UsingStorage is Ownable {
 	address private _storage;
+
 	modifier hasStorage() {
 		require(_storage != address(0), "storage is not setted");
 		_;
@@ -259,10 +258,16 @@ contract UsingStorage is Ownable {
 }
 
 
+
 // prettier-ignore
+
+
+
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
+
 	function addGroup(address _addr) external;
+
 	function getGroupKey(address _addr) internal pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
