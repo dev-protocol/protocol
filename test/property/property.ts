@@ -5,6 +5,7 @@ import {
 	validateAddressErrorMessage
 } from '../test-lib/utils/error'
 import {DEFAULT_ADDRESS} from '../test-lib/const'
+import {toBigNumber} from '../test-lib/utils/common'
 
 contract(
 	'PropertyTest',
@@ -34,11 +35,17 @@ contract(
 						from: propertyFactory
 					}
 				)
+				const tenMillion = toBigNumber(1000)
+					.times(10000)
+					.times(1e18)
 				expect(await propertyInstance.author()).to.be.equal(author)
 				expect((await propertyInstance.decimals()).toNumber()).to.be.equal(18)
 				expect(
-					(await propertyInstance.balanceOf(author)).toNumber()
-				).to.be.equal(10000000000000000000000000)
+					(await propertyInstance.balanceOf(author).then(toBigNumber)).toFixed()
+				).to.be.equal(tenMillion.toFixed())
+				expect(
+					(await propertyInstance.totalSupply().then(toBigNumber)).toFixed()
+				).to.be.equal(tenMillion.toFixed())
 			})
 		})
 		describe('Property; withdraw', () => {
