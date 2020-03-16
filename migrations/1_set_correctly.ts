@@ -1,8 +1,9 @@
 import Web3 from 'web3'
 import {addressConfig, property, market, metrics} from './addresses'
-import {toBigNumber} from '../test/test-lib/utils/common'
 import BigNumber from 'bignumber.js'
 
+const toBigNumber = (v: string | BigNumber | number): BigNumber =>
+	new BigNumber(v)
 const expected = {
 	endBlock: toBigNumber('9647486'),
 	calclatedResult: toBigNumber('282'),
