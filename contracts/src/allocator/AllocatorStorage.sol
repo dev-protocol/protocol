@@ -75,41 +75,6 @@ contract AllocatorStorage is
 		return keccak256(abi.encodePacked("_pendingIncrement", _metrics));
 	}
 
-	// LastAllocationBlockEachMetrics
-	function setLastAllocationBlockEachMetrics(
-		address _metrics,
-		uint256 blockNumber
-	) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		eternalStorage().setUint(
-			getLastAllocationBlockEachMetricsKey(_metrics),
-			blockNumber
-		);
-	}
-
-	function getLastAllocationBlockEachMetrics(address _metrics)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastAllocationBlockEachMetricsKey(_metrics)
-			);
-	}
-
-	function getLastAllocationBlockEachMetricsKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_lastAllocationBlockEachMetrics", _addr)
-			);
-	}
-
 	// LastAssetValueEachMetrics
 	function setLastAssetValueEachMetrics(address _metrics, uint256 value)
 		external

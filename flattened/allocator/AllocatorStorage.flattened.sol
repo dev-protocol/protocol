@@ -459,6 +459,7 @@ contract AllocatorStorage is
 	// Last Block Number
 	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(getLastBlockNumberKey(_metrics), _blocks);
 	}
 
@@ -481,6 +482,7 @@ contract AllocatorStorage is
 	// Base Block Number
 	function setBaseBlockNumber(uint256 _blockNumber) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(getBaseBlockNumberKey(), _blockNumber);
 	}
 
@@ -495,6 +497,7 @@ contract AllocatorStorage is
 	// PendingIncrement
 	function setPendingIncrement(address _metrics, bool value) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setBool(getPendingIncrementKey(_metrics), value);
 	}
 
@@ -514,45 +517,12 @@ contract AllocatorStorage is
 		return keccak256(abi.encodePacked("_pendingIncrement", _metrics));
 	}
 
-	// LastAllocationBlockEachMetrics
-	function setLastAllocationBlockEachMetrics(
-		address _metrics,
-		uint256 blockNumber
-	) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-		eternalStorage().setUint(
-			getLastAllocationBlockEachMetricsKey(_metrics),
-			blockNumber
-		);
-	}
-
-	function getLastAllocationBlockEachMetrics(address _metrics)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastAllocationBlockEachMetricsKey(_metrics)
-			);
-	}
-
-	function getLastAllocationBlockEachMetricsKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_lastAllocationBlockEachMetrics", _addr)
-			);
-	}
-
 	// LastAssetValueEachMetrics
 	function setLastAssetValueEachMetrics(address _metrics, uint256 value)
 		external
 	{
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(
 			getLastAssetValueEachMetricsKey(_metrics),
 			value
@@ -581,6 +551,7 @@ contract AllocatorStorage is
 		external
 	{
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(
 			getLastAssetValueEachMarketPerBlockKey(_market),
 			value

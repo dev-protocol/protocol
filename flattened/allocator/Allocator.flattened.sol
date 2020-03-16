@@ -2961,6 +2961,7 @@ contract AllocatorStorage is
 	// Last Block Number
 	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(getLastBlockNumberKey(_metrics), _blocks);
 	}
 
@@ -2983,6 +2984,7 @@ contract AllocatorStorage is
 	// Base Block Number
 	function setBaseBlockNumber(uint256 _blockNumber) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(getBaseBlockNumberKey(), _blockNumber);
 	}
 
@@ -2997,6 +2999,7 @@ contract AllocatorStorage is
 	// PendingIncrement
 	function setPendingIncrement(address _metrics, bool value) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setBool(getPendingIncrementKey(_metrics), value);
 	}
 
@@ -3016,45 +3019,12 @@ contract AllocatorStorage is
 		return keccak256(abi.encodePacked("_pendingIncrement", _metrics));
 	}
 
-	// LastAllocationBlockEachMetrics
-	function setLastAllocationBlockEachMetrics(
-		address _metrics,
-		uint256 blockNumber
-	) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-		eternalStorage().setUint(
-			getLastAllocationBlockEachMetricsKey(_metrics),
-			blockNumber
-		);
-	}
-
-	function getLastAllocationBlockEachMetrics(address _metrics)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastAllocationBlockEachMetricsKey(_metrics)
-			);
-	}
-
-	function getLastAllocationBlockEachMetricsKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_lastAllocationBlockEachMetrics", _addr)
-			);
-	}
-
 	// LastAssetValueEachMetrics
 	function setLastAssetValueEachMetrics(address _metrics, uint256 value)
 		external
 	{
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(
 			getLastAssetValueEachMetricsKey(_metrics),
 			value
@@ -3083,6 +3053,7 @@ contract AllocatorStorage is
 		external
 	{
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(
 			getLastAssetValueEachMarketPerBlockKey(_market),
 			value
@@ -3116,6 +3087,7 @@ contract AllocatorStorage is
 contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+
 	event BeforeAllocation(
 		uint256 _blocks,
 		uint256 _mint,
@@ -3124,6 +3096,15 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		uint256 _assets,
 		uint256 _totalAssets
 	);
+	event AllocationResult(
+		address _metrics,
+		uint256 _value,
+		address _market,
+		address _property,
+		uint256 _lockupValue,
+		uint256 _result
+	);
+
 	uint64 public constant basis = 1000000000000000000;
 
 	// solium-disable-next-line no-empty-blocks
@@ -3131,6 +3112,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 
 	function allocate(address _metrics) external {
 		addressValidator().validateGroup(_metrics, config().metricsGroup());
+
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		getStorage().setPendingIncrement(_metrics, true);
@@ -3144,6 +3126,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 
 	function calculatedCallback(address _metrics, uint256 _value) external {
 		addressValidator().validateGroup(_metrics, config().metricsGroup());
+
 		Metrics metrics = Metrics(_metrics);
 		Market market = Market(metrics.market());
 		require(
@@ -3160,8 +3143,9 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			metrics.property()
 		);
 		uint256 blocks = block.number.sub(
-			getStorage().getLastAllocationBlockEachMetrics(_metrics)
+			getLastAllocationBlockNumber(_metrics)
 		);
+		blocks = blocks > 0 ? blocks : 1;
 		uint256 mint = Policy(config().policy()).rewards(
 			Lockup(config().lockup()).getAllValue(),
 			totalAssets
@@ -3175,7 +3159,6 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))
 			.add(value);
 		uint256 assets = market.issuedMetrics();
-		getStorage().setLastAllocationBlockEachMetrics(_metrics, block.number);
 		getStorage().setLastAssetValueEachMetrics(_metrics, value);
 		getStorage().setLastAssetValueEachMarketPerBlock(
 			metrics.market(),
@@ -3197,6 +3180,14 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			assets,
 			totalAssets
 		);
+		emit AllocationResult(
+			_metrics,
+			_value,
+			metrics.market(),
+			metrics.property(),
+			lockupValue,
+			result
+		);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
 	}
@@ -3217,6 +3208,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		external
 	{
 		addressValidator().validateGroup(msg.sender, config().propertyGroup());
+
 		Withdraw(config().withdraw()).beforeBalanceChange(
 			_property,
 			_from,

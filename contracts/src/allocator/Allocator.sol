@@ -20,6 +20,7 @@ import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+
 	event BeforeAllocation(
 		uint256 _blocks,
 		uint256 _mint,
@@ -27,6 +28,14 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		uint256 _marketValue,
 		uint256 _assets,
 		uint256 _totalAssets
+	);
+	event AllocationResult(
+		address _metrics,
+		uint256 _value,
+		address _market,
+		address _property,
+		uint256 _lockupValue,
+		uint256 _result
 	);
 
 	uint64 public constant basis = 1000000000000000000;
@@ -67,8 +76,9 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			metrics.property()
 		);
 		uint256 blocks = block.number.sub(
-			getStorage().getLastAllocationBlockEachMetrics(_metrics)
+			getLastAllocationBlockNumber(_metrics)
 		);
+		blocks = blocks > 0 ? blocks : 1;
 		uint256 mint = Policy(config().policy()).rewards(
 			Lockup(config().lockup()).getAllValue(),
 			totalAssets
@@ -82,7 +92,6 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))
 			.add(value);
 		uint256 assets = market.issuedMetrics();
-		getStorage().setLastAllocationBlockEachMetrics(_metrics, block.number);
 		getStorage().setLastAssetValueEachMetrics(_metrics, value);
 		getStorage().setLastAssetValueEachMarketPerBlock(
 			metrics.market(),
@@ -103,6 +112,14 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 			marketValue,
 			assets,
 			totalAssets
+		);
+		emit AllocationResult(
+			_metrics,
+			_value,
+			metrics.market(),
+			metrics.property(),
+			lockupValue,
+			result
 		);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
