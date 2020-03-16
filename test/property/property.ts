@@ -38,7 +38,7 @@ contract(
 				expect((await propertyInstance.decimals()).toNumber()).to.be.equal(18)
 				expect(
 					(await propertyInstance.balanceOf(author)).toNumber()
-				).to.be.equal(10000000)
+				).to.be.equal(10000000000000000000000000)
 			})
 		})
 		describe('Property; withdraw', () => {
