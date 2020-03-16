@@ -20,16 +20,19 @@ const expected = {
 }
 
 const createRewardsAmountKey = (prop: string): string =>
-	Web3.utils.keccak256(`_rewardsAmount${prop}`)
+	Web3.utils.soliditySha3('_rewardsAmount', prop) as string
 const createCumulativePriceKey = (prop: string): string =>
-	Web3.utils.keccak256(`_cumulativePrice${prop}`)
+	Web3.utils.soliditySha3('_cumulativePrice', prop) as string
 const lastAssetValueEachMarketPerBlockKey = (prop: string): string =>
-	Web3.utils.keccak256(`_lastAssetValueEachMarketPerBlock${prop}`)
+	Web3.utils.soliditySha3('_lastAssetValueEachMarketPerBlock', prop) as string
 const lastAssetValueEachMetricsKey = (prop: string): string =>
-	Web3.utils.keccak256(`_lastAssetValueEachMetrics${prop}`)
+	Web3.utils.soliditySha3('_lastAssetValueEachMetrics', prop) as string
 
 const price = (value: BigNumber): BigNumber =>
-	value.times(toBigNumber('1000000000000000000')).div(10000000)
+	value
+		.times(toBigNumber('1000000000000000000'))
+		.div(10000000)
+		.integerValue()
 
 const handler = function(deployer, network, [owner]) {
 	if (network === 'test') {
@@ -128,7 +131,10 @@ const handler = function(deployer, network, [owner]) {
 						.assetValue(expected.calclatedResult, expected.lockedValue)
 						.then(toBigNumber)
 					const basis = await allocatorInstance.basis().then(toBigNumber)
-					return assetValue.times(basis).div(blocks)
+					return assetValue
+						.times(basis)
+						.div(blocks)
+						.integerValue()
 				})()
 				console.log(
 					'*** Calculated the correct asset value ***',
