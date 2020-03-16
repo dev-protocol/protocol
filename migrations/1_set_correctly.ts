@@ -13,6 +13,7 @@ const expected = {
 	allocationResult: toBigNumber('15135211357674806527948'),
 	incorrectAllocationResult: toBigNumber('3787821725082588096476872'),
 	incorrectMarketValue: toBigNumber('29230412980127'),
+	incorrectAssetValue: toBigNumber('29230412980127'),
 	correctAssetValue: toBigNumber('7315364860307660'),
 	correctMarketValue: toBigNumber('7315364860307660')
 }
@@ -202,7 +203,7 @@ const handler = function(deployer, network, [owner]) {
 				originalRewardsAmount,
 				originalCumulativePrice,
 				originalLastAssetValueEachMarketPerBlock,
-				originalLastAssetValueEachMetricsKey
+				originalLastAssetValueEachMetrics
 			] = await Promise.all([
 				withdrawEternalStorageInstance
 					.getUint(keys.rewardsAmount)
@@ -222,7 +223,7 @@ const handler = function(deployer, network, [owner]) {
 				originalRewardsAmount.toFixed(),
 				originalCumulativePrice.toFixed(),
 				originalLastAssetValueEachMarketPerBlock.toFixed(),
-				originalLastAssetValueEachMetricsKey.toFixed()
+				originalLastAssetValueEachMetrics.toFixed()
 			)
 
 			/* Verify the incorrect states are equals to the incorrect states that expected
@@ -236,8 +237,8 @@ const handler = function(deployer, network, [owner]) {
 				!originalLastAssetValueEachMarketPerBlock.isEqualTo(
 					expected.incorrectMarketValue
 				) &&
-				!originalLastAssetValueEachMetricsKey.isEqualTo(
-					expected.incorrectAllocationResult
+				!originalLastAssetValueEachMetrics.isEqualTo(
+					expected.incorrectAssetValue
 				)
 			) {
 				throw new Error('got an unexpected value')
