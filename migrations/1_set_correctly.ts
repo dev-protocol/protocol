@@ -155,7 +155,8 @@ const handler = function(deployer, network, [owner]) {
 			 */
 			if (
 				!allocationResult.isEqualTo(expected.allocationResult) &&
-				!correctAssetValue.isEqualTo(expected.correctAssetValue)
+				!correctAssetValue.isEqualTo(expected.correctAssetValue) &&
+				!correctAssetValue.isEqualTo(expected.correctMarketValue)
 			) {
 				throw new Error('unexpected allocation result or assetValue result')
 			}
