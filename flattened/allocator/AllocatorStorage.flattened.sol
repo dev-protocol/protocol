@@ -31,6 +31,7 @@ contract Context {
 	constructor() internal {}
 
 	// solhint-disable-previous-line no-empty-blocks
+
 	function _msgSender() internal view returns (address payable) {
 		return msg.sender;
 	}
@@ -53,6 +54,7 @@ contract Context {
  */
 contract Ownable is Context {
 	address private _owner;
+
 	event OwnershipTransferred(
 		address indexed previousOwner,
 		address indexed newOwner
@@ -62,8 +64,9 @@ contract Ownable is Context {
 	 * @dev Initializes the contract setting the deployer as the initial owner.
 	 */
 	constructor() internal {
-		_owner = _msgSender();
-		emit OwnershipTransferred(address(0), _owner);
+		address msgSender = _msgSender();
+		_owner = msgSender;
+		emit OwnershipTransferred(address(0), msgSender);
 	}
 
 	/**
@@ -124,12 +127,14 @@ contract Ownable is Context {
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
+
 	mapping(bytes32 => uint256) private uIntStorage;
 	mapping(bytes32 => string) private stringStorage;
 	mapping(bytes32 => address) private addressStorage;
 	mapping(bytes32 => bytes32) private bytesStorage;
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
+
 	modifier onlyCurrentOwner() {
 		require(msg.sender == currentOwner, "not current owner");
 		_;
@@ -225,6 +230,7 @@ contract EternalStorage {
 
 contract UsingStorage is Ownable {
 	address private _storage;
+
 	modifier hasStorage() {
 		require(_storage != address(0), "storage is not setted");
 		_;
@@ -260,9 +266,12 @@ contract UsingStorage is Ownable {
 
 
 // prettier-ignore
+
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
+
 	function addGroup(address _addr) external;
+
 	function getGroupKey(address _addr) internal pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
