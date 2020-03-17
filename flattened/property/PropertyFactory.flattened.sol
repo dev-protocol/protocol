@@ -3275,7 +3275,6 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 }
 
 
-
 contract PropertyFactory is Pausable, UsingConfig {
 	event Create(address indexed _from, address _property);
 
