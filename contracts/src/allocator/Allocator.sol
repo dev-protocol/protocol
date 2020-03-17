@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
@@ -17,7 +17,7 @@ import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
 
-contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
+contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -216,6 +216,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	}
 
 	function getStorage() private view returns (AllocatorStorage) {
+		require(paused() == false, "You cannot use that");
 		return AllocatorStorage(config().allocatorStorage());
 	}
 }
