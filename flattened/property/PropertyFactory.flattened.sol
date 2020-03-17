@@ -3236,7 +3236,7 @@ contract Allocator is
 
 contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	uint8 private constant _decimals = 18;
-	uint256 private constant _supply = 10000000;
+	uint256 private constant _supply = 10000000000000000000000000;
 	address public author;
 
 	constructor(
@@ -3249,6 +3249,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 			msg.sender,
 			config().propertyFactory()
 		);
+
 		author = _own;
 		_mint(author, _supply);
 	}
@@ -3256,6 +3257,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		addressValidator().validateIllegalAddress(_to);
 		require(_value != 0, "illegal transfer value");
+
 		Allocator(config().allocator()).beforeBalanceChange(
 			address(this),
 			msg.sender,
@@ -3266,13 +3268,15 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 
 	function withdraw(address _sender, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
+
 		ERC20 devToken = ERC20(config().token());
 		devToken.transfer(_sender, _value);
 	}
 }
 
 
-contract PropertyFactory is Pausable, UsingConfig, Killable {
+
+contract PropertyFactory is Pausable, UsingConfig {
 	event Create(address indexed _from, address _property);
 
 	// solium-disable-next-line no-empty-blocks
@@ -3286,6 +3290,7 @@ contract PropertyFactory is Pausable, UsingConfig, Killable {
 		require(paused() == false, "You cannot use that");
 		validatePropertyName(_name);
 		validatePropertySymbol(_symbol);
+
 		Property property = new Property(
 			address(config()),
 			_author,
