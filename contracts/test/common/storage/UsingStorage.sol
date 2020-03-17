@@ -4,6 +4,14 @@ import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
 
 contract UsingStorageTest is UsingStorage {
+	function getEternalStorageAddress()
+		public
+		view
+		returns (address)
+	{
+		return address(eternalStorage());
+	}
+
 	function setUInt(uint256 _value) external {
 		eternalStorage().setUint(getUintKey(), _value);
 	}
