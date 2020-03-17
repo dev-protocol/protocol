@@ -106,7 +106,7 @@ contract('Allocator', ([deployer, user1]) => {
 		})
 
 		it('The calculation period is based on the previous execution blocks to the current execution blocks', async () => {
-			const [dev, metrics] = await init()
+			const [dev, , metrics] = await init()
 			await dev.allocator.allocate(metrics.address)
 			const _lastBlock = await dev.allocatorStorage
 				.getLastBlockNumber(metrics.address)
