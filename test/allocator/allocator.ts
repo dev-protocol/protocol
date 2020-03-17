@@ -3,7 +3,11 @@ import BigNumber from 'bignumber.js'
 import {toBigNumber, mine} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {watch, waitForEvent, getEventValue} from '../test-lib/utils/event'
-import {validateErrorMessage} from '../test-lib/utils/error'
+import {
+	validateErrorMessage,
+	validatePauseErrorMessage,
+	validatePauseOnlyOwnerErrorMessage
+} from '../test-lib/utils/error'
 
 import {WEB3_URI} from '../test-lib/const'
 import {
@@ -524,22 +528,24 @@ contract('Allocator', ([deployer, user1]) => {
 		})
 	})
 
-	describe('Allocator; kill', () => {
-		it('Destruct this contract', async () => {
-			const [dev] = await init()
-			await dev.allocator.kill()
-			const res = await dev.allocator.basis().catch((err: Error) => err)
-
-			expect(res).to.be.an.instanceOf(Error)
+	describe('Allocator; pause', () => {
+		it('pause and unpause this contract', async () => {
+			const [dev, , metrics] = await init()
+			await dev.allocator.pause()
+			const res = await dev.allocator
+				.allocate(metrics.address)
+				.catch((err: Error) => err)
+			validatePauseErrorMessage(res)
+			await dev.allocator.unpause()
+			await dev.allocator.allocate(metrics.address)
 		})
 
-		it('Should fail to destruct this contract when sent from the non-owner account', async () => {
+		it('Should fail to pause this contract when sent from the non-owner account', async () => {
 			const [dev] = await init()
 			const res = await dev.allocator
-				.kill({from: user1})
+				.pause({from: user1})
 				.catch((err: Error) => err)
-
-			expect(res).to.be.an.instanceOf(Error)
+			validatePauseOnlyOwnerErrorMessage(res)
 		})
 	})
 })
