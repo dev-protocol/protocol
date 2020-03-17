@@ -1,6 +1,6 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
-import {toBigNumber} from '../test-lib/utils/common'
+import {toBigNumber, mine} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {watch, waitForEvent, getEventValue} from '../test-lib/utils/event'
 import {validateErrorMessage} from '../test-lib/utils/error'
@@ -103,6 +103,27 @@ contract('Allocator', ([deployer, user1]) => {
 			dev.allocator.allocate(metrics.address)
 			await waitForEvent(behavior, WEB3_URI)('LogCalculate')
 			expect(1).to.be.eq(1)
+		})
+
+		it('The calculation period is based on the previous execution blocks to the current execution blocks', async () => {
+			const [dev, metrics] = await init()
+			await dev.allocator.allocate(metrics.address)
+			const _lastBlock = await dev.allocatorStorage
+				.getLastBlockNumber(metrics.address)
+				.then(toBigNumber)
+			await mine(10)
+			dev.allocator.allocate(metrics.address)
+			const blocks = await getEventValue(dev.allocator, WEB3_URI)(
+				'BeforeAllocation',
+				'_blocks'
+			)
+			const lastBlock = await dev.allocatorStorage
+				.getLastBlockNumber(metrics.address)
+				.then(toBigNumber)
+			expect(blocks.toString()).to.be.equal('11')
+			expect(lastBlock.minus(_lastBlock).toString()).to.be.equal(
+				blocks.toString()
+			)
 		})
 
 		it('Should fail to call when other than Metrics address is passed', async () => {

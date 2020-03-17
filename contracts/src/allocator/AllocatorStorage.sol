@@ -137,4 +137,33 @@ contract AllocatorStorage is
 				abi.encodePacked("_lastAssetValueEachMarketPerBlock", _addr)
 			);
 	}
+
+	// pendingLastBlockNumber
+	function setPendingLastBlockNumber(address _metrics, uint256 value)
+		external
+	{
+		addressValidator().validateAddress(msg.sender, config().allocator());
+
+		eternalStorage().setUint(
+			getPendingLastBlockNumberKey(_metrics),
+			value
+		);
+	}
+
+	function getPendingLastBlockNumber(address _metrics)
+		external
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(getPendingLastBlockNumberKey(_metrics));
+	}
+
+	function getPendingLastBlockNumberKey(address _addr)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_pendingLastBlockNumber", _addr));
+	}
 }

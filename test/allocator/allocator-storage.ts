@@ -74,5 +74,24 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
+		describe('AllocatorStorage; setPendingLastBlockNumber, getPendingLastBlockNumber', () => {
+			it('Can get setted value.', async () => {
+				await dev.allocatorStorage.setPendingLastBlockNumber(metrics, 1000000, {
+					from: allocator
+				})
+				const result = await dev.allocatorStorage.getPendingLastBlockNumber(
+					metrics
+				)
+				expect(result.toNumber()).to.be.equal(1000000)
+			})
+			it('Cannot rewrite data from other than allocator.', async () => {
+				const result = await dev.allocatorStorage
+					.setPendingLastBlockNumber(metrics, 1000000, {
+						from: dummyAllocator
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
 	}
 )

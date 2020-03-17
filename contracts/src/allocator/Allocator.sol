@@ -49,12 +49,12 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		getStorage().setPendingIncrement(_metrics, true);
+		getStorage().setPendingLastBlockNumber(_metrics, block.number);
 		IMarketBehavior(Market(market).behavior()).calculate(
 			_metrics,
 			getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
-		getStorage().setLastBlockNumber(_metrics, block.number);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) external {
@@ -123,6 +123,8 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
+		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
+		getStorage().setLastBlockNumber(_metrics, lastBlock);
 	}
 
 	function increment(address _property, uint256 _reward, uint256 _lockup)
