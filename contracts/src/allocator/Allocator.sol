@@ -76,9 +76,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			metrics.property()
 		);
 		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
-		uint256 blocks = lastBlock.sub(
-			getLastAllocationBlockNumber(_metrics)
-		);
+		uint256 blocks = lastBlock.sub(getLastAllocationBlockNumber(_metrics));
 		blocks = blocks > 0 ? blocks : 1;
 		uint256 mint = Policy(config().policy()).rewards(
 			Lockup(config().lockup()).getAllValue(),

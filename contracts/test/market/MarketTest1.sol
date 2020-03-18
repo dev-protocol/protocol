@@ -50,16 +50,13 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		return true;
 	}
 
-	function calculated(
-	) external returns (bool) {
+	function calculated() external returns (bool) {
 		emit LogCalculate(metrics, lastBlock, currentBlock);
 		Allocator(config().allocator()).calculatedCallback(metrics, 100);
 		return true;
 	}
 
-	function changeAsynchronousMode(
-		bool _mode
-	) external {
+	function changeAsynchronousMode(bool _mode) external {
 		asynchronousMode = _mode;
 	}
 }
