@@ -3157,9 +3157,8 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
 			metrics.property()
 		);
-		uint256 blocks = block.number.sub(
-			getLastAllocationBlockNumber(_metrics)
-		);
+		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
+		uint256 blocks = lastBlock.sub(getLastAllocationBlockNumber(_metrics));
 		blocks = blocks > 0 ? blocks : 1;
 		uint256 mint = Policy(config().policy()).rewards(
 			Lockup(config().lockup()).getAllValue(),
@@ -3205,7 +3204,6 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
-		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
 		getStorage().setLastBlockNumber(_metrics, lastBlock);
 	}
 
