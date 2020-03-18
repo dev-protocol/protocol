@@ -1,20 +1,6 @@
 pragma solidity ^0.5.0;
 
 
-contract Killable {
-	address payable public _owner;
-
-	constructor() internal {
-		_owner = msg.sender;
-	}
-
-	function kill() public {
-		require(msg.sender == _owner, "only owner method");
-		selfdestruct(_owner);
-	}
-}
-
-
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -125,6 +111,161 @@ contract Ownable is Context {
 }
 
 
+/**
+ * @title Roles
+ * @dev Library for managing addresses assigned to a Role.
+ */
+library Roles {
+	struct Role {
+		mapping(address => bool) bearer;
+	}
+
+	/**
+	 * @dev Give an account access to this role.
+	 */
+	function add(Role storage role, address account) internal {
+		require(!has(role, account), "Roles: account already has role");
+		role.bearer[account] = true;
+	}
+
+	/**
+	 * @dev Remove an account's access to this role.
+	 */
+	function remove(Role storage role, address account) internal {
+		require(has(role, account), "Roles: account does not have role");
+		role.bearer[account] = false;
+	}
+
+	/**
+	 * @dev Check if an account has this role.
+	 * @return bool
+	 */
+	function has(Role storage role, address account)
+		internal
+		view
+		returns (bool)
+	{
+		require(account != address(0), "Roles: account is the zero address");
+		return role.bearer[account];
+	}
+}
+
+
+contract PauserRole is Context {
+	using Roles for Roles.Role;
+
+	event PauserAdded(address indexed account);
+	event PauserRemoved(address indexed account);
+
+	Roles.Role private _pausers;
+
+	constructor() internal {
+		_addPauser(_msgSender());
+	}
+
+	modifier onlyPauser() {
+		require(
+			isPauser(_msgSender()),
+			"PauserRole: caller does not have the Pauser role"
+		);
+		_;
+	}
+
+	function isPauser(address account) public view returns (bool) {
+		return _pausers.has(account);
+	}
+
+	function addPauser(address account) public onlyPauser {
+		_addPauser(account);
+	}
+
+	function renouncePauser() public {
+		_removePauser(_msgSender());
+	}
+
+	function _addPauser(address account) internal {
+		_pausers.add(account);
+		emit PauserAdded(account);
+	}
+
+	function _removePauser(address account) internal {
+		_pausers.remove(account);
+		emit PauserRemoved(account);
+	}
+}
+
+
+/**
+ * @dev Contract module which allows children to implement an emergency stop
+ * mechanism that can be triggered by an authorized account.
+ *
+ * This module is used through inheritance. It will make available the
+ * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
+ * the functions of your contract. Note that they will not be pausable by
+ * simply including this module, only once the modifiers are put in place.
+ */
+contract Pausable is Context, PauserRole {
+	/**
+	 * @dev Emitted when the pause is triggered by a pauser (`account`).
+	 */
+	event Paused(address account);
+
+	/**
+	 * @dev Emitted when the pause is lifted by a pauser (`account`).
+	 */
+	event Unpaused(address account);
+
+	bool private _paused;
+
+	/**
+	 * @dev Initializes the contract in unpaused state. Assigns the Pauser role
+	 * to the deployer.
+	 */
+	constructor() internal {
+		_paused = false;
+	}
+
+	/**
+	 * @dev Returns true if the contract is paused, and false otherwise.
+	 */
+	function paused() public view returns (bool) {
+		return _paused;
+	}
+
+	/**
+	 * @dev Modifier to make a function callable only when the contract is not paused.
+	 */
+	modifier whenNotPaused() {
+		require(!_paused, "Pausable: paused");
+		_;
+	}
+
+	/**
+	 * @dev Modifier to make a function callable only when the contract is paused.
+	 */
+	modifier whenPaused() {
+		require(_paused, "Pausable: not paused");
+		_;
+	}
+
+	/**
+	 * @dev Called by a pauser to pause, triggers stopped state.
+	 */
+	function pause() public onlyPauser whenNotPaused {
+		_paused = true;
+		emit Paused(_msgSender());
+	}
+
+	/**
+	 * @dev Called by a pauser to unpause, returns to normal state.
+	 */
+	function unpause() public onlyPauser whenPaused {
+		_paused = false;
+		emit Unpaused(_msgSender());
+	}
+}
+
+
 contract EternalStorage {
 	address private currentOwner = msg.sender;
 
@@ -228,7 +369,7 @@ contract EternalStorage {
 }
 
 
-contract UsingStorage is Ownable {
+contract UsingStorage is Ownable, Pausable {
 	address private _storage;
 
 	modifier hasStorage() {
@@ -242,6 +383,7 @@ contract UsingStorage is Ownable {
 		hasStorage
 		returns (EternalStorage)
 	{
+		require(paused() == false, "You cannot use that");
 		return EternalStorage(_storage);
 	}
 
@@ -261,6 +403,20 @@ contract UsingStorage is Ownable {
 
 	function changeOwner(address newOwner) external onlyOwner {
 		EternalStorage(_storage).changeOwner(newOwner);
+	}
+}
+
+
+contract Killable {
+	address payable public _owner;
+
+	constructor() internal {
+		_owner = msg.sender;
+	}
+
+	function kill() public {
+		require(msg.sender == _owner, "only owner method");
+		selfdestruct(_owner);
 	}
 }
 
@@ -457,12 +613,7 @@ contract UsingConfig {
 }
 
 
-contract AllocatorStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	// Last Block Number
@@ -587,5 +738,30 @@ contract AllocatorStorage is
 			keccak256(
 				abi.encodePacked("_lastAssetValueEachMarketPerBlock", _addr)
 			);
+	}
+
+	// pendingLastBlockNumber
+	function setPendingLastBlockNumber(address _metrics, uint256 value)
+		external
+	{
+		addressValidator().validateAddress(msg.sender, config().allocator());
+
+		eternalStorage().setUint(getPendingLastBlockNumberKey(_metrics), value);
+	}
+
+	function getPendingLastBlockNumber(address _metrics)
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getPendingLastBlockNumberKey(_metrics));
+	}
+
+	function getPendingLastBlockNumberKey(address _addr)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_pendingLastBlockNumber", _addr));
 	}
 }
