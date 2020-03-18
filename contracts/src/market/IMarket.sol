@@ -16,11 +16,6 @@ contract IMarket {
 			address
 		);
 
-	function getAuthenticationFee(address _property)
-		private
-		view
-		returns (uint256);
-
 	function authenticatedCallback(address _property, bytes32 _idHash)
 		external
 		returns (address);
