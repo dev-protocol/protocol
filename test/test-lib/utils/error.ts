@@ -11,3 +11,18 @@ export function validateErrorMessage(
 export function validateAddressErrorMessage(result: any, reason = true): void {
 	validateErrorMessage(result, 'this is illegal address', reason)
 }
+
+export function validatePauseErrorMessage(result: any, reason = true): void {
+	validateErrorMessage(result, 'You cannot use that', reason)
+}
+
+export function validatePauseOnlyOwnerErrorMessage(
+	result: any,
+	reason = true
+): void {
+	validateErrorMessage(
+		result,
+		'PauserRole: caller does not have the Pauser role',
+		reason
+	)
+}
