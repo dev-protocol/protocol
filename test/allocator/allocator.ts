@@ -110,13 +110,20 @@ contract('Allocator', ([deployer, user1]) => {
 		})
 
 		it('Determine the calculation period by the interval between the previous run block and the current running block', async () => {
-			const [dev, , metrics] = await init()
+			const [dev, market, metrics] = await init()
+			const behavior = await market
+				.behavior()
+				.then(x => artifacts.require('MarketTest1').at(x))
+			await behavior.changeAsynchronousMode(true)
 			await dev.allocator.allocate(metrics.address)
+			await behavior.calculated()
 			const _lastBlock = await dev.allocatorStorage
 				.getLastBlockNumber(metrics.address)
 				.then(toBigNumber)
 			await mine(10)
-			dev.allocator.allocate(metrics.address)
+			await dev.allocator.allocate(metrics.address)
+			await mine(10)
+			await behavior.calculated()
 			const blocks = await getEventValue(dev.allocator, WEB3_URI)(
 				'BeforeAllocation',
 				'_blocks'

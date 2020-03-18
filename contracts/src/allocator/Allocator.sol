@@ -75,7 +75,8 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
 			metrics.property()
 		);
-		uint256 blocks = block.number.sub(
+		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
+		uint256 blocks = lastBlock.sub(
 			getLastAllocationBlockNumber(_metrics)
 		);
 		blocks = blocks > 0 ? blocks : 1;
@@ -123,7 +124,6 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
-		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
 		getStorage().setLastBlockNumber(_metrics, lastBlock);
 	}
 
