@@ -2352,11 +2352,6 @@ contract IMarket {
 			address
 		);
 
-	function getAuthenticationFee(address _property)
-		private
-		view
-		returns (uint256);
-
 	function authenticatedCallback(address _property, bytes32 _idHash)
 		external
 		returns (address);
@@ -2950,12 +2945,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 }
 
 
-contract AllocatorStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	// Last Block Number
@@ -3081,10 +3071,35 @@ contract AllocatorStorage is
 				abi.encodePacked("_lastAssetValueEachMarketPerBlock", _addr)
 			);
 	}
+
+	// pendingLastBlockNumber
+	function setPendingLastBlockNumber(address _metrics, uint256 value)
+		external
+	{
+		addressValidator().validateAddress(msg.sender, config().allocator());
+
+		eternalStorage().setUint(getPendingLastBlockNumberKey(_metrics), value);
+	}
+
+	function getPendingLastBlockNumber(address _metrics)
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getPendingLastBlockNumberKey(_metrics));
+	}
+
+	function getPendingLastBlockNumberKey(address _addr)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_pendingLastBlockNumber", _addr));
+	}
 }
 
 
-contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
+contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -3116,12 +3131,12 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		getStorage().setPendingIncrement(_metrics, true);
+		getStorage().setPendingLastBlockNumber(_metrics, block.number);
 		IMarketBehavior(Market(market).behavior()).calculate(
 			_metrics,
 			getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
-		getStorage().setLastBlockNumber(_metrics, block.number);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) external {
@@ -3190,6 +3205,8 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
+		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
+		getStorage().setLastBlockNumber(_metrics, lastBlock);
 	}
 
 	function increment(address _property, uint256 _reward, uint256 _lockup)
@@ -3281,6 +3298,7 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	}
 
 	function getStorage() private view returns (AllocatorStorage) {
+		require(paused() == false, "You cannot use that");
 		return AllocatorStorage(config().allocatorStorage());
 	}
 }
