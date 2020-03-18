@@ -131,7 +131,7 @@ contract('Allocator', ([deployer, user1]) => {
 			const lastBlock = await dev.allocatorStorage
 				.getLastBlockNumber(metrics.address)
 				.then(toBigNumber)
-			expect(blocks.toString()).to.be.equal('11')
+			expect(blocks.toString()).to.be.equal('12')
 			expect(lastBlock.minus(_lastBlock).toString()).to.be.equal(
 				blocks.toString()
 			)
