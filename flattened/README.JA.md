@@ -16,7 +16,7 @@
 
 ```
 cd ~/frame00/protpcol
-solidityFlattener.pl --mainsol=src/metrics/MetricsGroup.sol --outputsol=flattener/metrics/MetricsGroup.flattener --verbose
+solidityFlattener.pl --mainsol=src/metrics/MetricsGroup.sol --outputsol=flattened/metrics/MetricsGroup.flattened.sol --verbose
 ```
 
 --verbose オプションをつけると詳細なログがでてくるので、おすすめ。
