@@ -33,7 +33,10 @@ async function create(artifacts: Truffle.Artifacts): Promise<string[]> {
 		'MarketFactory',
 		artifacts
 	)
-	let market = await createInstance<MarketTest1Instance>(
+	let market:
+		| MarketTest1Instance
+		| MarketTest2Instance
+		| MarketTest3Instance = await createInstance<MarketTest1Instance>(
 		'MarketTest1',
 		artifacts
 	)
