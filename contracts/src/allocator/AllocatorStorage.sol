@@ -1,17 +1,11 @@
 pragma solidity ^0.5.0;
 
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
 
-contract AllocatorStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	// Last Block Number
@@ -136,5 +130,30 @@ contract AllocatorStorage is
 			keccak256(
 				abi.encodePacked("_lastAssetValueEachMarketPerBlock", _addr)
 			);
+	}
+
+	// pendingLastBlockNumber
+	function setPendingLastBlockNumber(address _metrics, uint256 value)
+		external
+	{
+		addressValidator().validateAddress(msg.sender, config().allocator());
+
+		eternalStorage().setUint(getPendingLastBlockNumberKey(_metrics), value);
+	}
+
+	function getPendingLastBlockNumber(address _metrics)
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getPendingLastBlockNumberKey(_metrics));
+	}
+
+	function getPendingLastBlockNumberKey(address _addr)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_pendingLastBlockNumber", _addr));
 	}
 }

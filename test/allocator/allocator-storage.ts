@@ -1,5 +1,8 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {validateAddressErrorMessage} from '../test-lib/utils/error'
+import {
+	validateAddressErrorMessage,
+	validatePauseErrorMessage
+} from '../test-lib/utils/error'
 
 contract(
 	'AllocatorStorageTest',
@@ -72,6 +75,42 @@ contract(
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
+			})
+		})
+		describe('AllocatorStorage; setPendingLastBlockNumber, getPendingLastBlockNumber', () => {
+			it('Can get setted value.', async () => {
+				await dev.allocatorStorage.setPendingLastBlockNumber(metrics, 1000000, {
+					from: allocator
+				})
+				const result = await dev.allocatorStorage.getPendingLastBlockNumber(
+					metrics
+				)
+				expect(result.toNumber()).to.be.equal(1000000)
+			})
+			it('Cannot rewrite data from other than allocator.', async () => {
+				const result = await dev.allocatorStorage
+					.setPendingLastBlockNumber(metrics, 1000000, {
+						from: dummyAllocator
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
+		describe('AllocatorStorage; pause, unpause', () => {
+			it('if owner execute pause method, owner cannot use set function.', async () => {
+				await dev.allocatorStorage.pause()
+				const res = await dev.allocatorStorage
+					.setLastBlockNumber(metrics, 100, {
+						from: allocator
+					})
+					.catch((err: Error) => err)
+				validatePauseErrorMessage(res)
+				await dev.allocatorStorage.unpause()
+				await dev.allocatorStorage.setLastBlockNumber(metrics, 10000000, {
+					from: allocator
+				})
+				const result = await dev.allocatorStorage.getLastBlockNumber(metrics)
+				expect(result.toNumber()).to.be.equal(10000000)
 			})
 		})
 	}
