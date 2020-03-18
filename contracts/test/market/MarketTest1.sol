@@ -8,6 +8,10 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
 contract MarketTest1 is IMarketBehavior, UsingConfig {
 	string public schema = "[]";
+	bool public asynchronousMode = false;
+	address metrics;
+	uint256 lastBlock;
+	uint256 currentBlock;
 	event LogCalculate(
 		address _metrics,
 		uint256 _lastBlock,
@@ -36,8 +40,23 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		uint256 _lastBlock,
 		uint256 _currentBlock
 	) external returns (bool) {
-		emit LogCalculate(_metrics, _lastBlock, _currentBlock);
-		Allocator(config().allocator()).calculatedCallback(_metrics, 100);
+		metrics = _metrics;
+		lastBlock = _lastBlock;
+		currentBlock = _currentBlock;
+		if (!asynchronousMode) {
+			emit LogCalculate(_metrics, _lastBlock, _currentBlock);
+			Allocator(config().allocator()).calculatedCallback(_metrics, 100);
+		}
 		return true;
+	}
+
+	function calculated() external returns (bool) {
+		emit LogCalculate(metrics, lastBlock, currentBlock);
+		Allocator(config().allocator()).calculatedCallback(metrics, 100);
+		return true;
+	}
+
+	function changeAsynchronousMode(bool _mode) external {
+		asynchronousMode = _mode;
 	}
 }
