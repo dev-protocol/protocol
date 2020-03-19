@@ -57,8 +57,8 @@
 		"web3": "^1.2.6"
 	},
 	"dependencies": {
+		"@openzeppelin/contracts": "^2.5.0",
 		"commander": "^5.0.0",
-		"openzeppelin-solidity": "^2.5.0",
 		"shelljs": "^0.8.3"
 	},
 	"bundleddependencies": [

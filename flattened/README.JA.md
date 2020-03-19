@@ -23,10 +23,10 @@ solidityFlattener.pl --mainsol=src/metrics/MetricsGroup.sol --outputsol=flattene
 Solidity Flattener が Solidity 推奨の import 記述形式に対応していないため。エラーがでたところを順に修正していくこととなる。
 
 ```
-import {ERC20} from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 ↓
-import "../../../node_midules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "../../../node_midules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../common/lifecycle/Killable.sol";
 ```
 
