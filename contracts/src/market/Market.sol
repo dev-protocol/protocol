@@ -133,7 +133,7 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);
-		address metrics = metricsFactory.drop(idHashMetricsMap[idHash]);
+		metricsFactory.drop(idHashMetricsMap[idHash]);
 		issuedMetrics = issuedMetrics.sub(1);
 	}
 
@@ -155,23 +155,6 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 
 	function schema() external view returns (string memory) {
 		return IMarketBehavior(behavior).schema();
-	}
-
-	function authenticateByOwner(address _property, bytes32 _idHash)
-		external
-		enabledTemporarily
-	{
-		require(enabled, "market is not enabled");
-
-		require(idMap[_idHash] == false, "id is duplicated");
-		idMap[_idHash] = true;
-		propertyIdHashMap[_property] = _idHash;
-		MetricsFactory metricsFactory = MetricsFactory(
-			config().metricsFactory()
-		);
-		address metrics = metricsFactory.create(_property);
-		idHashMetricsMap[_idHash] = metrics;
-		issuedMetrics = issuedMetrics.add(1);
 	}
 
 	function dropMetrics(address _metrics) external enabledTemporarily {
