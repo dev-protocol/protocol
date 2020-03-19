@@ -123,7 +123,7 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		return metrics;
 	}
 
-	function deauthorization(address _property)
+	function deauthenticate(address _property)
 		external
 		checkBeforeAuthenticate(_prop)
 	{
