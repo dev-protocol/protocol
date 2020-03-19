@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
-import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";

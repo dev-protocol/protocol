@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
