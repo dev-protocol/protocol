@@ -22,8 +22,7 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 	uint256 private _votingEndBlockNumber;
 	uint256 public issuedMetrics;
 	mapping(bytes32 => bool) private idMap;
-	mapping(address => bytes32) private propertyIdHashMap;
-	mapping(bytes32 => address) private idHashMetricsMap;
+	mapping(address => bytes32) private idHashMetricsMap;
 
 	constructor(address _config, address _behavior)
 		public
@@ -41,12 +40,22 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		_votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
 
-	modifier onlyPropertyAuthor(address _prop) {
+	function propertyValidation(address _prop) internal view {
 		addressValidator().validateAddress(
 			msg.sender,
 			Property(_prop).author()
 		);
 		require(enabled, "market is not enabled");
+	}
+
+	modifier onlyPropertyAuthor(address _prop) {
+		propertyValidation(_prop);
+		_;
+	}
+
+	modifier onlyLinkedPropertyAuthor(address _metrics) {
+		address _prop = Metrics(_metrics).property();
+		propertyValidation(_prop);
 		_;
 	}
 
@@ -107,13 +116,12 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 
 		require(idMap[_idHash] == false, "id is duplicated");
 		idMap[_idHash] = true;
-		propertyIdHashMap[_property] = _idHash;
 		address sender = Property(_property).author();
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);
 		address metrics = metricsFactory.create(_property);
-		idHashMetricsMap[_idHash] = metrics;
+		idHashMetricsMap[metrics] = _idHash;
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		require(
 			Dev(config().token()).fee(sender, authenticationFee),
@@ -123,19 +131,18 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		return metrics;
 	}
 
-	function deauthenticate(address _prop)
+	function deauthenticate(address _metrics)
 		external
-		onlyPropertyAuthor(_prop)
+		onlyLinkedPropertyAuthor(_metrics)
 	{
-		bytes32 idHash = propertyIdHashMap[_prop];
+		bytes32 idHash = idHashMetricsMap[_metrics];
 		require(idMap[idHash], "not authenticated");
 		idMap[idHash] = false;
-		idHashMetricsMap[idHash] = address(0);
-		propertyIdHashMap[_prop] = bytes32(0);
+		idHashMetricsMap[_metrics] = address(0);
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);
-		metricsFactory.destroy(idHashMetricsMap[idHash]);
+		metricsFactory.destroy(_metrics);
 		issuedMetrics = issuedMetrics.sub(1);
 	}
 
