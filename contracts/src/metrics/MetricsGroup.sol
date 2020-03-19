@@ -7,12 +7,7 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
 
-contract MetricsGroup is
-	UsingConfig,
-	UsingStorage,
-	UsingValidator,
-	IGroup
-{
+contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
