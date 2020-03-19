@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
+import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
@@ -13,7 +13,7 @@ contract MetricsGroup is
 	UsingStorage,
 	UsingValidator,
 	IGroup,
-	Killable
+	Pausable
 {
 	using SafeMath for uint256;
 
@@ -21,6 +21,7 @@ contract MetricsGroup is
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
+		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(
 			msg.sender,
 			config().metricsFactory()
@@ -30,6 +31,20 @@ contract MetricsGroup is
 		eternalStorage().setBool(getGroupKey(_addr), true);
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		totalCount = totalCount.add(1);
+		eternalStorage().setUint(getTotalCountKey(), totalCount);
+	}
+
+	function removeGroup(address _addr) external {
+		require(paused() == false, "You cannot use that");
+		addressValidator().validateAddress(
+			msg.sender,
+			config().metricsFactory()
+		);
+
+		require(isGroup(_addr), "address is not group");
+		eternalStorage().setBool(getGroupKey(_addr), false);
+		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
+		totalCount = totalCount.sub(1);
 		eternalStorage().setUint(getTotalCountKey(), totalCount);
 	}
 

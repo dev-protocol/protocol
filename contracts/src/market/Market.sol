@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {Temporarily} from "contracts/src/common/lifecycle/Temporarily.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
@@ -14,13 +15,15 @@ import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {Dev} from "contracts/src/dev/Dev.sol";
 
 
-contract Market is UsingConfig, IMarket, UsingValidator {
+contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
 	uint256 private _votingEndBlockNumber;
 	uint256 public issuedMetrics;
 	mapping(bytes32 => bool) private idMap;
+	mapping(address => bytes32) private propertyIdHashMap;
+	mapping(bytes32 => address) private idHashMetricsMap;
 
 	constructor(address _config, address _behavior)
 		public
@@ -38,6 +41,15 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		_votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
 
+	modifier checkBeforeAuthenticate(address _prop) {
+		addressValidator().validateAddress(
+			msg.sender,
+			Property(_prop).author()
+		);
+		require(enabled, "market is not enabled");
+		_;
+	}
+
 	function toEnable() external {
 		addressValidator().validateAddress(
 			msg.sender,
@@ -53,13 +65,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
-	) public returns (address) {
-		addressValidator().validateAddress(
-			msg.sender,
-			Property(_prop).author()
-		);
-		require(enabled, "market is not enabled");
-
+	) public checkBeforeAuthenticate(_prop) returns (address) {
 		uint256 len = bytes(_args1).length;
 		require(len > 0, "id is required");
 
@@ -101,11 +107,13 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 
 		require(idMap[_idHash] == false, "id is duplicated");
 		idMap[_idHash] = true;
+		propertyIdHashMap[_property] = _idHash;
 		address sender = Property(_property).author();
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);
 		address metrics = metricsFactory.create(_property);
+		idHashMetricsMap[_idHash] = metrics;
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		require(
 			Dev(config().token()).fee(sender, authenticationFee),
@@ -113,6 +121,20 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		);
 		issuedMetrics = issuedMetrics.add(1);
 		return metrics;
+	}
+
+	function deauthorization(address _property)
+		external
+		checkBeforeAuthenticate(_prop)
+	{
+		bytes32 idHash = propertyIdHashMap[_property];
+		require(idMap[idHash], "not authenticated");
+		idMap[idHash] = false;
+		MetricsFactory metricsFactory = MetricsFactory(
+			config().metricsFactory()
+		);
+		address metrics = metricsFactory.drop(idHashMetricsMap[idHash]);
+		issuedMetrics = issuedMetrics.sub(1);
 	}
 
 	function vote(address _property, bool _agree) external {
@@ -133,5 +155,31 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 
 	function schema() external view returns (string memory) {
 		return IMarketBehavior(behavior).schema();
+	}
+
+	function authenticateByOwner(address _property, bytes32 _idHash)
+		external
+		enabledTemporarily
+	{
+		require(enabled, "market is not enabled");
+
+		require(idMap[_idHash] == false, "id is duplicated");
+		idMap[_idHash] = true;
+		propertyIdHashMap[_property] = _idHash;
+		MetricsFactory metricsFactory = MetricsFactory(
+			config().metricsFactory()
+		);
+		address metrics = metricsFactory.create(_property);
+		idHashMetricsMap[_idHash] = metrics;
+		issuedMetrics = issuedMetrics.add(1);
+	}
+
+	function dropMetrics(address _metrics) external enabledTemporarily {
+		require(enabled, "market is not enabled");
+
+		MetricsFactory metricsFactory = MetricsFactory(
+			config().metricsFactory()
+		);
+		metricsFactory.drop(_metrics);
 	}
 }
