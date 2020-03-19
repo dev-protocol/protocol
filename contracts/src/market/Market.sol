@@ -41,7 +41,7 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		_votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
 
-	modifier checkBeforeAuthenticate(address _prop) {
+	modifier onlyPropertyAuthor(address _prop) {
 		addressValidator().validateAddress(
 			msg.sender,
 			Property(_prop).author()
@@ -65,7 +65,7 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
-	) public checkBeforeAuthenticate(_prop) returns (address) {
+	) public onlyPropertyAuthor(_prop) returns (address) {
 		uint256 len = bytes(_args1).length;
 		require(len > 0, "id is required");
 
@@ -125,7 +125,7 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 
 	function deauthenticate(address _prop)
 		external
-		checkBeforeAuthenticate(_prop)
+		onlyPropertyAuthor(_prop)
 	{
 		bytes32 idHash = propertyIdHashMap[_prop];
 		require(idMap[idHash], "not authenticated");
