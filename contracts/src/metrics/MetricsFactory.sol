@@ -10,7 +10,7 @@ import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 
 contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 	event Create(address indexed _from, address _metrics);
-	event Drop(address indexed _from, address _metrics);
+	event Destroy(address indexed _from, address _metrics);
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -27,11 +27,11 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 		return metricsAddress;
 	}
 
-	function drop(address _metrics) external {
+	function destroy(address _metrics) external {
 		require(paused() == false, "You cannot use that");
 		addressValidator().validateGroup(msg.sender, config().marketGroup());
 
 		metricsGroup.removeGroup(_metrics);
-		emit Drop(msg.sender, metricsAddress);
+		emit Destroy(msg.sender, metricsAddress);
 	}
 }

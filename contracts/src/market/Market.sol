@@ -133,7 +133,7 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);
-		metricsFactory.drop(idHashMetricsMap[idHash]);
+		metricsFactory.destroy(idHashMetricsMap[idHash]);
 		issuedMetrics = issuedMetrics.sub(1);
 	}
 
@@ -157,12 +157,13 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		return IMarketBehavior(behavior).schema();
 	}
 
-	function dropMetrics(address _metrics) external enabledTemporarily {
+	function destroyMetrics(address _metrics) external enabledTemporarily {
 		require(enabled, "market is not enabled");
 
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);
-		metricsFactory.drop(_metrics);
+		metricsFactory.destroy(_metrics);
+		issuedMetrics = issuedMetrics.sub(1);
 	}
 }
