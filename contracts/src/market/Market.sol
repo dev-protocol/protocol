@@ -130,6 +130,8 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		bytes32 idHash = propertyIdHashMap[_property];
 		require(idMap[idHash], "not authenticated");
 		idMap[idHash] = false;
+		idHashMetricsMap[_idHash] = address(0);
+		propertyIdHashMap[_property] = bytes32(0);
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);
@@ -164,6 +166,5 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 			config().metricsFactory()
 		);
 		metricsFactory.destroy(_metrics);
-		issuedMetrics = issuedMetrics.sub(1);
 	}
 }
