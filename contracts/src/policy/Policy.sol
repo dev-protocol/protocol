@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";

@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
-import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
 

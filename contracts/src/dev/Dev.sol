@@ -1,11 +1,11 @@
 pragma solidity ^0.5.0;
 
 // prettier-ignore
-import {ERC20Detailed} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
+import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 // prettier-ignore
-import {ERC20Mintable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 // prettier-ignore
-import {ERC20Burnable} from "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
+import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "../common/config/UsingConfig.sol";
 import {Lockup} from "../lockup/Lockup.sol";
