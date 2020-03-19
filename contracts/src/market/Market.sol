@@ -123,15 +123,15 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		return metrics;
 	}
 
-	function deauthenticate(address _property)
+	function deauthenticate(address _prop)
 		external
 		checkBeforeAuthenticate(_prop)
 	{
-		bytes32 idHash = propertyIdHashMap[_property];
+		bytes32 idHash = propertyIdHashMap[_prop];
 		require(idMap[idHash], "not authenticated");
 		idMap[idHash] = false;
-		idHashMetricsMap[_idHash] = address(0);
-		propertyIdHashMap[_property] = bytes32(0);
+		idHashMetricsMap[idHash] = address(0);
+		propertyIdHashMap[_prop] = bytes32(0);
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);
@@ -159,6 +159,7 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		return IMarketBehavior(behavior).schema();
 	}
 
+	// duplicated
 	function destroyMetrics(address _metrics) external enabledTemporarily {
 		require(enabled, "market is not enabled");
 

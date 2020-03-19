@@ -1,7 +1,6 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import {Pausable} from "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
@@ -12,8 +11,7 @@ contract MetricsGroup is
 	UsingConfig,
 	UsingStorage,
 	UsingValidator,
-	IGroup,
-	Pausable
+	IGroup
 {
 	using SafeMath for uint256;
 

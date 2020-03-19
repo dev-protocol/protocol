@@ -4,19 +4,15 @@ import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 
 contract Temporarily is Ownable {
-	bool private enabledTemporarily;
-
-	constructor() internal {
-		enabledTemporarily = true;
-	}
+	bool private enabled = true;
 
 	modifier enabledTemporarily() {
 		require(isOwner(), "Ownable: caller is not the owner");
-		require(enabledTemporarily, "this function is disabled");
+		require(enabled, "this function is disabled");
 		_;
 	}
 
 	function disabled() internal onlyOwner {
-		enabledTemporarily = false;
+		enabled = false;
 	}
 }

@@ -1,7 +1,9 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
+	validatePauseErrorMessage,
+	validatePauseOnlyOwnerErrorMessage
 } from '../test-lib/utils/error'
 
 contract(
@@ -12,7 +14,8 @@ contract(
 		dummyMetricsFactory,
 		metrics1,
 		metrics2,
-		dummyMetrics
+		dummyMetrics,
+		user1
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
 		before(async () => {
@@ -62,6 +65,25 @@ contract(
 				})
 				result = await dev.metricsGroup.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(2)
+			})
+		})
+		describe('MetricsGroup; pause', () => {
+			it('if you pause, you cannot execute functions', async () => {
+				await dev.metricsGroup.pause()
+				let res = await dev.metricsGroup
+					.addGroup(metrics1)
+					.catch((err: Error) => err)
+				validatePauseErrorMessage(res)
+				res = await dev.metricsGroup
+					.removeGroup(metrics1)
+					.catch((err: Error) => err)
+				validatePauseErrorMessage(res)
+			})
+			it('if you pause, you cannot execute functions', async () => {
+				const res = await dev.metricsGroup
+					.pause({from: user1})
+					.catch((err: Error) => err)
+				validatePauseOnlyOwnerErrorMessage(res)
 			})
 		})
 	}
