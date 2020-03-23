@@ -1,7 +1,6 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Temporarily} from "contracts/src/common/lifecycle/Temporarily.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
@@ -16,7 +15,7 @@ import {Lockup} from "contracts/src/lockup/Lockup.sol";
 import {Dev} from "contracts/src/dev/Dev.sol";
 
 
-contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
+contract Market is UsingConfig, IMarket, UsingValidator {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
