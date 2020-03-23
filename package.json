@@ -11,7 +11,7 @@
 		"predeploy": "npm run build",
 		"lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
 		"lint:eslint": "eslint . --ext .ts,.js --fix",
-		"lint:solium": "solium --dir . --fix",
+		"lint:solium": "solium --dir contracts --fix",
 		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
 		"prepack": "npm run build",
 		"build": "tsc -p tsconfig.build.json",
