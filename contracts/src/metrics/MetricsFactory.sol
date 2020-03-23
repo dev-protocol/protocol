@@ -30,7 +30,10 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 	function destroy(address _metrics) external {
 		require(paused() == false, "You cannot use that");
 		if (isPauser(msg.sender) == false) {
-			addressValidator().validateGroup(msg.sender, config().marketGroup());
+			addressValidator().validateGroup(
+				msg.sender,
+				config().marketGroup()
+			);
 		}
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
 		require(metricsGroup.isGroup(_metrics), "address is not metrics");
