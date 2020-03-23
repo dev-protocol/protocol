@@ -204,7 +204,7 @@ contract(
 				validateErrorMessage(result, 'id is duplicated')
 			})
 
-			it('authenticate and deauthenticate executors are different.', async () => {
+			it('Should fail to deauthenticate when sent from other than passed metrics linked property author.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const metricsAddress = await new Promise<string>(resolve => {
@@ -226,7 +226,7 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'this is illegal address')
 			})
-			it('deauthenticate function will break the authentication.', async () => {
+			it('When deauthenticate, decrease the issuedMetrics, emit the Destroy event.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const metricsAddress = await new Promise<string>(resolve => {
@@ -259,7 +259,7 @@ contract(
 				expect(_from).to.be.equal(marketAddress1)
 				expect(_metrics).to.be.equal(metricsAddress)
 			})
-			it('An error occurs when the deauthenticate function is executed multiple times.', async () => {
+			it('Should fail to deauthenticate when passed already deauthenticated metrics.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const metricsAddress = await new Promise<string>(resolve => {
