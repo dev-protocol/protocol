@@ -32,6 +32,7 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateGroup(msg.sender, config().marketGroup());
 
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
+		require(metricsGroup.isGroup(_metrics), "address is not metrics");
 		metricsGroup.removeGroup(_metrics);
 		emit Destroy(msg.sender, _metrics);
 	}
