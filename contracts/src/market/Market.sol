@@ -9,6 +9,7 @@ import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
+import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {MetricsFactory} from "contracts/src/metrics/MetricsFactory.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
@@ -138,7 +139,7 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 		bytes32 idHash = idHashMetricsMap[_metrics];
 		require(idMap[idHash], "not authenticated");
 		idMap[idHash] = false;
-		idHashMetricsMap[_metrics] = address(0);
+		idHashMetricsMap[_metrics] = bytes32(0);
 		MetricsFactory metricsFactory = MetricsFactory(
 			config().metricsFactory()
 		);

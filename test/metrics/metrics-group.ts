@@ -25,21 +25,21 @@ contract(
 				from: deployer
 			})
 		})
-		describe('MetricsGroup; addGroup, isGroup', () => {
+		describe('MetricsGroup; addGroup, removeGroup, isGroup', () => {
 			before(async () => {
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory
 				})
 			})
-			it('When the metrics address is Specified', async () => {
+			it('When the metrics address is Specified.', async () => {
 				const result = await dev.metricsGroup.isGroup(metrics1)
 				expect(result).to.be.equal(true)
 			})
-			it('When the metrics address is not specified', async () => {
+			it('When the metrics address is not specified.', async () => {
 				const result = await dev.metricsGroup.isGroup(dummyMetrics)
 				expect(result).to.be.equal(false)
 			})
-			it('Existing metrics cannot be added', async () => {
+			it('Existing metrics cannot be added.', async () => {
 				const result = await dev.metricsGroup
 					.addGroup(metrics1, {
 						from: metricsFactory
@@ -47,7 +47,7 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'already enabled')
 			})
-			it('Can not execute addGroup without metricsFactory address', async () => {
+			it('Can not execute addGroup without metricsFactory address.', async () => {
 				const result = await dev.metricsGroup
 					.addGroup(dummyMetrics, {
 						from: dummyMetricsFactory
@@ -55,20 +55,48 @@ contract(
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
+			it('Can not execute removeGroup without metricsFactory address.', async () => {
+				const result = await dev.metricsGroup
+					.removeGroup(metrics1, {
+						from: dummyMetricsFactory
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+			it('Not existing metrics cannot be removed.', async () => {
+				const result = await dev.metricsGroup
+					.removeGroup(dummyMetrics, {
+						from: metricsFactory
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'address is not group')
+			})
+			it('existing metrics can be removed.', async () => {
+				await dev.metricsGroup.removeGroup(metrics1, {from: metricsFactory})
+			})
+			it('Deleted metrics addresses are treated as if they do not exist in the group.', async () => {
+				const result = await dev.metricsGroup.isGroup(metrics1)
+				expect(result).to.be.equal(false)
+			})
 		})
 		describe('MetricsGroup; totalIssuedMetrics', () => {
-			it('Count increases when metrics are added', async () => {
+			it('Count increases when metrics are added.', async () => {
 				let result = await dev.metricsGroup.totalIssuedMetrics()
-				expect(result.toNumber()).to.be.equal(1)
+				expect(result.toNumber()).to.be.equal(0)
 				await dev.metricsGroup.addGroup(metrics2, {
 					from: metricsFactory
 				})
 				result = await dev.metricsGroup.totalIssuedMetrics()
-				expect(result.toNumber()).to.be.equal(2)
+				expect(result.toNumber()).to.be.equal(1)
+				await dev.metricsGroup.removeGroup(metrics2, {
+					from: metricsFactory
+				})
+				result = await dev.metricsGroup.totalIssuedMetrics()
+				expect(result.toNumber()).to.be.equal(0)
 			})
 		})
 		describe('MetricsGroup; pause', () => {
-			it('if you pause, you cannot execute functions', async () => {
+			it('if you pause, you cannot execute functions.', async () => {
 				await dev.metricsGroup.pause()
 				let res = await dev.metricsGroup
 					.addGroup(metrics1)
@@ -79,7 +107,7 @@ contract(
 					.catch((err: Error) => err)
 				validatePauseErrorMessage(res)
 			})
-			it('if you pause, you cannot execute functions', async () => {
+			it('if you pause, you cannot execute functions.', async () => {
 				const res = await dev.metricsGroup
 					.pause({from: user1})
 					.catch((err: Error) => err)

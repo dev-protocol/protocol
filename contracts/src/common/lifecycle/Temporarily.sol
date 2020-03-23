@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import {Ownable} from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 
 
 contract Temporarily is Ownable {

@@ -20,7 +20,7 @@ contract IMarket {
 		external
 		returns (address);
 
-	function deauthorization(address _prop) external;
+	function deauthenticate(address _metrics) external;
 
 	function vote(address _property, bool _agree) external;
 
