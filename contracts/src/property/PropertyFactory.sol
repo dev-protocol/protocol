@@ -1,14 +1,13 @@
 pragma solidity ^0.5.0;
 
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 
 
-contract PropertyFactory is Pausable, UsingConfig, Killable {
+contract PropertyFactory is Pausable, UsingConfig {
 	event Create(address indexed _from, address _property);
 
 	// solium-disable-next-line no-empty-blocks

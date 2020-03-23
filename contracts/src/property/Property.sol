@@ -11,7 +11,7 @@ import {Lockup} from "contracts/src/lockup/Lockup.sol";
 
 contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	uint8 private constant _decimals = 18;
-	uint256 private constant _supply = 10000000;
+	uint256 private constant _supply = 10000000000000000000000000;
 	address public author;
 
 	constructor(

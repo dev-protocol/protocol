@@ -256,7 +256,12 @@ contract('WithdrawTest', ([deployer, user1]) => {
 						prev
 							.times(0.8)
 							.integerValue(BigNumber.ROUND_DOWN)
-							.plus(increased.times(0.7))
+							.plus(
+								increased
+									.times(0.1)
+									.integerValue(BigNumber.ROUND_DOWN)
+									.times(7)
+							)
 							.integerValue(BigNumber.ROUND_DOWN)
 							.toFixed()
 					)

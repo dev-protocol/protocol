@@ -1,6 +1,7 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {getPropertyAddress} from '../test-lib/utils/log'
 import {validateErrorMessage} from '../test-lib/utils/error'
+import {toBigNumber} from '../test-lib/utils/common'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 	const dev = new DevProtocolInstance(deployer)
@@ -33,12 +34,19 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			const name = await deployedProperty.name({from: user2})
 			const symbol = await deployedProperty.symbol({from: user2})
 			const decimals = await deployedProperty.decimals({from: user2})
-			const totalSupply = await deployedProperty.totalSupply({from: user2})
+			const totalSupply = await deployedProperty
+				.totalSupply({from: user2})
+				.then(toBigNumber)
 			const author = await deployedProperty.author({from: user2})
 			expect(name).to.be.equal('sample')
 			expect(symbol).to.be.equal('SAMPLE')
 			expect(decimals.toNumber()).to.be.equal(18)
-			expect(totalSupply.toNumber()).to.be.equal(10000000)
+			expect(totalSupply.toFixed()).to.be.equal(
+				toBigNumber(1000)
+					.times(10000)
+					.times(1e18)
+					.toFixed()
+			)
 			expect(author).to.be.equal(user)
 		})
 
