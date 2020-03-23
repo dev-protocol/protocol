@@ -17,6 +17,7 @@ contract Context {
 	constructor() internal {}
 
 	// solhint-disable-previous-line no-empty-blocks
+
 	function _msgSender() internal view returns (address payable) {
 		return msg.sender;
 	}
@@ -70,8 +71,10 @@ library Roles {
 
 contract PauserRole is Context {
 	using Roles for Roles.Role;
+
 	event PauserAdded(address indexed account);
 	event PauserRemoved(address indexed account);
+
 	Roles.Role private _pausers;
 
 	constructor() internal {
@@ -124,10 +127,12 @@ contract Pausable is Context, PauserRole {
 	 * @dev Emitted when the pause is triggered by a pauser (`account`).
 	 */
 	event Paused(address account);
+
 	/**
 	 * @dev Emitted when the pause is lifted by a pauser (`account`).
 	 */
 	event Unpaused(address account);
+
 	bool private _paused;
 
 	/**
@@ -152,6 +157,7 @@ contract Pausable is Context, PauserRole {
 		require(!_paused, "Pausable: paused");
 		_;
 	}
+
 	/**
 	 * @dev Modifier to make a function callable only when the contract is paused.
 	 */
@@ -203,6 +209,7 @@ contract Killable {
  */
 contract Ownable is Context {
 	address private _owner;
+
 	event OwnershipTransferred(
 		address indexed previousOwner,
 		address indexed newOwner
@@ -212,8 +219,9 @@ contract Ownable is Context {
 	 * @dev Initializes the contract setting the deployer as the initial owner.
 	 */
 	constructor() internal {
-		_owner = _msgSender();
-		emit OwnershipTransferred(address(0), _owner);
+		address msgSender = _msgSender();
+		_owner = msgSender;
+		emit OwnershipTransferred(address(0), msgSender);
 	}
 
 	/**
@@ -273,9 +281,12 @@ contract Ownable is Context {
 
 
 // prettier-ignore
+
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
+
 	function addGroup(address _addr) external;
+
 	function getGroupKey(address _addr) internal pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
@@ -487,6 +498,7 @@ library SafeMath {
 	function add(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a + b;
 		require(c >= a, "SafeMath: addition overflow");
+
 		return c;
 	}
 
@@ -521,6 +533,7 @@ library SafeMath {
 	{
 		require(b <= a, errorMessage);
 		uint256 c = a - b;
+
 		return c;
 	}
 
@@ -540,8 +553,10 @@ library SafeMath {
 		if (a == 0) {
 			return 0;
 		}
+
 		uint256 c = a * b;
 		require(c / a == b, "SafeMath: multiplication overflow");
+
 		return c;
 	}
 
@@ -582,6 +597,7 @@ library SafeMath {
 		require(b > 0, errorMessage);
 		uint256 c = a / b;
 		// assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
 		return c;
 	}
 
@@ -626,12 +642,14 @@ library SafeMath {
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
+
 	mapping(bytes32 => uint256) private uIntStorage;
 	mapping(bytes32 => string) private stringStorage;
 	mapping(bytes32 => address) private addressStorage;
 	mapping(bytes32 => bytes32) private bytesStorage;
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
+
 	modifier onlyCurrentOwner() {
 		require(msg.sender == currentOwner, "not current owner");
 		_;
@@ -725,8 +743,9 @@ contract EternalStorage {
 }
 
 
-contract UsingStorage is Ownable {
+contract UsingStorage is Ownable, Pausable {
 	address private _storage;
+
 	modifier hasStorage() {
 		require(_storage != address(0), "storage is not setted");
 		_;
@@ -738,6 +757,7 @@ contract UsingStorage is Ownable {
 		hasStorage
 		returns (EternalStorage)
 	{
+		require(paused() == false, "You cannot use that");
 		return EternalStorage(_storage);
 	}
 
@@ -777,6 +797,7 @@ contract VoteTimesStorage is
 
 	function setVoteTimes(uint256 times) external {
 		addressValidator().validateAddress(msg.sender, config().voteTimes());
+
 		return eternalStorage().setUint(getVoteTimesKey(), times);
 	}
 
@@ -795,6 +816,7 @@ contract VoteTimesStorage is
 
 	function setVoteTimesByProperty(address _property, uint256 times) external {
 		addressValidator().validateAddress(msg.sender, config().voteTimes());
+
 		return
 			eternalStorage().setUint(
 				getVoteTimesByPropertyKey(_property),
@@ -824,6 +846,7 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 			config().marketFactory(),
 			config().policyFactory()
 		);
+
 		uint256 voteTimes = getStorage().getVoteTimes();
 		voteTimes = voteTimes.add(1);
 		getStorage().setVoteTimes(voteTimes);
@@ -831,6 +854,7 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 
 	function addVoteTimesByProperty(address _property) external {
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
+
 		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(
 			_property
 		);
@@ -844,6 +868,7 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 			config().allocator(),
 			config().propertyFactory()
 		);
+
 		uint256 voteTimes = getStorage().getVoteTimes();
 		getStorage().setVoteTimesByProperty(_property, voteTimes);
 	}
@@ -940,6 +965,7 @@ interface IERC20 {
 	 * Note that `value` may be zero.
 	 */
 	event Transfer(address indexed from, address indexed to, uint256 value);
+
 	/**
 	 * @dev Emitted when the allowance of a `spender` for an `owner` is set by
 	 * a call to {approve}. `value` is the new allowance.
@@ -978,8 +1004,11 @@ interface IERC20 {
  */
 contract ERC20 is Context, IERC20 {
 	using SafeMath for uint256;
+
 	mapping(address => uint256) private _balances;
+
 	mapping(address => mapping(address => uint256)) private _allowances;
+
 	uint256 private _totalSupply;
 
 	/**
@@ -1132,6 +1161,7 @@ contract ERC20 is Context, IERC20 {
 	{
 		require(sender != address(0), "ERC20: transfer from the zero address");
 		require(recipient != address(0), "ERC20: transfer to the zero address");
+
 		_balances[sender] = _balances[sender].sub(
 			amount,
 			"ERC20: transfer amount exceeds balance"
@@ -1151,6 +1181,7 @@ contract ERC20 is Context, IERC20 {
 	 */
 	function _mint(address account, uint256 amount) internal {
 		require(account != address(0), "ERC20: mint to the zero address");
+
 		_totalSupply = _totalSupply.add(amount);
 		_balances[account] = _balances[account].add(amount);
 		emit Transfer(address(0), account, amount);
@@ -1169,6 +1200,7 @@ contract ERC20 is Context, IERC20 {
 	 */
 	function _burn(address account, uint256 amount) internal {
 		require(account != address(0), "ERC20: burn from the zero address");
+
 		_balances[account] = _balances[account].sub(
 			amount,
 			"ERC20: burn amount exceeds balance"
@@ -1193,6 +1225,7 @@ contract ERC20 is Context, IERC20 {
 	function _approve(address owner, address spender, uint256 amount) internal {
 		require(owner != address(0), "ERC20: approve from the zero address");
 		require(spender != address(0), "ERC20: approve to the zero address");
+
 		_allowances[owner][spender] = amount;
 		emit Approval(owner, spender, amount);
 	}
@@ -1218,6 +1251,7 @@ contract ERC20 is Context, IERC20 {
 
 
 // prettier-ignore
+
 /**
  * @dev Optional functions from the ERC20 standard.
  */
@@ -1225,6 +1259,7 @@ contract ERC20Detailed is IERC20 {
 	string private _name;
 	string private _symbol;
 	uint8 private _decimals;
+
 	/**
 	 * @dev Sets the values for `name`, `symbol`, and `decimals`. All three of
 	 * these values are immutable: they can only be set once during
@@ -1235,12 +1270,14 @@ contract ERC20Detailed is IERC20 {
 		_symbol = symbol;
 		_decimals = decimals;
 	}
+
 	/**
 	 * @dev Returns the name of the token.
 	 */
 	function name() public view returns (string memory) {
 		return _name;
 	}
+
 	/**
 	 * @dev Returns the symbol of the token, usually a shorter version of the
 	 * name.
@@ -1248,6 +1285,7 @@ contract ERC20Detailed is IERC20 {
 	function symbol() public view returns (string memory) {
 		return _symbol;
 	}
+
 	/**
 	 * @dev Returns the number of decimals used to get its user representation.
 	 * For example, if `decimals` equals `2`, a balance of `505` tokens should
@@ -1320,31 +1358,41 @@ library Decimals {
 
 
 // prettier-ignore
+
 contract MinterRole is Context {
 	using Roles for Roles.Role;
+
 	event MinterAdded(address indexed account);
 	event MinterRemoved(address indexed account);
+
 	Roles.Role private _minters;
+
 	constructor () internal {
 		_addMinter(_msgSender());
 	}
+
 	modifier onlyMinter() {
 		require(isMinter(_msgSender()), "MinterRole: caller does not have the Minter role");
 		_;
 	}
+
 	function isMinter(address account) public view returns (bool) {
 		return _minters.has(account);
 	}
+
 	function addMinter(address account) public onlyMinter {
 		_addMinter(account);
 	}
+
 	function renounceMinter() public {
 		_removeMinter(_msgSender());
 	}
+
 	function _addMinter(address account) internal {
 		_minters.add(account);
 		emit MinterAdded(account);
 	}
+
 	function _removeMinter(address account) internal {
 		_minters.remove(account);
 		emit MinterRemoved(account);
@@ -1392,6 +1440,7 @@ contract PropertyGroup is
 			msg.sender,
 			config().propertyFactory()
 		);
+
 		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
 	}
@@ -1406,12 +1455,30 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	//AllValue
+	function setAllValue(uint256 _value) external returns (uint256) {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		bytes32 key = getAllValueKey();
+		eternalStorage().setUint(key, _value);
+	}
+
+	function getAllValue() external view returns (uint256) {
+		bytes32 key = getAllValueKey();
+		return eternalStorage().getUint(key);
+	}
+
+	function getAllValueKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_allValue"));
+	}
+
 	//Value
 	function setValue(address _property, address _sender, uint256 _value)
 		external
 		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().lockup());
+
 		bytes32 key = getValueKey(_property, _sender);
 		eternalStorage().setUint(key, _value);
 	}
@@ -1439,6 +1506,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().lockup());
+
 		bytes32 key = getPropertyValueKey(_property);
 		eternalStorage().setUint(key, _value);
 	}
@@ -1467,6 +1535,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 		uint256 _value
 	) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
+
 		bytes32 key = getWithdrawalStatusKey(_property, _from);
 		eternalStorage().setUint(key, _value);
 	}
@@ -1497,6 +1566,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().lockup());
+
 		eternalStorage().setUint(getInterestPriceKey(_property), _value);
 	}
 
@@ -1523,6 +1593,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 		uint256 _value
 	) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
+
 		eternalStorage().setUint(
 			getLastInterestPriceKey(_property, _user),
 			_value
@@ -1556,6 +1627,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 		uint256 _value
 	) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
+
 		eternalStorage().setUint(
 			getPendingInterestWithdrawalKey(_property, _user),
 			_value
@@ -1644,6 +1716,7 @@ contract MarketGroup is
 			msg.sender,
 			config().marketFactory()
 		);
+
 		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
 		addCount();
@@ -1682,6 +1755,7 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 			msg.sender,
 			config().policyFactory()
 		);
+
 		uint256 index = eternalStorage().getUint(getPlicySetIndexKey());
 		bytes32 key = getIndexKey(index);
 		eternalStorage().setAddress(key, _addr);
@@ -1694,6 +1768,7 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 			msg.sender,
 			config().policyFactory()
 		);
+
 		uint256 index = eternalStorage().getUint(getPlicySetIndexKey());
 		for (uint256 i = 0; i < index; i++) {
 			bytes32 key = getIndexKey(i);
@@ -1736,6 +1811,7 @@ contract PolicyGroup is
 			msg.sender,
 			config().policyFactory()
 		);
+
 		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
 	}
@@ -1745,6 +1821,7 @@ contract PolicyGroup is
 			msg.sender,
 			config().policyFactory()
 		);
+
 		require(isGroup(_addr), "not enabled");
 		return eternalStorage().setBool(getGroupKey(_addr), false);
 	}
@@ -1764,6 +1841,7 @@ contract PolicyFactory is Pausable, UsingConfig, UsingValidator, Killable {
 	function create(address _newPolicyAddress) external returns (address) {
 		require(paused() == false, "You cannot use that");
 		addressValidator().validateIllegalAddress(_newPolicyAddress);
+
 		Policy policy = new Policy(address(config()), _newPolicyAddress);
 		address policyAddress = address(policy);
 		emit Create(msg.sender, policyAddress, _newPolicyAddress);
@@ -1781,6 +1859,7 @@ contract PolicyFactory is Pausable, UsingConfig, UsingValidator, Killable {
 
 	function convergePolicy(address _currentPolicyAddress) external {
 		addressValidator().validateGroup(msg.sender, config().policyGroup());
+
 		config().setPolicy(_currentPolicyAddress);
 		PolicySet policySet = PolicySet(config().policySet());
 		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
@@ -1811,6 +1890,7 @@ contract Policy is Killable, UsingConfig, UsingValidator {
 			msg.sender,
 			config().policyFactory()
 		);
+
 		_policy = IPolicy(_innerPolicyAddress);
 		setVotingEndBlockNumber();
 	}
@@ -1885,6 +1965,7 @@ contract Policy is Killable, UsingConfig, UsingValidator {
 
 	function vote(address _property, bool _agree) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
+
 		require(config().policy() != address(this), "this policy is current");
 		require(voting(), "voting deadline is over");
 		VoteCounter voteCounter = VoteCounter(config().voteCounter());
@@ -1923,12 +2004,14 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		addressValidator().validateAddress(msg.sender, config().token());
 		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(_value != 0, "illegal lockup value");
+
 		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
 			0;
 		require(isWaiting == false, "lockup is already canceled");
 		updatePendingInterestWithdrawal(_property, _from);
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
+		addAllValue(_value);
 		getStorage().setLastInterestPrice(
 			_property,
 			_from,
@@ -1939,6 +2022,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 
 	function cancel(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
+
 		require(hasValue(_property, msg.sender), "dev token is not locked");
 		bool isWaiting = getStorage().getWithdrawalStatus(
 			_property,
@@ -1952,6 +2036,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 
 	function withdraw(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
+
 		require(possible(_property, msg.sender), "waiting for release");
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
 		require(lockupedValue != 0, "dev token is not locked");
@@ -1959,6 +2044,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		Property(_property).withdraw(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
 		subPropertyValue(_property, lockupedValue);
+		subAllValue(lockupedValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
@@ -2011,6 +2097,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 
 	function withdrawInterest(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
+
 		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
@@ -2024,6 +2111,22 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+	}
+
+	function getAllValue() external view returns (uint256) {
+		return getStorage().getAllValue();
+	}
+
+	function addAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.add(_value);
+		getStorage().setAllValue(value);
+	}
+
+	function subAllValue(uint256 _value) private {
+		uint256 value = getStorage().getAllValue();
+		value = value.sub(_value);
+		getStorage().setAllValue(value);
 	}
 
 	function getPropertyValue(address _property)
@@ -2112,6 +2215,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 
 
 // prettier-ignore
+
 contract VoteCounterStorage is
 	UsingStorage,
 	UsingConfig,
@@ -2120,6 +2224,7 @@ contract VoteCounterStorage is
 {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
+
 	// Already Vote Flg
 	function setAlreadyVoteFlg(
 		address _user,
@@ -2127,9 +2232,11 @@ contract VoteCounterStorage is
 		address _property
 	) external {
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
+
 		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
 		return eternalStorage().setBool(alreadyVoteKey, true);
 	}
+
 	function getAlreadyVoteFlg(
 		address _user,
 		address _sender,
@@ -2138,6 +2245,7 @@ contract VoteCounterStorage is
 		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
 		return eternalStorage().getBool(alreadyVoteKey);
 	}
+
 	function getAlreadyVoteKey(
 		address _sender,
 		address _target,
@@ -2148,17 +2256,21 @@ contract VoteCounterStorage is
 				abi.encodePacked("_alreadyVote", _sender, _target, _property)
 			);
 	}
+
 	// Agree Count
 	function getAgreeCount(address _sender) external view returns (uint256) {
 		return eternalStorage().getUint(getAgreeVoteCountKey(_sender));
 	}
+
 	function setAgreeCount(address _sender, uint256 count)
 		external
 		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
+
 		eternalStorage().setUint(getAgreeVoteCountKey(_sender), count);
 	}
+
 	function getAgreeVoteCountKey(address _sender)
 		private
 		pure
@@ -2166,17 +2278,21 @@ contract VoteCounterStorage is
 	{
 		return keccak256(abi.encodePacked(_sender, "_agreeVoteCount"));
 	}
+
 	// Opposite Count
 	function getOppositeCount(address _sender) external view returns (uint256) {
 		return eternalStorage().getUint(getOppositeVoteCountKey(_sender));
 	}
+
 	function setOppositeCount(address _sender, uint256 count)
 		external
 		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
+
 		eternalStorage().setUint(getOppositeVoteCountKey(_sender), count);
 	}
+
 	function getOppositeVoteCountKey(address _sender)
 		private
 		pure
@@ -2201,6 +2317,7 @@ contract VoteCounter is UsingConfig, UsingValidator, Killable {
 			config().marketGroup(),
 			config().policyGroup()
 		);
+
 		bool alreadyVote = getStorage().getAlreadyVoteFlg(
 			_user,
 			msg.sender,
@@ -2263,10 +2380,6 @@ contract VoteCounter is UsingConfig, UsingValidator, Killable {
 
 
 contract IMarket {
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool);
-
 	function authenticate(
 		address _prop,
 		string memory _args1,
@@ -2280,11 +2393,6 @@ contract IMarket {
 			// solium-disable-next-line indentation
 			address
 		);
-
-	function getAuthenticationFee(address _property)
-		private
-		view
-		returns (uint256);
 
 	function authenticatedCallback(address _property, bytes32 _idHash)
 		external
@@ -2349,6 +2457,7 @@ contract MetricsGroup is
 			msg.sender,
 			config().metricsFactory()
 		);
+
 		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
@@ -2379,6 +2488,7 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator, Killable {
 	function create(address _property) external returns (address) {
 		require(paused() == false, "You cannot use that");
 		addressValidator().validateGroup(msg.sender, config().marketGroup());
+
 		Metrics metrics = new Metrics(msg.sender, _property);
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
 		address metricsAddress = address(metrics);
@@ -2392,6 +2502,7 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator, Killable {
 // prettier-ignore
 // prettier-ignore
 // prettier-ignore
+
 /**
  * @dev Extension of {ERC20} that allows token holders to destroy both their own
  * tokens and those that they have an allowance for, in a way that can be
@@ -2406,6 +2517,7 @@ contract ERC20Burnable is Context, ERC20 {
 	function burn(uint256 amount) public {
 		_burn(_msgSender(), amount);
 	}
+
 	/**
 	 * @dev See {ERC20-_burnFrom}.
 	 */
@@ -2471,6 +2583,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 			msg.sender,
 			config().marketFactory()
 		);
+
 		behavior = _behavior;
 		enabled = false;
 		uint256 marketVotingBlocks = Policy(config().policy())
@@ -2486,14 +2599,6 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		enabled = true;
 	}
 
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool)
-	{
-		addressValidator().validateAddress(msg.sender, config().allocator());
-		return IMarketBehavior(behavior).calculate(_metrics, _start, _end);
-	}
-
 	function authenticate(
 		address _prop,
 		string memory _args1,
@@ -2507,8 +2612,10 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 			Property(_prop).author()
 		);
 		require(enabled, "market is not enabled");
+
 		uint256 len = bytes(_args1).length;
 		require(len > 0, "id is required");
+
 		return
 			IMarketBehavior(behavior).authenticate(
 				_prop,
@@ -2544,6 +2651,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	{
 		addressValidator().validateAddress(msg.sender, behavior);
 		require(enabled, "market is not enabled");
+
 		require(idMap[_idHash] == false, "id is duplicated");
 		idMap[_idHash] = true;
 		address sender = Property(_property).author();
@@ -2567,6 +2675,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 			block.number <= _votingEndBlockNumber,
 			"voting deadline is over"
 		);
+
 		VoteCounter voteCounter = VoteCounter(config().voteCounter());
 		voteCounter.addVoteCount(msg.sender, _property, _agree);
 		enabled = Policy(config().policy()).marketApproval(
@@ -2582,6 +2691,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 
 
 // prettier-ignore
+
 contract WithdrawStorage is
 	UsingStorage,
 	UsingConfig,
@@ -2590,11 +2700,14 @@ contract WithdrawStorage is
 {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
+
 	// RewardsAmount
 	function setRewardsAmount(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
+
 		eternalStorage().setUint(getRewardsAmountKey(_property), _value);
 	}
+
 	function getRewardsAmount(address _property)
 		external
 		view
@@ -2602,6 +2715,7 @@ contract WithdrawStorage is
 	{
 		return eternalStorage().getUint(getRewardsAmountKey(_property));
 	}
+
 	function getRewardsAmountKey(address _property)
 		private
 		pure
@@ -2609,14 +2723,17 @@ contract WithdrawStorage is
 	{
 		return keccak256(abi.encodePacked("_rewardsAmount", _property));
 	}
+
 	// CumulativePrice
 	function setCumulativePrice(address _property, uint256 _value)
 		external
 		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().withdraw());
+
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
 	}
+
 	function getCumulativePrice(address _property)
 		external
 		view
@@ -2624,6 +2741,7 @@ contract WithdrawStorage is
 	{
 		return eternalStorage().getUint(getCumulativePriceKey(_property));
 	}
+
 	function getCumulativePriceKey(address _property)
 		private
 		pure
@@ -2631,6 +2749,7 @@ contract WithdrawStorage is
 	{
 		return keccak256(abi.encodePacked("_cumulativePrice", _property));
 	}
+
 	// WithdrawalLimitTotal
 	function setWithdrawalLimitTotal(
 		address _property,
@@ -2638,11 +2757,13 @@ contract WithdrawStorage is
 		uint256 _value
 	) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
+
 		eternalStorage().setUint(
 			getWithdrawalLimitTotalKey(_property, _user),
 			_value
 		);
 	}
+
 	function getWithdrawalLimitTotal(address _property, address _user)
 		external
 		view
@@ -2653,6 +2774,7 @@ contract WithdrawStorage is
 				getWithdrawalLimitTotalKey(_property, _user)
 			);
 	}
+
 	function getWithdrawalLimitTotalKey(address _property, address _user)
 		private
 		pure
@@ -2663,6 +2785,7 @@ contract WithdrawStorage is
 				abi.encodePacked("_withdrawalLimitTotal", _property, _user)
 			);
 	}
+
 	// WithdrawalLimitBalance
 	function setWithdrawalLimitBalance(
 		address _property,
@@ -2670,11 +2793,13 @@ contract WithdrawStorage is
 		uint256 _value
 	) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
+
 		eternalStorage().setUint(
 			getWithdrawalLimitBalanceKey(_property, _user),
 			_value
 		);
 	}
+
 	function getWithdrawalLimitBalance(address _property, address _user)
 		external
 		view
@@ -2685,6 +2810,7 @@ contract WithdrawStorage is
 				getWithdrawalLimitBalanceKey(_property, _user)
 			);
 	}
+
 	function getWithdrawalLimitBalanceKey(address _property, address _user)
 		private
 		pure
@@ -2695,6 +2821,7 @@ contract WithdrawStorage is
 				abi.encodePacked("_withdrawalLimitBalance", _property, _user)
 			);
 	}
+
 	//LastWithdrawalPrice
 	function setLastWithdrawalPrice(
 		address _property,
@@ -2702,11 +2829,13 @@ contract WithdrawStorage is
 		uint256 _value
 	) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
+
 		eternalStorage().setUint(
 			getLastWithdrawalPriceKey(_property, _user),
 			_value
 		);
 	}
+
 	function getLastWithdrawalPrice(address _property, address _user)
 		external
 		view
@@ -2717,6 +2846,7 @@ contract WithdrawStorage is
 				getLastWithdrawalPriceKey(_property, _user)
 			);
 	}
+
 	function getLastWithdrawalPriceKey(address _property, address _user)
 		private
 		pure
@@ -2727,6 +2857,7 @@ contract WithdrawStorage is
 				abi.encodePacked("_lastWithdrawalPrice", _property, _user)
 			);
 	}
+
 	//PendingWithdrawal
 	function setPendingWithdrawal(
 		address _property,
@@ -2734,11 +2865,13 @@ contract WithdrawStorage is
 		uint256 _value
 	) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
+
 		eternalStorage().setUint(
 			getPendingWithdrawalKey(_property, _user),
 			_value
 		);
 	}
+
 	function getPendingWithdrawal(address _property, address _user)
 		external
 		view
@@ -2747,6 +2880,7 @@ contract WithdrawStorage is
 		return
 			eternalStorage().getUint(getPendingWithdrawalKey(_property, _user));
 	}
+
 	function getPendingWithdrawalKey(address _property, address _user)
 		private
 		pure
@@ -2768,6 +2902,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 	function withdraw(address _property) external {
 		require(paused() == false, "You cannot use that");
 		addressValidator().validateGroup(_property, config().propertyGroup());
+
 		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
 		uint256 price = getStorage().getCumulativePrice(_property);
@@ -2781,6 +2916,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 		external
 	{
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		uint256 price = getStorage().getCumulativePrice(_property);
 		uint256 amountFrom = _calculateAmount(_property, _from);
 		uint256 amountTo = _calculateAmount(_property, _to);
@@ -2887,17 +3023,13 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 }
 
 
-contract AllocatorStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	// Last Block Number
 	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(getLastBlockNumberKey(_metrics), _blocks);
 	}
 
@@ -2920,6 +3052,7 @@ contract AllocatorStorage is
 	// Base Block Number
 	function setBaseBlockNumber(uint256 _blockNumber) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(getBaseBlockNumberKey(), _blockNumber);
 	}
 
@@ -2934,6 +3067,7 @@ contract AllocatorStorage is
 	// PendingIncrement
 	function setPendingIncrement(address _metrics, bool value) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setBool(getPendingIncrementKey(_metrics), value);
 	}
 
@@ -2953,45 +3087,12 @@ contract AllocatorStorage is
 		return keccak256(abi.encodePacked("_pendingIncrement", _metrics));
 	}
 
-	// LastAllocationBlockEachMetrics
-	function setLastAllocationBlockEachMetrics(
-		address _metrics,
-		uint256 blockNumber
-	) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-		eternalStorage().setUint(
-			getLastAllocationBlockEachMetricsKey(_metrics),
-			blockNumber
-		);
-	}
-
-	function getLastAllocationBlockEachMetrics(address _metrics)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastAllocationBlockEachMetricsKey(_metrics)
-			);
-	}
-
-	function getLastAllocationBlockEachMetricsKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_lastAllocationBlockEachMetrics", _addr)
-			);
-	}
-
 	// LastAssetValueEachMetrics
 	function setLastAssetValueEachMetrics(address _metrics, uint256 value)
 		external
 	{
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(
 			getLastAssetValueEachMetricsKey(_metrics),
 			value
@@ -3020,6 +3121,7 @@ contract AllocatorStorage is
 		external
 	{
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		eternalStorage().setUint(
 			getLastAssetValueEachMarketPerBlockKey(_market),
 			value
@@ -3047,18 +3149,38 @@ contract AllocatorStorage is
 				abi.encodePacked("_lastAssetValueEachMarketPerBlock", _addr)
 			);
 	}
+
+	// pendingLastBlockNumber
+	function setPendingLastBlockNumber(address _metrics, uint256 value)
+		external
+	{
+		addressValidator().validateAddress(msg.sender, config().allocator());
+
+		eternalStorage().setUint(getPendingLastBlockNumberKey(_metrics), value);
+	}
+
+	function getPendingLastBlockNumber(address _metrics)
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getPendingLastBlockNumberKey(_metrics));
+	}
+
+	function getPendingLastBlockNumberKey(address _addr)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_pendingLastBlockNumber", _addr));
+	}
 }
 
 
-contract Allocator is
-	Killable,
-	Ownable,
-	UsingConfig,
-	IAllocator,
-	UsingValidator
-{
+contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+
 	event BeforeAllocation(
 		uint256 _blocks,
 		uint256 _mint,
@@ -3067,6 +3189,15 @@ contract Allocator is
 		uint256 _assets,
 		uint256 _totalAssets
 	);
+	event AllocationResult(
+		address _metrics,
+		uint256 _value,
+		address _market,
+		address _property,
+		uint256 _lockupValue,
+		uint256 _result
+	);
+
 	uint64 public constant basis = 1000000000000000000;
 
 	// solium-disable-next-line no-empty-blocks
@@ -3074,19 +3205,21 @@ contract Allocator is
 
 	function allocate(address _metrics) external {
 		addressValidator().validateGroup(_metrics, config().metricsGroup());
+
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
 		getStorage().setPendingIncrement(_metrics, true);
-		Market(market).calculate(
+		getStorage().setPendingLastBlockNumber(_metrics, block.number);
+		IMarketBehavior(Market(market).behavior()).calculate(
 			_metrics,
 			getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
-		getStorage().setLastBlockNumber(_metrics, block.number);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) external {
 		addressValidator().validateGroup(_metrics, config().metricsGroup());
+
 		Metrics metrics = Metrics(_metrics);
 		Market market = Market(metrics.market());
 		require(
@@ -3097,25 +3230,28 @@ contract Allocator is
 			getStorage().getPendingIncrement(_metrics),
 			"not asking for an indicator"
 		);
-		Policy policy = Policy(config().policy());
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
 			metrics.property()
 		);
 		uint256 blocks = block.number.sub(
-			getStorage().getLastAllocationBlockEachMetrics(_metrics)
+			getLastAllocationBlockNumber(_metrics)
 		);
-		uint256 mint = policy.rewards(lockupValue, totalAssets);
-		uint256 value = (policy.assetValue(_value, lockupValue).mul(basis)).div(
-			blocks
+		blocks = blocks > 0 ? blocks : 1;
+		uint256 mint = Policy(config().policy()).rewards(
+			Lockup(config().lockup()).getAllValue(),
+			totalAssets
 		);
+		uint256 value = (
+			Policy(config().policy()).assetValue(_value, lockupValue).mul(basis)
+		)
+			.div(blocks);
 		uint256 marketValue = getStorage()
 			.getLastAssetValueEachMarketPerBlock(metrics.market())
 			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))
 			.add(value);
 		uint256 assets = market.issuedMetrics();
-		getStorage().setLastAllocationBlockEachMetrics(_metrics, block.number);
 		getStorage().setLastAssetValueEachMetrics(_metrics, value);
 		getStorage().setLastAssetValueEachMarketPerBlock(
 			metrics.market(),
@@ -3137,8 +3273,18 @@ contract Allocator is
 			assets,
 			totalAssets
 		);
+		emit AllocationResult(
+			_metrics,
+			_value,
+			metrics.market(),
+			metrics.property(),
+			lockupValue,
+			result
+		);
 		increment(metrics.property(), result, lockupValue);
 		getStorage().setPendingIncrement(_metrics, false);
+		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
+		getStorage().setLastBlockNumber(_metrics, lastBlock);
 	}
 
 	function increment(address _property, uint256 _reward, uint256 _lockup)
@@ -3157,6 +3303,7 @@ contract Allocator is
 		external
 	{
 		addressValidator().validateGroup(msg.sender, config().propertyGroup());
+
 		Withdraw(config().withdraw()).beforeBalanceChange(
 			_property,
 			_from,
@@ -3229,6 +3376,7 @@ contract Allocator is
 	}
 
 	function getStorage() private view returns (AllocatorStorage) {
+		require(paused() == false, "You cannot use that");
 		return AllocatorStorage(config().allocatorStorage());
 	}
 }
@@ -3236,7 +3384,7 @@ contract Allocator is
 
 contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	uint8 private constant _decimals = 18;
-	uint256 private constant _supply = 10000000;
+	uint256 private constant _supply = 10000000000000000000000000;
 	address public author;
 
 	constructor(
@@ -3249,6 +3397,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 			msg.sender,
 			config().propertyFactory()
 		);
+
 		author = _own;
 		_mint(author, _supply);
 	}
@@ -3256,6 +3405,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		addressValidator().validateIllegalAddress(_to);
 		require(_value != 0, "illegal transfer value");
+
 		Allocator(config().allocator()).beforeBalanceChange(
 			address(this),
 			msg.sender,
@@ -3266,13 +3416,14 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 
 	function withdraw(address _sender, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
+
 		ERC20 devToken = ERC20(config().token());
 		devToken.transfer(_sender, _value);
 	}
 }
 
 
-contract PropertyFactory is Pausable, UsingConfig, Killable {
+contract PropertyFactory is Pausable, UsingConfig {
 	event Create(address indexed _from, address _property);
 
 	// solium-disable-next-line no-empty-blocks
@@ -3286,6 +3437,7 @@ contract PropertyFactory is Pausable, UsingConfig, Killable {
 		require(paused() == false, "You cannot use that");
 		validatePropertyName(_name);
 		validatePropertySymbol(_symbol);
+
 		Property property = new Property(
 			address(config()),
 			_author,
