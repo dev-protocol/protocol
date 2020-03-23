@@ -166,14 +166,4 @@ contract Market is Temporarily, UsingConfig, IMarket, UsingValidator {
 	function schema() external view returns (string memory) {
 		return IMarketBehavior(behavior).schema();
 	}
-
-	// duplicated
-	function destroyMetrics(address _metrics) external enabledTemporarily {
-		require(enabled, "market is not enabled");
-
-		MetricsFactory metricsFactory = MetricsFactory(
-			config().metricsFactory()
-		);
-		metricsFactory.destroy(_metrics);
-	}
 }

@@ -96,7 +96,8 @@ contract(
 		})
 		describe('MetircsFactory; destroy', () => {
 			const dev = new DevProtocolInstance(deployer)
-			let metricsAddress: string
+			let metricsAddress1: string
+			let metricsAddress2: string
 			before(async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
@@ -106,11 +107,16 @@ contract(
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				await dev.marketGroup.addGroup(market, {from: marketFactory})
-				const metricsFactoryResult = await dev.metricsFactory.create(
+				const metricsFactoryResult1 = await dev.metricsFactory.create(
 					property1,
 					{from: market}
 				)
-				metricsAddress = getMetricsAddress(metricsFactoryResult)
+				const metricsFactoryResult2 = await dev.metricsFactory.create(
+					property1,
+					{from: market}
+				)
+				metricsAddress1 = getMetricsAddress(metricsFactoryResult1)
+				metricsAddress2 = getMetricsAddress(metricsFactoryResult2)
 			})
 			it('If a non-metrics address is specified, an error will occur.', async () => {
 				const result = await dev.metricsFactory
@@ -121,14 +127,14 @@ contract(
 				validateErrorMessage(result, 'address is not metrics')
 			})
 			it('If a metrics address is specified, the remove process is performed and the event is also issued.', async () => {
-				let result = await dev.metricsGroup.isGroup(metricsAddress, {
+				let result = await dev.metricsGroup.isGroup(metricsAddress1, {
 					from: deployer
 				})
 				expect(result).to.be.equal(true)
-				await dev.metricsFactory.destroy(metricsAddress, {
+				await dev.metricsFactory.destroy(metricsAddress1, {
 					from: market
 				})
-				result = await dev.metricsGroup.isGroup(metricsAddress, {
+				result = await dev.metricsGroup.isGroup(metricsAddress1, {
 					from: deployer
 				})
 				expect(result).to.be.equal(false)
@@ -139,11 +145,32 @@ contract(
 					})
 				})
 				expect(market).to.be.equal(from)
-				expect(metricsAddress).to.be.equal(metrics)
+				expect(metricsAddress1).to.be.equal(metrics)
+			})
+			it('You can also run the destroy method in owner.', async () => {
+				let result = await dev.metricsGroup.isGroup(metricsAddress2, {
+					from: deployer
+				})
+				expect(result).to.be.equal(true)
+				await dev.metricsFactory.destroy(metricsAddress2, {
+					from: deployer
+				})
+				result = await dev.metricsGroup.isGroup(metricsAddress2, {
+					from: deployer
+				})
+				expect(result).to.be.equal(false)
+				const [from, metrics] = await new Promise<string[]>(resolve => {
+					watch(dev.metricsFactory, WEB3_URI)('Destroy', (_, values) => {
+						const {_from, _metrics} = values
+						resolve([_from, _metrics])
+					})
+				})
+				expect(deployer).to.be.equal(from)
+				expect(metricsAddress2).to.be.equal(metrics)
 			})
 			it('Cannot be executed from other than market contract.', async () => {
 				const result = await dev.metricsFactory
-					.destroy(metricsAddress, {
+					.destroy(metricsAddress1, {
 						from: user
 					})
 					.catch((err: Error) => err)
@@ -152,7 +179,7 @@ contract(
 			it('Cannot run if paused.', async () => {
 				await dev.metricsFactory.pause({from: deployer})
 				const result = await dev.metricsFactory
-					.destroy(metricsAddress, {
+					.destroy(metricsAddress1, {
 						from: market
 					})
 					.catch((err: Error) => err)
