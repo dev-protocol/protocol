@@ -126,6 +126,14 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'address is not metrics')
 			})
+			it('Cannot be executed from other than market contract.', async () => {
+				const result = await dev.metricsFactory
+					.destroy(metricsAddress1, {
+						from: user
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
 			it('If a metrics address is specified, the remove process is performed and the event is also issued.', async () => {
 				let result = await dev.metricsGroup.isGroup(metricsAddress1, {
 					from: deployer
@@ -167,14 +175,6 @@ contract(
 				})
 				expect(deployer).to.be.equal(from)
 				expect(metricsAddress2).to.be.equal(metrics)
-			})
-			it('Cannot be executed from other than market contract.', async () => {
-				const result = await dev.metricsFactory
-					.destroy(metricsAddress1, {
-						from: user
-					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
 			})
 			it('Cannot run if paused.', async () => {
 				await dev.metricsFactory.pause({from: deployer})

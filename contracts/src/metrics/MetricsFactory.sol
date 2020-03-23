@@ -29,6 +29,9 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 
 	function destroy(address _metrics) external {
 		require(paused() == false, "You cannot use that");
+
+		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
+		require(metricsGroup.isGroup(_metrics), "address is not metrics");
 		if (isPauser(msg.sender) == false) {
 			addressValidator().validateGroup(
 				msg.sender,
@@ -37,8 +40,6 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 			Metrics metrics = Metrics(_metrics);
 			addressValidator().validateAddress(msg.sender, metrics.market());
 		}
-		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
-		require(metricsGroup.isGroup(_metrics), "address is not metrics");
 		metricsGroup.removeGroup(_metrics);
 		emit Destroy(msg.sender, _metrics);
 	}
