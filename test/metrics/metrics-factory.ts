@@ -118,7 +118,7 @@ contract(
 				metricsAddress1 = getMetricsAddress(metricsFactoryResult1)
 				metricsAddress2 = getMetricsAddress(metricsFactoryResult2)
 			})
-			it('If a non-metrics address is specified, an error will occur.', async () => {
+			it('Should fail to destroy when passed other than metrics address.', async () => {
 				const result = await dev.metricsFactory
 					.destroy(dummyMetrics, {
 						from: market
@@ -126,7 +126,7 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'address is not metrics')
 			})
-			it('Cannot be executed from other than market contract.', async () => {
+			it('Should fail to destroy when sent from other than a Market. ', async () => {
 				const result = await dev.metricsFactory
 					.destroy(metricsAddress1, {
 						from: user
@@ -134,7 +134,7 @@ contract(
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
-			it('If a metrics address is specified, the remove process is performed and the event is also issued.', async () => {
+			it('When call the destroy, remove the metrics from MetricsGroup, emit Destroy event.', async () => {
 				let result = await dev.metricsGroup.isGroup(metricsAddress1, {
 					from: deployer
 				})
@@ -176,7 +176,7 @@ contract(
 				expect(deployer).to.be.equal(from)
 				expect(metricsAddress2).to.be.equal(metrics)
 			})
-			it('Cannot run if paused.', async () => {
+			it('Should fail to destroy when the pausing.', async () => {
 				await dev.metricsFactory.pause({from: deployer})
 				const result = await dev.metricsFactory
 					.destroy(metricsAddress1, {
