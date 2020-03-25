@@ -33,7 +33,9 @@ contract UsingStorage is Pausable, IStorage {
 		_storage = address(tmp);
 	}
 
-	function setStorage(address _sender, address _eternalStorageAddress) external {
+	function setStorage(address _sender, address _eternalStorageAddress)
+		external
+	{
 		require(isPauser(_sender), "you cannot do this function");
 		_storage = _eternalStorageAddress;
 	}
