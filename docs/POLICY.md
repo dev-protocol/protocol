@@ -15,9 +15,9 @@ As lockups increase, rewards decrease, and inflation rates decrease. As assets i
 
 The following formula illustrates the basic concept:
 
-![Rewards = Max*(1-StakingRate)^((12-(StakingRate*10))/2+1)](https://latex.codecogs.com/svg.latex?Rewards%20%3D%20Max*%281-StakingRate%29%5E%7B%2812-%28StakingRate*10%29%29/2+1%7D)
+![Rewards = Max*(1-StakingRatio)^((12-(StakingRatio*10))/2+1)](https://latex.codecogs.com/svg.latex?Rewards%20%3D%20Max*%281-StakingRatio%29%5E%7B%2812-%28StakingRatio*10%29%29/2+1%7D)
 
-The number of reward vs. staking rate will as follows curve:
+The number of reward vs. staking ratio will as follows curve:
 
 ![Reward curve](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/policy/staking-ratio-vs-mint-amount.svg?sanitize=true)
 
