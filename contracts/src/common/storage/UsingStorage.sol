@@ -1,11 +1,11 @@
 pragma solidity ^0.5.0;
 
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
+import {IStorage} from "contracts/src/common/storage/IStorage.sol";
 import {EternalStorage} from "contracts/src/common/storage/EternalStorage.sol";
 
 
-contract UsingStorage is Ownable, Pausable {
+contract UsingStorage is Pausable, IStorage {
 	address private _storage;
 
 	modifier hasStorage() {
@@ -27,17 +27,19 @@ contract UsingStorage is Ownable, Pausable {
 		return _storage;
 	}
 
-	function createStorage() external onlyOwner {
+	function createStorage() external onlyPauser {
 		require(_storage == address(0), "storage is setted");
 		EternalStorage tmp = new EternalStorage();
 		_storage = address(tmp);
 	}
 
-	function setStorage(address _storageAddress) external onlyOwner {
-		_storage = _storageAddress;
+	function setStorage(address _sender, address _eternalStorageAddress) external {
+		require(isPauser(_sender), "you cannot do this function");
+		_storage = _eternalStorageAddress;
 	}
 
-	function changeOwner(address newOwner) external onlyOwner {
+	function changeOwner(address newOwner) external onlyPauser hasStorage {
+		IStorage(newOwner).setStorage(msg.sender, _storage);
 		EternalStorage(_storage).changeOwner(newOwner);
 	}
 }

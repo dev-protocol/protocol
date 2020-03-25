@@ -10,6 +10,11 @@ contract('UsingStorageTest', ([deployer, account]) => {
 		})
 	})
 	describe('UsingStorage: eternalStorage', () => {
+		it('should fail to returns EternalStorage instance when the contract is not create storage', async () => {
+			const usingStorage = await UsingStorageTestContract.new()
+			const result = await usingStorage.setUInt(1).catch((err: Error) => err)
+			validateErrorMessage(result, 'storage is not setted', false)
+		})
 		it('returns EternalStorage instance', async () => {
 			const usingStorage = await UsingStorageTestContract.new()
 			await usingStorage.createStorage()
@@ -80,28 +85,18 @@ contract('UsingStorageTest', ([deployer, account]) => {
 			const result = await usingStorageTest.getUInt()
 			expect(result.toNumber()).to.be.equal(1)
 		})
-		it('the storage address is taken over, the same storage can be accessed from the takeover destination.', async () => {
-			const storageAddress = await usingStorageTest.getStorageAddress()
-			await usingStorageTestNext.setStorage(storageAddress)
-			const result = await usingStorageTestNext.getUInt()
-			expect(result.toNumber()).to.be.equal(1)
-		})
-		it('Before delegating authority, you can not write.', async () => {
-			const result = await usingStorageTestNext
-				.setUInt(2)
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'not current owner')
-		})
 		it('Delegation of authority is not possible from the delegate.', async () => {
 			const result = await usingStorageTestNext
 				.changeOwner(usingStorageTestNext.address)
 				.catch((err: Error) => err)
-			validateErrorMessage(result, 'not current owner')
+			validateErrorMessage(result, 'storage is not setted')
 		})
 		it('When delegating authority, the delegate can write to storage', async () => {
 			await usingStorageTest.changeOwner(usingStorageTestNext.address)
+			let result = await usingStorageTestNext.getUInt()
+			expect(result.toNumber()).to.be.equal(1)
 			await usingStorageTestNext.setUInt(2)
-			const result = await usingStorageTestNext.getUInt()
+			result = await usingStorageTestNext.getUInt()
 			expect(result.toNumber()).to.be.equal(2)
 		})
 		it('When delegating authority, delegation source can not write to storage.', async () => {
