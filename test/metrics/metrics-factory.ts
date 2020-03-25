@@ -1,15 +1,27 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {getMetricsAddress} from '../test-lib/utils/log'
+import {watch} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
+	validatePauseErrorMessage,
+	validatePauseOnlyOwnerErrorMessage
 } from '../test-lib/utils/error'
+import {WEB3_URI} from '../test-lib/const'
 
 contract(
 	'MetricsFactoryTest',
-	([deployer, user, market, marketFactory, property1, property2]) => {
-		const dev = new DevProtocolInstance(deployer)
+	([
+		deployer,
+		user,
+		market,
+		marketFactory,
+		property1,
+		property2,
+		dummyMetrics
+	]) => {
 		describe('MetircsFactory; create', () => {
+			const dev = new DevProtocolInstance(deployer)
 			let metricsAddress: string
 			before(async () => {
 				await dev.generateAddressConfig()
@@ -28,12 +40,19 @@ contract(
 			})
 
 			it('Adds a new metrics contract address to state contract,', async () => {
+				const [from, metrics] = await new Promise<string[]>(resolve => {
+					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) => {
+						const {_from, _metrics} = values
+						resolve([_from, _metrics])
+					})
+				})
+				expect(market).to.be.equal(from)
+				expect(metricsAddress).to.be.equal(metrics)
 				const result = await dev.metricsGroup.isGroup(metricsAddress, {
 					from: deployer
 				})
 				expect(result).to.be.equal(true)
 			})
-
 			it('Cannot be executed from other than market contract.', async () => {
 				const result = await dev.metricsFactory
 					.create(property2, {
@@ -46,18 +65,12 @@ contract(
 				let result = await dev.metricsFactory
 					.pause({from: user})
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result,
-					'PauserRole: caller does not have the Pauser role'
-				)
+				validatePauseOnlyOwnerErrorMessage(result)
 				await dev.metricsFactory.pause({from: deployer})
 				result = await dev.metricsFactory
 					.unpause({from: user})
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result,
-					'PauserRole: caller does not have the Pauser role'
-				)
+				validatePauseOnlyOwnerErrorMessage(result)
 				await dev.metricsFactory.unpause({from: deployer})
 			})
 			it('Cannot run if paused.', async () => {
@@ -69,7 +82,7 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'You cannot use that')
 			})
-			it('Can be executed when pause is released', async () => {
+			it('Can be executed when pause is released.', async () => {
 				await dev.metricsFactory.unpause({from: deployer})
 				let createResult = await dev.metricsFactory.create(property2, {
 					from: market
@@ -79,6 +92,98 @@ contract(
 					from: deployer
 				})
 				expect(result).to.be.equal(true)
+			})
+		})
+		describe('MetircsFactory; destroy', () => {
+			const dev = new DevProtocolInstance(deployer)
+			let metricsAddress1: string
+			let metricsAddress2: string
+			before(async () => {
+				await dev.generateAddressConfig()
+				await Promise.all([
+					dev.generateMarketGroup(),
+					dev.generateMetricsFactory(),
+					dev.generateMetricsGroup()
+				])
+				await dev.addressConfig.setMarketFactory(marketFactory)
+				await dev.marketGroup.addGroup(market, {from: marketFactory})
+				const metricsFactoryResult1 = await dev.metricsFactory.create(
+					property1,
+					{from: market}
+				)
+				const metricsFactoryResult2 = await dev.metricsFactory.create(
+					property1,
+					{from: market}
+				)
+				metricsAddress1 = getMetricsAddress(metricsFactoryResult1)
+				metricsAddress2 = getMetricsAddress(metricsFactoryResult2)
+			})
+			it('Should fail to destroy when passed other than metrics address.', async () => {
+				const result = await dev.metricsFactory
+					.destroy(dummyMetrics, {
+						from: market
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'address is not metrics')
+			})
+			it('Should fail to destroy when sent from other than a Market. ', async () => {
+				const result = await dev.metricsFactory
+					.destroy(metricsAddress1, {
+						from: user
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+			it('When call the destroy, remove the metrics from MetricsGroup, emit Destroy event.', async () => {
+				let result = await dev.metricsGroup.isGroup(metricsAddress1, {
+					from: deployer
+				})
+				expect(result).to.be.equal(true)
+				await dev.metricsFactory.destroy(metricsAddress1, {
+					from: market
+				})
+				result = await dev.metricsGroup.isGroup(metricsAddress1, {
+					from: deployer
+				})
+				expect(result).to.be.equal(false)
+				const [from, metrics] = await new Promise<string[]>(resolve => {
+					watch(dev.metricsFactory, WEB3_URI)('Destroy', (_, values) => {
+						const {_from, _metrics} = values
+						resolve([_from, _metrics])
+					})
+				})
+				expect(market).to.be.equal(from)
+				expect(metricsAddress1).to.be.equal(metrics)
+			})
+			it('You can also run the destroy method in owner.', async () => {
+				let result = await dev.metricsGroup.isGroup(metricsAddress2, {
+					from: deployer
+				})
+				expect(result).to.be.equal(true)
+				await dev.metricsFactory.destroy(metricsAddress2, {
+					from: deployer
+				})
+				result = await dev.metricsGroup.isGroup(metricsAddress2, {
+					from: deployer
+				})
+				expect(result).to.be.equal(false)
+				const [from, metrics] = await new Promise<string[]>(resolve => {
+					watch(dev.metricsFactory, WEB3_URI)('Destroy', (_, values) => {
+						const {_from, _metrics} = values
+						resolve([_from, _metrics])
+					})
+				})
+				expect(deployer).to.be.equal(from)
+				expect(metricsAddress2).to.be.equal(metrics)
+			})
+			it('Should fail to destroy when the pausing.', async () => {
+				await dev.metricsFactory.pause({from: deployer})
+				const result = await dev.metricsFactory
+					.destroy(metricsAddress1, {
+						from: market
+					})
+					.catch((err: Error) => err)
+				validatePauseErrorMessage(result)
 			})
 		})
 	}

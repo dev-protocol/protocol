@@ -17,6 +17,7 @@ contract Context {
 	constructor() internal {}
 
 	// solhint-disable-previous-line no-empty-blocks
+
 	function _msgSender() internal view returns (address payable) {
 		return msg.sender;
 	}
@@ -70,8 +71,10 @@ library Roles {
 
 contract PauserRole is Context {
 	using Roles for Roles.Role;
+
 	event PauserAdded(address indexed account);
 	event PauserRemoved(address indexed account);
+
 	Roles.Role private _pausers;
 
 	constructor() internal {
@@ -124,10 +127,12 @@ contract Pausable is Context, PauserRole {
 	 * @dev Emitted when the pause is triggered by a pauser (`account`).
 	 */
 	event Paused(address account);
+
 	/**
 	 * @dev Emitted when the pause is lifted by a pauser (`account`).
 	 */
 	event Unpaused(address account);
+
 	bool private _paused;
 
 	/**
@@ -152,6 +157,7 @@ contract Pausable is Context, PauserRole {
 		require(!_paused, "Pausable: paused");
 		_;
 	}
+
 	/**
 	 * @dev Modifier to make a function callable only when the contract is paused.
 	 */
@@ -203,6 +209,7 @@ contract Killable {
  */
 contract Ownable is Context {
 	address private _owner;
+
 	event OwnershipTransferred(
 		address indexed previousOwner,
 		address indexed newOwner
@@ -212,8 +219,9 @@ contract Ownable is Context {
 	 * @dev Initializes the contract setting the deployer as the initial owner.
 	 */
 	constructor() internal {
-		_owner = _msgSender();
-		emit OwnershipTransferred(address(0), _owner);
+		address msgSender = _msgSender();
+		_owner = msgSender;
+		emit OwnershipTransferred(address(0), msgSender);
 	}
 
 	/**
@@ -273,9 +281,12 @@ contract Ownable is Context {
 
 
 // prettier-ignore
+
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
+
 	function addGroup(address _addr) external;
+
 	function getGroupKey(address _addr) internal pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
@@ -487,6 +498,7 @@ library SafeMath {
 	function add(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a + b;
 		require(c >= a, "SafeMath: addition overflow");
+
 		return c;
 	}
 
@@ -521,6 +533,7 @@ library SafeMath {
 	{
 		require(b <= a, errorMessage);
 		uint256 c = a - b;
+
 		return c;
 	}
 
@@ -540,8 +553,10 @@ library SafeMath {
 		if (a == 0) {
 			return 0;
 		}
+
 		uint256 c = a * b;
 		require(c / a == b, "SafeMath: multiplication overflow");
+
 		return c;
 	}
 
@@ -582,6 +597,7 @@ library SafeMath {
 		require(b > 0, errorMessage);
 		uint256 c = a / b;
 		// assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
 		return c;
 	}
 
@@ -624,15 +640,16 @@ library SafeMath {
 }
 
 
-//import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 contract EternalStorage {
 	address private currentOwner = msg.sender;
+
 	mapping(bytes32 => uint256) private uIntStorage;
 	mapping(bytes32 => string) private stringStorage;
 	mapping(bytes32 => address) private addressStorage;
 	mapping(bytes32 => bytes32) private bytesStorage;
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
+
 	modifier onlyCurrentOwner() {
 		require(msg.sender == currentOwner, "not current owner");
 		_;
@@ -726,8 +743,9 @@ contract EternalStorage {
 }
 
 
-contract UsingStorage is Ownable {
+contract UsingStorage is Ownable, Pausable {
 	address private _storage;
+
 	modifier hasStorage() {
 		require(_storage != address(0), "storage is not setted");
 		_;
@@ -739,6 +757,7 @@ contract UsingStorage is Ownable {
 		hasStorage
 		returns (EternalStorage)
 	{
+		require(paused() == false, "You cannot use that");
 		return EternalStorage(_storage);
 	}
 
@@ -778,6 +797,7 @@ contract VoteTimesStorage is
 
 	function setVoteTimes(uint256 times) external {
 		addressValidator().validateAddress(msg.sender, config().voteTimes());
+
 		return eternalStorage().setUint(getVoteTimesKey(), times);
 	}
 
@@ -796,6 +816,7 @@ contract VoteTimesStorage is
 
 	function setVoteTimesByProperty(address _property, uint256 times) external {
 		addressValidator().validateAddress(msg.sender, config().voteTimes());
+
 		return
 			eternalStorage().setUint(
 				getVoteTimesByPropertyKey(_property),
@@ -825,6 +846,7 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 			config().marketFactory(),
 			config().policyFactory()
 		);
+
 		uint256 voteTimes = getStorage().getVoteTimes();
 		voteTimes = voteTimes.add(1);
 		getStorage().setVoteTimes(voteTimes);
@@ -832,6 +854,7 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 
 	function addVoteTimesByProperty(address _property) external {
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
+
 		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(
 			_property
 		);
@@ -845,6 +868,7 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 			config().allocator(),
 			config().propertyFactory()
 		);
+
 		uint256 voteTimes = getStorage().getVoteTimes();
 		getStorage().setVoteTimesByProperty(_property, voteTimes);
 	}
@@ -879,27 +903,37 @@ contract Metrics {
 }
 
 
-contract MetricsGroup is
-	UsingConfig,
-	UsingStorage,
-	UsingValidator,
-	IGroup,
-	Killable
-{
+contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
+		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(
 			msg.sender,
 			config().metricsFactory()
 		);
+
 		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		totalCount = totalCount.add(1);
+		eternalStorage().setUint(getTotalCountKey(), totalCount);
+	}
+
+	function removeGroup(address _addr) external {
+		require(paused() == false, "You cannot use that");
+		addressValidator().validateAddress(
+			msg.sender,
+			config().metricsFactory()
+		);
+
+		require(isGroup(_addr), "address is not group");
+		eternalStorage().setBool(getGroupKey(_addr), false);
+		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
+		totalCount = totalCount.sub(1);
 		eternalStorage().setUint(getTotalCountKey(), totalCount);
 	}
 
@@ -917,8 +951,9 @@ contract MetricsGroup is
 }
 
 
-contract MetricsFactory is Pausable, UsingConfig, UsingValidator, Killable {
+contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 	event Create(address indexed _from, address _metrics);
+	event Destroy(address indexed _from, address _metrics);
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -926,11 +961,29 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator, Killable {
 	function create(address _property) external returns (address) {
 		require(paused() == false, "You cannot use that");
 		addressValidator().validateGroup(msg.sender, config().marketGroup());
+
 		Metrics metrics = new Metrics(msg.sender, _property);
 		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
 		address metricsAddress = address(metrics);
 		metricsGroup.addGroup(metricsAddress);
 		emit Create(msg.sender, metricsAddress);
 		return metricsAddress;
+	}
+
+	function destroy(address _metrics) external {
+		require(paused() == false, "You cannot use that");
+
+		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
+		require(metricsGroup.isGroup(_metrics), "address is not metrics");
+		if (isPauser(msg.sender) == false) {
+			addressValidator().validateGroup(
+				msg.sender,
+				config().marketGroup()
+			);
+			Metrics metrics = Metrics(_metrics);
+			addressValidator().validateAddress(msg.sender, metrics.market());
+		}
+		metricsGroup.removeGroup(_metrics);
+		emit Destroy(msg.sender, _metrics);
 	}
 }
