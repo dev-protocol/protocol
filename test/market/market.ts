@@ -203,6 +203,89 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'id is duplicated')
 			})
+
+			it('Should fail to deauthenticate when sent from other than passed metrics linked property author.', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress1)
+				const metricsAddress = await new Promise<string>(resolve => {
+					marketInstance.authenticate(
+						propertyAddress,
+						'id-key',
+						'',
+						'',
+						'',
+						'',
+						{from: propertyAuther}
+					)
+					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
+						resolve(values._metrics)
+					)
+				})
+				const result = await marketInstance
+					.deauthenticate(metricsAddress, {from: user})
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'this is illegal address')
+			})
+			it('When deauthenticate, decrease the issuedMetrics, emit the Destroy event.', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress1)
+				const metricsAddress = await new Promise<string>(resolve => {
+					marketInstance.authenticate(
+						propertyAddress,
+						'id-key',
+						'',
+						'',
+						'',
+						'',
+						{from: propertyAuther}
+					)
+					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
+						resolve(values._metrics)
+					)
+				})
+				let count = await marketInstance.issuedMetrics()
+				expect(count.toNumber()).to.be.equal(1)
+				await marketInstance.deauthenticate(metricsAddress, {
+					from: propertyAuther
+				})
+				count = await marketInstance.issuedMetrics()
+				expect(count.toNumber()).to.be.equal(0)
+				const [_from, _metrics] = await new Promise<string[]>(resolve => {
+					watch(dev.metricsFactory, WEB3_URI)('Destroy', (_, values) => {
+						const {_from, _metrics} = values
+						resolve([_from, _metrics])
+					})
+				})
+				expect(_from).to.be.equal(marketAddress1)
+				expect(_metrics).to.be.equal(metricsAddress)
+			})
+			it('Should fail to deauthenticate when passed already deauthenticated metrics.', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress1)
+				const metricsAddress = await new Promise<string>(resolve => {
+					marketInstance.authenticate(
+						propertyAddress,
+						'id-key',
+						'',
+						'',
+						'',
+						'',
+						{from: propertyAuther}
+					)
+					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
+						resolve(values._metrics)
+					)
+				})
+				await marketInstance.deauthenticate(metricsAddress, {
+					from: propertyAuther
+				})
+				const result = await marketInstance
+					.deauthenticate(metricsAddress, {
+						from: propertyAuther
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'not authenticated')
+			})
 		})
 
 		describe('Market; vote', () => {

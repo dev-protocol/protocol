@@ -8,6 +8,7 @@ import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
+import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {MetricsFactory} from "contracts/src/metrics/MetricsFactory.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
@@ -21,6 +22,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	uint256 private _votingEndBlockNumber;
 	uint256 public issuedMetrics;
 	mapping(bytes32 => bool) private idMap;
+	mapping(address => bytes32) private idHashMetricsMap;
 
 	constructor(address _config, address _behavior)
 		public
@@ -38,6 +40,25 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		_votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
 
+	function propertyValidation(address _prop) internal view {
+		addressValidator().validateAddress(
+			msg.sender,
+			Property(_prop).author()
+		);
+		require(enabled, "market is not enabled");
+	}
+
+	modifier onlyPropertyAuthor(address _prop) {
+		propertyValidation(_prop);
+		_;
+	}
+
+	modifier onlyLinkedPropertyAuthor(address _metrics) {
+		address _prop = Metrics(_metrics).property();
+		propertyValidation(_prop);
+		_;
+	}
+
 	function toEnable() external {
 		addressValidator().validateAddress(
 			msg.sender,
@@ -53,13 +74,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
-	) public returns (address) {
-		addressValidator().validateAddress(
-			msg.sender,
-			Property(_prop).author()
-		);
-		require(enabled, "market is not enabled");
-
+	) public onlyPropertyAuthor(_prop) returns (address) {
 		uint256 len = bytes(_args1).length;
 		require(len > 0, "id is required");
 
@@ -106,6 +121,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 			config().metricsFactory()
 		);
 		address metrics = metricsFactory.create(_property);
+		idHashMetricsMap[metrics] = _idHash;
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		require(
 			Dev(config().token()).fee(sender, authenticationFee),
@@ -113,6 +129,21 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		);
 		issuedMetrics = issuedMetrics.add(1);
 		return metrics;
+	}
+
+	function deauthenticate(address _metrics)
+		external
+		onlyLinkedPropertyAuthor(_metrics)
+	{
+		bytes32 idHash = idHashMetricsMap[_metrics];
+		require(idMap[idHash], "not authenticated");
+		idMap[idHash] = false;
+		idHashMetricsMap[_metrics] = bytes32(0);
+		MetricsFactory metricsFactory = MetricsFactory(
+			config().metricsFactory()
+		);
+		metricsFactory.destroy(_metrics);
+		issuedMetrics = issuedMetrics.sub(1);
 	}
 
 	function vote(address _property, bool _agree) external {

@@ -20,6 +20,8 @@ contract IMarket {
 		external
 		returns (address);
 
+	function deauthenticate(address _metrics) external;
+
 	function vote(address _property, bool _agree) external;
 
 	function schema() external view returns (string memory);
