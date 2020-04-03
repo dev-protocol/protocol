@@ -155,26 +155,17 @@ contract(
 				expect(market).to.be.equal(from)
 				expect(metricsAddress1).to.be.equal(metrics)
 			})
-			it('You can also run the destroy method in owner.', async () => {
+			it('can not also run the destroy method in owner.', async () => {
 				let result = await dev.metricsGroup.isGroup(metricsAddress2, {
 					from: deployer
 				})
 				expect(result).to.be.equal(true)
-				await dev.metricsFactory.destroy(metricsAddress2, {
-					from: deployer
-				})
-				result = await dev.metricsGroup.isGroup(metricsAddress2, {
-					from: deployer
-				})
-				expect(result).to.be.equal(false)
-				const [from, metrics] = await new Promise<string[]>(resolve => {
-					watch(dev.metricsFactory, WEB3_URI)('Destroy', (_, values) => {
-						const {_from, _metrics} = values
-						resolve([_from, _metrics])
+				const destroｙResult = await dev.metricsFactory
+					.destroy(metricsAddress2, {
+						from: deployer
 					})
-				})
-				expect(deployer).to.be.equal(from)
-				expect(metricsAddress2).to.be.equal(metrics)
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(destroｙResult)
 			})
 			it('Should fail to destroy when the pausing.', async () => {
 				await dev.metricsFactory.pause({from: deployer})
