@@ -8,22 +8,25 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
 contract MarketTest2 is IMarketBehavior, UsingConfig {
 	string public schema = "[]";
+	mapping(address => string) internal keys;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function authenticate(
 		address _prop,
-		string calldata _args1,
-		string calldata,
-		string calldata,
-		string calldata,
-		string calldata,
+		string memory _args1,
+		string memory,
+		string memory,
+		string memory,
+		string memory,
 		// solium-disable-next-line no-trailing-whitespace
 		address market
-	) external returns (address) {
+	) public returns (address) {
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
-		return Market(market).authenticatedCallback(_prop, idHash);
+		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
+		keys[_metrics] = _args1;
+		return _metrics;
 	}
 
 	function calculate(address _metrics, uint256, uint256)
@@ -32,5 +35,9 @@ contract MarketTest2 is IMarketBehavior, UsingConfig {
 	{
 		Allocator(config().allocator()).calculatedCallback(_metrics, 100);
 		return true;
+	}
+
+	function getId(address _metrics) external view returns (string memory) {
+		return keys[_metrics];
 	}
 }
