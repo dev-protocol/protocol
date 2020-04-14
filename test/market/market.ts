@@ -155,6 +155,13 @@ contract(
 				expect(await metrics.property()).to.be.equal(propertyAddress)
 				const tmp = await dev.dev.balanceOf(propertyAuther)
 				expect(tmp.toNumber()).to.be.equal(9999800000)
+				const behavuor = await marketInstance.behavior()
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const behavuorInstance = await artifacts
+					.require('MarketTest3')
+					.at(behavuor)
+				const key = await behavuorInstance.getId(metrics.address)
+				expect(key).to.be.equal('id-key')
 			})
 			it('Market that is not enabled generates an error when performing authentication function.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable

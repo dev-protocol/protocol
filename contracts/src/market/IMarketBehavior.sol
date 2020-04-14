@@ -6,14 +6,14 @@ contract IMarketBehavior {
 
 	function authenticate(
 		address _prop,
-		string calldata _args1,
-		string calldata _args2,
-		string calldata _args3,
-		string calldata _args4,
-		string calldata _args5,
+		string memory _args1,
+		string memory _args2,
+		string memory _args3,
+		string memory _args4,
+		string memory _args5,
 		address market
 	)
-		external
+		public
 		returns (
 			// solium-disable-next-line indentation
 			address
@@ -22,4 +22,6 @@ contract IMarketBehavior {
 	function calculate(address _metrics, uint256 _start, uint256 _end)
 		external
 		returns (bool);
+
+	function getId(address _metrics) external view returns (string memory);
 }
