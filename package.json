@@ -1,6 +1,6 @@
 {
-	"name": "@dev-protocol/protocol",
-	"version": "0.1.4",
+	"name": "@devprtcl/protocol",
+	"version": "0.1.5",
 	"description": "Securitize for Internet assets",
 	"main": "cli/index.js",
 	"scripts": {
@@ -85,8 +85,5 @@
 		"hooks": {
 			"pre-commit": "npm run lint"
 		}
-	},
-	"publishConfig": {
-		"registry": "https://npm.pkg.github.com/"
 	}
 }
