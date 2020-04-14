@@ -72,12 +72,12 @@ contract('LockupTest', ([deployer, user1]) => {
 	const err = (error: Error): Error => error
 
 	describe('Lockup; cancel', () => {
-		it('An error occurs if you specify something other than a property address', async () => {
+		it('An error occurs if you specify something other than a property address.', async () => {
 			const [dev, ,] = await init()
 			const res = await dev.lockup.cancel(user1).catch(err)
 			validateErrorMessage(res, 'this is illegal address')
 		})
-		it('An error occurs if you specify something other than a property address', async () => {
+		it('An error occurs when specifying a property address that is not locked up.', async () => {
 			const [dev, , property] = await init()
 			const res = await dev.lockup.cancel(property.address).catch(err)
 			validateErrorMessage(res, 'dev token is not locked')
