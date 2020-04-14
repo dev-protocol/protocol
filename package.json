@@ -30,7 +30,7 @@
 	"devDependencies": {
 		"@truffle/hdwallet-provider": "1.0.33",
 		"@types/dotenv": "8.2.0",
-		"@types/node": "13.9.1",
+		"@types/node": "13.11.1",
 		"@types/ramda": "0.26.44",
 		"@types/shelljs": "0.8.6",
 		"@typescript-eslint/eslint-plugin": "2.23.0",
