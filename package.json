@@ -31,7 +31,7 @@
 		"@truffle/hdwallet-provider": "1.0.34",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "13.11.1",
-		"@types/ramda": "0.26.44",
+		"@types/ramda": "0.27.3",
 		"@types/shelljs": "0.8.6",
 		"@typescript-eslint/eslint-plugin": "2.28.0",
 		"@typescript-eslint/parser": "2.28.0",
