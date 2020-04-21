@@ -12,7 +12,7 @@
 		"lint": "npm run lint:eslint && npm run lint:format",
 		"lint:eslint": "eslint . --ext .ts,.js --fix",
 		"lint:solium": "solium --dir contracts --fix",
-		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
+		"lint:format": "prettier --write '**/*.{js,json,md,yml}'",
 		"prepack": "npm run build",
 		"build": "tsc -p tsconfig.build.json",
 		"prebuild": "rm -f migrations/*.js && rm -f migrations/*/*.js && npm run generate"
