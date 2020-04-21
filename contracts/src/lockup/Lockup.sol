@@ -1,10 +1,8 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-// prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {Dev} from "contracts/src/dev/Dev.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
@@ -133,8 +131,8 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 			getStorage().getInterestPrice(_property)
 		);
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
-		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		require(erc20.mint(msg.sender, value), "dev mint failed");
+		Dev dev = Dev(config().token());
+		dev.mint(msg.sender, value);
 	}
 
 	function getAllValue() external view returns (uint256) {

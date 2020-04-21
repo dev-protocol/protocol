@@ -1,7 +1,7 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 
 contract(
@@ -12,7 +12,7 @@ contract(
 		dummyMarketFactory,
 		market1,
 		market2,
-		dummyMarket
+		dummyMarket,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
 		describe('MarketGroup addGroup, isGroup', () => {
@@ -20,7 +20,7 @@ contract(
 				await dev.generateAddressConfig()
 				await dev.generateMarketGroup()
 				await dev.addressConfig.setMarketFactory(marketFactory, {
-					from: deployer
+					from: deployer,
 				})
 				await dev.marketGroup.addGroup(market1, {from: marketFactory})
 			})
@@ -42,7 +42,7 @@ contract(
 			it('Existing market cannot be added', async () => {
 				const result = await dev.marketGroup
 					.addGroup(market1, {
-						from: marketFactory
+						from: marketFactory,
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'already enabled')
@@ -50,7 +50,7 @@ contract(
 			it('Can not execute addGroup without marketFactory address', async () => {
 				const result = await dev.marketGroup
 					.addGroup(dummyMarket, {
-						from: dummyMarketFactory
+						from: dummyMarketFactory,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)

@@ -2,7 +2,7 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import {getPropertyAddress} from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 import {DEFAULT_ADDRESS} from '../test-lib/const'
 import {toBigNumber} from '../test-lib/utils/common'
@@ -19,7 +19,7 @@ contract(
 			it('Cannot be created from other than factory', async () => {
 				const result = await propertyContract
 					.new(dev.addressConfig.address, author, 'sample', 'SAMPLE', {
-						from: deployer
+						from: deployer,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
@@ -32,12 +32,10 @@ contract(
 					'sample',
 					'SAMPLE',
 					{
-						from: propertyFactory
+						from: propertyFactory,
 					}
 				)
-				const tenMillion = toBigNumber(1000)
-					.times(10000)
-					.times(1e18)
+				const tenMillion = toBigNumber(1000).times(10000).times(1e18)
 				expect(await propertyInstance.author()).to.be.equal(author)
 				expect((await propertyInstance.decimals()).toNumber()).to.be.equal(18)
 				expect(
@@ -58,14 +56,14 @@ contract(
 					dev.generateVoteTimesStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
-					dev.generateDev()
+					dev.generateDev(),
 				])
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
 					author,
 					{
-						from: user
+						from: user,
 					}
 				)
 				propertyAddress = getPropertyAddress(result)
@@ -108,14 +106,14 @@ contract(
 					dev.generateVoteTimes(),
 					dev.generateVoteTimesStorage(),
 					dev.generatePropertyGroup(),
-					dev.generatePropertyFactory()
+					dev.generatePropertyFactory(),
 				])
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
 					author,
 					{
-						from: user
+						from: user,
 					}
 				)
 				propertyAddress = getPropertyAddress(result)

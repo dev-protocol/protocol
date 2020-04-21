@@ -1,17 +1,17 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IGroup} from "contracts/src/common/interface/IGroup.sol";
+import {ContractGroup} from "contracts/src/common/abstract/ContractGroup.sol";
 
 
 contract MarketGroup is
 	UsingConfig,
 	UsingStorage,
-	IGroup,
+	ContractGroup,
 	UsingValidator,
 	Killable
 {
@@ -20,7 +20,7 @@ contract MarketGroup is
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
-	function addGroup(address _addr) external {
+	function addGroup(address _addr) external override {
 		addressValidator().validateAddress(
 			msg.sender,
 			config().marketFactory()
@@ -31,7 +31,7 @@ contract MarketGroup is
 		addCount();
 	}
 
-	function isGroup(address _addr) public view returns (bool) {
+	function isGroup(address _addr) public override view returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";

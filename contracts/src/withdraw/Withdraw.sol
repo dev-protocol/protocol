@@ -1,14 +1,13 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-// prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
+import {Dev} from "contracts/src/dev/Dev.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 
@@ -29,8 +28,8 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 		uint256 price = getStorage().getCumulativePrice(_property);
 		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
 		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
-		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		require(erc20.mint(msg.sender, value), "dev mint failed");
+		Dev dev = Dev(config().token());
+		dev.mint(msg.sender, value);
 	}
 
 	function beforeBalanceChange(address _property, address _from, address _to)

@@ -1,6 +1,6 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
-import {IGroup} from "contracts/src/common/interface/IGroup.sol";
+import {ContractGroup} from "contracts/src/common/abstract/ContractGroup.sol";
 
 
 contract AddressValidator {
@@ -11,7 +11,7 @@ contract AddressValidator {
 	}
 
 	function validateGroup(address _addr, address _groupAddr) external view {
-		require(IGroup(_groupAddr).isGroup(_addr), errorMessage);
+		require(ContractGroup(_groupAddr).isGroup(_addr), errorMessage);
 	}
 
 	function validateGroups(
@@ -19,10 +19,10 @@ contract AddressValidator {
 		address _groupAddr1,
 		address _groupAddr2
 	) external view {
-		if (IGroup(_groupAddr1).isGroup(_addr)) {
+		if (ContractGroup(_groupAddr1).isGroup(_addr)) {
 			return;
 		}
-		require(IGroup(_groupAddr2).isGroup(_addr), errorMessage);
+		require(ContractGroup(_groupAddr2).isGroup(_addr), errorMessage);
 	}
 
 	function validateAddress(address _addr, address _target) external pure {

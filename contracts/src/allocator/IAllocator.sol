@@ -1,7 +1,7 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 
-contract IAllocator {
+interface IAllocator {
 	function allocate(address _metrics) external;
 
 	function calculatedCallback(address _metrics, uint256 _value) external;
@@ -22,7 +22,7 @@ contract IAllocator {
 		uint256 _assets,
 		uint256 _totalAssets
 	)
-		public
+		external
 		pure
 		returns (
 			// solium-disable-next-line indentation

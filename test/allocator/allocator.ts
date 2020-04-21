@@ -6,7 +6,7 @@ import {watch, waitForEvent, getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validatePauseErrorMessage,
-	validatePauseOnlyOwnerErrorMessage
+	validatePauseOnlyOwnerErrorMessage,
 } from '../test-lib/utils/error'
 
 import {WEB3_URI} from '../test-lib/const'
@@ -15,15 +15,13 @@ import {
 	MarketInstance,
 	MarketTest1Instance,
 	AddressConfigInstance,
-	IPolicyInstance
+	IPolicyInstance,
 } from '../../types/truffle-contracts'
 
 contract('Allocator', ([deployer, user1]) => {
-	const init = async (): Promise<[
-		DevProtocolInstance,
-		MarketInstance,
-		MetricsInstance
-	]> => {
+	const init = async (): Promise<
+		[DevProtocolInstance, MarketInstance, MetricsInstance]
+	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await Promise.all([
@@ -46,7 +44,7 @@ contract('Allocator', ([deployer, user1]) => {
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
 			dev.generatePolicySet(),
-			dev.generateDev()
+			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const policy = await artifacts.require('PolicyTestForAllocator').new()
@@ -56,7 +54,7 @@ contract('Allocator', ([deployer, user1]) => {
 			await dev.propertyFactory.create('test', 'TEST', deployer)
 		)
 		const [property] = await Promise.all([
-			artifacts.require('Property').at(propertyAddress)
+			artifacts.require('Property').at(propertyAddress),
 		])
 		const marketBehavior = await artifacts
 			.require('MarketTest1')
@@ -65,16 +63,16 @@ contract('Allocator', ([deployer, user1]) => {
 			await dev.marketFactory.create(marketBehavior.address)
 		)
 		const [market] = await Promise.all([
-			artifacts.require('Market').at(marketAddress)
+			artifacts.require('Market').at(marketAddress),
 		])
-		const metricsAddress = await new Promise<string>(resolve => {
+		const metricsAddress = await new Promise<string>((resolve) => {
 			market.authenticate(property.address, 'id1', '', '', '', '')
 			watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 				resolve(values._metrics)
 			)
 		})
 		const [metrics] = await Promise.all([
-			artifacts.require('Metrics').at(metricsAddress)
+			artifacts.require('Metrics').at(metricsAddress),
 		])
 		return [dev, market, metrics]
 	}
@@ -85,7 +83,7 @@ contract('Allocator', ([deployer, user1]) => {
 	): Promise<MarketTest1Instance> => {
 		const behavior = await market.behavior()
 		const [marketBehavior] = await Promise.all([
-			artifacts.require('MarketTest1').at(behavior)
+			artifacts.require('MarketTest1').at(behavior),
 		])
 		return marketBehavior
 	}
@@ -95,7 +93,7 @@ contract('Allocator', ([deployer, user1]) => {
 	): Promise<IPolicyInstance> => {
 		const policyAddress = await addressConfig.policy()
 		const [policy] = await Promise.all([
-			artifacts.require('IPolicy').at(policyAddress)
+			artifacts.require('IPolicy').at(policyAddress),
 		])
 		return policy
 	}
@@ -113,7 +111,7 @@ contract('Allocator', ([deployer, user1]) => {
 			const [dev, market, metrics] = await init()
 			const behavior = await market
 				.behavior()
-				.then(x => artifacts.require('MarketTest1').at(x))
+				.then((x) => artifacts.require('MarketTest1').at(x))
 			await behavior.changeAsynchronousMode(true)
 			await dev.allocator.allocate(metrics.address)
 			await behavior.calculated()
@@ -199,7 +197,7 @@ contract('Allocator', ([deployer, user1]) => {
 					dev.dev.mint(deployer, 1),
 					dev.dev.mint(deployer, 1),
 					dev.dev.mint(deployer, 1),
-					dev.dev.mint(deployer, 1)
+					dev.dev.mint(deployer, 1),
 				])
 
 				const expected = lastBlock.toNumber() + 2
@@ -237,10 +235,9 @@ contract('Allocator', ([deployer, user1]) => {
 			Market's total asset value per block is 7406907,
 			number of assets per Market is 48568,
 			number of assets total all Market is 547568;
-			the result is ${5760 *
-				50000 *
-				(300 / 7406907) *
-				(48568 / 547568)}`, async () => {
+			the result is ${
+				5760 * 50000 * (300 / 7406907) * (48568 / 547568)
+			}`, async () => {
 			const [dev] = await init()
 			const result = await dev.allocator.allocation(
 				5760,
@@ -268,8 +265,8 @@ contract('Allocator', ([deployer, user1]) => {
 				_value,
 				_marketValue,
 				_assets,
-				_totalAssets
-			] = await new Promise<BigNumber[]>(resolve => {
+				_totalAssets,
+			] = await new Promise<BigNumber[]>((resolve) => {
 				watch(dev.allocator, WEB3_URI)('BeforeAllocation', (_, values) => {
 					const {
 						_blocks,
@@ -277,7 +274,7 @@ contract('Allocator', ([deployer, user1]) => {
 						_value,
 						_marketValue,
 						_assets,
-						_totalAssets
+						_totalAssets,
 					} = values
 					resolve([
 						new BigNumber(_blocks),
@@ -285,7 +282,7 @@ contract('Allocator', ([deployer, user1]) => {
 						new BigNumber(_value),
 						new BigNumber(_marketValue),
 						new BigNumber(_assets),
-						new BigNumber(_totalAssets)
+						new BigNumber(_totalAssets),
 					])
 				})
 			})
@@ -294,8 +291,8 @@ contract('Allocator', ([deployer, user1]) => {
 				_argValue,
 				_market,
 				_property,
-				_lockupValue
-			] = await new Promise<any[]>(resolve => {
+				_lockupValue,
+			] = await new Promise<any[]>((resolve) => {
 				watch(dev.allocator, WEB3_URI)('AllocationResult', (_, values) => {
 					const {
 						_metrics,
@@ -303,7 +300,7 @@ contract('Allocator', ([deployer, user1]) => {
 						_market,
 						_property,
 						_lockupValue,
-						_result
+						_result,
 					} = values
 					resolve([
 						_metrics,
@@ -311,7 +308,7 @@ contract('Allocator', ([deployer, user1]) => {
 						_market,
 						_property,
 						new BigNumber(_lockupValue),
-						new BigNumber(_result)
+						new BigNumber(_result),
 					])
 				})
 			})
@@ -348,7 +345,7 @@ contract('Allocator', ([deployer, user1]) => {
 					.then(toBigNumber),
 				dev.allocatorStorage
 					.getLastAssetValueEachMetrics(metrics.address)
-					.then(toBigNumber)
+					.then(toBigNumber),
 			])
 			const assetValue = await policy
 				.assetValue(100, lockUpValue)
@@ -374,8 +371,8 @@ contract('Allocator', ([deployer, user1]) => {
 				_value,
 				_marketValue,
 				_assets,
-				_totalAssets
-			] = await new Promise<BigNumber[]>(resolve => {
+				_totalAssets,
+			] = await new Promise<BigNumber[]>((resolve) => {
 				watch(dev.allocator, WEB3_URI)('BeforeAllocation', (_, values) => {
 					const {
 						_blocks,
@@ -383,7 +380,7 @@ contract('Allocator', ([deployer, user1]) => {
 						_value,
 						_marketValue,
 						_assets,
-						_totalAssets
+						_totalAssets,
 					} = values
 					resolve([
 						new BigNumber(_blocks),
@@ -391,7 +388,7 @@ contract('Allocator', ([deployer, user1]) => {
 						new BigNumber(_value),
 						new BigNumber(_marketValue),
 						new BigNumber(_assets),
-						new BigNumber(_totalAssets)
+						new BigNumber(_totalAssets),
 					])
 				})
 			})
@@ -400,8 +397,8 @@ contract('Allocator', ([deployer, user1]) => {
 				_argValue,
 				_market,
 				_property,
-				_lockupValue
-			] = await new Promise<any[]>(resolve => {
+				_lockupValue,
+			] = await new Promise<any[]>((resolve) => {
 				watch(dev.allocator, WEB3_URI)('AllocationResult', (_, values) => {
 					const {
 						_metrics,
@@ -409,7 +406,7 @@ contract('Allocator', ([deployer, user1]) => {
 						_market,
 						_property,
 						_lockupValue,
-						_result
+						_result,
 					} = values
 					resolve([
 						_metrics,
@@ -417,7 +414,7 @@ contract('Allocator', ([deployer, user1]) => {
 						_market,
 						_property,
 						new BigNumber(_lockupValue),
-						new BigNumber(_result)
+						new BigNumber(_result),
 					])
 				})
 			})
@@ -483,7 +480,7 @@ contract('Allocator', ([deployer, user1]) => {
 
 			dev.allocator.allocate(metrics.address)
 			const [, , , , _assets, _totalAssets] = await new Promise<BigNumber[]>(
-				resolve => {
+				(resolve) => {
 					watch(dev.allocator, WEB3_URI)('BeforeAllocation', (_, values) => {
 						const {
 							_blocks,
@@ -491,7 +488,7 @@ contract('Allocator', ([deployer, user1]) => {
 							_value,
 							_marketValue,
 							_assets,
-							_totalAssets
+							_totalAssets,
 						} = values
 						resolve([
 							new BigNumber(_blocks),
@@ -499,12 +496,12 @@ contract('Allocator', ([deployer, user1]) => {
 							new BigNumber(_value),
 							new BigNumber(_marketValue),
 							new BigNumber(_assets),
-							new BigNumber(_totalAssets)
+							new BigNumber(_totalAssets),
 						])
 					})
 				}
 			)
-			const [_metrics] = await new Promise<any[]>(resolve => {
+			const [_metrics] = await new Promise<any[]>((resolve) => {
 				watch(dev.allocator, WEB3_URI)('AllocationResult', (_, values) => {
 					const {
 						_metrics,
@@ -512,7 +509,7 @@ contract('Allocator', ([deployer, user1]) => {
 						_market,
 						_property,
 						_lockupValue,
-						_result
+						_result,
 					} = values
 					resolve([
 						_metrics,
@@ -520,7 +517,7 @@ contract('Allocator', ([deployer, user1]) => {
 						_market,
 						_property,
 						new BigNumber(_lockupValue),
-						new BigNumber(_result)
+						new BigNumber(_result),
 					])
 				})
 			})

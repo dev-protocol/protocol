@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";
@@ -7,7 +7,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
 
 contract MarketTest3 is IMarketBehavior, UsingConfig {
-	string public schema = "[]";
+	string private schemaInfo = "[]";
 	mapping(address => string) internal keys;
 	event LogCalculate(
 		address _metrics,
@@ -27,7 +27,7 @@ contract MarketTest3 is IMarketBehavior, UsingConfig {
 		string memory,
 		// solium-disable-next-line no-trailing-whitespace
 		address market
-	) public returns (address) {
+	) public override returns (address) {
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
 		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
 		keys[_metrics] = _args1;
@@ -38,12 +38,16 @@ contract MarketTest3 is IMarketBehavior, UsingConfig {
 		address _metrics,
 		uint256 _lastBlock,
 		uint256 _currentBlock
-	) external returns (bool) {
+	) external override returns (bool) {
 		emit LogCalculate(_metrics, _lastBlock, _currentBlock);
 		return true;
 	}
 
-	function getId(address _metrics) external view returns (string memory) {
+	function getId(address _metrics) external override view returns (string memory) {
 		return keys[_metrics];
+	}
+
+	function schema() external override view returns (string memory) {
+		return schemaInfo;
 	}
 }

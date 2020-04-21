@@ -1,7 +1,7 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
@@ -43,7 +43,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function allocate(address _metrics) external {
+	function allocate(address _metrics) external override {
 		addressValidator().validateGroup(_metrics, config().metricsGroup());
 
 		validateTargetPeriod(_metrics);
@@ -57,7 +57,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		);
 	}
 
-	function calculatedCallback(address _metrics, uint256 _value) external {
+	function calculatedCallback(address _metrics, uint256 _value) external override {
 		addressValidator().validateGroup(_metrics, config().metricsGroup());
 
 		Metrics metrics = Metrics(_metrics);
@@ -138,7 +138,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	}
 
 	function beforeBalanceChange(address _property, address _from, address _to)
-		external
+		external override
 	{
 		addressValidator().validateGroup(msg.sender, config().propertyGroup());
 
@@ -150,7 +150,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	}
 
 	function getRewardsAmount(address _property)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -164,7 +164,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		uint256 _marketValue,
 		uint256 _assets,
 		uint256 _totalAssets
-	) public pure returns (uint256) {
+	) public override pure returns (uint256) {
 		uint256 aShare = _totalAssets > 0
 			? _assets.outOf(_totalAssets)
 			: Decimals.basis();

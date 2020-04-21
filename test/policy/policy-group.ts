@@ -1,7 +1,7 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 
 contract(
@@ -12,7 +12,7 @@ contract(
 			await dev.generateAddressConfig()
 			await dev.generatePolicyGroup()
 			await dev.addressConfig.setPolicyFactory(policyFactory, {
-				from: deployer
+				from: deployer,
 			})
 			await dev.policyGroup.addGroup(policy, {from: policyFactory})
 		})
@@ -28,7 +28,7 @@ contract(
 			it('Existing policy cannot be added', async () => {
 				const result = await dev.policyGroup
 					.addGroup(policy, {
-						from: policyFactory
+						from: policyFactory,
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'already enabled')
@@ -36,7 +36,7 @@ contract(
 			it('Can not execute addGroup without policyFactory address', async () => {
 				const result = await dev.policyGroup
 					.addGroup(dummyPolicy, {
-						from: dummyPolicyFactory
+						from: dummyPolicyFactory,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
@@ -57,7 +57,7 @@ contract(
 			it('Can not execute deleteGroup without policyFactory address', async () => {
 				const result = await dev.policyGroup
 					.deleteGroup(policy, {
-						from: dummyPolicyFactory
+						from: dummyPolicyFactory,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)

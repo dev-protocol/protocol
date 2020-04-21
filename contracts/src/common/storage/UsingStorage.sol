@@ -1,7 +1,7 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
-import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import {EternalStorage} from "contracts/src/common/storage/EternalStorage.sol";
 
 

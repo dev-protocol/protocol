@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 

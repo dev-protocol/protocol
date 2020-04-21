@@ -9,7 +9,7 @@
 		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
 		"deploy": "truffle migrate --network",
 		"predeploy": "npm run build",
-		"lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
+		"lint": "npm run lint:eslint && npm run lint:format",
 		"lint:eslint": "eslint . --ext .ts,.js --fix",
 		"lint:solium": "solium --dir contracts --fix",
 		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",

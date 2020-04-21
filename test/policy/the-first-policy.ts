@@ -22,10 +22,7 @@ contract('TheFirstPolicy', ([deployer]) => {
 			const totalSupply = new BigNumber(1e18).times(10000000)
 			const stakingRate = new BigNumber(stake).div(totalSupply)
 			const _d = new BigNumber(1).minus(stakingRate)
-			const _p = new BigNumber(12)
-				.minus(stakingRate.times(10))
-				.div(2)
-				.plus(1)
+			const _p = new BigNumber(12).minus(stakingRate.times(10)).div(2).plus(1)
 			const p = ~~_p.toNumber()
 			const rp = p + 1
 			const f = _p.minus(p)

@@ -1,11 +1,11 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
 
 contract PolicyTestForAllocator is IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -13,7 +13,7 @@ contract PolicyTestForAllocator is IPolicy {
 	}
 
 	function holdersShare(uint256 _amount, uint256 _lockups)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -21,7 +21,7 @@ contract PolicyTestForAllocator is IPolicy {
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -31,7 +31,7 @@ contract PolicyTestForAllocator is IPolicy {
 	}
 
 	function authenticationFee(uint256 _assets, uint256 _propertyLockups)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -39,7 +39,7 @@ contract PolicyTestForAllocator is IPolicy {
 	}
 
 	function marketApproval(uint256 _agree, uint256 _opposite)
-		external
+		external override
 		view
 		returns (bool)
 	{
@@ -50,7 +50,7 @@ contract PolicyTestForAllocator is IPolicy {
 	}
 
 	function policyApproval(uint256 _agree, uint256 _opposite)
-		external
+		external override
 		view
 		returns (bool)
 	{
@@ -60,19 +60,19 @@ contract PolicyTestForAllocator is IPolicy {
 		return _agree > _opposite;
 	}
 
-	function marketVotingBlocks() external view returns (uint256) {
+	function marketVotingBlocks() external override view returns (uint256) {
 		return 10;
 	}
 
-	function policyVotingBlocks() external view returns (uint256) {
+	function policyVotingBlocks() external override view returns (uint256) {
 		return 20;
 	}
 
-	function abstentionPenalty(uint256 _count) external view returns (uint256) {
+	function abstentionPenalty(uint256 _count) external override view returns (uint256) {
 		return _count - 1;
 	}
 
-	function lockUpBlocks() external view returns (uint256) {
+	function lockUpBlocks() external override view returns (uint256) {
 		return 1;
 	}
 }

@@ -12,7 +12,12 @@
 		"prettier/@typescript-eslint"
 	],
 	"rules": {
-		"prettier/prettier": "error"
+		"prettier/prettier": "error",
+		"@typescript-eslint/prefer-readonly-parameter-types": "off",
+		"@typescript-eslint/no-unsafe-member-access": "off",
+		"@typescript-eslint/no-unsafe-call": "off",
+		"@typescript-eslint/no-unsafe-return": "off",
+		"@typescript-eslint/no-base-to-string": "off"
 	},
 	"overrides": [
 		{

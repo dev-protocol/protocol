@@ -10,14 +10,14 @@ contract(
 		dummyPolicyFactory,
 		policy1,
 		policy2,
-		policy3
+		policy3,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
 		before(async () => {
 			await dev.generateAddressConfig()
 			await dev.generatePolicySet()
 			await dev.addressConfig.setPolicyFactory(policyFactory, {
-				from: deployer
+				from: deployer,
 			})
 			await dev.policySet.addSet(policy1, {from: policyFactory})
 			await dev.policySet.addSet(policy2, {from: policyFactory})
@@ -26,7 +26,7 @@ contract(
 			it('Can not execute addSet without policyGroup address', async () => {
 				const result = await dev.policySet
 					.addSet(policy3, {
-						from: dummyPolicyFactory
+						from: dummyPolicyFactory,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)

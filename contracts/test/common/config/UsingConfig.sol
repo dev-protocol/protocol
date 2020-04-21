@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
+
 import {AddressConfig} from "contracts/src/common/config/AddressConfig.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 

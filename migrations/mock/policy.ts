@@ -1,6 +1,6 @@
 import {
 	AddressConfigInstance,
-	PolicyFactoryInstance
+	PolicyFactoryInstance,
 } from '../../types/truffle-contracts'
 import {createInstance} from './common'
 

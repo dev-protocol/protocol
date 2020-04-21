@@ -1,7 +1,7 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 
-contract IPolicy {
+interface IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view

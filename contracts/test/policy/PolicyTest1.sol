@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
@@ -8,7 +8,7 @@ contract PolicyTest1 is IPolicy {
 	using Decimals for uint256;
 
 	function rewards(uint256 _lockups, uint256 _assets)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -16,7 +16,7 @@ contract PolicyTest1 is IPolicy {
 	}
 
 	function holdersShare(uint256 _amount, uint256 _lockups)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -26,7 +26,7 @@ contract PolicyTest1 is IPolicy {
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -34,7 +34,7 @@ contract PolicyTest1 is IPolicy {
 	}
 
 	function authenticationFee(uint256 _assets, uint256 _propertyLockups)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -42,7 +42,7 @@ contract PolicyTest1 is IPolicy {
 	}
 
 	function marketApproval(uint256 _agree, uint256 _opposite)
-		external
+		external override
 		view
 		returns (bool)
 	{
@@ -53,7 +53,7 @@ contract PolicyTest1 is IPolicy {
 	}
 
 	function policyApproval(uint256 _agree, uint256 _opposite)
-		external
+		external override
 		view
 		returns (bool)
 	{
@@ -63,19 +63,19 @@ contract PolicyTest1 is IPolicy {
 		return _agree > _opposite;
 	}
 
-	function marketVotingBlocks() external view returns (uint256) {
+	function marketVotingBlocks() external override view returns (uint256) {
 		return 10;
 	}
 
-	function policyVotingBlocks() external view returns (uint256) {
+	function policyVotingBlocks() external override view returns (uint256) {
 		return 20;
 	}
 
-	function abstentionPenalty(uint256 _count) external view returns (uint256) {
+	function abstentionPenalty(uint256 _count) external override view returns (uint256) {
 		return _count * 5760;
 	}
 
-	function lockUpBlocks() external view returns (uint256) {
+	function lockUpBlocks() external override view returns (uint256) {
 		return 1;
 	}
 }

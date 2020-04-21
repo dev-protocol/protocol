@@ -1,26 +1,20 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 // prettier-ignore
-import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
-// prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
-// prettier-ignore
-import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+import {ERC20PresetMinterPauser} from "@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {UsingConfig} from "../common/config/UsingConfig.sol";
-import {Lockup} from "../lockup/Lockup.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {Lockup} from "contracts/src//lockup/Lockup.sol";
 
 
 contract Dev is
-	ERC20Detailed,
-	ERC20Mintable,
-	ERC20Burnable,
+	ERC20PresetMinterPauser,
 	UsingConfig,
 	UsingValidator
 {
 	constructor(address _config)
 		public
-		ERC20Detailed("Dev", "DEV", 18)
+		ERC20PresetMinterPauser("Dev", "DEV")
 		UsingConfig(_config)
 	{}
 

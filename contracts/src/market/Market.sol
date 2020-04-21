@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
@@ -18,7 +18,7 @@ import {Dev} from "contracts/src/dev/Dev.sol";
 contract Market is UsingConfig, IMarket, UsingValidator {
 	using SafeMath for uint256;
 	bool public enabled;
-	address public behavior;
+	address public override behavior;
 	uint256 private _votingEndBlockNumber;
 	uint256 public issuedMetrics;
 	mapping(bytes32 => bool) private idMap;
@@ -74,7 +74,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
-	) public onlyPropertyAuthor(_prop) returns (address) {
+	) public override onlyPropertyAuthor(_prop) returns (address) {
 		uint256 len = bytes(_args1).length;
 		require(len > 0, "id is required");
 
@@ -108,7 +108,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	}
 
 	function authenticatedCallback(address _property, bytes32 _idHash)
-		external
+		external override
 		returns (address)
 	{
 		addressValidator().validateAddress(msg.sender, behavior);
@@ -132,7 +132,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	}
 
 	function deauthenticate(address _metrics)
-		external
+		external override
 		onlyLinkedPropertyAuthor(_metrics)
 	{
 		bytes32 idHash = idHashMetricsMap[_metrics];
@@ -146,7 +146,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		issuedMetrics = issuedMetrics.sub(1);
 	}
 
-	function vote(address _property, bool _agree) external {
+	function vote(address _property, bool _agree) external override {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(enabled == false, "market is already enabled");
 		require(
@@ -162,7 +162,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		);
 	}
 
-	function schema() external view returns (string memory) {
+	function schema() external override view returns (string memory) {
 		return IMarketBehavior(behavior).schema();
 	}
 }

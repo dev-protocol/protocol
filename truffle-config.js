@@ -8,20 +8,20 @@ const {
 	ETHEREUM_PROVIDERS_AZURE,
 	ETHEREUM_WALLET_MNEMONIC,
 	ETHEREUM_MOCK_HOST,
-	ETHEREUM_MOCK_PORT
+	ETHEREUM_MOCK_PORT,
 } = process.env
 
 module.exports = {
 	test_file_extension_regexp: /.*\.ts$/,
 	compilers: {
 		solc: {
-			version: '^0.5.16',
+			version: '^0.6.0',
 			settings: {
 				optimizer: {
-					enabled: true
-				}
-			}
-		}
+					enabled: true,
+				},
+			},
+		},
 	},
 	networks: {
 		mainnet: {
@@ -32,7 +32,7 @@ module.exports = {
 				),
 			network_id: 1,
 			gas: 4000000,
-			gasPrice: 10000000000
+			gasPrice: 10000000000,
 		},
 		ropsten: {
 			provider: () =>
@@ -42,12 +42,12 @@ module.exports = {
 				),
 			network_id: 3,
 			gas: 4000000,
-			gasPrice: 10000000000
+			gasPrice: 10000000000,
 		},
 		mock: {
 			host: ETHEREUM_MOCK_HOST,
 			port: ETHEREUM_MOCK_PORT,
-			network_id: '*'
+			network_id: '*',
 		},
 		azure: {
 			provider: () =>
@@ -57,7 +57,7 @@ module.exports = {
 				),
 			network_id: '*',
 			gas: 0,
-			gasPrice: 0
-		}
-	}
+			gasPrice: 0,
+		},
+	},
 }

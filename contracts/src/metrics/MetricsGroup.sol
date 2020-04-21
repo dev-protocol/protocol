@@ -1,19 +1,19 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IGroup} from "contracts/src/common/interface/IGroup.sol";
+import {ContractGroup} from "contracts/src/common/abstract/ContractGroup.sol";
 
 
-contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
+contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, ContractGroup {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addGroup(address _addr) external {
+	function addGroup(address _addr) external override {
 		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(
 			msg.sender,
@@ -41,7 +41,7 @@ contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 		eternalStorage().setUint(getTotalCountKey(), totalCount);
 	}
 
-	function isGroup(address _addr) public view returns (bool) {
+	function isGroup(address _addr) public override view returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 

@@ -37,7 +37,7 @@ export async function createProperty(
 		// eslint-disable-next-line padding-line-between-statements
 		const addressInfo: AddressInfo = {
 			account: userAddresses[i],
-			property: propertyAddress
+			property: propertyAddress,
 		}
 		result.push(addressInfo)
 	}

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -8,9 +8,9 @@ import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
 contract TheFirstPolicy is IPolicy, UsingConfig {
 	using SafeMath for uint256;
-	uint256 public marketVotingBlocks = 525600;
-	uint256 public policyVotingBlocks = 525600;
-	uint256 public lockUpBlocks = 175200;
+	uint256 public override marketVotingBlocks = 525600;
+	uint256 public override policyVotingBlocks = 525600;
+	uint256 public override lockUpBlocks = 175200;
 
 	uint256 private constant basis = 10000000000000000000000000;
 	uint256 private constant power_basis = 10000000000;
@@ -19,7 +19,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function rewards(uint256 _lockups, uint256 _assets)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -50,7 +50,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function holdersShare(uint256 _reward, uint256 _lockups)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -58,7 +58,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -66,7 +66,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function authenticationFee(uint256 total_assets, uint256 property_lockups)
-		external
+		external override
 		view
 		returns (uint256)
 	{
@@ -77,7 +77,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function marketApproval(uint256 _up_votes, uint256 _negative_votes)
-		external
+		external override
 		view
 		returns (bool)
 	{
@@ -91,7 +91,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function policyApproval(uint256 _up_votes, uint256 _negative_votes)
-		external
+		external override
 		view
 		returns (bool)
 	{
@@ -105,7 +105,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function abstentionPenalty(uint256 abstentions)
-		external
+		external override
 		view
 		returns (uint256)
 	{

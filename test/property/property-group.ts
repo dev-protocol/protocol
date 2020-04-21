@@ -1,7 +1,7 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 
 contract(
@@ -11,7 +11,7 @@ contract(
 		propertyFactory,
 		dummyPropertyFactory,
 		property,
-		dummyProperty
+		dummyProperty,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
 		describe('PrpertyGroup; addGroup, isGroup', () => {
@@ -19,7 +19,7 @@ contract(
 				await dev.generateAddressConfig()
 				await dev.generatePropertyGroup()
 				await dev.addressConfig.setPropertyFactory(propertyFactory, {
-					from: deployer
+					from: deployer,
 				})
 				await dev.propertyGroup.addGroup(property, {from: propertyFactory})
 			})
@@ -36,7 +36,7 @@ contract(
 			it('Existing property cannot be added', async () => {
 				const result = await dev.propertyGroup
 					.addGroup(property, {
-						from: propertyFactory
+						from: propertyFactory,
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'already enabled')
@@ -44,7 +44,7 @@ contract(
 			it('Can not execute addGroup without propertyFactory address', async () => {
 				const result = await dev.propertyGroup
 					.addGroup(dummyProperty, {
-						from: dummyPropertyFactory
+						from: dummyPropertyFactory,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
