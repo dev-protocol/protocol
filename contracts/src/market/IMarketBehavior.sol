@@ -22,7 +22,9 @@ contract IMarketBehavior {
 	function calculate(
 		address _metrics,
 		uint256 _start,
-		uint256 _end) external returns (bool);
+		uint256 _end
+	// solium-disable-next-line indentation
+	) external returns (bool);
 
 	function getId(address _metrics) external view returns (string memory);
 }
