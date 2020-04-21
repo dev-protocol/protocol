@@ -127,7 +127,7 @@ The Market Factory Contract generates a new Market Contract.
 The generation of a Market Contract is carried out by executing the `create` function. The `create` function receives the address for the contract with the next interface and generates a new Market Contract.
 
 ```solidity
-contract IMarket {
+contract IMarketBehavior {
 	string public schema;
 
 	function authenticate(
@@ -136,14 +136,27 @@ contract IMarket {
 		string memory _args2,
 		string memory _args3,
 		string memory _args4,
-		string memory _args5
-	) public returns (bool);
+		string memory _args5,
+		address market
+	)
+		public
+		returns (
+			// solium-disable-next-line indentation
+			address
+		);
 
 	function calculate(
 		address _metrics,
 		uint256 _start,
 		uint256 _end
-	) external returns (bool);
+	)
+		external
+		returns (
+			// solium-disable-next-line indentation
+			bool
+		);
+
+	function getId(address _metrics) external view returns (string memory);
 }
 ```
 
