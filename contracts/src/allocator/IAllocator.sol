@@ -10,7 +10,7 @@ contract IAllocator {
 		address _property,
 		address _from,
 		address _to
-	// solium-disable-next-line indentation
+		// solium-disable-next-line indentation
 	) external;
 
 	function getRewardsAmount(address _property)
