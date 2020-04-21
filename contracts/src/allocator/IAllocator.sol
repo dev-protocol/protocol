@@ -6,8 +6,12 @@ contract IAllocator {
 
 	function calculatedCallback(address _metrics, uint256 _value) external;
 
-	function beforeBalanceChange(address _property, address _from, address _to)
-		external;
+	function beforeBalanceChange(
+		address _property,
+		address _from,
+		address _to
+		// solium-disable-next-line indentation
+	) external;
 
 	function getRewardsAmount(address _property)
 		external

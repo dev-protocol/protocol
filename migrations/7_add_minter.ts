@@ -1,4 +1,4 @@
-const handler = function(deployer, network) {
+const handler = function (deployer, network) {
 	if (network === 'test') {
 		return
 	}
@@ -10,11 +10,11 @@ const handler = function(deployer, network) {
 		.then(async () => {
 			return artifacts.require('Dev').deployed()
 		})
-		.then(async dev => {
+		.then(async (dev) => {
 			return Promise.all([
 				dev.addMinter(devMigration.address),
 				dev.addMinter(lockup.address),
-				dev.addMinter(withdraw.address)
+				dev.addMinter(withdraw.address),
 			])
 		})
 		.then(() => {
@@ -22,7 +22,7 @@ const handler = function(deployer, network) {
 				'*** The addition of the address of the contract to mint is completed ***'
 			)
 		})
-		.catch(err => {
+		.catch((err) => {
 			console.error('*** ERROR! ***', err)
 		})
 } as Truffle.Migration

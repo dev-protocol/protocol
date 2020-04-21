@@ -13,16 +13,16 @@ contract(
 		describe('WithdrawStorageTest; setRewardsAmount, getRewardsAmount', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.withdrawStorage.getRewardsAmount(property, {
-					from: withdraw
+					from: withdraw,
 				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.withdrawStorage.setRewardsAmount(property, 5, {
-					from: withdraw
+					from: withdraw,
 				})
 				const result = await dev.withdrawStorage.getRewardsAmount(property, {
-					from: withdraw
+					from: withdraw,
 				})
 				expect(result.toNumber()).to.be.equal(5)
 			})
@@ -36,16 +36,16 @@ contract(
 		describe('WithdrawStorageTest; setCumulativePrice, getCumulativePrice', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.withdrawStorage.getCumulativePrice(property, {
-					from: withdraw
+					from: withdraw,
 				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.withdrawStorage.setCumulativePrice(property, 50, {
-					from: withdraw
+					from: withdraw,
 				})
 				const result = await dev.withdrawStorage.getCumulativePrice(property, {
-					from: withdraw
+					from: withdraw,
 				})
 				expect(result.toNumber()).to.be.equal(50)
 			})
@@ -62,20 +62,20 @@ contract(
 					property,
 					user,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.withdrawStorage.setWithdrawalLimitTotal(property, user, 500, {
-					from: withdraw
+					from: withdraw,
 				})
 				const result = await dev.withdrawStorage.getWithdrawalLimitTotal(
 					property,
 					user,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				expect(result.toNumber()).to.be.equal(500)
@@ -93,7 +93,7 @@ contract(
 					property,
 					user,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				expect(result.toNumber()).to.be.equal(0)
@@ -104,14 +104,14 @@ contract(
 					user,
 					5000,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				const result = await dev.withdrawStorage.getWithdrawalLimitBalance(
 					property,
 					user,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				expect(result.toNumber()).to.be.equal(5000)
@@ -119,7 +119,7 @@ contract(
 			it('Cannot rewrite data from other than withdraw.', async () => {
 				const result = await dev.withdrawStorage
 					.setWithdrawalLimitBalance(property, user, 5000, {
-						from: dummyWithdraw
+						from: dummyWithdraw,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
@@ -131,7 +131,7 @@ contract(
 					property,
 					user,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				expect(result.toNumber()).to.be.equal(0)
@@ -142,14 +142,14 @@ contract(
 					user,
 					50000,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				const result = await dev.withdrawStorage.getLastWithdrawalPrice(
 					property,
 					user,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				expect(result.toNumber()).to.be.equal(50000)
@@ -167,20 +167,20 @@ contract(
 					property,
 					user,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.withdrawStorage.setPendingWithdrawal(property, user, 500000, {
-					from: withdraw
+					from: withdraw,
 				})
 				const result = await dev.withdrawStorage.getPendingWithdrawal(
 					property,
 					user,
 					{
-						from: withdraw
+						from: withdraw,
 					}
 				)
 				expect(result.toNumber()).to.be.equal(500000)

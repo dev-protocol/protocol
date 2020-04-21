@@ -3,7 +3,7 @@ import {
 	MarketFactoryInstance,
 	MarketTest1Instance,
 	MarketTest2Instance,
-	MarketTest3Instance
+	MarketTest3Instance,
 } from '../../types/truffle-contracts'
 import {createInstance, AddressInfo, createInstanceByAddress} from './common'
 
@@ -62,7 +62,7 @@ async function vote(
 			artifacts
 		)
 		await market.vote(addressInfo[0].property!, true, {
-			from: addressInfo[0].account
+			from: addressInfo[0].account,
 		})
 		const result = await market.enabled()
 		console.log(

@@ -5,7 +5,7 @@ import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {watch} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
@@ -29,7 +29,7 @@ contract(
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet()
+					dev.generatePolicySet(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
@@ -51,13 +51,13 @@ contract(
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet()
+					dev.generatePolicySet(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
 				market = await marketContract.new(dev.addressConfig.address, behavuor, {
-					from: marketFactory
+					from: marketFactory,
 				})
 			})
 			it('Cannot be enabled from other than market factory', async () => {
@@ -76,7 +76,7 @@ contract(
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet()
+					dev.generatePolicySet(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
@@ -111,7 +111,7 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateLockupStorage(),
-					dev.generateDev()
+					dev.generateDev(),
 				])
 				const behavuor1 = await dev.getMarket('MarketTest3', user)
 				const behavuor2 = await dev.getMarket('MarketTest3', user)
@@ -135,7 +135,7 @@ contract(
 				await dev.dev.deposit(propertyAddress, 100000, {from: propertyAuther})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				const metricsAddress = await new Promise<string>(resolve => {
+				const metricsAddress = await new Promise<string>((resolve) => {
 					marketInstance.authenticate(
 						propertyAddress,
 						'id-key',
@@ -168,7 +168,7 @@ contract(
 				const marketInstance = await marketContract.at(marketAddress2)
 				const result = await marketInstance
 					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
-						from: propertyAuther
+						from: propertyAuther,
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'market is not enabled')
@@ -178,7 +178,7 @@ contract(
 				const marketInstance = await marketContract.at(marketAddress1)
 				const result = await marketInstance
 					.authenticate(propertyAddress, '', '', '', '', '', {
-						from: propertyAuther
+						from: propertyAuther,
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'id is required')
@@ -205,7 +205,7 @@ contract(
 				)
 				const result = await marketInstance
 					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
-						from: propertyAuther
+						from: propertyAuther,
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'id is duplicated')
@@ -214,7 +214,7 @@ contract(
 			it('Should fail to deauthenticate when sent from other than passed metrics linked property author.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				const metricsAddress = await new Promise<string>(resolve => {
+				const metricsAddress = await new Promise<string>((resolve) => {
 					marketInstance.authenticate(
 						propertyAddress,
 						'id-key',
@@ -236,7 +236,7 @@ contract(
 			it('When deauthenticate, decrease the issuedMetrics, emit the Destroy event.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				const metricsAddress = await new Promise<string>(resolve => {
+				const metricsAddress = await new Promise<string>((resolve) => {
 					marketInstance.authenticate(
 						propertyAddress,
 						'id-key',
@@ -253,11 +253,11 @@ contract(
 				let count = await marketInstance.issuedMetrics()
 				expect(count.toNumber()).to.be.equal(1)
 				await marketInstance.deauthenticate(metricsAddress, {
-					from: propertyAuther
+					from: propertyAuther,
 				})
 				count = await marketInstance.issuedMetrics()
 				expect(count.toNumber()).to.be.equal(0)
-				const [_from, _metrics] = await new Promise<string[]>(resolve => {
+				const [_from, _metrics] = await new Promise<string[]>((resolve) => {
 					watch(dev.metricsFactory, WEB3_URI)('Destroy', (_, values) => {
 						const {_from, _metrics} = values
 						resolve([_from, _metrics])
@@ -269,7 +269,7 @@ contract(
 			it('Should fail to deauthenticate when passed already deauthenticated metrics.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				const metricsAddress = await new Promise<string>(resolve => {
+				const metricsAddress = await new Promise<string>((resolve) => {
 					marketInstance.authenticate(
 						propertyAddress,
 						'id-key',
@@ -284,11 +284,11 @@ contract(
 					)
 				})
 				await marketInstance.deauthenticate(metricsAddress, {
-					from: propertyAuther
+					from: propertyAuther,
 				})
 				const result = await marketInstance
 					.deauthenticate(metricsAddress, {
-						from: propertyAuther
+						from: propertyAuther,
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'not authenticated')
@@ -316,7 +316,7 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateLockupStorage(),
-					dev.generateDev()
+					dev.generateDev(),
 				])
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)

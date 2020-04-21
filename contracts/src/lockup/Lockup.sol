@@ -23,7 +23,11 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function lockup(address _from, address _property, uint256 _value) external {
+	function lockup(
+		address _from,
+		address _property,
+		uint256 _value
+	) external {
 		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(msg.sender, config().token());
 		addressValidator().validateGroup(_property, config().propertyGroup());
@@ -169,9 +173,11 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		return getStorage().getValue(_property, _sender);
 	}
 
-	function addValue(address _property, address _sender, uint256 _value)
-		private
-	{
+	function addValue(
+		address _property,
+		address _sender,
+		uint256 _value
+	) private {
 		uint256 value = getStorage().getValue(_property, _sender);
 		value = value.add(_value);
 		getStorage().setValue(_property, _sender, value);

@@ -469,10 +469,11 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//Value
-	function setValue(address _property, address _sender, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setValue(
+		address _property,
+		address _sender,
+		uint256 _value
+	) external returns (uint256) {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 		bytes32 key = getValueKey(_property, _sender);
 		eternalStorage().setUint(key, _value);

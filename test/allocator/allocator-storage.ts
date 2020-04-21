@@ -1,7 +1,7 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	validateAddressErrorMessage,
-	validatePauseErrorMessage
+	validatePauseErrorMessage,
 } from '../test-lib/utils/error'
 
 contract(
@@ -16,7 +16,7 @@ contract(
 		describe('AllocatorStorage; setAllocationBlockNumber, getLastBlockNumber', () => {
 			it('Can get setted value.', async () => {
 				await dev.allocatorStorage.setLastBlockNumber(metrics, 100, {
-					from: allocator
+					from: allocator,
 				})
 				const result = await dev.allocatorStorage.getLastBlockNumber(metrics)
 				expect(result.toNumber()).to.be.equal(100)
@@ -44,7 +44,7 @@ contract(
 		describe('AllocatorStorage; setPendingIncrement, getPendingIncrement', () => {
 			it('Can get setted value.', async () => {
 				await dev.allocatorStorage.setPendingIncrement(metrics, true, {
-					from: allocator
+					from: allocator,
 				})
 				const result = await dev.allocatorStorage.getPendingIncrement(metrics)
 				expect(result).to.be.equal(true)
@@ -71,7 +71,7 @@ contract(
 			it('Cannot rewrite data from other than allocator.', async () => {
 				const result = await dev.allocatorStorage
 					.setLastAssetValueEachMarketPerBlock(metrics, 1000000, {
-						from: dummyAllocator
+						from: dummyAllocator,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
@@ -80,7 +80,7 @@ contract(
 		describe('AllocatorStorage; setPendingLastBlockNumber, getPendingLastBlockNumber', () => {
 			it('Can get setted value.', async () => {
 				await dev.allocatorStorage.setPendingLastBlockNumber(metrics, 1000000, {
-					from: allocator
+					from: allocator,
 				})
 				const result = await dev.allocatorStorage.getPendingLastBlockNumber(
 					metrics
@@ -90,7 +90,7 @@ contract(
 			it('Cannot rewrite data from other than allocator.', async () => {
 				const result = await dev.allocatorStorage
 					.setPendingLastBlockNumber(metrics, 1000000, {
-						from: dummyAllocator
+						from: dummyAllocator,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
@@ -101,13 +101,13 @@ contract(
 				await dev.allocatorStorage.pause()
 				const res = await dev.allocatorStorage
 					.setLastBlockNumber(metrics, 100, {
-						from: allocator
+						from: allocator,
 					})
 					.catch((err: Error) => err)
 				validatePauseErrorMessage(res)
 				await dev.allocatorStorage.unpause()
 				await dev.allocatorStorage.setLastBlockNumber(metrics, 10000000, {
-					from: allocator
+					from: allocator,
 				})
 				const result = await dev.allocatorStorage.getLastBlockNumber(metrics)
 				expect(result.toNumber()).to.be.equal(10000000)

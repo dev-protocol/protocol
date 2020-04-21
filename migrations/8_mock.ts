@@ -5,7 +5,7 @@ import {lockup} from './mock/lockup'
 import {createMarket} from './mock/market'
 import {createMetrics} from './mock/metrics'
 
-const handler = async function(deployer, network) {
+const handler = async function (deployer, network) {
 	if (network !== 'mock') {
 		return
 	}

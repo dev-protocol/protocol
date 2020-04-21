@@ -133,7 +133,7 @@ Market Factory Contract は新しい Market Contract を生成する。
 Market Contract の生成は `create` 関数を実行することで行われる。 `create` 関数は次のインターフェイスを持つコントラクトのアドレスを受け取り、新たな Market Contract を生成する。
 
 ```solidity
-contract IMarket {
+contract IMarketBehavior {
 	string public schema;
 
 	function authenticate(
@@ -142,12 +142,27 @@ contract IMarket {
 		string memory _args2,
 		string memory _args3,
 		string memory _args4,
-		string memory _args5
-	) public returns (bool);
+		string memory _args5,
+		address market
+	)
+		public
+		returns (
+			// solium-disable-next-line indentation
+			address
+		);
 
-	function calculate(address _metrics, uint256 _start, uint256 _end)
+	function calculate(
+		address _metrics,
+		uint256 _start,
+		uint256 _end
+	)
 		external
-		returns (bool);
+		returns (
+			// solium-disable-next-line indentation
+			bool
+		);
+
+	function getId(address _metrics) external view returns (string memory);
 }
 ```
 

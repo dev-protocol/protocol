@@ -22,7 +22,7 @@ contract(
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.voteCounterStorage.setAlreadyVoteFlg(user, sender, property, {
-					from: voteCounter
+					from: voteCounter,
 				})
 				const result = await dev.voteCounterStorage.getAlreadyVoteFlg(
 					user,
@@ -42,16 +42,16 @@ contract(
 		describe('VoteCounterStorage; getAgreeCount, setAgreeCount', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.voteCounterStorage.getAgreeCount(sender, {
-					from: voteCounter
+					from: voteCounter,
 				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.voteCounterStorage.setAgreeCount(sender, 10, {
-					from: voteCounter
+					from: voteCounter,
 				})
 				const result = await dev.voteCounterStorage.getAgreeCount(sender, {
-					from: voteCounter
+					from: voteCounter,
 				})
 				expect(result.toNumber()).to.be.equal(10)
 			})
@@ -65,16 +65,16 @@ contract(
 		describe('VoteCounterStorage; getOppositeCount, setOppositeCount', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.voteCounterStorage.getOppositeCount(sender, {
-					from: voteCounter
+					from: voteCounter,
 				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.voteCounterStorage.setOppositeCount(sender, 10, {
-					from: voteCounter
+					from: voteCounter,
 				})
 				const result = await dev.voteCounterStorage.getOppositeCount(sender, {
-					from: voteCounter
+					from: voteCounter,
 				})
 				expect(result.toNumber()).to.be.equal(10)
 			})

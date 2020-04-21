@@ -3,7 +3,7 @@ contract('metricsTest', ([metricsFactory, market, property]) => {
 	describe('Metrics; constructor', () => {
 		it('The set address can be referenced.', async () => {
 			const metrics = await metricsContract.new(market, property, {
-				from: metricsFactory
+				from: metricsFactory,
 			})
 			expect(await metrics.market()).to.be.equal(market)
 			expect(await metrics.property()).to.be.equal(property)

@@ -33,9 +33,11 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 	}
 
-	function beforeBalanceChange(address _property, address _from, address _to)
-		external
-	{
+	function beforeBalanceChange(
+		address _property,
+		address _from,
+		address _to
+	) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
 
 		uint256 price = getStorage().getCumulativePrice(_property);

@@ -2,7 +2,7 @@ import {DevProtocolInstance} from '../../test-lib/instance'
 import {getPropertyAddress} from '../../test-lib/utils/log'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
 } from '../../test-lib/utils/error'
 contract(
 	'VoteCounterTest',
@@ -15,7 +15,7 @@ contract(
 		policyFactory,
 		user1,
 		user2,
-		propertyAuther
+		propertyAuther,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
 		let propertyAddress: string
@@ -37,7 +37,7 @@ contract(
 					dev.generatePolicyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
-					dev.generateDev()
+					dev.generateDev(),
 				])
 				await dev.dev.mint(user1, 100, {from: deployer})
 				await dev.dev.mint(user2, 100, {from: deployer})
@@ -70,7 +70,7 @@ contract(
 				expect(result.toNumber()).to.be.equal(0)
 				await dev.dev.deposit(propertyAddress, 100, {from: user1})
 				await dev.voteCounter.addVoteCount(user1, propertyAddress, true, {
-					from: market1
+					from: market1,
 				})
 				result = await dev.voteCounter.getAgreeCount(market1)
 				expect(result.toNumber()).to.be.equal(100)
@@ -96,7 +96,7 @@ contract(
 				expect(result.toNumber()).to.be.equal(0)
 				await dev.dev.deposit(propertyAddress, 100, {from: user1})
 				await dev.voteCounter.addVoteCount(user1, propertyAddress, true, {
-					from: market1
+					from: market1,
 				})
 				result = await dev.voteCounter.getAgreeCount(market1)
 				expect(result.toNumber()).to.be.equal(100)
@@ -110,7 +110,7 @@ contract(
 				expect(result.toNumber()).to.be.equal(0)
 				await dev.dev.deposit(propertyAddress, 100, {from: user1})
 				await dev.voteCounter.addVoteCount(user1, propertyAddress, false, {
-					from: market2
+					from: market2,
 				})
 				result = await dev.voteCounter.getAgreeCount(market2)
 				expect(result.toNumber()).to.be.equal(0)

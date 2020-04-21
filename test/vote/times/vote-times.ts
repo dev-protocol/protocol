@@ -8,7 +8,7 @@ contract(
 		propertyFactory,
 		property,
 		dummyProperty,
-		voteCounter
+		voteCounter,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
 
@@ -18,20 +18,20 @@ contract(
 				await Promise.all([
 					dev.generateVoteTimes(),
 					dev.generateVoteTimesStorage(),
-					dev.generatePropertyGroup()
+					dev.generatePropertyGroup(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory, {
-					from: deployer
+					from: deployer,
 				})
 				await dev.addressConfig.setPropertyFactory(propertyFactory, {
-					from: deployer
+					from: deployer,
 				})
 				await dev.addressConfig.setVoteCounter(voteCounter, {from: deployer})
 				await dev.propertyGroup.addGroup(property, {from: propertyFactory})
 				await dev.voteTimes.addVoteTime({from: marketFactory})
 				await dev.voteTimes.addVoteTime({from: marketFactory})
 				await dev.voteTimes.addVoteTimesByProperty(property, {
-					from: voteCounter
+					from: voteCounter,
 				})
 			})
 			it('If the vote was held twice, but the vote was held only once, the number of abstentions will be 1.', async () => {
@@ -40,7 +40,7 @@ contract(
 			})
 			it('When reset, the number of abstentions becomes 0.', async () => {
 				await dev.voteTimes.resetVoteTimesByProperty(property, {
-					from: propertyFactory
+					from: propertyFactory,
 				})
 				const result = await dev.voteTimes.getAbstentionTimes(property)
 				expect(result.toNumber()).to.be.equal(0)
@@ -51,21 +51,21 @@ contract(
 			})
 			it('Storage information can be taken over.', async () => {
 				const storageAddress = await dev.voteTimesStorage.getStorageAddress({
-					from: deployer
+					from: deployer,
 				})
 				const newVoteTimesStorage = await artifacts
 					.require('VoteTimesStorage')
 					.new(dev.addressConfig.address)
 				await newVoteTimesStorage.setStorage(storageAddress, {
-					from: deployer
+					from: deployer,
 				})
 				await dev.voteTimesStorage.changeOwner(newVoteTimesStorage.address, {
-					from: deployer
+					from: deployer,
 				})
 				await dev.addressConfig.setVoteTimesStorage(
 					newVoteTimesStorage.address,
 					{
-						from: deployer
+						from: deployer,
 					}
 				)
 				await dev.voteTimes.addVoteTime({from: marketFactory})

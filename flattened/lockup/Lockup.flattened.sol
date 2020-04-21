@@ -91,9 +91,11 @@ interface IERC20 {
 	 *
 	 * Emits a {Transfer} event.
 	 */
-	function transferFrom(address sender, address recipient, uint256 amount)
-		external
-		returns (bool);
+	function transferFrom(
+		address sender,
+		address recipient,
+		uint256 amount
+	) external returns (bool);
 
 	/**
 	 * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -167,11 +169,11 @@ library SafeMath {
 	 *
 	 * _Available since v2.4.0._
 	 */
-	function sub(uint256 a, uint256 b, string memory errorMessage)
-		internal
-		pure
-		returns (uint256)
-	{
+	function sub(
+		uint256 a,
+		uint256 b,
+		string memory errorMessage
+	) internal pure returns (uint256) {
 		require(b <= a, errorMessage);
 		uint256 c = a - b;
 		return c;
@@ -226,11 +228,11 @@ library SafeMath {
 	 *
 	 * _Available since v2.4.0._
 	 */
-	function div(uint256 a, uint256 b, string memory errorMessage)
-		internal
-		pure
-		returns (uint256)
-	{
+	function div(
+		uint256 a,
+		uint256 b,
+		string memory errorMessage
+	) internal pure returns (uint256) {
 		// Solidity only automatically asserts when dividing by 0
 		require(b > 0, errorMessage);
 		uint256 c = a / b;
@@ -266,11 +268,11 @@ library SafeMath {
 	 *
 	 * _Available since v2.4.0._
 	 */
-	function mod(uint256 a, uint256 b, string memory errorMessage)
-		internal
-		pure
-		returns (uint256)
-	{
+	function mod(
+		uint256 a,
+		uint256 b,
+		string memory errorMessage
+	) internal pure returns (uint256) {
 		require(b != 0, errorMessage);
 		return a % b;
 	}
@@ -369,10 +371,11 @@ contract ERC20 is Context, IERC20 {
 	 * - the caller must have allowance for `sender`'s tokens of at least
 	 * `amount`.
 	 */
-	function transferFrom(address sender, address recipient, uint256 amount)
-		public
-		returns (bool)
-	{
+	function transferFrom(
+		address sender,
+		address recipient,
+		uint256 amount
+	) public returns (bool) {
 		_transfer(sender, recipient, amount);
 		_approve(
 			sender,
@@ -452,9 +455,11 @@ contract ERC20 is Context, IERC20 {
 	 * - `recipient` cannot be the zero address.
 	 * - `sender` must have a balance of at least `amount`.
 	 */
-	function _transfer(address sender, address recipient, uint256 amount)
-		internal
-	{
+	function _transfer(
+		address sender,
+		address recipient,
+		uint256 amount
+	) internal {
 		require(sender != address(0), "ERC20: transfer from the zero address");
 		require(recipient != address(0), "ERC20: transfer to the zero address");
 		_balances[sender] = _balances[sender].sub(
@@ -515,7 +520,11 @@ contract ERC20 is Context, IERC20 {
 	 * - `owner` cannot be the zero address.
 	 * - `spender` cannot be the zero address.
 	 */
-	function _approve(address owner, address spender, uint256 amount) internal {
+	function _approve(
+		address owner,
+		address spender,
+		uint256 amount
+	) internal {
 		require(owner != address(0), "ERC20: approve from the zero address");
 		require(spender != address(0), "ERC20: approve to the zero address");
 		_allowances[owner][spender] = amount;
@@ -1113,8 +1122,11 @@ contract IAllocator {
 
 	function calculatedCallback(address _metrics, uint256 _value) external;
 
-	function beforeBalanceChange(address _property, address _from, address _to)
-		external;
+	function beforeBalanceChange(
+		address _property,
+		address _from,
+		address _to
+	) external;
 
 	function getRewardsAmount(address _property)
 		external
@@ -1462,9 +1474,11 @@ contract VoteCounter is UsingConfig, UsingValidator, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addVoteCount(address _user, address _property, bool _agree)
-		external
-	{
+	function addVoteCount(
+		address _user,
+		address _property,
+		bool _agree
+	) external {
 		addressValidator().validateGroups(
 			msg.sender,
 			config().marketGroup(),
@@ -1532,9 +1546,11 @@ contract VoteCounter is UsingConfig, UsingValidator, Killable {
 
 
 contract IMarket {
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool);
+	function calculate(
+		address _metrics,
+		uint256 _start,
+		uint256 _end
+	) external returns (bool);
 
 	function authenticate(
 		address _prop,
@@ -1583,9 +1599,11 @@ contract IMarketBehavior {
 			address
 		);
 
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool);
+	function calculate(
+		address _metrics,
+		uint256 _start,
+		uint256 _end
+	) external returns (bool);
 }
 
 
@@ -2052,10 +2070,11 @@ contract Dev is
 		return true;
 	}
 
-	function depositFrom(address _from, address _to, uint256 _amount)
-		external
-		returns (bool)
-	{
+	function depositFrom(
+		address _from,
+		address _to,
+		uint256 _amount
+	) external returns (bool) {
 		require(transferFrom(_from, _to, _amount), "dev transferFrom failed");
 		lock(_from, _to, _amount);
 		return true;
@@ -2067,7 +2086,11 @@ contract Dev is
 		return true;
 	}
 
-	function lock(address _from, address _to, uint256 _amount) private {
+	function lock(
+		address _from,
+		address _to,
+		uint256 _amount
+	) private {
 		Lockup(config().lockup()).lockup(_from, _to, _amount);
 	}
 }
@@ -2104,10 +2127,11 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		enabled = true;
 	}
 
-	function calculate(address _metrics, uint256 _start, uint256 _end)
-		external
-		returns (bool)
-	{
+	function calculate(
+		address _metrics,
+		uint256 _start,
+		uint256 _end
+	) external returns (bool) {
 		addressValidator().validateAddress(msg.sender, config().allocator());
 		return IMarketBehavior(behavior).calculate(_metrics, _start, _end);
 	}
@@ -2395,9 +2419,11 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 	}
 
-	function beforeBalanceChange(address _property, address _from, address _to)
-		external
-	{
+	function beforeBalanceChange(
+		address _property,
+		address _from,
+		address _to
+	) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
 		uint256 price = getStorage().getCumulativePrice(_property);
 		uint256 amountFrom = _calculateAmount(_property, _from);
@@ -2756,9 +2782,11 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		getStorage().setPendingIncrement(_metrics, false);
 	}
 
-	function increment(address _property, uint256 _reward, uint256 _lockup)
-		private
-	{
+	function increment(
+		address _property,
+		uint256 _reward,
+		uint256 _lockup
+	) private {
 		uint256 holders = Policy(config().policy()).holdersShare(
 			_reward,
 			_lockup
@@ -2768,9 +2796,11 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 		Lockup(config().lockup()).increment(_property, interest);
 	}
 
-	function beforeBalanceChange(address _property, address _from, address _to)
-		external
-	{
+	function beforeBalanceChange(
+		address _property,
+		address _from,
+		address _to
+	) external {
 		addressValidator().validateGroup(msg.sender, config().propertyGroup());
 		Withdraw(config().withdraw()).beforeBalanceChange(
 			_property,
@@ -2908,10 +2938,11 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//Value
-	function setValue(address _property, address _sender, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setValue(
+		address _property,
+		address _sender,
+		uint256 _value
+	) external returns (uint256) {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 		bytes32 key = getValueKey(_property, _sender);
 		eternalStorage().setUint(key, _value);
@@ -3095,7 +3126,11 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function lockup(address _from, address _property, uint256 _value) external {
+	function lockup(
+		address _from,
+		address _property,
+		uint256 _value
+	) external {
 		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(msg.sender, config().token());
 		addressValidator().validateGroup(_property, config().propertyGroup());
@@ -3237,9 +3272,11 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		return getStorage().getValue(_property, _sender);
 	}
 
-	function addValue(address _property, address _sender, uint256 _value)
-		private
-	{
+	function addValue(
+		address _property,
+		address _sender,
+		uint256 _value
+	) private {
 		uint256 value = getStorage().getValue(_property, _sender);
 		value = value.add(_value);
 		getStorage().setValue(_property, _sender, value);

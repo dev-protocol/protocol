@@ -3,7 +3,7 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 	validatePauseErrorMessage,
-	validatePauseOnlyOwnerErrorMessage
+	validatePauseOnlyOwnerErrorMessage,
 } from '../test-lib/utils/error'
 
 contract(
@@ -15,20 +15,20 @@ contract(
 		metrics1,
 		metrics2,
 		dummyMetrics,
-		user1
+		user1,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
 		before(async () => {
 			await dev.generateAddressConfig()
 			await dev.generateMetricsGroup()
 			await dev.addressConfig.setMetricsFactory(metricsFactory, {
-				from: deployer
+				from: deployer,
 			})
 		})
 		describe('MetricsGroup; addGroup, removeGroup, isGroup', () => {
 			before(async () => {
 				await dev.metricsGroup.addGroup(metrics1, {
-					from: metricsFactory
+					from: metricsFactory,
 				})
 			})
 			it('When the metrics address is Specified.', async () => {
@@ -42,7 +42,7 @@ contract(
 			it('Existing metrics cannot be added.', async () => {
 				const result = await dev.metricsGroup
 					.addGroup(metrics1, {
-						from: metricsFactory
+						from: metricsFactory,
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'already enabled')
@@ -50,7 +50,7 @@ contract(
 			it('Can not execute addGroup without metricsFactory address.', async () => {
 				const result = await dev.metricsGroup
 					.addGroup(dummyMetrics, {
-						from: dummyMetricsFactory
+						from: dummyMetricsFactory,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
@@ -58,7 +58,7 @@ contract(
 			it('Can not execute removeGroup without metricsFactory address.', async () => {
 				const result = await dev.metricsGroup
 					.removeGroup(metrics1, {
-						from: dummyMetricsFactory
+						from: dummyMetricsFactory,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
@@ -66,7 +66,7 @@ contract(
 			it('Not existing metrics cannot be removed.', async () => {
 				const result = await dev.metricsGroup
 					.removeGroup(dummyMetrics, {
-						from: metricsFactory
+						from: metricsFactory,
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'address is not group')
@@ -84,12 +84,12 @@ contract(
 				let result = await dev.metricsGroup.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(0)
 				await dev.metricsGroup.addGroup(metrics2, {
-					from: metricsFactory
+					from: metricsFactory,
 				})
 				result = await dev.metricsGroup.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(1)
 				await dev.metricsGroup.removeGroup(metrics2, {
-					from: metricsFactory
+					from: metricsFactory,
 				})
 				result = await dev.metricsGroup.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(0)

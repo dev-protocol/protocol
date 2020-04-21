@@ -5,7 +5,7 @@ contract('KillableTest', ([deployer, user]) => {
 	describe('Killable; kill', () => {
 		it('The contract is killed and the function cannot be executed', async () => {
 			const killableTest = await killableTestContract.new({
-				from: deployer
+				from: deployer,
 			})
 			const value = await killableTest.getValue()
 			expect(value.toNumber()).to.be.equal(1)
@@ -18,7 +18,7 @@ contract('KillableTest', ([deployer, user]) => {
 		})
 		it('Only deployed accounts can be killed', async () => {
 			const killableTest = await killableTestContract.new({
-				from: deployer
+				from: deployer,
 			})
 			const result = await killableTest
 				.kill({from: user})

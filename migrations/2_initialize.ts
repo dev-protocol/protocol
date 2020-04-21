@@ -1,4 +1,4 @@
-const handler = function(deployer, network) {
+const handler = function (deployer, network) {
 	if (network === 'test') {
 		return
 	}

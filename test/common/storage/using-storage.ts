@@ -6,7 +6,7 @@ contract('UsingStorageTest', ([deployer, account]) => {
 	let usingStorageTest: UsingStorageTestInstance
 	before(async () => {
 		usingStorageTest = await UsingStorageTestContract.new({
-			from: deployer
+			from: deployer,
 		})
 	})
 	describe('UsingStorage: eternalStorage', () => {
@@ -73,7 +73,7 @@ contract('UsingStorageTest', ([deployer, account]) => {
 		before(async () => {
 			await usingStorageTest.setUInt(1)
 			usingStorageTestNext = await UsingStorageTestContract.new({
-				from: deployer
+				from: deployer,
 			})
 		})
 		it('Can get the value set in the storage.', async () => {

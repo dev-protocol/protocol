@@ -2,7 +2,7 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import {getMarketAddress} from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 import {DEFAULT_ADDRESS} from '../test-lib/const'
 
@@ -21,14 +21,14 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 				dev.generateVoteTimes(),
 				dev.generateVoteTimesStorage(),
 				dev.generateMarketFactory(),
-				dev.generateMarketGroup()
+				dev.generateMarketGroup(),
 			])
 			const policy = await dev.getPolicy('PolicyTest1', user)
 			await dev.policyFactory.create(policy.address, {from: user})
 			const market = await dev.getMarket('MarketTest1', user)
 			marketBehaviorAddress = market.address
 			const result = await dev.marketFactory.create(market.address, {
-				from: user
+				from: user,
 			})
 			marketAddress = getMarketAddress(result)
 		})
@@ -42,7 +42,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 
 		it('Adds a new Market Contract address to State Contract,', async () => {
 			const result = await dev.marketGroup.isGroup(marketAddress, {
-				from: deployer
+				from: deployer,
 			})
 			expect(result).to.be.equal(true)
 		})
@@ -57,7 +57,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 			expect(times.toNumber()).to.be.equal(1)
 			const market = await dev.getMarket('MarketTest2', user)
 			const result = await dev.marketFactory.create(market.address, {
-				from: user
+				from: user,
 			})
 			times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
 			expect(times.toNumber()).to.be.equal(2)
@@ -69,7 +69,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 		it('An error occurs if the default address is specified.', async () => {
 			const result = await dev.marketFactory
 				.create(DEFAULT_ADDRESS, {
-					from: user
+					from: user,
 				})
 				.catch((err: Error) => err)
 			validateAddressErrorMessage(result)
@@ -97,7 +97,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 			const market = await dev.getMarket('MarketTest3', user)
 			const result = await dev.marketFactory
 				.create(market.address, {
-					from: user
+					from: user,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'You cannot use that')
@@ -106,11 +106,11 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 			await dev.marketFactory.unpause({from: deployer})
 			const market = await dev.getMarket('MarketTest3', user)
 			let createResult = await dev.marketFactory.create(market.address, {
-				from: user
+				from: user,
 			})
 			const tmpMarketAddress = getMarketAddress(createResult)
 			const result = await dev.marketGroup.isGroup(tmpMarketAddress, {
-				from: deployer
+				from: deployer,
 			})
 			expect(result).to.be.equal(true)
 		})

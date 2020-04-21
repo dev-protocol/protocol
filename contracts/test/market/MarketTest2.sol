@@ -29,10 +29,11 @@ contract MarketTest2 is IMarketBehavior, UsingConfig {
 		return _metrics;
 	}
 
-	function calculate(address _metrics, uint256, uint256)
-		external
-		returns (bool)
-	{
+	function calculate(
+		address _metrics,
+		uint256,
+		uint256
+	) external returns (bool) {
 		Allocator(config().allocator()).calculatedCallback(_metrics, 100);
 		return true;
 	}

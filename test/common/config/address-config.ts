@@ -1,7 +1,7 @@
 import {DevProtocolInstance} from '../../test-lib/instance'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
 } from '../../test-lib/utils/error'
 
 contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
@@ -18,7 +18,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(allocator)', async () => {
 			const result = await dev.addressConfig
 				.setAllocator(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -31,7 +31,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(allocatorStorage)', async () => {
 			const result = await dev.addressConfig
 				.setAllocatorStorage(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -44,7 +44,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(withdraw)', async () => {
 			const result = await dev.addressConfig
 				.setWithdraw(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -57,7 +57,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(withdrawStorage)', async () => {
 			const result = await dev.addressConfig
 				.setWithdrawStorage(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -70,7 +70,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(marketFactory)', async () => {
 			const result = await dev.addressConfig
 				.setMarketFactory(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -83,7 +83,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(marketGroup)', async () => {
 			const result = await dev.addressConfig
 				.setMarketGroup(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -96,7 +96,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by onon-wner(propertyFactory)', async () => {
 			const result = await dev.addressConfig
 				.setPropertyFactory(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -109,7 +109,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(propertyGroup)', async () => {
 			const result = await dev.addressConfig
 				.setPropertyGroup(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -122,7 +122,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(metricsFactory)', async () => {
 			const result = await dev.addressConfig
 				.setMetricsFactory(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -135,7 +135,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(metricsGroup)', async () => {
 			const result = await dev.addressConfig
 				.setMetricsGroup(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -148,7 +148,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(policyFactory)', async () => {
 			const result = await dev.addressConfig
 				.setPolicyFactory(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -161,7 +161,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(policyGroup)', async () => {
 			const result = await dev.addressConfig
 				.setPolicyGroup(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -174,7 +174,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(policySet)', async () => {
 			const result = await dev.addressConfig
 				.setPolicySet(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -187,7 +187,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(token)', async () => {
 			const result = await dev.addressConfig
 				.setToken(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -200,7 +200,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(lockup)', async () => {
 			const result = await dev.addressConfig
 				.setLockup(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -213,14 +213,14 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(lockupStorage)', async () => {
 			const result = await dev.addressConfig
 				.setLockupStorage(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(voteTimes)', async () => {
 			await dev.addressConfig.setVoteTimes(setAddress1, {
-				from: deployer
+				from: deployer,
 			})
 			const addresss = await dev.addressConfig.voteTimes()
 			expect(addresss).to.be.equal(setAddress1)
@@ -228,7 +228,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(voteTimes)', async () => {
 			const result = await dev.addressConfig
 				.setVoteTimes(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -241,7 +241,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(voteTimesStorage)', async () => {
 			const result = await dev.addressConfig
 				.setVoteTimesStorage(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
@@ -254,14 +254,14 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(voteCounter)', async () => {
 			const result = await dev.addressConfig
 				.setVoteCounter(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(voteCounterStorage)', async () => {
 			await dev.addressConfig.setVoteCounterStorage(setAddress1, {
-				from: deployer
+				from: deployer,
 			})
 			const addresss = await dev.addressConfig.voteCounterStorage()
 			expect(addresss).to.be.equal(setAddress1)
@@ -269,7 +269,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 		it('Value set by non-owner(voteCounterStorage)', async () => {
 			const result = await dev.addressConfig
 				.setVoteCounterStorage(setAddress1, {
-					from: other
+					from: other,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
