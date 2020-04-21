@@ -1,4 +1,4 @@
-const handler = function(deployer, network) {
+const handler = function (deployer, network) {
 	if (network === 'test') {
 		return
 	}
@@ -44,7 +44,7 @@ const handler = function(deployer, network) {
 		.then(async () => {
 			return artifacts.require('AddressConfig').deployed()
 		})
-		.then(async addressConfig => {
+		.then(async (addressConfig) => {
 			return Promise.all([
 				addressConfig.setAllocator(allocator.address),
 				addressConfig.setAllocatorStorage(allocatorStorage.address),
@@ -65,7 +65,7 @@ const handler = function(deployer, network) {
 				addressConfig.setVoteTimesStorage(voteTimesStorage.address),
 				addressConfig.setWithdraw(withdraw.address),
 				addressConfig.setWithdrawStorage(withdrawStorage.address),
-				addressConfig.setToken(token.address)
+				addressConfig.setToken(token.address),
 			])
 		})
 		.then(async () => {
@@ -81,18 +81,18 @@ const handler = function(deployer, network) {
 				propertyGroup.deployed(),
 				voteCounterStorage.deployed(),
 				voteTimesStorage.deployed(),
-				withdrawStorage.deployed()
+				withdrawStorage.deployed(),
 			])
 		})
-		.then(async storages => {
-			return Promise.all(storages.map(async x => x.createStorage()))
+		.then(async (storages) => {
+			return Promise.all(storages.map(async (x) => x.createStorage()))
 		})
 		.then(() => {
 			console.log(
 				'*** Storage creation for all storage contracts are completed ***'
 			)
 		})
-		.catch(err => {
+		.catch((err) => {
 			console.error('*** ERROR! ***', err)
 		})
 } as Truffle.Migration

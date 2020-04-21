@@ -30,10 +30,11 @@ contract Dev is
 		return true;
 	}
 
-	function depositFrom(address _from, address _to, uint256 _amount)
-		external
-		returns (bool)
-	{
+	function depositFrom(
+		address _from,
+		address _to,
+		uint256 _amount
+	) external returns (bool) {
 		require(transferFrom(_from, _to, _amount), "dev transferFrom failed");
 		lock(_from, _to, _amount);
 		return true;
@@ -45,7 +46,11 @@ contract Dev is
 		return true;
 	}
 
-	function lock(address _from, address _to, uint256 _amount) private {
+	function lock(
+		address _from,
+		address _to,
+		uint256 _amount
+	) private {
 		Lockup(config().lockup()).lockup(_from, _to, _amount);
 	}
 }

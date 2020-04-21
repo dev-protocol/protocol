@@ -6,16 +6,14 @@ import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
-	validateAddressErrorMessage
+	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
 contract('WithdrawTest', ([deployer, user1]) => {
-	const init = async (): Promise<[
-		DevProtocolInstance,
-		MetricsInstance,
-		PropertyInstance
-	]> => {
+	const init = async (): Promise<
+		[DevProtocolInstance, MetricsInstance, PropertyInstance]
+	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await Promise.all([
@@ -38,7 +36,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
 			dev.generatePolicySet(),
-			dev.generateDev()
+			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const policy = await artifacts.require('PolicyTestForAllocator').new()
@@ -48,7 +46,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 			await dev.propertyFactory.create('test', 'TEST', deployer)
 		)
 		const [property] = await Promise.all([
-			artifacts.require('Property').at(propertyAddress)
+			artifacts.require('Property').at(propertyAddress),
 		])
 		const marketBehavior = await artifacts
 			.require('MarketTest1')
@@ -57,14 +55,14 @@ contract('WithdrawTest', ([deployer, user1]) => {
 			await dev.marketFactory.create(marketBehavior.address)
 		)
 		const [market] = await Promise.all([
-			artifacts.require('Market').at(marketAddress)
+			artifacts.require('Market').at(marketAddress),
 		])
 		const metricsAddress = await (async () => {
 			market.authenticate(property.address, 'id1', '', '', '', '')
 			return getEventValue(dev.metricsFactory, WEB3_URI)('Create', '_metrics')
 		})()
 		const [metrics] = await Promise.all([
-			artifacts.require('Metrics').at(metricsAddress as string)
+			artifacts.require('Metrics').at(metricsAddress as string),
 		])
 		await dev.dev.addMinter(dev.withdraw.address)
 		return [dev, metrics, property]
@@ -97,7 +95,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				const totalSupply = await property.totalSupply().then(toBigNumber)
 
 				await property.transfer(user1, totalSupply.times(0.2), {
-					from: deployer
+					from: deployer,
 				})
 
 				await dev.allocator.allocate(metrics.address)
@@ -113,16 +111,10 @@ contract('WithdrawTest', ([deployer, user1]) => {
 					.then(toBigNumber)
 
 				expect(
-					totalAmount
-						.times(0.8)
-						.integerValue(BigNumber.ROUND_DOWN)
-						.toFixed()
+					totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
 				).to.be.equal(amount1.toFixed())
 				expect(
-					totalAmount
-						.times(0.2)
-						.integerValue(BigNumber.ROUND_DOWN)
-						.toFixed()
+					totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
 				).to.be.equal(amount2.toFixed())
 			})
 
@@ -133,7 +125,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				const prevBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
 
 				await property.transfer(user1, totalSupply.times(0.2), {
-					from: deployer
+					from: deployer,
 				})
 
 				await dev.allocator.allocate(metrics.address)
@@ -191,11 +183,11 @@ contract('WithdrawTest', ([deployer, user1]) => {
 
 				const totalSupply = await property.totalSupply().then(toBigNumber)
 				await property.transfer(bob, totalSupply.times(0.2), {
-					from: alice
+					from: alice,
 				})
 				await dev.allocator.allocate(metrics.address)
 				await property.transfer(bob, totalSupply.times(0.1), {
-					from: alice
+					from: alice,
 				})
 			})
 
@@ -209,10 +201,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 						.then(toBigNumber)
 
 					expect(aliceAmount.toFixed()).to.be.equal(
-						totalAmount
-							.times(0.8)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.toFixed()
+						totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 				})
 
@@ -225,10 +214,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 						.then(toBigNumber)
 
 					expect(bobAmount.toFixed()).to.be.equal(
-						totalAmount
-							.times(0.2)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.toFixed()
+						totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 				})
 			})
@@ -257,10 +243,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 							.times(0.8)
 							.integerValue(BigNumber.ROUND_DOWN)
 							.plus(
-								increased
-									.times(0.1)
-									.integerValue(BigNumber.ROUND_DOWN)
-									.times(7)
+								increased.times(0.1).integerValue(BigNumber.ROUND_DOWN).times(7)
 							)
 							.integerValue(BigNumber.ROUND_DOWN)
 							.toFixed()
@@ -305,7 +288,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 			it('Should fail to call `beforeBalanceChange` when sent from other than Property Contract address', async () => {
 				const res = await dev.withdraw
 					.beforeBalanceChange(property.address, deployer, user1, {
-						from: deployer
+						from: deployer,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(res)

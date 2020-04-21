@@ -15,13 +15,13 @@ contract(
 		marketFactory,
 		propertyFactory,
 		metricsFactory,
-		policyFactory
+		policyFactory,
 	]) => {
 		let addressValidator: AddressValidatorInstance
 		before(async () => {
 			const addressValidatorContract = artifacts.require('AddressValidator')
 			addressValidator = await addressValidatorContract.new({
-				from: deployer
+				from: deployer,
 			})
 		})
 		describe('AddressValidator; validateIllegal', () => {
@@ -44,19 +44,19 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generateMarketGroup(),
 					dev.generateMetricsGroup(),
-					dev.generatePolicyGroup()
+					dev.generatePolicyGroup(),
 				])
 				await Promise.all([
 					dev.addressConfig.setPropertyFactory(propertyFactory),
 					dev.addressConfig.setMarketFactory(marketFactory),
 					dev.addressConfig.setMetricsFactory(metricsFactory),
-					dev.addressConfig.setPolicyFactory(policyFactory)
+					dev.addressConfig.setPolicyFactory(policyFactory),
 				])
 				await Promise.all([
 					dev.propertyGroup.addGroup(property, {from: propertyFactory}),
 					dev.marketGroup.addGroup(market, {from: marketFactory}),
 					dev.metricsGroup.addGroup(metrics, {from: metricsFactory}),
-					dev.policyGroup.addGroup(policy, {from: policyFactory})
+					dev.policyGroup.addGroup(policy, {from: policyFactory}),
 				])
 			})
 			it('No error occurs if the address belongs to a market group.', async () => {

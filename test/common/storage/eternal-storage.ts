@@ -7,7 +7,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 	before(async () => {
 		const eternalStorageContract = artifacts.require('EternalStorage')
 		eternalStorage = await eternalStorageContract.new({
-			from: deployer
+			from: deployer,
 		})
 	})
 	describe('EternalStorage; getter,setter,deleter', () => {

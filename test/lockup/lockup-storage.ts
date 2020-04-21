@@ -30,16 +30,16 @@ contract(
 		describe('LockupStorageStorage; setValue, getValue', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.lockupStorage.getValue(property, sender, {
-					from: lockup
+					from: lockup,
 				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.lockupStorage.setValue(property, sender, 3, {
-					from: lockup
+					from: lockup,
 				})
 				const result = await dev.lockupStorage.getValue(property, sender, {
-					from: lockup
+					from: lockup,
 				})
 				expect(result.toNumber()).to.be.equal(3)
 			})
@@ -53,16 +53,16 @@ contract(
 		describe('LockupStorageStorage; setPropertyValue, getPropertyValue', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.lockupStorage.getPropertyValue(property, {
-					from: lockup
+					from: lockup,
 				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.lockupStorage.setPropertyValue(property, 30, {
-					from: lockup
+					from: lockup,
 				})
 				const result = await dev.lockupStorage.getPropertyValue(property, {
-					from: lockup
+					from: lockup,
 				})
 				expect(result.toNumber()).to.be.equal(30)
 			})
@@ -84,7 +84,7 @@ contract(
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.lockupStorage.setWithdrawalStatus(property, user, 300, {
-					from: lockup
+					from: lockup,
 				})
 				const result = await dev.lockupStorage.getWithdrawalStatus(
 					property,
@@ -103,16 +103,16 @@ contract(
 		describe('LockupStorageStorage; setInterestPrice, getInterestPrice', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.lockupStorage.getInterestPrice(property, {
-					from: lockup
+					from: lockup,
 				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.lockupStorage.setInterestPrice(property, 3000, {
-					from: lockup
+					from: lockup,
 				})
 				const result = await dev.lockupStorage.getInterestPrice(property, {
-					from: lockup
+					from: lockup,
 				})
 				expect(result.toNumber()).to.be.equal(3000)
 			})
@@ -134,7 +134,7 @@ contract(
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.lockupStorage.setLastInterestPrice(property, user, 30000, {
-					from: lockup
+					from: lockup,
 				})
 				const result = await dev.lockupStorage.getLastInterestPrice(
 					property,
@@ -165,7 +165,7 @@ contract(
 					user,
 					300000,
 					{
-						from: lockup
+						from: lockup,
 					}
 				)
 				const result = await dev.lockupStorage.getPendingInterestWithdrawal(
@@ -178,7 +178,7 @@ contract(
 			it('Cannot rewrite data from other than lockup.', async () => {
 				const result = await dev.lockupStorage
 					.setPendingInterestWithdrawal(property, user, 300000, {
-						from: dummyLockup
+						from: dummyLockup,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)

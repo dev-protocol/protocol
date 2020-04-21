@@ -8,11 +8,9 @@ import {validateErrorMessage} from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
 contract('LockupTest', ([deployer, user1]) => {
-	const init = async (): Promise<[
-		DevProtocolInstance,
-		MetricsInstance,
-		PropertyInstance
-	]> => {
+	const init = async (): Promise<
+		[DevProtocolInstance, MetricsInstance, PropertyInstance]
+	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await Promise.all([
@@ -35,7 +33,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
 			dev.generatePolicySet(),
-			dev.generateDev()
+			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const policy = await artifacts.require('PolicyTestForAllocator').new()
@@ -45,7 +43,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			await dev.propertyFactory.create('test', 'TEST', deployer)
 		)
 		const [property] = await Promise.all([
-			artifacts.require('Property').at(propertyAddress)
+			artifacts.require('Property').at(propertyAddress),
 		])
 		const marketBehavior = await artifacts
 			.require('MarketTest1')
@@ -54,16 +52,16 @@ contract('LockupTest', ([deployer, user1]) => {
 			await dev.marketFactory.create(marketBehavior.address)
 		)
 		const [market] = await Promise.all([
-			artifacts.require('Market').at(marketAddress)
+			artifacts.require('Market').at(marketAddress),
 		])
-		const metricsAddress = await new Promise<string>(resolve => {
+		const metricsAddress = await new Promise<string>((resolve) => {
 			market.authenticate(property.address, 'id1', '', '', '', '')
 			watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 				resolve(values._metrics)
 			)
 		})
 		const [metrics] = await Promise.all([
-			artifacts.require('Metrics').at(metricsAddress)
+			artifacts.require('Metrics').at(metricsAddress),
 		])
 		await dev.dev.addMinter(dev.lockup.address)
 		return [dev, metrics, property]
@@ -190,7 +188,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const [_from, _property, _value] = await Promise.all([
 				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_from'),
 				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_property'),
-				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_value')
+				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_value'),
 			])
 
 			expect(_from).to.be.equal(deployer)
@@ -376,7 +374,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				before(async () => {
 					await dev.lockup.cancel(property.address, {from: alice})
 					await dev.lockup.withdraw(property.address, {
-						from: alice
+						from: alice,
 					})
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
@@ -424,16 +422,10 @@ contract('LockupTest', ([deployer, user1]) => {
 						.then(toBigNumber)
 
 					expect(aliceBalance.toFixed()).to.be.equal(
-						total
-							.times(0.8)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.toFixed()
+						total.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 					expect(bobBalance.toFixed()).to.be.equal(
-						total
-							.times(0.2)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.toFixed()
+						total.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
@@ -469,8 +461,9 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 			})
 			describe('additional staking', () => {
-				it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${625000 /
-					16250}%, Alice's share become ${1000000 / 16250}%`, async () => {
+				it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
+					625000 / 16250
+				}%, Alice's share become ${1000000 / 16250}%`, async () => {
 					await dev.dev.deposit(property.address, 12500 * 0.3, {from: bob})
 					const aliceBalance = await dev.lockup
 						.getValue(property.address, alice)
@@ -497,8 +490,9 @@ contract('LockupTest', ([deployer, user1]) => {
 				before(async () => {
 					await dev.lockup.increment(property.address, 3000000)
 				})
-				it(`Alice's withdrawable interest is 100% of 2 times ago interest and 80% of prev interest and ${1000000 /
-					16250}% of current interest`, async () => {
+				it(`Alice's withdrawable interest is 100% of 2 times ago interest and 80% of prev interest and ${
+					1000000 / 16250
+				}% of current interest`, async () => {
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
@@ -507,8 +501,9 @@ contract('LockupTest', ([deployer, user1]) => {
 						~~(5000000 + 3000000 * 0.8 + 3000000 * (10000 / 16250))
 					)
 				})
-				it(`Bob's withdrawable interest is 20% of prev interest and ${625000 /
-					16250}% of current interest`, async () => {
+				it(`Bob's withdrawable interest is 20% of prev interest and ${
+					625000 / 16250
+				}% of current interest`, async () => {
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, bob)
 						.then(toBigNumber)
@@ -523,14 +518,15 @@ contract('LockupTest', ([deployer, user1]) => {
 					await dev.lockup.cancel(property.address, {from: alice})
 					await dev.lockup.cancel(property.address, {from: bob})
 					await dev.lockup.withdraw(property.address, {
-						from: alice
+						from: alice,
 					})
 					await dev.lockup.withdraw(property.address, {
-						from: bob
+						from: bob,
 					})
 				})
-				it(`Alice's withdrawable interest is 100% of 2 times ago interest and 80% of prev interest and ${1000000 /
-					16250}% of current interest`, async () => {
+				it(`Alice's withdrawable interest is 100% of 2 times ago interest and 80% of prev interest and ${
+					1000000 / 16250
+				}% of current interest`, async () => {
 					const aliceLockup = await dev.lockup
 						.getValue(property.address, alice)
 						.then(toBigNumber)
@@ -543,8 +539,9 @@ contract('LockupTest', ([deployer, user1]) => {
 						~~(5000000 + 3000000 * 0.8 + 3000000 * (10000 / 16250))
 					)
 				})
-				it(`Bob's withdrawable interest is 25% of prev interest and ${625000 /
-					16250}%% of current interest`, async () => {
+				it(`Bob's withdrawable interest is 25% of prev interest and ${
+					625000 / 16250
+				}%% of current interest`, async () => {
 					const bobLockup = await dev.lockup
 						.getValue(property.address, bob)
 						.then(toBigNumber)

@@ -242,7 +242,7 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateVoteTimes(),
-					dev.generateVoteTimesStorage()
+					dev.generateVoteTimesStorage(),
 				])
 				return dev
 			}
@@ -252,7 +252,9 @@ contract(
 			): Promise<string> =>
 				dev.propertyFactory
 					.create('test', 'test', deployer)
-					.then(res => res.logs.find(x => x.event === 'Create')?.args._property)
+					.then(
+						(res) => res.logs.find((x) => x.event === 'Create')?.args._property
+					)
 
 			it('lockup token to properties', async () => {
 				const dev = await generateEnv()
@@ -371,7 +373,7 @@ contract(
 				const tmpLockupAddress = await dev.addressConfig.lockup()
 				await dev.addressConfig.setLockup(dummyLockup)
 				await lockupStorage.setWithdrawalStatus(prop, user1, 9999999999999, {
-					from: dummyLockup
+					from: dummyLockup,
 				})
 				await dev.addressConfig.setLockup(tmpLockupAddress)
 

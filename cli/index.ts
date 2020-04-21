@@ -9,7 +9,7 @@ program
 	.action((_, [host = '127.0.0.1', port = 7545] = []) => {
 		const env = {
 			ETHEREUM_MOCK_HOST: host,
-			ETHEREUM_MOCK_PORT: port
+			ETHEREUM_MOCK_PORT: port,
 		}
 		exec('npx truffle compile', {env})
 		exec('npx truffle migrate --reset --network mock', {env})

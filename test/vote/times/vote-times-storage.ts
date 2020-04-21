@@ -13,14 +13,14 @@ contract(
 		describe('VoteTimesStorage; getVoteTimes, setVoteTimes', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.voteTimesStorage.getVoteTimes({
-					from: voteTimes
+					from: voteTimes,
 				})
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.voteTimesStorage.setVoteTimes(3, {from: voteTimes})
 				const result = await dev.voteTimesStorage.getVoteTimes({
-					from: voteTimes
+					from: voteTimes,
 				})
 				expect(result.toNumber()).to.be.equal(3)
 			})
@@ -41,7 +41,7 @@ contract(
 			})
 			it('The set value can be taken as it is.', async () => {
 				await dev.voteTimesStorage.setVoteTimesByProperty(property, 3, {
-					from: voteTimes
+					from: voteTimes,
 				})
 				const result = await dev.voteTimesStorage.getVoteTimesByProperty(
 					property,

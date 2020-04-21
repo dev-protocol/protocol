@@ -90,9 +90,11 @@ interface IERC20 {
 	 *
 	 * Emits a {Transfer} event.
 	 */
-	function transferFrom(address sender, address recipient, uint256 amount)
-		external
-		returns (bool);
+	function transferFrom(
+		address sender,
+		address recipient,
+		uint256 amount
+	) external returns (bool);
 
 	/**
 	 * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -166,11 +168,11 @@ library SafeMath {
 	 *
 	 * _Available since v2.4.0._
 	 */
-	function sub(uint256 a, uint256 b, string memory errorMessage)
-		internal
-		pure
-		returns (uint256)
-	{
+	function sub(
+		uint256 a,
+		uint256 b,
+		string memory errorMessage
+	) internal pure returns (uint256) {
 		require(b <= a, errorMessage);
 		uint256 c = a - b;
 		return c;
@@ -225,11 +227,11 @@ library SafeMath {
 	 *
 	 * _Available since v2.4.0._
 	 */
-	function div(uint256 a, uint256 b, string memory errorMessage)
-		internal
-		pure
-		returns (uint256)
-	{
+	function div(
+		uint256 a,
+		uint256 b,
+		string memory errorMessage
+	) internal pure returns (uint256) {
 		// Solidity only automatically asserts when dividing by 0
 		require(b > 0, errorMessage);
 		uint256 c = a / b;
@@ -265,11 +267,11 @@ library SafeMath {
 	 *
 	 * _Available since v2.4.0._
 	 */
-	function mod(uint256 a, uint256 b, string memory errorMessage)
-		internal
-		pure
-		returns (uint256)
-	{
+	function mod(
+		uint256 a,
+		uint256 b,
+		string memory errorMessage
+	) internal pure returns (uint256) {
 		require(b != 0, errorMessage);
 		return a % b;
 	}
@@ -368,10 +370,11 @@ contract ERC20 is Context, IERC20 {
 	 * - the caller must have allowance for `sender`'s tokens of at least
 	 * `amount`.
 	 */
-	function transferFrom(address sender, address recipient, uint256 amount)
-		public
-		returns (bool)
-	{
+	function transferFrom(
+		address sender,
+		address recipient,
+		uint256 amount
+	) public returns (bool) {
 		_transfer(sender, recipient, amount);
 		_approve(
 			sender,
@@ -451,9 +454,11 @@ contract ERC20 is Context, IERC20 {
 	 * - `recipient` cannot be the zero address.
 	 * - `sender` must have a balance of at least `amount`.
 	 */
-	function _transfer(address sender, address recipient, uint256 amount)
-		internal
-	{
+	function _transfer(
+		address sender,
+		address recipient,
+		uint256 amount
+	) internal {
 		require(sender != address(0), "ERC20: transfer from the zero address");
 		require(recipient != address(0), "ERC20: transfer to the zero address");
 		_balances[sender] = _balances[sender].sub(
@@ -514,7 +519,11 @@ contract ERC20 is Context, IERC20 {
 	 * - `owner` cannot be the zero address.
 	 * - `spender` cannot be the zero address.
 	 */
-	function _approve(address owner, address spender, uint256 amount) internal {
+	function _approve(
+		address owner,
+		address spender,
+		uint256 amount
+	) internal {
 		require(owner != address(0), "ERC20: approve from the zero address");
 		require(spender != address(0), "ERC20: approve to the zero address");
 		_allowances[owner][spender] = amount;

@@ -14,7 +14,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
 				dev.generateVoteTimes(),
-				dev.generateVoteTimesStorage()
+				dev.generateVoteTimesStorage(),
 			])
 			await dev.addressConfig.setMarketFactory(marketFactory)
 			const result = await dev.propertyFactory.create(
@@ -22,7 +22,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				'SAMPLE',
 				user,
 				{
-					from: user2
+					from: user2,
 				}
 			)
 			propertyAddress = getPropertyAddress(result)
@@ -42,10 +42,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			expect(symbol).to.be.equal('SAMPLE')
 			expect(decimals.toNumber()).to.be.equal(18)
 			expect(totalSupply.toFixed()).to.be.equal(
-				toBigNumber(1000)
-					.times(10000)
-					.times(1e18)
-					.toFixed()
+				toBigNumber(1000).times(10000).times(1e18).toFixed()
 			)
 			expect(author).to.be.equal(user)
 		})
@@ -53,7 +50,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		it('2 characters name cause an error.', async () => {
 			const result = await dev.propertyFactory
 				.create('te', 'TEST', user, {
-					from: user2
+					from: user2,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(
@@ -63,7 +60,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		})
 		it('3 characters name donot cause an error.', async () => {
 			const result = await dev.propertyFactory.create('tes', 'TEST', user, {
-				from: user2
+				from: user2,
 			})
 			const propertyAddress = getPropertyAddress(result)
 			// eslint-disable-next-line no-undef
@@ -76,7 +73,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				'TEST',
 				user,
 				{
-					from: user2
+					from: user2,
 				}
 			)
 			const propertyAddress = getPropertyAddress(result)
@@ -87,7 +84,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		it('11 characters name cause an error.', async () => {
 			const result = await dev.propertyFactory
 				.create('01234567890', 'TEST', user, {
-					from: user2
+					from: user2,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(
@@ -98,7 +95,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		it('2 characters symbol cause an error.', async () => {
 			const result = await dev.propertyFactory
 				.create('test', 'TE', user, {
-					from: user2
+					from: user2,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(
@@ -108,7 +105,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		})
 		it('3 characters symbol donot cause an error.', async () => {
 			const result = await dev.propertyFactory.create('test', 'TES', user, {
-				from: user2
+				from: user2,
 			})
 			const propertyAddress = getPropertyAddress(result)
 			// eslint-disable-next-line no-undef
@@ -121,7 +118,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				'0123456789',
 				user,
 				{
-					from: user2
+					from: user2,
 				}
 			)
 			const propertyAddress = getPropertyAddress(result)
@@ -132,7 +129,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		it('11 characters symbol cause an error.', async () => {
 			const result = await dev.propertyFactory
 				.create('test', '01234567890', user, {
-					from: user2
+					from: user2,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(
@@ -166,7 +163,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await dev.propertyFactory.pause({from: deployer})
 			const result = await dev.propertyFactory
 				.create('sample2', 'SAMPLE2', user, {
-					from: user2
+					from: user2,
 				})
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'You cannot use that')
@@ -178,12 +175,12 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				'SAMPLE2',
 				user,
 				{
-					from: user2
+					from: user2,
 				}
 			)
 			const tmpPropertyAddress = getPropertyAddress(createResult)
 			const result = await dev.propertyGroup.isGroup(tmpPropertyAddress, {
-				from: deployer
+				from: deployer,
 			})
 			expect(result).to.be.equal(true)
 		})
@@ -194,7 +191,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				'SAMPLE3',
 				user,
 				{
-					from: user2
+					from: user2,
 				}
 			)
 			const tmpPropertyAddress = getPropertyAddress(createResult)

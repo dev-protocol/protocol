@@ -22,7 +22,7 @@ import {
 	WithdrawStorageInstance,
 	IPolicyInstance,
 	IMarketInstance,
-	WithdrawInstance
+	WithdrawInstance,
 } from '../../types/truffle-contracts'
 
 const contract = artifacts.require
@@ -158,10 +158,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateAllocator(): Promise<void> {
-		this._allocator = await (async x => {
+		this._allocator = await (async (x) => {
 			;(x as any).link(
 				'Decimals',
-				await this.generateDecimals().then(x => x.address)
+				await this.generateDecimals().then((x) => x.address)
 			)
 			return x.new(this.addressConfig.address, this.fromDeployer)
 		})(contract('Allocator'))
@@ -184,10 +184,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateLockup(): Promise<void> {
-		this._lockup = await (async x => {
+		this._lockup = await (async (x) => {
 			;(x as any).link(
 				'Decimals',
-				await this.generateDecimals().then(x => x.address)
+				await this.generateDecimals().then((x) => x.address)
 			)
 			return x.new(this.addressConfig.address, this.fromDeployer)
 		})(contract('Lockup'))
@@ -357,10 +357,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateWithdraw(): Promise<void> {
-		this._withdraw = await (async x => {
+		this._withdraw = await (async (x) => {
 			;(x as any).link(
 				'Decimals',
-				await this.generateDecimals().then(x => x.address)
+				await this.generateDecimals().then((x) => x.address)
 			)
 			return x.new(this.addressConfig.address, this.fromDeployer)
 		})(contract('Withdraw'))
@@ -390,11 +390,11 @@ export class DevProtocolInstance {
 		contractName: string,
 		user: string
 	): Promise<IPolicyInstance> {
-		const tmp = await (async x => {
+		const tmp = await (async (x) => {
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
 			;(x as any).link(
 				'Decimals',
-				await this.generateDecimals().then(x => x.address)
+				await this.generateDecimals().then((x) => x.address)
 			)
 			return x.new({from: user})
 		})(contract(contractName))
@@ -406,7 +406,7 @@ export class DevProtocolInstance {
 		user: string
 	): Promise<IMarketInstance> {
 		const tmp = await contract(contractName).new(this.addressConfig.address, {
-			from: user
+			from: user,
 		})
 		return tmp
 	}

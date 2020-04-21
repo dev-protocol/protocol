@@ -24,7 +24,7 @@ export const waitForEvent = (deployedContract: any, uri: string) => async (
 ): Promise<Error | void> =>
 	new Promise((resolve, reject) => {
 		setTimeout(() => reject(new Error()), timeout)
-		watch(deployedContract, uri)(name, err => {
+		watch(deployedContract, uri)(name, (err) => {
 			if (err) {
 				return reject(err)
 			}

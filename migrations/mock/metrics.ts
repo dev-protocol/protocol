@@ -19,7 +19,7 @@ export async function createMetrics(
 			artifacts
 		)
 		await dev.approve(market.address, balance, {
-			from: addressInfo[accountIndex].account
+			from: addressInfo[accountIndex].account,
 		})
 		await market.authenticate(
 			addressInfo[accountIndex].property!,

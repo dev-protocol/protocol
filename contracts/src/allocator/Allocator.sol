@@ -125,9 +125,11 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		getStorage().setLastBlockNumber(_metrics, lastBlock);
 	}
 
-	function increment(address _property, uint256 _reward, uint256 _lockup)
-		private
-	{
+	function increment(
+		address _property,
+		uint256 _reward,
+		uint256 _lockup
+	) private {
 		uint256 holders = Policy(config().policy()).holdersShare(
 			_reward,
 			_lockup
@@ -137,9 +139,11 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		Lockup(config().lockup()).increment(_property, interest);
 	}
 
-	function beforeBalanceChange(address _property, address _from, address _to)
-		external
-	{
+	function beforeBalanceChange(
+		address _property,
+		address _from,
+		address _to
+	) external {
 		addressValidator().validateGroup(msg.sender, config().propertyGroup());
 
 		Withdraw(config().withdraw()).beforeBalanceChange(

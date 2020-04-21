@@ -21,7 +21,7 @@ export async function changeBalance(
 		const value = transferValue[i]
 		// eslint-disable-next-line no-await-in-loop
 		await dev.transfer(address, new BigNumber(value * decimals), {
-			from: addressInfo[0].account
+			from: addressInfo[0].account,
 		})
 		// eslint-disable-next-line no-await-in-loop
 		const tmp = await dev.balanceOf(address)

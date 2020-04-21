@@ -18,9 +18,11 @@ contract VoteCounter is UsingConfig, UsingValidator, Killable {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addVoteCount(address _user, address _property, bool _agree)
-		external
-	{
+	function addVoteCount(
+		address _user,
+		address _property,
+		bool _agree
+	) external {
 		addressValidator().validateGroups(
 			msg.sender,
 			config().marketGroup(),
