@@ -9,8 +9,7 @@ contract IAllocator {
 	function beforeBalanceChange(
 		address _property,
 		address _from,
-		address _to
-		) external;
+		address _to) external;
 
 	function getRewardsAmount(address _property)
 		external
