@@ -44,7 +44,7 @@
 		"ethlint": "1.2.5",
 		"husky": "4.2.5",
 		"prettier": "2.0.5",
-		"prettier-plugin-solidity": "1.0.0-alpha.48",
+		"prettier-plugin-solidity": "1.0.0-alpha.49",
 		"truffle": "5.1.23",
 		"truffle-typings": "1.0.8",
 		"ts-generator": "0.0.8",
