@@ -4,7 +4,10 @@ import BigNumber from 'bignumber.js'
 import {mine, toBigNumber} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {watch, waitForEvent, getEventValue} from '../test-lib/utils/event'
-import {validateErrorMessage} from '../test-lib/utils/error'
+import {
+	validateErrorMessage,
+	validatePauseErrorMessage,
+} from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
 contract('LockupTest', ([deployer, user1]) => {
@@ -111,14 +114,12 @@ contract('LockupTest', ([deployer, user1]) => {
 	})
 	describe('Lockup; lockup', () => {
 		it('should fail to call when paused', async () => {
-			const [dev, , property] = await init()
+			const [dev, ,] = await init()
 
 			await dev.lockup.pause()
 
-			const res = await dev.lockup
-				.lockup(deployer, property.address, 10000)
-				.catch(err)
-			validateErrorMessage(res, 'You cannot use that')
+			const res = await dev.lockup.getAllValue().catch(err)
+			validatePauseErrorMessage(res, false)
 		})
 		it('should fail to call when sent from other than Dev Contract', async () => {
 			const [dev, , property] = await init()
@@ -184,7 +185,7 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('emit an event that notifies token locked-up', async () => {
 			const [dev, , property] = await init()
 
-			dev.dev.deposit(property.address, 10000).catch(err)
+			await dev.dev.deposit(property.address, 10000).catch(err)
 			const [_from, _property, _value] = await Promise.all([
 				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_from'),
 				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_property'),
