@@ -52,7 +52,7 @@
 		"typechain": "1.0.5",
 		"typechain-target-truffle": "1.0.2",
 		"typescript": "3.8.3",
-		"web3": "1.2.6"
+		"web3": "1.2.7"
 	},
 	"dependencies": {
 		"@openzeppelin/contracts": "^2.5.0",

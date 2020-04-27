@@ -54,8 +54,8 @@ contract('LockupTest', ([deployer, user1]) => {
 		const [market] = await Promise.all([
 			artifacts.require('Market').at(marketAddress),
 		])
+		await market.authenticate(property.address, 'id1', '', '', '', '')
 		const metricsAddress = await new Promise<string>((resolve) => {
-			market.authenticate(property.address, 'id1', '', '', '', '')
 			watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 				resolve(values._metrics)
 			)
@@ -96,14 +96,14 @@ contract('LockupTest', ([deployer, user1]) => {
 			const [dev, , property] = await init()
 			await dev.dev.deposit(property.address, 10000)
 			await dev.lockup.cancel(property.address)
-			mine(1)
+			await mine(1)
 			await dev.lockup.withdraw(property.address)
 		})
 		it('Cannot be canceled after withdraw ends normally.', async () => {
 			const [dev, , property] = await init()
 			await dev.dev.deposit(property.address, 10000)
 			await dev.lockup.cancel(property.address)
-			mine(1)
+			await mine(1)
 			await dev.lockup.withdraw(property.address)
 			const res = await dev.lockup.cancel(property.address).catch(err)
 			validateErrorMessage(res, 'dev token is not locked')

@@ -135,16 +135,16 @@ contract(
 				await dev.dev.deposit(propertyAddress, 100000, {from: propertyAuther})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
+				await marketInstance.authenticate(
+					propertyAddress,
+					'id-key',
+					'',
+					'',
+					'',
+					'',
+					{from: propertyAuther}
+				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					marketInstance.authenticate(
-						propertyAddress,
-						'id-key',
-						'',
-						'',
-						'',
-						'',
-						{from: propertyAuther}
-					)
 					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 						resolve(values._metrics)
 					)
@@ -214,16 +214,16 @@ contract(
 			it('Should fail to deauthenticate when sent from other than passed metrics linked property author.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
+				await marketInstance.authenticate(
+					propertyAddress,
+					'id-key',
+					'',
+					'',
+					'',
+					'',
+					{from: propertyAuther}
+				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					marketInstance.authenticate(
-						propertyAddress,
-						'id-key',
-						'',
-						'',
-						'',
-						'',
-						{from: propertyAuther}
-					)
 					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 						resolve(values._metrics)
 					)
@@ -236,16 +236,16 @@ contract(
 			it('When deauthenticate, decrease the issuedMetrics, emit the Destroy event.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
+				await marketInstance.authenticate(
+					propertyAddress,
+					'id-key',
+					'',
+					'',
+					'',
+					'',
+					{from: propertyAuther}
+				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					marketInstance.authenticate(
-						propertyAddress,
-						'id-key',
-						'',
-						'',
-						'',
-						'',
-						{from: propertyAuther}
-					)
 					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 						resolve(values._metrics)
 					)
@@ -269,16 +269,16 @@ contract(
 			it('Should fail to deauthenticate when passed already deauthenticated metrics.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
+				await marketInstance.authenticate(
+					propertyAddress,
+					'id-key',
+					'',
+					'',
+					'',
+					'',
+					{from: propertyAuther}
+				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					marketInstance.authenticate(
-						propertyAddress,
-						'id-key',
-						'',
-						'',
-						'',
-						'',
-						{from: propertyAuther}
-					)
 					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
 						resolve(values._metrics)
 					)

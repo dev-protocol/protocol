@@ -57,8 +57,8 @@ contract('WithdrawTest', ([deployer, user1]) => {
 		const [market] = await Promise.all([
 			artifacts.require('Market').at(marketAddress),
 		])
+		await market.authenticate(property.address, 'id1', '', '', '', '')
 		const metricsAddress = await (async () => {
-			market.authenticate(property.address, 'id1', '', '', '', '')
 			return getEventValue(dev.metricsFactory, WEB3_URI)('Create', '_metrics')
 		})()
 		const [metrics] = await Promise.all([
