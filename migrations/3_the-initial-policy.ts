@@ -5,7 +5,7 @@ const handler = function (deployer, network) {
 
 	const {address} = artifacts.require('AddressConfig')
 
-	deployer.deploy(artifacts.require('TheFirstPolicy'), address)
+	deployer.deploy(artifacts.require('TheInitialPolicy'), address)
 } as Truffle.Migration
 
 export = handler
