@@ -6,7 +6,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
 
-contract TheFirstPolicy is IPolicy, UsingConfig {
+contract TheInitialPolicy is IPolicy, UsingConfig {
 	using SafeMath for uint256;
 	uint256 public marketVotingBlocks = 525600;
 	uint256 public policyVotingBlocks = 525600;
@@ -70,10 +70,12 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		view
 		returns (uint256)
 	{
-		return
-			(total_assets.div(10000)).sub(
-				(property_lockups.div(100000000000000000000000))
-			);
+		uint256 a = total_assets.div(10000);
+		uint256 b = property_lockups.div(100000000000000000000000);
+		if (a <= b) {
+			return 0;
+		}
+		return a.sub(b);
 	}
 
 	function marketApproval(uint256 _up_votes, uint256 _negative_votes)
@@ -110,7 +112,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		returns (uint256)
 	{
 		uint256 penalty = 0;
-		if (abstentions > 9) {
+		if (abstentions > 10) {
 			penalty = 175200;
 		}
 		return penalty;
