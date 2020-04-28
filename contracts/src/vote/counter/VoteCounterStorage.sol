@@ -52,9 +52,7 @@ contract VoteCounterStorage is
 		return eternalStorage().getUint(getAgreeVoteCountKey(_sender));
 	}
 
-	function setAgreeCount(address _sender, uint256 count)
-		external
-	{
+	function setAgreeCount(address _sender, uint256 count) external {
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		eternalStorage().setUint(getAgreeVoteCountKey(_sender), count);
@@ -73,9 +71,7 @@ contract VoteCounterStorage is
 		return eternalStorage().getUint(getOppositeVoteCountKey(_sender));
 	}
 
-	function setOppositeCount(address _sender, uint256 count)
-		external
-	{
+	function setOppositeCount(address _sender, uint256 count) external {
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		eternalStorage().setUint(getOppositeVoteCountKey(_sender), count);

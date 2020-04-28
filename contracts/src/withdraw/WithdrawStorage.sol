@@ -39,9 +39,7 @@ contract WithdrawStorage is
 	}
 
 	// CumulativePrice
-	function setCumulativePrice(address _property, uint256 _value)
-		external
-	{
+	function setCumulativePrice(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);

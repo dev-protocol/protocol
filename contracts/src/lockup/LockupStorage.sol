@@ -57,9 +57,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//PropertyValue
-	function setPropertyValue(address _property, uint256 _value)
-		external
-	{
+	function setPropertyValue(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getPropertyValueKey(_property);
@@ -116,9 +114,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//InterestPrice
-	function setInterestPrice(address _property, uint256 _value)
-		external
-	{
+	function setInterestPrice(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(getInterestPriceKey(_property), _value);
