@@ -31,7 +31,7 @@ import "../common/lifecycle/Killable.sol";
 ```
 
 下記のスクリプトを実行すれば、一気に修正可能。sol ファイルが修正されるので、コミットしてしまわないように注意すること。
-また実行前にスクリプト内のPROJECT_PATHを修正すること。
+また実行前にスクリプト内の PROJECT_PATH を修正すること。
 
 ```
 cd flattened
