@@ -26,8 +26,15 @@ Solidity Flattener が Solidity 推奨の import 記述形式に対応してい�
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 ↓
-import "../../../node_midules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "../../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../common/lifecycle/Killable.sol";
+```
+
+下記のスクリプトを実行すれば、一気に修正可能。solファイルが修正されるので、コミットしてしまわないように注意
+
+```
+cd flattened
+python flattener.py
 ```
 
 # Etherscan 登録
