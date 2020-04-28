@@ -54,7 +54,6 @@ contract VoteCounterStorage is
 
 	function setAgreeCount(address _sender, uint256 count)
 		external
-		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
@@ -76,7 +75,6 @@ contract VoteCounterStorage is
 
 	function setOppositeCount(address _sender, uint256 count)
 		external
-		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 

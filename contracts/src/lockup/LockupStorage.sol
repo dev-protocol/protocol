@@ -11,7 +11,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	//AllValue
-	function setAllValue(uint256 _value) external returns (uint256) {
+	function setAllValue(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getAllValueKey();
@@ -32,7 +32,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 		address _property,
 		address _sender,
 		uint256 _value
-	) external returns (uint256) {
+	) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getValueKey(_property, _sender);
@@ -59,7 +59,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	//PropertyValue
 	function setPropertyValue(address _property, uint256 _value)
 		external
-		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
@@ -119,7 +118,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	//InterestPrice
 	function setInterestPrice(address _property, uint256 _value)
 		external
-		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().lockup());
 

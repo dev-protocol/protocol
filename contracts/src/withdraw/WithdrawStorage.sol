@@ -41,7 +41,6 @@ contract WithdrawStorage is
 	// CumulativePrice
 	function setCumulativePrice(address _property, uint256 _value)
 		external
-		returns (uint256)
 	{
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
