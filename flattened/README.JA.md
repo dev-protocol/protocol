@@ -30,7 +30,8 @@ import "../../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../common/lifecycle/Killable.sol";
 ```
 
-下記のスクリプトを実行すれば、一気に修正可能。sol ファイルが修正されるので、コミットしてしまわないように注意
+下記のスクリプトを実行すれば、一気に修正可能。sol ファイルが修正されるので、コミットしてしまわないように注意すること。
+また実行前にスクリプト内のPROJECT_PATHを修正すること。
 
 ```
 cd flattened
