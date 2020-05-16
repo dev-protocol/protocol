@@ -31,7 +31,7 @@
 		"@truffle/hdwallet-provider": "1.0.35",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "13.13.6",
-		"@types/shelljs": "0.8.7",
+		"@types/shelljs": "0.8.8",
 		"@typescript-eslint/eslint-plugin": "2.33.0",
 		"@typescript-eslint/parser": "2.33.0",
 		"bignumber.js": "9.0.0",
