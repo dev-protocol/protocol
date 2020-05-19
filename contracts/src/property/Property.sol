@@ -10,7 +10,7 @@ import {Lockup} from "contracts/src/lockup/Lockup.sol";
 
 
 contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
-	uint8 private constant _decimals = 18;
+	uint8 private constant _property_decimals = 18;
 	uint256 private constant _supply = 10000000000000000000000000;
 	address public author;
 
@@ -19,7 +19,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		address _own,
 		string memory _name,
 		string memory _symbol
-	) public UsingConfig(_config) ERC20Detailed(_name, _symbol, _decimals) {
+	) public UsingConfig(_config) ERC20Detailed(_name, _symbol, _property_decimals) {
 		addressValidator().validateAddress(
 			msg.sender,
 			config().propertyFactory()
