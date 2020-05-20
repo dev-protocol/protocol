@@ -1,5 +1,5 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {getPropertyAddress, getTransferToAddress} from '../test-lib/utils/log'
+import {getPropertyAddress} from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -137,9 +137,7 @@ contract(
 			it('transfer success', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property.transfer(transfer, 10, {from: author})
-				const toAddress = getTransferToAddress(result)
-				expect(toAddress).to.be.equal(transfer)
+				await property.transfer(transfer, 10, {from: author})
 			})
 		})
 	}
