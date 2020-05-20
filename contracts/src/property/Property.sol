@@ -19,7 +19,11 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		address _own,
 		string memory _name,
 		string memory _symbol
-	) public UsingConfig(_config) ERC20Detailed(_name, _symbol, _property_decimals) {
+	)
+		public
+		UsingConfig(_config)
+		ERC20Detailed(_name, _symbol, _property_decimals)
+	{
 		addressValidator().validateAddress(
 			msg.sender,
 			config().propertyFactory()
@@ -39,6 +43,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 			_to
 		);
 		_transfer(msg.sender, _to, _value);
+		return true;
 	}
 
 	function withdraw(address _sender, uint256 _value) external {
