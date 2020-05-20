@@ -33,3 +33,12 @@ export function getPropertyAddress(
 	)[0].args._property
 	return tmp
 }
+
+export function getTransferToAddress(
+	transaction: Truffle.TransactionResponse
+): string {
+	const tmp = transaction.logs.filter(
+		(e: {event: string}) => e.event === 'Transfer'
+	)[0].args.to
+	return tmp
+}
