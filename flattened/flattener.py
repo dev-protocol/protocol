@@ -1,6 +1,6 @@
 import os
 
-PROJECT_PATH = '/Users/hogehoge/frame00/protocol'
+PROJECT_PATH = '/Users/taniguchiakira/frame00/protocol'
 
 def get_target_file_path_list():
 	path_list = []
