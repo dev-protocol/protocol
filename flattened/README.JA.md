@@ -30,6 +30,14 @@ import "../../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../common/lifecycle/Killable.sol";
 ```
 
+下記のスクリプトを実行すれば、一気に修正可能。sol ファイルが修正されるので、コミットしてしまわないように注意すること。
+また実行前にスクリプト内の PROJECT_PATH を修正すること。
+
+```
+cd flattened
+python flattener.py
+```
+
 # Etherscan 登録
 
 (注：画面 UI、Version 番号、アドレス等は予告なく変更される場合があります)
