@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
