@@ -9,8 +9,7 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 contract VoteCounterStorage is
 	UsingStorage,
 	UsingConfig,
-	UsingValidator,
-	Killable
+	UsingValidator
 {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
