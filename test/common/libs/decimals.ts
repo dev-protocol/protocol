@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js'
-import {validateErrorMessage} from '../../test-lib/utils/error'
 
 contract('DecimalsTest', ([deployer]) => {
 	const decimalsTestContract = artifacts.require('DecimalsTest')
@@ -17,10 +16,11 @@ contract('DecimalsTest', ([deployer]) => {
 			const decimalsTest = await decimalsTestContract.new({
 				from: deployer,
 			})
-			const err = await decimalsTest
-				.outOf(28, '700000000000000000000000000000000000000')
-				.catch((err: Error) => err)
-			validateErrorMessage(err, 'the denominator is too big', false)
+			const result = await decimalsTest.outOf(
+				28,
+				'700000000000000000000000000000000000000'
+			)
+			expect(result.toNumber()).to.be.equal(0)
 		})
 	})
 })

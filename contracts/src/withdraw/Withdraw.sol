@@ -6,14 +6,13 @@ import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.s
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 
 
-contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
+contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -21,7 +20,6 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function withdraw(address _property) external {
-		require(paused() == false, "You cannot use that");
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
@@ -141,6 +139,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {
+		require(paused() == false, "You cannot use that");
 		return WithdrawStorage(config().withdrawStorage());
 	}
 }

@@ -5,7 +5,6 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
@@ -15,7 +14,7 @@ import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 
 
-contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
+contract Lockup is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event Lockedup(address _from, address _property, uint256 _value);
@@ -28,7 +27,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 		address _property,
 		uint256 _value
 	) external {
-		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(msg.sender, config().token());
 		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(_value != 0, "illegal lockup value");
@@ -78,6 +76,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 
 	function increment(address _property, uint256 _interestResult) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		uint256 priceValue = _interestResult.outOf(
 			getStorage().getPropertyValue(_property)
 		);
@@ -239,6 +238,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 	}
 
 	function getStorage() private view returns (LockupStorage) {
+		require(paused() == false, "You cannot use that");
 		return LockupStorage(config().lockupStorage());
 	}
 }
