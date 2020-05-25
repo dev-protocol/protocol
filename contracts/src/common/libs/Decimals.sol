@@ -16,7 +16,9 @@ library Decimals {
 			return 0;
 		}
 		uint256 a = _a.mul(basisValue);
-		require(a > _b, "the denominator is too big");
+		if (a < _b) {
+			return 0;
+		}
 		return (a.div(_b));
 	}
 
