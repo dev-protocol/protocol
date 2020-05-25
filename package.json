@@ -32,8 +32,8 @@
 		"@types/dotenv": "8.2.0",
 		"@types/node": "13.13.8",
 		"@types/shelljs": "0.8.8",
-		"@typescript-eslint/eslint-plugin": "2.34.0",
-		"@typescript-eslint/parser": "2.34.0",
+		"@typescript-eslint/eslint-plugin": "3.0.0",
+		"@typescript-eslint/parser": "3.0.0",
 		"bignumber.js": "9.0.0",
 		"dotenv": "8.2.0",
 		"eslint": "7.0.0",
@@ -44,7 +44,7 @@
 		"ethlint": "1.2.5",
 		"husky": "4.2.5",
 		"prettier": "2.0.5",
-		"prettier-plugin-solidity": "1.0.0-alpha.51",
+		"prettier-plugin-solidity": "1.0.0-alpha.52",
 		"truffle": "5.1.26",
 		"truffle-typings": "1.0.8",
 		"ts-generator": "0.0.8",
@@ -52,7 +52,7 @@
 		"typechain": "2.0.0",
 		"typechain-target-truffle": "1.0.2",
 		"typescript": "3.9.3",
-		"web3": "1.2.7"
+		"web3": "1.2.8"
 	},
 	"dependencies": {
 		"@openzeppelin/contracts": "^2.5.0",
