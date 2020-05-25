@@ -24,6 +24,7 @@ export const watch = (deployedContract: any, uri: string, froｍ = 0) => (
 export const waitForEvent = (deployedContract: any, uri: string) => async (
 	name: string,
 	timeout = 10000
+	// eslint-disable-next-line @typescript-eslint/no-invalid-void-type
 ): Promise<Error | void> =>
 	new Promise((resolve, reject) => {
 		setTimeout(() => reject(new Error()), timeout)
