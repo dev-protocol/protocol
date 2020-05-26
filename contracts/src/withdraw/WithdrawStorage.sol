@@ -1,17 +1,11 @@
 pragma solidity ^0.5.0;
 
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
 
-contract WithdrawStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -39,10 +33,7 @@ contract WithdrawStorage is
 	}
 
 	// CumulativePrice
-	function setCumulativePrice(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setCumulativePrice(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);

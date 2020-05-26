@@ -1267,12 +1267,7 @@ contract PropertyGroup is
 }
 
 
-contract WithdrawStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -1300,10 +1295,7 @@ contract WithdrawStorage is
 	}
 
 	// CumulativePrice
-	function setCumulativePrice(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setCumulativePrice(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);

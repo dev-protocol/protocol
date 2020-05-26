@@ -1441,12 +1441,7 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 
 // prettier-ignore
 
-contract VoteCounterStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -1487,10 +1482,7 @@ contract VoteCounterStorage is
 		return eternalStorage().getUint(getAgreeVoteCountKey(_sender));
 	}
 
-	function setAgreeCount(address _sender, uint256 count)
-		external
-		returns (uint256)
-	{
+	function setAgreeCount(address _sender, uint256 count) external {
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		eternalStorage().setUint(getAgreeVoteCountKey(_sender), count);
@@ -1509,10 +1501,7 @@ contract VoteCounterStorage is
 		return eternalStorage().getUint(getOppositeVoteCountKey(_sender));
 	}
 
-	function setOppositeCount(address _sender, uint256 count)
-		external
-		returns (uint256)
-	{
+	function setOppositeCount(address _sender, uint256 count) external {
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		eternalStorage().setUint(getOppositeVoteCountKey(_sender), count);
@@ -2348,12 +2337,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 
 // prettier-ignore
 
-contract WithdrawStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -2381,10 +2365,7 @@ contract WithdrawStorage is
 	}
 
 	// CumulativePrice
-	function setCumulativePrice(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setCumulativePrice(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
@@ -3083,12 +3064,12 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 }
 
 
-contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
+contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	//AllValue
-	function setAllValue(uint256 _value) external returns (uint256) {
+	function setAllValue(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getAllValueKey();
@@ -3109,7 +3090,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 		address _property,
 		address _sender,
 		uint256 _value
-	) external returns (uint256) {
+	) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getValueKey(_property, _sender);
@@ -3134,10 +3115,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//PropertyValue
-	function setPropertyValue(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setPropertyValue(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getPropertyValueKey(_property);
@@ -3194,10 +3172,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//InterestPrice
-	function setInterestPrice(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setInterestPrice(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(getInterestPriceKey(_property), _value);
