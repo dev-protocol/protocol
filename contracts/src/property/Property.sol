@@ -48,7 +48,11 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		return true;
 	}
 
-	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+	function transferFrom(
+		address _from,
+		address _to,
+		uint256 _value
+	) public returns (bool) {
 		addressValidator().validateIllegalAddress(_from);
 		addressValidator().validateIllegalAddress(_to);
 		require(_value != 0, "illegal transfer value");
@@ -60,7 +64,14 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		);
 		_transfer(_from, _to, _value);
 		uint256 allowanceAmount = allowance(_from, msg.sender);
-		_approve(_from, msg.sender, allowanceAmount.sub(_value, "ERC20: transfer amount exceeds allowance"));
+		_approve(
+			_from,
+			msg.sender,
+			allowanceAmount.sub(
+				_value,
+				"ERC20: transfer amount exceeds allowance"
+			)
+		);
 		return true;
 	}
 
