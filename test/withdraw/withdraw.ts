@@ -7,6 +7,7 @@ import {getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
+	validatePauseErrorMessage,
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
@@ -293,6 +294,19 @@ contract('WithdrawTest', ([deployer, user1]) => {
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(res)
 			})
+		})
+	})
+	describe('Withdraw; pause', () => {
+		it('should fail to call when paused.', async () => {
+			const [dev, , property] = await init()
+			await dev.withdraw.pause()
+			let res = await dev.withdraw
+				.getRewardsAmount(property.address)
+				.catch((err: Error) => err)
+			validatePauseErrorMessage(res, false)
+			await dev.withdraw.unpause()
+			res = await dev.withdraw.getRewardsAmount(property.address)
+			expect(res.toNumber()).to.be.equal(0)
 		})
 	})
 })

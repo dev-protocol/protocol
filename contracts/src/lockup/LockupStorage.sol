@@ -1,17 +1,16 @@
 pragma solidity ^0.5.0;
 
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
 
-contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
+contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	//AllValue
-	function setAllValue(uint256 _value) external returns (uint256) {
+	function setAllValue(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getAllValueKey();
@@ -32,7 +31,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 		address _property,
 		address _sender,
 		uint256 _value
-	) external returns (uint256) {
+	) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getValueKey(_property, _sender);
@@ -57,10 +56,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//PropertyValue
-	function setPropertyValue(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setPropertyValue(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getPropertyValueKey(_property);
@@ -117,10 +113,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//InterestPrice
-	function setInterestPrice(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setInterestPrice(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(getInterestPriceKey(_property), _value);
