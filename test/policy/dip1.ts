@@ -50,6 +50,18 @@ contract('DIP1', ([deployer]) => {
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
 				(await theInitialPolicy[method](e, f)).toString()
 			)
+			expect((await dip1[method](a, 0)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 0)).toString()
+			)
+			expect((await dip1[method](a, 1)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 1)).toString()
+			)
+			expect((await dip1[method](0, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](0, a)).toString()
+			)
+			expect((await dip1[method](1, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](1, a)).toString()
+			)
 		})
 	})
 	describe('DIP1; holdersShare', () => {
@@ -85,6 +97,18 @@ contract('DIP1', ([deployer]) => {
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
 				(await theInitialPolicy[method](e, f)).toString()
 			)
+			expect((await dip1[method](a, 0)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 0)).toString()
+			)
+			expect((await dip1[method](a, 1)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 1)).toString()
+			)
+			expect((await dip1[method](0, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](0, a)).toString()
+			)
+			expect((await dip1[method](1, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](1, a)).toString()
+			)
 		})
 	})
 	describe('DIP1; authenticationFee', () => {
@@ -99,6 +123,18 @@ contract('DIP1', ([deployer]) => {
 			)
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
 				(await theInitialPolicy[method](e, f)).toString()
+			)
+			expect((await dip1[method](a, 0)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 0)).toString()
+			)
+			expect((await dip1[method](a, 1)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 1)).toString()
+			)
+			expect((await dip1[method](0, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](0, a)).toString()
+			)
+			expect((await dip1[method](1, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](1, a)).toString()
 			)
 		})
 	})
@@ -115,6 +151,18 @@ contract('DIP1', ([deployer]) => {
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
 				(await theInitialPolicy[method](e, f)).toString()
 			)
+			expect((await dip1[method](a, 0)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 0)).toString()
+			)
+			expect((await dip1[method](a, 1)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 1)).toString()
+			)
+			expect((await dip1[method](0, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](0, a)).toString()
+			)
+			expect((await dip1[method](1, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](1, a)).toString()
+			)
 		})
 	})
 	describe('DIP1; policyApproval', () => {
@@ -129,6 +177,18 @@ contract('DIP1', ([deployer]) => {
 			)
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
 				(await theInitialPolicy[method](e, f)).toString()
+			)
+			expect((await dip1[method](a, 0)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 0)).toString()
+			)
+			expect((await dip1[method](a, 1)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, 1)).toString()
+			)
+			expect((await dip1[method](0, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](0, a)).toString()
+			)
+			expect((await dip1[method](1, a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](1, a)).toString()
 			)
 		})
 	})
@@ -160,6 +220,12 @@ contract('DIP1', ([deployer]) => {
 			)
 			expect((await dip1[method](c)).toString()).to.be.equal(
 				(await theInitialPolicy[method](c)).toString()
+			)
+			expect((await dip1[method](0)).toString()).to.be.equal(
+				(await theInitialPolicy[method](0)).toString()
+			)
+			expect((await dip1[method](1)).toString()).to.be.equal(
+				(await theInitialPolicy[method](1)).toString()
 			)
 		})
 	})

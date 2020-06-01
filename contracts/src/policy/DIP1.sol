@@ -5,7 +5,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
-contract DIP1 is IPolicy, UsingConfig {
+contract TheInitialPolicy is IPolicy, UsingConfig {
 	using SafeMath for uint256;
 	uint256 public marketVotingBlocks = 525600;
 	uint256 public policyVotingBlocks = 525600;
@@ -53,7 +53,7 @@ contract DIP1 is IPolicy, UsingConfig {
 		view
 		returns (uint256)
 	{
-		return _lockups > 0 ? (_reward.mul(51)).div(100) : _reward;
+		return _lockups > 0 ? (_reward.mul(95)).div(100) : _reward;
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
