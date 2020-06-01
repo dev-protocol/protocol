@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -27,7 +26,6 @@ contract Context {
 		return msg.data;
 	}
 }
-
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -116,7 +114,6 @@ interface IERC20 {
 		uint256 value
 	);
 }
-
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -284,7 +281,6 @@ library SafeMath {
 		return a % b;
 	}
 }
-
 
 /**
  * @dev Implementation of the {IERC20} interface.
@@ -564,7 +560,6 @@ contract ERC20 is Context, IERC20 {
 	}
 }
 
-
 // prettier-ignore
 
 /**
@@ -601,7 +596,6 @@ library Roles {
         return role.bearer[account];
     }
 }
-
 
 contract MinterRole is Context {
 	using Roles for Roles.Role;
@@ -646,7 +640,6 @@ contract MinterRole is Context {
 	}
 }
 
-
 /**
  * @dev Extension of {ERC20} that adds a set of accounts with the {MinterRole},
  * which have permission to mint (create) new tokens as they see fit.
@@ -670,7 +663,6 @@ contract ERC20Mintable is ERC20, MinterRole {
 		return true;
 	}
 }
-
 
 contract PauserRole is Context {
 	using Roles for Roles.Role;
@@ -714,7 +706,6 @@ contract PauserRole is Context {
 		emit PauserRemoved(account);
 	}
 }
-
 
 /**
  * @dev Contract module which allows children to implement an emergency stop
@@ -786,7 +777,6 @@ contract Pausable is Context, PauserRole {
 	}
 }
 
-
 library Decimals {
 	using SafeMath for uint256;
 	uint120 private constant basisValue = 1000000000000000000;
@@ -811,7 +801,6 @@ library Decimals {
 	}
 }
 
-
 contract Killable {
 	address payable public _owner;
 
@@ -824,7 +813,6 @@ contract Killable {
 		selfdestruct(_owner);
 	}
 }
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -907,7 +895,6 @@ contract Ownable is Context {
 	}
 }
 
-
 // prettier-ignore
 
 contract IGroup {
@@ -919,7 +906,6 @@ contract IGroup {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
-
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -959,7 +945,6 @@ contract AddressValidator {
 	}
 }
 
-
 contract UsingValidator {
 	AddressValidator private _validator;
 
@@ -971,7 +956,6 @@ contract UsingValidator {
 		return _validator;
 	}
 }
-
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -1082,7 +1066,6 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
-
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -1098,7 +1081,6 @@ contract UsingConfig {
 		return address(_config);
 	}
 }
-
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
@@ -1202,7 +1184,6 @@ contract EternalStorage {
 	}
 }
 
-
 contract UsingStorage is Ownable, Pausable {
 	address private _storage;
 
@@ -1240,7 +1221,6 @@ contract UsingStorage is Ownable, Pausable {
 	}
 }
 
-
 contract PropertyGroup is
 	UsingConfig,
 	UsingStorage,
@@ -1265,7 +1245,6 @@ contract PropertyGroup is
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 }
-
 
 contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
@@ -1457,7 +1436,6 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 			keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
 	}
 }
-
 
 contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;

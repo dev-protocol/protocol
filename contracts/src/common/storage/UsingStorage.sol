@@ -4,7 +4,6 @@ import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {EternalStorage} from "contracts/src/common/storage/EternalStorage.sol";
 
-
 contract UsingStorage is Ownable, Pausable {
 	address private _storage;
 

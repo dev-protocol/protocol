@@ -6,7 +6,6 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {VoteTimesStorage} from "contracts/src/vote/times/VoteTimesStorage.sol";
 
-
 contract VoteTimes is UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
 

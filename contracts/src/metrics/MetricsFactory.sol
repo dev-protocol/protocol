@@ -7,7 +7,6 @@ import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 
-
 contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 	event Create(address indexed _from, address _metrics);
 	event Destroy(address indexed _from, address _metrics);

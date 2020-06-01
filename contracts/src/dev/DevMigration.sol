@@ -5,7 +5,6 @@ import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.s
 // prettier-ignore
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 
-
 contract DevMigration {
 	address public legacy;
 	address public next;

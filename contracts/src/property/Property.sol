@@ -9,7 +9,6 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 
-
 contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	uint8 private constant _property_decimals = 18;

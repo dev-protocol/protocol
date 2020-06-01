@@ -6,7 +6,6 @@ import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 
-
 contract PropertyFactory is Pausable, UsingConfig {
 	event Create(address indexed _from, address _property);
 

@@ -11,7 +11,6 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 
-
 contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;

@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 contract IAllocator {
 	function allocate(address _metrics) external;
 

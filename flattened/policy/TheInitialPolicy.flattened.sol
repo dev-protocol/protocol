@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
  * checks.
@@ -168,7 +167,6 @@ library SafeMath {
 	}
 }
 
-
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -195,7 +193,6 @@ contract Context {
 		return msg.data;
 	}
 }
-
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -284,7 +281,6 @@ interface IERC20 {
 		uint256 value
 	);
 }
-
 
 /**
  * @dev Implementation of the {IERC20} interface.
@@ -564,7 +560,6 @@ contract ERC20 is Context, IERC20 {
 	}
 }
 
-
 contract Killable {
 	address payable public _owner;
 
@@ -577,7 +572,6 @@ contract Killable {
 		selfdestruct(_owner);
 	}
 }
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -660,7 +654,6 @@ contract Ownable is Context {
 	}
 }
 
-
 // prettier-ignore
 
 contract IGroup {
@@ -672,7 +665,6 @@ contract IGroup {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
-
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -712,7 +704,6 @@ contract AddressValidator {
 	}
 }
 
-
 contract UsingValidator {
 	AddressValidator private _validator;
 
@@ -724,7 +715,6 @@ contract UsingValidator {
 		return _validator;
 	}
 }
-
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -835,7 +825,6 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
-
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -851,7 +840,6 @@ contract UsingConfig {
 		return address(_config);
 	}
 }
-
 
 contract IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)
@@ -892,7 +880,6 @@ contract IPolicy {
 
 	function lockUpBlocks() external view returns (uint256);
 }
-
 
 contract TheInitialPolicy is IPolicy, UsingConfig {
 	using SafeMath for uint256;

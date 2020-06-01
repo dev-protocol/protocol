@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 contract Killable {
 	address payable public _owner;
 
@@ -13,7 +12,6 @@ contract Killable {
 		selfdestruct(_owner);
 	}
 }
-
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -40,7 +38,6 @@ contract Context {
 		return msg.data;
 	}
 }
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -120,7 +117,6 @@ contract Ownable is Context {
 		_owner = newOwner;
 	}
 }
-
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
@@ -222,7 +218,6 @@ contract EternalStorage {
 	}
 }
 
-
 contract UsingStorage is Ownable {
 	address private _storage;
 	modifier hasStorage() {
@@ -258,7 +253,6 @@ contract UsingStorage is Ownable {
 	}
 }
 
-
 // prettier-ignore
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
@@ -267,7 +261,6 @@ contract IGroup {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
-
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -307,7 +300,6 @@ contract AddressValidator {
 	}
 }
 
-
 contract UsingValidator {
 	AddressValidator private _validator;
 
@@ -319,7 +311,6 @@ contract UsingValidator {
 		return _validator;
 	}
 }
-
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -430,7 +421,6 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
-
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -446,7 +436,6 @@ contract UsingConfig {
 		return address(_config);
 	}
 }
-
 
 contract VoteTimesStorage is
 	UsingStorage,

@@ -9,7 +9,6 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {PolicySet} from "contracts/src/policy/PolicySet.sol";
 import {PolicyGroup} from "contracts/src/policy/PolicyGroup.sol";
 
-
 contract PolicyFactory is Pausable, UsingConfig, UsingValidator, Killable {
 	event Create(address indexed _from, address _policy, address _innerPolicy);
 

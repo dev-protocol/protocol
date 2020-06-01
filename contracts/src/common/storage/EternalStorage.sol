@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 contract EternalStorage {
 	address private currentOwner = msg.sender;
 

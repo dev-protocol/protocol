@@ -5,7 +5,6 @@ import {Allocator} from "contracts/src/allocator/Allocator.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
-
 contract MarketTest2 is IMarketBehavior, UsingConfig {
 	string public schema = "[]";
 	mapping(address => string) internal keys;
