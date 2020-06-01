@@ -22,7 +22,7 @@ const batchRandom = (): BigNumber[] => [
 	random(),
 ]
 
-contract('DIP1', ([deployer, user]) => {
+contract('DIP1', ([deployer]) => {
 	let dip1: Dip1Instance
 	let theInitialPolicy: TheInitialPolicyInstance
 
@@ -31,7 +31,7 @@ contract('DIP1', ([deployer, user]) => {
 		await dev.generateAddressConfig()
 		await dev.generateDev()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		dip1 = await artifacts.require('DIP1').new(await dev.addressConfig.token())
+		dip1 = await artifacts.require('DIP1').new(dev.addressConfig.address)
 		theInitialPolicy = await artifacts
 			.require('TheInitialPolicy')
 			.new(dev.addressConfig.address)
@@ -169,26 +169,6 @@ contract('DIP1', ([deployer, user]) => {
 			expect((await dip1[method]()).toString()).to.be.equal(
 				(await theInitialPolicy[method]()).toString()
 			)
-		})
-	})
-	describe('DIP1; updateTokenAddress', () => {
-		it('change token address', async () => {
-			const expected = '0xf6efbc6d4689dc0d90128b040d5c2cce49492bda'
-			const result = await dip1
-				.updateTokenAddress(expected)
-				.then(async () => dip1.token())
-			expect(result.toLowerCase()).to.be.equal(expected.toLowerCase())
-		})
-		it('should fail to change the address when sent from non-owner', async () => {
-			const before = await dip1.token()
-			const result = await dip1
-				.updateTokenAddress('0xf6efbc6d4689dc0d90128b040d5c2cce49492bda', {
-					from: user,
-				})
-				.catch((err) => err)
-			const after = await dip1.token()
-			expect(result).to.be.instanceOf(Error)
-			expect(before).to.be.equal(after)
 		})
 	})
 })
