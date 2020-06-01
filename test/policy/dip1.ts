@@ -4,9 +4,23 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
 
 const random = (): BigNumber =>
-	((f) => new BigNumber(f()).times(f()))((): string =>
+	((f) => new BigNumber(f()).times(f().slice(0, 1)))((): string =>
 		Math.random().toString().replace('0.', '')
 	)
+const batchRandom = (): BigNumber[] => [
+	random(),
+	random(),
+	random(),
+	random(),
+	random(),
+	random(),
+	random(),
+	random(),
+	random(),
+	random(),
+	random(),
+	random(),
+]
 
 contract('DIP1', ([deployer, user]) => {
 	let dip1: Dip1Instance
@@ -17,7 +31,7 @@ contract('DIP1', ([deployer, user]) => {
 		await dev.generateAddressConfig()
 		await dev.generateDev()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		dip1 = await artifacts.require('Dip1').new(await dev.addressConfig.token())
+		dip1 = await artifacts.require('DIP1').new(await dev.addressConfig.token())
 		theInitialPolicy = await artifacts
 			.require('TheInitialPolicy')
 			.new(dev.addressConfig.address)
@@ -26,18 +40,19 @@ contract('DIP1', ([deployer, user]) => {
 	describe('DIP1; rewards', () => {
 		it('rewards equals TheInitialPolicy', async () => {
 			const method = 'rewards'
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			const [a, b, c, d, e, f] = batchRandom()
+			expect((await dip1[method](a, b)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, b)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](c, d)).toString()).to.be.equal(
+				(await theInitialPolicy[method](c, d)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](e, f)).toString()).to.be.equal(
+				(await theInitialPolicy[method](e, f)).toString()
 			)
 		})
 	})
-	describe('DIP1; holdersShare equals TheInitialPolicy', () => {
+	describe('DIP1; holdersShare', () => {
 		it('Returns the reward that the Property holders can receive when the reward per Property and the number of locked-ups is passed', async () => {
 			const result = await dip1.holdersShare(1000000, 10000)
 			expect(result.toString()).to.be.equal('510000')
@@ -60,56 +75,60 @@ contract('DIP1', ([deployer, user]) => {
 	describe('DIP1; assetValue', () => {
 		it('assetValue equals TheInitialPolicy', async () => {
 			const method = 'assetValue'
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			const [a, b, c, d, e, f] = batchRandom()
+			expect((await dip1[method](a, b)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, b)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](c, d)).toString()).to.be.equal(
+				(await theInitialPolicy[method](c, d)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](e, f)).toString()).to.be.equal(
+				(await theInitialPolicy[method](e, f)).toString()
 			)
 		})
 	})
 	describe('DIP1; authenticationFee', () => {
 		it('authenticationFee equals TheInitialPolicy', async () => {
 			const method = 'authenticationFee'
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			const [a, b, c, d, e, f] = batchRandom()
+			expect((await dip1[method](a, b)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, b)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](c, d)).toString()).to.be.equal(
+				(await theInitialPolicy[method](c, d)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](e, f)).toString()).to.be.equal(
+				(await theInitialPolicy[method](e, f)).toString()
 			)
 		})
 	})
 	describe('DIP1; marketApproval', () => {
 		it('marketApproval equals TheInitialPolicy', async () => {
 			const method = 'marketApproval'
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			const [a, b, c, d, e, f] = batchRandom()
+			expect((await dip1[method](a, b)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, b)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](c, d)).toString()).to.be.equal(
+				(await theInitialPolicy[method](c, d)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](e, f)).toString()).to.be.equal(
+				(await theInitialPolicy[method](e, f)).toString()
 			)
 		})
 	})
 	describe('DIP1; policyApproval', () => {
 		it('policyApproval equals TheInitialPolicy', async () => {
 			const method = 'policyApproval'
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			const [a, b, c, d, e, f] = batchRandom()
+			expect((await dip1[method](a, b)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a, b)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](c, d)).toString()).to.be.equal(
+				(await theInitialPolicy[method](c, d)).toString()
 			)
-			expect((await dip1[method](random(), random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random(), random())).toString()
+			expect((await dip1[method](e, f)).toString()).to.be.equal(
+				(await theInitialPolicy[method](e, f)).toString()
 			)
 		})
 	})
@@ -132,14 +151,15 @@ contract('DIP1', ([deployer, user]) => {
 	describe('DIP1; abstentionPenalty', () => {
 		it('abstentionPenalty equals TheInitialPolicy', async () => {
 			const method = 'abstentionPenalty'
-			expect((await dip1[method](random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random())).toString()
+			const [a, b, c] = batchRandom()
+			expect((await dip1[method](a)).toString()).to.be.equal(
+				(await theInitialPolicy[method](a)).toString()
 			)
-			expect((await dip1[method](random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random())).toString()
+			expect((await dip1[method](b)).toString()).to.be.equal(
+				(await theInitialPolicy[method](b)).toString()
 			)
-			expect((await dip1[method](random())).toString()).to.be.equal(
-				(await theInitialPolicy[method](random())).toString()
+			expect((await dip1[method](c)).toString()).to.be.equal(
+				(await theInitialPolicy[method](c)).toString()
 			)
 		})
 	})
@@ -157,7 +177,7 @@ contract('DIP1', ([deployer, user]) => {
 			const result = await dip1
 				.updateTokenAddress(expected)
 				.then(async () => dip1.token())
-			expect(result).to.be.equal(expected)
+			expect(result.toLowerCase()).to.be.equal(expected.toLowerCase())
 		})
 		it('should fail to change the address when sent from non-owner', async () => {
 			const before = await dip1.token()
