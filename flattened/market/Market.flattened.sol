@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
  * checks.
@@ -163,7 +162,6 @@ library SafeMath {
 	}
 }
 
-
 contract Killable {
 	address payable public _owner;
 
@@ -176,7 +174,6 @@ contract Killable {
 		selfdestruct(_owner);
 	}
 }
-
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -203,7 +200,6 @@ contract Context {
 		return msg.data;
 	}
 }
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -284,7 +280,6 @@ contract Ownable is Context {
 	}
 }
 
-
 contract UsingValidator {
 	AddressValidator private _validator;
 
@@ -296,7 +291,6 @@ contract UsingValidator {
 		return _validator;
 	}
 }
-
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -407,7 +401,6 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
-
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -423,7 +416,6 @@ contract UsingConfig {
 		return address(_config);
 	}
 }
-
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -511,7 +503,6 @@ interface IERC20 {
 		uint256 value
 	);
 }
-
 
 /**
  * @dev Implementation of the {IERC20} interface.
@@ -784,7 +775,6 @@ contract ERC20 is Context, IERC20 {
 	}
 }
 
-
 /**
  * @dev Optional functions from the ERC20 standard.
  */
@@ -840,7 +830,6 @@ contract ERC20Detailed is IERC20 {
 	}
 }
 
-
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
 
@@ -850,7 +839,6 @@ contract IGroup {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
-
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -890,7 +878,6 @@ contract AddressValidator {
 	}
 }
 
-
 contract IAllocator {
 	function allocate(address _metrics) external;
 
@@ -923,7 +910,6 @@ contract IAllocator {
 		);
 }
 
-
 library Decimals {
 	using SafeMath for uint256;
 	uint120 private constant basisValue = 1000000000000000000;
@@ -946,7 +932,6 @@ library Decimals {
 	}
 }
 
-
 contract Metrics {
 	address public market;
 	address public property;
@@ -957,7 +942,6 @@ contract Metrics {
 		property = _property;
 	}
 }
-
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
@@ -1059,7 +1043,6 @@ contract EternalStorage {
 	}
 }
 
-
 contract UsingStorage is Ownable {
 	address private _storage;
 	modifier hasStorage() {
@@ -1094,7 +1077,6 @@ contract UsingStorage is Ownable {
 		EternalStorage(_storage).changeOwner(newOwner);
 	}
 }
-
 
 contract MetricsGroup is
 	UsingConfig,
@@ -1132,7 +1114,6 @@ contract MetricsGroup is
 		return keccak256(abi.encodePacked("_totalCount"));
 	}
 }
-
 
 contract VoteTimesStorage is
 	UsingStorage,
@@ -1183,7 +1164,6 @@ contract VoteTimesStorage is
 		return keccak256(abi.encodePacked("_voteTimesByProperty", _property));
 	}
 }
-
 
 contract VoteTimes is UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
@@ -1238,7 +1218,6 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 	}
 }
 
-
 /**
  * @title Roles
  * @dev Library for managing addresses assigned to a Role.
@@ -1277,7 +1256,6 @@ library Roles {
 		return role.bearer[account];
 	}
 }
-
 
 contract MinterRole is Context {
 	using Roles for Roles.Role;
@@ -1320,7 +1298,6 @@ contract MinterRole is Context {
 	}
 }
 
-
 /**
  * @dev Extension of {ERC20} that adds a set of accounts with the {MinterRole},
  * which have permission to mint (create) new tokens as they see fit.
@@ -1344,7 +1321,6 @@ contract ERC20Mintable is ERC20, MinterRole {
 		return true;
 	}
 }
-
 
 contract PauserRole is Context {
 	using Roles for Roles.Role;
@@ -1386,7 +1362,6 @@ contract PauserRole is Context {
 		emit PauserRemoved(account);
 	}
 }
-
 
 /**
  * @dev Contract module which allows children to implement an emergency stop
@@ -1455,7 +1430,6 @@ contract Pausable is Context, PauserRole {
 	}
 }
 
-
 contract PropertyGroup is
 	UsingConfig,
 	UsingStorage,
@@ -1479,7 +1453,6 @@ contract PropertyGroup is
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 }
-
 
 contract WithdrawStorage is
 	UsingStorage,
@@ -1674,7 +1647,6 @@ contract WithdrawStorage is
 	}
 }
 
-
 contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
 	using Decimals for uint256;
@@ -1805,7 +1777,6 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator, Killable {
 	}
 }
 
-
 contract VoteCounter is UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
 
@@ -1882,7 +1853,6 @@ contract VoteCounter is UsingConfig, UsingValidator, Killable {
 	}
 }
 
-
 contract IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
@@ -1922,7 +1892,6 @@ contract IPolicy {
 
 	function lockUpBlocks() external view returns (uint256);
 }
-
 
 contract Policy is Killable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
@@ -2035,7 +2004,6 @@ contract Policy is Killable, UsingConfig, UsingValidator {
 	}
 }
 
-
 contract MarketGroup is
 	UsingConfig,
 	UsingStorage,
@@ -2078,7 +2046,6 @@ contract MarketGroup is
 		return keccak256(abi.encodePacked("_count"));
 	}
 }
-
 
 contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 	using SafeMath for uint256;
@@ -2129,7 +2096,6 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 }
 
-
 contract PolicyGroup is
 	UsingConfig,
 	UsingStorage,
@@ -2162,7 +2128,6 @@ contract PolicyGroup is
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 }
-
 
 contract PolicyFactory is Pausable, UsingConfig, UsingValidator, Killable {
 	event Create(address indexed _from, address _policy, address _innerPolicy);
@@ -2206,7 +2171,6 @@ contract PolicyFactory is Pausable, UsingConfig, UsingValidator, Killable {
 	}
 }
 
-
 contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	uint8 private constant _decimals = 18;
 	uint256 private constant _supply = 10000000;
@@ -2243,7 +2207,6 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		devToken.transfer(_sender, _value);
 	}
 }
-
 
 contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	// solium-disable-next-line no-empty-blocks
@@ -2445,7 +2408,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 }
 
-
 // prettier-ignore
 contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
@@ -2643,7 +2605,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator, Killable {
 	}
 }
 
-
 contract AllocatorStorage is
 	UsingStorage,
 	UsingConfig,
@@ -2805,7 +2766,6 @@ contract AllocatorStorage is
 			);
 	}
 }
-
 
 contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
@@ -2991,7 +2951,6 @@ contract Allocator is Killable, UsingConfig, IAllocator, UsingValidator {
 	}
 }
 
-
 contract VoteCounterStorage is
 	UsingStorage,
 	UsingConfig,
@@ -3075,7 +3034,6 @@ contract VoteCounterStorage is
 	}
 }
 
-
 contract IMarket {
 	function calculate(
 		address _metrics,
@@ -3111,7 +3069,6 @@ contract IMarket {
 	function schema() external view returns (string memory);
 }
 
-
 contract IMarketBehavior {
 	string public schema;
 
@@ -3137,7 +3094,6 @@ contract IMarketBehavior {
 	) external returns (bool);
 }
 
-
 contract MetricsFactory is Pausable, UsingConfig, UsingValidator, Killable {
 	event Create(address indexed _from, address _metrics);
 
@@ -3155,7 +3111,6 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator, Killable {
 		return metricsAddress;
 	}
 }
-
 
 /**
  * @dev Extension of {ERC20} that allows token holders to destroy both their own
@@ -3179,7 +3134,6 @@ contract ERC20Burnable is Context, ERC20 {
 		_burnFrom(account, amount);
 	}
 }
-
 
 contract Dev is
 	ERC20Detailed,
@@ -3224,7 +3178,6 @@ contract Dev is
 		Lockup(config().lockup()).lockup(_from, _to, _amount);
 	}
 }
-
 
 contract Market is UsingConfig, IMarket, UsingValidator {
 	using SafeMath for uint256;

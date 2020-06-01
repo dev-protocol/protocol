@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
  * checks.
@@ -168,7 +167,6 @@ library SafeMath {
 	}
 }
 
-
 contract Killable {
 	address payable public _owner;
 
@@ -181,7 +179,6 @@ contract Killable {
 		selfdestruct(_owner);
 	}
 }
-
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -209,7 +206,6 @@ contract Context {
 		return msg.data;
 	}
 }
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -292,7 +288,6 @@ contract Ownable is Context {
 	}
 }
 
-
 // prettier-ignore
 
 contract IGroup {
@@ -304,7 +299,6 @@ contract IGroup {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
-
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -344,7 +338,6 @@ contract AddressValidator {
 	}
 }
 
-
 contract UsingValidator {
 	AddressValidator private _validator;
 
@@ -356,7 +349,6 @@ contract UsingValidator {
 		return _validator;
 	}
 }
-
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -467,7 +459,6 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
-
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -483,7 +474,6 @@ contract UsingConfig {
 		return address(_config);
 	}
 }
-
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -572,7 +562,6 @@ interface IERC20 {
 		uint256 value
 	);
 }
-
 
 /**
  * @dev Implementation of the {IERC20} interface.
@@ -852,7 +841,6 @@ contract ERC20 is Context, IERC20 {
 	}
 }
 
-
 // prettier-ignore
 
 /**
@@ -906,7 +894,6 @@ contract ERC20Detailed is IERC20 {
     }
 }
 
-
 /**
  * @title Roles
  * @dev Library for managing addresses assigned to a Role.
@@ -945,7 +932,6 @@ library Roles {
 		return role.bearer[account];
 	}
 }
-
 
 contract PauserRole is Context {
 	using Roles for Roles.Role;
@@ -989,7 +975,6 @@ contract PauserRole is Context {
 		emit PauserRemoved(account);
 	}
 }
-
 
 /**
  * @dev Contract module which allows children to implement an emergency stop
@@ -1061,7 +1046,6 @@ contract Pausable is Context, PauserRole {
 	}
 }
 
-
 contract IAllocator {
 	function allocate(address _metrics) external;
 
@@ -1095,7 +1079,6 @@ contract IAllocator {
 		);
 }
 
-
 library Decimals {
 	using SafeMath for uint256;
 	uint120 private constant basisValue = 1000000000000000000;
@@ -1119,7 +1102,6 @@ library Decimals {
 		return basisValue;
 	}
 }
-
 
 contract IMarket {
 	function authenticate(
@@ -1148,7 +1130,6 @@ contract IMarket {
 
 	function behavior() external view returns (address);
 }
-
 
 contract IMarketBehavior {
 	string public schema;
@@ -1181,7 +1162,6 @@ contract IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 }
-
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
@@ -1285,7 +1265,6 @@ contract EternalStorage {
 	}
 }
 
-
 contract UsingStorage is Ownable, Pausable {
 	address private _storage;
 
@@ -1323,7 +1302,6 @@ contract UsingStorage is Ownable, Pausable {
 	}
 }
 
-
 contract PropertyGroup is
 	UsingConfig,
 	UsingStorage,
@@ -1348,7 +1326,6 @@ contract PropertyGroup is
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 }
-
 
 contract IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)
@@ -1389,7 +1366,6 @@ contract IPolicy {
 
 	function lockUpBlocks() external view returns (uint256);
 }
-
 
 contract VoteTimesStorage is
 	UsingStorage,
@@ -1442,7 +1418,6 @@ contract VoteTimesStorage is
 		return keccak256(abi.encodePacked("_voteTimesByProperty", _property));
 	}
 }
-
 
 contract VoteTimes is UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;
@@ -1500,7 +1475,6 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 	}
 }
 
-
 contract MarketGroup is
 	UsingConfig,
 	UsingStorage,
@@ -1544,7 +1518,6 @@ contract MarketGroup is
 		return keccak256(abi.encodePacked("_count"));
 	}
 }
-
 
 contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 	using SafeMath for uint256;
@@ -1597,7 +1570,6 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 }
 
-
 contract PolicyGroup is
 	UsingConfig,
 	UsingStorage,
@@ -1632,7 +1604,6 @@ contract PolicyGroup is
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 }
-
 
 contract PolicyFactory is Pausable, UsingConfig, UsingValidator, Killable {
 	event Create(address indexed _from, address _policy, address _innerPolicy);
@@ -1677,7 +1648,6 @@ contract PolicyFactory is Pausable, UsingConfig, UsingValidator, Killable {
 		policySet.addSet(_currentPolicyAddress);
 	}
 }
-
 
 contract Policy is Killable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
@@ -1792,7 +1762,6 @@ contract Policy is Killable, UsingConfig, UsingValidator {
 	}
 }
 
-
 contract Metrics {
 	address public market;
 	address public property;
@@ -1803,7 +1772,6 @@ contract Metrics {
 		property = _property;
 	}
 }
-
 
 contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	using SafeMath for uint256;
@@ -1852,7 +1820,6 @@ contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	}
 }
 
-
 contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 	event Create(address indexed _from, address _metrics);
 	event Destroy(address indexed _from, address _metrics);
@@ -1884,7 +1851,6 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 		emit Destroy(msg.sender, _metrics);
 	}
 }
-
 
 // prettier-ignore
 
@@ -1928,7 +1894,6 @@ contract MinterRole is Context {
     }
 }
 
-
 /**
  * @dev Extension of {ERC20} that adds a set of accounts with the {MinterRole},
  * which have permission to mint (create) new tokens as they see fit.
@@ -1952,7 +1917,6 @@ contract ERC20Mintable is ERC20, MinterRole {
 		return true;
 	}
 }
-
 
 contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
@@ -2154,7 +2118,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 			);
 	}
 }
-
 
 contract Lockup is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
@@ -2385,7 +2348,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	}
 }
 
-
 // prettier-ignore
 // prettier-ignore
 // prettier-ignore
@@ -2412,7 +2374,6 @@ contract ERC20Burnable is Context, ERC20 {
         _burnFrom(account, amount);
     }
 }
-
 
 contract Dev is
 	ERC20Detailed,
@@ -2457,7 +2418,6 @@ contract Dev is
 		Lockup(config().lockup()).lockup(_from, _to, _amount);
 	}
 }
-
 
 contract Market is UsingConfig, IMarket, UsingValidator {
 	using SafeMath for uint256;
@@ -2610,7 +2570,6 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		return IMarketBehavior(behavior).schema();
 	}
 }
-
 
 // prettier-ignore
 
@@ -2805,7 +2764,6 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 }
 
-
 contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
@@ -2937,7 +2895,6 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		return WithdrawStorage(config().withdrawStorage());
 	}
 }
-
 
 contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
@@ -3091,7 +3048,6 @@ contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
 		return keccak256(abi.encodePacked("_pendingLastBlockNumber", _addr));
 	}
 }
-
 
 contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
@@ -3299,7 +3255,6 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	}
 }
 
-
 contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	uint8 private constant _property_decimals = 18;
@@ -3372,7 +3327,6 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		devToken.transfer(_sender, _value);
 	}
 }
-
 
 // prettier-ignore
 
@@ -3450,7 +3404,6 @@ contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
 		return keccak256(abi.encodePacked(_sender, "_oppositeVoteCount"));
 	}
 }
-
 
 contract VoteCounter is UsingConfig, UsingValidator, Killable {
 	using SafeMath for uint256;

@@ -8,7 +8,6 @@ import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {MarketGroup} from "contracts/src/market/MarketGroup.sol";
 
-
 contract MarketFactory is Pausable, UsingConfig, UsingValidator, Killable {
 	event Create(address indexed _from, address _market);
 

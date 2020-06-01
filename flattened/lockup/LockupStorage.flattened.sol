@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -27,7 +26,6 @@ contract Context {
 		return msg.data;
 	}
 }
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -110,7 +108,6 @@ contract Ownable is Context {
 	}
 }
 
-
 /**
  * @title Roles
  * @dev Library for managing addresses assigned to a Role.
@@ -149,7 +146,6 @@ library Roles {
 		return role.bearer[account];
 	}
 }
-
 
 contract PauserRole is Context {
 	using Roles for Roles.Role;
@@ -193,7 +189,6 @@ contract PauserRole is Context {
 		emit PauserRemoved(account);
 	}
 }
-
 
 /**
  * @dev Contract module which allows children to implement an emergency stop
@@ -264,7 +259,6 @@ contract Pausable is Context, PauserRole {
 		emit Unpaused(_msgSender());
 	}
 }
-
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
@@ -368,7 +362,6 @@ contract EternalStorage {
 	}
 }
 
-
 contract UsingStorage is Ownable, Pausable {
 	address private _storage;
 
@@ -406,7 +399,6 @@ contract UsingStorage is Ownable, Pausable {
 	}
 }
 
-
 contract Killable {
 	address payable public _owner;
 
@@ -420,7 +412,6 @@ contract Killable {
 	}
 }
 
-
 // prettier-ignore
 
 contract IGroup {
@@ -432,7 +423,6 @@ contract IGroup {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
-
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -472,7 +462,6 @@ contract AddressValidator {
 	}
 }
 
-
 contract UsingValidator {
 	AddressValidator private _validator;
 
@@ -484,7 +473,6 @@ contract UsingValidator {
 		return _validator;
 	}
 }
-
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -595,7 +583,6 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
-
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -611,7 +598,6 @@ contract UsingConfig {
 		return address(_config);
 	}
 }
-
 
 contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	// solium-disable-next-line no-empty-blocks

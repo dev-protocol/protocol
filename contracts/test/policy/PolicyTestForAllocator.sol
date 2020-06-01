@@ -2,7 +2,6 @@ pragma solidity ^0.5.0;
 
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
-
 contract PolicyTestForAllocator is IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)
 		external

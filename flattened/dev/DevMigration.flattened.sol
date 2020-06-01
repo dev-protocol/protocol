@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-
 // prettier-ignore
 /*
  * @dev Provides information about the current execution context, including the
@@ -25,7 +24,6 @@ contract Context {
 		return msg.data;
 	}
 }
-
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -113,7 +111,6 @@ interface IERC20 {
 		uint256 value
 	);
 }
-
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -276,7 +273,6 @@ library SafeMath {
 		return a % b;
 	}
 }
-
 
 /**
  * @dev Implementation of the {IERC20} interface.
@@ -549,7 +545,6 @@ contract ERC20 is Context, IERC20 {
 	}
 }
 
-
 /**
  * @title Roles
  * @dev Library for managing addresses assigned to a Role.
@@ -588,7 +583,6 @@ library Roles {
 		return role.bearer[account];
 	}
 }
-
 
 contract MinterRole is Context {
 	using Roles for Roles.Role;
@@ -631,7 +625,6 @@ contract MinterRole is Context {
 	}
 }
 
-
 /**
  * @dev Extension of {ERC20} that adds a set of accounts with the {MinterRole},
  * which have permission to mint (create) new tokens as they see fit.
@@ -656,7 +649,6 @@ contract ERC20Mintable is ERC20, MinterRole {
 	}
 }
 
-
 // prettier-ignore
 /**
  * @dev Extension of {ERC20} that allows token holders to destroy both their own
@@ -679,7 +671,6 @@ contract ERC20Burnable is Context, ERC20 {
 		_burnFrom(account, amount);
 	}
 }
-
 
 contract DevMigration {
 	address public legacy;

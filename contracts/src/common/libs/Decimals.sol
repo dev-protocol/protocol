@@ -2,7 +2,6 @@ pragma solidity ^0.5.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
-
 library Decimals {
 	using SafeMath for uint256;
 	uint120 private constant basisValue = 1000000000000000000;
