@@ -2,20 +2,31 @@ pragma solidity ^0.5.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
-contract TheInitialPolicy is IPolicy, UsingConfig {
+contract DIP1 is IPolicy, Ownable {
 	using SafeMath for uint256;
 	uint256 public marketVotingBlocks = 525600;
 	uint256 public policyVotingBlocks = 525600;
 	uint256 public lockUpBlocks = 175200;
+	address public token;
 
 	uint256 private constant basis = 10000000000000000000000000;
 	uint256 private constant power_basis = 10000000000;
 	uint256 private constant mint_per_block_and_aseet = 250000000000000;
 
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _token) public {
+		_updateTokenAddress(_token);
+	}
+
+	function _updateTokenAddress(address _token) private {
+		token = _token;
+	}
+
+	function updateTokenAddress(address _token) external onlyOwner {
+		_updateTokenAddress(_token);
+	}
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
@@ -23,7 +34,7 @@ contract TheInitialPolicy is IPolicy, UsingConfig {
 		returns (uint256)
 	{
 		uint256 max = _assets.mul(mint_per_block_and_aseet);
-		uint256 t = ERC20(config().token()).totalSupply();
+		uint256 t = ERC20(token).totalSupply();
 		uint256 s = (_lockups.mul(basis)).div(t);
 		uint256 _d = basis.sub(s);
 		uint256 _p = (
