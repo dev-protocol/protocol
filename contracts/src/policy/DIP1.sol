@@ -64,7 +64,7 @@ contract DIP1 is IPolicy, Ownable {
 		view
 		returns (uint256)
 	{
-		return _lockups > 0 ? (_reward.mul(95)).div(100) : _reward;
+		return _lockups > 0 ? (_reward.mul(51)).div(100) : _reward;
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)
