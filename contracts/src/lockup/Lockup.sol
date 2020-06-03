@@ -226,6 +226,16 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		view
 		returns (bool)
 	{
+		// The behavior is changing because of a patch for DIP3.
+		// uint256 blockNumber = getStorage().getWithdrawalStatus(
+		// 	_property,
+		// 	_from
+		// );
+		// if (blockNumber == 0) {
+		// 	return false;
+		// }
+		// return blockNumber <= block.number;
+
 		uint256 blockNumber = getStorage().getWithdrawalStatus(
 			_property,
 			_from
@@ -233,7 +243,14 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		if (blockNumber == 0) {
 			return false;
 		}
-		return blockNumber <= block.number;
+		if (blockNumber <= block.number) {
+			return true;
+		} else {
+			if (Policy(config().policy()).lockUpBlocks() == 1) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	function getStorage() private view returns (LockupStorage) {
