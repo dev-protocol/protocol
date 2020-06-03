@@ -4,6 +4,7 @@ import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
 contract PolicyTestForAllocator is IPolicy {
 	uint256 _lockUpBlocks = 1;
+
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view
@@ -79,5 +80,4 @@ contract PolicyTestForAllocator is IPolicy {
 	function setLockUpBlocks(uint256 _blocks) public {
 		_lockUpBlocks = _blocks;
 	}
-
 }
