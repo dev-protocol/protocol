@@ -96,6 +96,23 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
+		describe('AllocatorStorage; setWaitUntilAllocatable, getWaitUntilAllocatable', () => {
+			it('Can get setted value.', async () => {
+				await dev.allocatorStorage.setWaitUntilAllocatable(1000000, {
+					from: allocator,
+				})
+				const result = await dev.allocatorStorage.getWaitUntilAllocatable()
+				expect(result.toNumber()).to.be.equal(1000000)
+			})
+			it('Cannot rewrite data from other than allocator.', async () => {
+				const result = await dev.allocatorStorage
+					.setWaitUntilAllocatable(1000000, {
+						from: dummyAllocator,
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
 		describe('AllocatorStorage; pause, unpause', () => {
 			it('if owner execute pause method, owner cannot use set function.', async () => {
 				await dev.allocatorStorage.pause()

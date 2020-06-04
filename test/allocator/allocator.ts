@@ -557,11 +557,10 @@ contract('Allocator', ([deployer, user1]) => {
 			validatePauseOnlyOwnerErrorMessage(res)
 		})
 	})
-	describe('Allocator; allocatable', () => {
+	describe.only('Allocator; allocatable', () => {
 		it('can get whether allocate can run or not.', async () => {
 			const [dev, , metrics] = await init()
-			const waitBlockNumber = await dev.allocator.wait_allocate()
-			await mine(waitBlockNumber.toNumber())
+			await dev.allocator.setWaitUntilAllocatable(3)
 			let allocatable = await dev.allocator.allocatable(metrics.address)
 			expect(allocatable).to.be.equal(true)
 			await dev.allocator.allocate(metrics.address)
@@ -571,7 +570,7 @@ contract('Allocator', ([deployer, user1]) => {
 				.allocate(metrics.address)
 				.catch((err: Error) => err)
 			validateErrorMessage(res, 'can not allocate yet')
-			await mine(waitBlockNumber.toNumber())
+			await mine(3)
 			allocatable = await dev.allocator.allocatable(metrics.address)
 			expect(allocatable).to.be.equal(true)
 		})

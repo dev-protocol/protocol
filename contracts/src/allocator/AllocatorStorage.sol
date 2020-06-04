@@ -155,4 +155,29 @@ contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
 	{
 		return keccak256(abi.encodePacked("_pendingLastBlockNumber", _addr));
 	}
+
+	// waitUntilAllocatable
+	function setWaitUntilAllocatable(uint256 _blockNumber)
+		external
+	{
+		addressValidator().validateAddress(msg.sender, config().allocator());
+
+		eternalStorage().setUint(getWaitUntilAllocatableKey(), _blockNumber);
+	}
+
+	function getWaitUntilAllocatable()
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getWaitUntilAllocatableKey());
+	}
+
+	function getWaitUntilAllocatableKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_waitUntilAllocatable"));
+	}
 }
