@@ -1,5 +1,9 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {MetricsInstance, PropertyInstance} from '../../types/truffle-contracts'
+import {
+	MetricsInstance,
+	PropertyInstance,
+	PolicyTestForAllocatorInstance,
+} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
@@ -12,7 +16,12 @@ import {WEB3_URI} from '../test-lib/const'
 
 contract('LockupTest', ([deployer, user1]) => {
 	const init = async (): Promise<
-		[DevProtocolInstance, MetricsInstance, PropertyInstance]
+		[
+			DevProtocolInstance,
+			MetricsInstance,
+			PropertyInstance,
+			PolicyTestForAllocatorInstance
+		]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
@@ -67,7 +76,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			artifacts.require('Metrics').at(metricsAddress),
 		])
 		await dev.dev.addMinter(dev.lockup.address)
-		return [dev, metrics, property]
+		return [dev, metrics, property, policy]
 	}
 
 	const err = (error: Error): Error => error
@@ -235,6 +244,54 @@ contract('LockupTest', ([deployer, user1]) => {
 			await dev.lockup.withdraw(property.address)
 			lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
 			expect(lockedupAllAmount.toFixed()).to.be.equal('0')
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.toFixed()
+			)
+		})
+		// Patch for DIP3
+		it('should fail to withdraw when not enable DIP3 and block is small', async () => {
+			const [dev, , property, policy] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			// Disable DIP3
+			await policy.setLockUpBlocks(10)
+
+			await dev.dev.deposit(property.address, 10000)
+			await dev.lockup.cancel(property.address)
+			const res = await dev.lockup.withdraw(property.address).catch(err)
+
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			expect(afterBalance.toFixed()).to.be.equal(
+				beforeBalance.minus(10000).toFixed()
+			)
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.toFixed()
+			)
+			validateErrorMessage(res, 'waiting for release')
+		})
+		it('can withdraw when enabling DIP3', async () => {
+			const [dev, , property, policy] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			// Disable DIP3
+			await policy.setLockUpBlocks(10)
+
+			await dev.dev.deposit(property.address, 10000)
+
+			// Enable DIP3
+			await policy.setLockUpBlocks(1)
+
+			await dev.lockup.cancel(property.address)
+			await dev.lockup.withdraw(property.address)
+
 			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
