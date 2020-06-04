@@ -45,10 +45,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 
 	function allocate(address _metrics) external {
 		addressValidator().validateGroup(_metrics, config().metricsGroup());
-		require(
-			allocatable(_metrics),
-			"can not allocate yet"
-		);
+		require(allocatable(_metrics), "can not allocate yet");
 
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
@@ -62,7 +59,9 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	}
 
 	function allocatable(address _metrics) public view returns (bool) {
-		uint256 latestBlockNumber = getStorage().getPendingLastBlockNumber(_metrics);
+		uint256 latestBlockNumber = getStorage().getPendingLastBlockNumber(
+			_metrics
+		);
 		uint256 differenceBlockNumber = block.number.sub(latestBlockNumber);
 		return differenceBlockNumber >= wait_allocate;
 	}
