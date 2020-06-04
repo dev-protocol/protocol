@@ -38,12 +38,17 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	);
 
 	uint64 public constant basis = 1000000000000000000;
+	uint64 public constant wait_allocate = 11520;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function allocate(address _metrics) external {
 		addressValidator().validateGroup(_metrics, config().metricsGroup());
+		require(
+			allocatable(_metrics),
+			"can not allocate yet"
+		);
 
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
@@ -54,6 +59,12 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
+	}
+
+	function allocatable(address _metrics) public view returns (bool) {
+		uint256 latestBlockNumber = getStorage().getPendingLastBlockNumber(_metrics);
+		uint256 differenceBlockNumber = block.number.sub(latestBlockNumber);
+		return differenceBlockNumber >= wait_allocate;
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) external {
