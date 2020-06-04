@@ -557,7 +557,7 @@ contract('Allocator', ([deployer, user1]) => {
 			validatePauseOnlyOwnerErrorMessage(res)
 		})
 	})
-	describe.only('Allocator; allocatable', () => {
+	describe('Allocator; allocatable', () => {
 		it('can get whether allocate can run or not.', async () => {
 			const [dev, , metrics] = await init()
 			const waitBlockNumber = await dev.allocator.wait_allocate()
