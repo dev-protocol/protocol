@@ -56,7 +56,10 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		);
 	}
 
-	function setWaitUntilAllocatable(uint256 _waitUntilAllocatable) external onlyPauser {
+	function setWaitUntilAllocatable(uint256 _waitUntilAllocatable)
+		external
+		onlyPauser
+	{
 		getStorage().setWaitUntilAllocatable(_waitUntilAllocatable);
 	}
 
@@ -170,7 +173,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		uint256 latestBlockNumber = getStorage().getPendingLastBlockNumber(
 			_metrics
 		);
-		if (latestBlockNumber == 0){
+		if (latestBlockNumber == 0) {
 			return true;
 		}
 		uint256 differenceBlockNumber = block.number.sub(latestBlockNumber);
