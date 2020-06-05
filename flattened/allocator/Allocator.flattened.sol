@@ -1333,12 +1333,12 @@ contract PropertyGroup is
 	}
 }
 
-contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
+contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	//AllValue
-	function setAllValue(uint256 _value) external returns (uint256) {
+	function setAllValue(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getAllValueKey();
@@ -1359,7 +1359,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 		address _property,
 		address _sender,
 		uint256 _value
-	) external returns (uint256) {
+	) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getValueKey(_property, _sender);
@@ -1384,10 +1384,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//PropertyValue
-	function setPropertyValue(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setPropertyValue(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		bytes32 key = getPropertyValueKey(_property);
@@ -1444,10 +1441,7 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator, Killable {
 	}
 
 	//InterestPrice
-	function setInterestPrice(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setInterestPrice(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(getInterestPriceKey(_property), _value);
@@ -1650,12 +1644,7 @@ contract VoteTimes is UsingConfig, UsingValidator, Killable {
 
 // prettier-ignore
 
-contract VoteCounterStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -1696,10 +1685,7 @@ contract VoteCounterStorage is
 		return eternalStorage().getUint(getAgreeVoteCountKey(_sender));
 	}
 
-	function setAgreeCount(address _sender, uint256 count)
-		external
-		returns (uint256)
-	{
+	function setAgreeCount(address _sender, uint256 count) external {
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		eternalStorage().setUint(getAgreeVoteCountKey(_sender), count);
@@ -1718,10 +1704,7 @@ contract VoteCounterStorage is
 		return eternalStorage().getUint(getOppositeVoteCountKey(_sender));
 	}
 
-	function setOppositeCount(address _sender, uint256 count)
-		external
-		returns (uint256)
-	{
+	function setOppositeCount(address _sender, uint256 count) external {
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		eternalStorage().setUint(getOppositeVoteCountKey(_sender), count);
@@ -2353,6 +2336,16 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		view
 		returns (bool)
 	{
+		// The behavior is changing because of a patch for DIP3.
+		// uint256 blockNumber = getStorage().getWithdrawalStatus(
+		// 	_property,
+		// 	_from
+		// );
+		// if (blockNumber == 0) {
+		// 	return false;
+		// }
+		// return blockNumber <= block.number;
+
 		uint256 blockNumber = getStorage().getWithdrawalStatus(
 			_property,
 			_from
@@ -2360,7 +2353,14 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		if (blockNumber == 0) {
 			return false;
 		}
-		return blockNumber <= block.number;
+		if (blockNumber <= block.number) {
+			return true;
+		} else {
+			if (Policy(config().policy()).lockUpBlocks() == 1) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	function getStorage() private view returns (LockupStorage) {
@@ -2370,7 +2370,8 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 }
 
 contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
-	uint8 private constant _decimals = 18;
+	using SafeMath for uint256;
+	uint8 private constant _property_decimals = 18;
 	uint256 private constant _supply = 10000000000000000000000000;
 	address public author;
 
@@ -2379,7 +2380,11 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		address _own,
 		string memory _name,
 		string memory _symbol
-	) public UsingConfig(_config) ERC20Detailed(_name, _symbol, _decimals) {
+	)
+		public
+		UsingConfig(_config)
+		ERC20Detailed(_name, _symbol, _property_decimals)
+	{
 		addressValidator().validateAddress(
 			msg.sender,
 			config().propertyFactory()
@@ -2399,6 +2404,34 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 			_to
 		);
 		_transfer(msg.sender, _to, _value);
+		return true;
+	}
+
+	function transferFrom(
+		address _from,
+		address _to,
+		uint256 _value
+	) public returns (bool) {
+		addressValidator().validateIllegalAddress(_from);
+		addressValidator().validateIllegalAddress(_to);
+		require(_value != 0, "illegal transfer value");
+
+		Allocator(config().allocator()).beforeBalanceChange(
+			address(this),
+			_from,
+			_to
+		);
+		_transfer(_from, _to, _value);
+		uint256 allowanceAmount = allowance(_from, msg.sender);
+		_approve(
+			_from,
+			msg.sender,
+			allowanceAmount.sub(
+				_value,
+				"ERC20: transfer amount exceeds allowance"
+			)
+		);
+		return true;
 	}
 
 	function withdraw(address _sender, uint256 _value) external {
@@ -2784,12 +2817,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 
 // prettier-ignore
 
-contract WithdrawStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
+contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -2817,10 +2845,7 @@ contract WithdrawStorage is
 	}
 
 	// CumulativePrice
-	function setCumulativePrice(address _property, uint256 _value)
-		external
-		returns (uint256)
-	{
+	function setCumulativePrice(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
@@ -3266,6 +3291,21 @@ contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
 	{
 		return keccak256(abi.encodePacked("_pendingLastBlockNumber", _addr));
 	}
+
+	// waitUntilAllocatable
+	function setWaitUntilAllocatable(uint256 _blockNumber) external {
+		addressValidator().validateAddress(msg.sender, config().allocator());
+
+		eternalStorage().setUint(getWaitUntilAllocatableKey(), _blockNumber);
+	}
+
+	function getWaitUntilAllocatable() external view returns (uint256) {
+		return eternalStorage().getUint(getWaitUntilAllocatableKey());
+	}
+
+	function getWaitUntilAllocatableKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_waitUntilAllocatable"));
+	}
 }
 
 contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
@@ -3295,7 +3335,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function allocate(address _metrics) external {
-		addressValidator().validateGroup(_metrics, config().metricsGroup());
+		require(allocatable(_metrics), "can not allocate yet");
 
 		validateTargetPeriod(_metrics);
 		address market = Metrics(_metrics).market();
@@ -3306,6 +3346,13 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			getLastAllocationBlockNumber(_metrics),
 			block.number
 		);
+	}
+
+	function setWaitUntilAllocatable(uint256 _waitUntilAllocatable)
+		external
+		onlyPauser
+	{
+		getStorage().setWaitUntilAllocatable(_waitUntilAllocatable);
 	}
 
 	function calculatedCallback(address _metrics, uint256 _value) external {
@@ -3410,6 +3457,20 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		returns (uint256)
 	{
 		return Withdraw(config().withdraw()).getRewardsAmount(_property);
+	}
+
+	function allocatable(address _metrics) public view returns (bool) {
+		addressValidator().validateGroup(_metrics, config().metricsGroup());
+
+		uint256 latestBlockNumber = getStorage().getPendingLastBlockNumber(
+			_metrics
+		);
+		if (latestBlockNumber == 0) {
+			return true;
+		}
+		uint256 differenceBlockNumber = block.number.sub(latestBlockNumber);
+		uint256 waitUntilAllocatable = getStorage().getWaitUntilAllocatable();
+		return differenceBlockNumber >= waitUntilAllocatable;
 	}
 
 	function allocation(
