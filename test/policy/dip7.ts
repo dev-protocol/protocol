@@ -22,7 +22,7 @@ const batchRandom = (): BigNumber[] => [
 	random(),
 ]
 
-contract('DIP3', ([deployer]) => {
+contract('DIP7', ([deployer]) => {
 	let dip7: Dip7Instance
 	let dip3: Dip1Instance
 
@@ -61,8 +61,16 @@ contract('DIP3', ([deployer]) => {
 			const expected = rewards(stake, new BigNumber(1))
 			expect(result.toString()).to.be.equal(expected.toString())
 		})
+		it('Returns 0.00012 when zero staked and one asset', async () => {
+			const result = await dip7.rewards(0, 1)
+			expect(result.toString()).to.be.equal('120000000000000')
+			expect(
+				new BigNumber(result.toString()).div(new BigNumber(1e18)).toString()
+			).to.be.equal('0.00012')
+		})
 		it('Depends staking rate, decrease the impact of assets', async () => {
 			const assets = new BigNumber(2000)
+			const natural = (i: BigNumber): BigNumber => i.div(new BigNumber(1e18))
 			const per1010 = new BigNumber(1e18).times(1010000)
 			const per2170 = new BigNumber(1e18).times(2170000)
 			const per9560 = new BigNumber(1e18).times(9560000)
@@ -73,6 +81,9 @@ contract('DIP3', ([deployer]) => {
 			expect(result1.toString()).to.be.equal('108206904907283965')
 			expect(result2.toString()).to.be.equal('44325693373049001')
 			expect(result3.toString()).to.be.equal('16144344268800')
+			expect(natural(result1).toString()).to.be.equal('0.108206904907283965')
+			expect(natural(result2).toString()).to.be.equal('0.044325693373049001')
+			expect(natural(result3).toString()).to.be.equal('0.0000161443442688')
 			expect(rewards(per1010, assets).toString()).to.be.equal(
 				'108206904907283965'
 			)
@@ -83,6 +94,7 @@ contract('DIP3', ([deployer]) => {
 		})
 		it('Will be correct curve', async () => {
 			const one = new BigNumber(1)
+			const natural = (i: BigNumber): BigNumber => i.div(new BigNumber(1e18))
 			const per199 = new BigNumber(1e18).times(1990000)
 			const per200 = new BigNumber(1e18).times(2000000)
 			const per201 = new BigNumber(1e18).times(2010000)
@@ -93,6 +105,9 @@ contract('DIP3', ([deployer]) => {
 			expect(result1.toString()).to.be.equal('25361592517898')
 			expect(result2.toString()).to.be.equal('25165824000000')
 			expect(result3.toString()).to.be.equal('24977825272313')
+			expect(natural(result1).toString()).to.be.equal('0.000025361592517898')
+			expect(natural(result2).toString()).to.be.equal('0.000025165824')
+			expect(natural(result3).toString()).to.be.equal('0.000024977825272313')
 			expect(rewards(per199, one).toString()).to.be.equal('25361592517898')
 			expect(rewards(per200, one).toString()).to.be.equal('25165824000000')
 			expect(rewards(per201, one).toString()).to.be.equal('24977825272313')
