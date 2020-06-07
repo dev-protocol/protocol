@@ -112,6 +112,7 @@ contract('Allocator', ([deployer, user1]) => {
 			const behavior = await market
 				.behavior()
 				.then((x) => artifacts.require('MarketTest1').at(x))
+			await dev.allocator.setWaitUntilAllocatable(5)
 			await behavior.changeAsynchronousMode(true)
 			await dev.allocator.allocate(metrics.address)
 			await behavior.calculated()
@@ -170,12 +171,15 @@ contract('Allocator', ([deployer, user1]) => {
 				const [dev, market, metrics] = await init()
 				const behavior = await getMarketBehavior(market)
 				await dev.allocator.allocate(metrics.address)
-				const baseBlock = await dev.allocatorStorage.getBaseBlockNumber()
+				// eslint-disable-next-line no-undef
+				const fromBlock = await web3.eth.getBlockNumber()
+				const waitUntilAllocatable = await dev.allocatorStorage.getWaitUntilAllocatable()
+				const lastBlock = fromBlock - waitUntilAllocatable.toNumber()
 				const res = await getEventValue(behavior, WEB3_URI)(
 					'LogCalculate',
 					'_lastBlock'
 				)
-				expect(res.toString()).to.be.equal(baseBlock.toString())
+				expect(res.toString()).to.be.equal(lastBlock.toString())
 			})
 
 			it('The second argument is the block number of the end of the abstention penalty if the Metrics linked Property was the targeted of the abstention penalty', async () => {
