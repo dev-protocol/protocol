@@ -227,13 +227,9 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		returns (uint256)
 	{
 		uint256 blockNumber = getStorage().getLastBlockNumber(_metrics);
-		uint256 baseBlockNumber = getStorage().getBaseBlockNumber();
-		if (baseBlockNumber == 0) {
-			getStorage().setBaseBlockNumber(block.number);
-		}
 		uint256 lastAllocationBlockNumber = blockNumber > 0
 			? blockNumber
-			: getStorage().getBaseBlockNumber();
+			: block.number.sub(getStorage().getWaitUntilAllocatable());
 		return lastAllocationBlockNumber;
 	}
 
