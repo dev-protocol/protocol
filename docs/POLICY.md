@@ -1,17 +1,17 @@
-# Policy proposal
-
-This proposal is the first policy of the Dev Protocol.
+# Current Policy
 
 All codes in this document are pseudo code for explanation.
 
 ## rewards
+
+This policy has been enabled by [DIP7](https://github.com/dev-protocol/DIPs/issues/7).
 
 The total reward for a per block called `rewards` is determined as follows.
 
 - More lockups, less rewards.
 - More assets, more rewards.
 
-As lockups increase, rewards decrease, and inflation rates decrease. As assets increase, rewards increase and inflation rates increase. The deflationary trend makes it more rapidly by lockup increases. Ideally, an increase in assets should be accompanied by lockups, so an increase in assets should be a factor in increasing the inflation rate. The maximum value is 0.00025 per block and an asset.
+As lockups increase, rewards decrease, and inflation rates decrease. As assets increase, rewards increase, and inflation rates increase. The deflationary trend makes it more rapidly by lockup increases. Ideally, an increase in assets should be accompanied by lockups, so an increase in assets should be a factor in increasing the inflation rate. But as lockups increase, the less impact the increase in assets will have. The maximum value is 0.00012 per block and an asset.
 
 The following formula illustrates the basic concept:
 
@@ -21,22 +21,26 @@ The number of reward vs. staking ratio will as follows curve:
 
 ![Reward curve](https://raw.githubusercontent.com/dev-protocol/protocol/master/public/asset/policy/staking-ratio-vs-mint-amount.svg?sanitize=true)
 
+And here's simulation with Spreadsheets: https://docs.google.com/spreadsheets/d/1LTksSLaK_Q0IiZW2GHmvlTPzXVJe7fis-53X192YTtE/edit?usp=sharing
+
 In Solidity:
 
 ```solidity
 using SafeMath for uint256;
 uint120 private constant basis = 10000000000000000000000000;
 uint120 private constant power_basis = 10000000000;
-uint64 private constant mint_per_block_and_aseet = 250000000000000;
+uint64 private constant mint_per_block_and_aseet = 120000000000000;
 
-function rewards(uint256 _lockups, uint256 _assets) external view returns(uint256) {
-	uint256 max = _assets.mul(mint_per_block_and_aseet);
+function rewards(uint256 _lockups, uint256 _assets) external view returns (uint256) {
 	uint256 t = ERC20(config().token()).totalSupply();
 	uint256 s = (_lockups.mul(basis)).div(t);
+	uint256 assets = _assets.mul(basis.sub(s));
+	uint256 max = assets.mul(mint_per_block_and_aseet);
 	uint256 _d = basis.sub(s);
 	uint256 _p = (
 		(power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))
-	).div(2);
+	)
+		.div(2);
 	uint256 p = _p.div(power_basis);
 	uint256 rp = p.add(1);
 	uint256 f = _p.sub(p.mul(power_basis));
@@ -51,18 +55,20 @@ function rewards(uint256 _lockups, uint256 _assets) external view returns(uint25
 	uint256 g = ((d1.sub(d2)).mul(f)).div(power_basis);
 	uint256 d = d1.sub(g);
 	uint256 mint = max.mul(d);
-	mint = mint.div(basis);
+	mint = mint.div(basis).div(basis);
 	return mint;
 }
 ```
 
 ## holdersShare
 
-Property Contract holders receive a reward share is 95%.
+This policy has been enabled by [DIP1](https://github.com/dev-protocol/DIPs/issues/1).
+
+Property Contract holders receive a reward share is 51%.
 
 ```solidity
 function holdersShare(uint256 _reward, uint256 _lockups) external view returns (uint256) {
-	return _lockups > 0 ? (_reward.mul(95)).div(100) : _reward;
+	return _lockups > 0 ? (_reward.mul(51)).div(100) : _reward;
 }
 ```
 
@@ -152,8 +158,10 @@ function abstentionPenalty(uint256 abstentions) external view returns (uint256) 
 
 ## lockUpBlocks
 
-The lock-up period from the request for cancellation of staking until the withdrawal becomes possible is 175200 blocks equals 1 month.
+This policy has been enabled by [DIP3](https://github.com/dev-protocol/DIPs/issues/3).
+
+The lock-up period from the request for cancellation of staking until the withdrawal becomes possible is one block. In other words, there is practically no lock-up. See [DIP3](https://github.com/dev-protocol/DIPs/issues/3) for details.
 
 ```solidity
-uint public lockUpBlocks = 175200;
+uint public lockUpBlocks = 1;
 ```
