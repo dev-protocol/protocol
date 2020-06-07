@@ -224,12 +224,16 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 
 	function getLastAllocationBlockNumber(address _metrics)
 		private
+		view
 		returns (uint256)
 	{
+		uint256 waitUntilAllocatable = getStorage().getWaitUntilAllocatable();
 		uint256 blockNumber = getStorage().getLastBlockNumber(_metrics);
 		uint256 lastAllocationBlockNumber = blockNumber > 0
 			? blockNumber
-			: block.number.sub(getStorage().getWaitUntilAllocatable());
+			: block.number >= waitUntilAllocatable
+			? block.number.sub(waitUntilAllocatable)
+			: 0;
 		return lastAllocationBlockNumber;
 	}
 

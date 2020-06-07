@@ -112,6 +112,7 @@ contract('Allocator', ([deployer, user1]) => {
 			const behavior = await market
 				.behavior()
 				.then((x) => artifacts.require('MarketTest1').at(x))
+			await dev.allocator.setWaitUntilAllocatable(5)
 			await behavior.changeAsynchronousMode(true)
 			await dev.allocator.allocate(metrics.address)
 			await behavior.calculated()
