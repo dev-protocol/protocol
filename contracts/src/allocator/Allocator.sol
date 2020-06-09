@@ -20,129 +20,46 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
-	event BeforeAllocation(
-		uint256 _blocks,
-		uint256 _mint,
-		uint256 _value,
-		uint256 _marketValue,
-		uint256 _assets,
-		uint256 _totalAssets
-	);
-	event AllocationResult(
-		address _metrics,
-		uint256 _value,
-		address _market,
-		address _property,
-		uint256 _lockupValue,
-		uint256 _result
-	);
-
 	uint64 public constant basis = 1000000000000000000;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function allocate(address _metrics) external {
-		require(allocatable(_metrics), "can not allocate yet");
-
-		validateTargetPeriod(_metrics);
-		address market = Metrics(_metrics).market();
-		getStorage().setPendingIncrement(_metrics, true);
-		getStorage().setPendingLastBlockNumber(_metrics, block.number);
-		IMarketBehavior(Market(market).behavior()).calculate(
-			_metrics,
-			getLastAllocationBlockNumber(_metrics),
-			block.number
-		);
-	}
-
-	function setWaitUntilAllocatable(uint256 _waitUntilAllocatable)
-		external
-		onlyPauser
+	function calculate(address _property)
+		public
+		view
+		returns (uint256 holders, uint256 interest)
 	{
-		getStorage().setWaitUntilAllocatable(_waitUntilAllocatable);
-	}
+		addressValidator().validateGroup(_property, config().propertyGroup());
 
-	function calculatedCallback(address _metrics, uint256 _value) external {
-		addressValidator().validateGroup(_metrics, config().metricsGroup());
-
-		Metrics metrics = Metrics(_metrics);
-		Market market = Market(metrics.market());
-		require(
-			msg.sender == market.behavior(),
-			"don't call from other than market behavior"
-		);
-		require(
-			getStorage().getPendingIncrement(_metrics),
-			"not asking for an indicator"
-		);
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
-		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
-			metrics.property()
+		uint256 lockedUps = Lockup(config().lockup()).getPropertyValue(
+			_property
 		);
-		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
-		uint256 blocks = lastBlock.sub(getLastAllocationBlockNumber(_metrics));
+		uint256 totalLockedUps = Lockup(config().lockup()).getAllValue();
+		uint256 lastBlock = getStorage().getLastBlockNumber(_property);
+		uint256 blocks = block.number.sub(lastBlock);
 		blocks = blocks > 0 ? blocks : 1;
 		uint256 mint = Policy(config().policy()).rewards(
-			Lockup(config().lockup()).getAllValue(),
+			totalLockedUps,
 			totalAssets
 		);
-		uint256 value = (
-			Policy(config().policy()).assetValue(_value, lockupValue).mul(basis)
-		)
-			.div(blocks);
-		uint256 marketValue = getStorage()
-			.getLastAssetValueEachMarketPerBlock(metrics.market())
-			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))
-			.add(value);
-		uint256 assets = market.issuedMetrics();
-		getStorage().setLastAssetValueEachMetrics(_metrics, value);
-		getStorage().setLastAssetValueEachMarketPerBlock(
-			metrics.market(),
-			marketValue
-		);
-		emit BeforeAllocation(
-			blocks,
-			mint,
-			value,
-			marketValue,
-			assets,
-			totalAssets
-		);
-		uint256 result = allocation(
-			blocks,
-			mint,
-			value,
-			marketValue,
-			assets,
-			totalAssets
-		);
-		emit AllocationResult(
-			_metrics,
-			_value,
-			metrics.market(),
-			metrics.property(),
-			lockupValue,
-			result
-		);
-		increment(metrics.property(), result, lockupValue);
-		getStorage().setPendingIncrement(_metrics, false);
-		getStorage().setLastBlockNumber(_metrics, lastBlock);
-	}
-
-	function increment(
-		address _property,
-		uint256 _reward,
-		uint256 _lockup
-	) private {
+		uint256 result = allocation(blocks, mint, lockedUps, totalLockedUps);
 		uint256 holders = Policy(config().policy()).holdersShare(
-			_reward,
-			_lockup
+			result,
+			lockedUps
 		);
 		uint256 interest = _reward.sub(holders);
+		return (holders, interest);
+	}
+
+	function allocate(address _property) external {
+		(uint256 holders, uint256 interest) = calculate(_property);
+		increment(_property, result, _lockup);
 		Withdraw(config().withdraw()).increment(_property, holders);
 		Lockup(config().lockup()).increment(_property, interest);
+		getStorage().setLastBlock(_property, block.number);
 	}
 
 	function beforeBalanceChange(
@@ -167,39 +84,17 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		return Withdraw(config().withdraw()).getRewardsAmount(_property);
 	}
 
-	function allocatable(address _metrics) public view returns (bool) {
-		addressValidator().validateGroup(_metrics, config().metricsGroup());
-
-		uint256 latestBlockNumber = getStorage().getPendingLastBlockNumber(
-			_metrics
-		);
-		if (latestBlockNumber == 0) {
-			return true;
-		}
-		uint256 differenceBlockNumber = block.number.sub(latestBlockNumber);
-		uint256 waitUntilAllocatable = getStorage().getWaitUntilAllocatable();
-		return differenceBlockNumber >= waitUntilAllocatable;
-	}
-
 	function allocation(
 		uint256 _blocks,
 		uint256 _mint,
-		uint256 _value,
-		uint256 _marketValue,
-		uint256 _assets,
-		uint256 _totalAssets
+		uint256 _lockedUps,
+		uint256 _totalLockedUps
 	) public pure returns (uint256) {
-		uint256 aShare = _totalAssets > 0
-			? _assets.outOf(_totalAssets)
-			: Decimals.basis();
-		uint256 vShare = _marketValue > 0
-			? _value.outOf(_marketValue)
+		uint256 lShare = _totalLockedUps > 0
+			? _lockedUps.outOf(_totalLockedUps)
 			: Decimals.basis();
 		uint256 mint = _mint.mul(_blocks);
-		return
-			mint.mul(aShare).mul(vShare).div(Decimals.basis()).div(
-				Decimals.basis()
-			);
+		return mint.mul(lShare).div(Decimals.basis());
 	}
 
 	function validateTargetPeriod(address _metrics) private {
@@ -220,21 +115,6 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		);
 		getStorage().setLastBlockNumber(_metrics, notTargetBlockNumber);
 		voteTimes.resetVoteTimesByProperty(property);
-	}
-
-	function getLastAllocationBlockNumber(address _metrics)
-		private
-		view
-		returns (uint256)
-	{
-		uint256 waitUntilAllocatable = getStorage().getWaitUntilAllocatable();
-		uint256 blockNumber = getStorage().getLastBlockNumber(_metrics);
-		uint256 lastAllocationBlockNumber = blockNumber > 0
-			? blockNumber
-			: block.number >= waitUntilAllocatable
-			? block.number.sub(waitUntilAllocatable)
-			: 0;
-		return lastAllocationBlockNumber;
 	}
 
 	function getStorage() private view returns (AllocatorStorage) {

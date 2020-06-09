@@ -73,13 +73,32 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
-	function increment(address _property, uint256 _interestResult) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		uint256 priceValue = _interestResult.outOf(
+	function next(address _property, uint256 _priceValue)
+		private
+		view
+		returns (uint256)
+	{
+		uint256 result = _priceValue.outOf(
 			getStorage().getPropertyValue(_property)
 		);
-		incrementInterest(_property, priceValue);
+		uint256 price = getStorage().getInterestPrice(_property);
+		return price.add(result);
+	}
+
+	function increment(address _property, uint256 _interestResult) external {
+		addressValidator().validateAddress(msg.sender, config().allocator());
+		uint256 price = next(_property, _interestResult);
+		getStorage().setInterestPrice(_property, price);
+	}
+
+	function dry(address _property) external view returns (uint256) {
+		(, uint256 interest) = Allocator(config().allocator()).calculate(
+			_property
+		);
+		uint256 price = interest.outOf(
+			getStorage().getPropertyValue(_property)
+		);
+		return next(price);
 	}
 
 	function _calculateInterestAmount(address _property, address _user)
@@ -89,10 +108,13 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	{
 		uint256 _last = getStorage().getLastInterestPrice(_property, _user);
 		uint256 price = getStorage().getInterestPrice(_property);
+		uint256 dryPrice = dry(_property);
 		uint256 priceGap = price.sub(_last);
+		uint256 dryPriceGap = dryPrice.sub(price);
 		uint256 lockupedValue = getStorage().getValue(_property, _user);
 		uint256 value = priceGap.mul(lockupedValue);
-		return value.div(Decimals.basis());
+		uint256 dryValue = dryPriceGap.mul(lockupedValue);
+		return value.add(dryValue).div(Decimals.basis());
 	}
 
 	function calculateInterestAmount(address _property, address _user)
@@ -124,6 +146,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	function withdrawInterest(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
+		Allocator(config().allocator()).allocate();
 		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
@@ -200,11 +223,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		uint256 value = getStorage().getPropertyValue(_property);
 		value = value.sub(_value);
 		getStorage().setPropertyValue(_property, value);
-	}
-
-	function incrementInterest(address _property, uint256 _priceValue) private {
-		uint256 price = getStorage().getInterestPrice(_property);
-		getStorage().setInterestPrice(_property, price.add(_priceValue));
 	}
 
 	function updatePendingInterestWithdrawal(address _property, address _user)

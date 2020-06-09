@@ -21,6 +21,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	function withdraw(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
+		Allocator(config().allocator()).allocate();
 		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
 		uint256 price = getStorage().getCumulativePrice(_property);
@@ -65,15 +66,30 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		}
 	}
 
-	function increment(address _property, uint256 _allocationResult) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
+	function next(address _property, uint256 _allocationResult)
+		private
+		view
+		returns (uint256 total, uint256 price)
+	{
 		uint256 priceValue = _allocationResult.outOf(
 			ERC20(_property).totalSupply()
 		);
 		uint256 total = getStorage().getRewardsAmount(_property);
-		getStorage().setRewardsAmount(_property, total.add(_allocationResult));
 		uint256 price = getStorage().getCumulativePrice(_property);
-		getStorage().setCumulativePrice(_property, price.add(priceValue));
+		return (total.add(_allocationResult), price.add(priceValue));
+	}
+
+	function increment(address _property, uint256 _allocationResult) external {
+		addressValidator().validateAddress(msg.sender, config().allocator());
+		(uint256 total, uint256 price) = next(_property, _allocationResult);
+		getStorage().setRewardsAmount(_property, total);
+		getStorage().setCumulativePrice(_property, price);
+	}
+
+	function dry(address _property) external view returns (uint256) {
+		uint256 holder = Allocator(config().allocator()).calculate(_property);
+		(, uint256 price) = next(_property, holder);
+		return price;
 	}
 
 	function getRewardsAmount(address _property)
@@ -99,14 +115,17 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 			_user
 		);
 		uint256 price = getStorage().getCumulativePrice(_property);
+		uint256 dryPrice = dry(_property);
 		uint256 priceGap = price.sub(_last);
+		uint256 dryPriceGap = dryPrice.sub(price);
 		uint256 balance = ERC20(_property).balanceOf(_user);
 		uint256 total = getStorage().getRewardsAmount(_property);
 		if (totalLimit == total) {
 			balance = balanceLimit;
 		}
 		uint256 value = priceGap.mul(balance);
-		return value.div(Decimals.basis());
+		uint256 dryValue = dryPriceGap.mul(balance);
+		return value.add(dryValue).div(Decimals.basis());
 	}
 
 	function calculateAmount(address _property, address _user)
