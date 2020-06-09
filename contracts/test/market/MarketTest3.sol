@@ -8,11 +8,6 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 contract MarketTest3 is IMarketBehavior, UsingConfig {
 	string public schema = "[]";
 	mapping(address => string) internal keys;
-	event LogCalculate(
-		address _metrics,
-		uint256 _lastBlock,
-		uint256 _currentBlock
-	);
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -31,15 +26,6 @@ contract MarketTest3 is IMarketBehavior, UsingConfig {
 		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
 		keys[_metrics] = _args1;
 		return _metrics;
-	}
-
-	function calculate(
-		address _metrics,
-		uint256 _lastBlock,
-		uint256 _currentBlock
-	) external returns (bool) {
-		emit LogCalculate(_metrics, _lastBlock, _currentBlock);
-		return true;
 	}
 
 	function getId(address _metrics) external view returns (string memory) {

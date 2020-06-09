@@ -10,6 +10,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
+import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 
 contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
@@ -68,7 +69,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	function next(address _property, uint256 _allocationResult)
 		private
 		view
-		returns (uint256 total, uint256 price)
+		returns (uint256 _total, uint256 _price)
 	{
 		uint256 priceValue = _allocationResult.outOf(
 			ERC20(_property).totalSupply()
@@ -79,17 +80,40 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	}
 
 	function update(address _property) private {
+		(uint256 begin, uint256 end) = term(_property);
+		require(
+			IAllocator(config().allocator()).validateTargetPeriod(
+				_property,
+				begin,
+				end
+			),
+			"now abstention penalty"
+		);
 		(uint256 nextTotal, uint256 nextPrice) = dry(_property);
 		getStorage().setRewardsAmount(_property, nextTotal);
 		getStorage().setCumulativePrice(_property, nextPrice);
+		getStorage().setLastBlockNumber(_property, block.number);
+	}
+
+	function term(address _property)
+		private
+		view
+		returns (uint256 _begin, uint256 _end)
+	{
+		return (getStorage().getLastBlockNumber(_property), block.number);
 	}
 
 	function dry(address _property)
-		external
+		private
 		view
-		returns (uint256 total, uint256 price)
+		returns (uint256 _total, uint256 _price)
 	{
-		uint256 holder = Allocator(config().allocator()).calculate(_property);
+		(uint256 begin, uint256 end) = term(_property);
+		(uint256 holder,) = IAllocator(config().allocator()).calculate(
+			_property,
+			begin,
+			end
+		);
 		(uint256 total, uint256 price) = next(_property, holder);
 		return (total, price);
 	}

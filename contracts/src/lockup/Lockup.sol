@@ -12,6 +12,7 @@ import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
+import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 
 contract Lockup is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
@@ -86,15 +87,36 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	}
 
 	function update(address _property) private {
+		(uint256 begin, uint256 end) = term(_property);
+		require(
+			IAllocator(config().allocator()).validateTargetPeriod(
+				_property,
+				begin,
+				end
+			),
+			"now abstention penalty"
+		);
 		uint256 nextPrice = dry(_property);
 		getStorage().setInterestPrice(_property, nextPrice);
+		getStorage().setLastBlockNumber(_property, end);
 	}
 
-	function dry(address _property) external view returns (uint256) {
-		(, uint256 interest) = Allocator(config().allocator()).calculate(
-			_property
+	function term(address _property)
+		private
+		view
+		returns (uint256 begin, uint256 end)
+	{
+		return (getStorage().getLastBlockNumber(_property), block.number);
+	}
+
+	function dry(address _property) private view returns (uint256) {
+		(uint256 begin, uint256 end) = term(_property);
+		(, uint256 interest) = IAllocator(config().allocator()).calculate(
+			_property,
+			begin,
+			end
 		);
-		return next(interest);
+		return next(_property, interest);
 	}
 
 	function _calculateInterestAmount(address _property, address _user)

@@ -37,31 +37,6 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		return _metrics;
 	}
 
-	function calculate(
-		address _metrics,
-		uint256 _lastBlock,
-		uint256 _currentBlock
-	) external returns (bool) {
-		metrics = _metrics;
-		lastBlock = _lastBlock;
-		currentBlock = _currentBlock;
-		if (!asynchronousMode) {
-			emit LogCalculate(_metrics, _lastBlock, _currentBlock);
-			Allocator(config().allocator()).calculatedCallback(_metrics, 100);
-		}
-		return true;
-	}
-
-	function calculated() external returns (bool) {
-		emit LogCalculate(metrics, lastBlock, currentBlock);
-		Allocator(config().allocator()).calculatedCallback(metrics, 100);
-		return true;
-	}
-
-	function changeAsynchronousMode(bool _mode) external {
-		asynchronousMode = _mode;
-	}
-
 	function getId(address _metrics) external view returns (string memory) {
 		return keys[_metrics];
 	}

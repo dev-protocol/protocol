@@ -25,11 +25,11 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function calculate(address _property)
-		public
-		view
-		returns (uint256 holders, uint256 interest)
-	{
+	function calculate(
+		address _property,
+		uint256 _beginBlock,
+		uint256 _endBlock
+	) external view returns (uint256 _holders, uint256 _interest) {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
@@ -38,19 +38,18 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			_property
 		);
 		uint256 totalLockedUps = Lockup(config().lockup()).getAllValue();
-		uint256 lastBlock = getStorage().getLastBlockNumber(_property);
-		uint256 blocks = block.number.sub(lastBlock);
+		uint256 blocks = _endBlock.sub(_beginBlock);
 		blocks = blocks > 0 ? blocks : 1;
 		uint256 mint = Policy(config().policy()).rewards(
 			totalLockedUps,
 			totalAssets
 		);
-		uint256 result = allocation(blocks, mint, lockedUps, totalLockedUps);
+		uint256 result = _allocation(blocks, mint, lockedUps, totalLockedUps);
 		uint256 holders = Policy(config().policy()).holdersShare(
 			result,
 			lockedUps
 		);
-		uint256 interest = _reward.sub(holders);
+		uint256 interest = result.sub(holders);
 		return (holders, interest);
 	}
 
@@ -81,7 +80,16 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		uint256 _mint,
 		uint256 _lockedUps,
 		uint256 _totalLockedUps
-	) public pure returns (uint256) {
+	) external pure returns (uint256) {
+		return _allocation(_blocks, _mint, _lockedUps, _totalLockedUps);
+	}
+
+	function _allocation(
+		uint256 _blocks,
+		uint256 _mint,
+		uint256 _lockedUps,
+		uint256 _totalLockedUps
+	) private pure returns (uint256) {
 		uint256 lShare = _totalLockedUps > 0
 			? _lockedUps.outOf(_totalLockedUps)
 			: Decimals.basis();
@@ -89,24 +97,47 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		return mint.mul(lShare).div(Decimals.basis());
 	}
 
-	function validateTargetPeriod(address _metrics) private {
-		address property = Metrics(_metrics).property();
+	function allocatable(
+		address _property,
+		uint256 _beginBlock,
+		uint256 _endBlock
+	) external view returns (bool) {
+		return _allocatable(_property, _beginBlock, _endBlock);
+	}
+
+	function _allocatable(
+		address _property,
+		uint256 _beginBlock,
+		uint256 _endBlock
+	) private view returns (bool) {
 		VoteTimes voteTimes = VoteTimes(config().voteTimes());
-		uint256 abstentionCount = voteTimes.getAbstentionTimes(property);
+		uint256 abstentionCount = voteTimes.getAbstentionTimes(_property);
 		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
 			abstentionCount
 		);
 		if (notTargetPeriod == 0) {
-			return;
+			return true;
 		}
-		uint256 blockNumber = getLastAllocationBlockNumber(_metrics);
-		uint256 notTargetBlockNumber = blockNumber.add(notTargetPeriod);
+		uint256 notTargetBlockNumber = _beginBlock.add(notTargetPeriod);
+		return notTargetBlockNumber < _endBlock;
+	}
+
+	function validateTargetPeriod(
+		address _property,
+		uint256 _beginBlock,
+		uint256 _endBlock
+	) external returns(bool) {
+		addressValidator().validateAddresses(
+			msg.sender,
+			config().lockup(),
+			config().withdraw()
+		);
 		require(
-			notTargetBlockNumber < block.number,
+			_allocatable(_property, _beginBlock, _endBlock),
 			"outside the target period"
 		);
-		getStorage().setLastBlockNumber(_metrics, notTargetBlockNumber);
-		voteTimes.resetVoteTimesByProperty(property);
+		VoteTimes(config().voteTimes()).resetVoteTimesByProperty(_property);
+		return true;
 	}
 
 	function getStorage() private view returns (AllocatorStorage) {

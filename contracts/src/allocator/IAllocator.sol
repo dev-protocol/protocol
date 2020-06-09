@@ -1,9 +1,12 @@
 pragma solidity ^0.5.0;
 
 contract IAllocator {
-	function allocate(address _metrics) external;
-
-	function calculatedCallback(address _metrics, uint256 _value) external;
+	function calculate(
+		address _property,
+		uint256 _beginBlock,
+		uint256 _endBlock
+	)
+		external view returns (uint256 _holders, uint256 _interest);
 
 	function beforeBalanceChange(
 		address _property,
@@ -25,10 +28,24 @@ contract IAllocator {
 		uint256 _assets,
 		uint256 _totalAssets
 	)
-		public
+		external
 		pure
 		returns (
 			// solium-disable-next-line indentation
 			uint256
 		);
+
+	function allocatable(
+		address _property,
+		uint256 _beginBlock,
+		uint256 _endBlock
+	)
+		external view returns (bool);
+
+	function validateTargetPeriod(
+		address _property,
+		uint256 _beginBlock,
+		uint256 _endBlock
+	)
+		external returns(bool);
 }
