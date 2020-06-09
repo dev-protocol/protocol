@@ -126,7 +126,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		address _property,
 		uint256 _beginBlock,
 		uint256 _endBlock
-	) external returns(bool) {
+	) external returns (bool) {
 		addressValidator().validateAddresses(
 			msg.sender,
 			config().lockup(),

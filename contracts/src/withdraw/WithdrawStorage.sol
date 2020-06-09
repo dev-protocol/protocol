@@ -16,7 +16,11 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getLastBlockNumber(address _property) external view returns (uint256) {
+	function getLastBlockNumber(address _property)
+		external
+		view
+		returns (uint256)
+	{
 		bytes32 key = getLastBlockNumberKey(_property);
 		return eternalStorage().getUint(key);
 	}

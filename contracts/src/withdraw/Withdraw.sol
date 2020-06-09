@@ -109,7 +109,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		returns (uint256 _total, uint256 _price)
 	{
 		(uint256 begin, uint256 end) = term(_property);
-		(uint256 holder,) = IAllocator(config().allocator()).calculate(
+		(uint256 holder, ) = IAllocator(config().allocator()).calculate(
 			_property,
 			begin,
 			end
