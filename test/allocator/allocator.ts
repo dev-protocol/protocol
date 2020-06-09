@@ -207,6 +207,7 @@ contract('Allocator', ([deployer, user1]) => {
 					dev.dev.mint(deployer, 1),
 				])
 
+				// eslint-disable-next-line @typescript-eslint/restrict-plus-operands
 				const expected = lastBlock.toNumber() + 2
 				// eslint-disable-next-line no-undef
 				const fromBlock = await web3.eth.getBlockNumber()

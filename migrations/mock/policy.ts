@@ -18,5 +18,6 @@ export async function createPolicy(
 		artifacts
 	)
 	const policyAddress = await addressConfig.policy()
+	// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 	console.log(`policy address:${policyAddress}`)
 }
