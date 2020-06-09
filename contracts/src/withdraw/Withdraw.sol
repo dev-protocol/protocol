@@ -84,7 +84,11 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		getStorage().setCumulativePrice(_property, nextPrice);
 	}
 
-	function dry(address _property) external view returns (uint256 total, uint256 price) {
+	function dry(address _property)
+		external
+		view
+		returns (uint256 total, uint256 price)
+	{
 		uint256 holder = Allocator(config().allocator()).calculate(_property);
 		(uint256 total, uint256 price) = next(_property, holder);
 		return (total, price);
