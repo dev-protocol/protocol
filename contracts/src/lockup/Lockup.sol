@@ -85,20 +85,16 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		return price.add(result);
 	}
 
-	function increment(address _property, uint256 _interestResult) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-		uint256 price = next(_property, _interestResult);
-		getStorage().setInterestPrice(_property, price);
+	function update(address _property) private {
+		uint256 nextPrice = dry(_property);
+		getStorage().setInterestPrice(_property, nextPrice);
 	}
 
 	function dry(address _property) external view returns (uint256) {
 		(, uint256 interest) = Allocator(config().allocator()).calculate(
 			_property
 		);
-		uint256 price = interest.outOf(
-			getStorage().getPropertyValue(_property)
-		);
-		return next(price);
+		return next(interest);
 	}
 
 	function _calculateInterestAmount(address _property, address _user)
@@ -146,7 +142,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	function withdrawInterest(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
-		Allocator(config().allocator()).allocate();
+		update(_property);
 		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender

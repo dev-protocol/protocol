@@ -54,14 +54,6 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		return (holders, interest);
 	}
 
-	function allocate(address _property) external {
-		(uint256 holders, uint256 interest) = calculate(_property);
-		increment(_property, result, _lockup);
-		Withdraw(config().withdraw()).increment(_property, holders);
-		Lockup(config().lockup()).increment(_property, interest);
-		getStorage().setLastBlock(_property, block.number);
-	}
-
 	function beforeBalanceChange(
 		address _property,
 		address _from,
