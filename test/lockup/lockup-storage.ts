@@ -184,5 +184,28 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
+		describe('LockupStorageStorage; setLastBlockNumber, getLastBlockNumber', () => {
+			it('Initial value is 0.', async () => {
+				const result = await dev.lockupStorage.getLastBlockNumber(property, {
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('The set value can be taken as it is.', async () => {
+				await dev.lockupStorage.setLastBlockNumber(property, 30000, {
+					from: lockup,
+				})
+				const result = await dev.lockupStorage.getLastBlockNumber(property, {
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(30000)
+			})
+			it('Cannot rewrite data from other than lockup.', async () => {
+				const result = await dev.lockupStorage
+					.setLastBlockNumber(property, 3000, {from: dummyLockup})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
 	}
 )

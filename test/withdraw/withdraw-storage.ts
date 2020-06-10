@@ -192,7 +192,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
-		describe.only('WithdrawStorageTest; setLastBlockNumber, getLastBlockNumber', () => {
+		describe('WithdrawStorageTest; setLastBlockNumber, getLastBlockNumber', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.withdrawStorage.getLastBlockNumber(property, {
 					from: withdraw,
