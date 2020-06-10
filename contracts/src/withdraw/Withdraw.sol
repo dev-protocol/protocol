@@ -24,6 +24,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 
 		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
+		update(_property);
 		uint256 price = getStorage().getCumulativePrice(_property);
 		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
 		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
