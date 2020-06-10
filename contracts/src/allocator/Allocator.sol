@@ -32,13 +32,16 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	) external view returns (uint256 _holders, uint256 _interest) {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
+		uint256 beginBlock = _beginBlock > 0
+			? _beginBlock
+			: getStorage().getLastBlockNumber(_property);
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 lockedUps = Lockup(config().lockup()).getPropertyValue(
 			_property
 		);
 		uint256 totalLockedUps = Lockup(config().lockup()).getAllValue();
-		uint256 blocks = _endBlock.sub(_beginBlock);
+		uint256 blocks = _endBlock.sub(beginBlock);
 		blocks = blocks > 0 ? blocks : 1;
 		uint256 mint = Policy(config().policy()).rewards(
 			totalLockedUps,
