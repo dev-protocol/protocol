@@ -18,16 +18,5 @@ contract IMarketBehavior {
 			address
 		);
 
-	function calculate(
-		address _metrics,
-		uint256 _start,
-		uint256 _end
-	)
-		external
-		returns (
-			// solium-disable-next-line indentation
-			bool
-		);
-
 	function getId(address _metrics) external view returns (string memory);
 }
