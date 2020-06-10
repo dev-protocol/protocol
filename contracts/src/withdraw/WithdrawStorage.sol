@@ -10,7 +10,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 
 	//Last Block Number
 	function setLastBlockNumber(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
+		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		bytes32 key = getLastBlockNumberKey(_property);
 		eternalStorage().setUint(key, _value);
