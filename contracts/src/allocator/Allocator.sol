@@ -44,7 +44,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			totalLockedUps,
 			totalAssets
 		);
-		uint256 result = _allocation(blocks, mint, lockedUps, totalLockedUps);
+		uint256 result = allocation(blocks, mint, lockedUps, totalLockedUps);
 		uint256 holders = Policy(config().policy()).holdersShare(
 			result,
 			lockedUps
@@ -80,16 +80,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		uint256 _mint,
 		uint256 _lockedUps,
 		uint256 _totalLockedUps
-	) external pure returns (uint256) {
-		return _allocation(_blocks, _mint, _lockedUps, _totalLockedUps);
-	}
-
-	function _allocation(
-		uint256 _blocks,
-		uint256 _mint,
-		uint256 _lockedUps,
-		uint256 _totalLockedUps
-	) private pure returns (uint256) {
+	) public pure returns (uint256) {
 		uint256 lShare = _totalLockedUps > 0
 			? _lockedUps.outOf(_totalLockedUps)
 			: Decimals.basis();
@@ -101,15 +92,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		address _property,
 		uint256 _beginBlock,
 		uint256 _endBlock
-	) external view returns (bool) {
-		return _allocatable(_property, _beginBlock, _endBlock);
-	}
-
-	function _allocatable(
-		address _property,
-		uint256 _beginBlock,
-		uint256 _endBlock
-	) private view returns (bool) {
+	) public view returns (bool) {
 		VoteTimes voteTimes = VoteTimes(config().voteTimes());
 		uint256 abstentionCount = voteTimes.getAbstentionTimes(_property);
 		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
@@ -133,7 +116,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			config().withdraw()
 		);
 		require(
-			_allocatable(_property, _beginBlock, _endBlock),
+			allocatable(_property, _beginBlock, _endBlock),
 			"outside the target period"
 		);
 		VoteTimes(config().voteTimes()).resetVoteTimesByProperty(_property);
