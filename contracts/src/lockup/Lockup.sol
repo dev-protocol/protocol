@@ -43,6 +43,10 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			_from,
 			getStorage().getInterestPrice(_property)
 		);
+		if (getStorage().getLastBlockNumber(_property) == 0) {
+			// Set the block that has been locked-up for the first time as the starting block.
+			getStorage().setLastBlockNumber(_property, block.number);
+		}
 		emit Lockedup(_from, _property, _value);
 	}
 
