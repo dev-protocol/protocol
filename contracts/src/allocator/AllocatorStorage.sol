@@ -1,13 +1,11 @@
 pragma solidity ^0.5.0;
 
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
-contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
-	mapping(address => address) property_n_metrics;
+contract AllocatorStorage is UsingStorage {
+	mapping(address => address) private property_n_metrics;
 
-	constructor(address _config) public UsingConfig(_config) UsingStorage() {
+	constructor() public UsingStorage() {
 		property_n_metrics[0x05BC991269a9730232a65ea7C471ABcC7D86A5B3] = 0xFEfC8Ffb329b6DfE755d24F86A19f604CEbDf3ce;
 		// more...
 	}

@@ -12,7 +12,7 @@ const handler = function (deployer, network) {
 	// Allocator
 	deployer.link(decimals, artifacts.require('Allocator'))
 	deployer.deploy(artifacts.require('Allocator'), address)
-	deployer.deploy(artifacts.require('AllocatorStorage'), address)
+	deployer.deploy(artifacts.require('AllocatorStorage'))
 
 	// Dev
 	deployer.deploy(artifacts.require('Dev'), address)
