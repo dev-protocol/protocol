@@ -173,7 +173,6 @@ export class DevProtocolInstance {
 
 	public async generateAllocatorStorage(): Promise<void> {
 		this._allocatorStorage = await contract('AllocatorStorage').new(
-			this.addressConfig.address,
 			this.fromDeployer
 		)
 		await this._addressConfig.setAllocatorStorage(

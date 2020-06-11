@@ -3,11 +3,13 @@ import BigNumber from 'bignumber.js'
 import {PropertyInstance} from '../../types/truffle-contracts'
 import {getPropertyAddress} from '../test-lib/utils/log'
 import {
+	validateErrorMessage,
 	validatePauseErrorMessage,
 	validatePauseOnlyOwnerErrorMessage,
+	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 
-contract('Allocator', ([deployer, user1]) => {
+contract('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
 	const init = async (): Promise<[DevProtocolInstance, PropertyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
@@ -119,7 +121,66 @@ contract('Allocator', ([deployer, user1]) => {
 	})
 
 	describe('Allocator; validateTargetPeriod', () => {
-		// TODO: Add tests
-		it('todo')
+		const _init = async (): Promise<
+			[DevProtocolInstance, PropertyInstance]
+		> => {
+			const dev = new DevProtocolInstance(deployer)
+			await dev.generateAddressConfig()
+			await Promise.all([
+				dev.generateAllocator(),
+				dev.generatePropertyFactory(),
+				dev.generatePropertyGroup(),
+				dev.generateVoteTimes(),
+				dev.generateVoteTimesStorage(),
+				dev.generatePolicyFactory(),
+				dev.generatePolicyGroup(),
+				dev.generatePolicySet(),
+			])
+			const policy = await artifacts.require('PolicyTestForAllocator').new()
+			await dev.policyFactory.create(policy.address)
+			const propertyAddress = getPropertyAddress(
+				await dev.propertyFactory.create('test', 'TEST', deployer)
+			)
+			const [property] = await Promise.all([
+				artifacts.require('Property').at(propertyAddress),
+			])
+			await dev.addressConfig.setLockup(dummyLockup)
+			await dev.addressConfig.setWithdraw(dummyWithdraw)
+			return [dev, property]
+		}
+
+		describe('validate', () => {
+			// The first argument is guaranteed to be a property address on the caller, so we won't test it here
+			it('No error when called from a Lockup contract.', async () => {
+				const [dev, property] = await _init()
+				await dev.allocator.validateTargetPeriod(property.address, 0, 100, {
+					from: dummyLockup,
+				})
+			})
+			it('No error when called from a Withdraw contract.', async () => {
+				const [dev, property] = await _init()
+				await dev.allocator.validateTargetPeriod(property.address, 0, 100, {
+					from: dummyWithdraw,
+				})
+			})
+			it('An error occurs when a contract other than Lockup or Withdraw is called.', async () => {
+				const [dev, property] = await _init()
+				const res = await dev.allocator
+					.validateTargetPeriod(property.address, 0, 100)
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(res)
+			})
+		})
+		describe('allocatable', () => {
+			it('If the range of block numbers is narrow, an error will occur on allocate and the function itself will fail.', async () => {
+				const [dev, property] = await _init()
+				const res = await dev.allocator
+					.validateTargetPeriod(property.address, 0, 2, {
+						from: dummyLockup,
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'outside the target period')
+			})
+		})
 	})
 })

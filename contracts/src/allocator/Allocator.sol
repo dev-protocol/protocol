@@ -129,6 +129,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			config().lockup(),
 			config().withdraw()
 		);
+
 		require(
 			allocatable(_property, _beginBlock, _endBlock),
 			"outside the target period"

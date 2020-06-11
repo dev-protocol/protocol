@@ -29,12 +29,10 @@ contract IAllocator {
 	function allocation(
 		uint256 _blocks,
 		uint256 _mint,
-		uint256 _value,
-		uint256 _marketValue,
-		uint256 _assets,
-		uint256 _totalAssets
+		uint256 _lockedUps,
+		uint256 _totalLockedUps
 	)
-		external
+		public
 		pure
 		returns (
 			// solium-disable-next-line indentation
