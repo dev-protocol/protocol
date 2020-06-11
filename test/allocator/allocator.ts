@@ -91,7 +91,7 @@ contract('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
 			const res = await dev.allocator
 				.calculate(property.address, 0, 1000)
 				.catch((err: Error) => err)
-			validatePauseErrorMessage(res)
+			validatePauseErrorMessage(res, false)
 			await dev.allocator.unpause()
 			await dev.allocator.calculate(property.address, 1, 1000)
 		})
@@ -119,7 +119,7 @@ contract('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
 				fromBlock,
 				fromBlock + 1
 			)
-			expect(res).to.be.equal(true)
+			expect(res).to.be.equal(false)
 		})
 		it('Returns true when the Property is not the target of the abstention penalty', async () => {
 			const [dev, property] = await init()
