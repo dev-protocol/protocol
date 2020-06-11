@@ -49,12 +49,6 @@ contract('Allocator', ([deployer, user1]) => {
 	describe('Allocator: calculate', () => {
 		it('Should fail to calculate when the first argument is not a Property')
 		it('Returns holders and stakers rewards')
-
-		describe('When the first argument is Metrics', () => {
-			it(
-				'Returns holders and stakers rewards, begin blocks get by AllocatorStorage'
-			)
-		})
 	})
 
 	describe('Allocator; allocation', () => {
