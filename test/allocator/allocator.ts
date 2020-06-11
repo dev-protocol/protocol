@@ -49,17 +49,35 @@ contract('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
 	}
 
 	describe('Allocator: calculate', () => {
-		it('Should fail to calculate when the first argument is not a Property')
-		it('Returns holders and stakers rewards')
+		it('If the difference between the start and end numbers is not appropriate, an error occurs.', async () => {
+			const [dev, property] = await init()
+			const res = await dev.allocator
+				.calculate(property.address, 0, 1)
+				.catch((err: Error) => err)
+			validateErrorMessage(res, 'SafeMath: subtraction overflow', false)
+		})
+		it('Returns holders and stakers rewards', async () => {
+			const [dev, property] = await init()
+			const res = await dev.allocator.calculate(property.address, 10000, 10500)
+			expect(res[0].toString()).to.be.equal('50000000000000000000000')
+			expect(res[1].toNumber()).to.be.equal(0)
+		})
+		it('teteteat', async () => {
+			const [dev, property] = await init()
+			await dev.dev.deposit(property.address, 1000000)
+			const res = await dev.allocator.calculate(property.address, 10000, 10500)
+			expect(res[0].toString()).to.be.equal('45000000000000450000000')
+			expect(res[1].toString()).to.be.equal('5000000000000050000000')
+		})
 	})
 
 	describe('Allocator; allocation', () => {
 		it(`
-			last allocation block is 5760,
-			mint per block is 50000,
-			locked-up is 300,
-			total locked-up is 7406907;
-			the result is ${5760 * 50000 * (300 / 7406907)}`, async () => {
+		last allocation block is 5760,
+		mint per block is 50000,
+		locked-up is 300,
+		total locked-up is 7406907;
+		the result is ${5760 * 50000 * (300 / 7406907)}`, async () => {
 			const [dev] = await init()
 			const result = await dev.allocator.allocation(5760, 50000, 300, 7406907)
 			expect(result.toNumber()).to.be.equal(~~(5760 * 50000 * (300 / 7406907)))
@@ -71,7 +89,7 @@ contract('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
 			const [dev, property] = await init()
 			await dev.allocator.pause()
 			const res = await dev.allocator
-				.calculate(property.address, 1, 1000)
+				.calculate(property.address, 0, 1000)
 				.catch((err: Error) => err)
 			validatePauseErrorMessage(res)
 			await dev.allocator.unpause()
