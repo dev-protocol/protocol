@@ -52,7 +52,11 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		return (holders, interest);
 	}
 
-	function getBeginBlock(address _property, uint256 _beginBlock) private view returns (uint256) {
+	function getBeginBlock(address _property, uint256 _beginBlock)
+		private
+		view
+		returns (uint256)
+	{
 		if (_beginBlock > 0) {
 			return _beginBlock;
 		}
