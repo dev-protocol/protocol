@@ -182,11 +182,17 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		return _calculateWithdrawableAmount(_property, _user);
 	}
 
-	function setLastBlockNumber(address _property, uint256 _blockNumber) external {
+	function setLastBlockNumber(address _property, uint256 _blockNumber)
+		external
+	{
 		getStorage().setLastBlockNumber(_property, _blockNumber);
 	}
 
-	function getLastBlockNumber(address _property) external view returns (uint256) {
+	function getLastBlockNumber(address _property)
+		external
+		view
+		returns (uint256)
+	{
 		return getStorage().getLastBlockNumber(_property);
 	}
 

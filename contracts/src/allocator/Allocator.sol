@@ -31,16 +31,16 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		uint256 _endBlock
 	) external view returns (uint256 _holders, uint256 _interest) {
 		uint256 beginBlock = getBeginBlock(_property, _beginBlock);
+		uint256 blocks = _endBlock.sub(beginBlock);
+		if (blocks == 0) {
+			return (0, 0);
+		}
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 lockedUps = Lockup(config().lockup()).getPropertyValue(
 			_property
 		);
 		uint256 totalLockedUps = Lockup(config().lockup()).getAllValue();
-		uint256 blocks = _endBlock.sub(beginBlock);
-		if (blocks == 0) {
-			return (0, 0);
-		}
 		uint256 mint = Policy(config().policy()).rewards(
 			totalLockedUps,
 			totalAssets
@@ -66,7 +66,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		if (tmp > 0) {
 			return tmp;
 		}
-		return block.number.sub(1);
+		return block.number;
 	}
 
 	function beforeBalanceChange(

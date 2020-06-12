@@ -49,7 +49,10 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			getStorage().setLastBlockNumber(_property, block.number);
 		}
 		if (Withdraw(config().withdraw()).getLastBlockNumber(_property) == 0) {
-			Withdraw(config().withdraw()).setLastBlockNumber(_property, block.number);
+			Withdraw(config().withdraw()).setLastBlockNumber(
+				_property,
+				block.number
+			);
 		}
 		emit Lockedup(_from, _property, _value);
 	}
