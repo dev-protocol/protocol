@@ -468,43 +468,38 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
-			// TODO:
-			// describe('after second withdrawal', () => {
-			// 	before(async () => {
-			// 		await dev.lockup.withdrawInterest(property.address, {from: alice})
-			// 		await dev.lockup.withdrawInterest(property.address, {from: bob})
-			// 	})
-			// 	it(`Alice's withdrawable interest is 80% of current interest`, async () => {
-			// 		const lastBlock = await dev.lockupStorage
-			// 			.getLastBlockNumber(property.address)
-			// 			.then(toBigNumber)
-			// 		const block = await getBlock()
-			// 		const aliceAmount = await dev.lockup
-			// 			.calculateWithdrawableInterestAmount(property.address, alice)
-			// 			.then(toBigNumber)
-			// 		const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-			// 			.times(1e18)
-			// 			.times(toBigNumber(block).minus(lastBlock))
-			// 			.times(0.8)
+			describe('after second withdrawal', () => {
+				before(async () => {
+					await dev.lockup.withdrawInterest(property.address, {from: alice})
+					await dev.lockup.withdrawInterest(property.address, {from: bob})
+					lastBlock = await getBlock().then(toBigNumber)
+					await mine(3)
+				})
+				it(`Alice's withdrawable interest is 80% of current interest`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+						.times(1e18)
+						.times(block.minus(lastBlock.minus(1)))
+						.times(0.8)
 
-			// 		expect(aliceAmount.toNumber()).to.be.equal(expected.toFixed())
-			// 	})
-			// 	it(`Bob's withdrawable interest is 20% of current interest`, async () => {
-			// 		const lastBlock = await dev.lockupStorage
-			// 			.getLastBlockNumber(property.address)
-			// 			.then(toBigNumber)
-			// 		const block = await getBlock()
-			// 		const bobAmount = await dev.lockup
-			// 			.calculateWithdrawableInterestAmount(property.address, bob)
-			// 			.then(toBigNumber)
-			// 		const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-			// 			.times(1e18)
-			// 			.times(toBigNumber(block).minus(lastBlock))
-			// 			.times(0.2)
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+				it(`Bob's withdrawable interest is 20% of current interest`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const bobAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+						.times(1e18)
+						.times(block.minus(lastBlock))
+						.times(0.2)
 
-			// 		expect(bobAmount.toNumber()).to.be.equal(expected.toFixed())
-			// 	})
-			// })
+					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
 			// TODO:
 			// describe('additional staking', () => {
 			// 	it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
