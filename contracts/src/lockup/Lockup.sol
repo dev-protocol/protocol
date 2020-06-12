@@ -78,6 +78,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		require(possible(_property, msg.sender), "waiting for release");
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
 		require(lockupedValue != 0, "dev token is not locked");
+		update(_property);
 		updatePendingInterestWithdrawal(_property, msg.sender);
 		Property(_property).withdraw(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
