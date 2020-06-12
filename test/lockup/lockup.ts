@@ -500,34 +500,33 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
-			// TODO:
-			// describe('additional staking', () => {
-			// 	it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
-			// 		625000 / 16250
-			// 	}%, Alice's share become ${1000000 / 16250}%`, async () => {
-			// 		bobFirstDepositBlock = await getBlock()
-			// 		await dev.dev.deposit(property.address, 12500 * 0.3, {from: bob})
-			// 		const aliceBalance = await dev.lockup
-			// 			.getValue(property.address, alice)
-			// 			.then(toBigNumber)
-			// 		const bobBalance = await dev.lockup
-			// 			.getValue(property.address, bob)
-			// 			.then(toBigNumber)
+			describe('additional staking', () => {
+				it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
+					625000 / 16250
+				}%, Alice's share become ${1000000 / 16250}%`, async () => {
+					await dev.dev.deposit(property.address, 12500 * 0.3, {from: bob})
+					bobBlock = await getBlock().then(toBigNumber)
+					const aliceBalance = await dev.lockup
+						.getValue(property.address, alice)
+						.then(toBigNumber)
+					const bobBalance = await dev.lockup
+						.getValue(property.address, bob)
+						.then(toBigNumber)
 
-			// 		expect(10000).to.be.equal(
-			// 			new BigNumber(16250)
-			// 				.times(new BigNumber(10000).div(16250))
-			// 				.toNumber()
-			// 		)
-			// 		expect(aliceBalance.toFixed()).to.be.equal('10000')
-			// 		expect(6250).to.be.equal(
-			// 			new BigNumber(16250)
-			// 				.times(new BigNumber(6250).div(16250))
-			// 				.toNumber()
-			// 		)
-			// 		expect(bobBalance.toFixed()).to.be.equal('6250')
-			// 	})
-			// })
+					expect(10000).to.be.equal(
+						new BigNumber(16250)
+							.times(new BigNumber(10000).div(16250))
+							.toNumber()
+					)
+					expect(aliceBalance.toFixed()).to.be.equal('10000')
+					expect(6250).to.be.equal(
+						new BigNumber(16250)
+							.times(new BigNumber(6250).div(16250))
+							.toNumber()
+					)
+					expect(bobBalance.toFixed()).to.be.equal('6250')
+				})
+			})
 			// TODO:
 			// describe('after additional staking', () => {
 			// 	it(`Alice's withdrawable interest is 80% of prev interest and ${
