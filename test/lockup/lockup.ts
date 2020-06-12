@@ -289,6 +289,8 @@ contract('LockupTest', ([deployer, user1]) => {
 		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
+			let lastBlock: BigNumber
+
 			const alice = deployer
 			const bob = user1
 
@@ -297,6 +299,9 @@ contract('LockupTest', ([deployer, user1]) => {
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.dev.deposit(property.address, 10000, {from: alice})
+				lastBlock = await dev.lockupStorage
+					.getLastBlockNumber(property.address)
+					.then(toBigNumber)
 			})
 
 			/*
@@ -315,9 +320,6 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-					const lastBlock = await dev.lockupStorage
-						.getLastBlockNumber(property.address)
-						.then(toBigNumber)
 					await mine(9)
 					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.lockup
@@ -332,6 +334,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			describe('after second run', () => {
 				before(async () => {
 					await dev.lockup.withdrawInterest(property.address, {from: alice})
+					lastBlock = await dev.lockupStorage
+						.getLastBlockNumber(property.address)
+						.then(toBigNumber)
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
 					await mine(3)
@@ -345,11 +350,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 			})
 			describe('after additional staking', () => {
-				let lastBlock: BigNumber
 				before(async () => {
-					lastBlock = await dev.lockupStorage
-						.getLastBlockNumber(property.address)
-						.then(toBigNumber)
 					await dev.dev.deposit(property.address, 10000, {from: alice})
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
@@ -364,32 +365,28 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
-			// TODO:
-			// describe('after withdrawal', () => {
-			// 	before(async () => {
-			// 		await dev.lockup.cancel(property.address, {from: alice})
-			// 		await dev.lockup.withdraw(property.address, {
-			// 			from: alice,
-			// 		})
-			// 	})
-			// 	it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-			// 		const lastBlock = await dev.lockupStorage
-			// 			.getLastBlockNumber(property.address)
-			// 			.then(toBigNumber)
-			// 		const block = await getBlock()
-			// 		const aliceLockup = await dev.lockup
-			// 			.getValue(property.address, alice)
-			// 			.then(toBigNumber)
-			// 		const aliceAmount = await dev.lockup
-			// 			.calculateWithdrawableInterestAmount(property.address, alice)
-			// 			.then(toBigNumber)
-			// 		const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-			// 			.times(1e18)
-			// 			.times(lastBlock.minus(block))
-			// 		expect(aliceLockup.toFixed()).to.be.equal('0')
-			// 		expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-			// 	})
-			// })
+			describe('after withdrawal', () => {
+				before(async () => {
+					await dev.lockup.cancel(property.address, {from: alice})
+					await dev.lockup.withdraw(property.address, {
+						from: alice,
+					})
+				})
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const aliceLockup = await dev.lockup
+						.getValue(property.address, alice)
+						.then(toBigNumber)
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+						.times(1e18)
+						.times(block.minus(lastBlock))
+					expect(aliceLockup.toFixed()).to.be.equal('0')
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
 		})
 
 		// TODO:
