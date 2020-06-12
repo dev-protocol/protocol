@@ -35,16 +35,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
 			0;
 		require(isWaiting == false, "lockup is already canceled");
-		update(_property);
-		updatePendingInterestWithdrawal(_property, _from);
-		addValue(_property, _from, _value);
-		addPropertyValue(_property, _value);
-		addAllValue(_value);
-		getStorage().setLastInterestPrice(
-			_property,
-			_from,
-			getStorage().getInterestPrice(_property)
-		);
 		if (getStorage().getLastBlockNumber(_property) == 0) {
 			// Set the block that has been locked-up for the first time as the starting block.
 			getStorage().setLastBlockNumber(_property, block.number);
@@ -55,6 +45,16 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 				block.number
 			);
 		}
+		update(_property);
+		updatePendingInterestWithdrawal(_property, _from);
+		addValue(_property, _from, _value);
+		addPropertyValue(_property, _value);
+		addAllValue(_value);
+		getStorage().setLastInterestPrice(
+			_property,
+			_from,
+			getStorage().getInterestPrice(_property)
+		);
 		emit Lockedup(_from, _property, _value);
 	}
 
