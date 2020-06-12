@@ -7,13 +7,14 @@ import {
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {waitForEvent, getEventValue} from '../test-lib/utils/event'
+import {waitForEvent, getEventValue, watch} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validatePauseErrorMessage,
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 import {config} from 'process'
+import {alias} from 'commander'
 
 contract('LockupTest', ([deployer, user1]) => {
 	const init = async (): Promise<
@@ -57,7 +58,7 @@ contract('LockupTest', ([deployer, user1]) => {
 		await dev.addressConfig.setMetricsFactory(deployer)
 		await dev.metricsGroup.addGroup(deployer)
 
-		await dev.dev.addMinter(dev.withdraw.address)
+		await dev.dev.addMinter(dev.lockup.address)
 		return [dev, property, policy]
 	}
 
@@ -328,43 +329,42 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
+			describe('after second run', () => {
+				before(async () => {
+					await dev.lockup.withdrawInterest(property.address, {from: alice})
+				})
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					await mine(3)
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+						.times(1e18)
+						.times(3)
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+			describe('after additional staking', () => {
+				let lastBlock: BigNumber
+				before(async () => {
+					lastBlock = await dev.lockupStorage
+						.getLastBlockNumber(property.address)
+						.then(toBigNumber)
+					await dev.dev.deposit(property.address, 10000, {from: alice})
+				})
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+						.times(1e18)
+						.times(block.minus(lastBlock))
+
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
 			// TODO:
-			// describe('after second run', () => {
-			// 	before(async () => {
-			// 		await dev.lockup.withdrawInterest(property.address, {from: alice})
-			// 	})
-			// 	it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-			// 		const lastBlock = await dev.lockupStorage
-			// 			.getLastBlockNumber(property.address)
-			// 			.then(toBigNumber)
-			// 		const block = await getBlock()
-			// 		const aliceAmount = await dev.lockup
-			// 			.calculateWithdrawableInterestAmount(property.address, alice)
-			// 			.then(toBigNumber)
-			// 		const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-			// 			.times(1e18)
-			// 			.times(lastBlock.minus(block))
-			// 		expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-			// 	})
-			// })
-			// describe('after additional staking', () => {
-			// 	before(async () => {
-			// 		await dev.dev.deposit(property.address, 40000, {from: alice})
-			// 	})
-			// 	it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
-			// 		const lastBlock = await dev.lockupStorage
-			// 			.getLastBlockNumber(property.address)
-			// 			.then(toBigNumber)
-			// 		const block = await getBlock()
-			// 		const aliceAmount = await dev.lockup
-			// 			.calculateWithdrawableInterestAmount(property.address, alice)
-			// 			.then(toBigNumber)
-			// 		const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-			// 			.times(1e18)
-			// 			.times(lastBlock.minus(block))
-			// 		expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-			// 	})
-			// })
 			// describe('after withdrawal', () => {
 			// 	before(async () => {
 			// 		await dev.lockup.cancel(property.address, {from: alice})
