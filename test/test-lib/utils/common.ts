@@ -50,4 +50,4 @@ export const collectsEth = (to: string, uri = WEB3_URI) => async (
 }
 
 // eslint-disable-next-line no-undef
-export const getBlock = async (): Promise<number> => web3.eth.getBlock()
+export const getBlock = async (): Promise<number> => web3.eth.getBlockNumber()
