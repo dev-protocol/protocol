@@ -13,6 +13,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
+import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
 
 contract Lockup is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
@@ -46,6 +47,9 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		if (getStorage().getLastBlockNumber(_property) == 0) {
 			// Set the block that has been locked-up for the first time as the starting block.
 			getStorage().setLastBlockNumber(_property, block.number);
+		}
+		if (Withdraw(config().withdraw()).getLastBlockNumber(_property) == 0) {
+			Withdraw(config().withdraw()).setLastBlockNumber(_property, block.number);
 		}
 		emit Lockedup(_from, _property, _value);
 	}

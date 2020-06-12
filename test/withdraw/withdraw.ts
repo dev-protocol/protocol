@@ -1,7 +1,7 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {MetricsInstance, PropertyInstance} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
-import {toBigNumber} from '../test-lib/utils/common'
+import {mine, toBigNumber} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {getEventValue} from '../test-lib/utils/event'
 import {
@@ -69,7 +69,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 		return [dev, metrics, property]
 	}
 
-	describe.only('Withdraw; withdraw', () => {
+	describe('Withdraw; withdraw', () => {
 		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
 
@@ -78,18 +78,20 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				.catch((err: Error) => err)
 			validateAddressErrorMessage(res)
 		})
-		it(`should fail to call when hasn't withdrawable interest amount`, async () => {
-			// Const [dev, , property] = await init()
-			// Const res = await dev.lockup.withdrawInterest(property.address).catch(err)
-			// validateErrorMessage(res, 'your interest amount is 0')
+		it(`should fail to call when hasn't withdrawable amount`, async () => {
+			const [dev, , property] = await init()
+			const res = await dev.withdraw
+				.withdraw(property.address, {from: user1})
+				.catch((err: Error) => err)
+			validateErrorMessage(res, 'withdraw value is 0')
 		})
 		describe('withdrawing interest amount', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 
 			before(async () => {
-				;[dev, property] = await init()
-				await dev.lockup.lockup(deployer, property.address, 10000)
+				;[dev, , property] = await init()
+				await dev.dev.deposit(property.address, 10000)
 			})
 
 			it(`withdrawing sender's withdrawable interest full amount`, async () => {
@@ -97,17 +99,15 @@ contract('WithdrawTest', ([deployer, user1]) => {
 					.balanceOf(deployer)
 					.then(toBigNumber)
 				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-				// Await mine(10)
-				const amount = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, deployer)
+				await mine(10)
+				const amount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, deployer)
 					.then(toBigNumber)
-
-				await dev.lockup.withdrawInterest(property.address)
-
+				await dev.withdraw.withdraw(property.address)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-				expect(amount.toFixed()).to.be.equal('500000')
+				expect(amount.toFixed()).to.be.equal('90000000000000000000')
 				expect(afterBalance.toFixed()).to.be.equal(
 					beforeBalance.plus(amount).toFixed()
 				)
@@ -116,15 +116,12 @@ contract('WithdrawTest', ([deployer, user1]) => {
 				)
 			})
 			it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
-				const amount = await dev.lockup
-					.calculateWithdrawableInterestAmount(property.address, deployer)
+				const amount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, deployer)
 					.then(toBigNumber)
 				expect(amount.toFixed()).to.be.equal('0')
 			})
 		})
-	})
-
-	describe('Withdraw; withdraw', () => {
 		describe('Withdraw; Withdraw is mint', () => {
 			it('Withdraw mints an ERC20 token specified in the Address Config Contract', async () => {
 				// Const [dev, metrics, property] = await init()
@@ -230,7 +227,8 @@ contract('WithdrawTest', ([deployer, user1]) => {
 			})
 		})
 	})
-	describe('Withdraw; beforeBalanceChange', () => {
+
+	describe.only('Withdraw; beforeBalanceChange', () => {
 		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance

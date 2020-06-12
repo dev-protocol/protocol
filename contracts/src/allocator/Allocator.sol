@@ -38,7 +38,9 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		);
 		uint256 totalLockedUps = Lockup(config().lockup()).getAllValue();
 		uint256 blocks = _endBlock.sub(beginBlock);
-		blocks = blocks > 0 ? blocks : 1;
+		if (blocks == 0) {
+			return (0, 0);
+		}
 		uint256 mint = Policy(config().policy()).rewards(
 			totalLockedUps,
 			totalAssets
