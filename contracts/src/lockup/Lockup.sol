@@ -45,7 +45,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 				block.number
 			);
 		}
-		update(_property);
 		updatePendingInterestWithdrawal(_property, _from);
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
@@ -84,7 +83,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		require(possible(_property, msg.sender), "waiting for release");
 		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
 		require(lockupedValue != 0, "dev token is not locked");
-		update(_property);
 		updatePendingInterestWithdrawal(_property, msg.sender);
 		Property(_property).withdraw(msg.sender, lockupedValue);
 		getStorage().setValue(_property, msg.sender, 0);
@@ -287,6 +285,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	function updatePendingInterestWithdrawal(address _property, address _user)
 		private
 	{
+		update(_property);
 		uint256 pending = getStorage().getPendingInterestWithdrawal(
 			_property,
 			_user
