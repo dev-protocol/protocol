@@ -844,7 +844,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					)
 				})
 			})
-			describe('after second withdrawal', () => {
+			describe('after withdrawal stakes', () => {
 				let aliceWithdrawalBlock: BigNumber
 				let bobWithdrawalBlock: BigNumber
 				before(async () => {
