@@ -25,16 +25,16 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function calculate(
-		address _property,
-		uint256 _beginBlock,
-		uint256 _endBlock
-	) external view returns (uint256 _holders, uint256 _interest) {
-		uint256 beginBlock = getBeginBlock(_property, _beginBlock);
-		uint256 blocks = _endBlock.sub(beginBlock);
-		if (blocks == 0) {
-			return (0, 0);
-		}
+	function calculatePerBlock(address _property)
+		public
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _maxHolders,
+			uint256 _maxInterest
+		)
+	{
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 lockedUps = Lockup(config().lockup()).getPropertyValue(
@@ -45,13 +45,50 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			totalLockedUps,
 			totalAssets
 		);
-		uint256 result = allocation(blocks, mint, lockedUps, totalLockedUps);
+		uint256 result = allocation(1, mint, lockedUps, totalLockedUps);
 		uint256 holders = Policy(config().policy()).holdersShare(
 			result,
 			lockedUps
 		);
+		uint256 maxHolders = Policy(config().policy()).holdersShare(
+			mint,
+			totalLockedUps
+		);
 		uint256 interest = result.sub(holders);
-		return (holders, interest);
+		uint256 maxInterest = mint.sub(maxHolders);
+		return (holders, interest, maxHolders, maxInterest);
+	}
+
+	function calculate(
+		address _property,
+		uint256 _beginBlock,
+		uint256 _endBlock
+	)
+		external
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _maxHolders,
+			uint256 _maxInterest
+		)
+	{
+		uint256 beginBlock = getBeginBlock(_property, _beginBlock);
+		uint256 blocks = _endBlock.sub(beginBlock);
+		if (blocks == 0) {
+			return (0, 0, 0, 0);
+		}
+		(
+			uint256 _holdersPerBlock,
+			uint256 _interestPerBlock,
+			uint256 _maxHoldersPerBlock,
+			uint256 _maxInterestPerBlock
+		) = calculatePerBlock(_property);
+		uint256 holders = _holdersPerBlock.mul(blocks);
+		uint256 interest = _interestPerBlock.mul(blocks);
+		uint256 maxHolders = _maxHoldersPerBlock.mul(blocks);
+		uint256 maxInterest = _maxInterestPerBlock.mul(blocks);
+		return (holders, interest, maxHolders, maxInterest);
 	}
 
 	function getBeginBlock(address _property, uint256 _beginBlock)

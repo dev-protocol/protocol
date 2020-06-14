@@ -193,6 +193,91 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 			);
 	}
 
+	//LastMaxInterest
+	function setLastMaxInterest(uint256 _value) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(getLastMaxInterestKey(), _value);
+	}
+
+	function getLastMaxInterest() external view returns (uint256) {
+		return eternalStorage().getUint(getLastMaxInterestKey());
+	}
+
+	function getLastMaxInterestKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_lastMaxInterest"));
+	}
+
+	//LastSameInterestBlock
+	function setLastSameInterestBlock(uint256 _value) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(getLastSameInterestBlockKey(), _value);
+	}
+
+	function getLastSameInterestBlock() external view returns (uint256) {
+		return eternalStorage().getUint(getLastSameInterestBlockKey());
+	}
+
+	function getLastSameInterestBlockKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_lastSameInterestBlock"));
+	}
+
+	//GlobalInterestPrice
+	function setGlobalInterestPrice(uint256 _value) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(getGlobalInterestPriceKey(), _value);
+	}
+
+	function getGlobalInterestPrice() external view returns (uint256) {
+		return eternalStorage().getUint(getGlobalInterestPriceKey());
+	}
+
+	function getGlobalInterestPriceKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_globalInterestPrice"));
+	}
+
+	//LastGlobalInterestPrice
+	function setLastGlobalInterestPrice(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(
+			getLastGlobalInterestPriceKey(_property, _user),
+			_value
+		);
+	}
+
+	function getLastGlobalInterestPrice(address _property, address _user)
+		external
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getLastGlobalInterestPriceKey(_property, _user)
+			);
+	}
+
+	function getLastGlobalInterestPriceKey(address _property, address _user)
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastLastGlobalInterestPrice",
+					_property,
+					_user
+				)
+			);
+	}
+
 	//PendingWithdrawal
 	function setPendingInterestWithdrawal(
 		address _property,

@@ -50,6 +50,12 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
 		addAllValue(_value);
+		update(_property);
+		getStorage().setLastGlobalInterestPrice(
+			_property,
+			_from,
+			getStorage().getGlobalInterestPrice()
+		);
 		getStorage().setLastInterestPrice(
 			_property,
 			_from,
@@ -87,18 +93,6 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
-	function next(address _property, uint256 _priceValue)
-		private
-		view
-		returns (uint256)
-	{
-		uint256 result = _priceValue.outOf(
-			getStorage().getPropertyValue(_property)
-		);
-		uint256 price = getStorage().getInterestPrice(_property);
-		return price.add(result);
-	}
-
 	function update(address _property) private {
 		(uint256 begin, uint256 end) = term(_property);
 		require(
@@ -109,8 +103,10 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			),
 			"now abstention penalty"
 		);
-		uint256 nextPrice = dry(_property);
-		getStorage().setInterestPrice(_property, nextPrice);
+		(uint256 _price, uint256 _maxInterest) = dry(_property);
+		getStorage().setGlobalInterestPrice(_price);
+		getStorage().setLastMaxInterest(_maxInterest);
+		getStorage().setLastSameInterestBlock(end);
 		getStorage().setLastBlockNumber(_property, end);
 	}
 
@@ -122,14 +118,27 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		return (getStorage().getLastBlockNumber(_property), block.number);
 	}
 
-	function dry(address _property) private view returns (uint256) {
-		(uint256 begin, uint256 end) = term(_property);
-		(, uint256 interest) = IAllocator(config().allocator()).calculate(
-			_property,
-			begin,
-			end
-		);
-		return next(_property, interest);
+	function dry(address _property)
+		public
+		view
+		returns (uint256 _nextPrice, uint256 _maxInterest)
+	{
+		(, , , uint256 maxInterest) = IAllocator(config().allocator())
+			.calculatePerBlock(_property);
+		uint256 lastMaxInterest = getStorage().getLastMaxInterest();
+		uint256 prev = getStorage().getGlobalInterestPrice();
+		uint256 nextPrice;
+		if (maxInterest == lastMaxInterest) {
+			uint256 lastBlock = getStorage().getLastSameInterestBlock();
+			uint256 blocks = block.number.sub(lastBlock);
+			uint256 total = lastMaxInterest.mul(blocks);
+			uint256 addition = total.outOf(getStorage().getAllValue());
+			nextPrice = prev.add(addition);
+		} else {
+			uint256 addition = maxInterest.outOf(getStorage().getAllValue());
+			nextPrice = prev.add(addition);
+		}
+		return (nextPrice, maxInterest);
 	}
 
 	function _calculateInterestAmount(address _property, address _user)
@@ -137,15 +146,29 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		uint256 _last = getStorage().getLastInterestPrice(_property, _user);
-		uint256 price = getStorage().getInterestPrice(_property);
-		uint256 dryPrice = dry(_property);
-		uint256 priceGap = price.sub(_last);
-		uint256 dryPriceGap = dryPrice.sub(price);
 		uint256 lockupedValue = getStorage().getValue(_property, _user);
-		uint256 value = priceGap.mul(lockupedValue);
-		uint256 dryValue = dryPriceGap.mul(lockupedValue);
-		return value.add(dryValue).div(Decimals.basis());
+
+		uint256 lastLocalPrice = getStorage().getLastInterestPrice(
+			_property,
+			_user
+		);
+		uint256 localPrice = getStorage().getInterestPrice(_property);
+
+		uint256 lastGlobalPrice = getStorage().getLastGlobalInterestPrice(
+			_property,
+			_user
+		);
+
+		(uint256 globalPrice, ) = dry(_property);
+
+		uint256 localPriceGap = localPrice.sub(lastLocalPrice);
+
+		uint256 globalPriceGap = globalPrice.sub(lastGlobalPrice);
+
+		uint256 localValue = localPriceGap.mul(lockupedValue);
+		uint256 globalValue = globalPriceGap.mul(lockupedValue);
+
+		return globalValue.add(localValue).div(Decimals.basis());
 	}
 
 	function calculateInterestAmount(address _property, address _user)
@@ -187,6 +210,11 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			_property,
 			msg.sender,
 			getStorage().getInterestPrice(_property)
+		);
+		getStorage().setLastGlobalInterestPrice(
+			_property,
+			msg.sender,
+			getStorage().getGlobalInterestPrice()
 		);
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
