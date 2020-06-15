@@ -81,6 +81,20 @@ contract.only('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
 			expect(res[2].toString()).to.be.equal('45000000000000450000000')
 			expect(res[3].toString()).to.be.equal('5000000000000050000000')
 		})
+		it.only('If there is a staker, the holder and staker are rewarded.', async () => {
+			const [dev, property] = await init()
+			await dev.dev.mint(user1, new BigNumber(1e18).times(10000000))
+			console.log('*****************')
+			await dev.dev.deposit(property.address, 1000000)
+			console.log('*****************')
+			await dev.dev.deposit(property.address, 2000000, {from: user1})
+			console.log('*****************')
+			const res = await dev.allocator.calculate(property.address, 10000, 10500)
+			expect(res[0].toString()).to.be.equal('45000000000000450000000')
+			expect(res[1].toString()).to.be.equal('5000000000000050000000')
+			expect(res[2].toString()).to.be.equal('45000000000000450000000')
+			expect(res[3].toString()).to.be.equal('5000000000000050000000')
+		})
 	})
 
 	describe('Allocator; allocation', () => {

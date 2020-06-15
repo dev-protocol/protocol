@@ -10,7 +10,6 @@ import {Market} from "contracts/src/market/Market.sol";
 import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
-import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
@@ -139,42 +138,6 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			: Decimals.basis();
 		uint256 mint = _mint.mul(_blocks);
 		return mint.mul(lShare).div(Decimals.basis());
-	}
-
-	function allocatable(
-		address _property,
-		uint256 _beginBlock,
-		uint256 _endBlock
-	) public view returns (bool) {
-		VoteTimes voteTimes = VoteTimes(config().voteTimes());
-		uint256 abstentionCount = voteTimes.getAbstentionTimes(_property);
-		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
-			abstentionCount
-		);
-		if (notTargetPeriod == 0) {
-			return true;
-		}
-		uint256 notTargetBlockNumber = _beginBlock.add(notTargetPeriod);
-		return notTargetBlockNumber < _endBlock;
-	}
-
-	function validateTargetPeriod(
-		address _property,
-		uint256 _beginBlock,
-		uint256 _endBlock
-	) external returns (bool) {
-		addressValidator().validateAddresses(
-			msg.sender,
-			config().lockup(),
-			config().withdraw()
-		);
-
-		require(
-			allocatable(_property, _beginBlock, _endBlock),
-			"outside the target period"
-		);
-		VoteTimes(config().voteTimes()).resetVoteTimesByProperty(_property);
-		return true;
 	}
 
 	function getStorage() private view returns (AllocatorStorage) {

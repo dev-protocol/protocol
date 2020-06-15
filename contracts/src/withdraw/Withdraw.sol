@@ -11,6 +11,7 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
+import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
 
 contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
@@ -83,7 +84,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	function update(address _property) private {
 		(uint256 begin, uint256 end) = term(_property);
 		require(
-			IAllocator(config().allocator()).validateTargetPeriod(
+			IVoteTimes(config().allocator()).validateTargetPeriod(
 				_property,
 				begin,
 				end

@@ -13,6 +13,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
+import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
 import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
 
 contract Lockup is Pausable, UsingConfig, UsingValidator {
@@ -96,7 +97,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		uint256 blocks = end.sub(begin);
 		require(
 			blocks == 0 ||
-				IAllocator(config().allocator()).validateTargetPeriod(
+				IVoteTimes(config().allocator()).validateTargetPeriod(
 					_property,
 					begin,
 					end

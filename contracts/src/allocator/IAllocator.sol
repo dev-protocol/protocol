@@ -51,27 +51,4 @@ contract IAllocator {
 			// solium-disable-next-line indentation
 			uint256
 		);
-
-	function allocatable(
-		address _property,
-		uint256 _beginBlock,
-		uint256 _endBlock
-	)
-		external
-		view
-		returns (
-			// solium-disable-next-line indentation
-			bool
-		);
-
-	function validateTargetPeriod(
-		address _property,
-		uint256 _beginBlock,
-		uint256 _endBlock
-	)
-		external
-		returns (
-			// solium-disable-next-line indentation
-			bool
-		);
 }
