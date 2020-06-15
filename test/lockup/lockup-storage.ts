@@ -207,5 +207,29 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
+
+		describe.only('LockupStorageStorage; setLastMaxInterest, getLastMaxInterest', () => {
+			it('Initial value is 0.', async () => {
+				const result = await dev.lockupStorage.getLastMaxInterest({
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('The set value can be taken as it is.', async () => {
+				await dev.lockupStorage.setLastMaxInterest(300000, {
+					from: lockup,
+				})
+				const result = await dev.lockupStorage.getLastMaxInterest({
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(300000)
+			})
+			it('Cannot rewrite data from other than lockup.', async () => {
+				const result = await dev.lockupStorage
+					.setLastMaxInterest(300000, {from: dummyLockup})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
 	}
 )
