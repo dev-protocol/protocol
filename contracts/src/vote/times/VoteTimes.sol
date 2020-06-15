@@ -59,7 +59,7 @@ contract VoteTimes is IVoteTimes, UsingConfig, UsingValidator, Pausable {
 		return voteTimes.sub(voteTimesByProperty);
 	}
 
-	function allocatable(
+	function abstentionPenalty(
 		address _property,
 		uint256 _beginBlock,
 		uint256 _endBlock
@@ -87,10 +87,9 @@ contract VoteTimes is IVoteTimes, UsingConfig, UsingValidator, Pausable {
 		);
 
 		require(
-			allocatable(_property, _beginBlock, _endBlock),
+			abstentionPenalty(_property, _beginBlock, _endBlock),
 			"outside the target period"
 		);
-		// TODO resetされるタイミングを考慮する
 		resetVoteTimesByProperty(_property);
 		return true;
 	}
