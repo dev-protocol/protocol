@@ -207,8 +207,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
-
-		describe.only('LockupStorageStorage; setLastMaxInterest, getLastMaxInterest', () => {
+		describe('LockupStorageStorage; setLastMaxInterest, getLastMaxInterest', () => {
 			it('Initial value is 0.', async () => {
 				const result = await dev.lockupStorage.getLastMaxInterest({
 					from: lockup,
@@ -227,6 +226,86 @@ contract(
 			it('Cannot rewrite data from other than lockup.', async () => {
 				const result = await dev.lockupStorage
 					.setLastMaxInterest(300000, {from: dummyLockup})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
+		describe('LockupStorageStorage; setLastSameInterestBlock, getLastSameInterestBlock', () => {
+			it('Initial value is 0.', async () => {
+				const result = await dev.lockupStorage.getLastSameInterestBlock({
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('The set value can be taken as it is.', async () => {
+				await dev.lockupStorage.setLastSameInterestBlock(300000, {
+					from: lockup,
+				})
+				const result = await dev.lockupStorage.getLastSameInterestBlock({
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(300000)
+			})
+			it('Cannot rewrite data from other than lockup.', async () => {
+				const result = await dev.lockupStorage
+					.setLastSameInterestBlock(300000, {from: dummyLockup})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
+		describe('LockupStorageStorage; setGlobalInterestPrice, getGlobalInterestPrice', () => {
+			it('Initial value is 0.', async () => {
+				const result = await dev.lockupStorage.getGlobalInterestPrice({
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('The set value can be taken as it is.', async () => {
+				await dev.lockupStorage.setGlobalInterestPrice(3000000, {
+					from: lockup,
+				})
+				const result = await dev.lockupStorage.getGlobalInterestPrice({
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(3000000)
+			})
+			it('Cannot rewrite data from other than lockup.', async () => {
+				const result = await dev.lockupStorage
+					.setGlobalInterestPrice(3000000, {from: dummyLockup})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
+		describe('LockupStorageStorage; setLastGlobalInterestPrice, getLastGlobalInterestPrice', () => {
+			it('Initial value is 0.', async () => {
+				const result = await dev.lockupStorage.getLastGlobalInterestPrice(
+					property,
+					user,
+					{from: lockup}
+				)
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('The set value can be taken as it is.', async () => {
+				await dev.lockupStorage.setLastGlobalInterestPrice(
+					property,
+					user,
+					30000000,
+					{
+						from: lockup,
+					}
+				)
+				const result = await dev.lockupStorage.getLastGlobalInterestPrice(
+					property,
+					user,
+					{from: lockup}
+				)
+				expect(result.toNumber()).to.be.equal(30000000)
+			})
+			it('Cannot rewrite data from other than lockup.', async () => {
+				const result = await dev.lockupStorage
+					.setLastGlobalInterestPrice(property, user, 30000000, {
+						from: dummyLockup,
+					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
