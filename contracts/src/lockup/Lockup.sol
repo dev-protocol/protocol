@@ -96,11 +96,11 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		uint256 blocks = end.sub(begin);
 		require(
 			blocks == 0 ||
-			IAllocator(config().allocator()).validateTargetPeriod(
-				_property,
-				begin,
-				end
-			),
+				IAllocator(config().allocator()).validateTargetPeriod(
+					_property,
+					begin,
+					end
+				),
 			"now abstention penalty"
 		);
 		(uint256 _price, uint256 _maxInterest) = dry(_property);

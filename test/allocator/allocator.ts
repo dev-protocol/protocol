@@ -9,7 +9,7 @@ import {
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 
-contract('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
+contract.only('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
 	const init = async (): Promise<[DevProtocolInstance, PropertyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
@@ -64,7 +64,7 @@ contract('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
 			expect(res[2].toNumber()).to.be.equal(0)
 			expect(res[3].toNumber()).to.be.equal(0)
 		})
-		it('Returns holders and stakers rewards', async () => {
+		it('If there is no staker, only the holder is rewarded.', async () => {
 			const [dev, property] = await init()
 			const res = await dev.allocator.calculate(property.address, 10000, 10500)
 			expect(res[0].toString()).to.be.equal('50000000000000000000000')
@@ -72,14 +72,10 @@ contract('Allocator', ([deployer, user1, dummyLockup, dummyWithdraw]) => {
 			expect(res[2].toString()).to.be.equal('50000000000000000000000')
 			expect(res[3].toNumber()).to.be.equal(0)
 		})
-		it.only('teteteat', async () => {
+		it('If there is a staker, the holder and staker are rewarded.', async () => {
 			const [dev, property] = await init()
 			await dev.dev.deposit(property.address, 1000000)
 			const res = await dev.allocator.calculate(property.address, 10000, 10500)
-			console.log(res[0].toString())
-			console.log(res[1].toString())
-			console.log(res[2].toString())
-			console.log(res[3].toString())
 			expect(res[0].toString()).to.be.equal('45000000000000450000000')
 			expect(res[1].toString()).to.be.equal('5000000000000050000000')
 			expect(res[2].toString()).to.be.equal('45000000000000450000000')
