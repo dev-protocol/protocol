@@ -228,7 +228,7 @@ contract('WithdrawTest', ([deployer, user1]) => {
 		})
 	})
 
-	describe.only('Withdraw; beforeBalanceChange', () => {
+	describe('Withdraw; beforeBalanceChange', () => {
 		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
