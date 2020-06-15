@@ -93,7 +93,9 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 
 	function update(address _property) private {
 		(uint256 begin, uint256 end) = term(_property);
+		uint256 blocks = end.sub(begin);
 		require(
+			blocks == 0 ||
 			IAllocator(config().allocator()).validateTargetPeriod(
 				_property,
 				begin,
