@@ -18,6 +18,7 @@ contract(
 		voteCounter,
 		dummyLockup,
 		dummyWithdraw,
+		user,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
 
@@ -82,7 +83,7 @@ contract(
 				expect(result).to.be.equal(1)
 			})
 		})
-		describe('VoteTimes; validateTargetPeriod', () => {
+		describe.only('VoteTimes; validateTargetPeriod', () => {
 			const _init = async (): Promise<
 				[DevProtocolInstance, PropertyInstance]
 			> => {
@@ -98,7 +99,7 @@ contract(
 					dev.generatePolicyGroup(),
 					dev.generatePolicySet(),
 				])
-				const policy = await artifacts.require('PolicyTestForAllocator').new()
+				const policy = await artifacts.require('PolicyTestForTimeVote').new()
 				await dev.policyFactory.create(policy.address)
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test', 'TEST', deployer)
@@ -136,8 +137,14 @@ contract(
 			describe('abstentionPenalty', () => {
 				it('If the range of block numbers is narrow, an error will occur on abstentionPenalty and the function itself will fail.', async () => {
 					const [dev, property] = await _init()
+					await dev.generateMarketFactory()
+					await dev.generateMarketGroup()
+					const market = await dev.getMarket('MarketTest1', user)
+					await dev.marketFactory.create(market.address, {
+						from: user,
+					})
 					const res = await dev.voteTimes
-						.validateTargetPeriod(property.address, 0, 2, {
+						.validateTargetPeriod(property.address, 1, 2, {
 							from: dummyLockup,
 						})
 						.catch((err: Error) => err)
