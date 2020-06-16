@@ -97,7 +97,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		uint256 blocks = end.sub(begin);
 		require(
 			blocks == 0 ||
-				IVoteTimes(config().allocator()).validateTargetPeriod(
+				IVoteTimes(config().voteTimes()).validateTargetPeriod(
 					_property,
 					begin,
 					end

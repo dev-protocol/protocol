@@ -84,7 +84,7 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	function update(address _property) private {
 		(uint256 begin, uint256 end) = term(_property);
 		require(
-			IVoteTimes(config().allocator()).validateTargetPeriod(
+			IVoteTimes(config().voteTimes()).validateTargetPeriod(
 				_property,
 				begin,
 				end

@@ -90,21 +90,6 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		return (holders, interest, maxHolders, maxInterest);
 	}
 
-	function getBeginBlock(address _property, uint256 _beginBlock)
-		private
-		view
-		returns (uint256)
-	{
-		if (_beginBlock > 0) {
-			return _beginBlock;
-		}
-		uint256 tmp = getStorage().getLastBlockNumber(_property);
-		if (tmp > 0) {
-			return tmp;
-		}
-		return block.number;
-	}
-
 	function beforeBalanceChange(
 		address _property,
 		address _from,
@@ -125,6 +110,21 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		returns (uint256)
 	{
 		return Withdraw(config().withdraw()).getRewardsAmount(_property);
+	}
+
+	function getBeginBlock(address _property, uint256 _beginBlock)
+		private
+		view
+		returns (uint256)
+	{
+		if (_beginBlock > 0) {
+			return _beginBlock;
+		}
+		uint256 tmp = getStorage().getLastBlockNumber(_property);
+		if (tmp > 0) {
+			return tmp;
+		}
+		return block.number;
 	}
 
 	function allocation(
