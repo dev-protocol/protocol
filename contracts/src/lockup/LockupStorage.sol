@@ -238,6 +238,21 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		return keccak256(abi.encodePacked("_globalInterestPrice"));
 	}
 
+	//GlobalRewardPrice
+	function setGlobalRewardPrice(uint256 _value) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(getGlobalRewardPriceKey(), _value);
+	}
+
+	function getGlobalRewardPrice() external view returns (uint256) {
+		return eternalStorage().getUint(getGlobalRewardPriceKey());
+	}
+
+	function getGlobalRewardPriceKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_globalRewardPrice"));
+	}
+
 	//LastGlobalInterestPrice
 	function setLastGlobalInterestPrice(
 		address _property,
