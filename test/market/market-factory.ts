@@ -1,5 +1,6 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {getMarketAddress} from '../test-lib/utils/log'
+import {getAbstentionTimes} from '../test-lib/utils/common'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -53,14 +54,14 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 			expect(await deployedMarket.enabled()).to.be.equal(true)
 		})
 		it('The maximum number of votes is incremented.', async () => {
-			let times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
-			expect(times.toNumber()).to.be.equal(1)
+			let sub = await getAbstentionTimes(dev, dummyProperty)
+			expect(sub).to.be.equal(1)
 			const market = await dev.getMarket('MarketTest2', user)
 			const result = await dev.marketFactory.create(market.address, {
 				from: user,
 			})
-			times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
-			expect(times.toNumber()).to.be.equal(2)
+			sub = await getAbstentionTimes(dev, dummyProperty)
+			expect(sub).to.be.equal(2)
 			const tmpMarketAddress = getMarketAddress(result)
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(tmpMarketAddress)

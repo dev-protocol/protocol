@@ -1,6 +1,7 @@
 import {IPolicyInstance, PolicyInstance} from '../../types/truffle-contracts'
 import {DevProtocolInstance} from '../test-lib/instance'
-import {mine, collectsEth} from '../test-lib/utils/common'
+
+import {mine, collectsEth, getAbstentionTimes} from '../test-lib/utils/common'
 import {getPropertyAddress, getPolicyAddress} from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
@@ -84,14 +85,14 @@ contract(
 				await dev.policyFactory.create(policy.address, {
 					from: user1,
 				})
-				let times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
-				expect(times.toNumber()).to.be.equal(0)
+				let times = await getAbstentionTimes(dev, dummyProperty)
+				expect(times).to.be.equal(0)
 				const second = await dev.getPolicy('PolicyTest1', user1)
 				await dev.policyFactory.create(second.address, {
 					from: user1,
 				})
-				times = await dev.voteTimes.getAbstentionTimes(dummyProperty)
-				expect(times.toNumber()).to.be.equal(1)
+				times = await getAbstentionTimes(dev, dummyProperty)
+				expect(times).to.be.equal(1)
 			})
 		})
 		describe('A new Policy; vote', () => {
@@ -223,16 +224,14 @@ contract(
 				expect(agreeCount.toNumber()).to.be.equal(200)
 			})
 			it('The number of votes VoteTimes is added when the Property owner voted.', async () => {
-				let times = await dev.voteTimes.getAbstentionTimes(
-					createdPropertyAddress
-				)
-				expect(times.toNumber()).to.be.equal(0)
+				let times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(0)
 				const second = await dev.getPolicy('PolicyTest1', user1)
 				const result = await dev.policyFactory.create(second.address, {
 					from: user1,
 				})
-				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
-				expect(times.toNumber()).to.be.equal(1)
+				times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(1)
 				const secondPolicyAddress = getPolicyAddress(result)
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const secondPolicyInstance = await policyContract.at(
@@ -242,14 +241,12 @@ contract(
 				await secondPolicyInstance.vote(createdPropertyAddress, true, {
 					from: propertyAuther,
 				})
-				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
-				expect(times.toNumber()).to.be.equal(0)
+				times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(0)
 			})
 			it('VoteTimes votes will not be added when a vote by other than Property owner voted for.', async () => {
-				let times = await dev.voteTimes.getAbstentionTimes(
-					createdPropertyAddress
-				)
-				expect(times.toNumber()).to.be.equal(0)
+				let times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(0)
 				const second = await dev.getPolicy('PolicyTest1', user1)
 				const result = await dev.policyFactory.create(second.address, {
 					from: user1,
@@ -259,14 +256,14 @@ contract(
 				const secondPolicyInstance = await policyContract.at(
 					secondPolicyAddress
 				)
-				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
-				expect(times.toNumber()).to.be.equal(1)
+				times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(1)
 				await dev.dev.deposit(createdPropertyAddress, 100, {from: user1})
 				await secondPolicyInstance.vote(createdPropertyAddress, true, {
 					from: user1,
 				})
-				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
-				expect(times.toNumber()).to.be.equal(1)
+				times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(1)
 			})
 			it('The number of lock-ups for it Property and the accumulated Market reward will be added to the vote against when a Property owner votes against.', async () => {
 				const second = await dev.getPolicy('PolicyTest1', user1)
@@ -291,16 +288,14 @@ contract(
 				expect(agreeCount.toNumber()).to.be.equal(200)
 			})
 			it('The number of votes VoteTimes is added when the Property owner votes against.', async () => {
-				let times = await dev.voteTimes.getAbstentionTimes(
-					createdPropertyAddress
-				)
-				expect(times.toNumber()).to.be.equal(0)
+				let times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(0)
 				const second = await dev.getPolicy('PolicyTest1', user1)
 				const result = await dev.policyFactory.create(second.address, {
 					from: user1,
 				})
-				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
-				expect(times.toNumber()).to.be.equal(1)
+				times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(1)
 				const secondPolicyAddress = getPolicyAddress(result)
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const secondPolicyInstance = await policyContract.at(
@@ -310,14 +305,12 @@ contract(
 				await secondPolicyInstance.vote(createdPropertyAddress, false, {
 					from: propertyAuther,
 				})
-				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
-				expect(times.toNumber()).to.be.equal(0)
+				times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(0)
 			})
 			it('VoteCounter votes will not be added when a vote by other than Property owner voted against.', async () => {
-				let times = await dev.voteTimes.getAbstentionTimes(
-					createdPropertyAddress
-				)
-				expect(times.toNumber()).to.be.equal(0)
+				let times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(0)
 				const second = await dev.getPolicy('PolicyTest1', user1)
 				const result = await dev.policyFactory.create(second.address, {
 					from: user1,
@@ -327,14 +320,14 @@ contract(
 				const secondPolicyInstance = await policyContract.at(
 					secondPolicyAddress
 				)
-				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
-				expect(times.toNumber()).to.be.equal(1)
+				times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(1)
 				await dev.dev.deposit(createdPropertyAddress, 100, {from: user1})
 				await secondPolicyInstance.vote(createdPropertyAddress, false, {
 					from: user1,
 				})
-				times = await dev.voteTimes.getAbstentionTimes(createdPropertyAddress)
-				expect(times.toNumber()).to.be.equal(1)
+				times = await getAbstentionTimes(dev, createdPropertyAddress)
+				expect(times).to.be.equal(1)
 			})
 			it('When an account of other than Property owner votes for, the number of lock-ups in the Property by its account will be added to the vote.', async () => {
 				const second = await dev.getPolicy('PolicyTest1', user1)

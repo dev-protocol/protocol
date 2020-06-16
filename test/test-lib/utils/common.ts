@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 import BigNumber from 'bignumber.js'
 import {WEB3_URI} from './../const'
+import {DevProtocolInstance} from '../instance'
 
 export async function mine(count: number): Promise<void> {
 	for (let i = 0; i < count; i++) {
@@ -51,3 +52,15 @@ export const collectsEth = (to: string, uri = WEB3_URI) => async (
 
 // eslint-disable-next-line no-undef
 export const getBlock = async (): Promise<number> => web3.eth.getBlockNumber()
+
+export async function getAbstentionTimes(
+	dev: DevProtocolInstance,
+	propertyAddress: string
+): Promise<number> {
+	const times = await dev.voteTimesStorage.getVoteTimes()
+	const timesByProperty = await dev.voteTimesStorage.getVoteTimesByProperty(
+		propertyAddress
+	)
+	const sub = times.toNumber() - timesByProperty.toNumber()
+	return sub
+}

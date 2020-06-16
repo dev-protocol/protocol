@@ -47,6 +47,25 @@ contract VoteTimes is IVoteTimes, UsingConfig, UsingValidator, Pausable {
 		getStorage().setVoteTimesByProperty(_property, voteTimes);
 	}
 
+	function validateTargetPeriod(
+		address _property,
+		uint256 _beginBlock,
+		uint256 _endBlock
+	) external returns (bool) {
+		addressValidator().validateAddresses(
+			msg.sender,
+			config().lockup(),
+			config().withdraw()
+		);
+
+		require(
+			abstentionPenalty(_property, _beginBlock, _endBlock),
+			"outside the target period"
+		);
+		resetVoteTimesByProperty(_property);
+		return true;
+	}
+
 	function getAbstentionTimes(address _property)
 		private
 		view
@@ -73,25 +92,6 @@ contract VoteTimes is IVoteTimes, UsingConfig, UsingValidator, Pausable {
 		}
 		uint256 notTargetBlockNumber = _beginBlock.add(notTargetPeriod);
 		return notTargetBlockNumber < _endBlock;
-	}
-
-	function validateTargetPeriod(
-		address _property,
-		uint256 _beginBlock,
-		uint256 _endBlock
-	) external returns (bool) {
-		addressValidator().validateAddresses(
-			msg.sender,
-			config().lockup(),
-			config().withdraw()
-		);
-
-		require(
-			abstentionPenalty(_property, _beginBlock, _endBlock),
-			"outside the target period"
-		);
-		resetVoteTimesByProperty(_property);
-		return true;
 	}
 
 	function getStorage() private view returns (VoteTimesStorage) {
