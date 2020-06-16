@@ -193,104 +193,64 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 			);
 	}
 
-	//LastMaxInterest
-	function setLastMaxInterest(uint256 _value) external {
+	//LastMaxRewards
+	function setLastMaxRewards(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
-		eternalStorage().setUint(getLastMaxInterestKey(), _value);
+		eternalStorage().setUint(getLastMaxRewardsKey(), _value);
 	}
 
-	function getLastMaxInterest() external view returns (uint256) {
-		return eternalStorage().getUint(getLastMaxInterestKey());
+	function getLastMaxRewards() external view returns (uint256) {
+		return eternalStorage().getUint(getLastMaxRewardsKey());
 	}
 
-	function getLastMaxInterestKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_lastMaxInterest"));
+	function getLastMaxRewardsKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_lastMaxRewards"));
 	}
 
-	//LastSameInterestBlock
-	function setLastSameInterestBlock(uint256 _value) external {
+	//LastSameRewardsBlock
+	function setLastSameRewardsBlock(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
-		eternalStorage().setUint(getLastSameInterestBlockKey(), _value);
+		eternalStorage().setUint(getLastSameRewardsBlockKey(), _value);
 	}
 
-	function getLastSameInterestBlock() external view returns (uint256) {
-		return eternalStorage().getUint(getLastSameInterestBlockKey());
+	function getLastSameRewardsBlock() external view returns (uint256) {
+		return eternalStorage().getUint(getLastSameRewardsBlockKey());
 	}
 
-	function getLastSameInterestBlockKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_lastSameInterestBlock"));
+	function getLastSameRewardsBlockKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_LastSameRewardsBlock"));
 	}
 
-	//GlobalInterestPrice
-	function setGlobalInterestPrice(uint256 _value) external {
+	//CumulativeGlobalRewards
+	function setCumulativeGlobalRewards(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
-		eternalStorage().setUint(getGlobalInterestPriceKey(), _value);
+		eternalStorage().setUint(getCumulativeGlobalRewardsKey(), _value);
 	}
 
-	function getGlobalInterestPrice() external view returns (uint256) {
-		return eternalStorage().getUint(getGlobalInterestPriceKey());
+	function getCumulativeGlobalRewards() external view returns (uint256) {
+		return eternalStorage().getUint(getCumulativeGlobalRewardsKey());
 	}
 
-	function getGlobalInterestPriceKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_globalInterestPrice"));
+	function getCumulativeGlobalRewardsKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
 	}
 
-	//GlobalRewardPrice
-	function setGlobalRewardPrice(uint256 _value) external {
+	//CumulativeGlobalRewardsPrice
+	function setCumulativeGlobalRewardsPrice(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
-		eternalStorage().setUint(getGlobalRewardPriceKey(), _value);
+		eternalStorage().setUint(getCumulativeGlobalRewardsPriceKey(), _value);
 	}
 
-	function getGlobalRewardPrice() external view returns (uint256) {
-		return eternalStorage().getUint(getGlobalRewardPriceKey());
+	function getCumulativeGlobalRewardsPrice() external view returns (uint256) {
+		return eternalStorage().getUint(getCumulativeGlobalRewardsPriceKey());
 	}
 
-	function getGlobalRewardPriceKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_globalRewardPrice"));
-	}
-
-	//LastGlobalInterestPrice
-	function setLastGlobalInterestPrice(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(
-			getLastGlobalInterestPriceKey(_property, _user),
-			_value
-		);
-	}
-
-	function getLastGlobalInterestPrice(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastGlobalInterestPriceKey(_property, _user)
-			);
-	}
-
-	function getLastGlobalInterestPriceKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked(
-					"_lastLastGlobalInterestPrice",
-					_property,
-					_user
-				)
-			);
+	function getCumulativeGlobalRewardsPriceKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_cumulativeGlobalRewardsPrice"));
 	}
 
 	//PendingWithdrawal

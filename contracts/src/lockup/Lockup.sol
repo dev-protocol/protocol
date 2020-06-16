@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // prettier-ignore
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
@@ -50,17 +49,12 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
 		addAllValue(_value);
-		update(_property);
-		getStorage().setLastGlobalInterestPrice(
-			_property,
-			_from,
-			getStorage().getGlobalInterestPrice()
-		);
-		getStorage().setLastInterestPrice(
-			_property,
-			_from,
-			getStorage().getInterestPrice(_property)
-		);
+		update();
+		// getStorage().setLastInterestPrice(
+		// 	_property,
+		// 	_from,
+		// 	getStorage().getInterestPrice(_property)
+		// );
 		emit Lockedup(_from, _property, _value);
 	}
 
@@ -92,7 +86,19 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
-	function update(address _property) private {
+	function update() public {
+		(
+			uint256 _nextRewards,
+			uint256 _nextPrice,
+			uint256 _maxRewards
+		) = dry();
+		getStorage().setCumulativeGlobalRewards(_nextRewards);
+		getStorage().setCumulativeGlobalRewardsPrice(_nextPrice);
+		getStorage().setLastMaxRewards(_maxRewards);
+		getStorage().setLastSameRewardsBlock(block.number);
+	}
+
+	function updateProperty(address _property) private {
 		(uint256 begin, uint256 end) = term(_property);
 		uint256 blocks = end.sub(begin);
 		require(
@@ -104,15 +110,12 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 				),
 			"now abstention penalty"
 		);
-		(
-			uint256 _rewardPrice,
-			uint256 _interestPrice,
-			uint256 _maxInterest
-		) = dry(_property);
-		getStorage().setGlobalRewardPrice(_rewardPrice);
-		getStorage().setGlobalInterestPrice(_interestPrice);
-		getStorage().setLastMaxInterest(_maxInterest);
-		getStorage().setLastSameInterestBlock(end);
+		(, , , uint256 interestPrice) = next(_property);
+		getStorage().setLastInterestPrice(
+			_property,
+			msg.sender,
+			interestPrice
+		);
 		getStorage().setLastBlockNumber(_property, end);
 	}
 
@@ -124,39 +127,53 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		return (getStorage().getLastBlockNumber(_property), block.number);
 	}
 
-	function dry(address _property)
+	function dry()
 		public
 		view
 		returns (
-			uint256 _nextRewardPrice,
-			uint256 _nextInterestPrice,
-			uint256 _maxInterest
+			uint256 _rewards,
+			uint256 _price,
+			uint256 _max
 		)
 	{
-		(, , uint256 maxReward, uint256 maxInterest) = IAllocator(
+		(, , uint256 maxRewards) = IAllocator(
 			config().allocator()
 		)
-			.calculatePerBlock(_property);
-		uint256 lastBlock = getStorage().getLastSameInterestBlock();
-		uint256 blocks = block.number.sub(lastBlock);
-		uint256 lastMaxInterest = getStorage().getLastMaxInterest();
-		uint256 prevReward = getStorage().getGlobalRewardPrice();
-		uint256 prevInterest = getStorage().getGlobalInterestPrice();
-		uint256 additionalReward = maxInterest == lastMaxInterest
-			? maxReward.mul(blocks)
-			: maxReward;
-		uint256 additionalInterest = maxInterest == lastMaxInterest
-			? maxInterest.mul(blocks)
-			: maxInterest;
-		uint256 additionalRewardPrice = additionalReward.outOf(
-			ERC20(_property).totalSupply()
-		);
-		uint256 additionalInterestPrice = additionalInterest.outOf(
-			getStorage().getAllValue()
-		);
-		uint256 nextReward = prevReward.add(additionalRewardPrice);
-		uint256 nextInterest = prevInterest.add(additionalInterestPrice);
-		return (nextReward, nextInterest, maxInterest);
+			.calculateMaxRewardsPerBlock();
+		uint256 lastMaxRewards = getStorage().getLastMaxRewards();
+		uint256 prevRewards = getStorage().getCumulativeGlobalRewards();
+		uint256 prevPrice = getStorage().getCumulativeGlobalRewardsPrice();
+		uint256 lockedUp = getStorage().getAllValue();
+		uint256 lastBlock = maxRewards == lastMaxRewards ? getStorage().getLastSameRewardsBlock() : 0;
+		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
+
+		uint256 additionalRewards = maxRewards.mul(blocks);
+		uint256 additionalPrice = lockedUp > 0 ? maxRewards.mul(blocks).outOf(lockedUp) : 0;
+
+		uint256 nextRewards = prevRewards.add(additionalRewards);
+		uint256 nextPrice = prevPrice.add(additionalPrice);
+
+		return (nextRewards, nextPrice, maxRewards);
+	}
+
+	function next(address _property)
+		private
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _holdersPrice,
+			uint256 _interestPrice
+		)
+	{
+		(, uint256 nextPrice,) = dry();
+		uint256 lockedUp = getStorage().getPropertyValue(_property);
+		uint256 propertyRewards = nextPrice.mul(lockedUp);
+		uint256 holders = Policy(config().policy()).holdersShare(propertyRewards, lockedUp);
+		uint256 interest = propertyRewards.sub(holders);
+		uint256 holdersPrice = holders.outOf(ERC20Mintable(_property).totalSupply());
+		uint256 interestPrice = lockedUp > 0 ? interest.div(lockedUp) : 0;
+		return (holders, interest, holdersPrice, interestPrice);
 	}
 
 	function _calculateInterestAmount(address _property, address _user)
@@ -165,28 +182,14 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		returns (uint256)
 	{
 		uint256 lockupedValue = getStorage().getValue(_property, _user);
-
-		uint256 lastLocalPrice = getStorage().getLastInterestPrice(
+		uint256 lastPrice = getStorage().getLastInterestPrice(
 			_property,
 			_user
 		);
-		uint256 localPrice = getStorage().getInterestPrice(_property);
-
-		uint256 lastGlobalPrice = getStorage().getLastGlobalInterestPrice(
-			_property,
-			_user
-		);
-
-		(, uint256 globalPrice, ) = dry(_property);
-
-		uint256 localPriceGap = localPrice.sub(lastLocalPrice);
-
-		uint256 globalPriceGap = globalPrice.sub(lastGlobalPrice);
-
-		uint256 localValue = localPriceGap.mul(lockupedValue);
-		uint256 globalValue = globalPriceGap.mul(lockupedValue);
-
-		return globalValue.add(localValue).div(Decimals.basis());
+		(, , , uint256 interestPrice) = next(_property);
+		uint256 priceGap = interestPrice.sub(lastPrice);
+		uint256 value = priceGap.mul(lockupedValue);
+		return value > 0 ? value.div(Decimals.basis()) : 0;
 	}
 
 	function calculateInterestAmount(address _property, address _user)
@@ -218,25 +221,16 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	function withdrawInterest(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
-		update(_property);
 		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
 		);
 		require(value > 0, "your interest amount is 0");
-		getStorage().setLastInterestPrice(
-			_property,
-			msg.sender,
-			getStorage().getInterestPrice(_property)
-		);
-		getStorage().setLastGlobalInterestPrice(
-			_property,
-			msg.sender,
-			getStorage().getGlobalInterestPrice()
-		);
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
+		updateProperty(_property);
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+		update();
 	}
 
 	function getAllValue() external view returns (uint256) {
@@ -305,7 +299,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	function updatePendingInterestWithdrawal(address _property, address _user)
 		private
 	{
-		update(_property);
+		updateProperty(_property);
 		uint256 pending = getStorage().getPendingInterestWithdrawal(
 			_property,
 			_user
