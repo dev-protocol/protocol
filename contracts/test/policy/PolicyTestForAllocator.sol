@@ -10,7 +10,7 @@ contract PolicyTestForAllocator is IPolicy {
 		view
 		returns (uint256)
 	{
-		return _lockups + _assets + 100000000000000000000;
+		return 100000000000000000000;
 	}
 
 	function holdersShare(uint256 _amount, uint256 _lockups)

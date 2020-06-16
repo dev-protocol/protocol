@@ -104,7 +104,11 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 				),
 			"now abstention penalty"
 		);
-		(uint256 _rewardPrice, uint256 _interestPrice, uint256 _maxInterest) = dry(_property);
+		(
+			uint256 _rewardPrice,
+			uint256 _interestPrice,
+			uint256 _maxInterest
+		) = dry(_property);
 		getStorage().setGlobalRewardPrice(_rewardPrice);
 		getStorage().setGlobalInterestPrice(_interestPrice);
 		getStorage().setLastMaxInterest(_maxInterest);
@@ -123,19 +127,33 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	function dry(address _property)
 		public
 		view
-		returns (uint256 _nextRewardPrice, uint256 _nextInterestPrice, uint256 _maxInterest)
+		returns (
+			uint256 _nextRewardPrice,
+			uint256 _nextInterestPrice,
+			uint256 _maxInterest
+		)
 	{
-		(, , uint256 maxReward, uint256 maxInterest) = IAllocator(config().allocator())
+		(, , uint256 maxReward, uint256 maxInterest) = IAllocator(
+			config().allocator()
+		)
 			.calculatePerBlock(_property);
 		uint256 lastBlock = getStorage().getLastSameInterestBlock();
 		uint256 blocks = block.number.sub(lastBlock);
 		uint256 lastMaxInterest = getStorage().getLastMaxInterest();
 		uint256 prevReward = getStorage().getGlobalRewardPrice();
 		uint256 prevInterest = getStorage().getGlobalInterestPrice();
-		uint256 additionalReward = maxInterest == lastMaxInterest ? maxReward.mul(blocks) : maxReward;
-		uint256 additionalInterest = maxInterest == lastMaxInterest ? maxInterest.mul(blocks) : maxInterest;
-		uint256 additionalRewardPrice = additionalReward.outOf(ERC20(_property).totalSupply());
-		uint256 additionalInterestPrice = additionalInterest.outOf(getStorage().getAllValue());
+		uint256 additionalReward = maxInterest == lastMaxInterest
+			? maxReward.mul(blocks)
+			: maxReward;
+		uint256 additionalInterest = maxInterest == lastMaxInterest
+			? maxInterest.mul(blocks)
+			: maxInterest;
+		uint256 additionalRewardPrice = additionalReward.outOf(
+			ERC20(_property).totalSupply()
+		);
+		uint256 additionalInterestPrice = additionalInterest.outOf(
+			getStorage().getAllValue()
+		);
 		uint256 nextReward = prevReward.add(additionalRewardPrice);
 		uint256 nextInterest = prevInterest.add(additionalInterestPrice);
 		return (nextReward, nextInterest, maxInterest);
@@ -159,7 +177,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			_user
 		);
 
-		(, uint256 globalPrice,) = dry(_property);
+		(, uint256 globalPrice, ) = dry(_property);
 
 		uint256 localPriceGap = localPrice.sub(lastLocalPrice);
 
