@@ -83,7 +83,7 @@ contract(
 				expect(result).to.be.equal(1)
 			})
 		})
-		describe.only('VoteTimes; validateTargetPeriod', () => {
+		describe('VoteTimes; validateTargetPeriod', () => {
 			const _init = async (): Promise<
 				[DevProtocolInstance, PropertyInstance]
 			> => {
