@@ -74,7 +74,11 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			lockedUps
 		);
 		uint256 interest = result.sub(holders);
-		(uint256 maxHolders, uint256 maxInterest, ) = calculateMaxRewardsPerBlock();
+		(
+			uint256 maxHolders,
+			uint256 maxInterest,
+
+		) = calculateMaxRewardsPerBlock();
 		return (holders, interest, maxHolders, maxInterest);
 	}
 

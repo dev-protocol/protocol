@@ -87,11 +87,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 	}
 
 	function update() public {
-		(
-			uint256 _nextRewards,
-			uint256 _nextPrice,
-			uint256 _maxRewards
-		) = dry();
+		(uint256 _nextRewards, uint256 _nextPrice, uint256 _maxRewards) = dry();
 		getStorage().setCumulativeGlobalRewards(_nextRewards);
 		getStorage().setCumulativeGlobalRewardsPrice(_nextPrice);
 		getStorage().setLastMaxRewards(_maxRewards);
@@ -111,11 +107,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			"now abstention penalty"
 		);
 		(, , , uint256 interestPrice) = next(_property);
-		getStorage().setLastInterestPrice(
-			_property,
-			msg.sender,
-			interestPrice
-		);
+		getStorage().setLastInterestPrice(_property, msg.sender, interestPrice);
 		getStorage().setLastBlockNumber(_property, end);
 	}
 
@@ -136,19 +128,21 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			uint256 _max
 		)
 	{
-		(, , uint256 maxRewards) = IAllocator(
-			config().allocator()
-		)
+		(, , uint256 maxRewards) = IAllocator(config().allocator())
 			.calculateMaxRewardsPerBlock();
 		uint256 lastMaxRewards = getStorage().getLastMaxRewards();
 		uint256 prevRewards = getStorage().getCumulativeGlobalRewards();
 		uint256 prevPrice = getStorage().getCumulativeGlobalRewardsPrice();
 		uint256 lockedUp = getStorage().getAllValue();
-		uint256 lastBlock = maxRewards == lastMaxRewards ? getStorage().getLastSameRewardsBlock() : 0;
+		uint256 lastBlock = maxRewards == lastMaxRewards
+			? getStorage().getLastSameRewardsBlock()
+			: 0;
 		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
 
 		uint256 additionalRewards = maxRewards.mul(blocks);
-		uint256 additionalPrice = lockedUp > 0 ? maxRewards.mul(blocks).outOf(lockedUp) : 0;
+		uint256 additionalPrice = lockedUp > 0
+			? maxRewards.mul(blocks).outOf(lockedUp)
+			: 0;
 
 		uint256 nextRewards = prevRewards.add(additionalRewards);
 		uint256 nextPrice = prevPrice.add(additionalPrice);
@@ -166,12 +160,17 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			uint256 _interestPrice
 		)
 	{
-		(, uint256 nextPrice,) = dry();
+		(, uint256 nextPrice, ) = dry();
 		uint256 lockedUp = getStorage().getPropertyValue(_property);
 		uint256 propertyRewards = nextPrice.mul(lockedUp);
-		uint256 holders = Policy(config().policy()).holdersShare(propertyRewards, lockedUp);
+		uint256 holders = Policy(config().policy()).holdersShare(
+			propertyRewards,
+			lockedUp
+		);
 		uint256 interest = propertyRewards.sub(holders);
-		uint256 holdersPrice = holders.outOf(ERC20Mintable(_property).totalSupply());
+		uint256 holdersPrice = holders.outOf(
+			ERC20Mintable(_property).totalSupply()
+		);
 		uint256 interestPrice = lockedUp > 0 ? interest.div(lockedUp) : 0;
 		return (holders, interest, holdersPrice, interestPrice);
 	}
@@ -182,10 +181,7 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 		returns (uint256)
 	{
 		uint256 lockupedValue = getStorage().getValue(_property, _user);
-		uint256 lastPrice = getStorage().getLastInterestPrice(
-			_property,
-			_user
-		);
+		uint256 lastPrice = getStorage().getLastInterestPrice(_property, _user);
 		(, , , uint256 interestPrice) = next(_property);
 		uint256 priceGap = interestPrice.sub(lastPrice);
 		uint256 value = priceGap.mul(lockupedValue);

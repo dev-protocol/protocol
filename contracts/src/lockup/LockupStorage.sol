@@ -249,7 +249,11 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		return eternalStorage().getUint(getCumulativeGlobalRewardsPriceKey());
 	}
 
-	function getCumulativeGlobalRewardsPriceKey() private pure returns (bytes32) {
+	function getCumulativeGlobalRewardsPriceKey()
+		private
+		pure
+		returns (bytes32)
+	{
 		return keccak256(abi.encodePacked("_cumulativeGlobalRewardsPrice"));
 	}
 
