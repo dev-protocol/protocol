@@ -139,6 +139,14 @@ contract(
 			it('No error if either address is the same(ver2).', async () => {
 				await addressValidator.validateAddresses(market, policy, market)
 			})
+			it('No error if either address is the same(ver3).', async () => {
+				await addressValidator.validate3Addresses(
+					property,
+					policy,
+					market,
+					property
+				)
+			})
 			it('An error will occur if the address is different for both.', async () => {
 				const result = await addressValidator
 					.validateAddresses(market, policy, metrics)

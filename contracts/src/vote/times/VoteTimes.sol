@@ -37,9 +37,10 @@ contract VoteTimes is IVoteTimes, UsingConfig, UsingValidator, Pausable {
 	}
 
 	function resetVoteTimesByProperty(address _property) public {
-		addressValidator().validateAddresses(
+		addressValidator().validate3Addresses(
 			msg.sender,
-			config().allocator(),
+			config().lockup(),
+			config().withdraw(),
 			config().propertyFactory()
 		);
 
