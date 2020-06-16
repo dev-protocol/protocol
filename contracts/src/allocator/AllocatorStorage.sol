@@ -7,7 +7,7 @@ contract AllocatorStorage is UsingStorage {
 
 	constructor() public UsingStorage() {
 		property_n_metrics[0x05BC991269a9730232a65ea7C471ABcC7D86A5B3] = 0xFEfC8Ffb329b6DfE755d24F86A19f604CEbDf3ce;
-		// more...
+		// TODO more...
 	}
 
 	// Last Block Number
