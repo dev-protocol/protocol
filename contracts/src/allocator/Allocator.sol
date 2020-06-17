@@ -32,7 +32,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	{
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
-		uint256 totalLockedUps = Lockup(config().lockup()).getAllValue();
+		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
 		uint256 mint = Policy(config().policy()).rewards(
 			totalLockedUps,
 			totalAssets
