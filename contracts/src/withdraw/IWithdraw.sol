@@ -11,7 +11,7 @@ contract IWithdraw {
 		address _from,
 		address _to
 		// solium-disable-next-line indentation
-		) external;
+	) external;
 
 	function setLastBlockNumber(address _property, uint256 _blockNumber)
 		external;
