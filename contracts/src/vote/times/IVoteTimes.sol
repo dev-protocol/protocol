@@ -12,5 +12,7 @@ contract IVoteTimes {
 			bool
 		);
 
+	function addVoteTime() external;
 	function addVoteTimesByProperty(address _property) external;
+	function resetVoteTimesByProperty(address _property) public;
 }

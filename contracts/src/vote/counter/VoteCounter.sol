@@ -7,11 +7,12 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
+import {IVoteCounter} from "contracts/src/vote/counter/IVoteCounter.sol";
 // prettier-ignore
 import {VoteCounterStorage} from "contracts/src/vote/counter/VoteCounterStorage.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 
-contract VoteCounter is UsingConfig, UsingValidator, Pausable {
+contract VoteCounter is IVoteCounter, UsingConfig, UsingValidator, Pausable {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
