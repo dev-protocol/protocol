@@ -7,6 +7,8 @@ import {
 	validateAddressErrorMessage,
 } from '../../test-lib/utils/error'
 
+// TODO pause test
+
 contract(
 	'VoteTimesTest',
 	([

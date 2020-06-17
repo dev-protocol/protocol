@@ -85,6 +85,7 @@ contract VoteCounter is IVoteCounter, UsingConfig, UsingValidator, Pausable {
 	}
 
 	function getStorage() private view returns (VoteCounterStorage) {
+		require(paused() == false, "You cannot use that");
 		return VoteCounterStorage(config().voteCounterStorage());
 	}
 }
