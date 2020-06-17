@@ -5,9 +5,10 @@ contract IVoteCounter {
 		address _user,
 		address _property,
 		bool _agree
-	)
-		external;
+		// solium-disable-next-line indentation
+	) external;
 
 	function getAgreeCount(address _sender) external view returns (uint256);
+
 	function getOppositeCount(address _sender) external view returns (uint256);
 }
