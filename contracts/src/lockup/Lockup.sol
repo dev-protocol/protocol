@@ -7,15 +7,15 @@ import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
-import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
-import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
+import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
+import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
-contract Lockup is Pausable, UsingConfig, UsingValidator {
+contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event Lockedup(address _from, address _property, uint256 _value);
@@ -39,8 +39,8 @@ contract Lockup is Pausable, UsingConfig, UsingValidator {
 			// Set the block that has been locked-up for the first time as the starting block.
 			getStorage().setLastBlockNumber(_property, block.number);
 		}
-		if (Withdraw(config().withdraw()).getLastBlockNumber(_property) == 0) {
-			Withdraw(config().withdraw()).setLastBlockNumber(
+		if (IWithdraw(config().withdraw()).getLastBlockNumber(_property) == 0) {
+			IWithdraw(config().withdraw()).setLastBlockNumber(
 				_property,
 				block.number
 			);

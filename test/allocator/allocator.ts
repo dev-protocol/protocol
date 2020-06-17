@@ -47,6 +47,8 @@ contract('Allocator', ([deployer, user1]) => {
 		return [dev, property]
 	}
 
+	// TODO calculatePerBlock
+
 	describe('Allocator: calculate', () => {
 		it('If the difference between the start and end numbers is not appropriate, an error occurs.', async () => {
 			const [dev, property] = await init()
@@ -55,7 +57,7 @@ contract('Allocator', ([deployer, user1]) => {
 				.catch((err: Error) => err)
 			validateErrorMessage(res, 'SafeMath: subtraction overflow', false)
 		})
-		it('If the difference between the start and end numbers is not appropriate, an error occurs.', async () => {
+		it('If the start block number and the end block number are the same, 0 is returned.', async () => {
 			const [dev, property] = await init()
 			const res = await dev.allocator.calculate(property.address, 1, 1)
 			expect(res[0].toNumber()).to.be.equal(0)
@@ -75,37 +77,10 @@ contract('Allocator', ([deployer, user1]) => {
 			const [dev, property] = await init()
 			await dev.dev.deposit(property.address, 1000000)
 			const res = await dev.allocator.calculate(property.address, 10000, 10500)
-			expect(res[0].toString()).to.be.equal('45000000000000450000000')
-			expect(res[1].toString()).to.be.equal('5000000000000050000000')
-			expect(res[2].toString()).to.be.equal('45000000000000450000000')
-			expect(res[3].toString()).to.be.equal('5000000000000050000000')
-		})
-		it('If there is a staker, the holder and staker are rewarded.', async () => {
-			const [dev, property] = await init()
-			await dev.dev.mint(user1, new BigNumber(1e18).times(10000000))
-			console.log('*****************')
-			await dev.dev.deposit(property.address, 1000000)
-			console.log('*****************')
-			await dev.dev.deposit(property.address, 2000000, {from: user1})
-			console.log('*****************')
-			const res = await dev.allocator.calculate(property.address, 10000, 10500)
-			expect(res[0].toString()).to.be.equal('45000000000000450000000')
-			expect(res[1].toString()).to.be.equal('5000000000000050000000')
-			expect(res[2].toString()).to.be.equal('45000000000000450000000')
-			expect(res[3].toString()).to.be.equal('5000000000000050000000')
-		})
-	})
-
-	describe('Allocator; allocation', () => {
-		it(`
-		last allocation block is 5760,
-		mint per block is 50000,
-		locked-up is 300,
-		total locked-up is 7406907;
-		the result is ${5760 * 50000 * (300 / 7406907)}`, async () => {
-			const [dev] = await init()
-			const result = await dev.allocator.allocation(5760, 50000, 300, 7406907)
-			expect(result.toNumber()).to.be.equal(~~(5760 * 50000 * (300 / 7406907)))
+			expect(res[0].toString()).to.be.equal('45000000000000000000000')
+			expect(res[1].toString()).to.be.equal('5000000000000000000000')
+			expect(res[2].toString()).to.be.equal('45000000000000000000000')
+			expect(res[3].toString()).to.be.equal('5000000000000000000000')
 		})
 	})
 

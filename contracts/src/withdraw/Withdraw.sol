@@ -8,12 +8,12 @@ import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
+import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 
-contract Withdraw is Pausable, UsingConfig, UsingValidator {
+contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 

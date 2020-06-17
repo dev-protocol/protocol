@@ -1,6 +1,6 @@
 {
 	"name": "@devprtcl/protocol",
-	"version": "0.1.5",
+	"version": "1.0.0",
 	"description": "Securitize for Internet assets",
 	"main": "cli/index.js",
 	"scripts": {

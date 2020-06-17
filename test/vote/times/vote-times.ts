@@ -5,6 +5,7 @@ import {getAbstentionTimes} from '../../test-lib/utils/common'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
+	validatePauseErrorMessage,
 } from '../../test-lib/utils/error'
 
 contract(
@@ -149,6 +150,25 @@ contract(
 						})
 						.catch((err: Error) => err)
 					validateErrorMessage(res, 'outside the target period')
+				})
+			})
+		})
+
+		describe('VoteTimes; pause', () => {
+			it('When you apply a pause, you cannot access the storage.', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressConfig()
+				await dev.generateVoteTimes()
+				await dev.generateVoteTimesStorage()
+				await dev.addressConfig.setVoteCounter(voteCounter, {from: deployer})
+				await dev.voteTimes.pause()
+				const result = await dev.voteTimes
+					.addVoteTimesByProperty(dummyProperty, {from: voteCounter})
+					.catch((err: Error) => err)
+				validatePauseErrorMessage(result, false)
+				await dev.voteTimes.unpause()
+				await dev.voteTimes.addVoteTimesByProperty(dummyProperty, {
+					from: voteCounter,
 				})
 			})
 		})

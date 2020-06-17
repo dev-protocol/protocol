@@ -6,13 +6,10 @@ import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {Market} from "contracts/src/market/Market.sol";
-import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
-import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
-import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
+import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
-import {Lockup} from "contracts/src/lockup/Lockup.sol";
+import {ILockup} from "contracts/src/lockup/ILockup.sol";
 import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
 contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
@@ -60,10 +57,10 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	{
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
-		uint256 lockedUps = Lockup(config().lockup()).getPropertyValue(
+		uint256 lockedUps = ILockup(config().lockup()).getPropertyValue(
 			_property
 		);
-		uint256 totalLockedUps = Lockup(config().lockup()).getAllValue();
+		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
 		uint256 mint = Policy(config().policy()).rewards(
 			totalLockedUps,
 			totalAssets
@@ -121,19 +118,11 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	) external {
 		addressValidator().validateGroup(msg.sender, config().propertyGroup());
 
-		Withdraw(config().withdraw()).beforeBalanceChange(
+		IWithdraw(config().withdraw()).beforeBalanceChange(
 			_property,
 			_from,
 			_to
 		);
-	}
-
-	function getRewardsAmount(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return Withdraw(config().withdraw()).getRewardsAmount(_property);
 	}
 
 	function getBeginBlock(address _property, uint256 _beginBlock)
@@ -156,7 +145,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		uint256 _mint,
 		uint256 _lockedUps,
 		uint256 _totalLockedUps
-	) public pure returns (uint256) {
+	) private pure returns (uint256) {
 		uint256 lShare = _totalLockedUps > 0
 			? _lockedUps.outOf(_totalLockedUps)
 			: Decimals.basis();
