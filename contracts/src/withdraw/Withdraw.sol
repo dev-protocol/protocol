@@ -12,8 +12,9 @@ import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
+import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 
-contract Withdraw is Pausable, UsingConfig, UsingValidator {
+contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 

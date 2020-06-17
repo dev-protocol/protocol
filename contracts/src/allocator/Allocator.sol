@@ -104,14 +104,6 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		);
 	}
 
-	function getRewardsAmount(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return Withdraw(config().withdraw()).getRewardsAmount(_property);
-	}
-
 	function getBeginBlock(address _property, uint256 _beginBlock)
 		private
 		view
@@ -132,7 +124,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		uint256 _mint,
 		uint256 _lockedUps,
 		uint256 _totalLockedUps
-	) public pure returns (uint256) {
+	) private pure returns (uint256) {
 		uint256 lShare = _totalLockedUps > 0
 			? _lockedUps.outOf(_totalLockedUps)
 			: Decimals.basis();
