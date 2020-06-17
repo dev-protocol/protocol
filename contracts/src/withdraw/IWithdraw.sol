@@ -6,8 +6,12 @@ contract IWithdraw {
 		view
 		returns (uint256);
 
-	function beforeBalanceChange(address _property, address _from, address _to)
-		external;
+	function beforeBalanceChange(
+		address _property,
+		address _from,
+		address _to
+		// solium-disable-next-line indentation
+		) external;
 
 	function setLastBlockNumber(address _property, uint256 _blockNumber)
 		external;
