@@ -208,6 +208,21 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		return keccak256(abi.encodePacked("_lastMaxRewards"));
 	}
 
+	//LastMaxRewardsPrice
+	function setLastMaxRewardsPrice(uint256 _value) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(getLastMaxRewardsPriceKey(), _value);
+	}
+
+	function getLastMaxRewardsPrice() external view returns (uint256) {
+		return eternalStorage().getUint(getLastMaxRewardsPriceKey());
+	}
+
+	function getLastMaxRewardsPriceKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_lastMaxRewardsPrice"));
+	}
+
 	//LastSameRewardsBlock
 	function setLastSameRewardsBlock(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
