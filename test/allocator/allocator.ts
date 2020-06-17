@@ -84,38 +84,6 @@ contract('Allocator', ([deployer, user1]) => {
 		})
 	})
 
-	describe('Allocator; getRewardsAmount', () => {
-		it('The same result as getRewardsAmount in the withdrawal contract come back.', async () => {
-			const [dev, property] = await init()
-			let allocatorResult = await dev.allocator.getRewardsAmount(
-				property.address
-			)
-			let withdrawResult = await dev.withdraw.getRewardsAmount(property.address)
-			expect(withdrawResult.toString()).to.be.equal(allocatorResult.toString())
-			await dev.dev.deposit(property.address, 1000000)
-			await dev.dev.addMinter(dev.withdraw.address)
-			await dev.withdraw.withdraw(property.address)
-			allocatorResult = await dev.allocator.getRewardsAmount(property.address)
-			withdrawResult = await dev.withdraw.getRewardsAmount(property.address)
-			const tmp = withdrawResult.toString() === '0'
-			expect(tmp).to.be.equal(false)
-			expect(withdrawResult.toString()).to.be.equal(allocatorResult.toString())
-		})
-	})
-
-	describe('Allocator; allocation', () => {
-		it(`
-		last allocation block is 5760,
-		mint per block is 50000,
-		locked-up is 300,
-		total locked-up is 7406907;
-		the result is ${5760 * 50000 * (300 / 7406907)}`, async () => {
-			const [dev] = await init()
-			const result = await dev.allocator.allocation(5760, 50000, 300, 7406907)
-			expect(result.toNumber()).to.be.equal(~~(5760 * 50000 * (300 / 7406907)))
-		})
-	})
-
 	describe('Allocator; pause', () => {
 		it('pause and unpause this contract', async () => {
 			const [dev, property] = await init()
