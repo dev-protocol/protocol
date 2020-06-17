@@ -5,8 +5,8 @@ import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
-import {Lockup} from "contracts/src/lockup/Lockup.sol";
-import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
+import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
 // prettier-ignore
 import {VoteCounterStorage} from "contracts/src/vote/counter/VoteCounterStorage.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
@@ -59,14 +59,14 @@ contract VoteCounter is UsingConfig, UsingValidator, Pausable {
 		uint256 voteCount;
 		if (Property(_property).author() == _sender) {
 			// solium-disable-next-line operator-whitespace
-			voteCount = Lockup(config().lockup())
+			voteCount = ILockup(config().lockup())
 				.getPropertyValue(_property)
 				.add(
 				IWithdraw(config().withdraw()).getRewardsAmount(_property)
 			);
-			VoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
+			IVoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
 		} else {
-			voteCount = Lockup(config().lockup()).getValue(_property, _sender);
+			voteCount = ILockup(config().lockup()).getValue(_property, _sender);
 		}
 		return voteCount;
 	}

@@ -11,4 +11,9 @@ contract IVoteTimes {
 			// solium-disable-next-line indentation
 			bool
 		);
+
+	function addVoteTimesByProperty(
+		address _property
+	)
+		external;
 }
