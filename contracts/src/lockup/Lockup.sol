@@ -364,13 +364,12 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		address _property,
 		address _user
 	) private view returns (uint256) {
+		uint256 _last = getStorage().getLastInterestPrice(_property, _user);
+		uint256 price = getStorage().getInterestPrice(_property);
+		uint256 priceGap = price.sub(_last);
 		uint256 lockupedValue = getStorage().getValue(_property, _user);
-		uint256 interestPrice = getStorage().getInterestPrice(_property);
-		uint256 lastPrice = getStorage().getLastInterestPrice(_property, _user);
-		return
-			interestPrice > lastPrice
-				? interestPrice.sub(lastPrice).mul(lockupedValue) // solium-disable-next-line indentation
-				: 0;
+		uint256 value = priceGap.mul(lockupedValue);
+		return value.div(Decimals.basis());
 	}
 
 	function __updateLegacyWithdrawableInterestAmount(
