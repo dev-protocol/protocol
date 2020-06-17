@@ -106,14 +106,8 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		private
 	{
 		(, , , uint256 interestPrice) = next(_property);
-		emit Log("updateProperty: interestPrice", interestPrice);
-		emit Log("updateProperty: user", _user);
 		getStorage().setLastInterestPrice(_property, _user, interestPrice);
 		getStorage().setLastBlockNumber(_property, block.number);
-		emit Log(
-			"updateProperty: getLastInterestPrice",
-			getStorage().getLastInterestPrice(_property, _user)
-		);
 	}
 
 	function validateTargetPeriod(address _property) private {
