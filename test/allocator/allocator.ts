@@ -47,7 +47,7 @@ contract('Allocator', ([deployer, user1]) => {
 		return [dev, property]
 	}
 
-	// TODO calculatePerBlock、beforeBalanceChange、getRewardsAmount
+	// TODO calculatePerBlock、beforeBalanceChange
 
 	describe('Allocator: calculate', () => {
 		it('If the difference between the start and end numbers is not appropriate, an error occurs.', async () => {
@@ -81,6 +81,25 @@ contract('Allocator', ([deployer, user1]) => {
 			expect(res[1].toString()).to.be.equal('5000000000000000000000')
 			expect(res[2].toString()).to.be.equal('45000000000000000000000')
 			expect(res[3].toString()).to.be.equal('5000000000000000000000')
+		})
+	})
+
+	describe('Allocator; getRewardsAmount', () => {
+		it('The same result as getRewardsAmount in the withdrawal contract come back.', async () => {
+			const [dev, property] = await init()
+			let allocatorResult = await dev.allocator.getRewardsAmount(
+				property.address
+			)
+			let withdrawResult = await dev.withdraw.getRewardsAmount(property.address)
+			expect(withdrawResult.toString()).to.be.equal(allocatorResult.toString())
+			await dev.dev.deposit(property.address, 1000000)
+			await dev.dev.addMinter(dev.withdraw.address)
+			await dev.withdraw.withdraw(property.address)
+			allocatorResult = await dev.allocator.getRewardsAmount(property.address)
+			withdrawResult = await dev.withdraw.getRewardsAmount(property.address)
+			const tmp = withdrawResult.toString() === '0'
+			expect(tmp).to.be.equal(false)
+			expect(withdrawResult.toString()).to.be.equal(allocatorResult.toString())
 		})
 	})
 
