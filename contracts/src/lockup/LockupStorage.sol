@@ -272,6 +272,44 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		return keccak256(abi.encodePacked("_cumulativeGlobalRewardsPrice"));
 	}
 
+	//LastCumulativeGlobalInterestPrice
+	function setLastCumulativeGlobalInterestPrice(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(
+			getLastCumulativeGlobalInterestPriceKey(_property, _user),
+			_value
+		);
+	}
+
+	function getLastCumulativeGlobalInterestPrice(
+		address _property,
+		address _user
+	) external view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getLastCumulativeGlobalInterestPriceKey(_property, _user)
+			);
+	}
+
+	function getLastCumulativeGlobalInterestPriceKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativeGlobalInterestPrice",
+					_property,
+					_user
+				)
+			);
+	}
+
 	//PendingWithdrawal
 	function setPendingInterestWithdrawal(
 		address _property,

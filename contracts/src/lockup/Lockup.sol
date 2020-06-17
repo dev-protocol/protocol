@@ -106,7 +106,11 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		private
 	{
 		(, , , uint256 interestPrice) = next(_property);
-		getStorage().setLastInterestPrice(_property, _user, interestPrice);
+		getStorage().setLastCumulativeGlobalInterestPrice(
+			_property,
+			_user,
+			interestPrice
+		);
 		getStorage().setLastBlockNumber(_property, block.number);
 	}
 
@@ -191,7 +195,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		returns (uint256)
 	{
 		uint256 lockupedValue = getStorage().getValue(_property, _user);
-		uint256 lastPrice = getStorage().getLastInterestPrice(_property, _user);
+		uint256 lastPrice = getStorage().getLastCumulativeGlobalInterestPrice(
+			_property,
+			_user
+		);
 		(, , , uint256 interestPrice) = next(_property);
 		uint256 priceGap = interestPrice.sub(lastPrice);
 		uint256 value = priceGap.mul(lockupedValue);
@@ -214,7 +221,9 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_user
 		);
-		return _calculateInterestAmount(_property, _user).add(pending);
+		uint256 legacy = __legacyWithdrawableInterestAmount(_property, _user);
+		return
+			_calculateInterestAmount(_property, _user).add(pending).add(legacy);
 	}
 
 	function calculateWithdrawableInterestAmount(
@@ -236,6 +245,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		updateLastPriceForProperty(_property, msg.sender);
+		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 		update();
 	}
@@ -315,6 +325,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			_user,
 			_calculateInterestAmount(_property, _user).add(pending)
 		);
+		__updateLegacyWithdrawableInterestAmount(_property, _user);
 	}
 
 	function possible(address _property, address _from)
@@ -347,6 +358,27 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			}
 		}
 		return false;
+	}
+
+	function __legacyWithdrawableInterestAmount(
+		address _property,
+		address _user
+	) private view returns (uint256) {
+		uint256 lockupedValue = getStorage().getValue(_property, _user);
+		uint256 interestPrice = getStorage().getInterestPrice(_property);
+		uint256 lastPrice = getStorage().getLastInterestPrice(_property, _user);
+		return
+			interestPrice > lastPrice
+				? interestPrice.sub(lastPrice).mul(lockupedValue) // solium-disable-next-line indentation
+				: 0;
+	}
+
+	function __updateLegacyWithdrawableInterestAmount(
+		address _property,
+		address _user
+	) private {
+		uint256 interestPrice = getStorage().getInterestPrice(_property);
+		getStorage().setLastInterestPrice(_property, _user, interestPrice);
 	}
 
 	function getStorage() private view returns (LockupStorage) {
