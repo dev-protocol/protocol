@@ -8,6 +8,8 @@ contract ILockup {
 		// solium-disable-next-line indentation
 	) external;
 
+	function update() public;
+
 	function next(address _property)
 		public
 		view

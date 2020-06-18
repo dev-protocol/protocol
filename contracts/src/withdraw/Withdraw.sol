@@ -23,22 +23,26 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	function withdraw(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
-		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
+		(uint256 value, uint256 lastPrice) = _calculateWithdrawableAmount(
+			_property,
+			msg.sender
+		);
 		require(value != 0, "withdraw value is 0");
 		// update(_property);
-		(, uint256 _holdersPrice, , ) = ILockup(config().lockup()).next(
-			_property
-		);
 		// uint256 price = getStorage().getCumulativePrice(_property);
 		// getStorage().setLastWithdrawalPrice(_property, msg.sender, _holdersPrice);
 		getStorage().setLastCumulativeGlobalHoldersPrice(
 			_property,
 			msg.sender,
-			_holdersPrice
+			lastPrice
 		);
 		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
+		__updateLegacyWithdrawableAmount(_property, msg.sender);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
+		ILockup lockup = ILockup(config().lockup());
+		lockup.update();
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+		lockup.update();
 	}
 
 	function beforeBalanceChange(
@@ -49,8 +53,8 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateAddress(msg.sender, config().allocator());
 
 		uint256 price = getStorage().getCumulativePrice(_property);
-		uint256 amountFrom = _calculateAmount(_property, _from);
-		uint256 amountTo = _calculateAmount(_property, _to);
+		(uint256 amountFrom, ) = _calculateAmount(_property, _from);
+		(uint256 amountTo, ) = _calculateAmount(_property, _to);
 		getStorage().setLastWithdrawalPrice(_property, _from, price);
 		getStorage().setLastWithdrawalPrice(_property, _to, price);
 		uint256 pendFrom = getStorage().getPendingWithdrawal(_property, _from);
@@ -111,7 +115,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	function _calculateAmount(address _property, address _user)
 		private
 		view
-		returns (uint256)
+		returns (uint256 _amount, uint256 _price)
 	{
 		uint256 _last = getStorage().getLastCumulativeGlobalHoldersPrice(
 			_property,
@@ -137,7 +141,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			balance = balanceLimit;
 		}
 		uint256 value = priceGap.mul(balance);
-		return value.div(Decimals.basis());
+		return (value.div(Decimals.basis()), _holdersPrice);
 	}
 
 	function calculateAmount(address _property, address _user)
@@ -145,20 +149,21 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		return _calculateAmount(_property, _user);
+		(uint256 value, ) = _calculateAmount(_property, _user);
+		return value;
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)
 		private
 		view
-		returns (uint256)
+		returns (uint256 _amount, uint256 _price)
 	{
-		uint256 _value = _calculateAmount(_property, _user);
+		(uint256 _value, uint256 price) = _calculateAmount(_property, _user);
 		uint256 legacy = __legacyWithdrawableAmount(_property, _user);
 		uint256 value = _value
 			.add(getStorage().getPendingWithdrawal(_property, _user))
 			.add(legacy);
-		return value;
+		return (value, price);
 	}
 
 	function calculateWithdrawableAmount(address _property, address _user)
@@ -166,7 +171,8 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		return _calculateWithdrawableAmount(_property, _user);
+		(uint256 value, ) = _calculateWithdrawableAmount(_property, _user);
+		return value;
 	}
 
 	function setLastBlockNumber(address _property, uint256 _blockNumber)
