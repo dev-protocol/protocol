@@ -243,7 +243,17 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generateVoteTimes(),
 					dev.generateVoteTimesStorage(),
+					dev.generateAllocator(),
+					dev.generateAllocatorStorage(),
+					dev.generateMetricsGroup(),
+					dev.generateWithdraw(),
+					dev.generateWithdrawStorage(),
+					dev.generatePolicyFactory(),
+					dev.generatePolicyGroup(),
+					dev.generatePolicySet(),
 				])
+				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user1)
+				await dev.policyFactory.create(iPolicyInstance.address)
 				return dev
 			}
 
