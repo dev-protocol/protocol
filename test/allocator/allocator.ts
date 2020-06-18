@@ -47,8 +47,6 @@ contract('Allocator', ([deployer, user1]) => {
 		return [dev, property]
 	}
 
-	// TODO calculatePerBlock
-
 	describe('Allocator: calculate', () => {
 		it('If the difference between the start and end numbers is not appropriate, an error occurs.', async () => {
 			const [dev, property] = await init()

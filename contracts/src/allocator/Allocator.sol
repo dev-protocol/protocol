@@ -45,40 +45,6 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		return (maxHolders, maxInterest, mint);
 	}
 
-	function calculatePerBlock(address _property)
-		public
-		view
-		returns (
-			uint256 _holders,
-			uint256 _interest,
-			uint256 _maxHolders,
-			uint256 _maxInterest
-		)
-	{
-		uint256 totalAssets = MetricsGroup(config().metricsGroup())
-			.totalIssuedMetrics();
-		uint256 lockedUps = ILockup(config().lockup()).getPropertyValue(
-			_property
-		);
-		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
-		uint256 mint = Policy(config().policy()).rewards(
-			totalLockedUps,
-			totalAssets
-		);
-		uint256 result = allocation(1, mint, lockedUps, totalLockedUps);
-		uint256 holders = Policy(config().policy()).holdersShare(
-			result,
-			lockedUps
-		);
-		uint256 interest = result.sub(holders);
-		(
-			uint256 maxHolders,
-			uint256 maxInterest,
-
-		) = calculateMaxRewardsPerBlock();
-		return (holders, interest, maxHolders, maxInterest);
-	}
-
 	function calculate(
 		address _property,
 		uint256 _beginBlock,
@@ -123,6 +89,40 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			_from,
 			_to
 		);
+	}
+
+	function calculatePerBlock(address _property)
+		private
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _maxHolders,
+			uint256 _maxInterest
+		)
+	{
+		uint256 totalAssets = MetricsGroup(config().metricsGroup())
+			.totalIssuedMetrics();
+		uint256 lockedUps = ILockup(config().lockup()).getPropertyValue(
+			_property
+		);
+		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
+		uint256 mint = Policy(config().policy()).rewards(
+			totalLockedUps,
+			totalAssets
+		);
+		uint256 result = allocation(1, mint, lockedUps, totalLockedUps);
+		uint256 holders = Policy(config().policy()).holdersShare(
+			result,
+			lockedUps
+		);
+		uint256 interest = result.sub(holders);
+		(
+			uint256 maxHolders,
+			uint256 maxInterest,
+
+		) = calculateMaxRewardsPerBlock();
+		return (holders, interest, maxHolders, maxInterest);
 	}
 
 	function getBeginBlock(address _property, uint256 _beginBlock)
