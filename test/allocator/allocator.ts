@@ -1,7 +1,7 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
 import {PropertyInstance} from '../../types/truffle-contracts'
-import {getPropertyAddress} from '../test-lib/utils/log'
+import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
 	validatePauseErrorMessage,
@@ -9,6 +9,7 @@ import {
 } from '../test-lib/utils/error'
 
 contract('Allocator', ([deployer, user1]) => {
+	const marketContract = artifacts.require('Market')
 	const init = async (): Promise<[DevProtocolInstance, PropertyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
@@ -46,6 +47,59 @@ contract('Allocator', ([deployer, user1]) => {
 		])
 		return [dev, property]
 	}
+
+	const authenticate = async (
+		dev: DevProtocolInstance,
+		propertyAddress: string
+	): Promise<void> => {
+		const behavuor = await dev.getMarket('MarketTest3', user1)
+		let createMarketResult = await dev.marketFactory.create(behavuor.address)
+		const marketAddress = getMarketAddress(createMarketResult)
+		// eslint-disable-next-line @typescript-eslint/await-thenable
+		const marketInstance = await marketContract.at(marketAddress)
+		await marketInstance.authenticate(
+			propertyAddress,
+			'id-key',
+			'',
+			'',
+			'',
+			'',
+			{from: deployer}
+		)
+	}
+
+	describe('Allocator: calculateMaxRewardsPerBlock', () => {
+		it('With no authentication or lockup, no DEV will be mint.', async () => {
+			const [dev] = await init()
+			const res = await dev.allocator.calculateMaxRewardsPerBlock()
+			expect(res[0].toNumber()).to.be.equal(0)
+			expect(res[1].toNumber()).to.be.equal(0)
+			expect(res[2].toNumber()).to.be.equal(0)
+		})
+		it('A DEV is not minted just by certifying it to Market.', async () => {
+			const [dev, property] = await init()
+			await authenticate(dev, property.address)
+			const res = await dev.allocator.calculateMaxRewardsPerBlock()
+			expect(res[0].toNumber()).to.be.equal(0)
+			expect(res[1].toNumber()).to.be.equal(0)
+			expect(res[2].toNumber()).to.be.equal(0)
+		})
+		it.only('n.', async () => {
+			const [dev, property] = await init()
+			await authenticate(dev, property.address)
+			await dev.dev.deposit(property.address, 10000)
+			const tmp = await dev.lockupStorage.getAllValue()
+			console.log(tmp.toString())
+			const res = await dev.allocator.calculateMaxRewardsPerBlock()
+			console.log(res[0].toString())
+			console.log(res[0].toString())
+			console.log(res[0].toString())
+
+			// Expect(res[0].toNumber()).to.be.equal(0)
+			// expect(res[1].toNumber()).to.be.equal(0)
+			// expect(res[2].toNumber()).to.be.equal(0)
+		})
+	})
 
 	describe('Allocator: calculate', () => {
 		it('If the difference between the start and end numbers is not appropriate, an error occurs.', async () => {
