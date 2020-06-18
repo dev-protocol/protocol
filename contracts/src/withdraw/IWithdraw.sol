@@ -20,4 +20,15 @@ contract IWithdraw {
 		external
 		view
 		returns (uint256);
+
+	function setLastCumulativeGlobalHoldersPriceEachProperty(
+		address _property,
+		uint256 _value
+		// solium-disable-next-line indentation
+	) external;
+
+	function getLastCumulativeGlobalHoldersPriceEachProperty(address _property)
+		external
+		view
+		returns (uint256);
 }
