@@ -10,17 +10,6 @@ contract IAllocator {
 			uint256 _maxRewards
 		);
 
-	function calculatePerBlock(address _property)
-		external
-		view
-		returns (
-			// solium-disable-next-line indentation
-			uint256 _holders,
-			uint256 _interest,
-			uint256 _maxHolders,
-			uint256 _maxInterest
-		);
-
 	function calculate(
 		address _property,
 		uint256 _beginBlock,
