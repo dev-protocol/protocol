@@ -20,6 +20,8 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	using Decimals for uint256;
 	event Lockedup(address _from, address _property, uint256 _value);
 
+	// event Log(string, uint);
+
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -102,6 +104,9 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	function update() public {
 		(uint256 _nextRewards, uint256 _nextPrice, , uint256 _maxPrice) = dry();
 		LockupStorage lockupStorage = getStorage();
+		// emit Log("_nextRewards", _nextRewards);
+		// emit Log("_nextPrice", _nextPrice);
+		// emit Log("_maxPrice", _maxPrice);
 		if (lockupStorage.getCumulativeGlobalRewards() != _nextRewards)
 			lockupStorage.setCumulativeGlobalRewards(_nextRewards);
 		if (lockupStorage.getCumulativeGlobalRewardsPrice() != _nextPrice)
@@ -188,7 +193,12 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		)
 	{
 		(, uint256 nextPrice, , ) = dry();
-		uint256 lockedUp = getStorage().getPropertyValue(_property);
+		LockupStorage lockupStorage = getStorage();
+
+		uint256 lockedUp = lockupStorage.getPropertyValue(_property);
+		if (lockedUp == 0) {
+			lockedUp = lockupStorage.getJustBeforeReduceToZero(_property);
+		}
 		uint256 propertyRewards = nextPrice.mul(lockedUp);
 		uint256 holders = Policy(config().policy()).holdersShare(
 			propertyRewards,
@@ -331,8 +341,11 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	function subPropertyValue(address _property, uint256 _value) private {
 		LockupStorage lockupStorage = getStorage();
 		uint256 value = lockupStorage.getPropertyValue(_property);
-		value = value.sub(_value);
-		lockupStorage.setPropertyValue(_property, value);
+		uint256 nextValue = value.sub(_value);
+		lockupStorage.setPropertyValue(_property, nextValue);
+		if (nextValue == 0) {
+			lockupStorage.setJustBeforeReduceToZero(_property, value);
+		}
 	}
 
 	function updatePendingInterestWithdrawal(address _property, address _user)
