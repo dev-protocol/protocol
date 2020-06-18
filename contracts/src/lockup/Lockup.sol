@@ -176,16 +176,16 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	{
 		(, uint256 nextPrice, , ) = dry();
 		uint256 lockedUp = getStorage().getPropertyValue(_property);
-		uint256 propertyRewards = nextPrice.div(Decimals.basis()).mul(lockedUp);
+		uint256 propertyRewards = nextPrice.mul(lockedUp);
 		uint256 holders = Policy(config().policy()).holdersShare(
 			propertyRewards,
 			lockedUp
 		);
 		uint256 interest = propertyRewards.sub(holders);
-		uint256 holdersPrice = holders.outOf(
+		uint256 holdersPrice = holders.div(
 			ERC20Mintable(_property).totalSupply()
 		);
-		uint256 interestPrice = lockedUp > 0 ? interest.outOf(lockedUp) : 0;
+		uint256 interestPrice = lockedUp > 0 ? interest.div(lockedUp) : 0;
 		return (holders, interest, holdersPrice, interestPrice);
 	}
 
