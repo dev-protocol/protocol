@@ -371,6 +371,59 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 	// 	})
 	// })
 	describe('Withdraw; calculateWithdrawableAmount', () => {
+		describe('scenario; zero lockup', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+
+			const alice = deployer
+			const bob = user1
+
+			before(async () => {
+				;[dev, , property] = await init()
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+			})
+
+			describe('When totally is 0', () => {
+				it(`Alice's withdrawable reward is 0`, async () => {
+					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(total.toFixed()).to.be.equal('0')
+					expect(aliceAmount.toFixed()).to.be.equal('0')
+				})
+			})
+			describe('When Property1 is 0', () => {
+				before(async () => {
+					const [property2] = await Promise.all([
+						artifacts
+							.require('Property')
+							.at(
+								getPropertyAddress(
+									await dev.propertyFactory.create('test2', 'TEST2', deployer)
+								)
+							),
+					])
+					await dev.dev.deposit(
+						property2.address,
+						toBigNumber(10000).times(1e18),
+						{from: bob}
+					)
+				})
+
+				it(`Alice's withdrawable reward is 0`, async () => {
+					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(total.toFixed()).to.be.equal(
+						toBigNumber(10000).times(1e18).toFixed()
+					)
+					expect(aliceAmount.toFixed()).to.be.equal('0')
+				})
+			})
+		})
 		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
