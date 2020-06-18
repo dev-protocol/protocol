@@ -46,13 +46,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 				block.number
 			);
 		}
-		update();
-		updatePendingInterestWithdrawal(_property, _from);
-		addValue(_property, _from, _value);
-		addPropertyValue(_property, _value);
-		addAllValue(_value);
-		update();
-		updateLastPriceForProperty(_property, _from);
 		if (
 			IWithdraw(config().withdraw())
 				.getLastCumulativeGlobalHoldersPriceEachProperty(_property) == 0
@@ -64,6 +57,13 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 				holdersPrice
 			);
 		}
+		update();
+		updatePendingInterestWithdrawal(_property, _from);
+		addValue(_property, _from, _value);
+		addPropertyValue(_property, _value);
+		addAllValue(_value);
+		update();
+		updateLastPriceForProperty(_property, _from);
 		emit Lockedup(_from, _property, _value);
 	}
 
