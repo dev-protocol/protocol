@@ -64,3 +64,7 @@ export async function getAbstentionTimes(
 	const sub = times.toNumber() - timesByProperty.toNumber()
 	return sub
 }
+
+export function gasLogger(txRes: Truffle.TransactionResponse) {
+	console.log(txRes.receipt.gasUsed)
+}

@@ -5,7 +5,7 @@ import {
 	PolicyTestForLockupInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
-import {mine, toBigNumber, getBlock} from '../test-lib/utils/common'
+import {mine, toBigNumber, getBlock, gasLogger} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {waitForEvent, getEventValue, watch} from '../test-lib/utils/event'
 import {
@@ -298,7 +298,9 @@ contract('LockupTest', ([deployer, user1]) => {
 				;[dev, property] = await init()
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
-				await dev.dev.deposit(property.address, 10000, {from: alice})
+				await dev.dev
+					.deposit(property.address, 10000, {from: alice})
+					.then(gasLogger)
 				lastBlock = await dev.lockupStorage
 					.getLastBlockNumber(property.address)
 					.then(toBigNumber)
