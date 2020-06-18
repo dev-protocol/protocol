@@ -157,8 +157,12 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
 		uint256 additionalRewards = maxRewards.mul(blocks);
 		uint256 additionalPrice = maxPrice.mul(blocks);
-		uint256 nextRewards = lockupStorage.getCumulativeGlobalRewards().add(additionalRewards);
-		uint256 nextPrice = lockupStorage.getCumulativeGlobalRewardsPrice().add(additionalPrice);
+		uint256 nextRewards = lockupStorage.getCumulativeGlobalRewards().add(
+			additionalRewards
+		);
+		uint256 nextPrice = lockupStorage.getCumulativeGlobalRewardsPrice().add(
+			additionalPrice
+		);
 		return (nextRewards, nextPrice, maxRewards, maxPrice);
 	}
 
