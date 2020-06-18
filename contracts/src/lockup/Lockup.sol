@@ -73,33 +73,29 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(possible(_property, msg.sender), "waiting for release");
-		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
-		require(lockupedValue != 0, "dev token is not locked");
+		uint256 lockedUpValue = getStorage().getValue(_property, msg.sender);
+		require(lockedUpValue != 0, "dev token is not locked");
 		updatePendingInterestWithdrawal(_property, msg.sender);
-		Property(_property).withdraw(msg.sender, lockupedValue);
+		update();
+		Property(_property).withdraw(msg.sender, lockedUpValue);
 		getStorage().setValue(_property, msg.sender, 0);
-		subPropertyValue(_property, lockupedValue);
-		subAllValue(lockupedValue);
+		subPropertyValue(_property, lockedUpValue);
+		subAllValue(lockedUpValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
-		updateLastPriceForProperty(_property, msg.sender);
+		update();
+		// updateLastPriceForProperty(_property, msg.sender);
 	}
 
 	function update() public {
-		(
-			uint256 _nextRewards,
-			uint256 _nextPrice,
-			uint256 _maxRewards,
-			uint256 _maxPrice
-		) = dry();
-		// uint256 lastRewards = getStorage().getLastMaxRewards();
-		// uint256 lastPrice = getStorage().getLastMaxRewardsPrice();
-		// if (_maxRewards != lastRewards || _maxPrice != lastPrice) {
-		getStorage().setCumulativeGlobalRewards(_nextRewards);
-		getStorage().setCumulativeGlobalRewardsPrice(_nextPrice);
-		getStorage().setLastMaxRewards(_maxRewards);
-		getStorage().setLastMaxRewardsPrice(_maxPrice);
-		getStorage().setLastSameRewardsBlock(block.number);
-		// }
+		(uint256 _nextRewards, uint256 _nextPrice, , uint256 _maxPrice) = dry();
+		if (getStorage().getCumulativeGlobalRewards() != _nextRewards)
+			getStorage().setCumulativeGlobalRewards(_nextRewards);
+		if (getStorage().getCumulativeGlobalRewardsPrice() != _nextPrice)
+			getStorage().setCumulativeGlobalRewardsPrice(_nextPrice);
+		if (getStorage().getLastMaxRewardsPrice() != _maxPrice)
+			getStorage().setLastMaxRewardsPrice(_maxPrice);
+		if (getStorage().getLastSameRewardsPriceBlock() != block.number)
+			getStorage().setLastSameRewardsPriceBlock(block.number);
 	}
 
 	function updateLastPriceForProperty(address _property, address _user)
@@ -148,13 +144,13 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	{
 		(, , uint256 maxRewards) = IAllocator(config().allocator())
 			.calculateMaxRewardsPerBlock();
-		uint256 lastMaxRewards = getStorage().getLastMaxRewards();
+		uint256 lastMaxRewardsPrice = getStorage().getLastMaxRewardsPrice();
 		uint256 prevRewards = getStorage().getCumulativeGlobalRewards();
 		uint256 prevPrice = getStorage().getCumulativeGlobalRewardsPrice();
 		uint256 lockedUp = getStorage().getAllValue();
 		uint256 maxPrice = lockedUp > 0 ? maxRewards.outOf(lockedUp) : 0;
-		uint256 lastBlock = maxRewards == lastMaxRewards
-			? getStorage().getLastSameRewardsBlock()
+		uint256 lastBlock = maxPrice == lastMaxRewardsPrice
+			? getStorage().getLastSameRewardsPriceBlock()
 			: 0;
 		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
 		uint256 additionalRewards = maxRewards.mul(blocks);
@@ -194,14 +190,17 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		uint256 lockupedValue = getStorage().getValue(_property, _user);
+		uint256 lockedUp = getStorage().getValue(_property, _user);
+		if (lockedUp == 0) {
+			return 0;
+		}
 		uint256 lastPrice = getStorage().getLastCumulativeGlobalInterestPrice(
 			_property,
 			_user
 		);
 		(, , , uint256 interestPrice) = next(_property);
 		uint256 priceGap = interestPrice.sub(lastPrice);
-		uint256 value = priceGap.mul(lockupedValue);
+		uint256 value = priceGap.mul(lockedUp);
 		return value > 0 ? value.div(Decimals.basis()) : 0;
 	}
 
@@ -367,8 +366,8 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 _last = getStorage().getLastInterestPrice(_property, _user);
 		uint256 price = getStorage().getInterestPrice(_property);
 		uint256 priceGap = price.sub(_last);
-		uint256 lockupedValue = getStorage().getValue(_property, _user);
-		uint256 value = priceGap.mul(lockupedValue);
+		uint256 lockedUpValue = getStorage().getValue(_property, _user);
+		uint256 value = priceGap.mul(lockedUpValue);
 		return value.div(Decimals.basis());
 	}
 

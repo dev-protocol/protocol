@@ -194,19 +194,19 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//LastMaxRewards
-	function setLastMaxRewards(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
+	// function setLastMaxRewards(uint256 _value) external {
+	// 	addressValidator().validateAddress(msg.sender, config().lockup());
 
-		eternalStorage().setUint(getLastMaxRewardsKey(), _value);
-	}
+	// 	eternalStorage().setUint(getLastMaxRewardsKey(), _value);
+	// }
 
-	function getLastMaxRewards() external view returns (uint256) {
-		return eternalStorage().getUint(getLastMaxRewardsKey());
-	}
+	// function getLastMaxRewards() external view returns (uint256) {
+	// 	return eternalStorage().getUint(getLastMaxRewardsKey());
+	// }
 
-	function getLastMaxRewardsKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_lastMaxRewards"));
-	}
+	// function getLastMaxRewardsKey() private pure returns (bytes32) {
+	// 	return keccak256(abi.encodePacked("_lastMaxRewards"));
+	// }
 
 	//LastMaxRewardsPrice
 	function setLastMaxRewardsPrice(uint256 _value) external {
@@ -223,19 +223,19 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		return keccak256(abi.encodePacked("_lastMaxRewardsPrice"));
 	}
 
-	//LastSameRewardsBlock
-	function setLastSameRewardsBlock(uint256 _value) external {
+	//LastSameRewardsPriceBlock
+	function setLastSameRewardsPriceBlock(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
-		eternalStorage().setUint(getLastSameRewardsBlockKey(), _value);
+		eternalStorage().setUint(getLastSameRewardsPriceBlockKey(), _value);
 	}
 
-	function getLastSameRewardsBlock() external view returns (uint256) {
-		return eternalStorage().getUint(getLastSameRewardsBlockKey());
+	function getLastSameRewardsPriceBlock() external view returns (uint256) {
+		return eternalStorage().getUint(getLastSameRewardsPriceBlockKey());
 	}
 
-	function getLastSameRewardsBlockKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_LastSameRewardsBlock"));
+	function getLastSameRewardsPriceBlockKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_LastSameRewardsPriceBlock"));
 	}
 
 	//CumulativeGlobalRewards
