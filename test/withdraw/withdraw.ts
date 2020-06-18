@@ -42,7 +42,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		const policy = await artifacts.require('PolicyTestForAllocator').new()
+		const policy = await artifacts.require('PolicyTestForWithdraw').new()
 
 		await dev.policyFactory.create(policy.address)
 		const propertyAddress = getPropertyAddress(
@@ -384,10 +384,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				;[dev, , property] = await init()
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(carol, aliceBalance)
-				await dev.dev.deposit(property.address, 10000, {from: carol})
-				lastBlock = await dev.withdrawStorage
-					.getLastBlockNumber(property.address)
-					.then(toBigNumber)
+				await dev.dev.deposit(
+					property.address,
+					toBigNumber(10000).times(1e18),
+					{from: carol}
+				)
+				lastBlock = await getBlock().then(toBigNumber)
 			})
 
 			/*
@@ -396,24 +398,21 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			 */
 
 			describe('before second run', () => {
-				it(`Alice does staking 100% of the Property's total lockups`, async () => {
-					const total = await dev.lockup
+				it(`Property1 is locked-up 100% of all Property's locked-ups`, async () => {
+					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const property1 = await dev.lockup
 						.getPropertyValue(property.address)
 						.then(toBigNumber)
-					const aliceBalance = await dev.lockup
-						.getValue(property.address, alice)
-						.then(toBigNumber)
-					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
+					expect(property1.toFixed()).to.be.equal(total.toFixed())
 				})
-				it(`Alice's withdrawable reward is 100% of the Property's reward`, async () => {
+				it(`Alice's withdrawable reward is 900% of Carol's withdrawable interest`, async () => {
 					await mine(9)
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(90)
-						.times(1e18)
-						.times(block.minus(lastBlock))
+					const expected = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, carol)
+						.then((x) => toBigNumber(x).div(0.1).times(0.9))
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})

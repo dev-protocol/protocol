@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // prettier-ignore
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
@@ -12,6 +11,7 @@ import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
+import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
 contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
@@ -25,9 +25,17 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 
 		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
 		require(value != 0, "withdraw value is 0");
-		update(_property);
-		uint256 price = getStorage().getCumulativePrice(_property);
-		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
+		// update(_property);
+		(, uint256 _holdersPrice, , ) = ILockup(config().lockup()).next(
+			_property
+		);
+		// uint256 price = getStorage().getCumulativePrice(_property);
+		// getStorage().setLastWithdrawalPrice(_property, msg.sender, _holdersPrice);
+		getStorage().setLastCumulativeGlobalHoldersPrice(
+			_property,
+			msg.sender,
+			_holdersPrice
+		);
 		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		require(erc20.mint(msg.sender, value), "dev mint failed");
@@ -63,62 +71,34 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			getStorage().setWithdrawalLimitBalance(
 				_property,
 				_to,
-				ERC20(_property).balanceOf(_to)
+				ERC20Mintable(_property).balanceOf(_to)
 			);
 		}
 	}
 
-	function next(address _property, uint256 _allocationResult)
-		private
-		view
-		returns (uint256 _total, uint256 _price)
-	{
-		uint256 priceValue = _allocationResult.outOf(
-			ERC20(_property).totalSupply()
-		);
-		uint256 total = getStorage().getRewardsAmount(_property);
-		uint256 price = getStorage().getCumulativePrice(_property);
-		return (total.add(_allocationResult), price.add(priceValue));
-	}
+	// function update(address _property) private {
+	// 	(uint256 begin, uint256 end) = term(_property);
+	// 	require(
+	// 		IVoteTimes(config().voteTimes()).validateTargetPeriod(
+	// 			_property,
+	// 			begin,
+	// 			end
+	// 		),
+	// 		"now abstention penalty"
+	// 	);
+	// 	(uint256 nextTotal, uint256 nextPrice) = dry(_property);
+	// 	getStorage().setRewardsAmount(_property, nextTotal);
+	// 	getStorage().setCumulativePrice(_property, nextPrice);
+	// 	getStorage().setLastBlockNumber(_property, block.number);
+	// }
 
-	function update(address _property) private {
-		(uint256 begin, uint256 end) = term(_property);
-		require(
-			IVoteTimes(config().voteTimes()).validateTargetPeriod(
-				_property,
-				begin,
-				end
-			),
-			"now abstention penalty"
-		);
-		(uint256 nextTotal, uint256 nextPrice) = dry(_property);
-		getStorage().setRewardsAmount(_property, nextTotal);
-		getStorage().setCumulativePrice(_property, nextPrice);
-		getStorage().setLastBlockNumber(_property, block.number);
-	}
-
-	function term(address _property)
-		private
-		view
-		returns (uint256 _begin, uint256 _end)
-	{
-		return (getStorage().getLastBlockNumber(_property), block.number);
-	}
-
-	function dry(address _property)
-		private
-		view
-		returns (uint256 _total, uint256 _price)
-	{
-		(uint256 begin, uint256 end) = term(_property);
-		(uint256 holder, , , ) = IAllocator(config().allocator()).calculate(
-			_property,
-			begin,
-			end
-		);
-		(uint256 total, uint256 price) = next(_property, holder);
-		return (total, price);
-	}
+	// function term(address _property)
+	// 	private
+	// 	view
+	// 	returns (uint256 _begin, uint256 _end)
+	// {
+	// 	return (getStorage().getLastBlockNumber(_property), block.number);
+	// }
 
 	function getRewardsAmount(address _property)
 		external
@@ -133,26 +113,31 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		uint256 _last = getStorage().getLastWithdrawalPrice(_property, _user);
+		uint256 _last = getStorage().getLastCumulativeGlobalHoldersPrice(
+			_property,
+			_user
+		);
 		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
 			_property,
 			_user
 		);
+		uint256 propertyLimit = getStorage()
+			.getLastCumulativeGlobalHoldersPriceEachProperty(_property);
 		uint256 balanceLimit = getStorage().getWithdrawalLimitBalance(
 			_property,
 			_user
 		);
-		uint256 price = getStorage().getCumulativePrice(_property);
-		(uint256 dryTotal, uint256 dryPrice) = dry(_property);
-		uint256 priceGap = price.sub(_last);
-		uint256 dryPriceGap = dryPrice.sub(price);
-		uint256 balance = ERC20(_property).balanceOf(_user);
-		if (totalLimit == dryTotal) {
+		(uint256 _holders, , uint256 _holdersPrice, ) = ILockup(
+			config().lockup()
+		)
+			.next(_property);
+		uint256 priceGap = _holdersPrice.sub(_last).sub(propertyLimit);
+		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+		if (totalLimit == _holders) {
 			balance = balanceLimit;
 		}
 		uint256 value = priceGap.mul(balance);
-		uint256 dryValue = dryPriceGap.mul(balance);
-		return value.add(dryValue).div(Decimals.basis());
+		return value.div(Decimals.basis());
 	}
 
 	function calculateAmount(address _property, address _user)
@@ -169,9 +154,10 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		returns (uint256)
 	{
 		uint256 _value = _calculateAmount(_property, _user);
-		uint256 value = _value.add(
-			getStorage().getPendingWithdrawal(_property, _user)
-		);
+		uint256 legacy = __legacyWithdrawableAmount(_property, _user);
+		uint256 value = _value
+			.add(getStorage().getPendingWithdrawal(_property, _user))
+			.add(legacy);
 		return value;
 	}
 
@@ -195,6 +181,52 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		returns (uint256)
 	{
 		return getStorage().getLastBlockNumber(_property);
+	}
+
+	function setLastCumulativeGlobalHoldersPriceEachProperty(
+		address _property,
+		uint256 _value
+	) external {
+		getStorage().setLastCumulativeGlobalHoldersPriceEachProperty(
+			_property,
+			_value
+		);
+	}
+
+	function getLastCumulativeGlobalHoldersPriceEachProperty(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		return
+			getStorage().getLastCumulativeGlobalHoldersPriceEachProperty(
+				_property
+			);
+	}
+
+	function __legacyWithdrawableAmount(address _property, address _user)
+		private
+		view
+		returns (uint256)
+	{
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 _last = withdrawStorage.getLastWithdrawalPrice(
+			_property,
+			_user
+		);
+		uint256 price = withdrawStorage.getCumulativePrice(_property);
+		uint256 priceGap = price.sub(_last);
+		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+		uint256 value = priceGap.mul(balance);
+		return value.div(Decimals.basis());
+	}
+
+	function __updateLegacyWithdrawableAmount(address _property, address _user)
+		private
+	{
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 price = withdrawStorage.getCumulativePrice(_property);
+		withdrawStorage.setLastWithdrawalPrice(_property, _user, price);
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {

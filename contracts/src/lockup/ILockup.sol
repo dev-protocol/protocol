@@ -8,6 +8,16 @@ contract ILockup {
 		// solium-disable-next-line indentation
 	) external;
 
+	function next(address _property)
+		public
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _holdersPrice,
+			uint256 _interestPrice
+		);
+
 	function getPropertyValue(address _property)
 		external
 		view

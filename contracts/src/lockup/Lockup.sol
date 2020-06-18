@@ -53,6 +53,17 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addAllValue(_value);
 		update();
 		updateLastPriceForProperty(_property, _from);
+		if (
+			IWithdraw(config().withdraw())
+				.getLastCumulativeGlobalHoldersPriceEachProperty(_property) == 0
+		) {
+			(, , uint256 holdersPrice, ) = next(_property);
+			IWithdraw(config().withdraw())
+				.setLastCumulativeGlobalHoldersPriceEachProperty(
+				_property,
+				holdersPrice
+			);
+		}
 		emit Lockedup(_from, _property, _value);
 	}
 
@@ -167,7 +178,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function next(address _property)
-		private
+		public
 		view
 		returns (
 			uint256 _holders,
