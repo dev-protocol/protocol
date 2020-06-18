@@ -47,11 +47,11 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		}
 		update();
 		updatePendingInterestWithdrawal(_property, _from);
-		updateLastPriceForProperty(_property, _from);
 		addValue(_property, _from, _value);
 		addPropertyValue(_property, _value);
 		addAllValue(_value);
 		update();
+		updateLastPriceForProperty(_property, _from);
 		emit Lockedup(_from, _property, _value);
 	}
 
@@ -83,7 +83,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		subAllValue(lockedUpValue);
 		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
 		update();
-		// updateLastPriceForProperty(_property, msg.sender);
 	}
 
 	function update() public {

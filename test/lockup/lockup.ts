@@ -917,7 +917,6 @@ contract('LockupTest', ([deployer, user1]) => {
 								.times(block.minus(lastBlock3))
 								.times(10000)
 								.div(26000)
-								.integerValue(BigNumber.ROUND_DOWN)
 						)
 						.plus(
 							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
@@ -925,7 +924,6 @@ contract('LockupTest', ([deployer, user1]) => {
 								.times(block.minus(lastBlock3))
 								.times(9750)
 								.div(26000)
-								.integerValue(BigNumber.ROUND_DOWN)
 						)
 
 					expect(aliceAmount[0].plus(aliceAmount[1]).toFixed()).to.be.equal(
