@@ -131,19 +131,17 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_user
 		);
-		(uint256 _holders, , uint256 _holdersPrice, ) = ILockup(
+		(uint256 _holders, , , , uint256 _holdersPriceByShare) = ILockup(
 			config().lockup()
 		)
 			.next(_property);
-		uint256 priceGap = _holdersPrice.sub(_last).sub(
-			_last >= propertyLimit ? 0 : propertyLimit
-		);
+		uint256 priceGap = _holdersPriceByShare.sub(_last).sub(propertyLimit);
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
 		if (totalLimit == _holders) {
 			balance = balanceLimit;
 		}
 		uint256 value = priceGap.mul(balance);
-		return (value.div(Decimals.basis()), _holdersPrice);
+		return (value.div(Decimals.basis()), _holdersPriceByShare);
 	}
 
 	function calculateAmount(address _property, address _user)
@@ -195,9 +193,20 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		address _property,
 		uint256 _value
 	) external {
+		if (
+			getStorage().getLastCumulativeGlobalHoldersPriceEachPropertySaved(
+				_property
+			)
+		) {
+			return;
+		}
 		getStorage().setLastCumulativeGlobalHoldersPriceEachProperty(
 			_property,
 			_value
+		);
+		getStorage().setLastCumulativeGlobalHoldersPriceEachPropertySaved(
+			_property,
+			true
 		);
 	}
 

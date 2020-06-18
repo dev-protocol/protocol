@@ -430,7 +430,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			let lastBlock: BigNumber
 
 			const alice = deployer
-			const bob = user1
 			const carol = user2
 
 			before(async () => {
@@ -535,6 +534,43 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					expect(aliceAmount.toFixed()).to.be.equal('0')
+				})
+			})
+		})
+		describe('scenario: multiple lockup', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+
+			const alice = deployer
+			const bob = user1
+			const carol = user2
+
+			before(async () => {
+				;[dev, , property] = await init()
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+				await dev.dev.mint(carol, aliceBalance)
+				await dev.dev.deposit(property.address, 10000, {from: bob})
+				await dev.dev.deposit(property.address, 10000 * 0.25, {from: carol})
+			})
+
+			describe('before additional staking', () => {
+				it(`Alice's withdrawable holders rewards is correct`, async () => {
+					await mine(3)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const bobAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					const carolAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, carol)
+						.then(toBigNumber)
+					const expected = bobAmount
+						.div(0.1)
+						.times(0.9)
+						.plus(carolAmount.div(0.1).times(0.9))
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
 		})
