@@ -96,14 +96,14 @@ contract('Allocator', ([deployer, user1]) => {
 
 	describe('Allocator; pause', () => {
 		it('pause and unpause this contract', async () => {
-			const [dev, property] = await init()
+			const [dev] = await init()
 			await dev.allocator.pause()
 			const res = await dev.allocator
-				.calculate(property.address, 0, 1000)
+				.calculateMaxRewardsPerBlock()
 				.catch((err: Error) => err)
 			validatePauseErrorMessage(res, false)
 			await dev.allocator.unpause()
-			await dev.allocator.calculate(property.address, 1, 1000)
+			await dev.allocator.calculateMaxRewardsPerBlock()
 		})
 
 		it('Should fail to pause this contract when sent from the non-owner account', async () => {

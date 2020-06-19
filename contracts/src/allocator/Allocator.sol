@@ -9,7 +9,6 @@ import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
-import {AllocatorStorage} from "contracts/src/allocator/AllocatorStorage.sol";
 
 contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
@@ -28,6 +27,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			uint256 _maxRewards
 		)
 	{
+		require(paused() == false, "You cannot use that");
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
@@ -48,6 +48,7 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 		address _from,
 		address _to
 	) external {
+		require(paused() == false, "You cannot use that");
 		addressValidator().validateGroup(msg.sender, config().propertyGroup());
 
 		IWithdraw(config().withdraw()).beforeBalanceChange(
@@ -55,10 +56,5 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 			_from,
 			_to
 		);
-	}
-
-	function getStorage() private view returns (AllocatorStorage) {
-		require(paused() == false, "You cannot use that");
-		return AllocatorStorage(config().allocatorStorage());
 	}
 }
