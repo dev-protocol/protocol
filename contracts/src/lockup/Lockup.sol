@@ -84,7 +84,11 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		update();
 	}
 
-	function getCumulativeLockedUp(address _property) public view returns(uint256) {
+	function getCumulativeLockedUp(address _property)
+		public
+		view
+		returns (uint256)
+	{
 		LockupStorage lockupStorage = getStorage();
 		uint256 lastValue = lockupStorage.getCumulativeLockedUpValue(_property);
 		uint256 unit = lockupStorage.getCumulativeLockedUpUnit(_property);
@@ -92,7 +96,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return lastValue.add(unit.mul(block.number.sub(lastBlock)));
 	}
 
-	function getCumulativeLockedUpAll() public view returns(uint256) {
+	function getCumulativeLockedUpAll() public view returns (uint256) {
 		return getCumulativeLockedUp(address(0));
 	}
 
@@ -103,7 +107,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 lastUnit = lockupStorage.getCumulativeLockedUpUnit(_property);
 		uint256 lastValueAll = getCumulativeLockedUp(zero);
 		uint256 lastUnitAll = lockupStorage.getCumulativeLockedUpUnit(zero);
-		lockupStorage.setCumulativeLockedUpValue(_property, lastValue.add(_unit));
+		lockupStorage.setCumulativeLockedUpValue(
+			_property,
+			lastValue.add(_unit)
+		);
 		lockupStorage.setCumulativeLockedUpUnit(_property, lastUnit.add(_unit));
 		lockupStorage.setCumulativeLockedUpBlock(_property, block.number);
 		lockupStorage.setCumulativeLockedUpValue(zero, lastValueAll.add(_unit));
@@ -118,7 +125,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 lastUnit = lockupStorage.getCumulativeLockedUpUnit(_property);
 		uint256 lastValueAll = getCumulativeLockedUp(zero);
 		uint256 lastUnitAll = lockupStorage.getCumulativeLockedUpUnit(zero);
-		lockupStorage.setCumulativeLockedUpValue(_property, lastValue.sub(_unit));
+		lockupStorage.setCumulativeLockedUpValue(
+			_property,
+			lastValue.sub(_unit)
+		);
 		lockupStorage.setCumulativeLockedUpUnit(_property, lastUnit.sub(_unit));
 		lockupStorage.setCumulativeLockedUpBlock(_property, block.number);
 		lockupStorage.setCumulativeLockedUpValue(zero, lastValueAll.sub(_unit));
@@ -170,13 +180,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return (getStorage().getLastBlockNumber(_property), block.number);
 	}
 
-	function dry()
-		private
-		view
-		returns (
-			uint256
-		)
-	{
+	function dry() private view returns (uint256) {
 		(, , uint256 maxRewards) = IAllocator(config().allocator())
 			.calculateMaxRewardsPerBlock();
 		LockupStorage lockupStorage = getStorage();
@@ -201,7 +205,9 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	{
 		uint256 nextRewards = dry();
 		LockupStorage lockupStorage = getStorage();
-		uint256 share = getCumulativeLockedUp(_property).mul(Decimals.basis()).outOf(getCumulativeLockedUpAll());
+		uint256 share = getCumulativeLockedUp(_property)
+			.mul(Decimals.basis())
+			.outOf(getCumulativeLockedUpAll());
 		uint256 propertyRewards = nextRewards.mul(share);
 		uint256 lockedUp = lockupStorage.getPropertyValue(_property);
 		uint256 holders = Policy(config().policy()).holdersShare(
@@ -213,12 +219,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			ERC20Mintable(_property).totalSupply()
 		);
 		uint256 interestPrice = lockedUp > 0 ? interest.div(lockedUp) : 0;
-		return (
-			holders,
-			interest,
-			holdersPrice,
-			interestPrice
-		);
+		return (holders, interest, holdersPrice, interestPrice);
 	}
 
 	function _calculateInterestAmount(address _property, address _user)
@@ -238,7 +239,8 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		(, , , uint256 interestPrice) = next(_property);
 		uint256 priceGap = interestPrice.sub(lastPrice);
 		uint256 value = priceGap.mul(lockedUp);
-		return value > 0 ? value.div(Decimals.basis()).div(Decimals.basis()) : 0;
+		return
+			value > 0 ? value.div(Decimals.basis()).div(Decimals.basis()) : 0;
 	}
 
 	function calculateWithdrawableInterestAmount(

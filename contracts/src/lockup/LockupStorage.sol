@@ -348,7 +348,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		return keccak256(abi.encodePacked("_justBeforeReduceRewardsToZero"));
 	}
 
-
 	//CumulativeLockedUpUnit
 	function setCumulativeLockedUpUnit(address _addr, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
@@ -373,7 +372,9 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeLockedUpBlock
-	function setCumulativeLockedUpBlock(address _addr, uint256 _value) external {
+	function setCumulativeLockedUpBlock(address _addr, uint256 _value)
+		external
+	{
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(getCumulativeLockedUpBlockKey(_addr), _value);
@@ -396,7 +397,9 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeLockedUpValue
-	function setCumulativeLockedUpValue(address _addr, uint256 _value) external {
+	function setCumulativeLockedUpValue(address _addr, uint256 _value)
+		external
+	{
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(getCumulativeLockedUpValueKey(_addr), _value);
@@ -417,7 +420,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	{
 		return keccak256(abi.encodePacked("_cumulativeLockedUpValue", _addr));
 	}
-
 
 	//PendingWithdrawal
 	function setPendingInterestWithdrawal(

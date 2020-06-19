@@ -161,11 +161,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_user
 		);
-		(
-			uint256 _holders,
-			,
-			uint256 price,
-		) = next(_property);
+		(uint256 _holders, , uint256 price, ) = next(_property);
 		uint256 priceGap = price.sub(_last);
 
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
