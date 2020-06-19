@@ -39,6 +39,10 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		lockup.update();
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 		lockup.update();
+		withdrawStorage.setRewardsAmount(
+			_property,
+			withdrawStorage.getRewardsAmount(_property).add(value)
+		);
 	}
 
 	function beforeBalanceChange(
@@ -49,11 +53,21 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateAddress(msg.sender, config().allocator());
 		WithdrawStorage withdrawStorage = getStorage();
 
-		uint256 price = withdrawStorage.getCumulativePrice(_property);
-		(uint256 amountFrom, ) = _calculateAmount(_property, _from);
-		(uint256 amountTo, ) = _calculateAmount(_property, _to);
-		withdrawStorage.setLastWithdrawalPrice(_property, _from, price);
-		withdrawStorage.setLastWithdrawalPrice(_property, _to, price);
+		(uint256 amountFrom, uint256 priceFrom) = _calculateAmount(
+			_property,
+			_from
+		);
+		(uint256 amountTo, uint256 priceTo) = _calculateAmount(_property, _to);
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			_from,
+			priceFrom
+		);
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			_to,
+			priceTo
+		);
 		uint256 pendFrom = withdrawStorage.getPendingWithdrawal(
 			_property,
 			_from
@@ -73,7 +87,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_to
 		);
-		uint256 total = withdrawStorage.getRewardsAmount(_property);
+		(uint256 total, , , , ) = next(_property);
 		if (totalLimit != total) {
 			withdrawStorage.setWithdrawalLimitTotal(_property, _to, total);
 			withdrawStorage.setWithdrawalLimitBalance(
@@ -116,6 +130,20 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		return getStorage().getRewardsAmount(_property);
 	}
 
+	function next(address _property)
+		private
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _holdersPrice,
+			uint256 _interestPrice,
+			uint256 _holdersPriceByShare
+		)
+	{
+		return ILockup(config().lockup()).next(_property);
+	}
+
 	function _calculateAmount(address _property, address _user)
 		private
 		view
@@ -140,7 +168,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			uint256 _holdersPrice,
 			,
 			uint256 _holdersPriceByShare
-		) = ILockup(config().lockup()).next(_property);
+		) = next(_property);
 		uint256 price = _holdersPriceByShare > 0
 			? _holdersPriceByShare
 			: _holdersPrice;
