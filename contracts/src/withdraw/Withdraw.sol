@@ -28,9 +28,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			msg.sender
 		);
 		require(value != 0, "withdraw value is 0");
-		// update(_property);
-		// uint256 price = getStorage().getCumulativePrice(_property);
-		// getStorage().setLastWithdrawalPrice(_property, msg.sender, _holdersPrice);
 		getStorage().setLastCumulativeGlobalHoldersPrice(
 			_property,
 			msg.sender,
@@ -125,23 +122,28 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_user
 		);
-		uint256 propertyLimit = getStorage()
-			.getLastCumulativeGlobalHoldersPriceEachProperty(_property);
 		uint256 balanceLimit = getStorage().getWithdrawalLimitBalance(
 			_property,
 			_user
 		);
-		(uint256 _holders, , , , uint256 _holdersPriceByShare) = ILockup(
-			config().lockup()
-		)
-			.next(_property);
-		uint256 priceGap = _holdersPriceByShare.sub(_last).sub(propertyLimit);
+		(
+			uint256 _holders,
+			,
+			uint256 _holdersPrice,
+			,
+			uint256 _holdersPriceByShare
+		) = ILockup(config().lockup()).next(_property);
+		uint256 price = _holdersPriceByShare > 0
+			? _holdersPriceByShare
+			: _holdersPrice;
+		uint256 priceGap = price.sub(_last);
+
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
 		if (totalLimit == _holders) {
 			balance = balanceLimit;
 		}
 		uint256 value = priceGap.mul(balance);
-		return (value.div(Decimals.basis()), _holdersPriceByShare);
+		return (value.div(Decimals.basis()), price);
 	}
 
 	function calculateAmount(address _property, address _user)
@@ -175,51 +177,19 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		return value;
 	}
 
-	function setLastBlockNumber(address _property, uint256 _blockNumber)
-		external
-	{
-		getStorage().setLastBlockNumber(_property, _blockNumber);
-	}
+	// function setLastBlockNumber(address _property, uint256 _blockNumber)
+	// 	external
+	// {
+	// 	getStorage().setLastBlockNumber(_property, _blockNumber);
+	// }
 
-	function getLastBlockNumber(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return getStorage().getLastBlockNumber(_property);
-	}
-
-	function setLastCumulativeGlobalHoldersPriceEachProperty(
-		address _property,
-		uint256 _value
-	) external {
-		if (
-			getStorage().getLastCumulativeGlobalHoldersPriceEachPropertySaved(
-				_property
-			)
-		) {
-			return;
-		}
-		getStorage().setLastCumulativeGlobalHoldersPriceEachProperty(
-			_property,
-			_value
-		);
-		getStorage().setLastCumulativeGlobalHoldersPriceEachPropertySaved(
-			_property,
-			true
-		);
-	}
-
-	function getLastCumulativeGlobalHoldersPriceEachProperty(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			getStorage().getLastCumulativeGlobalHoldersPriceEachProperty(
-				_property
-			);
-	}
+	// function getLastBlockNumber(address _property)
+	// 	external
+	// 	view
+	// 	returns (uint256)
+	// {
+	// 	return getStorage().getLastBlockNumber(_property);
+	// }
 
 	function __legacyWithdrawableAmount(address _property, address _user)
 		private

@@ -1,6 +1,8 @@
 pragma solidity ^0.5.0;
 
 contract IWithdraw {
+	function withdraw(address _property) external;
+
 	function getRewardsAmount(address _property)
 		external
 		view
@@ -13,21 +15,12 @@ contract IWithdraw {
 		// solium-disable-next-line indentation
 	) external;
 
-	function setLastBlockNumber(address _property, uint256 _blockNumber)
-		external;
-
-	function getLastBlockNumber(address _property)
+	function calculateAmount(address _property, address _user)
 		external
 		view
 		returns (uint256);
 
-	function setLastCumulativeGlobalHoldersPriceEachProperty(
-		address _property,
-		uint256 _value
-		// solium-disable-next-line indentation
-	) external;
-
-	function getLastCumulativeGlobalHoldersPriceEachProperty(address _property)
+	function calculateWithdrawableAmount(address _property, address _user)
 		external
 		view
 		returns (uint256);
