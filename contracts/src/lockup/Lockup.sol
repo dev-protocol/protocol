@@ -234,10 +234,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return value > 0 ? value.div(Decimals.basis()) : 0;
 	}
 
-	function _calculateWithdrawableInterestAmount(
+	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	) private view returns (uint256) {
+	) public view returns (uint256) {
 		uint256 pending = getStorage().getPendingInterestWithdrawal(
 			_property,
 			_user
@@ -251,7 +251,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		validateTargetPeriod(_property);
-		uint256 value = _calculateWithdrawableInterestAmount(
+		uint256 value = calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
 		);

@@ -10,6 +10,10 @@ contract ILockup {
 
 	function update() public;
 
+	function cancel(address _property) external;
+
+	function withdraw(address _property) external;
+
 	function next(address _property)
 		public
 		view
@@ -32,4 +36,14 @@ contract ILockup {
 		external
 		view
 		returns (uint256);
+
+	function calculateWithdrawableInterestAmount(
+		address _property,
+		address _user
+	)
+		public
+		view
+		returns (uint256);
+
+	function withdrawInterest(address _property) external;
 }
