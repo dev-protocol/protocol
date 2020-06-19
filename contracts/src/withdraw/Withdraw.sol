@@ -26,12 +26,13 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			msg.sender
 		);
 		require(value != 0, "withdraw value is 0");
-		getStorage().setLastCumulativeGlobalHoldersPrice(
+		WithdrawStorage withdrawStorage = getStorage();
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
 			_property,
 			msg.sender,
 			lastPrice
 		);
-		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
+		withdrawStorage.setPendingWithdrawal(_property, msg.sender, 0);
 		__updateLegacyWithdrawableAmount(_property, msg.sender);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		ILockup lockup = ILockup(config().lockup());
@@ -46,28 +47,36 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		address _to
 	) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+		WithdrawStorage withdrawStorage = getStorage();
 
-		uint256 price = getStorage().getCumulativePrice(_property);
+		uint256 price = withdrawStorage.getCumulativePrice(_property);
 		(uint256 amountFrom, ) = _calculateAmount(_property, _from);
 		(uint256 amountTo, ) = _calculateAmount(_property, _to);
-		getStorage().setLastWithdrawalPrice(_property, _from, price);
-		getStorage().setLastWithdrawalPrice(_property, _to, price);
-		uint256 pendFrom = getStorage().getPendingWithdrawal(_property, _from);
-		uint256 pendTo = getStorage().getPendingWithdrawal(_property, _to);
-		getStorage().setPendingWithdrawal(
+		withdrawStorage.setLastWithdrawalPrice(_property, _from, price);
+		withdrawStorage.setLastWithdrawalPrice(_property, _to, price);
+		uint256 pendFrom = withdrawStorage.getPendingWithdrawal(
+			_property,
+			_from
+		);
+		uint256 pendTo = withdrawStorage.getPendingWithdrawal(_property, _to);
+		withdrawStorage.setPendingWithdrawal(
 			_property,
 			_from,
 			pendFrom.add(amountFrom)
 		);
-		getStorage().setPendingWithdrawal(_property, _to, pendTo.add(amountTo));
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
+		withdrawStorage.setPendingWithdrawal(
+			_property,
+			_to,
+			pendTo.add(amountTo)
+		);
+		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
 			_property,
 			_to
 		);
-		uint256 total = getStorage().getRewardsAmount(_property);
+		uint256 total = withdrawStorage.getRewardsAmount(_property);
 		if (totalLimit != total) {
-			getStorage().setWithdrawalLimitTotal(_property, _to, total);
-			getStorage().setWithdrawalLimitBalance(
+			withdrawStorage.setWithdrawalLimitTotal(_property, _to, total);
+			withdrawStorage.setWithdrawalLimitBalance(
 				_property,
 				_to,
 				ERC20Mintable(_property).balanceOf(_to)
@@ -112,15 +121,16 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256 _amount, uint256 _price)
 	{
-		uint256 _last = getStorage().getLastCumulativeGlobalHoldersPrice(
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 _last = withdrawStorage.getLastCumulativeGlobalHoldersPrice(
 			_property,
 			_user
 		);
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
+		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
 			_property,
 			_user
 		);
-		uint256 balanceLimit = getStorage().getWithdrawalLimitBalance(
+		uint256 balanceLimit = withdrawStorage.getWithdrawalLimitBalance(
 			_property,
 			_user
 		);
