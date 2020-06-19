@@ -609,6 +609,40 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
+			describe('after staking withdrawal', () => {
+				it(`Alice's withdrawable holders rewards is correct when also after withdrawal by Carol`, async () => {
+					await dev.lockup.cancel(property.address, {from: carol})
+					await dev.lockup.withdraw(property.address, {
+						from: carol,
+					})
+
+					await mine(3)
+					const block = await getBlock().then(toBigNumber)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(90)
+						.times(1e18)
+						.times(block.minus(lastBlock))
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+				it(`Alice's withdrawable holders rewards is correct when also after withdrawal by Bob`, async () => {
+					await dev.lockup.cancel(property.address, {from: bob})
+					await dev.lockup.withdraw(property.address, {
+						from: bob,
+					})
+					const block = await getBlock().then(toBigNumber)
+
+					await mine(3)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(90)
+						.times(1e18)
+						.times(block.minus(lastBlock))
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
 		})
 	})
 })
