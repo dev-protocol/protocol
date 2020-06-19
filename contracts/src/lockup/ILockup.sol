@@ -43,7 +43,10 @@ contract ILockup {
 	)
 		public
 		view
-		returns (uint256);
+		returns (
+			// solium-disable-next-line indentation
+			uint256
+		);
 
 	function withdrawInterest(address _property) external;
 }
