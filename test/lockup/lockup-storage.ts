@@ -310,5 +310,61 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
+		describe('LockupStorageStorage; setCumulativeGlobalRewardsPrice, getCumulativeGlobalRewardsPrice', () => {
+			it('Initial value is 0.', async () => {
+				const result = await dev.lockupStorage.getCumulativeGlobalRewardsPrice({
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('The set value can be taken as it is.', async () => {
+				await dev.lockupStorage.setCumulativeGlobalRewardsPrice(300000000, {
+					from: lockup,
+				})
+				const result = await dev.lockupStorage.getCumulativeGlobalRewardsPrice({
+					from: lockup,
+				})
+				expect(result.toNumber()).to.be.equal(300000000)
+			})
+			it('Cannot rewrite data from other than lockup.', async () => {
+				const result = await dev.lockupStorage
+					.setCumulativeGlobalRewardsPrice(300000000, {from: dummyLockup})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
+		describe('LockupStorageStorage; setJustBeforeReduceToZero, getJustBeforeReduceToZero', () => {
+			it('Initial value is 0.', async () => {
+				const result = await dev.lockupStorage.getJustBeforeReduceToZero(
+					property,
+					{
+						from: lockup,
+					}
+				)
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('The set value can be taken as it is.', async () => {
+				await dev.lockupStorage.setJustBeforeReduceToZero(
+					property,
+					3000000000,
+					{
+						from: lockup,
+					}
+				)
+				const result = await dev.lockupStorage.getJustBeforeReduceToZero(
+					property,
+					{
+						from: lockup,
+					}
+				)
+				expect(result.toNumber()).to.be.equal(3000000000)
+			})
+			it('Cannot rewrite data from other than lockup.', async () => {
+				const result = await dev.lockupStorage
+					.setJustBeforeReduceToZero(property, 3000000000, {from: dummyLockup})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
 	}
 )
