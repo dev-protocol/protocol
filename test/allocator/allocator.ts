@@ -3,7 +3,6 @@ import BigNumber from 'bignumber.js'
 import {PropertyInstance} from '../../types/truffle-contracts'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {
-	validateErrorMessage,
 	validatePauseErrorMessage,
 	validatePauseOnlyOwnerErrorMessage,
 } from '../test-lib/utils/error'
@@ -84,55 +83,14 @@ contract('Allocator', ([deployer, user1]) => {
 			expect(res[1].toNumber()).to.be.equal(0)
 			expect(res[2].toNumber()).to.be.equal(0)
 		})
-		it.only('n.', async () => {
+		it('Dev is minted if staking and authenticated the Market.', async () => {
 			const [dev, property] = await init()
 			await authenticate(dev, property.address)
 			await dev.dev.deposit(property.address, 10000)
-			const tmp = await dev.lockupStorage.getAllValue()
-			console.log(tmp.toString())
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()
-			console.log(res[0].toString())
-			console.log(res[0].toString())
-			console.log(res[0].toString())
-
-			// Expect(res[0].toNumber()).to.be.equal(0)
-			// expect(res[1].toNumber()).to.be.equal(0)
-			// expect(res[2].toNumber()).to.be.equal(0)
-		})
-	})
-
-	describe('Allocator: calculate', () => {
-		it('If the difference between the start and end numbers is not appropriate, an error occurs.', async () => {
-			const [dev, property] = await init()
-			const res = await dev.allocator
-				.calculate(property.address, 0, 1)
-				.catch((err: Error) => err)
-			validateErrorMessage(res, 'SafeMath: subtraction overflow', false)
-		})
-		it('If the start block number and the end block number are the same, 0 is returned.', async () => {
-			const [dev, property] = await init()
-			const res = await dev.allocator.calculate(property.address, 1, 1)
-			expect(res[0].toNumber()).to.be.equal(0)
-			expect(res[1].toNumber()).to.be.equal(0)
-			expect(res[2].toNumber()).to.be.equal(0)
-			expect(res[3].toNumber()).to.be.equal(0)
-		})
-		it('If there is no staker, only the holder is rewarded.', async () => {
-			const [dev, property] = await init()
-			const res = await dev.allocator.calculate(property.address, 10000, 10500)
-			expect(res[0].toString()).to.be.equal('50000000000000000000000')
-			expect(res[1].toNumber()).to.be.equal(0)
-			expect(res[2].toString()).to.be.equal('50000000000000000000000')
-			expect(res[3].toNumber()).to.be.equal(0)
-		})
-		it('If there is a staker, the holder and staker are rewarded.', async () => {
-			const [dev, property] = await init()
-			await dev.dev.deposit(property.address, 1000000)
-			const res = await dev.allocator.calculate(property.address, 10000, 10500)
-			expect(res[0].toString()).to.be.equal('45000000000000000000000')
-			expect(res[1].toString()).to.be.equal('5000000000000000000000')
-			expect(res[2].toString()).to.be.equal('45000000000000000000000')
-			expect(res[3].toString()).to.be.equal('5000000000000000000000')
+			expect(res[0].toNumber()).to.be.equal(9000)
+			expect(res[1].toNumber()).to.be.equal(1000)
+			expect(res[2].toNumber()).to.be.equal(10000)
 		})
 	})
 
