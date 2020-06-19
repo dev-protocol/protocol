@@ -348,6 +348,77 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		return keccak256(abi.encodePacked("_justBeforeReduceRewardsToZero"));
 	}
 
+
+	//CumulativeLockedUpUnit
+	function setCumulativeLockedUpUnit(address _addr, uint256 _value) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(getCumulativeLockedUpUnitKey(_addr), _value);
+	}
+
+	function getCumulativeLockedUpUnit(address _addr)
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getCumulativeLockedUpUnitKey(_addr));
+	}
+
+	function getCumulativeLockedUpUnitKey(address _addr)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_cumulativeLockedUpUnit", _addr));
+	}
+
+	//CumulativeLockedUpBlock
+	function setCumulativeLockedUpBlock(address _addr, uint256 _value) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(getCumulativeLockedUpBlockKey(_addr), _value);
+	}
+
+	function getCumulativeLockedUpBlock(address _addr)
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getCumulativeLockedUpBlockKey(_addr));
+	}
+
+	function getCumulativeLockedUpBlockKey(address _addr)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_cumulativeLockedUpBlock", _addr));
+	}
+
+	//CumulativeLockedUpValue
+	function setCumulativeLockedUpValue(address _addr, uint256 _value) external {
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(getCumulativeLockedUpValueKey(_addr), _value);
+	}
+
+	function getCumulativeLockedUpValue(address _addr)
+		external
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getCumulativeLockedUpValueKey(_addr));
+	}
+
+	function getCumulativeLockedUpValueKey(address _addr)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_cumulativeLockedUpValue", _addr));
+	}
+
+
 	//PendingWithdrawal
 	function setPendingInterestWithdrawal(
 		address _property,

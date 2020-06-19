@@ -87,7 +87,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_to
 		);
-		(uint256 total, , , , ) = next(_property);
+		(uint256 total, , , ) = next(_property);
 		if (totalLimit != total) {
 			withdrawStorage.setWithdrawalLimitTotal(_property, _to, total);
 			withdrawStorage.setWithdrawalLimitBalance(
@@ -137,8 +137,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			uint256 _holders,
 			uint256 _interest,
 			uint256 _holdersPrice,
-			uint256 _interestPrice,
-			uint256 _holdersPriceByShare
+			uint256 _interestPrice
 		)
 	{
 		return ILockup(config().lockup()).next(_property);
@@ -165,13 +164,8 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		(
 			uint256 _holders,
 			,
-			uint256 _holdersPrice,
-			,
-			uint256 _holdersPriceByShare
+			uint256 price,
 		) = next(_property);
-		uint256 price = _holdersPriceByShare > 0
-			? _holdersPriceByShare
-			: _holdersPrice;
 		uint256 priceGap = price.sub(_last);
 
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
@@ -179,7 +173,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			balance = balanceLimit;
 		}
 		uint256 value = priceGap.mul(balance);
-		return (value.div(Decimals.basis()), price);
+		return (value.div(Decimals.basis()).div(Decimals.basis()), price);
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)
