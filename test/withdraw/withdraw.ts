@@ -5,7 +5,7 @@ import {MetricsInstance, PropertyInstance} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {getEventValue} from '../test-lib/utils/event'
+import {getEventValue, watch} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -371,13 +371,65 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 	// 	})
 	// })
 	describe('Withdraw; calculateWithdrawableAmount', () => {
+		describe('scenario; zero lockup', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+
+			const alice = deployer
+			const bob = user1
+
+			before(async () => {
+				;[dev, , property] = await init()
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+			})
+
+			describe('When totally is 0', () => {
+				it(`Alice's withdrawable reward is 0`, async () => {
+					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(total.toFixed()).to.be.equal('0')
+					expect(aliceAmount.toFixed()).to.be.equal('0')
+				})
+			})
+			describe('When Property1 is 0', () => {
+				before(async () => {
+					const [property2] = await Promise.all([
+						artifacts
+							.require('Property')
+							.at(
+								getPropertyAddress(
+									await dev.propertyFactory.create('test2', 'TEST2', deployer)
+								)
+							),
+					])
+					await dev.dev.deposit(
+						property2.address,
+						toBigNumber(10000).times(1e18),
+						{from: bob}
+					)
+				})
+
+				it(`Alice's withdrawable reward is 0`, async () => {
+					const total = await dev.lockup.getAllValue().then(toBigNumber)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(total.toFixed()).to.be.equal(
+						toBigNumber(10000).times(1e18).toFixed()
+					)
+					expect(aliceAmount.toFixed()).to.be.equal('0')
+				})
+			})
+		})
 		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let lastBlock: BigNumber
 
 			const alice = deployer
-			const bob = user1
 			const carol = user2
 
 			before(async () => {
@@ -420,7 +472,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					await dev.withdraw.withdraw(property.address, {from: alice})
 					lastBlock = await getBlock().then(toBigNumber)
 				})
-				it(`Alice's withdrawable interest is correct`, async () => {
+				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(3)
 					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
@@ -429,6 +481,95 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					const expected = toBigNumber(90)
 						.times(1e18)
 						.times(block.minus(lastBlock))
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+			describe('after additional staking', () => {
+				before(async () => {
+					await dev.dev.deposit(
+						property.address,
+						toBigNumber(10000).times(1e18),
+						{from: carol}
+					)
+				})
+				it(`Alice's withdrawable holders rewards is correct`, async () => {
+					await mine(3)
+					const block = await getBlock().then(toBigNumber)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(90)
+						.times(1e18)
+						.times(block.minus(lastBlock))
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+			describe('after staking withdrawal', () => {
+				let block: BigNumber
+				before(async () => {
+					await dev.lockup.cancel(property.address, {from: carol})
+					await dev.lockup.withdraw(property.address, {
+						from: carol,
+					})
+					block = await getBlock().then(toBigNumber)
+				})
+				it(`Alice's withdrawable holders rewards is correct`, async () => {
+					await mine(3)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(90)
+						.times(1e18)
+						.times(block.minus(lastBlock))
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+			describe('after withdrawal', () => {
+				before(async () => {
+					await dev.withdraw.withdraw(property.address, {from: alice})
+				})
+				it(`Alice's withdrawable holders rewards is correct`, async () => {
+					await mine(3)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(aliceAmount.toFixed()).to.be.equal('0')
+				})
+			})
+		})
+		describe('scenario: multiple lockup', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+
+			const alice = deployer
+			const bob = user1
+			const carol = user2
+
+			before(async () => {
+				;[dev, , property] = await init()
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+				await dev.dev.mint(carol, aliceBalance)
+				await dev.dev.deposit(property.address, 10000, {from: bob})
+				await dev.dev.deposit(property.address, 10000 * 0.25, {from: carol})
+			})
+
+			describe('before additional staking', () => {
+				it(`Alice's withdrawable holders rewards is correct`, async () => {
+					await mine(3)
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const bobAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					const carolAmount = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, carol)
+						.then(toBigNumber)
+					const expected = bobAmount
+						.div(0.1)
+						.times(0.9)
+						.plus(carolAmount.div(0.1).times(0.9))
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})

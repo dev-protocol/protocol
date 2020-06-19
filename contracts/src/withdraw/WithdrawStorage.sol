@@ -292,4 +292,40 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 				)
 			);
 	}
+
+	//LastCumulativeGlobalHoldersPriceEachPropertySaved
+	function setLastCumulativeGlobalHoldersPriceEachPropertySaved(
+		address _property,
+		bool _saved
+	) external {
+		addressValidator().validateAddress(msg.sender, config().withdraw());
+
+		eternalStorage().setBool(
+			getLastCumulativeGlobalHoldersPriceEachPropertySavedKey(_property),
+			_saved
+		);
+	}
+
+	function getLastCumulativeGlobalHoldersPriceEachPropertySaved(
+		address _property
+	) external view returns (bool) {
+		return
+			eternalStorage().getBool(
+				getLastCumulativeGlobalHoldersPriceEachPropertySavedKey(
+					_property
+				)
+			);
+	}
+
+	function getLastCumulativeGlobalHoldersPriceEachPropertySavedKey(
+		address _property
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativeGlobalHoldersPriceEachPropertySaved",
+					_property
+				)
+			);
+	}
 }

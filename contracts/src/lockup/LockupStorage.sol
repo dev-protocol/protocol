@@ -295,6 +295,36 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 			);
 	}
 
+	//JustBeforeReduceToZero
+	function setJustBeforeReduceToZero(address _property, uint256 _value)
+		external
+	{
+		addressValidator().validateAddress(msg.sender, config().lockup());
+
+		eternalStorage().setUint(
+			getJustBeforeReduceToZeroKey(_property),
+			_value
+		);
+	}
+
+	function getJustBeforeReduceToZero(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(getJustBeforeReduceToZeroKey(_property));
+	}
+
+	function getJustBeforeReduceToZeroKey(address _property)
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(abi.encodePacked("_justBeforeReduceToZero", _property));
+	}
+
 	//PendingWithdrawal
 	function setPendingInterestWithdrawal(
 		address _property,
