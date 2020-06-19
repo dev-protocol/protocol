@@ -1,3 +1,4 @@
+/* eslint-disable max-nested-callbacks */
 /* eslint-disable no-warning-comments */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {DevProtocolInstance} from '../test-lib/instance'
@@ -514,7 +515,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					block = await getBlock().then(toBigNumber)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
-					await mine(3)
+					await mine(6)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)

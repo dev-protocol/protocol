@@ -40,23 +40,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			// Set the block that has been locked-up for the first time as the starting block.
 			lockupStorage.setLastBlockNumber(_property, block.number);
 		}
-		if (IWithdraw(config().withdraw()).getLastBlockNumber(_property) == 0) {
-			IWithdraw(config().withdraw()).setLastBlockNumber(
-				_property,
-				block.number
-			);
-		}
-		if (
-			IWithdraw(config().withdraw())
-				.getLastCumulativeGlobalHoldersPriceEachProperty(_property) == 0
-		) {
-			(, , , , uint256 price) = next(_property);
-			IWithdraw(config().withdraw())
-				.setLastCumulativeGlobalHoldersPriceEachProperty(
-				_property,
-				price
-			);
-		}
 		update();
 		updatePendingInterestWithdrawal(_property, _from);
 		addValue(_property, _from, _value);
@@ -188,7 +171,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			uint256 _holdersPriceByShare
 		)
 	{
-		(uint256 maxRewards, uint256 nextPrice, , ) = dry();
+		(uint256 nextRewards, uint256 nextPrice, , ) = dry();
 		LockupStorage lockupStorage = getStorage();
 
 		uint256 lockedUp = lockupStorage.getPropertyValue(_property);
@@ -206,7 +189,18 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		);
 		uint256 holdersPriceByShare = Policy(config().policy())
 			.holdersShare(
-			maxRewards.mul(lockedUp.outOf(lockupStorage.getAllValue())),
+			(
+				lockupStorage.getAllValue() > 0
+					? nextRewards
+					: lockupStorage.getJustBeforeReduceRewardsToZero()
+			)
+				.mul(
+				lockedUp.outOf(
+					lockupStorage.getAllValue() > 0
+						? lockupStorage.getAllValue()
+						: lockedUp
+				)
+			),
 			lockedUp
 		)
 			.div(ERC20Mintable(_property).totalSupply());
@@ -240,10 +234,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return value > 0 ? value.div(Decimals.basis()) : 0;
 	}
 
-	function _calculateWithdrawableInterestAmount(
+	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	) private view returns (uint256) {
+	) public view returns (uint256) {
 		uint256 pending = getStorage().getPendingInterestWithdrawal(
 			_property,
 			_user
@@ -257,7 +251,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		validateTargetPeriod(_property);
-		uint256 value = _calculateWithdrawableInterestAmount(
+		uint256 value = calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
 		);
@@ -286,6 +280,11 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 value = lockupStorage.getAllValue();
 		value = value.sub(_value);
 		lockupStorage.setAllValue(value);
+		if (value == 0) {
+			lockupStorage.setJustBeforeReduceRewardsToZero(
+				lockupStorage.getCumulativeGlobalRewards()
+			);
+		}
 	}
 
 	function getPropertyValue(address _property)
