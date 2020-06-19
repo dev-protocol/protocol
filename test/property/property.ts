@@ -107,7 +107,15 @@ contract(
 					dev.generateVoteTimesStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
+					dev.generateLockup(),
+					dev.generateLockupStorage(),
+					dev.generateMetricsGroup(),
+					dev.generatePolicyFactory(),
+					dev.generatePolicyGroup(),
+					dev.generatePolicySet(),
 				])
+				const policy = await artifacts.require('PolicyTestForProperty').new()
+				await dev.policyFactory.create(policy.address)
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -156,7 +164,15 @@ contract(
 					dev.generateVoteTimesStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
+					dev.generateLockup(),
+					dev.generateLockupStorage(),
+					dev.generateMetricsGroup(),
+					dev.generatePolicyFactory(),
+					dev.generatePolicyGroup(),
+					dev.generatePolicySet(),
 				])
+				const policy = await artifacts.require('PolicyTestForProperty').new()
+				await dev.policyFactory.create(policy.address)
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
