@@ -8,8 +8,6 @@ import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
-import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
-import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
@@ -144,15 +142,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		}
 		uint256 value = priceGap.mul(balance);
 		return (value.div(Decimals.basis()), price);
-	}
-
-	function calculateAmount(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		(uint256 value, ) = _calculateAmount(_property, _user);
-		return value;
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)

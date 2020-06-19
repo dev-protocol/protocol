@@ -131,7 +131,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function dry()
-		public
+		private
 		view
 		returns (
 			uint256 _rewards,
@@ -234,14 +234,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return value > 0 ? value.div(Decimals.basis()) : 0;
 	}
 
-	function calculateInterestAmount(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return _calculateInterestAmount(_property, _user);
-	}
-
 	function _calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
@@ -253,13 +245,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 legacy = __legacyWithdrawableInterestAmount(_property, _user);
 		return
 			_calculateInterestAmount(_property, _user).add(pending).add(legacy);
-	}
-
-	function calculateWithdrawableInterestAmount(
-		address _property,
-		address _user
-	) external view returns (uint256) {
-		return _calculateWithdrawableInterestAmount(_property, _user);
 	}
 
 	function withdrawInterest(address _property) external {
