@@ -18,10 +18,13 @@ import {ILockup} from "contracts/src/lockup/ILockup.sol";
 contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	uint256 private deployedBlock;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _config) public UsingConfig(_config) {
+		deployedBlock = block.number;
+	}
 
 	function lockup(
 		address _from,
@@ -84,15 +87,35 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		update();
 	}
 
+	function getCumulativeLockedUpUnitAndBlock(address _property)
+		private
+		view
+		returns (uint256 _unit, uint256 _block)
+	{
+		LockupStorage lockupStorage = getStorage();
+		(uint256 unit, uint256 lastBlock) = lockupStorage
+			.getCumulativeLockedUpUnitAndBlock(_property);
+		if (lastBlock > 0) {
+			return (unit, lastBlock);
+		}
+		// When lastBlock is 0, CumulativeLockedUpUnitAndBlock is not saved yet so failback to AllValue or PropertyValue.
+		unit = _property == address(0)
+			? lockupStorage.getAllValue()
+			: lockupStorage.getPropertyValue(_property);
+		// Assign lastBlock as deployedBlock because when AllValue or PropertyValue is not 0, already locked-up when deployed this contract.
+		lastBlock = deployedBlock;
+		return (unit, lastBlock);
+	}
+
 	function getCumulativeLockedUp(address _property)
 		public
 		view
 		returns (uint256)
 	{
-		LockupStorage lockupStorage = getStorage();
-		uint256 lastValue = lockupStorage.getCumulativeLockedUpValue(_property);
-		uint256 unit = lockupStorage.getCumulativeLockedUpUnit(_property);
-		uint256 lastBlock = lockupStorage.getCumulativeLockedUpBlock(_property);
+		(uint256 unit, uint256 lastBlock) = getCumulativeLockedUpUnitAndBlock(
+			_property
+		);
+		uint256 lastValue = getStorage().getCumulativeLockedUpValue(_property);
 		return lastValue.add(unit.mul(block.number.sub(lastBlock)));
 	}
 
@@ -104,36 +127,54 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		LockupStorage lockupStorage = getStorage();
 		address zero = address(0);
 		uint256 lastValue = getCumulativeLockedUp(_property);
-		uint256 lastUnit = lockupStorage.getCumulativeLockedUpUnit(_property);
+		(uint256 lastUnit, ) = lockupStorage.getCumulativeLockedUpUnitAndBlock(
+			_property
+		);
 		uint256 lastValueAll = getCumulativeLockedUp(zero);
-		uint256 lastUnitAll = lockupStorage.getCumulativeLockedUpUnit(zero);
+		(uint256 lastUnitAll, ) = lockupStorage
+			.getCumulativeLockedUpUnitAndBlock(zero);
 		lockupStorage.setCumulativeLockedUpValue(
 			_property,
 			lastValue.add(_unit)
 		);
-		lockupStorage.setCumulativeLockedUpUnit(_property, lastUnit.add(_unit));
-		lockupStorage.setCumulativeLockedUpBlock(_property, block.number);
 		lockupStorage.setCumulativeLockedUpValue(zero, lastValueAll.add(_unit));
-		lockupStorage.setCumulativeLockedUpUnit(zero, lastUnitAll.add(_unit));
-		lockupStorage.setCumulativeLockedUpBlock(zero, block.number);
+		lockupStorage.setCumulativeLockedUpUnitAndBlock(
+			_property,
+			lastUnit.add(_unit),
+			block.number
+		);
+		lockupStorage.setCumulativeLockedUpUnitAndBlock(
+			zero,
+			lastUnitAll.add(_unit),
+			block.number
+		);
 	}
 
 	function subCumulativeLockedUp(address _property, uint256 _unit) private {
 		LockupStorage lockupStorage = getStorage();
 		address zero = address(0);
 		uint256 lastValue = getCumulativeLockedUp(_property);
-		uint256 lastUnit = lockupStorage.getCumulativeLockedUpUnit(_property);
+		(uint256 lastUnit, ) = lockupStorage.getCumulativeLockedUpUnitAndBlock(
+			_property
+		);
 		uint256 lastValueAll = getCumulativeLockedUp(zero);
-		uint256 lastUnitAll = lockupStorage.getCumulativeLockedUpUnit(zero);
+		(uint256 lastUnitAll, ) = lockupStorage
+			.getCumulativeLockedUpUnitAndBlock(zero);
 		lockupStorage.setCumulativeLockedUpValue(
 			_property,
 			lastValue.sub(_unit)
 		);
-		lockupStorage.setCumulativeLockedUpUnit(_property, lastUnit.sub(_unit));
-		lockupStorage.setCumulativeLockedUpBlock(_property, block.number);
 		lockupStorage.setCumulativeLockedUpValue(zero, lastValueAll.sub(_unit));
-		lockupStorage.setCumulativeLockedUpUnit(zero, lastUnitAll.sub(_unit));
-		lockupStorage.setCumulativeLockedUpBlock(zero, block.number);
+		lockupStorage.setCumulativeLockedUpUnitAndBlock(
+			_property,
+			lastUnit.sub(_unit),
+			block.number
+		);
+		lockupStorage.setCumulativeLockedUpUnitAndBlock(
+			zero,
+			lastUnitAll.sub(_unit),
+			block.number
+		);
 	}
 
 	function update() public {

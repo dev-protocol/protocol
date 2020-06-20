@@ -1,10 +1,15 @@
 pragma solidity ^0.5.0;
 
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
 contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
+	using SafeMath for uint256;
+
+	uint256 constant basis = 10000000000000000000000000000000000000000000000000000000000000000;
+
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -348,52 +353,43 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		return keccak256(abi.encodePacked("_justBeforeReduceRewardsToZero"));
 	}
 
-	//CumulativeLockedUpUnit
-	function setCumulativeLockedUpUnit(address _addr, uint256 _value) external {
+	//CumulativeLockedUpUnitAndBlock
+	function setCumulativeLockedUpUnitAndBlock(
+		address _addr,
+		uint256 _unit,
+		uint256 _block
+	) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
-		eternalStorage().setUint(getCumulativeLockedUpUnitKey(_addr), _value);
+		uint256 record = _unit.mul(basis).add(_block);
+		eternalStorage().setUint(
+			getCumulativeLockedUpUnitAndBlockKey(_addr),
+			record
+		);
 	}
 
-	function getCumulativeLockedUpUnit(address _addr)
+	function getCumulativeLockedUpUnitAndBlock(address _addr)
 		external
 		view
-		returns (uint256)
+		returns (uint256 _unit, uint256 _block)
 	{
-		return eternalStorage().getUint(getCumulativeLockedUpUnitKey(_addr));
+		uint256 record = eternalStorage().getUint(
+			getCumulativeLockedUpUnitAndBlockKey(_addr)
+		);
+		uint256 unit = record.div(basis);
+		uint256 blockNumber = record.sub(unit.mul(basis));
+		return (unit, blockNumber);
 	}
 
-	function getCumulativeLockedUpUnitKey(address _addr)
+	function getCumulativeLockedUpUnitAndBlockKey(address _addr)
 		private
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_cumulativeLockedUpUnit", _addr));
-	}
-
-	//CumulativeLockedUpBlock
-	function setCumulativeLockedUpBlock(address _addr, uint256 _value)
-		external
-	{
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getCumulativeLockedUpBlockKey(_addr), _value);
-	}
-
-	function getCumulativeLockedUpBlock(address _addr)
-		external
-		view
-		returns (uint256)
-	{
-		return eternalStorage().getUint(getCumulativeLockedUpBlockKey(_addr));
-	}
-
-	function getCumulativeLockedUpBlockKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_cumulativeLockedUpBlock", _addr));
+		return
+			keccak256(
+				abi.encodePacked("_cumulativeLockedUpUnitAndBlock", _addr)
+			);
 	}
 
 	//CumulativeLockedUpValue
