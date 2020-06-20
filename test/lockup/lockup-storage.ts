@@ -1,5 +1,6 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {validateAddressErrorMessage} from '../test-lib/utils/error'
+import {toBigNumber} from '../test-lib/utils/common'
 
 contract(
 	'LockupStorageStorageTest',
@@ -281,6 +282,48 @@ contract(
 			it('Cannot rewrite data from other than lockup.', async () => {
 				const result = await dev.lockupStorage
 					.setLastCumulativeGlobalInterestPrice(property, user, 300000000, {
+						from: dummyLockup,
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+		})
+		describe('LockupStorageStorage; setCumulativeLockedUpUnitAndBlock, getCumulativeLockedUpUnitAndBlock', () => {
+			it('Initial value is 0 and 0.', async () => {
+				const result = await dev.lockupStorage.getCumulativeLockedUpUnitAndBlock(
+					property,
+					{
+						from: lockup,
+					}
+				)
+				expect(result[0].toNumber()).to.be.equal(0)
+				expect(result[1].toNumber()).to.be.equal(0)
+			})
+			it('Save two values combine to one value.', async () => {
+				const unit = toBigNumber(
+					'99999999999999999999.999999999999999999'
+				).times(1e18)
+				const block = '888888888888888888'
+				await dev.lockupStorage.setCumulativeLockedUpUnitAndBlock(
+					property,
+					unit,
+					block,
+					{
+						from: lockup,
+					}
+				)
+				const result = await dev.lockupStorage.getCumulativeLockedUpUnitAndBlock(
+					property,
+					{
+						from: lockup,
+					}
+				)
+				expect(toBigNumber(result[0]).toFixed()).to.be.equal(unit.toFixed())
+				expect(toBigNumber(result[1]).toFixed()).to.be.equal(block)
+			})
+			it('Cannot rewrite data from other than lockup.', async () => {
+				const result = await dev.lockupStorage
+					.setCumulativeLockedUpUnitAndBlock(property, 1, 1, {
 						from: dummyLockup,
 					})
 					.catch((err: Error) => err)
