@@ -330,11 +330,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 value = lockupStorage.getAllValue();
 		value = value.sub(_value);
 		lockupStorage.setAllValue(value);
-		if (value == 0) {
-			lockupStorage.setJustBeforeReduceRewardsToZero(
-				lockupStorage.getCumulativeGlobalRewards()
-			);
-		}
 	}
 
 	function getPropertyValue(address _property)
@@ -385,9 +380,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 value = lockupStorage.getPropertyValue(_property);
 		uint256 nextValue = value.sub(_value);
 		lockupStorage.setPropertyValue(_property, nextValue);
-		if (nextValue == 0) {
-			lockupStorage.setJustBeforeReduceToZero(_property, value);
-		}
 	}
 
 	function updatePendingInterestWithdrawal(address _property, address _user)
