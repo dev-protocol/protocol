@@ -3,6 +3,7 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	PropertyInstance,
 	PolicyTestForLockupInstance,
+	LockupInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock, gasLogger} from '../test-lib/utils/common'
@@ -286,6 +287,72 @@ contract('LockupTest', ([deployer, user1]) => {
 	// 	})
 	// })
 	describe('Lockup; calculateWithdrawableInterestAmount', () => {
+		type Calculator = (
+			prop: PropertyInstance,
+			account: string,
+			debug?: boolean
+		) => Promise<BigNumber>
+		const createCalculator = (dev: DevProtocolInstance): Calculator => async (
+			prop: PropertyInstance,
+			account: string,
+			debug = false
+		): Promise<BigNumber> =>
+			Promise.all([
+				dev.allocator.calculateMaxRewardsPerBlock().then((x) => x[2]),
+				dev.lockupStorage.getLastSameRewardsPriceBlock(),
+				getBlock(),
+				dev.lockupStorage.getCumulativeGlobalRewards(),
+				dev.lockup.getPropertyValue(prop.address),
+				dev.lockupStorage.getLastCumulativeGlobalInterestPrice(
+					prop.address,
+					account
+				),
+				dev.lockup.getCumulativeLockedUp(prop.address),
+				dev.lockup.getCumulativeLockedUpAll(),
+				dev.lockup.getValue(prop.address, account),
+				dev.lockupStorage.getPendingInterestWithdrawal(prop.address, account),
+			]).then((results) => {
+				const [
+					maxRewards,
+					lastBlock,
+					currentBlock,
+					globalRewards,
+					lockedUp,
+					lastPrice,
+					propertyLocked,
+					totalLocked,
+					lockedUpPerUser,
+					pending,
+				] = results.map(toBigNumber)
+				const nextRewars = maxRewards
+					.times(currentBlock.minus(lastBlock))
+					.plus(globalRewards)
+				const share = propertyLocked.times(1e36).div(totalLocked)
+				const propertyRewards = nextRewars.times(share)
+				const interest = propertyRewards.times(10).div(100)
+				const price = lockedUp.isGreaterThan(0)
+					? interest.div(lockedUp)
+					: toBigNumber(0)
+				const priceGap = price.minus(lastPrice)
+				const value = priceGap.times(lockedUpPerUser).div(1e36)
+				const withdrawable = value.plus(pending)
+				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
+				if (debug) {
+					console.log(results.map(toBigNumber))
+					console.log('nextRewars', nextRewars)
+					console.log('share', share)
+					console.log('propertyRewards', propertyRewards)
+					console.log('interest', interest)
+					console.log('price', price)
+					console.log('priceGap', priceGap)
+					console.log('value', value)
+					console.log('withdrawable', withdrawable)
+					console.log('res', res)
+				}
+
+				return res
+			})
+
 		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
@@ -393,20 +460,17 @@ contract('LockupTest', ([deployer, user1]) => {
 		describe('scenario: multiple lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
-			let lastBlock: BigNumber
-			let bobBlock: BigNumber
+			let calc: Calculator
 
 			const alice = deployer
 			const bob = user1
 
 			before(async () => {
 				;[dev, property] = await init()
+				calc = createCalculator(dev)
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.dev.deposit(property.address, 10000, {from: alice})
-				lastBlock = await dev.lockupStorage
-					.getLastBlockNumber(property.address)
-					.then(toBigNumber)
 			})
 
 			describe('before second run', () => {
@@ -421,7 +485,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 				it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
 					await dev.dev.deposit(property.address, 10000 * 0.25, {from: bob})
-					bobBlock = await getBlock().then(toBigNumber)
 					const total = await dev.lockup
 						.getPropertyValue(property.address)
 						.then(toBigNumber)
@@ -441,31 +504,18 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 				it(`Alice's withdrawable interest is 100% of between lastBlockNumber and Bob's first deposit block interest and 80% of current interest`, async () => {
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock))
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(block.minus(bobBlock))
-								.times(0.8)
-						)
+					const expected = await calc(property, alice)
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Bob's withdrawable interest is 20% of interest since the first deposit`, async () => {
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, bob)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(block.minus(bobBlock))
-						.times(0.2)
+					const expected = await calc(property, bob)
 					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
@@ -473,30 +523,21 @@ contract('LockupTest', ([deployer, user1]) => {
 				before(async () => {
 					await dev.lockup.withdrawInterest(property.address, {from: alice})
 					await dev.lockup.withdrawInterest(property.address, {from: bob})
-					lastBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
 				it(`Alice's withdrawable interest is 80% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(block.minus(lastBlock.minus(1)))
-						.times(0.8)
+					const expected = await calc(property, alice)
 
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Bob's withdrawable interest is 20% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, bob)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(block.minus(lastBlock))
-						.times(0.2)
+					const expected = await calc(property, bob)
 
 					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
@@ -504,7 +545,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			describe('additional staking', () => {
 				before(async () => {
 					await dev.dev.deposit(property.address, 12500 * 0.3, {from: bob})
-					bobBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
 				it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
@@ -535,67 +575,35 @@ contract('LockupTest', ([deployer, user1]) => {
 				it(`Alice's withdrawable interest is 80% of prev interest and ${
 					1000000 / 16250
 				}% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock.minus(1)))
-						.times(8)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(block.minus(bobBlock))
-								.times(10000)
-								.div(16250)
-						)
+					const expected = await calc(property, alice)
 
-					expect(aliceAmount.toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Bob's withdrawable interest is 20% of prev interest and ${
 					625000 / 16250
 				}% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, bob)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock))
-						.times(2)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(block.minus(bobBlock))
-								.times(6250)
-								.div(16250)
-						)
+					const expected = await calc(property, bob)
 
-					expect(bobAmount.toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
+					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
 			describe('after withdrawal', () => {
-				let aliceWithdrawalBlock: BigNumber
-				let bobWithdrawalBlock: BigNumber
 				before(async () => {
 					await dev.lockup.cancel(property.address, {from: alice})
 					await dev.lockup.cancel(property.address, {from: bob})
 					await dev.lockup.withdraw(property.address, {
 						from: alice,
 					})
-					aliceWithdrawalBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 					await dev.lockup.withdraw(property.address, {
 						from: bob,
 					})
-					bobWithdrawalBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
 				it(`Alice's withdrawable interest is 80% of prev interest and ${
@@ -604,22 +612,9 @@ contract('LockupTest', ([deployer, user1]) => {
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock.minus(1)))
-						.times(8)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(aliceWithdrawalBlock.minus(bobBlock))
-								.times(10000)
-								.div(16250)
-						)
+					const expected = await calc(property, alice)
 
-					expect(aliceAmount.toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Bob's withdrawable interest is 20% of prev interest and ${
 					625000 / 16250
@@ -627,27 +622,9 @@ contract('LockupTest', ([deployer, user1]) => {
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, bob)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock))
-						.times(2)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(aliceWithdrawalBlock.minus(bobBlock))
-								.times(6250)
-								.div(16250)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(bobWithdrawalBlock.minus(aliceWithdrawalBlock))
-						)
+					const expected = await calc(property, bob)
 
-					expect(bobAmount.toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
+					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
 		})
@@ -657,16 +634,14 @@ contract('LockupTest', ([deployer, user1]) => {
 			let property1: PropertyInstance
 			let property2: PropertyInstance
 			let property3: PropertyInstance
-			let lastBlock1: BigNumber
-			let lastBlock2: BigNumber
-			let lastBlock3: BigNumber
-			let bobBlock: BigNumber
+			let calc: Calculator
 
 			const alice = deployer
 			const bob = user1
 
 			before(async () => {
 				;[dev, property1] = await init()
+				calc = createCalculator(dev)
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				;[property2, property3] = await Promise.all([
@@ -687,7 +662,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				])
 
 				await dev.dev.deposit(property1.address, 10000, {from: alice})
-				lastBlock1 = await getBlock().then(toBigNumber)
 				await mine(3)
 			})
 
@@ -703,7 +677,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 				it(`Bob does staking 100% of the Property2 total lockups, Property2 is 20% of the total rewards`, async () => {
 					await dev.dev.deposit(property2.address, 2500, {from: bob})
-					lastBlock2 = await getBlock().then(toBigNumber)
 					const total = await dev.lockup.getAllValue().then(toBigNumber)
 					const p1 = await dev.lockup
 						.getPropertyValue(property1.address)
@@ -716,63 +689,40 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 				it(`Alice's withdrawable interest is 100% of between lastBlockNumber and Bob's first deposit block interest and 80% of current interest`, async () => {
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property1.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(lastBlock2.minus(lastBlock1))
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(block.minus(lastBlock2))
-								.times(0.8)
-						)
+					const expected = await calc(property1, alice)
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Bob's withdrawable interest is 20% of interest since the first deposit`, async () => {
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property2.address, bob)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(block.minus(lastBlock2))
-						.times(0.2)
+					const expected = await calc(property2, bob)
 					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
 					await dev.lockup.withdrawInterest(property1.address, {from: alice})
-					lastBlock1 = await getBlock().then(toBigNumber)
 					await dev.lockup.withdrawInterest(property2.address, {from: bob})
-					lastBlock2 = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
 				it(`Alice's withdrawable interest is 80% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property1.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(block.minus(lastBlock1))
-						.times(0.8)
+					const expected = await calc(property1, alice)
 
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Bob's withdrawable interest is 20% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property2.address, bob)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(block.minus(lastBlock2))
-						.times(0.2)
+					const expected = await calc(property2, bob)
 
 					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
@@ -780,7 +730,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			describe('additional staking', () => {
 				before(async () => {
 					await dev.dev.deposit(property2.address, 12500 * 0.3, {from: bob})
-					bobBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
 				it(`Bob does staking 30% of the all Property's total lockups, Bob's share become ${
@@ -811,22 +760,10 @@ contract('LockupTest', ([deployer, user1]) => {
 				it(`Alice's withdrawable interest is 80% of prev interest and ${
 					1000000 / 16250
 				}% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property1.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock1))
-						.times(8)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(block.minus(bobBlock))
-								.times(10000)
-								.div(16250)
-						)
+					const expected = await calc(property1, alice)
 
 					expect(aliceAmount.toFixed()).to.be.equal(
 						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
@@ -835,22 +772,10 @@ contract('LockupTest', ([deployer, user1]) => {
 				it(`Bob's withdrawable interest is 20% of prev interest and ${
 					625000 / 16250
 				}% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property2.address, bob)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock2))
-						.times(2)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(block.minus(bobBlock))
-								.times(6250)
-								.div(16250)
-						)
+					const expected = await calc(property2, bob)
 
 					expect(bobAmount.toFixed()).to.be.equal(
 						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
@@ -860,7 +785,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			describe('additional staking', () => {
 				before(async () => {
 					await dev.dev.deposit(property3.address, 16250 * 0.6, {from: alice})
-					lastBlock3 = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
 				it(`Alice does staking 60% of the all Property's total lockups, Alice's share become ${
@@ -892,7 +816,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				}% of prev interest and ${
 					1975000 / 26000
 				}% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await Promise.all([
 						dev.lockup
 							.calculateWithdrawableInterestAmount(property1.address, alice)
@@ -901,35 +824,11 @@ contract('LockupTest', ([deployer, user1]) => {
 							.calculateWithdrawableInterestAmount(property3.address, alice)
 							.then(toBigNumber),
 					])
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock1))
-						.times(8)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(lastBlock3.minus(bobBlock))
-								.times(10000)
-								.div(16250)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(block.minus(lastBlock3))
-								.times(10000)
-								.div(26000)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(block.minus(lastBlock3))
-								.times(9750)
-								.div(26000)
-						)
+					const res1 = await calc(property1, alice)
+					const res2 = await calc(property3, alice)
 
 					expect(aliceAmount[0].plus(aliceAmount[1]).toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
+						res1.plus(res2).toFixed()
 					)
 				})
 				it(`Bob's withdrawable interest is 20% of two prev interest and ${
@@ -937,39 +836,15 @@ contract('LockupTest', ([deployer, user1]) => {
 				}% of prev interest and ${
 					625000 / 26000
 				}% of current interest`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property2.address, bob)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock2))
-						.times(2)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(lastBlock3.minus(bobBlock))
-								.times(6250)
-								.div(16250)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(block.minus(lastBlock3))
-								.times(6250)
-								.div(26000)
-						)
+					const expected = await calc(property2, bob)
 
-					expect(bobAmount.toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
+					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
 			describe('after withdrawal stakes', () => {
-				let aliceWithdrawalBlock1: BigNumber
-				let aliceWithdrawalBlock3: BigNumber
-				let bobWithdrawalBlock: BigNumber
 				before(async () => {
 					await dev.lockup.cancel(property1.address, {from: alice})
 					await dev.lockup.cancel(property2.address, {from: bob})
@@ -977,17 +852,14 @@ contract('LockupTest', ([deployer, user1]) => {
 					await dev.lockup.withdraw(property1.address, {
 						from: alice,
 					})
-					aliceWithdrawalBlock1 = await getBlock().then(toBigNumber)
 					await mine(3)
 					await dev.lockup.withdraw(property3.address, {
 						from: alice,
 					})
-					aliceWithdrawalBlock3 = await getBlock().then(toBigNumber)
 					await mine(3)
 					await dev.lockup.withdraw(property2.address, {
 						from: bob,
 					})
-					bobWithdrawalBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
 				it(`Alice's withdrawable interest`, async () => {
@@ -999,90 +871,20 @@ contract('LockupTest', ([deployer, user1]) => {
 							.calculateWithdrawableInterestAmount(property3.address, alice)
 							.then(toBigNumber),
 					])
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock1))
-						.times(8)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(lastBlock3.minus(bobBlock))
-								.times(10000)
-								.div(16250)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(aliceWithdrawalBlock1.minus(lastBlock3))
-								.times(10000)
-								.div(26000)
-								.integerValue(BigNumber.ROUND_DOWN)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(aliceWithdrawalBlock1.minus(lastBlock3))
-								.times(9750)
-								.div(26000)
-								.integerValue(BigNumber.ROUND_DOWN)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(aliceWithdrawalBlock3.minus(aliceWithdrawalBlock1))
-								.times(9750)
-								.div(26000 - 10000)
-								.integerValue(BigNumber.ROUND_DOWN)
-						)
+					const res1 = await calc(property1, alice)
+					const res2 = await calc(property3, alice)
 
 					expect(aliceAmount[0].plus(aliceAmount[1]).toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
+						res1.plus(res2).toFixed()
 					)
 				})
 				it(`Bob's withdrawable interest`, async () => {
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property2.address, bob)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-						.times(1e18)
-						.times(bobBlock.minus(lastBlock2))
-						.times(2)
-						.div(10)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(lastBlock3.minus(bobBlock))
-								.times(6250)
-								.div(16250)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(aliceWithdrawalBlock1.minus(lastBlock3))
-								.times(6250)
-								.div(26000)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(aliceWithdrawalBlock3.minus(aliceWithdrawalBlock1))
-								.times(6250)
-								.div(26000 - 10000)
-								.integerValue(BigNumber.ROUND_DOWN)
-						)
-						.plus(
-							toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
-								.times(1e18)
-								.times(bobWithdrawalBlock.minus(aliceWithdrawalBlock3))
-								.times(6250)
-								.div(26000 - 10000 - 9750)
-								.integerValue(BigNumber.ROUND_DOWN)
-						)
+					const expected = await calc(property2, bob)
 
-					expect(bobAmount.toFixed()).to.be.equal(
-						expected.integerValue(BigNumber.ROUND_DOWN).toFixed()
-					)
+					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
 		})
