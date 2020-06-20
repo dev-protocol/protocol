@@ -47,6 +47,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addAllValue(_value);
 		update();
 		updateLastPriceForProperty(_property, _from);
+		addCumulativeLockedUp(_property, _value);
 		emit Lockedup(_from, _property, _value);
 	}
 
@@ -79,18 +80,67 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		subPropertyValue(_property, lockedUpValue);
 		subAllValue(lockedUpValue);
 		lockupStorage.setWithdrawalStatus(_property, msg.sender, 0);
+		subCumulativeLockedUp(_property, lockedUpValue);
 		update();
 	}
 
+	function getCumulativeLockedUp(address _property)
+		public
+		view
+		returns (uint256)
+	{
+		LockupStorage lockupStorage = getStorage();
+		uint256 lastValue = lockupStorage.getCumulativeLockedUpValue(_property);
+		uint256 unit = lockupStorage.getCumulativeLockedUpUnit(_property);
+		uint256 lastBlock = lockupStorage.getCumulativeLockedUpBlock(_property);
+		return lastValue.add(unit.mul(block.number.sub(lastBlock)));
+	}
+
+	function getCumulativeLockedUpAll() public view returns (uint256) {
+		return getCumulativeLockedUp(address(0));
+	}
+
+	function addCumulativeLockedUp(address _property, uint256 _unit) private {
+		LockupStorage lockupStorage = getStorage();
+		address zero = address(0);
+		uint256 lastValue = getCumulativeLockedUp(_property);
+		uint256 lastUnit = lockupStorage.getCumulativeLockedUpUnit(_property);
+		uint256 lastValueAll = getCumulativeLockedUp(zero);
+		uint256 lastUnitAll = lockupStorage.getCumulativeLockedUpUnit(zero);
+		lockupStorage.setCumulativeLockedUpValue(
+			_property,
+			lastValue.add(_unit)
+		);
+		lockupStorage.setCumulativeLockedUpUnit(_property, lastUnit.add(_unit));
+		lockupStorage.setCumulativeLockedUpBlock(_property, block.number);
+		lockupStorage.setCumulativeLockedUpValue(zero, lastValueAll.add(_unit));
+		lockupStorage.setCumulativeLockedUpUnit(zero, lastUnitAll.add(_unit));
+		lockupStorage.setCumulativeLockedUpBlock(zero, block.number);
+	}
+
+	function subCumulativeLockedUp(address _property, uint256 _unit) private {
+		LockupStorage lockupStorage = getStorage();
+		address zero = address(0);
+		uint256 lastValue = getCumulativeLockedUp(_property);
+		uint256 lastUnit = lockupStorage.getCumulativeLockedUpUnit(_property);
+		uint256 lastValueAll = getCumulativeLockedUp(zero);
+		uint256 lastUnitAll = lockupStorage.getCumulativeLockedUpUnit(zero);
+		lockupStorage.setCumulativeLockedUpValue(
+			_property,
+			lastValue.sub(_unit)
+		);
+		lockupStorage.setCumulativeLockedUpUnit(_property, lastUnit.sub(_unit));
+		lockupStorage.setCumulativeLockedUpBlock(_property, block.number);
+		lockupStorage.setCumulativeLockedUpValue(zero, lastValueAll.sub(_unit));
+		lockupStorage.setCumulativeLockedUpUnit(zero, lastUnitAll.sub(_unit));
+		lockupStorage.setCumulativeLockedUpBlock(zero, block.number);
+	}
+
 	function update() public {
-		(uint256 _nextRewards, uint256 _nextPrice, , uint256 _maxPrice) = dry();
+		uint256 _nextRewards = dry();
 		LockupStorage lockupStorage = getStorage();
 		if (lockupStorage.getCumulativeGlobalRewards() != _nextRewards)
 			lockupStorage.setCumulativeGlobalRewards(_nextRewards);
-		if (lockupStorage.getCumulativeGlobalRewardsPrice() != _nextPrice)
-			lockupStorage.setCumulativeGlobalRewardsPrice(_nextPrice);
-		if (lockupStorage.getLastMaxRewardsPrice() != _maxPrice)
-			lockupStorage.setLastMaxRewardsPrice(_maxPrice);
 		if (lockupStorage.getLastSameRewardsPriceBlock() != block.number)
 			lockupStorage.setLastSameRewardsPriceBlock(block.number);
 	}
@@ -98,7 +148,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	function updateLastPriceForProperty(address _property, address _user)
 		private
 	{
-		(, , , uint256 interestPrice, ) = next(_property);
+		(, , , uint256 interestPrice) = next(_property);
 		LockupStorage lockupStorage = getStorage();
 		lockupStorage.setLastCumulativeGlobalInterestPrice(
 			_property,
@@ -130,34 +180,17 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return (getStorage().getLastBlockNumber(_property), block.number);
 	}
 
-	function dry()
-		private
-		view
-		returns (
-			uint256 _rewards,
-			uint256 _price,
-			uint256 _maxRewards,
-			uint256 _maxPrice
-		)
-	{
+	function dry() private view returns (uint256) {
 		(, , uint256 maxRewards) = IAllocator(config().allocator())
 			.calculateMaxRewardsPerBlock();
 		LockupStorage lockupStorage = getStorage();
-		uint256 lockedUp = lockupStorage.getAllValue();
-		uint256 maxPrice = lockedUp > 0 ? maxRewards.outOf(lockedUp) : 0;
-		uint256 lastBlock = maxPrice == lockupStorage.getLastMaxRewardsPrice()
-			? lockupStorage.getLastSameRewardsPriceBlock()
-			: 0;
+		uint256 lastBlock = lockupStorage.getLastSameRewardsPriceBlock();
 		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
 		uint256 additionalRewards = maxRewards.mul(blocks);
-		uint256 additionalPrice = maxPrice.mul(blocks);
 		uint256 nextRewards = lockupStorage.getCumulativeGlobalRewards().add(
 			additionalRewards
 		);
-		uint256 nextPrice = lockupStorage.getCumulativeGlobalRewardsPrice().add(
-			additionalPrice
-		);
-		return (nextRewards, nextPrice, maxRewards, maxPrice);
+		return nextRewards;
 	}
 
 	function next(address _property)
@@ -167,18 +200,16 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			uint256 _holders,
 			uint256 _interest,
 			uint256 _holdersPrice,
-			uint256 _interestPrice,
-			uint256 _holdersPriceByShare
+			uint256 _interestPrice
 		)
 	{
-		(uint256 nextRewards, uint256 nextPrice, , ) = dry();
+		uint256 nextRewards = dry();
 		LockupStorage lockupStorage = getStorage();
-
+		uint256 share = getCumulativeLockedUp(_property)
+			.mul(Decimals.basis())
+			.outOf(getCumulativeLockedUpAll());
+		uint256 propertyRewards = nextRewards.mul(share);
 		uint256 lockedUp = lockupStorage.getPropertyValue(_property);
-		if (lockedUp == 0) {
-			lockedUp = lockupStorage.getJustBeforeReduceToZero(_property);
-		}
-		uint256 propertyRewards = nextPrice.mul(lockedUp);
 		uint256 holders = Policy(config().policy()).holdersShare(
 			propertyRewards,
 			lockedUp
@@ -187,31 +218,8 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 holdersPrice = holders.div(
 			ERC20Mintable(_property).totalSupply()
 		);
-		uint256 holdersPriceByShare = Policy(config().policy())
-			.holdersShare(
-			(
-				lockupStorage.getAllValue() > 0
-					? nextRewards
-					: lockupStorage.getJustBeforeReduceRewardsToZero()
-			)
-				.mul(
-				lockedUp.outOf(
-					lockupStorage.getAllValue() > 0
-						? lockupStorage.getAllValue()
-						: lockedUp
-				)
-			),
-			lockedUp
-		)
-			.div(ERC20Mintable(_property).totalSupply());
 		uint256 interestPrice = lockedUp > 0 ? interest.div(lockedUp) : 0;
-		return (
-			holders,
-			interest,
-			holdersPrice,
-			interestPrice,
-			holdersPriceByShare
-		);
+		return (holders, interest, holdersPrice, interestPrice);
 	}
 
 	function _calculateInterestAmount(address _property, address _user)
@@ -228,10 +236,11 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_user
 		);
-		(, , , uint256 interestPrice, ) = next(_property);
+		(, , , uint256 interestPrice) = next(_property);
 		uint256 priceGap = interestPrice.sub(lastPrice);
 		uint256 value = priceGap.mul(lockedUp);
-		return value > 0 ? value.div(Decimals.basis()) : 0;
+		return
+			value > 0 ? value.div(Decimals.basis()).div(Decimals.basis()) : 0;
 	}
 
 	function calculateWithdrawableInterestAmount(
