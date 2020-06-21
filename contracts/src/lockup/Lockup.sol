@@ -18,7 +18,7 @@ import {ILockup} from "contracts/src/lockup/ILockup.sol";
 contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	uint256 private deployedBlock;
+	uint256 public deployedBlock;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	// solium-disable-next-line no-empty-blocks
@@ -87,12 +87,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		lockupStorage.setWithdrawalStatus(_property, msg.sender, 0);
 	}
 
-	function getCumulativeLockedUpUnitAndBlock(address _property)
-		private
-		view
-		returns (uint256 _unit, uint256 _block)
-	{
-		LockupStorage lockupStorage = getStorage();
+	function getCumulativeLockedUpUnitAndBlock(
+		LockupStorage lockupStorage,
+		address _property
+	) private view returns (uint256 _unit, uint256 _block) {
 		(uint256 unit, uint256 lastBlock) = lockupStorage
 			.getCumulativeLockedUpUnitAndBlock(_property);
 		if (lastBlock > 0) {
@@ -110,16 +108,34 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	function getCumulativeLockedUp(address _property)
 		public
 		view
-		returns (uint256)
+		returns (
+			uint256 _value,
+			uint256 _unit,
+			uint256 _block
+		)
 	{
+		LockupStorage lockupStorage = getStorage();
 		(uint256 unit, uint256 lastBlock) = getCumulativeLockedUpUnitAndBlock(
+			lockupStorage,
 			_property
 		);
-		uint256 lastValue = getStorage().getCumulativeLockedUpValue(_property);
-		return lastValue.add(unit.mul(block.number.sub(lastBlock)));
+		uint256 lastValue = lockupStorage.getCumulativeLockedUpValue(_property);
+		return (
+			lastValue.add(unit.mul(block.number.sub(lastBlock))),
+			unit,
+			lastBlock
+		);
 	}
 
-	function getCumulativeLockedUpAll() public view returns (uint256) {
+	function getCumulativeLockedUpAll()
+		public
+		view
+		returns (
+			uint256 _value,
+			uint256 _unit,
+			uint256 _block
+		)
+	{
 		return getCumulativeLockedUp(address(0));
 	}
 
@@ -130,13 +146,12 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 _unit
 	) private {
 		address zero = address(0);
-		uint256 lastValue = getCumulativeLockedUp(_property);
-		(uint256 lastUnit, ) = lockupStorage.getCumulativeLockedUpUnitAndBlock(
+		(uint256 lastValue, uint256 lastUnit, ) = getCumulativeLockedUp(
 			_property
 		);
-		uint256 lastValueAll = getCumulativeLockedUp(zero);
-		(uint256 lastUnitAll, ) = lockupStorage
-			.getCumulativeLockedUpUnitAndBlock(zero);
+		(uint256 lastValueAll, uint256 lastUnitAll, ) = getCumulativeLockedUp(
+			zero
+		);
 		lockupStorage.setCumulativeLockedUpValue(
 			_property,
 			_addition ? lastValue.add(_unit) : lastValue.sub(_unit)
@@ -223,9 +238,9 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	{
 		LockupStorage lockupStorage = getStorage();
 		uint256 nextRewards = dry(lockupStorage);
-		uint256 share = getCumulativeLockedUp(_property)
-			.mul(Decimals.basis())
-			.outOf(getCumulativeLockedUpAll());
+		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
+		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
+		uint256 share = valuePerProperty.mul(Decimals.basis()).outOf(valueAll);
 		uint256 propertyRewards = nextRewards.mul(share);
 		uint256 lockedUp = lockupStorage.getPropertyValue(_property);
 		uint256 holders = Policy(config().policy()).holdersShare(
@@ -306,14 +321,14 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 _value
 	) private {
 		if (_addition) {
+			updateCumulativeLockedUp(lockupStorage, true, _property, _value);
 			addAllValue(lockupStorage, _value);
 			addPropertyValue(lockupStorage, _property, _value);
 			addValue(lockupStorage, _property, _account, _value);
-			updateCumulativeLockedUp(lockupStorage, true, _property, _value);
 		} else {
+			updateCumulativeLockedUp(lockupStorage, false, _property, _value);
 			subAllValue(lockupStorage, _value);
 			subPropertyValue(lockupStorage, _property, _value);
-			updateCumulativeLockedUp(lockupStorage, false, _property, _value);
 		}
 		update();
 	}
