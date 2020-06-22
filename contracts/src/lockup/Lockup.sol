@@ -156,7 +156,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_addition ? lastValue.add(_unit) : lastValue.sub(_unit)
 		);
-		lockupStorage.setCumulativeLockedUpValue(zero, lastValueAll.add(_unit));
+		lockupStorage.setCumulativeLockedUpValue(
+			zero,
+			_addition ? lastValueAll.add(_unit) : lastValueAll.sub(_unit)
+		);
 		lockupStorage.setCumulativeLockedUpUnitAndBlock(
 			_property,
 			_addition ? lastUnit.add(_unit) : lastUnit.sub(_unit),
