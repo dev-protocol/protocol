@@ -44,7 +44,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			// Set the block that has been locked-up for the first time as the starting block.
 			lockupStorage.setLastBlockNumber(_property, block.number);
 		}
-		update();
 		updatePendingInterestWithdrawal(lockupStorage, _property, _from);
 		updateValues(lockupStorage, true, _from, _property, _value);
 		updateLastPriceForProperty(lockupStorage, _property, _from);
@@ -74,7 +73,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 lockedUpValue = lockupStorage.getValue(_property, msg.sender);
 		require(lockedUpValue != 0, "dev token is not locked");
 		updatePendingInterestWithdrawal(lockupStorage, _property, msg.sender);
-		update();
 		Property(_property).withdraw(msg.sender, lockedUpValue);
 		updateValues(
 			lockupStorage,
@@ -174,11 +172,9 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 
 	function update() public {
 		LockupStorage lockupStorage = getStorage();
-		uint256 _nextRewards = dry(lockupStorage);
-		if (lockupStorage.getCumulativeGlobalRewards() != _nextRewards)
-			lockupStorage.setCumulativeGlobalRewards(_nextRewards);
-		if (lockupStorage.getLastSameRewardsPriceBlock() != block.number)
-			lockupStorage.setLastSameRewardsPriceBlock(block.number);
+		(uint256 _nextRewards, uint256 _amount) = dry(lockupStorage);
+		lockupStorage.setCumulativeGlobalRewards(_nextRewards);
+		lockupStorage.setLastSameRewardsAmountAndBlock(_amount, block.number);
 	}
 
 	function updateLastPriceForProperty(
@@ -217,16 +213,24 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return (getStorage().getLastBlockNumber(_property), block.number);
 	}
 
-	function dry(LockupStorage lockupStorage) private view returns (uint256) {
-		(, , uint256 maxRewards) = IAllocator(config().allocator())
+	function dry(LockupStorage lockupStorage)
+		private
+		view
+		returns (uint256 _nextRewards, uint256 _amount)
+	{
+		(, , uint256 rewardsAmount) = IAllocator(config().allocator())
 			.calculateMaxRewardsPerBlock();
-		uint256 lastBlock = lockupStorage.getLastSameRewardsPriceBlock();
+		(uint256 lastAmount, uint256 lastBlock) = lockupStorage
+			.getLastSameRewardsAmountAndBlock();
+		uint256 lastMaxRewards = lastAmount == rewardsAmount
+			? rewardsAmount
+			: lastAmount;
 		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
-		uint256 additionalRewards = maxRewards.mul(blocks);
+		uint256 additionalRewards = lastMaxRewards.mul(blocks);
 		uint256 nextRewards = lockupStorage.getCumulativeGlobalRewards().add(
 			additionalRewards
 		);
-		return nextRewards;
+		return (nextRewards, rewardsAmount);
 	}
 
 	function next(address _property)
@@ -240,7 +244,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		)
 	{
 		LockupStorage lockupStorage = getStorage();
-		uint256 nextRewards = dry(lockupStorage);
+		(uint256 nextRewards, ) = dry(lockupStorage);
 		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
 		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
 		uint256 share = valuePerProperty.mul(Decimals.basis()).outOf(valueAll);

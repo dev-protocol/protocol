@@ -202,19 +202,35 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 			);
 	}
 
-	//LastSameRewardsPriceBlock
-	function setLastSameRewardsPriceBlock(uint256 _value) external {
+	//LastSameRewardsAmountAndBlock
+	function setLastSameRewardsAmountAndBlock(uint256 _amount, uint256 _block)
+		external
+	{
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
-		eternalStorage().setUint(getLastSameRewardsPriceBlockKey(), _value);
+		uint256 record = _amount.mul(basis).add(_block);
+		eternalStorage().setUint(getLastSameRewardsAmountAndBlockKey(), record);
 	}
 
-	function getLastSameRewardsPriceBlock() external view returns (uint256) {
-		return eternalStorage().getUint(getLastSameRewardsPriceBlockKey());
+	function getLastSameRewardsAmountAndBlock()
+		external
+		view
+		returns (uint256 _amount, uint256 _block)
+	{
+		uint256 record = eternalStorage().getUint(
+			getLastSameRewardsAmountAndBlockKey()
+		);
+		uint256 amount = record.div(basis);
+		uint256 blockNumber = record.sub(amount.mul(basis));
+		return (amount, blockNumber);
 	}
 
-	function getLastSameRewardsPriceBlockKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_LastSameRewardsPriceBlock"));
+	function getLastSameRewardsAmountAndBlockKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_LastSameRewardsAmountAndBlock"));
 	}
 
 	//CumulativeGlobalRewards

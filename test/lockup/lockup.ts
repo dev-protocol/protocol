@@ -448,7 +448,12 @@ contract('LockupTest', ([deployer, user1]) => {
 		): Promise<BigNumber> =>
 			Promise.all([
 				dev.allocator.calculateMaxRewardsPerBlock().then((x) => x[2]),
-				dev.lockupStorage.getLastSameRewardsPriceBlock(),
+				dev.lockupStorage
+					.getLastSameRewardsAmountAndBlock()
+					.then((x: any) => x[0]),
+				dev.lockupStorage
+					.getLastSameRewardsAmountAndBlock()
+					.then((x: any) => x[1]),
 				getBlock(),
 				dev.lockupStorage.getCumulativeGlobalRewards(),
 				dev.lockup.getPropertyValue(prop.address),
@@ -463,6 +468,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			]).then((results) => {
 				const [
 					maxRewards,
+					lastRewardsAmount,
 					lastBlock,
 					currentBlock,
 					globalRewards,
@@ -473,7 +479,10 @@ contract('LockupTest', ([deployer, user1]) => {
 					lockedUpPerUser,
 					pending,
 				] = results.map(toBigNumber)
-				const nextRewars = maxRewards
+				const nextRewars = (maxRewards.isEqualTo(lastRewardsAmount)
+					? maxRewards
+					: lastRewardsAmount
+				)
 					.times(currentBlock.minus(lastBlock))
 					.plus(globalRewards)
 				const share = propertyLocked.times(1e36).div(totalLocked)

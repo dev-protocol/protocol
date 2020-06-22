@@ -38,7 +38,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		__updateLegacyWithdrawableAmount(_property, msg.sender);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		ILockup lockup = ILockup(config().lockup());
-		lockup.update();
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 		lockup.update();
 		withdrawStorage.setRewardsAmount(
