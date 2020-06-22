@@ -10,7 +10,7 @@ contract PolicyTestForWithdraw is IPolicy {
 		view
 		returns (uint256)
 	{
-		return 100000000000000000000;
+		return _lockups > 0 ? 100000000000000000000 : 0;
 	}
 
 	function holdersShare(uint256 _amount, uint256 _lockups)
