@@ -105,91 +105,91 @@ contract('LockupTest', ([deployer, user1]) => {
 			validateErrorMessage(res, 'dev token is not locked')
 		})
 	})
-	// Describe('Lockup; lockup', () => {
-	// 	it('should fail to call when paused', async () => {
-	// 		const [dev, ,] = await init()
+	describe.only('Lockup; lockup', () => {
+		it('should fail to call when paused', async () => {
+			const [dev, ,] = await init()
 
-	// 		await dev.lockup.pause()
+			await dev.lockup.pause()
 
-	// 		const res = await dev.lockup.getAllValue().catch(err)
-	// 		validatePauseErrorMessage(res, false)
-	// 	})
-	// 	it('should fail to call when sent from other than Dev Contract', async () => {
-	// 		const [dev, property] = await init()
+			const res = await dev.lockup.getAllValue().catch(err)
+			validatePauseErrorMessage(res, false)
+		})
+		it('should fail to call when sent from other than Dev Contract', async () => {
+			const [dev, property] = await init()
 
-	// 		const res = await dev.lockup
-	// 			.lockup(deployer, property.address, 10000)
-	// 			.catch(err)
-	// 		validateErrorMessage(res, 'this is illegal address')
-	// 	})
-	// 	it('should fail to call when passed address is not property contract', async () => {
-	// 		const [dev] = await init()
+			const res = await dev.lockup
+				.lockup(deployer, property.address, 10000)
+				.catch(err)
+			validateErrorMessage(res, 'this is illegal address')
+		})
+		it('should fail to call when passed address is not property contract', async () => {
+			const [dev] = await init()
 
-	// 		const res = await dev.lockup.lockup(deployer, user1, 10000).catch(err)
-	// 		validateErrorMessage(res, 'this is illegal address')
-	// 	})
-	// 	it('should fail to call when lockup is canceling', async () => {
-	// 		const [dev, property] = await init()
+			const res = await dev.lockup.lockup(deployer, user1, 10000).catch(err)
+			validateErrorMessage(res, 'this is illegal address')
+		})
+		it('should fail to call when lockup is canceling', async () => {
+			const [dev, property] = await init()
 
-	// 		await dev.addressConfig.setToken(deployer)
-	// 		await dev.addressConfig.setLockup(deployer)
-	// 		await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-	// 		await dev.addressConfig.setLockup(dev.lockup.address)
+			await dev.addressConfig.setToken(deployer)
+			await dev.addressConfig.setLockup(deployer)
+			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
+			await dev.addressConfig.setLockup(dev.lockup.address)
 
-	// 		const res = await dev.lockup
-	// 			.lockup(deployer, property.address, 10000)
-	// 			.catch(err)
-	// 		validateErrorMessage(res, 'lockup is already canceled')
-	// 	})
-	// 	it('should fail to call when a passed value is 0', async () => {
-	// 		const [dev, property] = await init()
+			const res = await dev.lockup
+				.lockup(deployer, property.address, 10000)
+				.catch(err)
+			validateErrorMessage(res, 'lockup is already canceled')
+		})
+		it('should fail to call when a passed value is 0', async () => {
+			const [dev, property] = await init()
 
-	// 		await dev.addressConfig.setToken(deployer)
-	// 		await dev.addressConfig.setLockup(deployer)
-	// 		await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-	// 		await dev.addressConfig.setLockup(dev.lockup.address)
+			await dev.addressConfig.setToken(deployer)
+			await dev.addressConfig.setLockup(deployer)
+			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
+			await dev.addressConfig.setLockup(dev.lockup.address)
 
-	// 		const res = await dev.lockup
-	// 			.lockup(deployer, property.address, 0)
-	// 			.catch(err)
-	// 		validateErrorMessage(res, 'illegal lockup value')
-	// 	})
-	// 	it(`should fail to call when token's transfer was failed`, async () => {
-	// 		const [dev, property] = await init()
+			const res = await dev.lockup
+				.lockup(deployer, property.address, 0)
+				.catch(err)
+			validateErrorMessage(res, 'illegal lockup value')
+		})
+		it(`should fail to call when token's transfer was failed`, async () => {
+			const [dev, property] = await init()
 
-	// 		const res = await dev.dev
-	// 			.deposit(property.address, 10000, {from: user1})
-	// 			.catch(err)
-	// 		validateErrorMessage(res, 'ERC20: transfer amount exceeds balance')
-	// 	})
-	// 	it('record transferred token as a lockup', async () => {
-	// 		const [dev, property] = await init()
+			const res = await dev.dev
+				.deposit(property.address, 10000, {from: user1})
+				.catch(err)
+			validateErrorMessage(res, 'ERC20: transfer amount exceeds balance')
+		})
+		it('record transferred token as a lockup', async () => {
+			const [dev, property] = await init()
 
-	// 		dev.dev.deposit(property.address, 10000).catch(err)
-	// 		await waitForEvent(dev.lockup, WEB3_URI)('Lockedup')
+			dev.dev.deposit(property.address, 10000).catch(err)
+			await waitForEvent(dev.lockup, WEB3_URI)('Lockedup')
 
-	// 		const lockedupAmount = await dev.lockup
-	// 			.getValue(property.address, deployer)
-	// 			.then(toBigNumber)
-	// 		expect(lockedupAmount.toFixed()).to.be.equal('10000')
-	// 		const lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
-	// 		expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
-	// 	})
-	// 	it('emit an event that notifies token locked-up', async () => {
-	// 		const [dev, property] = await init()
+			const lockedupAmount = await dev.lockup
+				.getValue(property.address, deployer)
+				.then(toBigNumber)
+			expect(lockedupAmount.toFixed()).to.be.equal('10000')
+			const lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+		})
+		it('emit an event that notifies token locked-up', async () => {
+			const [dev, property] = await init()
 
-	// 		await dev.dev.deposit(property.address, 10000).catch(err)
-	// 		const [_from, _property, _value] = await Promise.all([
-	// 			getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_from'),
-	// 			getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_property'),
-	// 			getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_value'),
-	// 		])
+			await dev.dev.deposit(property.address, 10000).catch(err)
+			const [_from, _property, _value] = await Promise.all([
+				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_from'),
+				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_property'),
+				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_value'),
+			])
 
-	// 		expect(_from).to.be.equal(deployer)
-	// 		expect(_property).to.be.equal(property.address)
-	// 		expect(_value).to.be.equal('10000')
-	// 	})
-	// })
+			expect(_from).to.be.equal(deployer)
+			expect(_property).to.be.equal(property.address)
+			expect(_value).to.be.equal('10000')
+		})
+	})
 	describe('Lockup; withdraw', () => {
 		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
