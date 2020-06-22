@@ -105,7 +105,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			validateErrorMessage(res, 'dev token is not locked')
 		})
 	})
-	describe.only('Lockup; lockup', () => {
+	describe('Lockup; lockup', () => {
 		it('should fail to call when paused', async () => {
 			const [dev, ,] = await init()
 
@@ -985,58 +985,57 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 		})
 	})
-	// TODO:
-	// describe('Lockup; withdrawInterest', () => {
-	// 	it('should fail to call when passed address is not property contract', async () => {
-	// 		const [dev] = await init()
+	describe('Lockup; withdrawInterest', () => {
+		it('should fail to call when passed address is not property contract', async () => {
+			const [dev] = await init()
 
-	// 		const res = await dev.lockup.withdrawInterest(deployer).catch(err)
-	// 		validateErrorMessage(res, 'this is illegal address')
-	// 	})
-	// 	it(`should fail to call when hasn't withdrawable interest amount`, async () => {
-	// 		const [dev, , property] = await init()
+			const res = await dev.lockup.withdrawInterest(deployer).catch(err)
+			validateErrorMessage(res, 'this is illegal address')
+		})
+		it(`should fail to call when hasn't withdrawable interest amount`, async () => {
+			const [dev, property] = await init()
 
-	// 		const res = await dev.lockup.withdrawInterest(property.address).catch(err)
-	// 		validateErrorMessage(res, 'your interest amount is 0')
-	// 	})
-	// 	describe('withdrawing interest amount', () => {
-	// 		let dev: DevProtocolInstance
-	// 		let property: PropertyInstance
+			const res = await dev.lockup.withdrawInterest(property.address).catch(err)
+			validateErrorMessage(res, 'your interest amount is 0')
+		})
+		describe('withdrawing interest amount', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
 
-	// 		before(async () => {
-	// 			;[dev, property] = await init()
-	// 			await dev.lockup.lockup(deployer, property.address, 10000)
-	// 		})
+			before(async () => {
+				;[dev, property] = await init()
+				await dev.dev.deposit(property.address, 10000)
+			})
 
-	// 		it(`withdrawing sender's withdrawable interest full amount`, async () => {
-	// 			const beforeBalance = await dev.dev
-	// 				.balanceOf(deployer)
-	// 				.then(toBigNumber)
-	// 			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-	// 			await mine(10)
-	// 			const amount = await dev.lockup
-	// 				.calculateWithdrawableInterestAmount(property.address, deployer)
-	// 				.then(toBigNumber)
+			it(`withdrawing sender's withdrawable interest full amount`, async () => {
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
+				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				await mine(10)
+				const amount = await dev.lockup
+					.calculateWithdrawableInterestAmount(property.address, deployer)
+					.then(toBigNumber)
 
-	// 			await dev.lockup.withdrawInterest(property.address)
+				await dev.lockup.withdrawInterest(property.address)
 
-	// 			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-	// 			expect(amount.toFixed()).to.be.equal('500000')
-	// 			expect(afterBalance.toFixed()).to.be.equal(
-	// 				beforeBalance.plus(amount).toFixed()
-	// 			)
-	// 			expect(afterTotalSupply.toFixed()).to.be.equal(
-	// 				beforeTotalSupply.plus(amount).toFixed()
-	// 			)
-	// 		})
-	// 		it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
-	// 			const amount = await dev.lockup
-	// 				.calculateWithdrawableInterestAmount(property.address, deployer)
-	// 				.then(toBigNumber)
-	// 			expect(amount.toFixed()).to.be.equal('0')
-	// 		})
-	// 	})
-	// })
+				expect(amount.toFixed()).to.be.equal('100000000000000000000')
+				expect(afterBalance.toFixed()).to.be.equal(
+					beforeBalance.plus(amount).toFixed()
+				)
+				expect(afterTotalSupply.toFixed()).to.be.equal(
+					beforeTotalSupply.plus(amount).toFixed()
+				)
+			})
+			it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
+				const amount = await dev.lockup
+					.calculateWithdrawableInterestAmount(property.address, deployer)
+					.then(toBigNumber)
+				expect(amount.toFixed()).to.be.equal('0')
+			})
+		})
+	})
 })
