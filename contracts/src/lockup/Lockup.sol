@@ -436,16 +436,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (bool)
 	{
-		// The behavior is changing because of a patch for DIP3.
-		// uint256 blockNumber = getStorage().getWithdrawalStatus(
-		// 	_property,
-		// 	_from
-		// );
-		// if (blockNumber == 0) {
-		// 	return false;
-		// }
-		// return blockNumber <= block.number;
-
 		uint256 blockNumber = getStorage().getWithdrawalStatus(
 			_property,
 			_from

@@ -8,31 +8,6 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	//Last Block Number
-	function setLastBlockNumber(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
-		bytes32 key = getLastBlockNumberKey(_property);
-		eternalStorage().setUint(key, _value);
-	}
-
-	function getLastBlockNumber(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		bytes32 key = getLastBlockNumberKey(_property);
-		return eternalStorage().getUint(key);
-	}
-
-	function getLastBlockNumberKey(address _property)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_lastBlockNumber", _property));
-	}
-
 	// RewardsAmount
 	function setRewardsAmount(address _property, uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().withdraw());
@@ -58,6 +33,8 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 
 	// CumulativePrice
 	function setCumulativePrice(address _property, uint256 _value) external {
+		// The previously used function
+		// This function is only used in testing
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
