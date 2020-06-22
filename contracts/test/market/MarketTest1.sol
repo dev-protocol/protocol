@@ -12,6 +12,7 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 	uint256 lastBlock;
 	uint256 currentBlock;
 	mapping(address => string) private keys;
+
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
