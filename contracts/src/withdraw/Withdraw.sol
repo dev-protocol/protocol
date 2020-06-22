@@ -26,18 +26,23 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			msg.sender
 		);
 		require(value != 0, "withdraw value is 0");
-		getStorage().setLastCumulativeGlobalHoldersPrice(
+		WithdrawStorage withdrawStorage = getStorage();
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
 			_property,
 			msg.sender,
 			lastPrice
 		);
-		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
+		withdrawStorage.setPendingWithdrawal(_property, msg.sender, 0);
 		__updateLegacyWithdrawableAmount(_property, msg.sender);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
 		ILockup lockup = ILockup(config().lockup());
 		lockup.update();
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 		lockup.update();
+		withdrawStorage.setRewardsAmount(
+			_property,
+			withdrawStorage.getRewardsAmount(_property).add(value)
+		);
 	}
 
 	function beforeBalanceChange(
@@ -46,28 +51,46 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		address _to
 	) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+		WithdrawStorage withdrawStorage = getStorage();
 
-		uint256 price = getStorage().getCumulativePrice(_property);
-		(uint256 amountFrom, ) = _calculateAmount(_property, _from);
-		(uint256 amountTo, ) = _calculateAmount(_property, _to);
-		getStorage().setLastWithdrawalPrice(_property, _from, price);
-		getStorage().setLastWithdrawalPrice(_property, _to, price);
-		uint256 pendFrom = getStorage().getPendingWithdrawal(_property, _from);
-		uint256 pendTo = getStorage().getPendingWithdrawal(_property, _to);
-		getStorage().setPendingWithdrawal(
+		(uint256 amountFrom, uint256 priceFrom) = _calculateAmount(
+			_property,
+			_from
+		);
+		(uint256 amountTo, uint256 priceTo) = _calculateAmount(_property, _to);
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			_from,
+			priceFrom
+		);
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			_to,
+			priceTo
+		);
+		uint256 pendFrom = withdrawStorage.getPendingWithdrawal(
+			_property,
+			_from
+		);
+		uint256 pendTo = withdrawStorage.getPendingWithdrawal(_property, _to);
+		withdrawStorage.setPendingWithdrawal(
 			_property,
 			_from,
 			pendFrom.add(amountFrom)
 		);
-		getStorage().setPendingWithdrawal(_property, _to, pendTo.add(amountTo));
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
+		withdrawStorage.setPendingWithdrawal(
+			_property,
+			_to,
+			pendTo.add(amountTo)
+		);
+		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
 			_property,
 			_to
 		);
-		uint256 total = getStorage().getRewardsAmount(_property);
+		(uint256 total, , , ) = next(_property);
 		if (totalLimit != total) {
-			getStorage().setWithdrawalLimitTotal(_property, _to, total);
-			getStorage().setWithdrawalLimitBalance(
+			withdrawStorage.setWithdrawalLimitTotal(_property, _to, total);
+			withdrawStorage.setWithdrawalLimitBalance(
 				_property,
 				_to,
 				ERC20Mintable(_property).balanceOf(_to)
@@ -107,33 +130,38 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		return getStorage().getRewardsAmount(_property);
 	}
 
+	function next(address _property)
+		private
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _holdersPrice,
+			uint256 _interestPrice
+		)
+	{
+		return ILockup(config().lockup()).next(_property);
+	}
+
 	function _calculateAmount(address _property, address _user)
 		private
 		view
 		returns (uint256 _amount, uint256 _price)
 	{
-		uint256 _last = getStorage().getLastCumulativeGlobalHoldersPrice(
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 _last = withdrawStorage.getLastCumulativeGlobalHoldersPrice(
 			_property,
 			_user
 		);
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
+		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
 			_property,
 			_user
 		);
-		uint256 balanceLimit = getStorage().getWithdrawalLimitBalance(
+		uint256 balanceLimit = withdrawStorage.getWithdrawalLimitBalance(
 			_property,
 			_user
 		);
-		(
-			uint256 _holders,
-			,
-			uint256 _holdersPrice,
-			,
-			uint256 _holdersPriceByShare
-		) = ILockup(config().lockup()).next(_property);
-		uint256 price = _holdersPriceByShare > 0
-			? _holdersPriceByShare
-			: _holdersPrice;
+		(uint256 _holders, , uint256 price, ) = next(_property);
 		uint256 priceGap = price.sub(_last);
 
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
@@ -141,7 +169,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			balance = balanceLimit;
 		}
 		uint256 value = priceGap.mul(balance);
-		return (value.div(Decimals.basis()), price);
+		return (value.div(Decimals.basis()).div(Decimals.basis()), price);
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)

@@ -1,10 +1,15 @@
 pragma solidity ^0.5.0;
 
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
 contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
+	using SafeMath for uint256;
+
+	uint256 constant basis = 100000000000000000000000000000000;
+
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
@@ -193,21 +198,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 			);
 	}
 
-	//LastMaxRewardsPrice
-	function setLastMaxRewardsPrice(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getLastMaxRewardsPriceKey(), _value);
-	}
-
-	function getLastMaxRewardsPrice() external view returns (uint256) {
-		return eternalStorage().getUint(getLastMaxRewardsPriceKey());
-	}
-
-	function getLastMaxRewardsPriceKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_lastMaxRewardsPrice"));
-	}
-
 	//LastSameRewardsPriceBlock
 	function setLastSameRewardsPriceBlock(uint256 _value) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
@@ -236,25 +226,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 
 	function getCumulativeGlobalRewardsKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
-	}
-
-	//CumulativeGlobalRewardsPrice
-	function setCumulativeGlobalRewardsPrice(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getCumulativeGlobalRewardsPriceKey(), _value);
-	}
-
-	function getCumulativeGlobalRewardsPrice() external view returns (uint256) {
-		return eternalStorage().getUint(getCumulativeGlobalRewardsPriceKey());
-	}
-
-	function getCumulativeGlobalRewardsPriceKey()
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_cumulativeGlobalRewardsPrice"));
 	}
 
 	//LastCumulativeGlobalInterestPrice
@@ -295,57 +266,68 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 			);
 	}
 
-	//JustBeforeReduceToZero
-	function setJustBeforeReduceToZero(address _property, uint256 _value)
-		external
-	{
+	//CumulativeLockedUpUnitAndBlock
+	function setCumulativeLockedUpUnitAndBlock(
+		address _addr,
+		uint256 _unit,
+		uint256 _block
+	) external {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
+		uint256 record = _unit.mul(basis).add(_block);
 		eternalStorage().setUint(
-			getJustBeforeReduceToZeroKey(_property),
-			_value
+			getCumulativeLockedUpUnitAndBlockKey(_addr),
+			record
 		);
 	}
 
-	function getJustBeforeReduceToZero(address _property)
+	function getCumulativeLockedUpUnitAndBlock(address _addr)
 		external
 		view
-		returns (uint256)
+		returns (uint256 _unit, uint256 _block)
 	{
-		return
-			eternalStorage().getUint(getJustBeforeReduceToZeroKey(_property));
+		uint256 record = eternalStorage().getUint(
+			getCumulativeLockedUpUnitAndBlockKey(_addr)
+		);
+		uint256 unit = record.div(basis);
+		uint256 blockNumber = record.sub(unit.mul(basis));
+		return (unit, blockNumber);
 	}
 
-	function getJustBeforeReduceToZeroKey(address _property)
+	function getCumulativeLockedUpUnitAndBlockKey(address _addr)
 		private
 		pure
 		returns (bytes32)
 	{
 		return
-			keccak256(abi.encodePacked("_justBeforeReduceToZero", _property));
+			keccak256(
+				abi.encodePacked("_cumulativeLockedUpUnitAndBlock", _addr)
+			);
 	}
 
-	//JustBeforeReduceRewardsToZero
-	function setJustBeforeReduceRewardsToZero(uint256 _value) external {
+	//CumulativeLockedUpValue
+	function setCumulativeLockedUpValue(address _addr, uint256 _value)
+		external
+	{
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
-		eternalStorage().setUint(getJustBeforeReduceRewardsToZeroKey(), _value);
+		eternalStorage().setUint(getCumulativeLockedUpValueKey(_addr), _value);
 	}
 
-	function getJustBeforeReduceRewardsToZero()
+	function getCumulativeLockedUpValue(address _addr)
 		external
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getJustBeforeReduceRewardsToZeroKey());
+		return eternalStorage().getUint(getCumulativeLockedUpValueKey(_addr));
 	}
 
-	function getJustBeforeReduceRewardsToZeroKey()
+	function getCumulativeLockedUpValueKey(address _addr)
 		private
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_justBeforeReduceRewardsToZero"));
+		return keccak256(abi.encodePacked("_cumulativeLockedUpValue", _addr));
 	}
 
 	//PendingWithdrawal
