@@ -109,8 +109,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				await dev.withdraw.withdraw(property.address)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-				expect(amount.toFixed()).to.be.equal('90000000000000000000')
+				expect(amount.toFixed()).to.be.equal('900000000000000000000')
 				expect(afterBalance.toFixed()).to.be.equal(
 					beforeBalance.plus(amount).toFixed()
 				)
