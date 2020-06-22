@@ -14,7 +14,7 @@ import {
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
-contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
+contract('WithdrawTest', ([deployer, user1, user2]) => {
 	const init = async (): Promise<
 		[DevProtocolInstance, MetricsInstance, PropertyInstance]
 	> => {
@@ -109,13 +109,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				await dev.withdraw.withdraw(property.address)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-				expect(amount.toFixed()).to.be.equal('90000000000000000000')
+				expect(amount.toFixed()).to.be.equal('900000000000000000000')
+				// At the time of execute withdraw function, the block advances and the actual amount issued changes.
+				const realAmount = amount.times(1.1)
 				expect(afterBalance.toFixed()).to.be.equal(
-					beforeBalance.plus(amount).toFixed()
+					beforeBalance.plus(realAmount).toFixed()
 				)
 				expect(afterTotalSupply.toFixed()).to.be.equal(
-					beforeTotalSupply.plus(amount).toFixed()
+					beforeTotalSupply.plus(realAmount).toFixed()
 				)
 			})
 			it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
@@ -179,7 +180,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				const prevBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const prevBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
 
-				await property.transfer(user1, totalSupply.times(0.2), {
+				const rate = 0.2
+				await property.transfer(user1, totalSupply.times(rate), {
 					from: deployer,
 				})
 
@@ -194,10 +196,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 
 				const nextBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const nextBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
-
-				expect(prevBalance1.plus(amount1).toFixed()).to.be.equal(
+				// At the time of execute withdraw function, the block advances and the actual amount issued changes.
+				const realAmount1 = amount1.times(2 - rate)
+				console.log(amount1.toFixed())
+				console.log(nextBalance1.minus(prevBalance1).toFixed())
+				const realAmount2 = amount2.times(1.2)
+				expect(prevBalance1.plus(realAmount1).toFixed()).to.be.equal(
 					nextBalance1.toFixed()
 				)
+				console.log(amount2.toFixed())
+				console.log(nextBalance2.minus(prevBalance2).toFixed())
 				expect(prevBalance2.plus(amount2).toFixed()).to.be.equal(
 					nextBalance2.toFixed()
 				)
