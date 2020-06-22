@@ -98,30 +98,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		}
 	}
 
-	// function update(address _property) private {
-	// 	(uint256 begin, uint256 end) = term(_property);
-	// 	require(
-	// 		IVoteTimes(config().voteTimes()).validateTargetPeriod(
-	// 			_property,
-	// 			begin,
-	// 			end
-	// 		),
-	// 		"now abstention penalty"
-	// 	);
-	// 	(uint256 nextTotal, uint256 nextPrice) = dry(_property);
-	// 	getStorage().setRewardsAmount(_property, nextTotal);
-	// 	getStorage().setCumulativePrice(_property, nextPrice);
-	// 	getStorage().setLastBlockNumber(_property, block.number);
-	// }
-
-	// function term(address _property)
-	// 	private
-	// 	view
-	// 	returns (uint256 _begin, uint256 _end)
-	// {
-	// 	return (getStorage().getLastBlockNumber(_property), block.number);
-	// }
-
 	function getRewardsAmount(address _property)
 		external
 		view
@@ -193,20 +169,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		(uint256 value, ) = _calculateWithdrawableAmount(_property, _user);
 		return value;
 	}
-
-	// function setLastBlockNumber(address _property, uint256 _blockNumber)
-	// 	external
-	// {
-	// 	getStorage().setLastBlockNumber(_property, _blockNumber);
-	// }
-
-	// function getLastBlockNumber(address _property)
-	// 	external
-	// 	view
-	// 	returns (uint256)
-	// {
-	// 	return getStorage().getLastBlockNumber(_property);
-	// }
 
 	function __legacyWithdrawableAmount(address _property, address _user)
 		private

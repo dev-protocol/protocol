@@ -12,12 +12,6 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 	uint256 lastBlock;
 	uint256 currentBlock;
 	mapping(address => string) private keys;
-	event LogCalculate(
-		address _metrics,
-		uint256 _lastBlock,
-		uint256 _currentBlock
-	);
-
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
