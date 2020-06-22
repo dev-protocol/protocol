@@ -6,7 +6,7 @@ import {MetricsInstance, PropertyInstance} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {getEventValue, watch} from '../test-lib/utils/event'
+import {getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -72,305 +72,292 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		return [dev, metrics, property]
 	}
 
-	// TODO:
-	// describe('Withdraw; withdraw', () => {
-	// 	it('should fail to call when passed address is not property contract', async () => {
-	// 		const [dev] = await init()
+	describe('Withdraw; withdraw', () => {
+		it('should fail to call when passed address is not property contract', async () => {
+			const [dev] = await init()
 
-	// 		const res = await dev.withdraw
-	// 			.withdraw(deployer)
-	// 			.catch((err: Error) => err)
-	// 		validateAddressErrorMessage(res)
-	// 	})
-	// 	it(`should fail to call when hasn't withdrawable amount`, async () => {
-	// 		const [dev, , property] = await init()
-	// 		const res = await dev.withdraw
-	// 			.withdraw(property.address, {from: user1})
-	// 			.catch((err: Error) => err)
-	// 		validateErrorMessage(res, 'withdraw value is 0')
-	// 	})
-	// 	describe('withdrawing interest amount', () => {
-	// 		let dev: DevProtocolInstance
-	// 		let property: PropertyInstance
+			const res = await dev.withdraw
+				.withdraw(deployer)
+				.catch((err: Error) => err)
+			validateAddressErrorMessage(res)
+		})
+		it(`should fail to call when hasn't withdrawable amount`, async () => {
+			const [dev, , property] = await init()
+			const res = await dev.withdraw
+				.withdraw(property.address, {from: user1})
+				.catch((err: Error) => err)
+			validateErrorMessage(res, 'withdraw value is 0')
+		})
+		describe('withdrawing interest amount', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
 
-	// 		before(async () => {
-	// 			;[dev, , property] = await init()
-	// 			await dev.dev.deposit(property.address, 10000)
-	// 		})
+			before(async () => {
+				;[dev, , property] = await init()
+				await dev.dev.deposit(property.address, 10000)
+			})
 
-	// 		it(`withdrawing sender's withdrawable interest full amount`, async () => {
-	// 			const beforeBalance = await dev.dev
-	// 				.balanceOf(deployer)
-	// 				.then(toBigNumber)
-	// 			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-	// 			await mine(10)
-	// 			const amount = await dev.withdraw
-	// 				.calculateWithdrawableAmount(property.address, deployer)
-	// 				.then(toBigNumber)
-	// 			await dev.withdraw.withdraw(property.address)
-	// 			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+			it(`withdrawing sender's withdrawable interest full amount`, async () => {
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
+				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				await mine(10)
+				const amount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, deployer)
+					.then(toBigNumber)
+				await dev.withdraw.withdraw(property.address)
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-	// 			expect(amount.toFixed()).to.be.equal('90000000000000000000')
-	// 			expect(afterBalance.toFixed()).to.be.equal(
-	// 				beforeBalance.plus(amount).toFixed()
-	// 			)
-	// 			expect(afterTotalSupply.toFixed()).to.be.equal(
-	// 				beforeTotalSupply.plus(amount).toFixed()
-	// 			)
-	// 		})
-	// 		it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
-	// 			const amount = await dev.withdraw
-	// 				.calculateWithdrawableAmount(property.address, deployer)
-	// 				.then(toBigNumber)
-	// 			expect(amount.toFixed()).to.be.equal('0')
-	// 		})
-	// 	})
-	// 	describe('Withdraw; Withdraw is mint', () => {
-	// 		it('Withdraw mints an ERC20 token specified in the Address Config Contract', async () => {
-	// 			// Const [dev, metrics, property] = await init()
-	// 			const [dev, , property] = await init()
-	// 			const prev = await dev.dev.totalSupply().then(toBigNumber)
-	// 			const balance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				expect(amount.toFixed()).to.be.equal('90000000000000000000')
+				expect(afterBalance.toFixed()).to.be.equal(
+					beforeBalance.plus(amount).toFixed()
+				)
+				expect(afterTotalSupply.toFixed()).to.be.equal(
+					beforeTotalSupply.plus(amount).toFixed()
+				)
+			})
+			it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
+				const amount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, deployer)
+					.then(toBigNumber)
+				expect(amount.toFixed()).to.be.equal('0')
+			})
+		})
+		describe('Withdraw; Withdraw is mint', () => {
+			it('Withdraw mints an ERC20 token specified in the Address Config Contract', async () => {
+				const [dev, , property] = await init()
+				await dev.dev.deposit(property.address, 10000)
+				const prev = await dev.dev.totalSupply().then(toBigNumber)
+				const balance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 
-	// 			// Await dev.allocator.allocate(metrics.address)
-	// 			await dev.withdraw.withdraw(property.address)
+				await dev.withdraw.withdraw(property.address)
 
-	// 			const next = await dev.dev.totalSupply().then(toBigNumber)
-	// 			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 			const gap = next.minus(prev)
+				const next = await dev.dev.totalSupply().then(toBigNumber)
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const gap = next.minus(prev)
 
-	// 			expect(prev.toString()).to.be.not.equal(next.toString())
-	// 			expect(balance.plus(gap).toString()).to.be.equal(
-	// 				afterBalance.toString()
-	// 			)
-	// 		})
-	// 	})
+				expect(prev.toString()).to.be.not.equal(next.toString())
+				expect(balance.plus(gap).toString()).to.be.equal(
+					afterBalance.toString()
+				)
+			})
+		})
 
-	// 	describe('Withdraw; Withdrawable amount', () => {
-	// 		it('The withdrawable amount each holder is the number multiplied the balance of the price per Property Contract and the Property Contract of the sender', async () => {
-	// 			// Const [dev, metrics, property] = await init()
-	// 			const [dev, , property] = await init()
-	// 			const totalSupply = await property.totalSupply().then(toBigNumber)
+		describe('Withdraw; Withdrawable amount', () => {
+			it('The withdrawable amount each holder is the number multiplied the balance of the price per Property Contract and the Property Contract of the sender', async () => {
+				const [dev, , property] = await init()
+				const totalSupply = await property.totalSupply().then(toBigNumber)
 
-	// 			await property.transfer(user1, totalSupply.times(0.2), {
-	// 				from: deployer,
-	// 			})
+				await property.transfer(user1, totalSupply.times(0.2), {
+					from: deployer,
+				})
 
-	// 			// Await dev.allocator.allocate(metrics.address)
+				const totalAmount = await dev.withdrawStorage
+					.getRewardsAmount(property.address)
+					.then(toBigNumber)
+				const amount1 = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, deployer)
+					.then(toBigNumber)
+				const amount2 = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, user1)
+					.then(toBigNumber)
 
-	// 			const totalAmount = await dev.withdrawStorage
-	// 				.getRewardsAmount(property.address)
-	// 				.then(toBigNumber)
-	// 			const amount1 = await dev.withdraw
-	// 				.calculateWithdrawableAmount(property.address, deployer)
-	// 				.then(toBigNumber)
-	// 			const amount2 = await dev.withdraw
-	// 				.calculateWithdrawableAmount(property.address, user1)
-	// 				.then(toBigNumber)
+				expect(
+					totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
+				).to.be.equal(amount1.toFixed())
+				expect(
+					totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
+				).to.be.equal(amount2.toFixed())
+			})
 
-	// 			expect(
-	// 				totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
-	// 			).to.be.equal(amount1.toFixed())
-	// 			expect(
-	// 				totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
-	// 			).to.be.equal(amount2.toFixed())
-	// 		})
+			it('The withdrawal amount is always the full amount of the withdrawable amount', async () => {
+				const [dev, , property] = await init()
+				await dev.dev.deposit(property.address, 10000)
+				const totalSupply = await property.totalSupply().then(toBigNumber)
+				const prevBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const prevBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
 
-	// 		it('The withdrawal amount is always the full amount of the withdrawable amount', async () => {
-	// 			// Const [dev, metrics, property] = await init()
-	// 			const [dev, , property] = await init()
-	// 			const totalSupply = await property.totalSupply().then(toBigNumber)
-	// 			const prevBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 			const prevBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
+				await property.transfer(user1, totalSupply.times(0.2), {
+					from: deployer,
+				})
 
-	// 			await property.transfer(user1, totalSupply.times(0.2), {
-	// 				from: deployer,
-	// 			})
+				const amount1 = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, deployer)
+					.then(toBigNumber)
+				const amount2 = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, user1)
+					.then(toBigNumber)
+				await dev.withdraw.withdraw(property.address, {from: deployer})
+				await dev.withdraw.withdraw(property.address, {from: user1})
 
-	// 			// Await dev.allocator.allocate(metrics.address)
+				const nextBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const nextBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
 
-	// 			const amount1 = await dev.withdraw
-	// 				.calculateWithdrawableAmount(property.address, deployer)
-	// 				.then(toBigNumber)
-	// 			const amount2 = await dev.withdraw
-	// 				.calculateWithdrawableAmount(property.address, user1)
-	// 				.then(toBigNumber)
-	// 			await dev.withdraw.withdraw(property.address, {from: deployer})
-	// 			await dev.withdraw.withdraw(property.address, {from: user1})
+				expect(prevBalance1.plus(amount1).toFixed()).to.be.equal(
+					nextBalance1.toFixed()
+				)
+				expect(prevBalance2.plus(amount2).toFixed()).to.be.equal(
+					nextBalance2.toFixed()
+				)
+			})
 
-	// 			const nextBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 			const nextBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
+			it('should fail to withdraw when the withdrawable amount is 0', async () => {
+				const [dev, , property] = await init()
+				const prevBalance = await dev.dev.balanceOf(user1).then(toBigNumber)
 
-	// 			expect(prevBalance1.plus(amount1).toFixed()).to.be.equal(
-	// 				nextBalance1.toFixed()
-	// 			)
-	// 			expect(prevBalance2.plus(amount2).toFixed()).to.be.equal(
-	// 				nextBalance2.toFixed()
-	// 			)
-	// 		})
+				const amount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, user1)
+					.then(toBigNumber)
+				const res = await dev.withdraw
+					.withdraw(property.address, {from: user1})
+					.catch((err: Error) => err)
+				const afterBalance = await dev.dev.balanceOf(user1).then(toBigNumber)
 
-	// 		it('should fail to withdraw when the withdrawable amount is 0', async () => {
-	// 			// Const [dev, metrics, property] = await init()
-	// 			const [dev, , property] = await init()
-	// 			const prevBalance = await dev.dev.balanceOf(user1).then(toBigNumber)
+				expect(amount.toFixed()).to.be.equal('0')
+				expect(prevBalance.toFixed()).to.be.equal(afterBalance.toFixed())
+				validateErrorMessage(res, 'withdraw value is 0')
+			})
+		})
+	})
 
-	// 			// Await dev.allocator.allocate(metrics.address)
+	describe('Withdraw; beforeBalanceChange', () => {
+		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			const alice = deployer
+			const bob = user1
 
-	// 			const amount = await dev.withdraw
-	// 				.calculateWithdrawableAmount(property.address, user1)
-	// 				.then(toBigNumber)
-	// 			const res = await dev.withdraw
-	// 				.withdraw(property.address, {from: user1})
-	// 				.catch((err: Error) => err)
-	// 			const afterBalance = await dev.dev.balanceOf(user1).then(toBigNumber)
+			before(async () => {
+				;[dev, , property] = await init()
 
-	// 			expect(amount.toFixed()).to.be.equal('0')
-	// 			expect(prevBalance.toFixed()).to.be.equal(afterBalance.toFixed())
-	// 			validateErrorMessage(res, 'withdraw value is 0')
-	// 		})
-	// 	})
-	// })
+				const totalSupply = await property.totalSupply().then(toBigNumber)
+				await property.transfer(bob, totalSupply.times(0.2), {
+					from: alice,
+				})
+				await property.transfer(bob, totalSupply.times(0.1), {
+					from: alice,
+				})
+			})
 
-	// describe('Withdraw; beforeBalanceChange', () => {
-	// 	describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
-	// 		let dev: DevProtocolInstance
-	// 		let property: PropertyInstance
-	// 		// Let metrics: MetricsInstance
-	// 		const alice = deployer
-	// 		const bob = user1
+			describe('Withdraw; Before increment', () => {
+				it(`Alice's withdrawable amount is 80% of reward`, async () => {
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const totalAmount = await dev.withdraw
+						.getRewardsAmount(property.address)
+						.then(toBigNumber)
 
-	// 		before(async () => {
-	// 			// ;[dev, metrics, property] = await init()
-	// 			;[dev, , property] = await init()
+					expect(aliceAmount.toFixed()).to.be.equal(
+						totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
+					)
+				})
 
-	// 			const totalSupply = await property.totalSupply().then(toBigNumber)
-	// 			await property.transfer(bob, totalSupply.times(0.2), {
-	// 				from: alice,
-	// 			})
-	// 			// Await dev.allocator.allocate(metrics.address)
-	// 			await property.transfer(bob, totalSupply.times(0.1), {
-	// 				from: alice,
-	// 			})
-	// 		})
+				it(`Bob's withdrawable amount is 20% of reward`, async () => {
+					const bobAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, bob)
+						.then(toBigNumber)
+					const totalAmount = await dev.withdraw
+						.getRewardsAmount(property.address)
+						.then(toBigNumber)
 
-	// 		describe('Withdraw; Before increment', () => {
-	// 			it(`Alice's withdrawable amount is 80% of reward`, async () => {
-	// 				const aliceAmount = await dev.withdraw
-	// 					.calculateWithdrawableAmount(property.address, alice)
-	// 					.then(toBigNumber)
-	// 				const totalAmount = await dev.withdraw
-	// 					.getRewardsAmount(property.address)
-	// 					.then(toBigNumber)
+					expect(bobAmount.toFixed()).to.be.equal(
+						totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
+					)
+				})
+			})
 
-	// 				expect(aliceAmount.toFixed()).to.be.equal(
-	// 					totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
-	// 				)
-	// 			})
+			describe('Withdraw; After increment', () => {
+				let prev: BigNumber
+				before(async () => {
+					prev = await dev.withdraw
+						.getRewardsAmount(property.address)
+						.then(toBigNumber)
+				})
 
-	// 			it(`Bob's withdrawable amount is 20% of reward`, async () => {
-	// 				const bobAmount = await dev.withdraw
-	// 					.calculateWithdrawableAmount(property.address, bob)
-	// 					.then(toBigNumber)
-	// 				const totalAmount = await dev.withdraw
-	// 					.getRewardsAmount(property.address)
-	// 					.then(toBigNumber)
+				it(`Alice's withdrawable amount is 80% of prev reward and 70% of current reward`, async () => {
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const increased = (
+						await dev.withdraw
+							.getRewardsAmount(property.address)
+							.then(toBigNumber)
+					).minus(prev)
 
-	// 				expect(bobAmount.toFixed()).to.be.equal(
-	// 					totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
-	// 				)
-	// 			})
-	// 		})
+					expect(aliceAmount.toFixed()).to.be.equal(
+						prev
+							.times(0.8)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.plus(
+								increased.times(0.1).integerValue(BigNumber.ROUND_DOWN).times(7)
+							)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.toFixed()
+					)
+				})
 
-	// 		describe('Withdraw; After increment', () => {
-	// 			let prev: BigNumber
-	// 			before(async () => {
-	// 				prev = await dev.withdraw
-	// 					.getRewardsAmount(property.address)
-	// 					.then(toBigNumber)
-	// 				// Await dev.allocator.allocate(metrics.address)
-	// 			})
+				it(`Bob's withdrawable amount is 20% of prev reward and 30% of current reward`, async () => {
+					const bobAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, bob)
+						.then(toBigNumber)
+					const increased = (
+						await dev.withdraw
+							.getRewardsAmount(property.address)
+							.then(toBigNumber)
+					).minus(prev)
 
-	// 			it(`Alice's withdrawable amount is 80% of prev reward and 70% of current reward`, async () => {
-	// 				const aliceAmount = await dev.withdraw
-	// 					.calculateWithdrawableAmount(property.address, alice)
-	// 					.then(toBigNumber)
-	// 				const increased = (
-	// 					await dev.withdraw
-	// 						.getRewardsAmount(property.address)
-	// 						.then(toBigNumber)
-	// 				).minus(prev)
+					expect(bobAmount.toFixed()).to.be.equal(
+						prev
+							.times(0.2)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.plus(increased.times(0.3))
+							.integerValue(BigNumber.ROUND_DOWN)
+							.toFixed()
+					)
+				})
 
-	// 				expect(aliceAmount.toFixed()).to.be.equal(
-	// 					prev
-	// 						.times(0.8)
-	// 						.integerValue(BigNumber.ROUND_DOWN)
-	// 						.plus(
-	// 							increased.times(0.1).integerValue(BigNumber.ROUND_DOWN).times(7)
-	// 						)
-	// 						.integerValue(BigNumber.ROUND_DOWN)
-	// 						.toFixed()
-	// 				)
-	// 			})
+				it('Become 0 withdrawable amount when after withdrawing', async () => {
+					await dev.dev.deposit(property.address, 10000)
+					await dev.withdraw.withdraw(property.address, {from: alice})
+					await dev.withdraw.withdraw(property.address, {from: bob})
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const bobAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, bob)
+						.then(toBigNumber)
 
-	// 			it(`Bob's withdrawable amount is 20% of prev reward and 30% of current reward`, async () => {
-	// 				const bobAmount = await dev.withdraw
-	// 					.calculateWithdrawableAmount(property.address, bob)
-	// 					.then(toBigNumber)
-	// 				const increased = (
-	// 					await dev.withdraw
-	// 						.getRewardsAmount(property.address)
-	// 						.then(toBigNumber)
-	// 				).minus(prev)
+					expect(aliceAmount.toFixed()).to.be.equal('0')
+					expect(bobAmount.toFixed()).to.be.equal('0')
+				})
+			})
 
-	// 				expect(bobAmount.toFixed()).to.be.equal(
-	// 					prev
-	// 						.times(0.2)
-	// 						.integerValue(BigNumber.ROUND_DOWN)
-	// 						.plus(increased.times(0.3))
-	// 						.integerValue(BigNumber.ROUND_DOWN)
-	// 						.toFixed()
-	// 				)
-	// 			})
-
-	// 			it('Become 0 withdrawable amount when after withdrawing', async () => {
-	// 				await dev.withdraw.withdraw(property.address, {from: alice})
-	// 				await dev.withdraw.withdraw(property.address, {from: bob})
-	// 				const aliceAmount = await dev.withdraw
-	// 					.calculateWithdrawableAmount(property.address, alice)
-	// 					.then(toBigNumber)
-	// 				const bobAmount = await dev.withdraw
-	// 					.calculateWithdrawableAmount(property.address, bob)
-	// 					.then(toBigNumber)
-
-	// 				expect(aliceAmount.toFixed()).to.be.equal('0')
-	// 				expect(bobAmount.toFixed()).to.be.equal('0')
-	// 			})
-	// 		})
-
-	// 		it('Should fail to call `beforeBalanceChange` when sent from other than Property Contract address', async () => {
-	// 			const res = await dev.withdraw
-	// 				.beforeBalanceChange(property.address, deployer, user1, {
-	// 					from: deployer,
-	// 				})
-	// 				.catch((err: Error) => err)
-	// 			validateAddressErrorMessage(res)
-	// 		})
-	// 	})
-	// })
-	// describe('Withdraw; pause', () => {
-	// 	it('should fail to call when paused.', async () => {
-	// 		const [dev, , property] = await init()
-	// 		await dev.withdraw.pause()
-	// 		let res = await dev.withdraw
-	// 			.getRewardsAmount(property.address)
-	// 			.catch((err: Error) => err)
-	// 		validatePauseErrorMessage(res, false)
-	// 		await dev.withdraw.unpause()
-	// 		res = await dev.withdraw.getRewardsAmount(property.address)
-	// 		expect(res.toNumber()).to.be.equal(0)
-	// 	})
-	// })
+			it('Should fail to call `beforeBalanceChange` when sent from other than Property Contract address', async () => {
+				const res = await dev.withdraw
+					.beforeBalanceChange(property.address, deployer, user1, {
+						from: deployer,
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(res)
+			})
+		})
+	})
+	describe('Withdraw; pause', () => {
+		it('should fail to call when paused.', async () => {
+			const [dev, , property] = await init()
+			await dev.withdraw.pause()
+			let res = await dev.withdraw
+				.getRewardsAmount(property.address)
+				.catch((err: Error) => err)
+			validatePauseErrorMessage(res, false)
+			await dev.withdraw.unpause()
+			res = await dev.withdraw.getRewardsAmount(property.address)
+			expect(res.toNumber()).to.be.equal(0)
+		})
+	})
 	describe('Withdraw; calculateWithdrawableAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,

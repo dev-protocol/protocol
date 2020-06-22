@@ -3,19 +3,16 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	PropertyInstance,
 	PolicyTestForLockupInstance,
-	LockupInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock, gasLogger} from '../test-lib/utils/common'
-import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {waitForEvent, getEventValue, watch} from '../test-lib/utils/event'
+import {getPropertyAddress} from '../test-lib/utils/log'
+import {waitForEvent, getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validatePauseErrorMessage,
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
-import {config} from 'process'
-import {alias} from 'commander'
 
 contract('LockupTest', ([deployer, user1]) => {
 	const init = async (): Promise<
