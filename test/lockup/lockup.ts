@@ -191,101 +191,101 @@ contract('LockupTest', ([deployer, user1]) => {
 	// 		expect(_value).to.be.equal('10000')
 	// 	})
 	// })
-	// describe('Lockup; withdraw', () => {
-	// 	it('should fail to call when passed address is not property contract', async () => {
-	// 		const [dev] = await init()
+	describe('Lockup; withdraw', () => {
+		it('should fail to call when passed address is not property contract', async () => {
+			const [dev] = await init()
 
-	// 		const res = await dev.lockup.withdraw(deployer).catch(err)
-	// 		validateErrorMessage(res, 'this is illegal address')
-	// 	})
-	// 	it('should fail to call when waiting for released', async () => {
-	// 		const [dev, property] = await init()
+			const res = await dev.lockup.withdraw(deployer).catch(err)
+			validateErrorMessage(res, 'this is illegal address')
+		})
+		it('should fail to call when waiting for released', async () => {
+			const [dev, property] = await init()
 
-	// 		const res = await dev.lockup.withdraw(property.address).catch(err)
-	// 		validateErrorMessage(res, 'waiting for release')
-	// 	})
-	// 	it('should fail to call when dev token is not locked', async () => {
-	// 		const [dev, property] = await init()
+			const res = await dev.lockup.withdraw(property.address).catch(err)
+			validateErrorMessage(res, 'waiting for release')
+		})
+		it('should fail to call when dev token is not locked', async () => {
+			const [dev, property] = await init()
 
-	// 		await dev.addressConfig.setLockup(deployer)
-	// 		await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-	// 		await dev.addressConfig.setLockup(dev.lockup.address)
+			await dev.addressConfig.setLockup(deployer)
+			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
+			await dev.addressConfig.setLockup(dev.lockup.address)
 
-	// 		const res = await dev.lockup.withdraw(property.address).catch(err)
-	// 		validateErrorMessage(res, 'dev token is not locked')
-	// 	})
-	// 	it(`withdrawing sender's withdrawable full amount`, async () => {
-	// 		const [dev, property] = await init()
-	// 		const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 		const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+			const res = await dev.lockup.withdraw(property.address).catch(err)
+			validateErrorMessage(res, 'dev token is not locked')
+		})
+		it(`withdrawing sender's withdrawable full amount`, async () => {
+			const [dev, property] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-	// 		await dev.dev.deposit(property.address, 10000)
-	// 		let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
-	// 		expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
-	// 		await dev.addressConfig.setLockup(deployer)
-	// 		await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-	// 		await dev.addressConfig.setLockup(dev.lockup.address)
+			await dev.dev.deposit(property.address, 10000)
+			let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+			await dev.addressConfig.setLockup(deployer)
+			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
+			await dev.addressConfig.setLockup(dev.lockup.address)
 
-	// 		await dev.lockup.withdraw(property.address)
-	// 		lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
-	// 		expect(lockedupAllAmount.toFixed()).to.be.equal('0')
-	// 		const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 		const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+			await dev.lockup.withdraw(property.address)
+			lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			expect(lockedupAllAmount.toFixed()).to.be.equal('0')
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-	// 		expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
-	// 		expect(afterTotalSupply.toFixed()).to.be.equal(
-	// 			beforeTotalSupply.toFixed()
-	// 		)
-	// 	})
-	// 	// Patch for DIP3
-	// 	it('should fail to withdraw when not enable DIP3 and block is small', async () => {
-	// 		const [dev, property, policy] = await init()
-	// 		const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 		const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+			expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.toFixed()
+			)
+		})
+		// Patch for DIP3
+		it('should fail to withdraw when not enable DIP3 and block is small', async () => {
+			const [dev, property, policy] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-	// 		// Disable DIP3
-	// 		await policy.setLockUpBlocks(10)
+			// Disable DIP3
+			await policy.setLockUpBlocks(10)
 
-	// 		await dev.dev.deposit(property.address, 10000)
-	// 		await dev.lockup.cancel(property.address)
-	// 		const res = await dev.lockup.withdraw(property.address).catch(err)
+			await dev.dev.deposit(property.address, 10000)
+			await dev.lockup.cancel(property.address)
+			const res = await dev.lockup.withdraw(property.address).catch(err)
 
-	// 		const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 		const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-	// 		expect(afterBalance.toFixed()).to.be.equal(
-	// 			beforeBalance.minus(10000).toFixed()
-	// 		)
-	// 		expect(afterTotalSupply.toFixed()).to.be.equal(
-	// 			beforeTotalSupply.toFixed()
-	// 		)
-	// 		validateErrorMessage(res, 'waiting for release')
-	// 	})
-	// 	it('can withdraw when enabling DIP3', async () => {
-	// 		const [dev, property, policy] = await init()
-	// 		const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 		const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+			expect(afterBalance.toFixed()).to.be.equal(
+				beforeBalance.minus(10000).toFixed()
+			)
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.toFixed()
+			)
+			validateErrorMessage(res, 'waiting for release')
+		})
+		it('can withdraw when enabling DIP3', async () => {
+			const [dev, property, policy] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-	// 		// Disable DIP3
-	// 		await policy.setLockUpBlocks(10)
+			// Disable DIP3
+			await policy.setLockUpBlocks(10)
 
-	// 		await dev.dev.deposit(property.address, 10000)
+			await dev.dev.deposit(property.address, 10000)
 
-	// 		// Enable DIP3
-	// 		await policy.setLockUpBlocks(1)
+			// Enable DIP3
+			await policy.setLockUpBlocks(1)
 
-	// 		await dev.lockup.cancel(property.address)
-	// 		await dev.lockup.withdraw(property.address)
+			await dev.lockup.cancel(property.address)
+			await dev.lockup.withdraw(property.address)
 
-	// 		const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-	// 		const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-	// 		expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
-	// 		expect(afterTotalSupply.toFixed()).to.be.equal(
-	// 			beforeTotalSupply.toFixed()
-	// 		)
-	// 	})
-	// })
+			expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.toFixed()
+			)
+		})
+	})
 	describe('Lockup; getCumulativeLockedUp, getCumulativeLockedUpAll', () => {
 		let dev: DevProtocolInstance
 		let property: PropertyInstance
