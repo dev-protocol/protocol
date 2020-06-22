@@ -1,3 +1,4 @@
+/* eslint-disable capitalized-comments */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {DevProtocolInstance} from '../test-lib/instance'
 import {
@@ -7,7 +8,7 @@ import {
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock, gasLogger} from '../test-lib/utils/common'
 import {getPropertyAddress} from '../test-lib/utils/log'
-import {waitForEvent, getEventValue} from '../test-lib/utils/event'
+import {waitForEvent, getEventValue, watch} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validatePauseErrorMessage,
@@ -313,28 +314,42 @@ contract('LockupTest', ([deployer, user1]) => {
 			await mine(3)
 			await dev.dev.deposit(property.address, 67890)
 			await mine(5)
+			await dev.lockup.cancel(property.address)
+			await dev.lockup.withdraw(property.address)
+			await mine(7)
 			const result = await dev.lockup
 				.getCumulativeLockedUp(property.address)
 				.then((x) => toBigNumber(x[0]))
-			const expected = 123456 * (3 + 1) + (123456 + 67890) * (5 + 1)
+			const expected =
+				0 + 123456 + 123456 * (3 + 1) + 67890 + (123456 + 67890) * (5 + 1)
 			expect(result.toNumber()).to.be.equal(expected)
 		})
 		it('getCumulativeLockedUp returns cumulative sum of locking-ups on the Property from PropertyValue when the last block is 0', async () => {
+			await dev.dev.transfer(property.address, 6457)
 			await dev.addressConfig.setLockup(deployer)
+			await dev.lockupStorage.setAllValue(6457)
 			await dev.lockupStorage.setPropertyValue(property.address, 6457)
+			await dev.lockupStorage.setValue(property.address, deployer, 6457)
 			await dev.addressConfig.setLockup(dev.lockup.address)
 			const block = await getBlock().then(toBigNumber)
 			await dev.dev.deposit(property.address, 123456)
 			await mine(3)
 			await dev.dev.deposit(property.address, 67890)
 			await mine(5)
+			await dev.lockup.cancel(property.address)
+			await dev.lockup.withdraw(property.address)
+			await mine(7)
 			const result = await dev.lockup
 				.getCumulativeLockedUp(property.address)
 				.then((x) => toBigNumber(x[0]))
 			const deployedBlock = await dev.lockup.deployedBlock().then(toBigNumber)
 			const expected =
+				0 +
+				6457 +
 				6457 * (block.toNumber() - deployedBlock.toNumber()) +
+				123456 +
 				(6457 + 123456) * (3 + 1) +
+				67890 +
 				(6457 + 123456 + 67890) * (5 + 1)
 
 			expect(result.toNumber()).to.be.equal(expected)
@@ -346,18 +361,40 @@ contract('LockupTest', ([deployer, user1]) => {
 			await mine(5)
 			await dev.dev.deposit(property3.address, 463578)
 			await mine(7)
+			await dev.lockup.cancel(property.address)
+			await dev.lockup.withdraw(property.address)
+			await mine(2)
+			await dev.lockup.cancel(property2.address)
+			await dev.lockup.withdraw(property2.address)
+			await mine(2)
+			await dev.lockup.cancel(property3.address)
+			await dev.lockup.withdraw(property3.address)
+			await mine(7)
 			const result = await dev.lockup
 				.getCumulativeLockedUpAll()
 				.then((x) => toBigNumber(x[0]))
 			const expected =
+				0 +
+				123456 +
 				123456 * (3 + 1) +
+				67890 +
 				(123456 + 67890) * (5 + 1) +
-				(123456 + 67890 + 463578) * (7 + 1)
+				463578 +
+				(123456 + 463578 + 67890) * (7 + 2) -
+				123456 +
+				(463578 + 67890) * (2 + 2) -
+				67890 +
+				463578 * (2 + 2) -
+				463578
+
 			expect(result.toNumber()).to.be.equal(expected)
 		})
 		it('getCumulativeLockedUpAll returns cumulative sum of total locking-ups on the protocol from AllValue when the last block is 0', async () => {
+			await dev.dev.transfer(property.address, 5475)
 			await dev.addressConfig.setLockup(deployer)
 			await dev.lockupStorage.setAllValue(5475)
+			await dev.lockupStorage.setPropertyValue(property.address, 5475)
+			await dev.lockupStorage.setValue(property.address, deployer, 5475)
 			await dev.addressConfig.setLockup(dev.lockup.address)
 			const block = await getBlock().then(toBigNumber)
 			await dev.dev.deposit(property.address, 123456)
@@ -366,15 +403,34 @@ contract('LockupTest', ([deployer, user1]) => {
 			await mine(5)
 			await dev.dev.deposit(property3.address, 463578)
 			await mine(7)
+			await dev.lockup.cancel(property.address)
+			await dev.lockup.withdraw(property.address)
+			await mine(2)
+			await dev.lockup.cancel(property2.address)
+			await dev.lockup.withdraw(property2.address)
+			await mine(2)
+			await dev.lockup.cancel(property3.address)
+			await dev.lockup.withdraw(property3.address)
+			await mine(7)
 			const result = await dev.lockup
 				.getCumulativeLockedUpAll()
 				.then((x) => toBigNumber(x[0]))
 			const deployedBlock = await dev.lockup.deployedBlock().then(toBigNumber)
 			const expected =
+				0 +
+				5475 +
 				5475 * (block.toNumber() - deployedBlock.toNumber()) +
+				123456 +
 				(5475 + 123456) * (3 + 1) +
+				67890 +
 				(5475 + 123456 + 67890) * (5 + 1) +
-				(5475 + 123456 + 67890 + 463578) * (7 + 1)
+				463578 +
+				(5475 + 123456 + 67890 + 463578) * (7 + 2) -
+				(5475 + 123456) +
+				(67890 + 463578) * (2 + 2) -
+				67890 +
+				463578 * (2 + 2) -
+				463578
 
 			expect(result.toNumber()).to.be.equal(expected)
 		})
