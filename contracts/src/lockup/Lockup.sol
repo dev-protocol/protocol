@@ -46,7 +46,12 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		}
 		updatePendingInterestWithdrawal(lockupStorage, _property, _from);
 		updateValues(lockupStorage, true, _from, _property, _value);
-		updateLastPriceForProperty(lockupStorage, _property, _from);
+		(, uint256 last) = _calculateWithdrawableInterestAmount(
+			lockupStorage,
+			_property,
+			_from
+		);
+		updateLastPriceForProperty(lockupStorage, _property, _from, last);
 		emit Lockedup(_from, _property, _value);
 	}
 
@@ -180,13 +185,13 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	function updateLastPriceForProperty(
 		LockupStorage lockupStorage,
 		address _property,
-		address _user
+		address _user,
+		uint256 _lastInterest
 	) private {
-		(, , , uint256 interestPrice) = next(_property);
-		lockupStorage.setLastCumulativeGlobalInterestPrice(
+		lockupStorage.setLastCumulativeGlobalInterest(
 			_property,
 			_user,
-			interestPrice
+			_lastInterest
 		);
 		lockupStorage.setLastBlockNumber(_property, block.number);
 	}
@@ -268,29 +273,31 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		LockupStorage lockupStorage,
 		address _property,
 		address _user
-	) private view returns (uint256) {
+	) private view returns (uint256 _amount, uint256 _interest) {
 		uint256 lockedUp = lockupStorage.getValue(_property, _user);
-		if (lockedUp == 0) {
-			return 0;
-		}
-		uint256 lastPrice = lockupStorage.getLastCumulativeGlobalInterestPrice(
+		uint256 propLockedUp = lockupStorage.getPropertyValue(_property);
+		uint256 last = lockupStorage.getLastCumulativeGlobalInterest(
 			_property,
 			_user
 		);
-		(, , , uint256 interestPrice) = next(_property);
-		uint256 priceGap = interestPrice >= lastPrice
-			? interestPrice.sub(lastPrice)
-			: 0;
-		uint256 value = priceGap.mul(lockedUp);
-		return
-			value > 0 ? value.div(Decimals.basis()).div(Decimals.basis()) : 0;
+		(, uint256 interest, , ) = next(_property);
+		if (lockedUp == 0) {
+			return (0, interest);
+		}
+		uint256 gap = interest.sub(last);
+		uint256 share = lockedUp.outOf(propLockedUp);
+		uint256 value = gap.mul(share).div(Decimals.basis());
+		return (
+			value > 0 ? value.div(Decimals.basis()).div(Decimals.basis()) : 0,
+			interest
+		);
 	}
 
 	function _calculateWithdrawableInterestAmount(
 		LockupStorage lockupStorage,
 		address _property,
 		address _user
-	) private view returns (uint256) {
+	) private view returns (uint256 _amount, uint256 _interest) {
 		uint256 pending = lockupStorage.getPendingInterestWithdrawal(
 			_property,
 			_user
@@ -300,37 +307,43 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_user
 		);
-		return
-			_calculateInterestAmount(lockupStorage, _property, _user)
-				.add(pending) // solium-disable-next-line indentation
-				.add(legacy);
+		(uint256 amount, uint256 interest) = _calculateInterestAmount(
+			lockupStorage,
+			_property,
+			_user
+		);
+		uint256 withdrawableAmount = amount
+			.add(pending) // solium-disable-next-line indentation
+			.add(legacy);
+		return (withdrawableAmount, interest);
 	}
 
 	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
 	) public view returns (uint256) {
-		return
-			_calculateWithdrawableInterestAmount(
-				getStorage(),
-				_property,
-				_user
-			);
+		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
+			getStorage(),
+			_property,
+			_user
+		);
+		return amount;
 	}
 
 	function withdrawInterest(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		validateTargetPeriod(_property);
-		uint256 value = calculateWithdrawableInterestAmount(
+		LockupStorage lockupStorage = getStorage();
+		(uint256 value, uint256 last) = _calculateWithdrawableInterestAmount(
+			lockupStorage,
 			_property,
 			msg.sender
 		);
 		require(value > 0, "your interest amount is 0");
-		LockupStorage lockupStorage = getStorage();
 		lockupStorage.setPendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		updateLastPriceForProperty(lockupStorage, _property, msg.sender);
+		updateLastPriceForProperty(lockupStorage, _property, msg.sender, last);
 		__updateLegacyWithdrawableInterestAmount(
 			lockupStorage,
 			_property,
@@ -437,14 +450,15 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		address _property,
 		address _user
 	) private {
+		(uint256 withdrawableAmount, ) = _calculateWithdrawableInterestAmount(
+			lockupStorage,
+			_property,
+			_user
+		);
 		lockupStorage.setPendingInterestWithdrawal(
 			_property,
 			_user,
-			_calculateWithdrawableInterestAmount(
-				lockupStorage,
-				_property,
-				_user
-			)
+			withdrawableAmount
 		);
 		__updateLegacyWithdrawableInterestAmount(
 			lockupStorage,

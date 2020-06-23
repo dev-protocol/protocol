@@ -458,7 +458,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				getBlock(),
 				dev.lockupStorage.getCumulativeGlobalRewards(),
 				dev.lockup.getPropertyValue(prop.address),
-				dev.lockupStorage.getLastCumulativeGlobalInterestPrice(
+				dev.lockupStorage.getLastCumulativeGlobalInterest(
 					prop.address,
 					account
 				),
@@ -499,13 +499,11 @@ contract('LockupTest', ([deployer, user1]) => {
 				const share = propertyLocked.times(1e36).div(totalLocked)
 				const propertyRewards = nextRewars.times(share)
 				const interest = propertyRewards.times(10).div(100)
-				const price = lockedUp.isGreaterThan(0)
-					? interest.div(lockedUp)
+				const gap = interest.minus(lastPrice)
+				const propertyShare = lockedUpPerUser.isGreaterThan(0)
+					? lockedUpPerUser.times(1e18).div(lockedUp)
 					: toBigNumber(0)
-				const priceGap = price.isGreaterThanOrEqualTo(lastPrice)
-					? price.minus(lastPrice)
-					: toBigNumber(0)
-				const value = priceGap.times(lockedUpPerUser).div(1e36)
+				const value = gap.times(propertyShare).div(1e18).div(1e36)
 				const legacyValue = legacyInterestPrice
 					.minus(legacyInterestPricePerUser)
 					.times(lockedUpPerUser)
@@ -514,16 +512,16 @@ contract('LockupTest', ([deployer, user1]) => {
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map(toBigNumber))
-					console.log('nextRewars', nextRewars)
-					console.log('share', share)
-					console.log('propertyRewards', propertyRewards)
-					console.log('interest', interest)
-					console.log('price', price)
-					console.log('priceGap', priceGap)
-					console.log('value', value)
-					console.log('legacyValue', legacyValue)
-					console.log('withdrawable', withdrawable)
-					console.log('res', res)
+					console.log('nextRewars', nextRewars.toFixed())
+					console.log('share', share.toFixed())
+					console.log('propertyRewards', propertyRewards.toFixed())
+					console.log('interest', interest.toFixed())
+					console.log('gap', gap.toFixed())
+					console.log('propertyShare', propertyShare.toFixed())
+					console.log('value', value.toFixed())
+					console.log('legacyValue', legacyValue.toFixed())
+					console.log('withdrawable', withdrawable.toFixed())
+					console.log('res', res.toFixed())
 				}
 
 				return res
@@ -1075,10 +1073,8 @@ contract('LockupTest', ([deployer, user1]) => {
 			let legacyLastPriceBob: BigNumber
 			let deployedBlock: BigNumber
 			let calc: Calculator
-
 			const alice = deployer
 			const bob = user1
-
 			before(async () => {
 				;[dev, property] = await init()
 				calc = createCalculator(dev)
@@ -1111,7 +1107,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				)
 				await dev.addressConfig.setLockup(dev.lockup.address)
 			})
-
 			describe('before withdraw interest', () => {
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const block = await getBlock().then(toBigNumber)
@@ -1221,10 +1216,8 @@ contract('LockupTest', ([deployer, user1]) => {
 			let legacyLastPriceAlice: BigNumber
 			let legacyLastPriceBob: BigNumber
 			let calc: Calculator
-
 			const alice = deployer
 			const bob = user1
-
 			before(async () => {
 				;[dev, property] = await init()
 				calc = createCalculator(dev)
@@ -1260,7 +1253,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				await dev.dev.deposit(property.address, 100000000, {from: bob})
 				await mine(10)
 			})
-
 			describe('before withdraw interest', () => {
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const result = await dev.lockup
