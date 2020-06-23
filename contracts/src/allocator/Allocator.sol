@@ -18,29 +18,12 @@ contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function calculateMaxRewardsPerBlock()
-		public
-		view
-		returns (
-			uint256 _maxHolders,
-			uint256 _maxInterest,
-			uint256 _maxRewards
-		)
-	{
+	function calculateMaxRewardsPerBlock() public view returns (uint256) {
 		require(paused() == false, "You cannot use that");
 		uint256 totalAssets = MetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
-		uint256 mint = Policy(config().policy()).rewards(
-			totalLockedUps,
-			totalAssets
-		);
-		uint256 maxHolders = Policy(config().policy()).holdersShare(
-			mint,
-			totalLockedUps
-		);
-		uint256 maxInterest = mint.sub(maxHolders);
-		return (maxHolders, maxInterest, mint);
+		return Policy(config().policy()).rewards(totalLockedUps, totalAssets);
 	}
 
 	function beforeBalanceChange(

@@ -447,7 +447,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			debug = false
 		): Promise<BigNumber> =>
 			Promise.all([
-				dev.allocator.calculateMaxRewardsPerBlock().then((x) => x[2]),
+				dev.allocator.calculateMaxRewardsPerBlock(),
 				dev.lockupStorage
 					.getLastSameRewardsAmountAndBlock()
 					.then((x: any) => x[0]),

@@ -218,7 +218,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256 _nextRewards, uint256 _amount)
 	{
-		(, , uint256 rewardsAmount) = IAllocator(config().allocator())
+		uint256 rewardsAmount = IAllocator(config().allocator())
 			.calculateMaxRewardsPerBlock();
 		(uint256 lastAmount, uint256 lastBlock) = lockupStorage
 			.getLastSameRewardsAmountAndBlock();

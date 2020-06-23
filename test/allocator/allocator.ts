@@ -73,26 +73,20 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		it('With no authentication or lockup, no DEV will be mint.', async () => {
 			const [dev] = await init()
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()
-			expect(res[0].toNumber()).to.be.equal(0)
-			expect(res[1].toNumber()).to.be.equal(0)
-			expect(res[2].toNumber()).to.be.equal(0)
+			expect(res.toNumber()).to.be.equal(0)
 		})
 		it('A DEV is not minted just by certifying it to Market.', async () => {
 			const [dev, property] = await init()
 			await authenticate(dev, property.address)
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()
-			expect(res[0].toNumber()).to.be.equal(0)
-			expect(res[1].toNumber()).to.be.equal(0)
-			expect(res[2].toNumber()).to.be.equal(0)
+			expect(res.toNumber()).to.be.equal(0)
 		})
 		it('Dev is minted if staking and authenticated the Market.', async () => {
 			const [dev, property] = await init()
 			await authenticate(dev, property.address)
 			await dev.dev.deposit(property.address, 10000)
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()
-			expect(res[0].toNumber()).to.be.equal(9000)
-			expect(res[1].toNumber()).to.be.equal(1000)
-			expect(res[2].toNumber()).to.be.equal(10000)
+			expect(res.toNumber()).to.be.equal(10000)
 		})
 	})
 
@@ -104,7 +98,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 				.catch((err: Error) => err)
 			validateAddressErrorMessage(res)
 		})
-		it.only("If run the Allocator's beforeBalanceChange Withdraw's beforeBalanceChange is executed.", async () => {
+		it("If run the Allocator's beforeBalanceChange Withdraw's beforeBalanceChange is executed.", async () => {
 			const [dev, property] = await init()
 			await authenticate(dev, property.address)
 			await dev.dev.deposit(property.address, 10000)
