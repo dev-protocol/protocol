@@ -454,6 +454,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				dev.lockupStorage
 					.getLastSameRewardsAmountAndBlock()
 					.then((x: any) => x[1]),
+				dev.lockup.deployedBlock(),
 				getBlock(),
 				dev.lockupStorage.getCumulativeGlobalRewards(),
 				dev.lockup.getPropertyValue(prop.address),
@@ -465,11 +466,14 @@ contract('LockupTest', ([deployer, user1]) => {
 				dev.lockup.getCumulativeLockedUpAll().then((x) => x[0]),
 				dev.lockup.getValue(prop.address, account),
 				dev.lockupStorage.getPendingInterestWithdrawal(prop.address, account),
+				dev.lockupStorage.getInterestPrice(prop.address),
+				dev.lockupStorage.getLastInterestPrice(prop.address, account),
 			]).then((results) => {
 				const [
 					maxRewards,
 					lastRewardsAmount,
 					lastBlock,
+					deployedBlock,
 					currentBlock,
 					globalRewards,
 					lockedUp,
@@ -478,12 +482,19 @@ contract('LockupTest', ([deployer, user1]) => {
 					totalLocked,
 					lockedUpPerUser,
 					pending,
+					legacyInterestPrice,
+					legacyInterestPricePerUser,
 				] = results.map(toBigNumber)
-				const nextRewars = (maxRewards.isEqualTo(lastRewardsAmount)
+				const nextRewars = (maxRewards.isEqualTo(lastRewardsAmount) ||
+				lastBlock.isEqualTo(0)
 					? maxRewards
 					: lastRewardsAmount
 				)
-					.times(currentBlock.minus(lastBlock))
+					.times(
+						currentBlock.minus(
+							lastBlock.isGreaterThan(0) ? lastBlock : deployedBlock
+						)
+					)
 					.plus(globalRewards)
 				const share = propertyLocked.times(1e36).div(totalLocked)
 				const propertyRewards = nextRewars.times(share)
@@ -491,9 +502,15 @@ contract('LockupTest', ([deployer, user1]) => {
 				const price = lockedUp.isGreaterThan(0)
 					? interest.div(lockedUp)
 					: toBigNumber(0)
-				const priceGap = price.minus(lastPrice)
+				const priceGap = price.isGreaterThanOrEqualTo(lastPrice)
+					? price.minus(lastPrice)
+					: toBigNumber(0)
 				const value = priceGap.times(lockedUpPerUser).div(1e36)
-				const withdrawable = value.plus(pending)
+				const legacyValue = legacyInterestPrice
+					.minus(legacyInterestPricePerUser)
+					.times(lockedUpPerUser)
+					.div(1e18)
+				const withdrawable = value.plus(pending).plus(legacyValue)
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map(toBigNumber))
@@ -504,6 +521,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					console.log('price', price)
 					console.log('priceGap', priceGap)
 					console.log('value', value)
+					console.log('legacyValue', legacyValue)
 					console.log('withdrawable', withdrawable)
 					console.log('res', res)
 				}
@@ -1043,6 +1061,282 @@ contract('LockupTest', ([deployer, user1]) => {
 					const expected = await calc(property2, bob)
 
 					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+		})
+		describe('scenario: fallback legacy locking-ups', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			let legacyPrice: BigNumber
+			let lockedAlice: BigNumber
+			let lockedBob: BigNumber
+			let blockAlice: BigNumber
+			let legacyLastPriceAlice: BigNumber
+			let legacyLastPriceBob: BigNumber
+			let deployedBlock: BigNumber
+			let calc: Calculator
+
+			const alice = deployer
+			const bob = user1
+
+			before(async () => {
+				;[dev, property] = await init()
+				calc = createCalculator(dev)
+				await dev.dev.mint(bob, await dev.dev.balanceOf(alice))
+				const legacyAmount = toBigNumber(1000).times(1e18)
+				const totalLocked = toBigNumber(100000000)
+				lockedAlice = totalLocked.times(0.8)
+				lockedBob = totalLocked.times(0.2)
+				legacyPrice = legacyAmount.times(1e18).div(totalLocked)
+				legacyLastPriceAlice = legacyPrice.div(4)
+				legacyLastPriceBob = legacyPrice.div(2)
+				deployedBlock = await dev.lockup.deployedBlock().then(toBigNumber)
+				await dev.dev.transfer(property.address, lockedAlice, {from: alice})
+				await dev.dev.transfer(property.address, lockedBob, {from: bob})
+				await dev.addressConfig.setLockup(deployer)
+				await dev.lockupStorage.setValue(property.address, alice, lockedAlice)
+				await dev.lockupStorage.setValue(property.address, bob, lockedBob)
+				await dev.lockupStorage.setPropertyValue(property.address, totalLocked)
+				await dev.lockupStorage.setAllValue(totalLocked)
+				await dev.lockupStorage.setInterestPrice(property.address, legacyPrice)
+				await dev.lockupStorage.setLastInterestPrice(
+					property.address,
+					alice,
+					legacyLastPriceAlice
+				)
+				await dev.lockupStorage.setLastInterestPrice(
+					property.address,
+					bob,
+					legacyLastPriceBob
+				)
+				await dev.addressConfig.setLockup(dev.lockup.address)
+			})
+
+			describe('before withdraw interest', () => {
+				it(`Alice's withdrawable interest is correct`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const latest = toBigNumber(10)
+						.times(1e18)
+						.times(8)
+						.div(10)
+						.times(block.minus(deployedBlock))
+					const legacy = lockedAlice
+						.times(legacyPrice.minus(legacyLastPriceAlice))
+						.div(1e18)
+					const expected = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					expect(latest.plus(legacy).toFixed()).to.be.equal(result.toFixed())
+				})
+				it(`Bob's withdrawable interest is correct`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					const latest = toBigNumber(10)
+						.times(1e18)
+						.times(2)
+						.div(10)
+						.times(block.minus(deployedBlock))
+					const legacy = lockedBob
+						.times(legacyPrice.minus(legacyLastPriceBob))
+						.div(1e18)
+					const expected = await calc(property, bob)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					expect(latest.plus(legacy).toFixed()).to.be.equal(result.toFixed())
+				})
+			})
+			describe('after withdraw interest', () => {
+				let lastBlockAlice: BigNumber
+				let lastBlockBob: BigNumber
+				before(async () => {
+					await dev.lockup.withdrawInterest(property.address, {from: alice})
+					lastBlockAlice = await getBlock().then(toBigNumber)
+					blockAlice = lastBlockAlice
+					await dev.lockup.withdrawInterest(property.address, {from: bob})
+					lastBlockBob = await getBlock().then(toBigNumber)
+					await mine(3)
+				})
+				it(`Alice's withdrawable interest is correct`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(10)
+						.times(1e18)
+						.times(block.minus(lastBlockAlice))
+						.times(0.8)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+				})
+				it(`Bob's withdrawable interest is correct`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					const expected = toBigNumber(10)
+						.times(1e18)
+						.times(block.minus(lastBlockBob))
+						.times(0.2)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+			describe('after withdraw', () => {
+				let lastBlockAlice: BigNumber
+				before(async () => {
+					await dev.lockup.cancel(property.address, {from: alice})
+					await dev.lockup.withdraw(property.address, {from: alice})
+					lastBlockAlice = await getBlock().then(toBigNumber)
+					await dev.lockup.cancel(property.address, {from: bob})
+					await dev.lockup.withdraw(property.address, {from: bob})
+					await mine(3)
+				})
+				it(`Alice's withdrawable interest is correct`, async () => {
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(10)
+						.times(1e18)
+						.times(lastBlockAlice.minus(blockAlice))
+						.times(0.8)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+				})
+				it(`Bob's withdrawable interest is correct`, async () => {
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					const expected = await calc(property, bob)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+		})
+		describe('scenario: fallback legacy locking-ups and latest locking-ups', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			let legacyPrice: BigNumber
+			let lockedAlice: BigNumber
+			let lockedBob: BigNumber
+			let blockAlice: BigNumber
+			let legacyLastPriceAlice: BigNumber
+			let legacyLastPriceBob: BigNumber
+			let calc: Calculator
+
+			const alice = deployer
+			const bob = user1
+
+			before(async () => {
+				;[dev, property] = await init()
+				calc = createCalculator(dev)
+				await dev.dev.mint(bob, await dev.dev.balanceOf(alice))
+				const legacyAmount = toBigNumber(1000).times(1e18)
+				const totalLocked = toBigNumber(100000000)
+				lockedAlice = totalLocked.times(0.8)
+				lockedBob = totalLocked.times(0.2)
+				legacyPrice = legacyAmount.times(1e18).div(totalLocked)
+				legacyLastPriceAlice = legacyPrice.div(4)
+				legacyLastPriceBob = legacyPrice.div(2)
+				await dev.dev.transfer(property.address, lockedAlice, {from: alice})
+				await dev.dev.transfer(property.address, lockedBob, {from: bob})
+				await dev.addressConfig.setLockup(deployer)
+				await dev.lockupStorage.setValue(property.address, alice, lockedAlice)
+				await dev.lockupStorage.setValue(property.address, bob, lockedBob)
+				await dev.lockupStorage.setPropertyValue(property.address, totalLocked)
+				await dev.lockupStorage.setAllValue(totalLocked)
+				await dev.lockupStorage.setInterestPrice(property.address, legacyPrice)
+				await dev.lockupStorage.setLastInterestPrice(
+					property.address,
+					alice,
+					legacyLastPriceAlice
+				)
+				await dev.lockupStorage.setLastInterestPrice(
+					property.address,
+					bob,
+					legacyLastPriceBob
+				)
+				await dev.addressConfig.setLockup(dev.lockup.address)
+				await dev.dev.deposit(property.address, 200000000, {from: alice})
+				blockAlice = await getBlock().then(toBigNumber)
+				await dev.dev.deposit(property.address, 100000000, {from: bob})
+				await mine(10)
+			})
+
+			describe('before withdraw interest', () => {
+				it(`Alice's withdrawable interest is correct`, async () => {
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+				})
+				it(`Bob's withdrawable interest is correct`, async () => {
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					const expected = await calc(property, bob)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+			describe('after withdraw interest', () => {
+				let lastBlockAlice: BigNumber
+				let lastBlockBob: BigNumber
+				before(async () => {
+					await dev.lockup.withdrawInterest(property.address, {from: alice})
+					lastBlockAlice = await getBlock().then(toBigNumber)
+					blockAlice = lastBlockAlice
+					await dev.lockup.withdrawInterest(property.address, {from: bob})
+					lastBlockBob = await getBlock().then(toBigNumber)
+					await mine(3)
+				})
+				it(`Alice's withdrawable interest is correct`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(10)
+						.times(1e18)
+						.times(block.minus(lastBlockAlice))
+						.times((100000000 * 0.8 + 200000000) / 400000000)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+				})
+				it(`Bob's withdrawable interest is correct`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					const expected = toBigNumber(10)
+						.times(1e18)
+						.times(block.minus(lastBlockBob))
+						.times((100000000 * 0.2 + 100000000) / 400000000)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+			describe('after withdraw', () => {
+				let lastBlockAlice: BigNumber
+				before(async () => {
+					await dev.lockup.cancel(property.address, {from: alice})
+					await dev.lockup.withdraw(property.address, {from: alice})
+					lastBlockAlice = await getBlock().then(toBigNumber)
+					await dev.lockup.cancel(property.address, {from: bob})
+					await dev.lockup.withdraw(property.address, {from: bob})
+					await mine(3)
+				})
+				it(`Alice's withdrawable interest is correct`, async () => {
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, alice)
+						.then(toBigNumber)
+					const expected = toBigNumber(10)
+						.times(1e18)
+						.times(lastBlockAlice.minus(blockAlice))
+						.times((100000000 * 0.8 + 200000000) / 400000000)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+				})
+				it(`Bob's withdrawable interest is correct`, async () => {
+					const result = await dev.lockup
+						.calculateWithdrawableInterestAmount(property.address, bob)
+						.then(toBigNumber)
+					const expected = await calc(property, bob)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
 		})

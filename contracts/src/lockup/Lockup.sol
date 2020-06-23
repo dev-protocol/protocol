@@ -222,10 +222,12 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			.calculateMaxRewardsPerBlock();
 		(uint256 lastAmount, uint256 lastBlock) = lockupStorage
 			.getLastSameRewardsAmountAndBlock();
-		uint256 lastMaxRewards = lastAmount == rewardsAmount
+		uint256 lastMaxRewards = lastAmount == rewardsAmount || lastBlock == 0
 			? rewardsAmount
 			: lastAmount;
-		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
+		uint256 blocks = lastBlock > 0
+			? block.number.sub(lastBlock)
+			: block.number.sub(deployedBlock);
 		uint256 additionalRewards = lastMaxRewards.mul(blocks);
 		uint256 nextRewards = lockupStorage.getCumulativeGlobalRewards().add(
 			additionalRewards
@@ -276,26 +278,44 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			_user
 		);
 		(, , , uint256 interestPrice) = next(_property);
-		uint256 priceGap = interestPrice.sub(lastPrice);
+		uint256 priceGap = interestPrice >= lastPrice
+			? interestPrice.sub(lastPrice)
+			: 0;
 		uint256 value = priceGap.mul(lockedUp);
 		return
 			value > 0 ? value.div(Decimals.basis()).div(Decimals.basis()) : 0;
+	}
+
+	function _calculateWithdrawableInterestAmount(
+		LockupStorage lockupStorage,
+		address _property,
+		address _user
+	) private view returns (uint256) {
+		uint256 pending = lockupStorage.getPendingInterestWithdrawal(
+			_property,
+			_user
+		);
+		uint256 legacy = __legacyWithdrawableInterestAmount(
+			lockupStorage,
+			_property,
+			_user
+		);
+		return
+			_calculateInterestAmount(lockupStorage, _property, _user)
+				.add(pending) // solium-disable-next-line indentation
+				.add(legacy);
 	}
 
 	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
 	) public view returns (uint256) {
-		LockupStorage lockupStorage = getStorage();
-		uint256 pending = lockupStorage.getPendingInterestWithdrawal(
-			_property,
-			_user
-		);
-		uint256 legacy = __legacyWithdrawableInterestAmount(_property, _user);
 		return
-			_calculateInterestAmount(lockupStorage, _property, _user)
-				.add(pending) // solium-disable-next-line indentation
-				.add(legacy);
+			_calculateWithdrawableInterestAmount(
+				getStorage(),
+				_property,
+				_user
+			);
 	}
 
 	function withdrawInterest(address _property) external {
@@ -417,15 +437,13 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		address _property,
 		address _user
 	) private {
-		uint256 pending = lockupStorage.getPendingInterestWithdrawal(
-			_property,
-			_user
-		);
 		lockupStorage.setPendingInterestWithdrawal(
 			_property,
 			_user,
-			_calculateInterestAmount(lockupStorage, _property, _user).add(
-				pending
+			_calculateWithdrawableInterestAmount(
+				lockupStorage,
+				_property,
+				_user
 			)
 		);
 		__updateLegacyWithdrawableInterestAmount(
@@ -458,10 +476,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function __legacyWithdrawableInterestAmount(
+		LockupStorage lockupStorage,
 		address _property,
 		address _user
 	) private view returns (uint256) {
-		LockupStorage lockupStorage = getStorage();
 		uint256 _last = lockupStorage.getLastInterestPrice(_property, _user);
 		uint256 price = lockupStorage.getInterestPrice(_property);
 		uint256 priceGap = price.sub(_last);
