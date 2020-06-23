@@ -1085,11 +1085,13 @@ contract('LockupTest', ([deployer, user1]) => {
 				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
 				expect(amount.toFixed()).to.be.equal('100000000000000000000')
+				// At the time of execute withdraw function, the block advances and the actual amount issued changes.
+				const realAmount = amount.times(1.1)
 				expect(afterBalance.toFixed()).to.be.equal(
-					beforeBalance.plus(amount).toFixed()
+					beforeBalance.plus(realAmount).toFixed()
 				)
 				expect(afterTotalSupply.toFixed()).to.be.equal(
-					beforeTotalSupply.plus(amount).toFixed()
+					beforeTotalSupply.plus(realAmount).toFixed()
 				)
 			})
 			it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
