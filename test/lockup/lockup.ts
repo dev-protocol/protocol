@@ -458,13 +458,13 @@ contract('LockupTest', ([deployer, user1]) => {
 				getBlock(),
 				dev.lockupStorage.getCumulativeGlobalRewards(),
 				dev.lockup.getPropertyValue(prop.address),
+				dev.lockup.getValue(prop.address, account),
 				dev.lockupStorage.getLastCumulativeGlobalInterest(
 					prop.address,
 					account
 				),
 				dev.lockup.getCumulativeLockedUp(prop.address).then((x) => x[0]),
 				dev.lockup.getCumulativeLockedUpAll().then((x) => x[0]),
-				dev.lockup.getValue(prop.address, account),
 				dev.lockupStorage.getPendingInterestWithdrawal(prop.address, account),
 				dev.lockupStorage.getInterestPrice(prop.address),
 				dev.lockupStorage.getLastInterestPrice(prop.address, account),
@@ -476,16 +476,16 @@ contract('LockupTest', ([deployer, user1]) => {
 					deployedBlock,
 					currentBlock,
 					globalRewards,
-					lockedUp,
-					lastPrice,
-					propertyLocked,
-					totalLocked,
+					lockedUpPerProperty,
 					lockedUpPerUser,
+					last,
+					cumulativeLockedUp,
+					cumulativeLockedUpAll,
 					pending,
 					legacyInterestPrice,
 					legacyInterestPricePerUser,
 				] = results.map(toBigNumber)
-				const nextRewars = (maxRewards.isEqualTo(lastRewardsAmount) ||
+				const rewards = (maxRewards.isEqualTo(lastRewardsAmount) ||
 				lastBlock.isEqualTo(0)
 					? maxRewards
 					: lastRewardsAmount
@@ -496,29 +496,29 @@ contract('LockupTest', ([deployer, user1]) => {
 						)
 					)
 					.plus(globalRewards)
-				const share = propertyLocked.times(1e36).div(totalLocked)
-				const propertyRewards = nextRewars.times(share)
+				const shareOfProperty = cumulativeLockedUp
+					.times(1e36)
+					.div(cumulativeLockedUpAll)
+				const propertyRewards = rewards.minus(last).times(shareOfProperty)
 				const interest = propertyRewards.times(10).div(100)
-				const gap = interest.minus(lastPrice)
-				const propertyShare = lockedUpPerUser.isGreaterThan(0)
-					? lockedUpPerUser.times(1e18).div(lockedUp)
+				const interestPrice = lockedUpPerProperty.isGreaterThan(0)
+					? interest.div(lockedUpPerProperty)
 					: toBigNumber(0)
-				const value = gap.times(propertyShare).div(1e18).div(1e36)
+				const amount = interestPrice.times(lockedUpPerUser).div(1e36)
 				const legacyValue = legacyInterestPrice
 					.minus(legacyInterestPricePerUser)
 					.times(lockedUpPerUser)
 					.div(1e18)
-				const withdrawable = value.plus(pending).plus(legacyValue)
+				const withdrawable = amount.plus(pending).plus(legacyValue)
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map(toBigNumber))
-					console.log('nextRewars', nextRewars.toFixed())
-					console.log('share', share.toFixed())
+					console.log('rewards', rewards.toFixed())
+					console.log('shareOfProperty', shareOfProperty.toFixed())
 					console.log('propertyRewards', propertyRewards.toFixed())
 					console.log('interest', interest.toFixed())
-					console.log('gap', gap.toFixed())
-					console.log('propertyShare', propertyShare.toFixed())
-					console.log('value', value.toFixed())
+					console.log('interestPrice', interestPrice.toFixed())
+					console.log('amount', amount.toFixed())
 					console.log('legacyValue', legacyValue.toFixed())
 					console.log('withdrawable', withdrawable.toFixed())
 					console.log('res', res.toFixed())

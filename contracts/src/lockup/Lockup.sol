@@ -240,6 +240,40 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return (nextRewards, rewardsAmount);
 	}
 
+	function difference(
+		LockupStorage lockupStorage,
+		address _property,
+		address _user
+	) private view returns (uint256 _reward, uint256 _amount) {
+		(uint256 rewards, ) = dry(lockupStorage);
+		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
+		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
+		uint256 last = lockupStorage.getLastCumulativeGlobalInterest(
+			_property,
+			_user
+		);
+		uint256 shareOfProperty = valuePerProperty.mul(Decimals.basis()).outOf(
+			valueAll
+		);
+		uint256 propertyRewards = rewards.sub(last).mul(shareOfProperty);
+		uint256 lockedUpPerProperty = lockupStorage.getPropertyValue(_property);
+		uint256 lockedUpPerAccount = lockupStorage.getValue(_property, _user);
+		uint256 interest = propertyRewards.sub(
+			Policy(config().policy()).holdersShare(
+				propertyRewards,
+				lockedUpPerProperty
+			)
+		);
+		uint256 interestPrice = lockedUpPerProperty > 0
+			? interest.div(lockedUpPerProperty)
+			: 0;
+		uint256 amount = interestPrice.mul(lockedUpPerAccount);
+		uint256 result = amount > 0
+			? amount.div(Decimals.basis()).div(Decimals.basis())
+			: 0;
+		return (rewards, result);
+	}
+
 	function next(address _property)
 		public
 		view
@@ -274,23 +308,12 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		address _property,
 		address _user
 	) private view returns (uint256 _amount, uint256 _interest) {
-		uint256 lockedUp = lockupStorage.getValue(_property, _user);
-		uint256 propLockedUp = lockupStorage.getPropertyValue(_property);
-		uint256 last = lockupStorage.getLastCumulativeGlobalInterest(
+		(uint256 nextReward, uint256 amount) = difference(
+			lockupStorage,
 			_property,
 			_user
 		);
-		(, uint256 interest, , ) = next(_property);
-		if (lockedUp == 0) {
-			return (0, interest);
-		}
-		uint256 gap = interest.sub(last);
-		uint256 share = lockedUp.outOf(propLockedUp);
-		uint256 value = gap.mul(share).div(Decimals.basis());
-		return (
-			value > 0 ? value.div(Decimals.basis()).div(Decimals.basis()) : 0,
-			interest
-		);
+		return (amount, nextReward);
 	}
 
 	function _calculateWithdrawableInterestAmount(
