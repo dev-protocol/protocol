@@ -98,7 +98,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 				.catch((err: Error) => err)
 			validateAddressErrorMessage(res)
 		})
-		it.only("If run the Allocator's beforeBalanceChange Withdraw's beforeBalanceChange is executed.", async () => {
+		it("If run the Allocator's beforeBalanceChange Withdraw's beforeBalanceChange is executed.", async () => {
 			const [dev, property] = await init()
 			await authenticate(dev, property.address)
 			await dev.dev.deposit(property.address, 10000)
