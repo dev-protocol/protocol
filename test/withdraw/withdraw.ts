@@ -103,15 +103,27 @@ contract('WithdrawTest', ([deployer, user1, user2]) => {
 					.then(toBigNumber)
 				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 				await mine(10)
-				const amount = await dev.withdraw
-					.calculateWithdrawableAmount(property.address, deployer)
-					.then(toBigNumber)
+				const block = await getBlock().then(toBigNumber)
 				await dev.withdraw.withdraw(property.address)
+				const [_from, _to, _value] = await Promise.all([
+					getEventValue(
+						dev.dev,
+						WEB3_URI,
+						block.toNumber()
+					)('Transfer', 'from'),
+					getEventValue(dev.dev, WEB3_URI, block.toNumber())('Transfer', 'to'),
+					getEventValue(
+						dev.dev,
+						WEB3_URI,
+						block.toNumber()
+					)('Transfer', 'value'),
+				])
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-				expect(amount.toFixed()).to.be.equal('900000000000000000000')
-				// At the time of execute withdraw function, the block advances and the actual amount issued changes.
-				const realAmount = amount.times(1.1)
+				const realAmount = toBigNumber(_value.toString())
+
+				expect(_from).to.be.equal('0x0000000000000000000000000000000000000000')
+				expect(deployer).to.be.equal(_to)
 				expect(afterBalance.toFixed()).to.be.equal(
 					beforeBalance.plus(realAmount).toFixed()
 				)
