@@ -270,9 +270,9 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
-		describe('LockupStorageStorage; setLastCumulativeGlobalInterest, getLastCumulativeGlobalInterest', () => {
+		describe('LockupStorageStorage; setLastCumulativeGlobalReward, getLastCumulativeGlobalReward', () => {
 			it('Initial value is 0.', async () => {
-				const result = await dev.lockupStorage.getLastCumulativeGlobalInterest(
+				const result = await dev.lockupStorage.getLastCumulativeGlobalReward(
 					property,
 					user,
 					{from: lockup}
@@ -280,7 +280,7 @@ contract(
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
-				await dev.lockupStorage.setLastCumulativeGlobalInterest(
+				await dev.lockupStorage.setLastCumulativeGlobalReward(
 					property,
 					user,
 					30000000000,
@@ -288,7 +288,7 @@ contract(
 						from: lockup,
 					}
 				)
-				const result = await dev.lockupStorage.getLastCumulativeGlobalInterest(
+				const result = await dev.lockupStorage.getLastCumulativeGlobalReward(
 					property,
 					user,
 					{from: lockup}
@@ -297,7 +297,7 @@ contract(
 			})
 			it('Cannot rewrite data from other than lockup.', async () => {
 				const result = await dev.lockupStorage
-					.setLastCumulativeGlobalInterest(property, user, 30000000000, {
+					.setLastCumulativeGlobalReward(property, user, 30000000000, {
 						from: dummyLockup,
 					})
 					.catch((err: Error) => err)

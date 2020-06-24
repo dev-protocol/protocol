@@ -248,8 +248,8 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
 	}
 
-	//LastCumulativeGlobalInterest
-	function setLastCumulativeGlobalInterest(
+	//LastCumulativeGlobalReward
+	function setLastCumulativeGlobalReward(
 		address _property,
 		address _user,
 		uint256 _value
@@ -257,30 +257,31 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(
-			getLastCumulativeGlobalInterestKey(_property, _user),
+			getLastCumulativeGlobalRewardKey(_property, _user),
 			_value
 		);
 	}
 
-	function getLastCumulativeGlobalInterest(address _property, address _user)
+	function getLastCumulativeGlobalReward(address _property, address _user)
 		external
 		view
 		returns (uint256)
 	{
 		return
 			eternalStorage().getUint(
-				getLastCumulativeGlobalInterestKey(_property, _user)
+				getLastCumulativeGlobalRewardKey(_property, _user)
 			);
 	}
 
-	function getLastCumulativeGlobalInterestKey(
-		address _property,
-		address _user
-	) private pure returns (bytes32) {
+	function getLastCumulativeGlobalRewardKey(address _property, address _user)
+		private
+		pure
+		returns (bytes32)
+	{
 		return
 			keccak256(
 				abi.encodePacked(
-					"_lastCumulativeGlobalInterest",
+					"_LastCumulativeGlobalReward",
 					_property,
 					_user
 				)

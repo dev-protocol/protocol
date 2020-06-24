@@ -459,10 +459,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				dev.lockupStorage.getCumulativeGlobalRewards(),
 				dev.lockup.getPropertyValue(prop.address),
 				dev.lockup.getValue(prop.address, account),
-				dev.lockupStorage.getLastCumulativeGlobalInterest(
-					prop.address,
-					account
-				),
+				dev.lockupStorage.getLastCumulativeGlobalReward(prop.address, account),
 				dev.lockup.getCumulativeLockedUp(prop.address).then((x) => x[0]),
 				dev.lockup.getCumulativeLockedUpAll().then((x) => x[0]),
 				dev.lockupStorage.getPendingInterestWithdrawal(prop.address, account),
