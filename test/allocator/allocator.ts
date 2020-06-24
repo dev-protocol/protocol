@@ -98,7 +98,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 				.catch((err: Error) => err)
 			validateAddressErrorMessage(res)
 		})
-		it("If run the Allocator's beforeBalanceChange Withdraw's beforeBalanceChange is executed.", async () => {
+		it.only("If run the Allocator's beforeBalanceChange Withdraw's beforeBalanceChange is executed.", async () => {
 			const [dev, property] = await init()
 			await authenticate(dev, property.address)
 			await dev.dev.deposit(property.address, 10000)
@@ -125,7 +125,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 				deployer
 			)
 			// We'll just check the fact that it's "done" here.
-			expect(beforeValue.toNumber() !== afterValue.toNumber()).to.be.equal(true)
+			expect(beforeValue.toString() !== afterValue.toString()).to.be.equal(true)
 		})
 	})
 
