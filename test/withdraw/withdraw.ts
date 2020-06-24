@@ -322,10 +322,10 @@ contract('WithdrawTest', ([deployer, user1, user2]) => {
 				it('Become 0 withdrawable amount when after withdrawing', async () => {
 					await dev.dev.deposit(property.address, 10000)
 					await dev.withdraw.withdraw(property.address, {from: alice})
-					await dev.withdraw.withdraw(property.address, {from: bob})
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
+					await dev.withdraw.withdraw(property.address, {from: bob})
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, bob)
 						.then(toBigNumber)
