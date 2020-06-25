@@ -420,7 +420,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				return res
 			})
 
-		describe.only('scenario; zero lockup', () => {
+		describe('scenario; zero lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 
