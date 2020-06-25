@@ -83,6 +83,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			artifacts.require('Metrics').at(metricsAddress as string),
 		])
 		await dev.dev.addMinter(dev.withdraw.address)
+		await dev.lockup.update()
+
 		return [dev, metrics, property, policyInstance]
 	}
 
@@ -396,24 +398,20 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			debug = false
 		): Promise<BigNumber> =>
 			Promise.all([
-				dev.lockup.next(prop.address).then((x) => x[2]),
-				dev.withdrawStorage.getLastCumulativeGlobalHoldersPrice(
-					prop.address,
-					account
-				),
+				dev.withdrawStorage
+					.getLastCumulativeGlobalHoldersPrice(prop.address, account)
+					.then(async (x) =>
+						dev.lockup.difference(prop.address, x).then((x) => x[2])
+					),
 				prop.balanceOf(account),
 				dev.withdrawStorage.getPendingWithdrawal(prop.address, account),
 			]).then((results) => {
-				const [price, lastPrice, balanceOfUser, pending] = results.map(
-					toBigNumber
-				)
-				const priceGap = price.minus(lastPrice)
-				const value = priceGap.times(balanceOfUser).div(1e36)
+				const [price, balanceOfUser, pending] = results.map(toBigNumber)
+				const value = price.times(balanceOfUser).div(1e36)
 				const withdrawable = value.plus(pending)
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map((x) => toBigNumber(x).toFixed()))
-					console.log('priceGap', priceGap)
 					console.log('value', value)
 					console.log('withdrawable', withdrawable)
 					console.log('res', res)
@@ -422,7 +420,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				return res
 			})
 
-		describe('scenario; zero lockup', () => {
+		describe.only('scenario; zero lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 

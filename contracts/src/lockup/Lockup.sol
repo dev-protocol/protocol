@@ -227,15 +227,11 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			.calculateMaxRewardsPerBlock();
 		(uint256 lastAmount, uint256 lastBlock) = lockupStorage
 			.getLastSameRewardsAmountAndBlock();
-		uint256 lastMaxRewards = lastAmount == rewardsAmount || lastBlock == 0
+		uint256 lastMaxRewards = lastAmount == rewardsAmount
 			? rewardsAmount
 			: lastAmount;
 
-		uint256 blocks = lastBlock > 0
-			? block.number.sub(lastBlock)
-			: lastMaxRewards > 0
-			? block.number.sub(deployedBlock)
-			: 0;
+		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
 		uint256 additionalRewards = lastMaxRewards.mul(blocks);
 		uint256 nextRewards = lockupStorage.getCumulativeGlobalRewards().add(
 			additionalRewards
@@ -271,7 +267,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return (
 			rewards,
 			holders,
-			lockedUpPerProperty > 0 ? holders.div(totalSupply) : 0,
+			holders.div(totalSupply),
 			interest,
 			lockedUpPerProperty > 0 ? interest.div(lockedUpPerProperty) : 0
 		);

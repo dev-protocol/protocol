@@ -59,6 +59,8 @@ contract('LockupTest', ([deployer, user1]) => {
 		await dev.metricsGroup.addGroup(deployer)
 
 		await dev.dev.addMinter(dev.lockup.address)
+		await dev.lockup.update()
+
 		return [dev, property, policy]
 	}
 
