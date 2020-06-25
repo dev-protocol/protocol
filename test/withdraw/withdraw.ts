@@ -1,5 +1,3 @@
-/* eslint-disable max-nested-callbacks */
-/* eslint-disable no-warning-comments */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {DevProtocolInstance} from '../test-lib/instance'
 import {
