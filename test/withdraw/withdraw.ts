@@ -9,7 +9,10 @@ import {
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock} from '../test-lib/utils/common'
-import {getWithdrawHolderAmount} from '../test-lib/utils/mint-amount'
+import {
+	getWithdrawHolderAmount,
+	getWithdrawHolderSplitAmount,
+} from '../test-lib/utils/mint-amount'
 import {
 	getPropertyAddress,
 	getMarketAddress,
@@ -23,7 +26,7 @@ import {
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
-contract('WithdrawTest', ([deployer, user1, user2]) => {
+contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 	const init = async (): Promise<
 		[DevProtocolInstance, MetricsInstance, PropertyInstance, PolicyInstance]
 	> => {
@@ -52,6 +55,7 @@ contract('WithdrawTest', ([deployer, user1, user2]) => {
 			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
+		await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
 		const policy = await artifacts.require('PolicyTestForWithdraw').new()
 
 		const policyCreateResult = await dev.policyFactory.create(policy.address)
@@ -188,10 +192,9 @@ contract('WithdrawTest', ([deployer, user1, user2]) => {
 					totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
 				).to.be.equal(amount2.toFixed())
 			})
-
 			it('The withdrawal amount is always the full amount of the withdrawable amount', async () => {
 				const [dev, , property] = await init()
-				await dev.dev.deposit(property.address, 10000)
+				await dev.dev.deposit(property.address, 10000, {from: user3})
 				const totalSupply = await property.totalSupply().then(toBigNumber)
 				const prevBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const prevBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
@@ -204,25 +207,34 @@ contract('WithdrawTest', ([deployer, user1, user2]) => {
 				const amount1 = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, deployer)
 					.then(toBigNumber)
+				await dev.withdraw.withdraw(property.address, {
+					from: deployer,
+				})
+				const realAmount1 = await getWithdrawHolderSplitAmount(
+					dev,
+					amount1,
+					property,
+					deployer
+				)
 				const amount2 = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, user1)
 					.then(toBigNumber)
-				await dev.withdraw.withdraw(property.address, {from: deployer})
 				await dev.withdraw.withdraw(property.address, {from: user1})
+				const realAmount2 = await getWithdrawHolderSplitAmount(
+					dev,
+					amount2,
+					property,
+					user1
+				)
 				const nextBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const nextBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
-				// At the time of execute withdraw function, the block advances and the actual amount issued changes.
-				const realAmount1 = amount1.times(2 - rate)
-				const realAmount2 = amount2.times(1.2)
 				expect(prevBalance1.plus(realAmount1).toFixed()).to.be.equal(
 					nextBalance1.toFixed()
 				)
-
 				expect(prevBalance2.plus(realAmount2).toFixed()).to.be.equal(
 					nextBalance2.toFixed()
 				)
 			})
-
 			it('should fail to withdraw when the withdrawable amount is 0', async () => {
 				const [dev, , property] = await init()
 				const prevBalance = await dev.dev.balanceOf(user1).then(toBigNumber)
