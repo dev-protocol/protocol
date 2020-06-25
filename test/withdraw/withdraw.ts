@@ -2,10 +2,19 @@
 /* eslint-disable no-warning-comments */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {DevProtocolInstance} from '../test-lib/instance'
-import {MetricsInstance, PropertyInstance} from '../../types/truffle-contracts'
+import {
+	MetricsInstance,
+	PropertyInstance,
+	PolicyInstance,
+} from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock} from '../test-lib/utils/common'
-import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
+import {getWithdrawHolderAmount} from '../test-lib/utils/mint-amount'
+import {
+	getPropertyAddress,
+	getMarketAddress,
+	getPolicyAddress,
+} from '../test-lib/utils/log'
 import {getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
@@ -16,7 +25,7 @@ import {WEB3_URI} from '../test-lib/const'
 
 contract('WithdrawTest', ([deployer, user1, user2]) => {
 	const init = async (): Promise<
-		[DevProtocolInstance, MetricsInstance, PropertyInstance]
+		[DevProtocolInstance, MetricsInstance, PropertyInstance, PolicyInstance]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
@@ -45,7 +54,10 @@ contract('WithdrawTest', ([deployer, user1, user2]) => {
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const policy = await artifacts.require('PolicyTestForWithdraw').new()
 
-		await dev.policyFactory.create(policy.address)
+		const policyCreateResult = await dev.policyFactory.create(policy.address)
+		const policyAddress = getPolicyAddress(policyCreateResult)
+		// eslint-disable-next-line @typescript-eslint/await-thenable
+		const policyInstance = await artifacts.require('Policy').at(policyAddress)
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', deployer)
 		)
@@ -69,7 +81,7 @@ contract('WithdrawTest', ([deployer, user1, user2]) => {
 			artifacts.require('Metrics').at(metricsAddress as string),
 		])
 		await dev.dev.addMinter(dev.withdraw.address)
-		return [dev, metrics, property]
+		return [dev, metrics, property, policyInstance]
 	}
 
 	describe('Withdraw; withdraw', () => {
@@ -91,9 +103,10 @@ contract('WithdrawTest', ([deployer, user1, user2]) => {
 		describe('withdrawing interest amount', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
+			let policy: PolicyInstance
 
 			before(async () => {
-				;[dev, , property] = await init()
+				;[dev, , property, policy] = await init()
 				await dev.dev.deposit(property.address, 10000)
 			})
 
@@ -103,27 +116,18 @@ contract('WithdrawTest', ([deployer, user1, user2]) => {
 					.then(toBigNumber)
 				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 				await mine(10)
-				const block = await getBlock().then(toBigNumber)
+				const amount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, deployer)
+					.then(toBigNumber)
 				await dev.withdraw.withdraw(property.address)
-				const [_from, _to, _value] = await Promise.all([
-					getEventValue(
-						dev.dev,
-						WEB3_URI,
-						block.toNumber()
-					)('Transfer', 'from'),
-					getEventValue(dev.dev, WEB3_URI, block.toNumber())('Transfer', 'to'),
-					getEventValue(
-						dev.dev,
-						WEB3_URI,
-						block.toNumber()
-					)('Transfer', 'value'),
-				])
+				const realAmount = await getWithdrawHolderAmount(
+					dev,
+					amount,
+					property.address
+				)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-				const realAmount = toBigNumber(_value.toString())
 
-				expect(_from).to.be.equal('0x0000000000000000000000000000000000000000')
-				expect(deployer).to.be.equal(_to)
 				expect(afterBalance.toFixed()).to.be.equal(
 					beforeBalance.plus(realAmount).toFixed()
 				)

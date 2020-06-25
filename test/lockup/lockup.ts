@@ -7,8 +7,9 @@ import {
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock, gasLogger} from '../test-lib/utils/common'
+import {getWithdrawInterestAmount} from '../test-lib/utils/mint-amount'
 import {getPropertyAddress} from '../test-lib/utils/log'
-import {waitForEvent, getEventValue, watch} from '../test-lib/utils/event'
+import {waitForEvent, getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validatePauseErrorMessage,
@@ -1465,13 +1466,14 @@ contract('LockupTest', ([deployer, user1]) => {
 					.then(toBigNumber)
 
 				await dev.lockup.withdrawInterest(property.address)
-
+				const realAmount = await getWithdrawInterestAmount(
+					dev,
+					amount,
+					property.address
+				)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-				expect(amount.toFixed()).to.be.equal('100000000000000000000')
-				// At the time of execute withdraw function, the block advances and the actual amount issued changes.
-				const realAmount = amount.times(1.1)
 				expect(afterBalance.toFixed()).to.be.equal(
 					beforeBalance.plus(realAmount).toFixed()
 				)
