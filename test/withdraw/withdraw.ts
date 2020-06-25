@@ -384,7 +384,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			expect(res.toNumber()).to.be.equal(0)
 		})
 	})
-	describe.only('Withdraw; calculateWithdrawableAmount', () => {
+	describe('Withdraw; calculateWithdrawableAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,
 			account: string,
@@ -509,7 +509,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 						.then(toBigNumber)
 					expect(property1.toFixed()).to.be.equal(total.toFixed())
 				})
-				it.only(`Alice's withdrawable reward is 900% of Carol's withdrawable interest`, async () => {
+				it(`Alice's withdrawable reward is 900% of Carol's withdrawable interest`, async () => {
 					await mine(9)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
