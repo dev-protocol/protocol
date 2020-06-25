@@ -88,7 +88,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_to
 		);
-		(uint256 total, , , ) = next(_property);
+		(, uint256 total, , , ) = difference(withdrawStorage, _property, _to);
 		if (totalLimit != total) {
 			withdrawStorage.setWithdrawalLimitTotal(_property, _to, total);
 			withdrawStorage.setWithdrawalLimitBalance(
@@ -107,17 +107,26 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		return getStorage().getRewardsAmount(_property);
 	}
 
-	function next(address _property)
+	function difference(
+		WithdrawStorage withdrawStorage,
+		address _property,
+		address _user
+	)
 		private
 		view
 		returns (
-			uint256 _holders,
-			uint256 _interest,
+			uint256 _reward,
+			uint256 _holdersAmount,
 			uint256 _holdersPrice,
+			uint256 _interestAmount,
 			uint256 _interestPrice
 		)
 	{
-		return ILockup(config().lockup()).next(_property);
+		uint256 _last = withdrawStorage.getLastCumulativeGlobalHoldersPrice(
+			_property,
+			_user
+		);
+		return ILockup(config().lockup()).difference(_property, _last);
 	}
 
 	function _calculateAmount(address _property, address _user)
@@ -126,10 +135,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		returns (uint256 _amount, uint256 _price)
 	{
 		WithdrawStorage withdrawStorage = getStorage();
-		uint256 _last = withdrawStorage.getLastCumulativeGlobalHoldersPrice(
-			_property,
-			_user
-		);
 		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
 			_property,
 			_user
@@ -138,15 +143,19 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			_user
 		);
-		(uint256 _holders, , uint256 price, ) = next(_property);
-		uint256 priceGap = price.sub(_last);
+		(
+			uint256 reward,
+			uint256 _holders,
+			uint256 _holdersPrice,
+			,
 
+		) = difference(withdrawStorage, _property, _user);
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
 		if (totalLimit == _holders) {
 			balance = balanceLimit;
 		}
-		uint256 value = priceGap.mul(balance);
-		return (value.div(Decimals.basis()).div(Decimals.basis()), price);
+		uint256 value = _holdersPrice.mul(balance);
+		return (value.div(Decimals.basis()).div(Decimals.basis()), reward);
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)
