@@ -1171,7 +1171,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			let blockAlice: BigNumber
 			let legacyLastPriceAlice: BigNumber
 			let legacyLastPriceBob: BigNumber
-			let deployedBlock: BigNumber
+			let lastBlock: BigNumber
 			let calc: Calculator
 			const alice = deployer
 			const bob = user1
@@ -1186,7 +1186,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				legacyPrice = legacyAmount.times(1e18).div(totalLocked)
 				legacyLastPriceAlice = legacyPrice.div(4)
 				legacyLastPriceBob = legacyPrice.div(2)
-				deployedBlock = await dev.lockup.deployedBlock().then(toBigNumber)
 				await dev.dev.transfer(property.address, lockedAlice, {from: alice})
 				await dev.dev.transfer(property.address, lockedBob, {from: bob})
 				await dev.addressConfig.setLockup(deployer)
@@ -1206,9 +1205,12 @@ contract('LockupTest', ([deployer, user1]) => {
 					legacyLastPriceBob
 				)
 				await dev.addressConfig.setLockup(dev.lockup.address)
+				await dev.lockup.update()
+				lastBlock = await getBlock().then(toBigNumber)
+				await mine(1)
 			})
-			describe('before withdraw interest', () => {
-				it(`Alice's withdrawable interest is correct`, async () => {
+			describe.only('before withdraw interest', () => {
+				it.only(`Alice's withdrawable interest is correct`, async () => {
 					const block = await getBlock().then(toBigNumber)
 					const result = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
@@ -1217,7 +1219,7 @@ contract('LockupTest', ([deployer, user1]) => {
 						.times(1e18)
 						.times(8)
 						.div(10)
-						.times(block.minus(deployedBlock))
+						.times(block.minus(await dev.lockup.deployedBlock()))
 					const legacy = lockedAlice
 						.times(legacyPrice.minus(legacyLastPriceAlice))
 						.div(1e18)
@@ -1234,7 +1236,7 @@ contract('LockupTest', ([deployer, user1]) => {
 						.times(1e18)
 						.times(2)
 						.div(10)
-						.times(block.minus(deployedBlock))
+						.times(block.minus(lastBlock))
 					const legacy = lockedBob
 						.times(legacyPrice.minus(legacyLastPriceBob))
 						.div(1e18)
