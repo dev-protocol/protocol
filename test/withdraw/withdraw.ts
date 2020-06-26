@@ -308,55 +308,33 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 
 			describe('Withdraw; After increment', () => {
-				let prev: BigNumber
-				before(async () => {
-					prev = await dev.withdraw
-						.getRewardsAmount(property.address)
-						.then(toBigNumber)
-				})
-
-				it(`Alice's withdrawable amount is 80% of prev reward and 70% of current reward`, async () => {
+				it(`Alice's withdrawable amount is 70% of rewardd`, async () => {
+					await mine(1)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const increased = (
-						await dev.withdraw
-							.getRewardsAmount(property.address)
-							.then(toBigNumber)
-					).minus(prev)
+					const totalAmount = await dev.withdraw
+						.calculateTotalWithdrawableAmount(property.address)
+						.then(toBigNumber)
 					expect(aliceAmount.toFixed()).to.be.equal(
-						prev
-							.times(0.8)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.plus(
-								increased.times(0.1).integerValue(BigNumber.ROUND_DOWN).times(7)
-							)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.toFixed()
+						totalAmount.times(0.7).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 				})
 
-				it(`Bob's withdrawable amount is 20% of prev reward and 30% of current reward`, async () => {
+				it(`Bob's withdrawable amount is 30% of reward`, async () => {
+					await mine(1)
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, bob)
 						.then(toBigNumber)
-					const increased = (
-						await dev.withdraw
-							.getRewardsAmount(property.address)
-							.then(toBigNumber)
-					).minus(prev)
+					const totalAmount = await dev.withdraw
+						.calculateTotalWithdrawableAmount(property.address)
+						.then(toBigNumber)
 					expect(bobAmount.toFixed()).to.be.equal(
-						prev
-							.times(0.2)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.plus(increased.times(0.3))
-							.integerValue(BigNumber.ROUND_DOWN)
-							.toFixed()
+						totalAmount.times(0.3).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 				})
 
 				it('Become 0 withdrawable amount when after withdrawing', async () => {
-					await dev.dev.deposit(property.address, 10000)
 					await dev.withdraw.withdraw(property.address, {from: alice})
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
@@ -481,10 +459,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 			})
 		})
-		describe('scenario; single lockup', () => {
+		describe.only('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
-			let lastBlock: BigNumber
 			let calc: Calculator
 
 			const alice = deployer
@@ -532,7 +509,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
@@ -550,7 +526,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
