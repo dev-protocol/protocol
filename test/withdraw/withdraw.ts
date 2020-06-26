@@ -391,14 +391,27 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					),
 				prop.balanceOf(account),
 				dev.withdrawStorage.getPendingWithdrawal(prop.address, account),
+				dev.withdrawStorage.getCumulativePrice(prop.address),
+				dev.withdrawStorage.getLastWithdrawalPrice(prop.address, account),
 			]).then((results) => {
-				const [price, balanceOfUser, pending] = results.map(toBigNumber)
+				const [
+					price,
+					balanceOfUser,
+					pending,
+					legacyPrice,
+					legacyLastPrice,
+				] = results.map(toBigNumber)
 				const value = price.times(balanceOfUser).div(1e36)
-				const withdrawable = value.plus(pending)
+				const legacy = legacyPrice
+					.minus(legacyLastPrice)
+					.times(balanceOfUser)
+					.div(1e18)
+				const withdrawable = value.plus(pending).plus(legacy)
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map((x) => toBigNumber(x).toFixed()))
 					console.log('value', value)
+					console.log('legacy', legacy)
 					console.log('withdrawable', withdrawable)
 					console.log('res', res)
 				}
@@ -459,7 +472,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 			})
 		})
-		describe.only('scenario; single lockup', () => {
+		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
@@ -865,6 +878,75 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 						.calculateWithdrawableAmount(property3.address, carol)
 						.then(toBigNumber)
 					expect(carolAmount.toFixed()).to.be.equal('0')
+				})
+			})
+		})
+		describe('scenario: fallback legacy rewards', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			let calc: Calculator
+			const alice = deployer
+
+			before(async () => {
+				;[dev, , property] = await init()
+				calc = createCalculator(dev)
+				await dev.addressConfig.setWithdraw(deployer)
+				await dev.withdrawStorage.setCumulativePrice(property.address, 10000)
+				await dev.withdrawStorage.setLastWithdrawalPrice(
+					property.address,
+					alice,
+					7000
+				)
+				await dev.addressConfig.setWithdraw(dev.withdraw.address)
+			})
+			describe('before withdraw interest', () => {
+				it(`Alice's withdrawable interest is correct`, async () => {
+					const aliceBalance = await property.balanceOf(alice).then(toBigNumber)
+					const result = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const legacy = toBigNumber(10000)
+						.minus(7000)
+						.times(aliceBalance)
+						.div(1e18)
+					const expected = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					expect(legacy.toFixed()).to.be.equal(result.toFixed())
+				})
+			})
+			describe('after withdraw interest', () => {
+				before(async () => {
+					await dev.withdraw.withdraw(property.address, {from: alice})
+					await mine(3)
+				})
+				it(`Alice's withdrawable interest is correct`, async () => {
+					const result = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const legacy = toBigNumber(0)
+					const expected = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					expect(legacy.toFixed()).to.be.equal(result.toFixed())
+				})
+			})
+			describe('after staking', () => {
+				let lastBlock: BigNumber
+				before(async () => {
+					await dev.dev.deposit(property.address, 10000)
+					lastBlock = await getBlock().then(toBigNumber)
+					await mine(3)
+				})
+				it(`Alice's withdrawable interest is correct`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const result = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const latest = toBigNumber(90)
+						.times(1e18)
+						.times(block.minus(lastBlock))
+					const expected = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					expect(latest.toFixed()).to.be.equal(result.toFixed())
 				})
 			})
 		})
