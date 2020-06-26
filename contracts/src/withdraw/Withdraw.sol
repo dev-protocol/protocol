@@ -189,7 +189,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			0
 		);
-		return _amount;
+		return _amount.div(Decimals.basis()).div(Decimals.basis());
 	}
 
 	function __legacyWithdrawableAmount(address _property, address _user)
