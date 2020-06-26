@@ -282,7 +282,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 
 			describe('Withdraw; Before increment', () => {
-				it(`Alice's withdrawable amount is 80% of reward`, async () => {
+				it(`Alice's withdrawable amount is 70% of reward`, async () => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
@@ -294,15 +294,15 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					)
 				})
 
-				it(`Bob's withdrawable amount is 20% of reward`, async () => {
+				it(`Bob's withdrawable amount is 30% of reward`, async () => {
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, bob)
 						.then(toBigNumber)
 					const totalAmount = await dev.withdraw
-						.getRewardsAmount(property.address)
+						.calculateTotalWithdrawableAmount(property.address)
 						.then(toBigNumber)
 					expect(bobAmount.toFixed()).to.be.equal(
-						totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
+						totalAmount.times(0.3).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 				})
 			})
