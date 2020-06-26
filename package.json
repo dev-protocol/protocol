@@ -28,7 +28,7 @@
 	"author": "aggre",
 	"license": "MPL-2.0",
 	"devDependencies": {
-		"@truffle/hdwallet-provider": "1.0.35",
+		"@truffle/hdwallet-provider": "1.0.36",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "13.13.12",
 		"@types/shelljs": "0.8.8",
@@ -45,7 +45,7 @@
 		"husky": "4.2.5",
 		"prettier": "2.0.5",
 		"prettier-plugin-solidity": "1.0.0-alpha.54",
-		"truffle": "5.1.31",
+		"truffle": "5.1.32",
 		"truffle-typings": "1.0.8",
 		"ts-generator": "0.0.8",
 		"ts-node": "8.10.2",
