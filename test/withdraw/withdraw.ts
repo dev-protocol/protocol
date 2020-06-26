@@ -894,4 +894,72 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 		})
 	})
+	describe.only('Withdraw; calculateTotalWithdrawableAmount', () => {
+		let dev: DevProtocolInstance
+		let property: PropertyInstance
+		let property2: PropertyInstance
+		let lastBlock: BigNumber
+		let lastBlock2: BigNumber
+		let lastBlock3: BigNumber
+
+		before(async () => {
+			;[dev, , property] = await init()
+			;[property2] = await Promise.all([
+				artifacts
+					.require('Property')
+					.at(
+						getPropertyAddress(
+							await dev.propertyFactory.create('test2', 'TEST2', user1)
+						)
+					),
+			])
+			await dev.dev.deposit(property.address, 10000)
+			lastBlock = await getBlock().then(toBigNumber)
+		})
+
+		it('Returns total withdrawable amount of a Property', async () => {
+			await mine(1)
+			const block = await getBlock().then(toBigNumber)
+			const result = await dev.withdraw
+				.calculateTotalWithdrawableAmount(property.address)
+				.then(toBigNumber)
+			const expected = toBigNumber(90).times(1e18).times(block.minus(lastBlock))
+			expect(result.toFixed()).to.be.equal(expected.toFixed())
+		})
+		it('Returns total withdrawable amount also does not change when after transfer balance', async () => {
+			await property.transfer(
+				user1,
+				await property.balanceOf(deployer).then((x) => toBigNumber(x).div(2))
+			)
+			await mine(1)
+			const block = await getBlock().then(toBigNumber)
+			const result = await dev.withdraw
+				.calculateTotalWithdrawableAmount(property.address)
+				.then(toBigNumber)
+			const expected = toBigNumber(90).times(1e18).times(block.minus(lastBlock))
+			expect(result.toFixed()).to.be.equal(expected.toFixed())
+		})
+		it('After withdrawn staking, stop increasing', async () => {
+			await dev.dev.deposit(property2.address, 10000)
+			lastBlock2 = await getBlock().then(toBigNumber)
+			await dev.lockup.cancel(property.address)
+			await dev.lockup.withdraw(property.address)
+			lastBlock3 = await getBlock().then(toBigNumber)
+			await mine(3)
+
+			const result = await dev.withdraw
+				.calculateTotalWithdrawableAmount(property.address)
+				.then(toBigNumber)
+			const expected = toBigNumber(90)
+				.times(1e18)
+				.times(lastBlock2.minus(lastBlock))
+				.plus(
+					toBigNumber(90)
+						.times(1e18)
+						.times(0.5)
+						.times(lastBlock3.minus(lastBlock2))
+				)
+			expect(result.toFixed()).to.be.equal(expected.toFixed())
+		})
+	})
 })
