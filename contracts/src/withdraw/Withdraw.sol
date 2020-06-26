@@ -180,6 +180,18 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		return value;
 	}
 
+	function calculateTotalWithdrawableAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		(, uint256 _amount, , , ) = ILockup(config().lockup()).difference(
+			_property,
+			0
+		);
+		return _amount;
+	}
+
 	function __legacyWithdrawableAmount(address _property, address _user)
 		private
 		view
