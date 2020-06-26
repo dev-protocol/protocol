@@ -869,7 +869,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 		})
 	})
-	describe.only('Withdraw; calculateTotalWithdrawableAmount', () => {
+	describe('Withdraw; calculateTotalWithdrawableAmount', () => {
 		let dev: DevProtocolInstance
 		let property: PropertyInstance
 		let property2: PropertyInstance
