@@ -603,7 +603,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
@@ -617,7 +616,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
@@ -633,7 +631,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					})
 
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
@@ -645,8 +642,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					await dev.lockup.withdraw(property.address, {
 						from: bob,
 					})
-					const block = await getBlock().then(toBigNumber)
-
 					await mine(3)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
@@ -663,8 +658,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			let property3: PropertyInstance
 			let lastBlock1: BigNumber
 			let lastBlock2: BigNumber
-			let lastBlock3: BigNumber
-			let bobBlock: BigNumber
 			let calc: Calculator
 
 			const alice = deployer
@@ -709,7 +702,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Alice's withdrawable holders reward is correct`, async () => {
 					await mine(3)
-					const block = await getBlock().then(toBigNumber)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property1.address, alice)
 						.then(toBigNumber)
