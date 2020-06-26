@@ -169,15 +169,17 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		describe('Withdraw; Withdrawable amount', () => {
 			it('The withdrawable amount each holder is the number multiplied the balance of the price per Property Contract and the Property Contract of the sender', async () => {
 				const [dev, , property] = await init()
+				await dev.dev.deposit(property.address, 10000, {from: user3})
 				const totalSupply = await property.totalSupply().then(toBigNumber)
 
 				await property.transfer(user1, totalSupply.times(0.2), {
 					from: deployer,
 				})
 
-				const totalAmount = await dev.withdrawStorage
-					.getRewardsAmount(property.address)
+				const oneBlockAmount = await dev.withdraw
+					.calculateTotalWithdrawableAmount(property.address)
 					.then(toBigNumber)
+				await mine(1)
 				const amount1 = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, deployer)
 					.then(toBigNumber)
@@ -186,10 +188,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					.then(toBigNumber)
 
 				expect(
-					totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
+					oneBlockAmount
+						.times(0.8)
+						.plus(oneBlockAmount)
+						.integerValue(BigNumber.ROUND_DOWN)
+						.toFixed()
 				).to.be.equal(amount1.toFixed())
 				expect(
-					totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
+					oneBlockAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
 				).to.be.equal(amount2.toFixed())
 			})
 			it('The withdrawal amount is always the full amount of the withdrawable amount', async () => {
