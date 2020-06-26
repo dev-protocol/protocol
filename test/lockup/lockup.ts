@@ -15,7 +15,9 @@ import {
 import {WEB3_URI} from '../test-lib/const'
 
 contract('LockupTest', ([deployer, user1]) => {
-	const init = async (): Promise<
+	const init = async (
+		initialUpdate = true
+	): Promise<
 		[DevProtocolInstance, PropertyInstance, PolicyTestForLockupInstance]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
@@ -57,7 +59,9 @@ contract('LockupTest', ([deployer, user1]) => {
 		await dev.metricsGroup.addGroup(deployer)
 
 		await dev.dev.addMinter(dev.lockup.address)
-		await dev.lockup.update()
+		if (initialUpdate) {
+			await dev.lockup.update()
+		}
 
 		return [dev, property, policy]
 	}
@@ -1176,7 +1180,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const alice = deployer
 			const bob = user1
 			before(async () => {
-				;[dev, property] = await init()
+				;[dev, property] = await init(false)
 				calc = createCalculator(dev)
 				await dev.dev.mint(bob, await dev.dev.balanceOf(alice))
 				const legacyAmount = toBigNumber(1000).times(1e18)
@@ -1209,8 +1213,8 @@ contract('LockupTest', ([deployer, user1]) => {
 				lastBlock = await getBlock().then(toBigNumber)
 				await mine(1)
 			})
-			describe.only('before withdraw interest', () => {
-				it.only(`Alice's withdrawable interest is correct`, async () => {
+			describe('before withdraw interest', () => {
+				it(`Alice's withdrawable interest is correct`, async () => {
 					const block = await getBlock().then(toBigNumber)
 					const result = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
@@ -1219,7 +1223,7 @@ contract('LockupTest', ([deployer, user1]) => {
 						.times(1e18)
 						.times(8)
 						.div(10)
-						.times(block.minus(await dev.lockup.deployedBlock()))
+						.times(block.minus(lastBlock))
 					const legacy = lockedAlice
 						.times(legacyPrice.minus(legacyLastPriceAlice))
 						.div(1e18)
