@@ -277,6 +277,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				await property.transfer(bob, totalSupply.times(0.1), {
 					from: alice,
 				})
+				await dev.dev.deposit(property.address, 10000, {from: user3})
+				await mine(1)
 			})
 
 			describe('Withdraw; Before increment', () => {
@@ -285,10 +287,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					const totalAmount = await dev.withdraw
-						.getRewardsAmount(property.address)
+						.calculateTotalWithdrawableAmount(property.address)
 						.then(toBigNumber)
 					expect(aliceAmount.toFixed()).to.be.equal(
-						totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
+						totalAmount.times(0.7).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 				})
 
