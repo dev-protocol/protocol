@@ -13,8 +13,6 @@ import {ILockup} from "contracts/src/lockup/ILockup.sol";
 contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
 	using SafeMath for uint256;
 
-	uint64 public constant basis = 1000000000000000000;
-
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
