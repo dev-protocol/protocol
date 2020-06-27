@@ -10,7 +10,6 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
 contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
-
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
