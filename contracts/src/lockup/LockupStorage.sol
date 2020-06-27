@@ -172,8 +172,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		address _user,
 		uint256 _value
 	) external {
-		// The previously used function
-		// This function is only used in testing
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(
