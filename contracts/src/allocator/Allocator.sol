@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
@@ -11,7 +10,6 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
 contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
-	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
