@@ -15,8 +15,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
-	// event Log(string, uint);
-
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 

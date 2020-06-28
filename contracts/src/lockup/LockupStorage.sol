@@ -8,7 +8,7 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	using SafeMath for uint256;
 
-	uint256 constant basis = 100000000000000000000000000000000;
+	uint256 private constant basis = 100000000000000000000000000000000;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -172,8 +172,6 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 		address _user,
 		uint256 _value
 	) external {
-		// The previously used function
-		// This function is only used in testing
 		addressValidator().validateAddress(msg.sender, config().lockup());
 
 		eternalStorage().setUint(

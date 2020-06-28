@@ -12,7 +12,6 @@ import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
-import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
 contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
