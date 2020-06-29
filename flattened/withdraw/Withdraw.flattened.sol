@@ -1,5 +1,9 @@
 pragma solidity ^0.5.0;
 
+// prettier-ignore
+
+
+
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -11,20 +15,19 @@ pragma solidity ^0.5.0;
  * This contract is only required for intermediate, library-like contracts.
  */
 contract Context {
-	// Empty internal constructor, to prevent people from mistakenly deploying
-	// an instance of this contract, which should be used via inheritance.
-	constructor() internal {}
+    // Empty internal constructor, to prevent people from mistakenly deploying
+    // an instance of this contract, which should be used via inheritance.
+    constructor () internal { }
+    // solhint-disable-previous-line no-empty-blocks
 
-	// solhint-disable-previous-line no-empty-blocks
+    function _msgSender() internal view returns (address payable) {
+        return msg.sender;
+    }
 
-	function _msgSender() internal view returns (address payable) {
-		return msg.sender;
-	}
-
-	function _msgData() internal view returns (bytes memory) {
-		this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
-		return msg.data;
-	}
+    function _msgData() internal view returns (bytes memory) {
+        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        return msg.data;
+    }
 }
 
 /**
@@ -32,87 +35,74 @@ contract Context {
  * the optional functions; to access them see {ERC20Detailed}.
  */
 interface IERC20 {
-	/**
-	 * @dev Returns the amount of tokens in existence.
-	 */
-	function totalSupply() external view returns (uint256);
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
 
-	/**
-	 * @dev Returns the amount of tokens owned by `account`.
-	 */
-	function balanceOf(address account) external view returns (uint256);
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
 
-	/**
-	 * @dev Moves `amount` tokens from the caller's account to `recipient`.
-	 *
-	 * Returns a boolean value indicating whether the operation succeeded.
-	 *
-	 * Emits a {Transfer} event.
-	 */
-	function transfer(address recipient, uint256 amount)
-		external
-		returns (bool);
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address recipient, uint256 amount) external returns (bool);
 
-	/**
-	 * @dev Returns the remaining number of tokens that `spender` will be
-	 * allowed to spend on behalf of `owner` through {transferFrom}. This is
-	 * zero by default.
-	 *
-	 * This value changes when {approve} or {transferFrom} are called.
-	 */
-	function allowance(address owner, address spender)
-		external
-		view
-		returns (uint256);
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender) external view returns (uint256);
 
-	/**
-	 * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
-	 *
-	 * Returns a boolean value indicating whether the operation succeeded.
-	 *
-	 * IMPORTANT: Beware that changing an allowance with this method brings the risk
-	 * that someone may use both the old and the new allowance by unfortunate
-	 * transaction ordering. One possible solution to mitigate this race
-	 * condition is to first reduce the spender's allowance to 0 and set the
-	 * desired value afterwards:
-	 * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-	 *
-	 * Emits an {Approval} event.
-	 */
-	function approve(address spender, uint256 amount) external returns (bool);
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
 
-	/**
-	 * @dev Moves `amount` tokens from `sender` to `recipient` using the
-	 * allowance mechanism. `amount` is then deducted from the caller's
-	 * allowance.
-	 *
-	 * Returns a boolean value indicating whether the operation succeeded.
-	 *
-	 * Emits a {Transfer} event.
-	 */
-	function transferFrom(
-		address sender,
-		address recipient,
-		uint256 amount
-	) external returns (bool);
+    /**
+     * @dev Moves `amount` tokens from `sender` to `recipient` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
-	/**
-	 * @dev Emitted when `value` tokens are moved from one account (`from`) to
-	 * another (`to`).
-	 *
-	 * Note that `value` may be zero.
-	 */
-	event Transfer(address indexed from, address indexed to, uint256 value);
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
-	/**
-	 * @dev Emitted when the allowance of a `spender` for an `owner` is set by
-	 * a call to {approve}. `value` is the new allowance.
-	 */
-	event Approval(
-		address indexed owner,
-		address indexed spender,
-		uint256 value
-	);
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 /**
@@ -129,157 +119,145 @@ interface IERC20 {
  * class of bugs, so it's recommended to use it always.
  */
 library SafeMath {
-	/**
-	 * @dev Returns the addition of two unsigned integers, reverting on
-	 * overflow.
-	 *
-	 * Counterpart to Solidity's `+` operator.
-	 *
-	 * Requirements:
-	 * - Addition cannot overflow.
-	 */
-	function add(uint256 a, uint256 b) internal pure returns (uint256) {
-		uint256 c = a + b;
-		require(c >= a, "SafeMath: addition overflow");
+    /**
+     * @dev Returns the addition of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `+` operator.
+     *
+     * Requirements:
+     * - Addition cannot overflow.
+     */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a, "SafeMath: addition overflow");
 
-		return c;
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the subtraction of two unsigned integers, reverting on
-	 * overflow (when the result is negative).
-	 *
-	 * Counterpart to Solidity's `-` operator.
-	 *
-	 * Requirements:
-	 * - Subtraction cannot overflow.
-	 */
-	function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-		return sub(a, b, "SafeMath: subtraction overflow");
-	}
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     * - Subtraction cannot overflow.
+     */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        return sub(a, b, "SafeMath: subtraction overflow");
+    }
 
-	/**
-	 * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
-	 * overflow (when the result is negative).
-	 *
-	 * Counterpart to Solidity's `-` operator.
-	 *
-	 * Requirements:
-	 * - Subtraction cannot overflow.
-	 *
-	 * _Available since v2.4.0._
-	 */
-	function sub(
-		uint256 a,
-		uint256 b,
-		string memory errorMessage
-	) internal pure returns (uint256) {
-		require(b <= a, errorMessage);
-		uint256 c = a - b;
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     * - Subtraction cannot overflow.
+     *
+     * _Available since v2.4.0._
+     */
+    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b <= a, errorMessage);
+        uint256 c = a - b;
 
-		return c;
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the multiplication of two unsigned integers, reverting on
-	 * overflow.
-	 *
-	 * Counterpart to Solidity's `*` operator.
-	 *
-	 * Requirements:
-	 * - Multiplication cannot overflow.
-	 */
-	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-		// Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-		// benefit is lost if 'b' is also tested.
-		// See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
-		if (a == 0) {
-			return 0;
-		}
+    /**
+     * @dev Returns the multiplication of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `*` operator.
+     *
+     * Requirements:
+     * - Multiplication cannot overflow.
+     */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+        // benefit is lost if 'b' is also tested.
+        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+        if (a == 0) {
+            return 0;
+        }
 
-		uint256 c = a * b;
-		require(c / a == b, "SafeMath: multiplication overflow");
+        uint256 c = a * b;
+        require(c / a == b, "SafeMath: multiplication overflow");
 
-		return c;
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the integer division of two unsigned integers. Reverts on
-	 * division by zero. The result is rounded towards zero.
-	 *
-	 * Counterpart to Solidity's `/` operator. Note: this function uses a
-	 * `revert` opcode (which leaves remaining gas untouched) while Solidity
-	 * uses an invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 */
-	function div(uint256 a, uint256 b) internal pure returns (uint256) {
-		return div(a, b, "SafeMath: division by zero");
-	}
+    /**
+     * @dev Returns the integer division of two unsigned integers. Reverts on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return div(a, b, "SafeMath: division by zero");
+    }
 
-	/**
-	 * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
-	 * division by zero. The result is rounded towards zero.
-	 *
-	 * Counterpart to Solidity's `/` operator. Note: this function uses a
-	 * `revert` opcode (which leaves remaining gas untouched) while Solidity
-	 * uses an invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 *
-	 * _Available since v2.4.0._
-	 */
-	function div(
-		uint256 a,
-		uint256 b,
-		string memory errorMessage
-	) internal pure returns (uint256) {
-		// Solidity only automatically asserts when dividing by 0
-		require(b > 0, errorMessage);
-		uint256 c = a / b;
-		// assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    /**
+     * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     *
+     * _Available since v2.4.0._
+     */
+    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        // Solidity only automatically asserts when dividing by 0
+        require(b > 0, errorMessage);
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
 
-		return c;
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-	 * Reverts when dividing by zero.
-	 *
-	 * Counterpart to Solidity's `%` operator. This function uses a `revert`
-	 * opcode (which leaves remaining gas untouched) while Solidity uses an
-	 * invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 */
-	function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-		return mod(a, b, "SafeMath: modulo by zero");
-	}
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * Reverts when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     */
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        return mod(a, b, "SafeMath: modulo by zero");
+    }
 
-	/**
-	 * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-	 * Reverts with custom message when dividing by zero.
-	 *
-	 * Counterpart to Solidity's `%` operator. This function uses a `revert`
-	 * opcode (which leaves remaining gas untouched) while Solidity uses an
-	 * invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 *
-	 * _Available since v2.4.0._
-	 */
-	function mod(
-		uint256 a,
-		uint256 b,
-		string memory errorMessage
-	) internal pure returns (uint256) {
-		require(b != 0, errorMessage);
-		return a % b;
-	}
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * Reverts with custom message when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     *
+     * _Available since v2.4.0._
+     */
+    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b != 0, errorMessage);
+        return a % b;
+    }
 }
 
 /**
@@ -307,260 +285,206 @@ library SafeMath {
  * allowances. See {IERC20-approve}.
  */
 contract ERC20 is Context, IERC20 {
-	using SafeMath for uint256;
+    using SafeMath for uint256;
 
-	mapping(address => uint256) private _balances;
+    mapping (address => uint256) private _balances;
 
-	mapping(address => mapping(address => uint256)) private _allowances;
+    mapping (address => mapping (address => uint256)) private _allowances;
 
-	uint256 private _totalSupply;
+    uint256 private _totalSupply;
 
-	/**
-	 * @dev See {IERC20-totalSupply}.
-	 */
-	function totalSupply() public view returns (uint256) {
-		return _totalSupply;
-	}
+    /**
+     * @dev See {IERC20-totalSupply}.
+     */
+    function totalSupply() public view returns (uint256) {
+        return _totalSupply;
+    }
 
-	/**
-	 * @dev See {IERC20-balanceOf}.
-	 */
-	function balanceOf(address account) public view returns (uint256) {
-		return _balances[account];
-	}
+    /**
+     * @dev See {IERC20-balanceOf}.
+     */
+    function balanceOf(address account) public view returns (uint256) {
+        return _balances[account];
+    }
 
-	/**
-	 * @dev See {IERC20-transfer}.
-	 *
-	 * Requirements:
-	 *
-	 * - `recipient` cannot be the zero address.
-	 * - the caller must have a balance of at least `amount`.
-	 */
-	function transfer(address recipient, uint256 amount) public returns (bool) {
-		_transfer(_msgSender(), recipient, amount);
-		return true;
-	}
+    /**
+     * @dev See {IERC20-transfer}.
+     *
+     * Requirements:
+     *
+     * - `recipient` cannot be the zero address.
+     * - the caller must have a balance of at least `amount`.
+     */
+    function transfer(address recipient, uint256 amount) public returns (bool) {
+        _transfer(_msgSender(), recipient, amount);
+        return true;
+    }
 
-	/**
-	 * @dev See {IERC20-allowance}.
-	 */
-	function allowance(address owner, address spender)
-		public
-		view
-		returns (uint256)
-	{
-		return _allowances[owner][spender];
-	}
+    /**
+     * @dev See {IERC20-allowance}.
+     */
+    function allowance(address owner, address spender) public view returns (uint256) {
+        return _allowances[owner][spender];
+    }
 
-	/**
-	 * @dev See {IERC20-approve}.
-	 *
-	 * Requirements:
-	 *
-	 * - `spender` cannot be the zero address.
-	 */
-	function approve(address spender, uint256 amount) public returns (bool) {
-		_approve(_msgSender(), spender, amount);
-		return true;
-	}
+    /**
+     * @dev See {IERC20-approve}.
+     *
+     * Requirements:
+     *
+     * - `spender` cannot be the zero address.
+     */
+    function approve(address spender, uint256 amount) public returns (bool) {
+        _approve(_msgSender(), spender, amount);
+        return true;
+    }
 
-	/**
-	 * @dev See {IERC20-transferFrom}.
-	 *
-	 * Emits an {Approval} event indicating the updated allowance. This is not
-	 * required by the EIP. See the note at the beginning of {ERC20};
-	 *
-	 * Requirements:
-	 * - `sender` and `recipient` cannot be the zero address.
-	 * - `sender` must have a balance of at least `amount`.
-	 * - the caller must have allowance for `sender`'s tokens of at least
-	 * `amount`.
-	 */
-	function transferFrom(
-		address sender,
-		address recipient,
-		uint256 amount
-	) public returns (bool) {
-		_transfer(sender, recipient, amount);
-		_approve(
-			sender,
-			_msgSender(),
-			_allowances[sender][_msgSender()].sub(
-				amount,
-				"ERC20: transfer amount exceeds allowance"
-			)
-		);
-		return true;
-	}
+    /**
+     * @dev See {IERC20-transferFrom}.
+     *
+     * Emits an {Approval} event indicating the updated allowance. This is not
+     * required by the EIP. See the note at the beginning of {ERC20};
+     *
+     * Requirements:
+     * - `sender` and `recipient` cannot be the zero address.
+     * - `sender` must have a balance of at least `amount`.
+     * - the caller must have allowance for `sender`'s tokens of at least
+     * `amount`.
+     */
+    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
+        _transfer(sender, recipient, amount);
+        _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        return true;
+    }
 
-	/**
-	 * @dev Atomically increases the allowance granted to `spender` by the caller.
-	 *
-	 * This is an alternative to {approve} that can be used as a mitigation for
-	 * problems described in {IERC20-approve}.
-	 *
-	 * Emits an {Approval} event indicating the updated allowance.
-	 *
-	 * Requirements:
-	 *
-	 * - `spender` cannot be the zero address.
-	 */
-	function increaseAllowance(address spender, uint256 addedValue)
-		public
-		returns (bool)
-	{
-		_approve(
-			_msgSender(),
-			spender,
-			_allowances[_msgSender()][spender].add(addedValue)
-		);
-		return true;
-	}
+    /**
+     * @dev Atomically increases the allowance granted to `spender` by the caller.
+     *
+     * This is an alternative to {approve} that can be used as a mitigation for
+     * problems described in {IERC20-approve}.
+     *
+     * Emits an {Approval} event indicating the updated allowance.
+     *
+     * Requirements:
+     *
+     * - `spender` cannot be the zero address.
+     */
+    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+        return true;
+    }
 
-	/**
-	 * @dev Atomically decreases the allowance granted to `spender` by the caller.
-	 *
-	 * This is an alternative to {approve} that can be used as a mitigation for
-	 * problems described in {IERC20-approve}.
-	 *
-	 * Emits an {Approval} event indicating the updated allowance.
-	 *
-	 * Requirements:
-	 *
-	 * - `spender` cannot be the zero address.
-	 * - `spender` must have allowance for the caller of at least
-	 * `subtractedValue`.
-	 */
-	function decreaseAllowance(address spender, uint256 subtractedValue)
-		public
-		returns (bool)
-	{
-		_approve(
-			_msgSender(),
-			spender,
-			_allowances[_msgSender()][spender].sub(
-				subtractedValue,
-				"ERC20: decreased allowance below zero"
-			)
-		);
-		return true;
-	}
+    /**
+     * @dev Atomically decreases the allowance granted to `spender` by the caller.
+     *
+     * This is an alternative to {approve} that can be used as a mitigation for
+     * problems described in {IERC20-approve}.
+     *
+     * Emits an {Approval} event indicating the updated allowance.
+     *
+     * Requirements:
+     *
+     * - `spender` cannot be the zero address.
+     * - `spender` must have allowance for the caller of at least
+     * `subtractedValue`.
+     */
+    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+        return true;
+    }
 
-	/**
-	 * @dev Moves tokens `amount` from `sender` to `recipient`.
-	 *
-	 * This is internal function is equivalent to {transfer}, and can be used to
-	 * e.g. implement automatic token fees, slashing mechanisms, etc.
-	 *
-	 * Emits a {Transfer} event.
-	 *
-	 * Requirements:
-	 *
-	 * - `sender` cannot be the zero address.
-	 * - `recipient` cannot be the zero address.
-	 * - `sender` must have a balance of at least `amount`.
-	 */
-	function _transfer(
-		address sender,
-		address recipient,
-		uint256 amount
-	) internal {
-		require(sender != address(0), "ERC20: transfer from the zero address");
-		require(recipient != address(0), "ERC20: transfer to the zero address");
+    /**
+     * @dev Moves tokens `amount` from `sender` to `recipient`.
+     *
+     * This is internal function is equivalent to {transfer}, and can be used to
+     * e.g. implement automatic token fees, slashing mechanisms, etc.
+     *
+     * Emits a {Transfer} event.
+     *
+     * Requirements:
+     *
+     * - `sender` cannot be the zero address.
+     * - `recipient` cannot be the zero address.
+     * - `sender` must have a balance of at least `amount`.
+     */
+    function _transfer(address sender, address recipient, uint256 amount) internal {
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
 
-		_balances[sender] = _balances[sender].sub(
-			amount,
-			"ERC20: transfer amount exceeds balance"
-		);
-		_balances[recipient] = _balances[recipient].add(amount);
-		emit Transfer(sender, recipient, amount);
-	}
+        _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
+        _balances[recipient] = _balances[recipient].add(amount);
+        emit Transfer(sender, recipient, amount);
+    }
 
-	/** @dev Creates `amount` tokens and assigns them to `account`, increasing
-	 * the total supply.
-	 *
-	 * Emits a {Transfer} event with `from` set to the zero address.
-	 *
-	 * Requirements
-	 *
-	 * - `to` cannot be the zero address.
-	 */
-	function _mint(address account, uint256 amount) internal {
-		require(account != address(0), "ERC20: mint to the zero address");
+    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+     * the total supply.
+     *
+     * Emits a {Transfer} event with `from` set to the zero address.
+     *
+     * Requirements
+     *
+     * - `to` cannot be the zero address.
+     */
+    function _mint(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: mint to the zero address");
 
-		_totalSupply = _totalSupply.add(amount);
-		_balances[account] = _balances[account].add(amount);
-		emit Transfer(address(0), account, amount);
-	}
+        _totalSupply = _totalSupply.add(amount);
+        _balances[account] = _balances[account].add(amount);
+        emit Transfer(address(0), account, amount);
+    }
 
-	/**
-	 * @dev Destroys `amount` tokens from `account`, reducing the
-	 * total supply.
-	 *
-	 * Emits a {Transfer} event with `to` set to the zero address.
-	 *
-	 * Requirements
-	 *
-	 * - `account` cannot be the zero address.
-	 * - `account` must have at least `amount` tokens.
-	 */
-	function _burn(address account, uint256 amount) internal {
-		require(account != address(0), "ERC20: burn from the zero address");
+    /**
+     * @dev Destroys `amount` tokens from `account`, reducing the
+     * total supply.
+     *
+     * Emits a {Transfer} event with `to` set to the zero address.
+     *
+     * Requirements
+     *
+     * - `account` cannot be the zero address.
+     * - `account` must have at least `amount` tokens.
+     */
+    function _burn(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: burn from the zero address");
 
-		_balances[account] = _balances[account].sub(
-			amount,
-			"ERC20: burn amount exceeds balance"
-		);
-		_totalSupply = _totalSupply.sub(amount);
-		emit Transfer(account, address(0), amount);
-	}
+        _balances[account] = _balances[account].sub(amount, "ERC20: burn amount exceeds balance");
+        _totalSupply = _totalSupply.sub(amount);
+        emit Transfer(account, address(0), amount);
+    }
 
-	/**
-	 * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
-	 *
-	 * This is internal function is equivalent to `approve`, and can be used to
-	 * e.g. set automatic allowances for certain subsystems, etc.
-	 *
-	 * Emits an {Approval} event.
-	 *
-	 * Requirements:
-	 *
-	 * - `owner` cannot be the zero address.
-	 * - `spender` cannot be the zero address.
-	 */
-	function _approve(
-		address owner,
-		address spender,
-		uint256 amount
-	) internal {
-		require(owner != address(0), "ERC20: approve from the zero address");
-		require(spender != address(0), "ERC20: approve to the zero address");
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
+     *
+     * This is internal function is equivalent to `approve`, and can be used to
+     * e.g. set automatic allowances for certain subsystems, etc.
+     *
+     * Emits an {Approval} event.
+     *
+     * Requirements:
+     *
+     * - `owner` cannot be the zero address.
+     * - `spender` cannot be the zero address.
+     */
+    function _approve(address owner, address spender, uint256 amount) internal {
+        require(owner != address(0), "ERC20: approve from the zero address");
+        require(spender != address(0), "ERC20: approve to the zero address");
 
-		_allowances[owner][spender] = amount;
-		emit Approval(owner, spender, amount);
-	}
+        _allowances[owner][spender] = amount;
+        emit Approval(owner, spender, amount);
+    }
 
-	/**
-	 * @dev Destroys `amount` tokens from `account`.`amount` is then deducted
-	 * from the caller's allowance.
-	 *
-	 * See {_burn} and {_approve}.
-	 */
-	function _burnFrom(address account, uint256 amount) internal {
-		_burn(account, amount);
-		_approve(
-			account,
-			_msgSender(),
-			_allowances[account][_msgSender()].sub(
-				amount,
-				"ERC20: burn amount exceeds allowance"
-			)
-		);
-	}
+    /**
+     * @dev Destroys `amount` tokens from `account`.`amount` is then deducted
+     * from the caller's allowance.
+     *
+     * See {_burn} and {_approve}.
+     */
+    function _burnFrom(address account, uint256 amount) internal {
+        _burn(account, amount);
+        _approve(account, _msgSender(), _allowances[account][_msgSender()].sub(amount, "ERC20: burn amount exceeds allowance"));
+    }
 }
 
-// prettier-ignore
 
 /**
  * @title Roles
@@ -598,46 +522,43 @@ library Roles {
 }
 
 contract MinterRole is Context {
-	using Roles for Roles.Role;
+    using Roles for Roles.Role;
 
-	event MinterAdded(address indexed account);
-	event MinterRemoved(address indexed account);
+    event MinterAdded(address indexed account);
+    event MinterRemoved(address indexed account);
 
-	Roles.Role private _minters;
+    Roles.Role private _minters;
 
-	constructor() internal {
-		_addMinter(_msgSender());
-	}
+    constructor () internal {
+        _addMinter(_msgSender());
+    }
 
-	modifier onlyMinter() {
-		require(
-			isMinter(_msgSender()),
-			"MinterRole: caller does not have the Minter role"
-		);
-		_;
-	}
+    modifier onlyMinter() {
+        require(isMinter(_msgSender()), "MinterRole: caller does not have the Minter role");
+        _;
+    }
 
-	function isMinter(address account) public view returns (bool) {
-		return _minters.has(account);
-	}
+    function isMinter(address account) public view returns (bool) {
+        return _minters.has(account);
+    }
 
-	function addMinter(address account) public onlyMinter {
-		_addMinter(account);
-	}
+    function addMinter(address account) public onlyMinter {
+        _addMinter(account);
+    }
 
-	function renounceMinter() public {
-		_removeMinter(_msgSender());
-	}
+    function renounceMinter() public {
+        _removeMinter(_msgSender());
+    }
 
-	function _addMinter(address account) internal {
-		_minters.add(account);
-		emit MinterAdded(account);
-	}
+    function _addMinter(address account) internal {
+        _minters.add(account);
+        emit MinterAdded(account);
+    }
 
-	function _removeMinter(address account) internal {
-		_minters.remove(account);
-		emit MinterRemoved(account);
-	}
+    function _removeMinter(address account) internal {
+        _minters.remove(account);
+        emit MinterRemoved(account);
+    }
 }
 
 /**
@@ -647,64 +568,59 @@ contract MinterRole is Context {
  * At construction, the deployer of the contract is the only minter.
  */
 contract ERC20Mintable is ERC20, MinterRole {
-	/**
-	 * @dev See {ERC20-_mint}.
-	 *
-	 * Requirements:
-	 *
-	 * - the caller must have the {MinterRole}.
-	 */
-	function mint(address account, uint256 amount)
-		public
-		onlyMinter
-		returns (bool)
-	{
-		_mint(account, amount);
-		return true;
-	}
+    /**
+     * @dev See {ERC20-_mint}.
+     *
+     * Requirements:
+     *
+     * - the caller must have the {MinterRole}.
+     */
+    function mint(address account, uint256 amount) public onlyMinter returns (bool) {
+        _mint(account, amount);
+        return true;
+    }
 }
 
+
+
 contract PauserRole is Context {
-	using Roles for Roles.Role;
+    using Roles for Roles.Role;
 
-	event PauserAdded(address indexed account);
-	event PauserRemoved(address indexed account);
+    event PauserAdded(address indexed account);
+    event PauserRemoved(address indexed account);
 
-	Roles.Role private _pausers;
+    Roles.Role private _pausers;
 
-	constructor() internal {
-		_addPauser(_msgSender());
-	}
+    constructor () internal {
+        _addPauser(_msgSender());
+    }
 
-	modifier onlyPauser() {
-		require(
-			isPauser(_msgSender()),
-			"PauserRole: caller does not have the Pauser role"
-		);
-		_;
-	}
+    modifier onlyPauser() {
+        require(isPauser(_msgSender()), "PauserRole: caller does not have the Pauser role");
+        _;
+    }
 
-	function isPauser(address account) public view returns (bool) {
-		return _pausers.has(account);
-	}
+    function isPauser(address account) public view returns (bool) {
+        return _pausers.has(account);
+    }
 
-	function addPauser(address account) public onlyPauser {
-		_addPauser(account);
-	}
+    function addPauser(address account) public onlyPauser {
+        _addPauser(account);
+    }
 
-	function renouncePauser() public {
-		_removePauser(_msgSender());
-	}
+    function renouncePauser() public {
+        _removePauser(_msgSender());
+    }
 
-	function _addPauser(address account) internal {
-		_pausers.add(account);
-		emit PauserAdded(account);
-	}
+    function _addPauser(address account) internal {
+        _pausers.add(account);
+        emit PauserAdded(account);
+    }
 
-	function _removePauser(address account) internal {
-		_pausers.remove(account);
-		emit PauserRemoved(account);
-	}
+    function _removePauser(address account) internal {
+        _pausers.remove(account);
+        emit PauserRemoved(account);
+    }
 }
 
 /**
@@ -717,65 +633,66 @@ contract PauserRole is Context {
  * simply including this module, only once the modifiers are put in place.
  */
 contract Pausable is Context, PauserRole {
-	/**
-	 * @dev Emitted when the pause is triggered by a pauser (`account`).
-	 */
-	event Paused(address account);
+    /**
+     * @dev Emitted when the pause is triggered by a pauser (`account`).
+     */
+    event Paused(address account);
 
-	/**
-	 * @dev Emitted when the pause is lifted by a pauser (`account`).
-	 */
-	event Unpaused(address account);
+    /**
+     * @dev Emitted when the pause is lifted by a pauser (`account`).
+     */
+    event Unpaused(address account);
 
-	bool private _paused;
+    bool private _paused;
 
-	/**
-	 * @dev Initializes the contract in unpaused state. Assigns the Pauser role
-	 * to the deployer.
-	 */
-	constructor() internal {
-		_paused = false;
-	}
+    /**
+     * @dev Initializes the contract in unpaused state. Assigns the Pauser role
+     * to the deployer.
+     */
+    constructor () internal {
+        _paused = false;
+    }
 
-	/**
-	 * @dev Returns true if the contract is paused, and false otherwise.
-	 */
-	function paused() public view returns (bool) {
-		return _paused;
-	}
+    /**
+     * @dev Returns true if the contract is paused, and false otherwise.
+     */
+    function paused() public view returns (bool) {
+        return _paused;
+    }
 
-	/**
-	 * @dev Modifier to make a function callable only when the contract is not paused.
-	 */
-	modifier whenNotPaused() {
-		require(!_paused, "Pausable: paused");
-		_;
-	}
+    /**
+     * @dev Modifier to make a function callable only when the contract is not paused.
+     */
+    modifier whenNotPaused() {
+        require(!_paused, "Pausable: paused");
+        _;
+    }
 
-	/**
-	 * @dev Modifier to make a function callable only when the contract is paused.
-	 */
-	modifier whenPaused() {
-		require(_paused, "Pausable: not paused");
-		_;
-	}
+    /**
+     * @dev Modifier to make a function callable only when the contract is paused.
+     */
+    modifier whenPaused() {
+        require(_paused, "Pausable: not paused");
+        _;
+    }
 
-	/**
-	 * @dev Called by a pauser to pause, triggers stopped state.
-	 */
-	function pause() public onlyPauser whenNotPaused {
-		_paused = true;
-		emit Paused(_msgSender());
-	}
+    /**
+     * @dev Called by a pauser to pause, triggers stopped state.
+     */
+    function pause() public onlyPauser whenNotPaused {
+        _paused = true;
+        emit Paused(_msgSender());
+    }
 
-	/**
-	 * @dev Called by a pauser to unpause, returns to normal state.
-	 */
-	function unpause() public onlyPauser whenPaused {
-		_paused = false;
-		emit Unpaused(_msgSender());
-	}
+    /**
+     * @dev Called by a pauser to unpause, returns to normal state.
+     */
+    function unpause() public onlyPauser whenPaused {
+        _paused = false;
+        emit Unpaused(_msgSender());
+    }
 }
+
 
 library Decimals {
 	using SafeMath for uint256;
@@ -801,6 +718,8 @@ library Decimals {
 	}
 }
 
+
+
 contract Killable {
 	address payable public _owner;
 
@@ -824,78 +743,73 @@ contract Killable {
  * the owner.
  */
 contract Ownable is Context {
-	address private _owner;
+    address private _owner;
 
-	event OwnershipTransferred(
-		address indexed previousOwner,
-		address indexed newOwner
-	);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-	/**
-	 * @dev Initializes the contract setting the deployer as the initial owner.
-	 */
-	constructor() internal {
-		address msgSender = _msgSender();
-		_owner = msgSender;
-		emit OwnershipTransferred(address(0), msgSender);
-	}
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    constructor () internal {
+        address msgSender = _msgSender();
+        _owner = msgSender;
+        emit OwnershipTransferred(address(0), msgSender);
+    }
 
-	/**
-	 * @dev Returns the address of the current owner.
-	 */
-	function owner() public view returns (address) {
-		return _owner;
-	}
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view returns (address) {
+        return _owner;
+    }
 
-	/**
-	 * @dev Throws if called by any account other than the owner.
-	 */
-	modifier onlyOwner() {
-		require(isOwner(), "Ownable: caller is not the owner");
-		_;
-	}
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(isOwner(), "Ownable: caller is not the owner");
+        _;
+    }
 
-	/**
-	 * @dev Returns true if the caller is the current owner.
-	 */
-	function isOwner() public view returns (bool) {
-		return _msgSender() == _owner;
-	}
+    /**
+     * @dev Returns true if the caller is the current owner.
+     */
+    function isOwner() public view returns (bool) {
+        return _msgSender() == _owner;
+    }
 
-	/**
-	 * @dev Leaves the contract without owner. It will not be possible to call
-	 * `onlyOwner` functions anymore. Can only be called by the current owner.
-	 *
-	 * NOTE: Renouncing ownership will leave the contract without an owner,
-	 * thereby removing any functionality that is only available to the owner.
-	 */
-	function renounceOwnership() public onlyOwner {
-		emit OwnershipTransferred(_owner, address(0));
-		_owner = address(0);
-	}
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 * Can only be called by the current owner.
-	 */
-	function transferOwnership(address newOwner) public onlyOwner {
-		_transferOwnership(newOwner);
-	}
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        _transferOwnership(newOwner);
+    }
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 */
-	function _transferOwnership(address newOwner) internal {
-		require(
-			newOwner != address(0),
-			"Ownable: new owner is the zero address"
-		);
-		emit OwnershipTransferred(_owner, newOwner);
-		_owner = newOwner;
-	}
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     */
+    function _transferOwnership(address newOwner) internal {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
+    }
 }
 
 // prettier-ignore
+
 
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
@@ -942,6 +856,21 @@ contract AddressValidator {
 			return;
 		}
 		require(_addr == _target2, errorMessage);
+	}
+
+	function validate3Addresses(
+		address _addr,
+		address _target1,
+		address _target2,
+		address _target3
+	) external pure {
+		if (_addr == _target1) {
+			return;
+		}
+		if (_addr == _target2) {
+			return;
+		}
+		require(_addr == _target3, errorMessage);
 	}
 }
 
@@ -1082,6 +1011,8 @@ contract UsingConfig {
 	}
 }
 
+
+
 contract EternalStorage {
 	address private currentOwner = msg.sender;
 
@@ -1221,31 +1152,6 @@ contract UsingStorage is Ownable, Pausable {
 	}
 }
 
-contract PropertyGroup is
-	UsingConfig,
-	UsingStorage,
-	UsingValidator,
-	IGroup,
-	Killable
-{
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function addGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().propertyFactory()
-		);
-
-		require(isGroup(_addr) == false, "already enabled");
-		eternalStorage().setBool(getGroupKey(_addr), true);
-	}
-
-	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
-	}
-}
-
 contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -1275,6 +1181,8 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 
 	// CumulativePrice
 	function setCumulativePrice(address _property, uint256 _value) external {
+		// The previously used function
+		// This function is only used in testing
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
@@ -1435,9 +1343,134 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 		return
 			keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
 	}
+
+	//LastCumulativeGlobalHoldersPrice
+	function setLastCumulativeGlobalHoldersPrice(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		addressValidator().validateAddress(msg.sender, config().withdraw());
+
+		eternalStorage().setUint(
+			getLastCumulativeGlobalHoldersPriceKey(_property, _user),
+			_value
+		);
+	}
+
+	function getLastCumulativeGlobalHoldersPrice(
+		address _property,
+		address _user
+	) external view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getLastCumulativeGlobalHoldersPriceKey(_property, _user)
+			);
+	}
+
+	function getLastCumulativeGlobalHoldersPriceKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativeGlobalHoldersPrice",
+					_property,
+					_user
+				)
+			);
+	}
 }
 
-contract Withdraw is Pausable, UsingConfig, UsingValidator {
+contract IWithdraw {
+	function withdraw(address _property) external;
+
+	function getRewardsAmount(address _property)
+		external
+		view
+		returns (uint256);
+
+	function beforeBalanceChange(
+		address _property,
+		address _from,
+		address _to
+		// solium-disable-next-line indentation
+	) external;
+
+	function calculateWithdrawableAmount(address _property, address _user)
+		external
+		view
+		returns (uint256);
+
+	function calculateTotalWithdrawableAmount(address _property)
+		external
+		view
+		returns (uint256);
+}
+
+contract ILockup {
+	function lockup(
+		address _from,
+		address _property,
+		uint256 _value
+		// solium-disable-next-line indentation
+	) external;
+
+	function update() public;
+
+	function cancel(address _property) external;
+
+	function withdraw(address _property) external;
+
+	function difference(address _property, uint256 _lastReward)
+		public
+		view
+		returns (
+			uint256 _reward,
+			uint256 _holdersAmount,
+			uint256 _holdersPrice,
+			uint256 _interestAmount,
+			uint256 _interestPrice
+		);
+
+	function next(address _property)
+		public
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _holdersPrice,
+			uint256 _interestPrice
+		);
+
+	function getPropertyValue(address _property)
+		external
+		view
+		returns (uint256);
+
+	function getAllValue() external view returns (uint256);
+
+	function getValue(address _property, address _sender)
+		external
+		view
+		returns (uint256);
+
+	function calculateWithdrawableInterestAmount(
+		address _property,
+		address _user
+	)
+		public
+		view
+		returns (
+			// solium-disable-next-line indentation
+			uint256
+		);
+
+	function withdrawInterest(address _property) external;
+}
+
+contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -1447,13 +1480,27 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	function withdraw(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
-		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
+		(uint256 value, uint256 lastPrice) = _calculateWithdrawableAmount(
+			_property,
+			msg.sender
+		);
 		require(value != 0, "withdraw value is 0");
-		uint256 price = getStorage().getCumulativePrice(_property);
-		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
-		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
+		WithdrawStorage withdrawStorage = getStorage();
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			msg.sender,
+			lastPrice
+		);
+		withdrawStorage.setPendingWithdrawal(_property, msg.sender, 0);
+		__updateLegacyWithdrawableAmount(_property, msg.sender);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
+		ILockup lockup = ILockup(config().lockup());
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+		lockup.update();
+		withdrawStorage.setRewardsAmount(
+			_property,
+			withdrawStorage.getRewardsAmount(_property).add(value)
+		);
 	}
 
 	function beforeBalanceChange(
@@ -1462,44 +1509,51 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		address _to
 	) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+		WithdrawStorage withdrawStorage = getStorage();
 
-		uint256 price = getStorage().getCumulativePrice(_property);
-		uint256 amountFrom = _calculateAmount(_property, _from);
-		uint256 amountTo = _calculateAmount(_property, _to);
-		getStorage().setLastWithdrawalPrice(_property, _from, price);
-		getStorage().setLastWithdrawalPrice(_property, _to, price);
-		uint256 pendFrom = getStorage().getPendingWithdrawal(_property, _from);
-		uint256 pendTo = getStorage().getPendingWithdrawal(_property, _to);
-		getStorage().setPendingWithdrawal(
+		(uint256 amountFrom, uint256 priceFrom) = _calculateAmount(
+			_property,
+			_from
+		);
+		(uint256 amountTo, uint256 priceTo) = _calculateAmount(_property, _to);
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			_from,
+			priceFrom
+		);
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			_to,
+			priceTo
+		);
+		uint256 pendFrom = withdrawStorage.getPendingWithdrawal(
+			_property,
+			_from
+		);
+		uint256 pendTo = withdrawStorage.getPendingWithdrawal(_property, _to);
+		withdrawStorage.setPendingWithdrawal(
 			_property,
 			_from,
 			pendFrom.add(amountFrom)
 		);
-		getStorage().setPendingWithdrawal(_property, _to, pendTo.add(amountTo));
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
+		withdrawStorage.setPendingWithdrawal(
+			_property,
+			_to,
+			pendTo.add(amountTo)
+		);
+		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
 			_property,
 			_to
 		);
-		uint256 total = getStorage().getRewardsAmount(_property);
+		(, uint256 total, , , ) = difference(withdrawStorage, _property, _to);
 		if (totalLimit != total) {
-			getStorage().setWithdrawalLimitTotal(_property, _to, total);
-			getStorage().setWithdrawalLimitBalance(
+			withdrawStorage.setWithdrawalLimitTotal(_property, _to, total);
+			withdrawStorage.setWithdrawalLimitBalance(
 				_property,
 				_to,
-				ERC20(_property).balanceOf(_to)
+				ERC20Mintable(_property).balanceOf(_to)
 			);
 		}
-	}
-
-	function increment(address _property, uint256 _allocationResult) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-		uint256 priceValue = _allocationResult.outOf(
-			ERC20(_property).totalSupply()
-		);
-		uint256 total = getStorage().getRewardsAmount(_property);
-		getStorage().setRewardsAmount(_property, total.add(_allocationResult));
-		uint256 price = getStorage().getCumulativePrice(_property);
-		getStorage().setCumulativePrice(_property, price.add(priceValue));
 	}
 
 	function getRewardsAmount(address _property)
@@ -1510,49 +1564,68 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		return getStorage().getRewardsAmount(_property);
 	}
 
+	function difference(
+		WithdrawStorage withdrawStorage,
+		address _property,
+		address _user
+	)
+		private
+		view
+		returns (
+			uint256 _reward,
+			uint256 _holdersAmount,
+			uint256 _holdersPrice,
+			uint256 _interestAmount,
+			uint256 _interestPrice
+		)
+	{
+		uint256 _last = withdrawStorage.getLastCumulativeGlobalHoldersPrice(
+			_property,
+			_user
+		);
+		return ILockup(config().lockup()).difference(_property, _last);
+	}
+
 	function _calculateAmount(address _property, address _user)
 		private
 		view
-		returns (uint256)
+		returns (uint256 _amount, uint256 _price)
 	{
-		uint256 _last = getStorage().getLastWithdrawalPrice(_property, _user);
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
 			_property,
 			_user
 		);
-		uint256 balanceLimit = getStorage().getWithdrawalLimitBalance(
+		uint256 balanceLimit = withdrawStorage.getWithdrawalLimitBalance(
 			_property,
 			_user
 		);
-		uint256 price = getStorage().getCumulativePrice(_property);
-		uint256 priceGap = price.sub(_last);
-		uint256 balance = ERC20(_property).balanceOf(_user);
-		uint256 total = getStorage().getRewardsAmount(_property);
-		if (totalLimit == total) {
+		(
+			uint256 reward,
+			uint256 _holders,
+			uint256 _holdersPrice,
+			,
+
+		) = difference(withdrawStorage, _property, _user);
+		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+		if (totalLimit == _holders) {
 			balance = balanceLimit;
 		}
-		uint256 value = priceGap.mul(balance);
-		return value.div(Decimals.basis());
-	}
-
-	function calculateAmount(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return _calculateAmount(_property, _user);
+		uint256 value = _holdersPrice.mul(balance);
+		return (value.div(Decimals.basis()).div(Decimals.basis()), reward);
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)
 		private
 		view
-		returns (uint256)
+		returns (uint256 _amount, uint256 _price)
 	{
-		uint256 _value = _calculateAmount(_property, _user);
-		uint256 value = _value.add(
-			getStorage().getPendingWithdrawal(_property, _user)
-		);
-		return value;
+		(uint256 _value, uint256 price) = _calculateAmount(_property, _user);
+		uint256 legacy = __legacyWithdrawableAmount(_property, _user);
+		uint256 value = _value
+			.add(getStorage().getPendingWithdrawal(_property, _user))
+			.add(legacy);
+		return (value, price);
 	}
 
 	function calculateWithdrawableAmount(address _property, address _user)
@@ -1560,7 +1633,45 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		return _calculateWithdrawableAmount(_property, _user);
+		(uint256 value, ) = _calculateWithdrawableAmount(_property, _user);
+		return value;
+	}
+
+	function calculateTotalWithdrawableAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		(, uint256 _amount, , , ) = ILockup(config().lockup()).difference(
+			_property,
+			0
+		);
+		return _amount.div(Decimals.basis()).div(Decimals.basis());
+	}
+
+	function __legacyWithdrawableAmount(address _property, address _user)
+		private
+		view
+		returns (uint256)
+	{
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 _last = withdrawStorage.getLastWithdrawalPrice(
+			_property,
+			_user
+		);
+		uint256 price = withdrawStorage.getCumulativePrice(_property);
+		uint256 priceGap = price.sub(_last);
+		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+		uint256 value = priceGap.mul(balance);
+		return value.div(Decimals.basis());
+	}
+
+	function __updateLegacyWithdrawableAmount(address _property, address _user)
+		private
+	{
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 price = withdrawStorage.getCumulativePrice(_property);
+		withdrawStorage.setLastWithdrawalPrice(_property, _user, price);
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {
