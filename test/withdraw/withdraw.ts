@@ -358,6 +358,120 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				validateAddressErrorMessage(res)
 			})
 		})
+		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 20% tokens to 30% tokens.', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			const alice = deployer
+			const bob = user1
+
+			before(async () => {
+				;[dev, , property] = await init()
+
+				const totalSupply = await property.totalSupply().then(toBigNumber)
+				await property.transfer(bob, totalSupply.times(0.2), {
+					from: alice,
+				})
+				await dev.dev.deposit(property.address, 10000, {from: user3})
+				await mine(1)
+			})
+
+			describe('calculateWithdrawableAmount; Before sent 10% tokens', () => {
+				it(`Alice's withdrawable amount is 80% of reward`, async () => {
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					const totalAmount = await dev.withdraw
+						.calculateTotalWithdrawableAmount(property.address)
+						.then(toBigNumber)
+					expect(aliceAmount.toFixed()).to.be.equal(
+						totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
+					)
+				})
+
+				it(`Bob's withdrawable amount is 20% of reward`, async () => {
+					const bobAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, bob)
+						.then(toBigNumber)
+					const totalAmount = await dev.withdraw
+						.calculateTotalWithdrawableAmount(property.address)
+						.then(toBigNumber)
+					expect(bobAmount.toFixed()).to.be.equal(
+						totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
+					)
+				})
+			})
+
+			describe('calculateWithdrawableAmount; After sent 10% tokens', () => {
+				let totalAmountPerBlock: BigNumber
+				before(async () => {
+					totalAmountPerBlock = await dev.withdraw
+						.calculateTotalWithdrawableAmount(property.address)
+						.then(toBigNumber)
+					const totalSupply = await property.totalSupply().then(toBigNumber)
+					await property.transfer(bob, totalSupply.times(0.1), {
+						from: alice,
+					})
+					await mine(1)
+				})
+				it(`Alice's withdrawable amount is 70% of rewardd`, async () => {
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					expect(aliceAmount.toFixed()).to.be.equal(
+						totalAmountPerBlock
+							.times(0.8)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.plus(
+								totalAmountPerBlock
+									.times(0.8)
+									.integerValue(BigNumber.ROUND_DOWN)
+							)
+							.plus(
+								totalAmountPerBlock
+									.times(0.7)
+									.integerValue(BigNumber.ROUND_DOWN)
+							)
+							.toFixed()
+					)
+				})
+
+				it(`Bob's withdrawable amount is 30% of reward`, async () => {
+					const bobAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, bob)
+						.then(toBigNumber)
+					expect(bobAmount.toFixed()).to.be.equal(
+						totalAmountPerBlock
+							.times(0.2)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.plus(
+								totalAmountPerBlock
+									.times(0.2)
+									.integerValue(BigNumber.ROUND_DOWN)
+							)
+							.plus(
+								totalAmountPerBlock
+									.times(0.3)
+									.integerValue(BigNumber.ROUND_DOWN)
+							)
+							.toFixed()
+					)
+				})
+
+				it('Become 0 withdrawable amount when after withdrawing', async () => {
+					await dev.withdraw.withdraw(property.address, {from: alice})
+					const aliceAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, alice)
+						.then(toBigNumber)
+					await dev.withdraw.withdraw(property.address, {from: bob})
+					const bobAmount = await dev.withdraw
+						.calculateWithdrawableAmount(property.address, bob)
+						.then(toBigNumber)
+
+					expect(aliceAmount.toFixed()).to.be.equal('0')
+					expect(bobAmount.toFixed()).to.be.equal('0')
+				})
+			})
+		})
 	})
 	describe('Withdraw; pause', () => {
 		it('should fail to call when paused.', async () => {
