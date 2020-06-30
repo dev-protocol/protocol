@@ -9,7 +9,8 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"typeRoots": ["./node_modules/@types", "./types"],
-		"types": ["node", "truffle-contracts"]
+		"types": ["node", "jest"],
+		"resolveJsonModule": true
 	},
 	"include": ["**/*"]
 }

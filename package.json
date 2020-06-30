@@ -4,10 +4,12 @@
 	"description": "Securitize for Internet assets",
 	"main": "cli/index.js",
 	"scripts": {
-		"test": "truffle test test/**/*.ts",
+		"test2": "npm run build && mocha --require ts-node/register 'test/**/*.test.ts'",
+		"test": "jest",
 		"pretest": "npm run build",
-		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
-		"deploy": "truffle migrate --network",
+		"generate2": "mkdir -p build && waffle waffle-config.json && tsc --build ./tsconfig.json",
+		"generate": "tsc --build ./tsconfig.json",
+		"deploy": "",
 		"predeploy": "npm run build",
 		"lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
 		"lint:eslint": "eslint . --ext .ts,.js --fix",
@@ -17,55 +19,76 @@
 		"build": "tsc -p tsconfig.build.json",
 		"prebuild": "rm -f migrations/*.js && rm -f migrations/*/*.js && npm run generate"
 	},
+	"jest": {
+		"moduleFileExtensions": [
+			"js",
+			"json",
+			"jsx",
+			"ts",
+			"tsx",
+			"node"
+		],
+		"transform": {
+			"^.+\\.(ts)$": "ts-jest"
+		},
+		"globals": {
+			"ts-jest": {
+				"config": "tsconfig.json"
+			}
+		},
+		"testMatch": [
+			"**/test/main/**/*.ts"
+		]
+	},
 	"bin": {
 		"dev-protocol": "cli/index.js"
 	},
 	"files": [
 		"contracts",
 		"migrations",
-		"truffle-config.js"
+		"waffle-config.js"
 	],
 	"author": "aggre",
 	"license": "MPL-2.0",
 	"devDependencies": {
-		"@truffle/hdwallet-provider": "1.0.36",
 		"@types/dotenv": "8.2.0",
+		"@types/jest": "^26.0.3",
 		"@types/node": "13.13.12",
 		"@types/shelljs": "0.8.8",
 		"@typescript-eslint/eslint-plugin": "3.5.0",
 		"@typescript-eslint/parser": "3.5.0",
 		"bignumber.js": "9.0.0",
+		"chai": "^4.2.0",
 		"dotenv": "8.2.0",
 		"eslint": "7.3.1",
 		"eslint-config-prettier": "6.11.0",
 		"eslint-config-xo": "0.31.0",
 		"eslint-config-xo-typescript": "0.31.0",
 		"eslint-plugin-prettier": "3.1.4",
+		"ethereum-waffle": "^2.3.2",
 		"ethlint": "1.2.5",
 		"husky": "4.2.5",
 		"prettier": "2.0.5",
 		"prettier-plugin-solidity": "1.0.0-alpha.54",
-		"truffle": "5.1.32",
-		"truffle-typings": "1.0.8",
 		"ts-generator": "0.0.8",
 		"ts-node": "8.10.2",
 		"typechain": "2.0.0",
-		"typechain-target-truffle": "1.0.2",
 		"typescript": "3.9.5",
 		"web3": "1.2.9"
 	},
 	"dependencies": {
 		"@openzeppelin/contracts": "^2.5.0",
+		"@types/chai": "^4.2.11",
 		"commander": "^5.0.0",
-		"shelljs": "^0.8.3"
+		"jest": "^26.1.0",
+		"shelljs": "^0.8.3",
+		"ts-jest": "^26.1.1"
 	},
 	"bundleddependencies": [
-		"truffle",
 		"shelljs",
 		"commander",
 		"dotenv",
-		"ts-node",
-		"truffle-hdwallet-provider"
+		"ts-node"
 	],
 	"directories": {
 		"doc": "docs",
