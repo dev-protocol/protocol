@@ -1,8 +1,28 @@
 import {use} from 'chai'
 import {Contract, Wallet} from 'ethers'
-import {deployContract, solidity} from 'ethereum-waffle'
+import {deployContract, solidity, link} from 'ethereum-waffle'
+import {ContractJSON} from 'ethereum-waffle/dist/esm/ContractJSON'
 import * as AddressConfig from '../../build/contracts/AddressConfig.json'
 import * as Allocator from '../../build/contracts/Allocator.json'
+import * as Dev from '../../build/contracts/Dev.json'
+import * as Decimals from '../../build/contracts/Decimals.json'
+import * as Lockup from '../../build/contracts/Lockup.json'
+import * as LockupStorage from '../../build/contracts/LockupStorage.json'
+import * as PropertyFactory from '../../build/contracts/PropertyFactory.json'
+import * as VoteCounter from '../../build/contracts/VoteCounter.json'
+import * as VoteCounterStorage from '../../build/contracts/VoteCounterStorage.json'
+import * as VoteTimes from '../../build/contracts/VoteTimes.json'
+import * as VoteTimesStorage from '../../build/contracts/VoteTimesStorage.json'
+import * as PropertyGroup from '../../build/contracts/PropertyGroup.json'
+import * as PolicyFactory from '../../build/contracts/PolicyFactory.json'
+import * as PolicySet from '../../build/contracts/PolicySet.json'
+import * as PolicyGroup from '../../build/contracts/PolicyGroup.json'
+import * as MarketFactory from '../../build/contracts/MarketFactory.json'
+import * as MarketGroup from '../../build/contracts/MarketGroup.json'
+import * as MetricsFactory from '../../build/contracts/MetricsFactory.json'
+import * as MetricsGroup from '../../build/contracts/MetricsGroup.json'
+import * as Withdraw from '../../build/contracts/Withdraw.json'
+import * as WithdrawStorage from '../../build/contracts/WithdrawStorage.json'
 
 use(solidity)
 
@@ -10,36 +30,28 @@ export class DevProtocolInstance {
 	private readonly _deployer: Wallet
 	private _addressConfig!: Contract
 	private _allocator!: Contract
-
-	// Private _addressConfig!: AddressConfigInstance
-	// private _allocator!: AllocatorInstance
-	// private _allocatorStorage!: AllocatorStorageInstance
-	// private _dev!: DevInstance
-	// private _lockup!: LockupInstance
-	// private _lockupStorage!: LockupStorageInstance
-	// private _propertyFactory!: PropertyFactoryInstance
-	// private _voteCounter!: VoteCounterInstance
-	// private _voteCounterStorage!: VoteCounterStorageInstance
-	// private _voteTimes!: VoteTimesInstance
-	// private _voteTimesStorage!: VoteTimesStorageInstance
-	// private _propertyGroup!: PropertyGroupInstance
-	// private _policyFactory!: PolicyFactoryInstance
-	// private _policySet!: PolicySetInstance
-	// private _policyGroup!: PolicyGroupInstance
-	// private _marketFactory!: MarketFactoryInstance
-	// private _marketGroup!: MarketGroupInstance
-	// private _metricsFactory!: MetricsFactoryInstance
-	// private _metricsGroup!: MetricsGroupInstance
-	// private _withdraw!: WithdrawInstance
-	// private _withdrawStorage!: WithdrawStorageInstance
+	private _dev!: Contract
+	private _lockup!: Contract
+	private _lockupStorage!: Contract
+	private _propertyFactory!: Contract
+	private _voteCounter!: Contract
+	private _voteCounterStorage!: Contract
+	private _voteTimes!: Contract
+	private _voteTimesStorage!: Contract
+	private _propertyGroup!: Contract
+	private _policyFactory!: Contract
+	private _policySet!: Contract
+	private _policyGroup!: Contract
+	private _marketFactory!: Contract
+	private _marketGroup!: Contract
+	private _metricsFactory!: Contract
+	private _metricsGroup!: Contract
+	private _withdraw!: Contract
+	private _withdrawStorage!: Contract
 
 	constructor(deployer: Wallet) {
 		this._deployer = deployer
 	}
-
-	// Public get fromDeployer(): {from: string} {
-	// 	return {from: this._deployer}
-	// }
 
 	public get addressConfig(): Contract {
 		return this._addressConfig
@@ -49,81 +61,77 @@ export class DevProtocolInstance {
 		return this._allocator
 	}
 
-	// Public get allocatorStorage(): AllocatorStorageInstance {
-	// 	return this._allocatorStorage
-	// }
+	public get dev(): Contract {
+		return this._dev
+	}
 
-	// public get dev(): DevInstance {
-	// 	return this._dev
-	// }
+	public get lockup(): Contract {
+		return this._lockup
+	}
 
-	// public get lockup(): LockupInstance {
-	// 	return this._lockup
-	// }
+	public get lockupStorage(): Contract {
+		return this._lockupStorage
+	}
 
-	// public get lockupStorage(): LockupStorageInstance {
-	// 	return this._lockupStorage
-	// }
+	public get propertyFactory(): Contract {
+		return this._propertyFactory
+	}
 
-	// public get propertyFactory(): PropertyFactoryInstance {
-	// 	return this._propertyFactory
-	// }
+	public get voteCounter(): Contract {
+		return this._voteCounter
+	}
 
-	// public get voteCounter(): VoteCounterInstance {
-	// 	return this._voteCounter
-	// }
+	public get voteCounterStorage(): Contract {
+		return this._voteCounterStorage
+	}
 
-	// public get voteCounterStorage(): VoteCounterStorageInstance {
-	// 	return this._voteCounterStorage
-	// }
+	public get voteTimes(): Contract {
+		return this._voteTimes
+	}
 
-	// public get voteTimes(): VoteTimesInstance {
-	// 	return this._voteTimes
-	// }
+	public get voteTimesStorage(): Contract {
+		return this._voteTimesStorage
+	}
 
-	// public get voteTimesStorage(): VoteTimesStorageInstance {
-	// 	return this._voteTimesStorage
-	// }
+	public get propertyGroup(): Contract {
+		return this._propertyGroup
+	}
 
-	// public get propertyGroup(): PropertyGroupInstance {
-	// 	return this._propertyGroup
-	// }
+	public get policyFactory(): Contract {
+		return this._policyFactory
+	}
 
-	// public get policyFactory(): PolicyFactoryInstance {
-	// 	return this._policyFactory
-	// }
+	public get policySet(): Contract {
+		return this._policySet
+	}
 
-	// public get policySet(): PolicySetInstance {
-	// 	return this._policySet
-	// }
+	public get policyGroup(): Contract {
+		return this._policyGroup
+	}
 
-	// public get policyGroup(): PolicyGroupInstance {
-	// 	return this._policyGroup
-	// }
+	public get marketFactory(): Contract {
+		return this._marketFactory
+	}
 
-	// public get marketFactory(): MarketFactoryInstance {
-	// 	return this._marketFactory
-	// }
+	public get marketGroup(): Contract {
+		return this._marketGroup
+	}
 
-	// public get marketGroup(): MarketGroupInstance {
-	// 	return this._marketGroup
-	// }
+	public get metricsFactory(): Contract {
+		return this._metricsFactory
+	}
 
-	// public get metricsFactory(): MetricsFactoryInstance {
-	// 	return this._metricsFactory
-	// }
+	public get metricsGroup(): Contract {
+		return this._metricsGroup
+	}
 
-	// public get metricsGroup(): MetricsGroupInstance {
-	// 	return this._metricsGroup
-	// }
+	public get withdraw(): Contract {
+		return this._withdraw
+	}
 
-	// public get withdraw(): WithdrawInstance {
-	// 	return this._withdraw
-	// }
-
-	// public get withdrawStorage(): WithdrawStorageInstance {
-	// 	return this._withdrawStorage
-	// }
+	public get withdrawStorage(): Contract {
+		return this._withdrawStorage
+	}
 
 	public async generateAddressConfig(): Promise<void> {
 		this._addressConfig = await deployContract(this._deployer, AddressConfig)
@@ -136,264 +144,181 @@ export class DevProtocolInstance {
 		await this._addressConfig.setAllocator(this._allocator.address)
 	}
 
-	// Public async generateDev(): Promise<void> {
-	// 	this._dev = await contract('Dev').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setToken(this._dev.address, this.fromDeployer)
-	// }
+	public async generateDev(): Promise<void> {
+		this._dev = await deployContract(this._deployer, Dev, [
+			this._addressConfig.address,
+		])
+		await this._addressConfig.setToken(this._dev.address)
+	}
 
-	// public async generateAllocator(): Promise<void> {
-	// 	this._allocator = await (async (x) => {
-	// 		;(x as any).link(
-	// 			'Decimals',
-	// 			await this.generateDecimals().then((x) => x.address)
-	// 		)
-	// 		return x.new(this.addressConfig.address, this.fromDeployer)
-	// 	})(contract('Allocator'))
-	// 	await this._addressConfig.setAllocator(
-	// 		this._allocator.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generateLockup(): Promise<void> {
+		const decimals = await deployContract(this._deployer, Decimals)
+		link(
+			Lockup,
+			'contracts/src/common/libs/Decimals.sol:Decimals',
+			decimals.address
+		)
+		this._lockup = await deployContract(
+			this._deployer,
+			Lockup,
+			[this._addressConfig.address],
+			{gasLimit: 6000000}
+		)
+		await this._addressConfig.setLockup(this._lockup.address)
+	}
 
-	// public async generateAllocatorStorage(): Promise<void> {
-	// 	this._allocatorStorage = await contract('AllocatorStorage').new(
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setAllocatorStorage(
-	// 		this._allocatorStorage.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._allocatorStorage.createStorage(this.fromDeployer)
-	// }
+	public async generateLockupStorage(): Promise<void> {
+		this._lockupStorage = await deployContract(
+			this._deployer,
+			LockupStorage,
+			[this._addressConfig.address],
+			{gasLimit: 6700000}
+		)
+		await this._addressConfig.setLockupStorage(this._lockupStorage.address)
+		await this._lockupStorage.createStorage()
+	}
 
-	// public async generateLockup(): Promise<void> {
-	// 	this._lockup = await (async (x) => {
-	// 		;(x as any).link(
-	// 			'Decimals',
-	// 			await this.generateDecimals().then((x) => x.address)
-	// 		)
-	// 		return x.new(this.addressConfig.address, this.fromDeployer)
-	// 	})(contract('Lockup'))
-	// 	await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
-	// }
+	public async generatePropertyFactory(): Promise<void> {
+		this._propertyFactory = await deployContract(
+			this._deployer,
+			PropertyFactory,
+			[this._addressConfig.address]
+		)
+		await this._addressConfig.setPropertyFactory(this._propertyFactory.address)
+	}
 
-	// public async generateLockupStorage(): Promise<void> {
-	// 	this._lockupStorage = await contract('LockupStorage').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setLockupStorage(
-	// 		this._lockupStorage.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._lockupStorage.createStorage(this.fromDeployer)
-	// }
+	public async generateVoteCounter(): Promise<void> {
+		this._voteCounter = await deployContract(this._deployer, VoteCounter, [
+			this._addressConfig.address,
+		])
+		await this._addressConfig.setVoteCounter(this._voteCounter.address)
+	}
 
-	// public async generatePropertyFactory(): Promise<void> {
-	// 	this._propertyFactory = await contract('PropertyFactory').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setPropertyFactory(
-	// 		this._propertyFactory.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generateVoteCounterStorage(): Promise<void> {
+		this._voteCounterStorage = await deployContract(
+			this._deployer,
+			VoteCounterStorage,
+			[this._addressConfig.address]
+		)
+		await this._addressConfig.setVoteCounterStorage(
+			this._voteCounterStorage.address
+		)
+		await this._voteCounterStorage.createStorage()
+	}
 
-	// public async generateVoteCounter(): Promise<void> {
-	// 	this._voteCounter = await contract('VoteCounter').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setVoteCounter(
-	// 		this._voteCounter.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generateVoteTimes(): Promise<void> {
+		this._voteTimes = await deployContract(this._deployer, VoteTimes, [
+			this._addressConfig.address,
+		])
+		await this._addressConfig.setVoteTimes(this._voteTimes.address)
+	}
 
-	// public async generateVoteCounterStorage(): Promise<void> {
-	// 	this._voteCounterStorage = await contract('VoteCounterStorage').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setVoteCounterStorage(
-	// 		this._voteCounterStorage.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._voteCounterStorage.createStorage(this.fromDeployer)
-	// }
+	public async generateVoteTimesStorage(): Promise<void> {
+		this._voteTimesStorage = await deployContract(
+			this._deployer,
+			VoteTimesStorage,
+			[this._addressConfig.address]
+		)
+		await this._addressConfig.setVoteTimesStorage(
+			this._voteTimesStorage.address
+		)
+		await this._voteTimesStorage.createStorage()
+	}
 
-	// public async generateVoteTimes(): Promise<void> {
-	// 	this._voteTimes = await contract('VoteTimes').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setVoteTimes(
-	// 		this._voteTimes.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generatePropertyGroup(): Promise<void> {
+		this._propertyGroup = await deployContract(this._deployer, PropertyGroup, [
+			this._addressConfig.address,
+		])
+		await this._propertyGroup.createStorage()
+		await this._addressConfig.setPropertyGroup(this._propertyGroup.address)
+	}
 
-	// public async generateVoteTimesStorage(): Promise<void> {
-	// 	this._voteTimesStorage = await contract('VoteTimesStorage').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setVoteTimesStorage(
-	// 		this._voteTimesStorage.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._voteTimesStorage.createStorage(this.fromDeployer)
-	// }
+	public async generatePolicyFactory(): Promise<void> {
+		this._policyFactory = await deployContract(this._deployer, PolicyFactory, [
+			this._addressConfig.address,
+		])
+		await this._addressConfig.setPolicyFactory(this._policyFactory.address)
+	}
 
-	// public async generatePropertyGroup(): Promise<void> {
-	// 	this._propertyGroup = await contract('PropertyGroup').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._propertyGroup.createStorage({from: this._deployer})
-	// 	await this._addressConfig.setPropertyGroup(
-	// 		this._propertyGroup.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generatePolicySet(): Promise<void> {
+		this._policySet = await deployContract(this._deployer, PolicySet, [
+			this._addressConfig.address,
+		])
+		await this._policySet.createStorage()
+		await this._addressConfig.setPolicySet(this._policySet.address)
+	}
 
-	// public async generatePolicyFactory(): Promise<void> {
-	// 	this._policyFactory = await contract('PolicyFactory').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setPolicyFactory(
-	// 		this._policyFactory.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generatePolicyGroup(): Promise<void> {
+		this._policyGroup = await deployContract(this._deployer, PolicyGroup, [
+			this._addressConfig.address,
+		])
+		await this._policyGroup.createStorage()
+		await this._addressConfig.setPolicyGroup(this._policyGroup.address)
+	}
 
-	// public async generatePolicySet(): Promise<void> {
-	// 	this._policySet = await contract('PolicySet').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._policySet.createStorage(this.fromDeployer)
-	// 	await this._addressConfig.setPolicySet(
-	// 		this._policySet.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generateMarketFactory(): Promise<void> {
+		this._marketFactory = await deployContract(
+			this._deployer,
+			MarketFactory,
+			[this._addressConfig.address],
+			{gasLimit: 5000000}
+		)
+		await this._addressConfig.setMarketFactory(this._marketFactory.address)
+	}
 
-	// public async generatePolicyGroup(): Promise<void> {
-	// 	this._policyGroup = await contract('PolicyGroup').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._policyGroup.createStorage({from: this._deployer})
-	// 	await this._addressConfig.setPolicyGroup(
-	// 		this._policyGroup.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generateMarketGroup(): Promise<void> {
+		this._marketGroup = await deployContract(this._deployer, MarketGroup, [
+			this._addressConfig.address,
+		])
+		await this._addressConfig.setMarketGroup(this._marketGroup.address)
+		await this._marketGroup.createStorage()
+	}
 
-	// public async generateMarketFactory(): Promise<void> {
-	// 	this._marketFactory = await contract('MarketFactory').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setMarketFactory(
-	// 		this._marketFactory.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generateMetricsFactory(): Promise<void> {
+		this._metricsFactory = await deployContract(
+			this._deployer,
+			MetricsFactory,
+			[this._addressConfig.address]
+		)
+		await this._addressConfig.setMetricsFactory(this._metricsFactory.address)
+	}
 
-	// public async generateMarketGroup(): Promise<void> {
-	// 	this._marketGroup = await contract('MarketGroup').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setMarketGroup(
-	// 		this._marketGroup.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._marketGroup.createStorage(this.fromDeployer)
-	// }
+	public async generateMetricsGroup(): Promise<void> {
+		this._metricsGroup = await deployContract(this._deployer, MetricsGroup, [
+			this._addressConfig.address,
+		])
+		await this._addressConfig.setMetricsGroup(this._metricsGroup.address)
+		await this._metricsGroup.createStorage()
+	}
 
-	// public async generateMetricsFactory(): Promise<void> {
-	// 	this._metricsFactory = await contract('MetricsFactory').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setMetricsFactory(
-	// 		this._metricsFactory.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
+	public async generateWithdraw(): Promise<void> {
+		const decimals = await deployContract(this._deployer, Decimals)
+		link(
+			Withdraw,
+			'contracts/src/common/libs/Decimals.sol:Decimals',
+			decimals.address
+		)
+		this._withdraw = await deployContract(this._deployer, Withdraw, [
+			this._addressConfig.address,
+		])
+		await this._addressConfig.setWithdraw(this._withdraw.address)
+	}
 
-	// public async generateMetricsGroup(): Promise<void> {
-	// 	this._metricsGroup = await contract('MetricsGroup').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setMetricsGroup(
-	// 		this._metricsGroup.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._metricsGroup.createStorage(this.fromDeployer)
-	// }
+	public async generateWithdrawStorage(): Promise<void> {
+		this._withdrawStorage = await deployContract(
+			this._deployer,
+			WithdrawStorage,
+			[this._addressConfig.address]
+		)
+		await this._addressConfig.setWithdrawStorage(this._withdrawStorage.address)
+		await this._withdrawStorage.createStorage()
+	}
 
-	// public async generateWithdraw(): Promise<void> {
-	// 	this._withdraw = await (async (x) => {
-	// 		;(x as any).link(
-	// 			'Decimals',
-	// 			await this.generateDecimals().then((x) => x.address)
-	// 		)
-	// 		return x.new(this.addressConfig.address, this.fromDeployer)
-	// 	})(contract('Withdraw'))
-	// 	await this._addressConfig.setWithdraw(
-	// 		this._withdraw.address,
-	// 		this.fromDeployer
-	// 	)
-	// }
-
-	// public async generateWithdrawStorage(): Promise<void> {
-	// 	this._withdrawStorage = await contract('WithdrawStorage').new(
-	// 		this.addressConfig.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._addressConfig.setWithdrawStorage(
-	// 		this._withdrawStorage.address,
-	// 		this.fromDeployer
-	// 	)
-	// 	await this._withdrawStorage.createStorage(this.fromDeployer)
-	// }
-
-	// public async generateDecimals(): Promise<DecimalsInstance> {
-	// 	return artifacts.require('Decimals').new(this.fromDeployer)
-	// }
-
-	// public async getPolicy(
-	// 	contractName: string,
-	// 	user: string
-	// ): Promise<IPolicyInstance> {
-	// 	const tmp = await (async (x) => {
-	// 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-	// 		;(x as any).link(
-	// 			'Decimals',
-	// 			await this.generateDecimals().then((x) => x.address)
-	// 		)
-	// 		return x.new({from: user})
-	// 	})(contract(contractName))
-	// 	return tmp
-	// }
-
-	// public async getMarket(
-	// 	contractName: string,
-	// 	user: string
-	// ): Promise<IMarketInstance> {
-	// 	const tmp = await contract(contractName).new(this.addressConfig.address, {
-	// 		from: user,
-	// 	})
-	// 	return tmp
-	// }
+	public async createPolicy(contractJSON: ContractJSON): Promise<void> {
+		const policyInstance = await deployContract(this._deployer, contractJSON, [
+			this._addressConfig.address,
+		])
+		const result = await this._policyFactory.create(policyInstance.address)
+		console.log(result)
+	}
 }

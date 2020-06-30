@@ -1,14 +1,94 @@
+import BigNumber from 'bignumber.js'
 // Import {expect, use} from 'chai'
+// import {Contract} from 'ethers'
 import {MockProvider} from 'ethereum-waffle'
 import {DevProtocolInstance} from '../../test-lib/instance'
+import * as PolicyTestForAllocator from '../../../build/contracts/PolicyTestForAllocator.json'
 
 describe('Commitment', () => {
 	const [wallet] = new MockProvider().getWallets()
-	const dev = new DevProtocolInstance(wallet)
+	const init = async (): Promise<[DevProtocolInstance]> => {
+		const dev = new DevProtocolInstance(wallet)
+		console.log(1)
+		await dev.generateAddressConfig()
+		// Console.log(2)
+		// await dev.generateAllocator()
+		// console.log(3)
+		// await dev.generateMarketFactory()
+		// console.log(4)
+		// await dev.generateMarketGroup()
+		// console.log(5)
+		// await dev.generateMetricsFactory()
+		// console.log(6)
+		// await dev.generateMetricsGroup()
+		// console.log(7)
+		// await dev.generateLockup()
+		console.log(8)
+		await dev.generateLockupStorage()
+		console.log(9)
+		await dev.generateWithdraw()
+		console.log(10)
+		await dev.generateWithdrawStorage()
+		console.log(11)
+		await dev.generatePropertyFactory()
+		console.log(12)
+		await dev.generatePropertyGroup()
+		console.log(13)
+		await dev.generateVoteTimes()
+		console.log(14)
+		await dev.generateVoteTimesStorage()
+		console.log(15)
+		await dev.generateVoteCounter()
+		console.log(16)
+		await dev.generateVoteCounterStorage()
+		console.log(17)
+		await dev.generatePolicyFactory()
+		console.log(18)
+		await dev.generatePolicyGroup()
+		console.log(19)
+		await dev.generatePolicySet()
+		console.log(20)
+		await dev.generateDev()
+		console.log(21)
+
+		// Await Promise.all([
+		// 	dev.generateAllocator(),
+		// 	dev.generateMarketFactory(),
+		// 	dev.generateMarketGroup(),
+		// 	dev.generateMetricsFactory(),
+		// 	dev.generateMetricsGroup(),
+		// 	dev.generateLockup(),
+		// 	dev.generateLockupStorage(),
+		// 	dev.generateWithdraw(),
+		// 	dev.generateWithdrawStorage(),
+		// 	dev.generatePropertyFactory(),
+		// 	dev.generatePropertyGroup(),
+		// 	dev.generateVoteTimes(),
+		// 	dev.generateVoteTimesStorage(),
+		// 	dev.generateVoteCounter(),
+		// 	dev.generateVoteCounterStorage(),
+		// 	dev.generatePolicyFactory(),
+		// 	dev.generatePolicyGroup(),
+		// 	dev.generatePolicySet(),
+		// 	dev.generateDev(),
+		// ])
+		await dev.dev.mint(wallet.address, new BigNumber(1e18).times(10000000))
+		await dev.createPolicy(PolicyTestForAllocator)
+		// Const policy = await artifacts.require('PolicyTestForAllocator').new()
+
+		// await dev.policyFactory.create(policy.address)
+		// const propertyAddress = getPropertyAddress(
+		// 	await dev.propertyFactory.create('test', 'TEST', deployer)
+		// )
+		// const [property] = await Promise.all([
+		// 	artifacts.require('Property').at(propertyAddress),
+		// ])
+		return [dev]
+	}
+
 	describe('Allocator: calculateMaxRewardsPerBlock', () => {
 		it('With no authentication or lockup, no DEV will be mint.', async () => {
-			await dev.generateAddressConfig()
-			await dev.generateAllocator()
+			await init()
 		})
 	})
 })
