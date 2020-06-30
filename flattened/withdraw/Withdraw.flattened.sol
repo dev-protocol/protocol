@@ -1,5 +1,7 @@
 pragma solidity ^0.5.0;
 
+// prettier-ignore
+
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -11,20 +13,19 @@ pragma solidity ^0.5.0;
  * This contract is only required for intermediate, library-like contracts.
  */
 contract Context {
-	// Empty internal constructor, to prevent people from mistakenly deploying
-	// an instance of this contract, which should be used via inheritance.
-	constructor() internal {}
+    // Empty internal constructor, to prevent people from mistakenly deploying
+    // an instance of this contract, which should be used via inheritance.
+    constructor () internal { }
+    // solhint-disable-previous-line no-empty-blocks
 
-	// solhint-disable-previous-line no-empty-blocks
+    function _msgSender() internal view returns (address payable) {
+        return msg.sender;
+    }
 
-	function _msgSender() internal view returns (address payable) {
-		return msg.sender;
-	}
-
-	function _msgData() internal view returns (bytes memory) {
-		this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
-		return msg.data;
-	}
+    function _msgData() internal view returns (bytes memory) {
+        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        return msg.data;
+    }
 }
 
 /**
@@ -560,41 +561,43 @@ contract ERC20 is Context, IERC20 {
 	}
 }
 
-// prettier-ignore
-
 /**
  * @title Roles
  * @dev Library for managing addresses assigned to a Role.
  */
 library Roles {
-    struct Role {
-        mapping (address => bool) bearer;
-    }
+	struct Role {
+		mapping(address => bool) bearer;
+	}
 
-    /**
-     * @dev Give an account access to this role.
-     */
-    function add(Role storage role, address account) internal {
-        require(!has(role, account), "Roles: account already has role");
-        role.bearer[account] = true;
-    }
+	/**
+	 * @dev Give an account access to this role.
+	 */
+	function add(Role storage role, address account) internal {
+		require(!has(role, account), "Roles: account already has role");
+		role.bearer[account] = true;
+	}
 
-    /**
-     * @dev Remove an account's access to this role.
-     */
-    function remove(Role storage role, address account) internal {
-        require(has(role, account), "Roles: account does not have role");
-        role.bearer[account] = false;
-    }
+	/**
+	 * @dev Remove an account's access to this role.
+	 */
+	function remove(Role storage role, address account) internal {
+		require(has(role, account), "Roles: account does not have role");
+		role.bearer[account] = false;
+	}
 
-    /**
-     * @dev Check if an account has this role.
-     * @return bool
-     */
-    function has(Role storage role, address account) internal view returns (bool) {
-        require(account != address(0), "Roles: account is the zero address");
-        return role.bearer[account];
-    }
+	/**
+	 * @dev Check if an account has this role.
+	 * @return bool
+	 */
+	function has(Role storage role, address account)
+		internal
+		view
+		returns (bool)
+	{
+		require(account != address(0), "Roles: account is the zero address");
+		return role.bearer[account];
+	}
 }
 
 contract MinterRole is Context {
@@ -943,6 +946,21 @@ contract AddressValidator {
 		}
 		require(_addr == _target2, errorMessage);
 	}
+
+	function validate3Addresses(
+		address _addr,
+		address _target1,
+		address _target2,
+		address _target3
+	) external pure {
+		if (_addr == _target1) {
+			return;
+		}
+		if (_addr == _target2) {
+			return;
+		}
+		require(_addr == _target3, errorMessage);
+	}
 }
 
 contract UsingValidator {
@@ -1221,31 +1239,6 @@ contract UsingStorage is Ownable, Pausable {
 	}
 }
 
-contract PropertyGroup is
-	UsingConfig,
-	UsingStorage,
-	UsingValidator,
-	IGroup,
-	Killable
-{
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function addGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().propertyFactory()
-		);
-
-		require(isGroup(_addr) == false, "already enabled");
-		eternalStorage().setBool(getGroupKey(_addr), true);
-	}
-
-	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
-	}
-}
-
 contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -1275,6 +1268,8 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 
 	// CumulativePrice
 	function setCumulativePrice(address _property, uint256 _value) external {
+		// The previously used function
+		// This function is only used in testing
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
@@ -1435,9 +1430,134 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 		return
 			keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
 	}
+
+	//LastCumulativeGlobalHoldersPrice
+	function setLastCumulativeGlobalHoldersPrice(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		addressValidator().validateAddress(msg.sender, config().withdraw());
+
+		eternalStorage().setUint(
+			getLastCumulativeGlobalHoldersPriceKey(_property, _user),
+			_value
+		);
+	}
+
+	function getLastCumulativeGlobalHoldersPrice(
+		address _property,
+		address _user
+	) external view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getLastCumulativeGlobalHoldersPriceKey(_property, _user)
+			);
+	}
+
+	function getLastCumulativeGlobalHoldersPriceKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativeGlobalHoldersPrice",
+					_property,
+					_user
+				)
+			);
+	}
 }
 
-contract Withdraw is Pausable, UsingConfig, UsingValidator {
+contract IWithdraw {
+	function withdraw(address _property) external;
+
+	function getRewardsAmount(address _property)
+		external
+		view
+		returns (uint256);
+
+	function beforeBalanceChange(
+		address _property,
+		address _from,
+		address _to
+		// solium-disable-next-line indentation
+	) external;
+
+	function calculateWithdrawableAmount(address _property, address _user)
+		external
+		view
+		returns (uint256);
+
+	function calculateTotalWithdrawableAmount(address _property)
+		external
+		view
+		returns (uint256);
+}
+
+contract ILockup {
+	function lockup(
+		address _from,
+		address _property,
+		uint256 _value
+		// solium-disable-next-line indentation
+	) external;
+
+	function update() public;
+
+	function cancel(address _property) external;
+
+	function withdraw(address _property) external;
+
+	function difference(address _property, uint256 _lastReward)
+		public
+		view
+		returns (
+			uint256 _reward,
+			uint256 _holdersAmount,
+			uint256 _holdersPrice,
+			uint256 _interestAmount,
+			uint256 _interestPrice
+		);
+
+	function next(address _property)
+		public
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _holdersPrice,
+			uint256 _interestPrice
+		);
+
+	function getPropertyValue(address _property)
+		external
+		view
+		returns (uint256);
+
+	function getAllValue() external view returns (uint256);
+
+	function getValue(address _property, address _sender)
+		external
+		view
+		returns (uint256);
+
+	function calculateWithdrawableInterestAmount(
+		address _property,
+		address _user
+	)
+		public
+		view
+		returns (
+			// solium-disable-next-line indentation
+			uint256
+		);
+
+	function withdrawInterest(address _property) external;
+}
+
+contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -1447,13 +1567,27 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 	function withdraw(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
-		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
+		(uint256 value, uint256 lastPrice) = _calculateWithdrawableAmount(
+			_property,
+			msg.sender
+		);
 		require(value != 0, "withdraw value is 0");
-		uint256 price = getStorage().getCumulativePrice(_property);
-		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
-		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
+		WithdrawStorage withdrawStorage = getStorage();
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			msg.sender,
+			lastPrice
+		);
+		withdrawStorage.setPendingWithdrawal(_property, msg.sender, 0);
+		__updateLegacyWithdrawableAmount(_property, msg.sender);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
+		ILockup lockup = ILockup(config().lockup());
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+		lockup.update();
+		withdrawStorage.setRewardsAmount(
+			_property,
+			withdrawStorage.getRewardsAmount(_property).add(value)
+		);
 	}
 
 	function beforeBalanceChange(
@@ -1462,44 +1596,51 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		address _to
 	) external {
 		addressValidator().validateAddress(msg.sender, config().allocator());
+		WithdrawStorage withdrawStorage = getStorage();
 
-		uint256 price = getStorage().getCumulativePrice(_property);
-		uint256 amountFrom = _calculateAmount(_property, _from);
-		uint256 amountTo = _calculateAmount(_property, _to);
-		getStorage().setLastWithdrawalPrice(_property, _from, price);
-		getStorage().setLastWithdrawalPrice(_property, _to, price);
-		uint256 pendFrom = getStorage().getPendingWithdrawal(_property, _from);
-		uint256 pendTo = getStorage().getPendingWithdrawal(_property, _to);
-		getStorage().setPendingWithdrawal(
+		(uint256 amountFrom, uint256 priceFrom) = _calculateAmount(
+			_property,
+			_from
+		);
+		(uint256 amountTo, uint256 priceTo) = _calculateAmount(_property, _to);
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			_from,
+			priceFrom
+		);
+		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+			_property,
+			_to,
+			priceTo
+		);
+		uint256 pendFrom = withdrawStorage.getPendingWithdrawal(
+			_property,
+			_from
+		);
+		uint256 pendTo = withdrawStorage.getPendingWithdrawal(_property, _to);
+		withdrawStorage.setPendingWithdrawal(
 			_property,
 			_from,
 			pendFrom.add(amountFrom)
 		);
-		getStorage().setPendingWithdrawal(_property, _to, pendTo.add(amountTo));
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
+		withdrawStorage.setPendingWithdrawal(
+			_property,
+			_to,
+			pendTo.add(amountTo)
+		);
+		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
 			_property,
 			_to
 		);
-		uint256 total = getStorage().getRewardsAmount(_property);
+		(, uint256 total, , , ) = difference(withdrawStorage, _property, _to);
 		if (totalLimit != total) {
-			getStorage().setWithdrawalLimitTotal(_property, _to, total);
-			getStorage().setWithdrawalLimitBalance(
+			withdrawStorage.setWithdrawalLimitTotal(_property, _to, total);
+			withdrawStorage.setWithdrawalLimitBalance(
 				_property,
 				_to,
-				ERC20(_property).balanceOf(_to)
+				ERC20Mintable(_property).balanceOf(_to)
 			);
 		}
-	}
-
-	function increment(address _property, uint256 _allocationResult) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-		uint256 priceValue = _allocationResult.outOf(
-			ERC20(_property).totalSupply()
-		);
-		uint256 total = getStorage().getRewardsAmount(_property);
-		getStorage().setRewardsAmount(_property, total.add(_allocationResult));
-		uint256 price = getStorage().getCumulativePrice(_property);
-		getStorage().setCumulativePrice(_property, price.add(priceValue));
 	}
 
 	function getRewardsAmount(address _property)
@@ -1510,49 +1651,68 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		return getStorage().getRewardsAmount(_property);
 	}
 
+	function difference(
+		WithdrawStorage withdrawStorage,
+		address _property,
+		address _user
+	)
+		private
+		view
+		returns (
+			uint256 _reward,
+			uint256 _holdersAmount,
+			uint256 _holdersPrice,
+			uint256 _interestAmount,
+			uint256 _interestPrice
+		)
+	{
+		uint256 _last = withdrawStorage.getLastCumulativeGlobalHoldersPrice(
+			_property,
+			_user
+		);
+		return ILockup(config().lockup()).difference(_property, _last);
+	}
+
 	function _calculateAmount(address _property, address _user)
 		private
 		view
-		returns (uint256)
+		returns (uint256 _amount, uint256 _price)
 	{
-		uint256 _last = getStorage().getLastWithdrawalPrice(_property, _user);
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
 			_property,
 			_user
 		);
-		uint256 balanceLimit = getStorage().getWithdrawalLimitBalance(
+		uint256 balanceLimit = withdrawStorage.getWithdrawalLimitBalance(
 			_property,
 			_user
 		);
-		uint256 price = getStorage().getCumulativePrice(_property);
-		uint256 priceGap = price.sub(_last);
-		uint256 balance = ERC20(_property).balanceOf(_user);
-		uint256 total = getStorage().getRewardsAmount(_property);
-		if (totalLimit == total) {
+		(
+			uint256 reward,
+			uint256 _holders,
+			uint256 _holdersPrice,
+			,
+
+		) = difference(withdrawStorage, _property, _user);
+		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+		if (totalLimit == _holders) {
 			balance = balanceLimit;
 		}
-		uint256 value = priceGap.mul(balance);
-		return value.div(Decimals.basis());
-	}
-
-	function calculateAmount(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return _calculateAmount(_property, _user);
+		uint256 value = _holdersPrice.mul(balance);
+		return (value.div(Decimals.basis()).div(Decimals.basis()), reward);
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)
 		private
 		view
-		returns (uint256)
+		returns (uint256 _amount, uint256 _price)
 	{
-		uint256 _value = _calculateAmount(_property, _user);
-		uint256 value = _value.add(
-			getStorage().getPendingWithdrawal(_property, _user)
-		);
-		return value;
+		(uint256 _value, uint256 price) = _calculateAmount(_property, _user);
+		uint256 legacy = __legacyWithdrawableAmount(_property, _user);
+		uint256 value = _value
+			.add(getStorage().getPendingWithdrawal(_property, _user))
+			.add(legacy);
+		return (value, price);
 	}
 
 	function calculateWithdrawableAmount(address _property, address _user)
@@ -1560,7 +1720,45 @@ contract Withdraw is Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		return _calculateWithdrawableAmount(_property, _user);
+		(uint256 value, ) = _calculateWithdrawableAmount(_property, _user);
+		return value;
+	}
+
+	function calculateTotalWithdrawableAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		(, uint256 _amount, , , ) = ILockup(config().lockup()).difference(
+			_property,
+			0
+		);
+		return _amount.div(Decimals.basis()).div(Decimals.basis());
+	}
+
+	function __legacyWithdrawableAmount(address _property, address _user)
+		private
+		view
+		returns (uint256)
+	{
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 _last = withdrawStorage.getLastWithdrawalPrice(
+			_property,
+			_user
+		);
+		uint256 price = withdrawStorage.getCumulativePrice(_property);
+		uint256 priceGap = price.sub(_last);
+		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+		uint256 value = priceGap.mul(balance);
+		return value.div(Decimals.basis());
+	}
+
+	function __updateLegacyWithdrawableAmount(address _property, address _user)
+		private
+	{
+		WithdrawStorage withdrawStorage = getStorage();
+		uint256 price = withdrawStorage.getCumulativePrice(_property);
+		withdrawStorage.setLastWithdrawalPrice(_property, _user, price);
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {

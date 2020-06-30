@@ -48,6 +48,21 @@ contract AddressValidator {
 		}
 		require(_addr == _target2, errorMessage);
 	}
+
+	function validate3Addresses(
+		address _addr,
+		address _target1,
+		address _target2,
+		address _target3
+	) external pure {
+		if (_addr == _target1) {
+			return;
+		}
+		if (_addr == _target2) {
+			return;
+		}
+		require(_addr == _target3, errorMessage);
+	}
 }
 
 contract UsingValidator {
@@ -628,6 +643,8 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 
 	// CumulativePrice
 	function setCumulativePrice(address _property, uint256 _value) external {
+		// The previously used function
+		// This function is only used in testing
 		addressValidator().validateAddress(msg.sender, config().withdraw());
 
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
@@ -787,5 +804,43 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	{
 		return
 			keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
+	}
+
+	//LastCumulativeGlobalHoldersPrice
+	function setLastCumulativeGlobalHoldersPrice(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		addressValidator().validateAddress(msg.sender, config().withdraw());
+
+		eternalStorage().setUint(
+			getLastCumulativeGlobalHoldersPriceKey(_property, _user),
+			_value
+		);
+	}
+
+	function getLastCumulativeGlobalHoldersPrice(
+		address _property,
+		address _user
+	) external view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getLastCumulativeGlobalHoldersPriceKey(_property, _user)
+			);
+	}
+
+	function getLastCumulativeGlobalHoldersPriceKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativeGlobalHoldersPrice",
+					_property,
+					_user
+				)
+			);
 	}
 }

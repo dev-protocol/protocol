@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
-contract PolicyTestForAllocator is IPolicy {
+contract PolicyTestForTimeVote is IPolicy {
 	uint256 _lockUpBlocks = 1;
 
 	function rewards(uint256 _lockups, uint256 _assets)
@@ -10,7 +10,7 @@ contract PolicyTestForAllocator is IPolicy {
 		view
 		returns (uint256)
 	{
-		return _assets > 0 ? _lockups : 0;
+		return 100000000000000000000;
 	}
 
 	function holdersShare(uint256 _amount, uint256 _lockups)
@@ -70,7 +70,7 @@ contract PolicyTestForAllocator is IPolicy {
 	}
 
 	function abstentionPenalty(uint256 _count) external view returns (uint256) {
-		return _count > 1 ? 5 : 0;
+		return _count >= 1 ? 5 : 0;
 	}
 
 	function lockUpBlocks() external view returns (uint256) {

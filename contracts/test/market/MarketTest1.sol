@@ -12,11 +12,6 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 	uint256 lastBlock;
 	uint256 currentBlock;
 	mapping(address => string) private keys;
-	event LogCalculate(
-		address _metrics,
-		uint256 _lastBlock,
-		uint256 _currentBlock
-	);
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -35,31 +30,6 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
 		keys[_metrics] = _args1;
 		return _metrics;
-	}
-
-	function calculate(
-		address _metrics,
-		uint256 _lastBlock,
-		uint256 _currentBlock
-	) external returns (bool) {
-		metrics = _metrics;
-		lastBlock = _lastBlock;
-		currentBlock = _currentBlock;
-		if (!asynchronousMode) {
-			emit LogCalculate(_metrics, _lastBlock, _currentBlock);
-			Allocator(config().allocator()).calculatedCallback(_metrics, 100);
-		}
-		return true;
-	}
-
-	function calculated() external returns (bool) {
-		emit LogCalculate(metrics, lastBlock, currentBlock);
-		Allocator(config().allocator()).calculatedCallback(metrics, 100);
-		return true;
-	}
-
-	function changeAsynchronousMode(bool _mode) external {
-		asynchronousMode = _mode;
 	}
 
 	function getId(address _metrics) external view returns (string memory) {
