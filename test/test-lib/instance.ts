@@ -23,8 +23,48 @@ import * as MetricsFactory from '../../build/contracts/MetricsFactory.json'
 import * as MetricsGroup from '../../build/contracts/MetricsGroup.json'
 import * as Withdraw from '../../build/contracts/Withdraw.json'
 import * as WithdrawStorage from '../../build/contracts/WithdrawStorage.json'
+import * as Market from '../../build/contracts/Market.json'
+import * as Property from '../../build/contracts/Property.json'
+import * as Policy from '../../build/contracts/Policy.json'
 
 use(solidity)
+
+class Link {
+	private static instance: Link
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	private constructor() {}
+
+	static getInstance() {
+		if (!Link.instance) {
+			Link.instance = new Link()
+			// ... any one time initialization goes here ...
+		}
+
+		return Link.instance
+	}
+
+	// eslint-disable-next-line @typescript-eslint/member-ordering
+	private _alreadyExecute = false
+
+	public async linkLibrary(deployer: Wallet): Promise<void> {
+		if (this._alreadyExecute) {
+			return
+		}
+
+		this._alreadyExecute = true
+		const decimals = await deployContract(deployer, Decimals)
+		link(
+			Lockup,
+			'contracts/src/common/libs/Decimals.sol:Decimals',
+			decimals.address
+		)
+		link(
+			Withdraw,
+			'contracts/src/common/libs/Decimals.sol:Decimals',
+			decimals.address
+		)
+	}
+}
 
 export class DevProtocolInstance {
 	private readonly _deployer: Wallet
@@ -133,6 +173,11 @@ export class DevProtocolInstance {
 		return this._withdrawStorage
 	}
 
+	public async linkDecimals(): Promise<void> {
+		const instance = Link.getInstance()
+		await instance.linkLibrary(this._deployer)
+	}
+
 	public async generateAddressConfig(): Promise<void> {
 		this._addressConfig = await deployContract(this._deployer, AddressConfig)
 	}
@@ -152,12 +197,6 @@ export class DevProtocolInstance {
 	}
 
 	public async generateLockup(): Promise<void> {
-		const decimals = await deployContract(this._deployer, Decimals)
-		link(
-			Lockup,
-			'contracts/src/common/libs/Decimals.sol:Decimals',
-			decimals.address
-		)
 		this._lockup = await deployContract(
 			this._deployer,
 			Lockup,
@@ -234,9 +273,12 @@ export class DevProtocolInstance {
 	}
 
 	public async generatePolicyFactory(): Promise<void> {
-		this._policyFactory = await deployContract(this._deployer, PolicyFactory, [
-			this._addressConfig.address,
-		])
+		this._policyFactory = await deployContract(
+			this._deployer,
+			PolicyFactory,
+			[this._addressConfig.address],
+			{gasLimit: 6000000}
+		)
 		await this._addressConfig.setPolicyFactory(this._policyFactory.address)
 	}
 
@@ -292,12 +334,6 @@ export class DevProtocolInstance {
 	}
 
 	public async generateWithdraw(): Promise<void> {
-		const decimals = await deployContract(this._deployer, Decimals)
-		link(
-			Withdraw,
-			'contracts/src/common/libs/Decimals.sol:Decimals',
-			decimals.address
-		)
 		this._withdraw = await deployContract(this._deployer, Withdraw, [
 			this._addressConfig.address,
 		])
@@ -308,17 +344,73 @@ export class DevProtocolInstance {
 		this._withdrawStorage = await deployContract(
 			this._deployer,
 			WithdrawStorage,
-			[this._addressConfig.address]
+			[this._addressConfig.address],
+			{gasLimit: 6000000}
 		)
 		await this._addressConfig.setWithdrawStorage(this._withdrawStorage.address)
 		await this._withdrawStorage.createStorage()
 	}
 
-	public async createPolicy(contractJSON: ContractJSON): Promise<void> {
-		const policyInstance = await deployContract(this._deployer, contractJSON, [
+	public async createProperty(
+		name: string,
+		symbol: string,
+		author: string
+	): Promise<Contract> {
+		await this._propertyFactory.create(name, symbol, author)
+		// eslint-disable-next-line new-cap
+		const filterFrom = this._propertyFactory.filters.Create(
+			this._deployer.address,
+			null
+		)
+		const propertyAddress = (
+			await this._propertyFactory.queryFilter(filterFrom)
+		)[0].args!._property
+		const propertyInstance = new Contract(
+			propertyAddress,
+			Property.abi,
+			this._deployer
+		)
+		return propertyInstance
+	}
+
+	public async createPolicy(contractJSON: ContractJSON): Promise<Contract> {
+		const innerPolicyInstance = await deployContract(
+			this._deployer,
+			contractJSON
+		)
+		await this._policyFactory.create(innerPolicyInstance.address)
+		// eslint-disable-next-line new-cap
+		const filterFrom = this._policyFactory.filters.Create(
+			this._deployer.address,
+			null
+		)
+		const policyAddress = (await this._policyFactory.queryFilter(filterFrom))[0]
+			.args!._policy
+		const policyInstance = new Contract(
+			policyAddress,
+			Policy.abi,
+			this._deployer
+		)
+		return policyInstance
+	}
+
+	public async createMarket(contractJSON: ContractJSON): Promise<Contract> {
+		const behavior = await deployContract(this._deployer, contractJSON, [
 			this._addressConfig.address,
 		])
-		const result = await this._policyFactory.create(policyInstance.address)
-		console.log(result)
+		await this._marketFactory.create(behavior.address)
+		// eslint-disable-next-line new-cap
+		const filterFrom = this._marketFactory.filters.Create(
+			this._deployer.address,
+			null
+		)
+		const marketAddress = (await this._marketFactory.queryFilter(filterFrom))[0]
+			.args!._market
+		const marketInstance = new Contract(
+			marketAddress,
+			Market.abi,
+			this._deployer
+		)
+		return marketInstance
 	}
 }
