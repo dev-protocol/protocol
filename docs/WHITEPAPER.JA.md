@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`2.1.6`**
+Version: **`3.0.0`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -23,11 +23,11 @@ Dev Protocol は、オンチェーンガバナンスであらゆる資産を自�
 
 Dev Protocol はガバナンスの指針となる政策の策定をコミュニティに移譲し、状況に合わせてアップデートする。ユーザーはプロトコル上で自由に政策を提案することが出来る。政策を有効化するためには、資産保有者たちの投票による承認が必要となる。
 
-インフレーションレートの決定などに関わる政策は[初期の政策](./POLICY.md) の策定は進行中。
+政策はインフレーションレートの決定などに関わる。現在の政策は [ここ](./POLICY.md) にある。
 
 ## マーケットについて
 
-マーケットは、個人の活動をブロックチェーン上に証明し、公平に評価する社会フェアネスとして機能する。マーケットは活動の評価指標毎に作られ、新たなマーケットの開設はコミュニティが提案出来る。
+マーケットは、個人の活動をブロックチェーン上に証明し、身元を保証する役割を果たす。マーケットは活動の評価指標毎に作られ、新たなマーケットの開設はコミュニティが提案出来る。
 
 ### 資産化
 
@@ -36,10 +36,6 @@ Dev Protocol はガバナンスの指針となる政策の策定をコミュニ�
 #### 資産化の方法
 
 ユーザーは Dev Protocol 上で活動のオーナーシップを表明できる外部アカウントを認証することで、マーケット上に“資産”として定義され、資産の所有者であることが証明される。資産の認証時に、ユーザーは政策によって定められた手数料を DEV で支払い、支払われた手数料は自動的にバーンされる。ユーザーは複数の資産を認証することが出来、複数のマーケットに接続することが出来る。認証出来る資産数の上限は政策によって定められる。
-
-### 評価
-
-資産の所有者は、マーケット報酬の受け取りのために任意のタイミングで資産価値の評価を受ける。資産価値の評価指標はマーケット毎に定められる。
 
 ### 収益, マーケット報酬, インフレーション, デフレーション
 
@@ -87,27 +83,20 @@ Dev Protocol はユーザーが互いの利害関係を侵さずに全員が利�
 
 # メカニズム
 
-Dev Protocol は以下の 20 個のコントラクトによって構成される。
+Dev Protocol は以下の 13 個の主なコントラクトによって構成される。
 
 - Market
 - Market Factory
-- Market Group
 - Property
 - Property Factory
-- Property Group
 - Metrics
-- Metrics Group
-- IPolicy
 - Policy
 - Policy Factory
-- Vote Counter
-- Vote Times
 - Lockup
 - Allocator
 - Policy
 - Policy Factory
 - Address Config
-- Using Config
 - DEV
 
 コントラクトの概観図:
@@ -116,15 +105,11 @@ Dev Protocol は以下の 20 個のコントラクトによって構成される
 
 ## Market
 
-Market Contract は特定の資産群を表す。資産の認証を行う `authenticate` 関数、資産価値の評価を行う `calculate` 関数の 2 つのインターフェイスによって、Dev Protocol で扱う資産を定義することができる。
+Market Contract は特定の資産群を表す。資産の認証を行う `authenticate` 関数によって、Dev Protocol で扱う資産を定義することができる。
 
 Market Contract は誰でも自由に提案できる。ただし、有効化するためには既存の資産保有者( Property Contract オーナー )たちの投票によって承認される必要がある。Property Contract の被ステーキング数と `totals` の合計値を票数とする。投票は基本的に資産保有者によって行われることを期待するが、ステーキング実行者が自己のステーキング数を票数として投票することもできる。この場合はステーキング対象の Property Contract アドレスを指定する。
 
 `authenticate` 関数は、認証する資産の表明と、実行者が資産の所有者であることを認証する。例えば、1 つの GitHub リポジトリを指定し実行者がその GitHub リポジトリの所有者であることを認証する。そのため `authenticate` 関数は Property Contract の所有者以外から実行できるべきではない。この関数はユーザーから直接呼び出され、認証成功の場合には `authenticatedCallback` を呼び出すことが期待されている。`authenticate` 関数の実行時には Policy Contract によって定められた手数料を DEV で支払い、支払われた手数料は自動的にバーンされる。
-
-`calculate` 関数は、マーケット報酬の決定のために資産価値を算出する。この関数は Allocator Contract から呼び出されることを期待しているが、ユーザーからも直接呼び出すことができる。ただし Allocator Contract から呼び出さるとき以外はなんら効果をもたらさない。実行時のコンテキストをバリデーションする必要はなく、それらはすべて Allocator Contract によって行われる。算出結果は Allocator Contract の `calculatedCallback` を呼び出すことで Allocator Contract に通告する。
-
-ひとつの Market Contract が 何を資産として 扱うかを `authenticate` が定義し、 どのように評価 するかを `calculate` が定義する。
 
 ## Market Factory
 
@@ -144,23 +129,7 @@ contract IMarketBehavior {
 		string memory _args4,
 		string memory _args5,
 		address market
-	)
-		public
-		returns (
-			// solium-disable-next-line indentation
-			address
-		);
-
-	function calculate(
-		address _metrics,
-		uint256 _start,
-		uint256 _end
-	)
-		external
-		returns (
-			// solium-disable-next-line indentation
-			bool
-		);
+	) public returns (address);
 
 	function getId(address _metrics) external view returns (string memory);
 }
@@ -184,7 +153,9 @@ string public schema = "['Read-only token', 'Your GitHub repository(e.g. your-na
 string public schema = "['Your GitHub repository(e.g. your-name/repos)', 'Read-only token']";
 ```
 
-Market Factory Contract はこのコントラクトへのプロキシメソッドなどを持つ Market Contract を新たに作成する。プロキシメソッドは `authenticate` と `calculate` の 2 つ。認証成功を受け取る `authenticatedCallback` 関数と、投票を受け付ける `vote` 関数も追加される。
+`getId` 関数は、Metrics Contract アドレスとして引数を受け取り、認証されたアセット名を返却する。たとえば、その戻り値は `dev-protocol/dev-kit-js` のようなものとなる。
+
+Market Factory Contract はこのコントラクトへのプロキシメソッドなどを持つ Market Contract を新たに作成する。プロキシメソッドは `authenticate`、 `schema` と `getId` の 3 つ。認証成功を受け取る `authenticatedCallback` 関数と、投票を受け付ける `vote` 関数も追加される。
 
 ## Property
 
@@ -194,7 +165,7 @@ Property Contract はユーザーの資産グループを表す。ERC20 に準�
 
 Property Contract の `transfer` 関数は、バランスの変化に伴ってマーケット報酬の引出可能額を変更するため、Allocator Contract に引出可能額の調整を要請する。
 
-初期状態の Property Contract はマーケット報酬を受け取ることができない。マーケット報酬はステーキングと資産価値に基づいて決まるため、マーケット報酬を受け取るには資産との関連付けが必須となる。
+初期状態の Property Contract はある資産を保証していない。
 
 Property Contract が資産を表す状態となるためには、Property Contract と Market Contract の関連付けが必要となる。関連付けは Market Contract の `authenticatedCallback` 関数によって行われる。Property Contract には複数の Market Contract を関連付けできる。特定の資産グループを表す 1 つの Property Contract としたり、資産毎に Property Contract を作成してもよい。
 
@@ -202,7 +173,7 @@ Property Contract が資産を表す状態となるためには、Property Contr
 
 Property Factory Contract は新しい Property Contract を生成する。
 
-Property Contract の生成は `create` 関数を実行することで行われる。引数として `name` と `symbol` を指定する。Property Contract の比較容易性のために `totalSupply` は `10000000` に、 `decimals` は `18` に固定する。
+Property Contract の生成は `create` 関数を実行することで行われる。引数として `name` と `symbol` を指定する。Property Contract の比較容易性のために `totalSupply` は `10000000`(Solidity では `10000000000000000000000000`) に、 `decimals` は `18` に固定する。
 
 ## Metrics
 
@@ -224,6 +195,37 @@ Lockup Contract はユーザーが Property Contract に対して行なうステ
 
 ユーザーは DEV をステーキングすることで、その対象の Property Contract オーナーから何らかのユーティリティを受け入れる。そのユーティリティを必要とする間はステーキングが継続され、DEV の希少価値を高める。
 
+ステーキングした時点における累積的総報酬額( Allocator Contract の `calculateMaxRewardsPerBlock` 関数の返却値を経過ブロックに応じて累積した値 )を記録、引出可能な報酬計算に用いる。
+
+報酬額は Property Contract が占めるステーキング比率によって決まるため、Lockup Contract は、Property Contract の累積的ステーキング数( ステーキング数を経過ブロックに応じて累積した値 )と、全体の累積的総ステーキング数( 総ステーキング数を経過ブロックに応じて累積した値 )も記録する。
+
+Property の累積的ステーキング数と累積的総ステーキング数の比から総報酬額の割当が決定する。
+
+ステーキング実行者の受け取る報酬額計算には、以下の変数が用いられる。
+
+- `r`: 累積的総報酬額( Allocator Contract の `calculateMaxRewardsPerBlock` 関数の返却値を経過ブロックに応じて累積した値 )
+- `p`: 累積的ステーキング数( ステーキング数を経過ブロックに応じて累積した値 )
+- `t`: 累積的総ステーキング数( 総ステーキング数を経過ブロックに応じて累積した値 )
+- `l`: ロックアップした時点における `r`
+- `Policy.holdersShare`: Property Contract ホルダーが受け取る報酬率関数
+
+計算式は次のようになる。
+
+```
+total interest = (p / t * (r -l)) - Policy.holdersShare(p / t * (r -l))
+```
+
+この結果を Property Contract に対するステーキング数で除算し、ステーキング実行者のステーキング数で積算することによって引出可能額を算出する。
+
+ステーキング実行者が報酬を引き出すと `l` の値が最新値でオーバーライドされる。このようにして、引出可能額は一人が引き出すことができる最大金額を超えない。このことを以下に例示する。単純化するために `p` と `t` は勘案しない。
+
+1. 500 DEV をステーキングしている Alice は、`r` が 100 のときにはじめてステーキングした。`r` が 500 になったときに引き出し、その報酬額は `(500 - 100) × 500 = 200000` である。
+2. `r` が 520 になり、再び Alice は引き出す。引出可能額は `(520 - 500) × 500 = 10000` である。
+
+Alice は 2 回に分けて引き出し、合計で `200000 + 10000 = 210000` を得た。仮に 1 回目の引き出しをしなかったなら、`(520 - 100) × 500 = 210000` であり引出可能額が変わらないことが分かる。
+
+この式はステーキング実行者のステーキング数が一定のときにのみ成立する。そのため Lockup Contract の `withdraw` 関数実行時には `l` の更新が必要である。
+
 ### cancel
 
 ユーザーが Property Contract に対してステーキングしている DEV を解除する。解除が要請されてから一定期間はステーキングが継続する。その期間は Policy Contract によって定められたブロック数で決定する。
@@ -238,28 +240,11 @@ Lockup Contract はユーザーが Property Contract に対して行なうステ
 
 Allocator Contract はマーケット報酬の決定のためのいくつかの役割を持つ。
 
-### allocate
+### calculateMaxRewardsPerBlock
 
-Property Contract のマーケット報酬を計算し引出可能額を増額する。引数として Metrics Contract のアドレスを受け取る。マーケット報酬の決定には以下の変数を用いる。
+全ユーザーに対して与えられる総報酬額の 1 ブロックあたりの値を計算して返却する。
 
-- `t` = `allocate` 関数が前回実行されてから今回までの期間( ブロック数 )
-- `a` = Metrics Contract によって関連付けされている Market Contract の `calculate` 関数を呼び出すことで得られた資産価値を `t` で除算した数
-- `l` = Metrics Contract によって関連付けされている Property Contract のステーキング数
-- `v` = `a` と `l` に基づいて Policy Contract が決定する総資産価値( ブロック毎 )
-- `p` = 前回の `v`
-- `d` = Metrics Contract によって関連付けされている Market Contract の合計総資産価値( ブロック毎 )
-- `m` = Policy Contract によって算出された総報酬額( ブロック毎 )
-- `s` = Metrics Contract によって関連付けされている Market Contract の発行済み Metrics 数のシェア
-
-基本的な考え方は、合計総資産価値( ブロック毎 )と各総資産価値の比率( ブロック毎 )によって決まる。計算が実行されるたびに、合計総資産価値がオーバーライドされ、次の計算に使用される。
-
-式は以下のとおり。
-
-```
-distributions = v / (d - p + v) * m * s * t
-```
-
-この計算の後、`d` は `(d - p + v)` の値によってオーバーライドされる。
+計算時点でロックアップされている DEV の総数と、認証済み資産の総数を取得し、Policy Contract の `rewards` 関数へのプロキシとして機能する。引数と返却値の相関は [政策](./POLICY.md#rewards) によって定められている。
 
 ## Withdraw
 
@@ -269,36 +254,34 @@ Winthdraw Contract はマーケット報酬の引出可能額を管理するた�
 
 Property Contract のマーケット報酬を引き出す。実行者は呼び出し時点の引出可能額全額を引き出す。
 
-Allocator Contract は、Property Contract のマーケット報酬の合計数を `totals` として、マーケット報酬の累積価格を `prices` として記録する。Property Contract が被ステーキングされている場合、ステーキング実行者向けの値として `lockTotals` と `lockPrices` も記録される。Property Contract(Token) のホルダーとステーキング実行者のマーケット報酬のシェアは Policy Contract によって定められる。
+報酬額は Property Contract が占めるステーキング比率によって決まるため、Lockup Contract に問い合わせて Property Contract の累積的ステーキング数( ステーキング数を経過ブロックに応じて累積した値 )と、全体の累積的総ステーキング数( 総ステーキング数を経過ブロックに応じて累積した値 )を取得し、引出可能額を計算する。
 
-```solidity
-mapping(address => uint) totals;
-mapping(address => uint) prices;
-mapping(address => uint) lockTotals;
-mapping(address => uint) lockPrices;
+Property の累積的ステーキング数と累積的総ステーキング数の比から総報酬額の割当が決定する。
+
+Property ホルダーの受け取る報酬額計算には、以下の変数が用いられる。
+
+- `r`: 累積的総報酬額( Allocator Contract の `calculateMaxRewardsPerBlock` 関数の返却値を経過ブロックに応じて累積した値 )
+- `p`: 累積的ステーキング数( ステーキング数を経過ブロックに応じて累積した値 )
+- `t`: 累積的総ステーキング数( 総ステーキング数を経過ブロックに応じて累積した値 )
+- `l`: 最後に引き出した時点における `r`
+- `Policy.holdersShare`: Property Contract ホルダーが受け取る報酬率関数
+
+計算式は次のようになる。
+
+```
+total market reward = Policy.holdersShare(p / t * (r -l))
 ```
 
-ユーザーが `withdraw` 関数を呼び出すと、ユーザーは `price` に Property Contract のユーザーの残高を乗じた数の DEV を受け取る。
+この結果を Property Contract の `totalSupply` で除算し、ユーザーのバランスで積算することによって引出可能額を算出する。
 
-`totals` と `prices` の更新は Allocator Contract の `increment` 関数によって行われる。
+ユーザーが報酬を引き出すと `l` の値が最新値でオーバーライドされる。このようにして、引出可能額は一人が引き出すことができる最大金額を超えない。このことを以下に例示する。単純化するために `p` と `t` は勘案しない。
 
-```solidity
-function increment(address _property, uint _value) internal {
-	totals[_property] += _value;
-	prices[_property] += _value / ERC20(_token).totalSupply();
-}
-```
+1. Alice は Property Contract を 500 トークン保有している。`r` が 100 になったときに引き出し、その報酬額は `(100 - 0) × 500 = 50000` である。
+2. `r` が 120 になり、再び Alice は引き出す。引出可能額は `(120 - 100) × 500 = 10000` である。
 
-`totals` はマーケット報酬の累積和であり、 `prices` は Property Contract(Token) の 1 につき引出可能なマーケット報酬の累積和となる。
+Alice は 2 回に分けて引き出し、合計で `50000 + 10000 = 60000` を得た。仮に 1 回目の引き出しをしなかったなら、`(120 - 0) × 500 = 60000` であり引出可能額が変わらないことが分かる。
 
-`prices` は Property Contract のユーザーアカウント毎にマッピングされ、同じユーザーが次回 `withdraw` 関数を呼び出すときに値から差し引かれる。このようにして、引出可能額は一人が引き出すことができる最大金額を超えない。このことを以下に例示する。
-
-1. Property Contract を 500 保有している Alice は、`prices` が 100 のときにはじめて引き出す。引出可能額は `(100 - 0) × 500 = 50000` である。
-2. `prices` が 120 になり、再び Alice は引き出す。引出可能額は `(120 - 100) × 500 = 10000` である。
-
-Alice は 2 回に分けて引き出し、合計で `50000 + 10000 = 60000` を得た。仮に 1 回目の引き出しをしなかったなら、`120 × 500 = 60000` であり引出可能額が変わらないことが分かる。
-
-この式はユーザーのバランスが一定のときにのみ成立する。そのため Property Contract の `transfer` 関数実行時には Allocator Contract にその通告を行い、転送者と受領者の引出可能額を調整する必要がある。
+この式はユーザーのバランスが一定のときにのみ成立する。そのため Property Contract の `transfer` 関数実行時には `l` の更新が必要である。
 
 ## Policy
 
