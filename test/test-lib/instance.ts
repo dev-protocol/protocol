@@ -1,6 +1,5 @@
-import {use} from 'chai'
 import {Contract, Wallet} from 'ethers'
-import {deployContract, solidity, link} from 'ethereum-waffle'
+import {deployContract, link} from 'ethereum-waffle'
 import {ContractJSON} from 'ethereum-waffle/dist/esm/ContractJSON'
 import * as AddressConfig from '../../build/contracts/AddressConfig.json'
 import * as Allocator from '../../build/contracts/Allocator.json'
@@ -27,8 +26,6 @@ import * as Market from '../../build/contracts/Market.json'
 import * as Property from '../../build/contracts/Property.json'
 import * as Policy from '../../build/contracts/Policy.json'
 
-use(solidity)
-
 class Link {
 	private static instance: Link
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -37,7 +34,6 @@ class Link {
 	static getInstance() {
 		if (!Link.instance) {
 			Link.instance = new Link()
-			// ... any one time initialization goes here ...
 		}
 
 		return Link.instance
@@ -68,6 +64,9 @@ class Link {
 
 export class DevProtocolInstance {
 	private readonly _deployer: Wallet
+	private readonly _policy: PolicyProvider
+	private readonly _market: MarketProvider
+	private readonly _property: PropertyProvider
 	private _addressConfig!: Contract
 	private _allocator!: Contract
 	private _dev!: Contract
@@ -89,8 +88,27 @@ export class DevProtocolInstance {
 	private _withdraw!: Contract
 	private _withdrawStorage!: Contract
 
-	constructor(deployer: Wallet) {
-		this._deployer = deployer
+	constructor(wallet: Wallet) {
+		this._deployer = wallet
+		this._policy = new PolicyProvider(this)
+		this._market = new MarketProvider(this)
+		this._property = new PropertyProvider(this)
+	}
+
+	public get deployer(): Wallet {
+		return this._deployer
+	}
+
+	public get policy(): PolicyProvider {
+		return this._policy
+	}
+
+	public get market(): MarketProvider {
+		return this._market
+	}
+
+	public get property(): PropertyProvider {
+		return this._property
 	}
 
 	public get addressConfig(): Contract {
@@ -350,67 +368,122 @@ export class DevProtocolInstance {
 		await this._addressConfig.setWithdrawStorage(this._withdrawStorage.address)
 		await this._withdrawStorage.createStorage()
 	}
+}
 
-	public async createProperty(
+class PropertyProvider {
+	private readonly _dev: DevProtocolInstance
+	private readonly _properties: Map<string, Contract>
+	constructor(dev: DevProtocolInstance) {
+		this._dev = dev
+		this._properties = new Map<string, Contract>()
+	}
+
+	public get properties(): Map<string, Contract> {
+		return this._properties
+	}
+
+	public async create(
 		name: string,
 		symbol: string,
-		author: string
+		author = ''
 	): Promise<Contract> {
-		await this._propertyFactory.create(name, symbol, author)
+		const propertyAuthor = author === '' ? this._dev.deployer.address : author
+		await this._dev.propertyFactory.create(name, symbol, propertyAuthor)
 		// eslint-disable-next-line new-cap
-		const filterFrom = this._propertyFactory.filters.Create(
-			this._deployer.address,
+		const filterFrom = this._dev.propertyFactory.filters.Create(
+			this._dev.deployer.address,
 			null
 		)
 		const propertyAddress = (
-			await this._propertyFactory.queryFilter(filterFrom)
+			await this._dev.propertyFactory.queryFilter(filterFrom)
 		)[0].args!._property
 		const propertyInstance = new Contract(
 			propertyAddress,
 			Property.abi,
-			this._deployer
+			this._dev.deployer
 		)
+		this._properties.set(propertyInstance.address, propertyInstance)
 		return propertyInstance
 	}
 
-	public async createPolicy(contractJSON: ContractJSON): Promise<Contract> {
-		const innerPolicyInstance = await deployContract(
-			this._deployer,
-			contractJSON
-		)
-		await this._policyFactory.create(innerPolicyInstance.address)
-		// eslint-disable-next-line new-cap
-		const filterFrom = this._policyFactory.filters.Create(
-			this._deployer.address,
-			null
-		)
-		const policyAddress = (await this._policyFactory.queryFilter(filterFrom))[0]
-			.args!._policy
-		const policyInstance = new Contract(
-			policyAddress,
-			Policy.abi,
-			this._deployer
-		)
-		return policyInstance
+	public getByAddress(address: string): Contract | undefined {
+		return this._properties.get(address)
 	}
 
-	public async createMarket(contractJSON: ContractJSON): Promise<Contract> {
-		const behavior = await deployContract(this._deployer, contractJSON, [
-			this._addressConfig.address,
+	public getOne(): Contract | undefined {
+		for (let key of this._properties.keys()) {
+			return this._properties.get(key)
+		}
+	}
+}
+
+class MarketProvider {
+	private readonly _dev: DevProtocolInstance
+	private readonly _markets: Map<string, Contract>
+	constructor(dev: DevProtocolInstance) {
+		this._dev = dev
+		this._markets = new Map<string, Contract>()
+	}
+
+	public async create(contractJSON: ContractJSON): Promise<Contract> {
+		const behavior = await deployContract(this._dev.deployer, contractJSON, [
+			this._dev.addressConfig.address,
 		])
-		await this._marketFactory.create(behavior.address)
+		await this._dev.marketFactory.create(behavior.address)
 		// eslint-disable-next-line new-cap
-		const filterFrom = this._marketFactory.filters.Create(
-			this._deployer.address,
+		const filterFrom = this._dev.marketFactory.filters.Create(
+			this._dev.deployer.address,
 			null
 		)
-		const marketAddress = (await this._marketFactory.queryFilter(filterFrom))[0]
-			.args!._market
+		const marketAddress = (
+			await this._dev.marketFactory.queryFilter(filterFrom)
+		)[0].args!._market
 		const marketInstance = new Contract(
 			marketAddress,
 			Market.abi,
-			this._deployer
+			this._dev.deployer
 		)
+		this._markets.set(marketInstance.address, marketInstance)
 		return marketInstance
+	}
+
+	public getByAddress(address: string): Contract | undefined {
+		return this._markets.get(address)
+	}
+}
+
+class PolicyProvider {
+	private readonly _dev: DevProtocolInstance
+	private readonly _policies: Map<string, Contract>
+	constructor(dev: DevProtocolInstance) {
+		this._dev = dev
+		this._policies = new Map<string, Contract>()
+	}
+
+	public async create(contractJSON: ContractJSON): Promise<Contract> {
+		const innerPolicyInstance = await deployContract(
+			this._dev.deployer,
+			contractJSON
+		)
+		await this._dev.policyFactory.create(innerPolicyInstance.address)
+		// eslint-disable-next-line new-cap
+		const filterFrom = this._dev.policyFactory.filters.Create(
+			this._dev.deployer.address,
+			null
+		)
+		const policyAddress = (
+			await this._dev.policyFactory.queryFilter(filterFrom)
+		)[0].args!._policy
+		const policyInstance = new Contract(
+			policyAddress,
+			Policy.abi,
+			this._dev.deployer
+		)
+		this._policies.set(policyInstance.address, policyInstance)
+		return policyInstance
+	}
+
+	public getByAddress(address: string): Contract | undefined {
+		return this._policies.get(address)
 	}
 }
