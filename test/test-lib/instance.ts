@@ -98,7 +98,7 @@ export class DevProtocolInstance {
 	}
 
 	public get provider(): providers.Web3Provider {
-		return this._providor
+		return this._provider
 	}
 
 	public get deployer(): Wallet {
@@ -400,7 +400,7 @@ class PropertyProvider {
 			propertyAuthor
 		)
 		const events = await getTransactionEvents(
-			this._dev.providor,
+			this._dev.provider,
 			tx,
 			this._dev.propertyFactory
 		)
@@ -439,7 +439,7 @@ class MarketProvider {
 		])
 		const tx = await this._dev.marketFactory.create(behavior.address)
 		const events = await getTransactionEvents(
-			this._dev.providor,
+			this._dev.provider,
 			tx,
 			this._dev.marketFactory
 		)
@@ -473,7 +473,7 @@ class PolicyProvider {
 		)
 		const tx = await this._dev.policyFactory.create(innerPolicyInstance.address)
 		const events = await getTransactionEvents(
-			this._dev.providor,
+			this._dev.provider,
 			tx,
 			this._dev.policyFactory
 		)
