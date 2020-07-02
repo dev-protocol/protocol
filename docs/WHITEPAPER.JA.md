@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`3.0.0`**
+Version: **`3.1.0`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -80,6 +80,16 @@ Dev Protocol はユーザーが互いの利害関係を侵さずに全員が利�
 - 自己保有する DEV の価値向上
 - 活動者の資産( Property )の一部を譲り受けることで報酬の一部を受け取る
 - 利用者からの手数料徴取
+
+# トークンディストリビューション
+
+Dev Protocol は基軸トークン "DEV" のトークンディストリビューションを計画している。
+
+次のグラフに最新のアロケーションを示す。
+
+![Token Distribution](https://devprtcl.com/image/token-distribution.svg)
+
+トークンディストリビューションに関する情報は [Medium ポスト](https://medium.com/devprtcl/dev-token-allocation-update-e1d7dd424087) を参照する。
 
 # メカニズム
 

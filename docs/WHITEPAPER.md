@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`3.0.0`**
+Version: **`3.1.0`**
 
 _There is a possibility that this white paper will be updated. When there is an update, the version number will increase according to [Semantic Versioning](https://semver.org/)._
 
@@ -75,6 +75,16 @@ By staking their DEV toward an activity participant, users receive some sort of 
 - Increase the value of DEV owned
 - Receive a portion of the rewards by inheriting a portion of the activity participant’s Property
 - Collect commission from the user
+
+# Token Distribution
+
+The Dev Protocol plans a token distribution of the core token "DEV."
+
+The following graph shows the latest allocation plan.
+
+![Token Distribution](https://devprtcl.com/image/token-distribution.svg)
+
+See [the Medium post](https://medium.com/devprtcl/dev-token-allocation-update-e1d7dd424087) for more information on token distribution.
 
 # Mechanism
 
