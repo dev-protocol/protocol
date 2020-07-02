@@ -1,5 +1,5 @@
 import {expect, use} from 'chai'
-import {MockProvider, solidity} from 'ethereum-waffle'
+import {createMockProvider, solidity, getWallets} from 'ethereum-waffle'
 import {DevProtocolInstance} from '../../test-lib/instance'
 import {toBigNumber} from '../../test-lib/common'
 import {
@@ -13,19 +13,14 @@ import * as MarketTest3 from '../../../build/contracts/MarketTest3.json'
 use(solidity)
 
 describe('Allocator', () => {
-	const provider = new MockProvider({
-		ganacheOptions: {
-			allowUnlimitedContractSize: true,
-		},
+	const provider = createMockProvider({
+		allowUnlimitedContractSize: true,
 	})
-	const [
-		wallet1,
-		wallet2,
-		dummyPropertyFactory,
-		dummyProperty,
-	] = provider.getWallets()
+	const [wallet1, wallet2, dummyPropertyFactory, dummyProperty] = getWallets(
+		provider
+	)
 	const init = async (): Promise<DevProtocolInstance> => {
-		const dev = new DevProtocolInstance(wallet1)
+		const dev = new DevProtocolInstance(provider, wallet1)
 		await dev.linkDecimals()
 		await dev.generateAddressConfig()
 		await Promise.all([

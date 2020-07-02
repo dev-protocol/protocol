@@ -1,4 +1,4 @@
-import {Contract, Wallet} from 'ethers'
+import {Contract, Wallet, providers} from 'ethers'
 import {deployContract, link} from 'ethereum-waffle'
 import {ContractJSON} from 'ethereum-waffle/dist/esm/ContractJSON'
 import * as AddressConfig from '../../build/contracts/AddressConfig.json'
@@ -63,6 +63,7 @@ class Link {
 }
 
 export class DevProtocolInstance {
+	private readonly _provider: providers.Web3Provider
 	private readonly _deployer: Wallet
 	private readonly _policy: PolicyProvider
 	private readonly _market: MarketProvider
@@ -88,11 +89,16 @@ export class DevProtocolInstance {
 	private _withdraw!: Contract
 	private _withdrawStorage!: Contract
 
-	constructor(wallet: Wallet) {
+	constructor(provider: providers.Web3Provider, wallet: Wallet) {
+		this._provider = provider
 		this._deployer = wallet
 		this._policy = new PolicyProvider(this)
 		this._market = new MarketProvider(this)
 		this._property = new PropertyProvider(this)
+	}
+
+	public get provider(): providers.Web3Provider {
+		return this._providor
 	}
 
 	public get deployer(): Wallet {
@@ -388,15 +394,17 @@ class PropertyProvider {
 		author = ''
 	): Promise<Contract> {
 		const propertyAuthor = author === '' ? this._dev.deployer.address : author
-		await this._dev.propertyFactory.create(name, symbol, propertyAuthor)
-		// eslint-disable-next-line new-cap
-		const filterFrom = this._dev.propertyFactory.filters.Create(
-			this._dev.deployer.address,
-			null
+		const tx = await this._dev.propertyFactory.create(
+			name,
+			symbol,
+			propertyAuthor
 		)
-		const propertyAddress = (
-			await this._dev.propertyFactory.queryFilter(filterFrom)
-		)[0].args!._property
+		const events = await getTransactionEvents(
+			this._dev.providor,
+			tx,
+			this._dev.propertyFactory
+		)
+		const propertyAddress = events[events.length - 1].values._property
 		const propertyInstance = new Contract(
 			propertyAddress,
 			Property.abi,
@@ -429,15 +437,13 @@ class MarketProvider {
 		const behavior = await deployContract(this._dev.deployer, contractJSON, [
 			this._dev.addressConfig.address,
 		])
-		await this._dev.marketFactory.create(behavior.address)
-		// eslint-disable-next-line new-cap
-		const filterFrom = this._dev.marketFactory.filters.Create(
-			this._dev.deployer.address,
-			null
+		const tx = await this._dev.marketFactory.create(behavior.address)
+		const events = await getTransactionEvents(
+			this._dev.providor,
+			tx,
+			this._dev.marketFactory
 		)
-		const marketAddress = (
-			await this._dev.marketFactory.queryFilter(filterFrom)
-		)[0].args!._market
+		const marketAddress = events[events.length - 1].values._market
 		const marketInstance = new Contract(
 			marketAddress,
 			Market.abi,
@@ -465,15 +471,13 @@ class PolicyProvider {
 			this._dev.deployer,
 			contractJSON
 		)
-		await this._dev.policyFactory.create(innerPolicyInstance.address)
-		// eslint-disable-next-line new-cap
-		const filterFrom = this._dev.policyFactory.filters.Create(
-			this._dev.deployer.address,
-			null
+		const tx = await this._dev.policyFactory.create(innerPolicyInstance.address)
+		const events = await getTransactionEvents(
+			this._dev.providor,
+			tx,
+			this._dev.policyFactory
 		)
-		const policyAddress = (
-			await this._dev.policyFactory.queryFilter(filterFrom)
-		)[0].args!._policy
+		const policyAddress = events[events.length - 1].values._policy
 		const policyInstance = new Contract(
 			policyAddress,
 			Policy.abi,
@@ -486,4 +490,15 @@ class PolicyProvider {
 	public getByAddress(address: string): Contract | undefined {
 		return this._policies.get(address)
 	}
+}
+
+async function getTransactionEvents(
+	provider: providers.Provider,
+	tx: any,
+	contract: Contract
+) {
+	await tx.wait()
+	const receipt = await provider.getTransactionReceipt(tx.hash)
+	const logs = receipt.logs ?? []
+	return logs.map((log) => contract.interface.parseLog(log))
 }
