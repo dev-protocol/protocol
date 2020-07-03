@@ -62,12 +62,56 @@ class Link {
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+class NonceProvider {
+	private static readonly instance = new Map<string, Nonce>()
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	private constructor() {}
+
+	static getInstance(provider: providers.Web3Provider, address: string) {
+		if (!NonceProvider.instance.has(address)) {
+			NonceProvider.instance.set(address, Nonce.getInstance(provider, address))
+		}
+
+		return NonceProvider.instance.get(address)
+	}
+}
+
+class Nonce {
+	private static instance: Nonce
+	private readonly _provider: providers.Web3Provider
+	private readonly _address: string
+	private _nonce: number
+	private constructor(provider: providers.Web3Provider, address: string) {
+		this._provider = provider
+		this._address = address
+		this._nonce = 0
+	}
+
+	static getInstance(provider: providers.Web3Provider, address: string): Nonce {
+		if (!Nonce.instance) {
+			Nonce.instance = new Nonce(provider, address)
+		}
+
+		return Nonce.instance
+	}
+
+	public async setNonce(): Promise<void> {
+		this._nonce = await this._provider.getTransactionCount(this._address)
+	}
+
+	public getNonce(): number {
+		return this._nonce++
+	}
+}
 export class DevProtocolInstance {
 	private readonly _provider: providers.Web3Provider
 	private readonly _deployer: Wallet
 	private readonly _policy: PolicyProvider
 	private readonly _market: MarketProvider
 	private readonly _property: PropertyProvider
+	private readonly _nonce: Nonce
+	private _addNonceToOption = false
 	private _addressConfig!: Contract
 	private _allocator!: Contract
 	private _dev!: Contract
@@ -95,6 +139,7 @@ export class DevProtocolInstance {
 		this._policy = new PolicyProvider(this)
 		this._market = new MarketProvider(this)
 		this._property = new PropertyProvider(this)
+		this._nonce = NonceProvider.getInstance(provider, wallet.address)!
 	}
 
 	public get provider(): providers.Web3Provider {
@@ -202,15 +247,31 @@ export class DevProtocolInstance {
 		await instance.linkLibrary(this._deployer)
 	}
 
+	public async startToAddNonceOption(): Promise<void> {
+		await this._nonce.setNonce()
+		this._addNonceToOption = true
+	}
+
+	public finishToAddNonceOption(): void {
+		this._addNonceToOption = false
+	}
+
 	public async generateAddressConfig(): Promise<void> {
 		this._addressConfig = await deployContract(this._deployer, AddressConfig)
 	}
 
 	public async generateAllocator(): Promise<void> {
-		this._allocator = await deployContract(this._deployer, Allocator, [
-			this._addressConfig.address,
-		])
-		await this._addressConfig.setAllocator(this._allocator.address)
+		this._allocator = await deployContract(
+			this._deployer,
+			Allocator,
+			[this._addressConfig.address],
+			this.getTransactionOption()
+		)
+
+		await this._addressConfig.setAllocator(
+			this._allocator.address,
+			this.getTransactionOption()
+		)
 	}
 
 	public async generateDev(): Promise<void> {
@@ -327,9 +388,12 @@ export class DevProtocolInstance {
 			this._deployer,
 			MarketFactory,
 			[this._addressConfig.address],
-			{gasLimit: 5000000}
+			this.getTransactionOption(5000000)
 		)
-		await this._addressConfig.setMarketFactory(this._marketFactory.address)
+		await this._addressConfig.setMarketFactory(
+			this._marketFactory.address,
+			this.getTransactionOption()
+		)
 	}
 
 	public async generateMarketGroup(): Promise<void> {
@@ -373,6 +437,23 @@ export class DevProtocolInstance {
 		)
 		await this._addressConfig.setWithdrawStorage(this._withdrawStorage.address)
 		await this._withdrawStorage.createStorage()
+	}
+
+	private getTransactionOption(gasLimit = 0): Record<string, unknown> {
+		let result = {gasLimit: 0, nonce: 0}
+		if (gasLimit === 0) {
+			delete result.gasLimit
+		} else {
+			result.gasLimit = gasLimit
+		}
+
+		if (this._addNonceToOption) {
+			result.nonce = this._nonce.getNonce()
+		} else {
+			delete result.nonce
+		}
+
+		return result
 	}
 }
 
@@ -489,6 +570,12 @@ class PolicyProvider {
 
 	public getByAddress(address: string): Contract | undefined {
 		return this._policies.get(address)
+	}
+
+	public getOne(): Contract | undefined {
+		for (let key of this._policies.keys()) {
+			return this._policies.get(key)
+		}
 	}
 }
 

@@ -24,26 +24,27 @@ describe('Allocator', () => {
 		await dev.linkDecimals()
 		await dev.generateAddressConfig()
 		await Promise.all([
-			await dev.generateAllocator(),
-			await dev.generateMarketFactory(),
-			await dev.generateMarketGroup(),
-			await dev.generateMetricsFactory(),
-			await dev.generateMetricsGroup(),
-			await dev.generateLockup(),
-			await dev.generateLockupStorage(),
-			await dev.generateWithdraw(),
-			await dev.generateWithdrawStorage(),
-			await dev.generatePropertyFactory(),
-			await dev.generatePropertyGroup(),
-			await dev.generateVoteTimes(),
-			await dev.generateVoteTimesStorage(),
-			await dev.generateVoteCounter(),
-			await dev.generateVoteCounterStorage(),
-			await dev.generatePolicyFactory(),
-			await dev.generatePolicyGroup(),
-			await dev.generatePolicySet(),
-			await dev.generateDev(),
+			dev.generateAllocator(),
+			dev.generateMarketFactory(),
+			dev.generateMarketGroup(),
+			dev.generateMetricsFactory(),
+			dev.generateMetricsGroup(),
+			dev.generateLockup(),
+			dev.generateLockupStorage(),
+			dev.generateWithdraw(),
+			dev.generateWithdrawStorage(),
+			dev.generatePropertyFactory(),
+			dev.generatePropertyGroup(),
+			dev.generateVoteTimes(),
+			dev.generateVoteTimesStorage(),
+			dev.generateVoteCounter(),
+			dev.generateVoteCounterStorage(),
+			dev.generatePolicyFactory(),
+			dev.generatePolicyGroup(),
+			dev.generatePolicySet(),
+			dev.generateDev(),
 		])
+		dev.finishToAddNonceOption()
 		await dev.dev.mint(dev.deployer.address, 10000000000000)
 		await dev.policy.create(PolicyTestForAllocator)
 		await dev.property.create('test', 'TEST')
@@ -62,7 +63,22 @@ describe('Allocator', () => {
 		)
 	}
 
+	const init2 = async (): Promise<DevProtocolInstance> => {
+		const dev = new DevProtocolInstance(provider, wallet1)
+		await dev.linkDecimals()
+		await dev.generateAddressConfig()
+		await dev.startToAddNonceOption()
+		await Promise.all([dev.generateAllocator(), dev.generateMarketFactory()])
+		dev.finishToAddNonceOption()
+		await dev.generateDev()
+		await dev.dev.mint(dev.deployer.address, 10000000000000)
+		return dev
+	}
+
 	describe('Allocator: calculateMaxRewardsPerBlock', () => {
+		it.only('Wrttewt.', async () => {
+			await init2()
+		})
 		it('With no authentication or lockup, no DEV will be mint.', async () => {
 			const dev = await init()
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()
