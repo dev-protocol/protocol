@@ -1,5 +1,6 @@
-import {expect, use} from 'chai'
-import {createMockProvider, solidity, getWallets} from 'ethereum-waffle'
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+import {expect} from 'chai'
+import {createMockProvider, getWallets} from 'ethereum-waffle'
 import {DevProtocolInstance} from '../../test-lib/instance'
 import {toBigNumber} from '../../test-lib/common'
 import {
@@ -10,8 +11,6 @@ import {
 import * as PolicyTestForAllocator from '../../../build/contracts/PolicyTestForAllocator.json'
 import * as MarketTest3 from '../../../build/contracts/MarketTest3.json'
 
-use(solidity)
-
 describe('Allocator', () => {
 	const provider = createMockProvider({
 		allowUnlimitedContractSize: true,
@@ -21,30 +20,29 @@ describe('Allocator', () => {
 	)
 	const init = async (): Promise<DevProtocolInstance> => {
 		const dev = new DevProtocolInstance(provider, wallet1)
-		await dev.linkDecimals()
+		// Await dev.linkDecimals()
 		await dev.generateAddressConfig()
-		await Promise.all([
-			dev.generateAllocator(),
-			dev.generateMarketFactory(),
-			dev.generateMarketGroup(),
-			dev.generateMetricsFactory(),
-			dev.generateMetricsGroup(),
-			dev.generateLockup(),
-			dev.generateLockupStorage(),
-			dev.generateWithdraw(),
-			dev.generateWithdrawStorage(),
-			dev.generatePropertyFactory(),
-			dev.generatePropertyGroup(),
-			dev.generateVoteTimes(),
-			dev.generateVoteTimesStorage(),
-			dev.generateVoteCounter(),
-			dev.generateVoteCounterStorage(),
-			dev.generatePolicyFactory(),
-			dev.generatePolicyGroup(),
-			dev.generatePolicySet(),
-			dev.generateDev(),
-		])
-		dev.finishToAddNonceOption()
+		await dev.startToAddNonceOption()
+		await dev.generateAllocator()
+		await dev.generateMarketFactory()
+		await dev.generateMarketGroup()
+		await dev.generateMetricsFactory()
+		await dev.generateMetricsGroup()
+		await dev.generateLockup()
+		await dev.generateLockupStorage()
+		await dev.generateWithdraw()
+		await dev.generateWithdrawStorage()
+		await dev.generatePropertyFactory()
+		await dev.generatePropertyGroup()
+		await dev.generateVoteTimes()
+		await dev.generateVoteTimesStorage()
+		await dev.generateVoteCounter()
+		await dev.generateVoteCounterStorage()
+		await dev.generatePolicyFactory()
+		await dev.generatePolicyGroup()
+		await dev.generatePolicySet()
+		await dev.generateDev()
+		//  Dev.finishToAddNonceOption()
 		await dev.dev.mint(dev.deployer.address, 10000000000000)
 		await dev.policy.create(PolicyTestForAllocator)
 		await dev.property.create('test', 'TEST')
@@ -63,22 +61,7 @@ describe('Allocator', () => {
 		)
 	}
 
-	const init2 = async (): Promise<DevProtocolInstance> => {
-		const dev = new DevProtocolInstance(provider, wallet1)
-		await dev.linkDecimals()
-		await dev.generateAddressConfig()
-		await dev.startToAddNonceOption()
-		await Promise.all([dev.generateAllocator(), dev.generateMarketFactory()])
-		dev.finishToAddNonceOption()
-		await dev.generateDev()
-		await dev.dev.mint(dev.deployer.address, 10000000000000)
-		return dev
-	}
-
 	describe('Allocator: calculateMaxRewardsPerBlock', () => {
-		it.only('Wrttewt.', async () => {
-			await init2()
-		})
 		it('With no authentication or lockup, no DEV will be mint.', async () => {
 			const dev = await init()
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()

@@ -104,6 +104,7 @@ class Nonce {
 		return this._nonce++
 	}
 }
+
 export class DevProtocolInstance {
 	private readonly _provider: providers.Web3Provider
 	private readonly _deployer: Wallet
@@ -261,182 +262,338 @@ export class DevProtocolInstance {
 	}
 
 	public async generateAllocator(): Promise<void> {
-		this._allocator = await deployContract(
-			this._deployer,
-			Allocator,
-			[this._addressConfig.address],
-			this.getTransactionOption()
-		)
+		const func = async (): Promise<void> => {
+			this._allocator = await deployContract(
+				this._deployer,
+				Allocator,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
 
-		await this._addressConfig.setAllocator(
-			this._allocator.address,
-			this.getTransactionOption()
-		)
+			await this._addressConfig.setAllocator(
+				this._allocator.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateDev(): Promise<void> {
-		this._dev = await deployContract(this._deployer, Dev, [
-			this._addressConfig.address,
-		])
-		await this._addressConfig.setToken(this._dev.address)
+		const func = async (): Promise<void> => {
+			this._dev = await deployContract(
+				this._deployer,
+				Dev,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setToken(
+				this._dev.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateLockup(): Promise<void> {
-		this._lockup = await deployContract(
-			this._deployer,
-			Lockup,
-			[this._addressConfig.address],
-			{gasLimit: 6000000}
-		)
-		await this._addressConfig.setLockup(this._lockup.address)
+		const func = async (): Promise<void> => {
+			this._lockup = await deployContract(
+				this._deployer,
+				Lockup,
+				[this._addressConfig.address],
+				this.getTransactionOption(6000000)
+			)
+			await this._addressConfig.setLockup(
+				this._lockup.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateLockupStorage(): Promise<void> {
-		this._lockupStorage = await deployContract(
-			this._deployer,
-			LockupStorage,
-			[this._addressConfig.address],
-			{gasLimit: 6700000}
-		)
-		await this._addressConfig.setLockupStorage(this._lockupStorage.address)
-		await this._lockupStorage.createStorage()
+		const func = async (): Promise<void> => {
+			this._lockupStorage = await deployContract(
+				this._deployer,
+				LockupStorage,
+				[this._addressConfig.address],
+				this.getTransactionOption(6700000)
+			)
+			await this._addressConfig.setLockupStorage(
+				this._lockupStorage.address,
+				this.getTransactionOption()
+			)
+			await this._lockupStorage.createStorage(this.getTransactionOption())
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
-		this._propertyFactory = await deployContract(
-			this._deployer,
-			PropertyFactory,
-			[this._addressConfig.address]
-		)
-		await this._addressConfig.setPropertyFactory(this._propertyFactory.address)
+		const func = async (): Promise<void> => {
+			this._propertyFactory = await deployContract(
+				this._deployer,
+				PropertyFactory,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setPropertyFactory(
+				this._propertyFactory.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateVoteCounter(): Promise<void> {
-		this._voteCounter = await deployContract(this._deployer, VoteCounter, [
-			this._addressConfig.address,
-		])
-		await this._addressConfig.setVoteCounter(this._voteCounter.address)
+		const func = async (): Promise<void> => {
+			this._voteCounter = await deployContract(
+				this._deployer,
+				VoteCounter,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setVoteCounter(
+				this._voteCounter.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateVoteCounterStorage(): Promise<void> {
-		this._voteCounterStorage = await deployContract(
-			this._deployer,
-			VoteCounterStorage,
-			[this._addressConfig.address]
-		)
-		await this._addressConfig.setVoteCounterStorage(
-			this._voteCounterStorage.address
-		)
-		await this._voteCounterStorage.createStorage()
+		const func = async (): Promise<void> => {
+			this._voteCounterStorage = await deployContract(
+				this._deployer,
+				VoteCounterStorage,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setVoteCounterStorage(
+				this._voteCounterStorage.address,
+				this.getTransactionOption()
+			)
+			await this._voteCounterStorage.createStorage(this.getTransactionOption())
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateVoteTimes(): Promise<void> {
-		this._voteTimes = await deployContract(this._deployer, VoteTimes, [
-			this._addressConfig.address,
-		])
-		await this._addressConfig.setVoteTimes(this._voteTimes.address)
+		const func = async (): Promise<void> => {
+			this._voteTimes = await deployContract(
+				this._deployer,
+				VoteTimes,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setVoteTimes(
+				this._voteTimes.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateVoteTimesStorage(): Promise<void> {
-		this._voteTimesStorage = await deployContract(
-			this._deployer,
-			VoteTimesStorage,
-			[this._addressConfig.address]
-		)
-		await this._addressConfig.setVoteTimesStorage(
-			this._voteTimesStorage.address
-		)
-		await this._voteTimesStorage.createStorage()
+		const func = async (): Promise<void> => {
+			this._voteTimesStorage = await deployContract(
+				this._deployer,
+				VoteTimesStorage,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setVoteTimesStorage(
+				this._voteTimesStorage.address,
+				this.getTransactionOption()
+			)
+			await this._voteTimesStorage.createStorage(this.getTransactionOption())
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generatePropertyGroup(): Promise<void> {
-		this._propertyGroup = await deployContract(this._deployer, PropertyGroup, [
-			this._addressConfig.address,
-		])
-		await this._propertyGroup.createStorage()
-		await this._addressConfig.setPropertyGroup(this._propertyGroup.address)
+		const func = async (): Promise<void> => {
+			this._propertyGroup = await deployContract(
+				this._deployer,
+				PropertyGroup,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setPropertyGroup(
+				this._propertyGroup.address,
+				this.getTransactionOption()
+			)
+			await this._propertyGroup.createStorage(this.getTransactionOption())
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generatePolicyFactory(): Promise<void> {
-		this._policyFactory = await deployContract(
-			this._deployer,
-			PolicyFactory,
-			[this._addressConfig.address],
-			{gasLimit: 6000000}
-		)
-		await this._addressConfig.setPolicyFactory(this._policyFactory.address)
+		const func = async (): Promise<void> => {
+			this._policyFactory = await deployContract(
+				this._deployer,
+				PolicyFactory,
+				[this._addressConfig.address],
+				this.getTransactionOption(6000000)
+			)
+			await this._addressConfig.setPolicyFactory(
+				this._policyFactory.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generatePolicySet(): Promise<void> {
-		this._policySet = await deployContract(this._deployer, PolicySet, [
-			this._addressConfig.address,
-		])
-		await this._policySet.createStorage()
-		await this._addressConfig.setPolicySet(this._policySet.address)
+		const func = async (): Promise<void> => {
+			this._policySet = await deployContract(
+				this._deployer,
+				PolicySet,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+
+			await this._addressConfig.setPolicySet(
+				this._policySet.address,
+				this.getTransactionOption()
+			)
+			await this._policySet.createStorage(this.getTransactionOption())
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generatePolicyGroup(): Promise<void> {
-		this._policyGroup = await deployContract(this._deployer, PolicyGroup, [
-			this._addressConfig.address,
-		])
-		await this._policyGroup.createStorage()
-		await this._addressConfig.setPolicyGroup(this._policyGroup.address)
+		const func = async (): Promise<void> => {
+			this._policyGroup = await deployContract(
+				this._deployer,
+				PolicyGroup,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+
+			await this._addressConfig.setPolicyGroup(
+				this._policyGroup.address,
+				this.getTransactionOption()
+			)
+			await this._policyGroup.createStorage(this.getTransactionOption())
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateMarketFactory(): Promise<void> {
-		this._marketFactory = await deployContract(
-			this._deployer,
-			MarketFactory,
-			[this._addressConfig.address],
-			this.getTransactionOption(5000000)
-		)
-		await this._addressConfig.setMarketFactory(
-			this._marketFactory.address,
-			this.getTransactionOption()
-		)
+		const func = async (): Promise<void> => {
+			this._marketFactory = await deployContract(
+				this._deployer,
+				MarketFactory,
+				[this._addressConfig.address],
+				this.getTransactionOption(5000000)
+			)
+			await this._addressConfig.setMarketFactory(
+				this._marketFactory.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateMarketGroup(): Promise<void> {
-		this._marketGroup = await deployContract(this._deployer, MarketGroup, [
-			this._addressConfig.address,
-		])
-		await this._addressConfig.setMarketGroup(this._marketGroup.address)
-		await this._marketGroup.createStorage()
+		const func = async (): Promise<void> => {
+			this._marketGroup = await deployContract(
+				this._deployer,
+				MarketGroup,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setMarketGroup(
+				this._marketGroup.address,
+				this.getTransactionOption()
+			)
+			await this._marketGroup.createStorage(this.getTransactionOption())
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateMetricsFactory(): Promise<void> {
-		this._metricsFactory = await deployContract(
-			this._deployer,
-			MetricsFactory,
-			[this._addressConfig.address]
-		)
-		await this._addressConfig.setMetricsFactory(this._metricsFactory.address)
+		const func = async (): Promise<void> => {
+			this._metricsFactory = await deployContract(
+				this._deployer,
+				MetricsFactory,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setMetricsFactory(
+				this._metricsFactory.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateMetricsGroup(): Promise<void> {
-		this._metricsGroup = await deployContract(this._deployer, MetricsGroup, [
-			this._addressConfig.address,
-		])
-		await this._addressConfig.setMetricsGroup(this._metricsGroup.address)
-		await this._metricsGroup.createStorage()
+		const func = async (): Promise<void> => {
+			this._metricsGroup = await deployContract(
+				this._deployer,
+				MetricsGroup,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setMetricsGroup(
+				this._metricsGroup.address,
+				this.getTransactionOption()
+			)
+			await this._metricsGroup.createStorage(this.getTransactionOption())
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateWithdraw(): Promise<void> {
-		this._withdraw = await deployContract(this._deployer, Withdraw, [
-			this._addressConfig.address,
-		])
-		await this._addressConfig.setWithdraw(this._withdraw.address)
+		const func = async (): Promise<void> => {
+			this._withdraw = await deployContract(
+				this._deployer,
+				Withdraw,
+				[this._addressConfig.address],
+				this.getTransactionOption()
+			)
+			await this._addressConfig.setWithdraw(
+				this._withdraw.address,
+				this.getTransactionOption()
+			)
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	public async generateWithdrawStorage(): Promise<void> {
-		this._withdrawStorage = await deployContract(
-			this._deployer,
-			WithdrawStorage,
-			[this._addressConfig.address],
-			{gasLimit: 6000000}
-		)
-		await this._addressConfig.setWithdrawStorage(this._withdrawStorage.address)
-		await this._withdrawStorage.createStorage()
+		const func = async (): Promise<void> => {
+			this._withdrawStorage = await deployContract(
+				this._deployer,
+				WithdrawStorage,
+				[this._addressConfig.address],
+				this.getTransactionOption(6000000)
+			)
+			await this._addressConfig.setWithdrawStorage(
+				this._withdrawStorage.address,
+				this.getTransactionOption()
+			)
+			await this._withdrawStorage.createStorage(this.getTransactionOption())
+		}
+
+		await this.retryNonceError(func)
 	}
 
 	private getTransactionOption(gasLimit = 0): Record<string, unknown> {
@@ -454,6 +611,24 @@ export class DevProtocolInstance {
 		}
 
 		return result
+	}
+
+	private async retryNonceError(func: () => Promise<void>) {
+		for (let i = 0; i < 3; i++) {
+			try {
+				// eslint-disable-next-line no-await-in-loop
+				await func()
+				return
+			} catch (e) {
+				if (e.name === 'TXRejectedError') {
+					// eslint-disable-next-line no-await-in-loop
+					await this.startToAddNonceOption()
+					continue
+				}
+
+				throw e
+			}
+		}
 	}
 }
 

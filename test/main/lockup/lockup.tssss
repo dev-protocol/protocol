@@ -88,7 +88,7 @@ describe('Lockup', () => {
 			const property = dev.property.getOne()!
 			await dev.dev.deposit(property.address, 10000)
 			await dev.lockup.cancel(property.address)
-			await mine(1)
+			await mine(dev.provider, 1)
 			await dev.lockup.withdraw(property.address)
 		})
 		it('Cannot be canceled after withdraw ends normally.', async () => {
@@ -96,7 +96,7 @@ describe('Lockup', () => {
 			const property = dev.property.getOne()!
 			await dev.dev.deposit(property.address, 10000)
 			await dev.lockup.cancel(property.address)
-			await mine(1)
+			await mine(dev.provider, 1)
 			await dev.lockup.withdraw(property.address)
 			const res = await dev.lockup.cancel(property.address).catch(err)
 			validateErrorMessage(res, 'dev token is not locked')

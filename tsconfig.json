@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"experimentalDecorators": true,
 		"target": "es2015",
 		"lib": ["es2015", "es2016", "es2017", "es2018", "esnext"],
 		"moduleResolution": "node",
@@ -9,7 +10,7 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"typeRoots": ["./node_modules/@types", "./types"],
-		"types": ["node", "jest"],
+		"types": ["node", "mocha"],
 		"resolveJsonModule": true
 	},
 	"include": ["**/*"]

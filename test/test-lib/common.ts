@@ -11,3 +11,7 @@ export async function mine(
 		await provider.send('eve_mine', [])
 	}
 }
+
+// eslint-disable-next-line @typescript-eslint/promise-function-async
+export const sleep = (msec: number) =>
+	new Promise((resolve) => setTimeout(resolve, msec))
