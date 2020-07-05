@@ -313,9 +313,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		(uint256 nextReward, , , , uint256 price) = difference(_property, last);
 		uint256 lockedUpPerAccount = lockupStorage.getValue(_property, _user);
 		uint256 amount = price.mul(lockedUpPerAccount);
-		uint256 result = amount > 0
-			? amount.divBasis().divBasis()
-			: 0;
+		uint256 result = amount > 0 ? amount.divBasis().divBasis() : 0;
 		return (result, nextReward);
 	}
 

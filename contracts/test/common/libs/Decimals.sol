@@ -13,19 +13,11 @@ contract DecimalsTest {
 		return _a.outOf(_b);
 	}
 
-	function mulBasis(uint256 _a)
-		external
-		pure
-		returns (uint256 result)
-	{
+	function mulBasis(uint256 _a) external pure returns (uint256 result) {
 		return _a.mulBasis();
 	}
 
-	function divBasis(uint256 _a)
-		external
-		pure
-		returns (uint256 result)
-	{
+	function divBasis(uint256 _a) external pure returns (uint256 result) {
 		return _a.divBasis();
 	}
 }
