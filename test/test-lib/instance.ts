@@ -11,7 +11,6 @@ import {
 	LockupInstance,
 	LockupStorageInstance,
 	PropertyFactoryInstance,
-	DecimalsInstance,
 	PolicyFactoryInstance,
 	PolicySetInstance,
 	PolicyGroupInstance,
@@ -158,13 +157,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateAllocator(): Promise<void> {
-		this._allocator = await (async (x) => {
-			;(x as any).link(
-				'Decimals',
-				await this.generateDecimals().then((x) => x.address)
-			)
-			return x.new(this.addressConfig.address, this.fromDeployer)
-		})(contract('Allocator'))
+		this._allocator = await contract('Allocator').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
 		await this._addressConfig.setAllocator(
 			this._allocator.address,
 			this.fromDeployer
@@ -183,13 +179,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateLockup(): Promise<void> {
-		this._lockup = await (async (x) => {
-			;(x as any).link(
-				'Decimals',
-				await this.generateDecimals().then((x) => x.address)
-			)
-			return x.new(this.addressConfig.address, this.fromDeployer)
-		})(contract('Lockup'))
+		this._lockup = await contract('Lockup').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 	}
 
@@ -356,13 +349,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateWithdraw(): Promise<void> {
-		this._withdraw = await (async (x) => {
-			;(x as any).link(
-				'Decimals',
-				await this.generateDecimals().then((x) => x.address)
-			)
-			return x.new(this.addressConfig.address, this.fromDeployer)
-		})(contract('Withdraw'))
+		this._withdraw = await contract('Withdraw').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
 		await this._addressConfig.setWithdraw(
 			this._withdraw.address,
 			this.fromDeployer
@@ -381,22 +371,11 @@ export class DevProtocolInstance {
 		await this._withdrawStorage.createStorage(this.fromDeployer)
 	}
 
-	public async generateDecimals(): Promise<DecimalsInstance> {
-		return artifacts.require('Decimals').new(this.fromDeployer)
-	}
-
 	public async getPolicy(
 		contractName: string,
 		user: string
 	): Promise<IPolicyInstance> {
-		const tmp = await (async (x) => {
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			;(x as any).link(
-				'Decimals',
-				await this.generateDecimals().then((x) => x.address)
-			)
-			return x.new({from: user})
-		})(contract(contractName))
+		const tmp = await contract(contractName).new({from: user})
 		return tmp
 	}
 

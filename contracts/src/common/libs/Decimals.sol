@@ -21,7 +21,11 @@ library Decimals {
 		return (a.div(_b));
 	}
 
-	function basis() external pure returns (uint120) {
-		return basisValue;
+	function mulBasis(uint256 _a) internal pure returns (uint256) {
+		return _a.mul(basisValue);
+	}
+
+	function divBasis(uint256 _a) internal pure returns (uint256) {
+		return _a.div(basisValue);
 	}
 }

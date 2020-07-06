@@ -153,7 +153,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			balance = balanceLimit;
 		}
 		uint256 value = _holdersPrice.mul(balance);
-		return (value.div(Decimals.basis()).div(Decimals.basis()), reward);
+		return (value.divBasis().divBasis(), reward);
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)
@@ -187,7 +187,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			0
 		);
-		return _amount.div(Decimals.basis()).div(Decimals.basis());
+		return _amount.divBasis().divBasis();
 	}
 
 	function __legacyWithdrawableAmount(address _property, address _user)
@@ -204,7 +204,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		uint256 priceGap = price.sub(_last);
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
 		uint256 value = priceGap.mul(balance);
-		return value.div(Decimals.basis());
+		return value.divBasis();
 	}
 
 	function __updateLegacyWithdrawableAmount(address _property, address _user)
