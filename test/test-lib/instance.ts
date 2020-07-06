@@ -183,14 +183,12 @@ export class DevProtocolInstance {
 			this.addressConfig.address,
 			this.fromDeployer
 		)
+		await this._lockup.createStorage()
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 	}
 
 	public async generateLockupStorage(): Promise<void> {
-		this._lockupStorage = await contract('LockupStorage').new(
-			this.addressConfig.address,
-			this.fromDeployer
-		)
+		this._lockupStorage = await contract('LockupStorage').new(this.fromDeployer)
 		await this._addressConfig.setLockupStorage(
 			this._lockupStorage.address,
 			this.fromDeployer
