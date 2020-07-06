@@ -166,8 +166,8 @@ export class DevProtocolInstance {
 			this.addressConfig.address,
 			this.fromDeployer
 		)
-		await this._lockup.createStorage()
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
+		await this._lockup.createStorage()
 	}
 
 	public async generateLockupStorage(): Promise<void> {
