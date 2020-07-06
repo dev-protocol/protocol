@@ -21,7 +21,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			dev.generateMetricsFactory(),
 			dev.generateMetricsGroup(),
 			dev.generateLockup(),
-			dev.generateLockupStorage(),
 			dev.generateWithdraw(),
 			dev.generateWithdrawStorage(),
 			dev.generatePropertyFactory(),

@@ -238,7 +238,6 @@ contract(
 				await Promise.all([
 					dev.generateDev(),
 					dev.generateLockup(),
-					dev.generateLockupStorage(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateVoteTimes(),

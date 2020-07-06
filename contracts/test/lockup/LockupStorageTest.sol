@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 
 contract LockupStorageTest is LockupStorage {
-
 	function setStorageLastBlockNumberTest(address _property, uint256 _value)
 		external
 	{
@@ -77,9 +76,10 @@ contract LockupStorageTest is LockupStorage {
 		setStorageCumulativeLockedUpUnitAndBlock(_addr, _unit, _block);
 	}
 
-	function setStorageCumulativeLockedUpValueTest(address _addr, uint256 _value)
-		external
-	{
+	function setStorageCumulativeLockedUpValueTest(
+		address _addr,
+		uint256 _value
+	) external {
 		setStorageCumulativeLockedUpValue(_addr, _value);
 	}
 

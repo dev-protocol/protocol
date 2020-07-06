@@ -37,7 +37,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			dev.generateMetricsFactory(),
 			dev.generateMetricsGroup(),
 			dev.generateLockup(),
-			dev.generateLockupStorage(),
 			dev.generateWithdraw(),
 			dev.generateWithdrawStorage(),
 			dev.generatePropertyFactory(),

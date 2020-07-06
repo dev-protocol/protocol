@@ -8,7 +8,6 @@ import {
 	PropertyGroupInstance,
 	DevInstance,
 	LockupInstance,
-	LockupStorageInstance,
 	PropertyFactoryInstance,
 	PolicyFactoryInstance,
 	PolicySetInstance,
@@ -32,7 +31,6 @@ export class DevProtocolInstance {
 	private _allocator!: AllocatorInstance
 	private _dev!: DevInstance
 	private _lockup!: LockupInstance
-	private _lockupStorage!: LockupStorageInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _voteCounter!: VoteCounterInstance
 	private _voteCounterStorage!: VoteCounterStorageInstance
@@ -71,10 +69,6 @@ export class DevProtocolInstance {
 
 	public get lockup(): LockupInstance {
 		return this._lockup
-	}
-
-	public get lockupStorage(): LockupStorageInstance {
-		return this._lockupStorage
 	}
 
 	public get propertyFactory(): PropertyFactoryInstance {
@@ -168,15 +162,6 @@ export class DevProtocolInstance {
 		)
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 		await this._lockup.createStorage()
-	}
-
-	public async generateLockupStorage(): Promise<void> {
-		this._lockupStorage = await contract('LockupStorage').new(this.fromDeployer)
-		await this._addressConfig.setLockupStorage(
-			this._lockupStorage.address,
-			this.fromDeployer
-		)
-		await this._lockupStorage.createStorage(this.fromDeployer)
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
