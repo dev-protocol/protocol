@@ -168,9 +168,9 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		const block = await getBlock()
+		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 		await this._lockup.createStorage()
 		await this._lockup.setDIP4GenesisBlock(block)
-		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 	}
 
 	public async generateLockupStorage(): Promise<void> {
