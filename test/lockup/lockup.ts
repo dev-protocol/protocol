@@ -4,7 +4,13 @@ import {
 	PolicyTestForLockupInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
-import {mine, toBigNumber, getBlock, gasLogger} from '../test-lib/utils/common'
+import {
+	mine,
+	toBigNumber,
+	getBlock,
+	gasLogger,
+	keccak256,
+} from '../test-lib/utils/common'
 import {getWithdrawInterestAmount} from '../test-lib/utils/mint-amount'
 import {getPropertyAddress} from '../test-lib/utils/log'
 import {waitForEvent, getEventValue} from '../test-lib/utils/event'
@@ -138,13 +144,10 @@ contract('LockupTest', ([deployer, user1]) => {
 				.getStorageAddress()
 				.then((x) => artifacts.require('EternalStorage').at(x))
 			await storage.setUint(
-				await dev.lockup.getStorageWithdrawalStatusKey(
-					property.address,
-					deployer
-				),
+				keccak256('_lastBlockNumber', property.address, deployer),
 				1
 			)
-			await dev.lockup.changeOwner(dev.lockup.address)
+			await storage.changeOwner(dev.lockup.address)
 
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 10000)
