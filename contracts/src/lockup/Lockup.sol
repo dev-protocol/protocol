@@ -254,7 +254,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
 		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
 		uint256 propertyRewards = rewards.sub(_lastReward).mul(
-			valuePerProperty.mul(Decimals.basis()).outOf(valueAll)
+			valuePerProperty.mulBasis().outOf(valueAll)
 		);
 		uint256 lockedUpPerProperty = lockupStorage.getPropertyValue(_property);
 		uint256 totalSupply = ERC20Mintable(_property).totalSupply();
@@ -286,7 +286,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		(uint256 nextRewards, ) = dry(lockupStorage);
 		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
 		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
-		uint256 share = valuePerProperty.mul(Decimals.basis()).outOf(valueAll);
+		uint256 share = valuePerProperty.mulBasis().outOf(valueAll);
 		uint256 propertyRewards = nextRewards.mul(share);
 		uint256 lockedUp = lockupStorage.getPropertyValue(_property);
 		uint256 holders = Policy(config().policy()).holdersShare(
@@ -313,9 +313,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		(uint256 nextReward, , , , uint256 price) = difference(_property, last);
 		uint256 lockedUpPerAccount = lockupStorage.getValue(_property, _user);
 		uint256 amount = price.mul(lockedUpPerAccount);
-		uint256 result = amount > 0
-			? amount.div(Decimals.basis()).div(Decimals.basis())
-			: 0;
+		uint256 result = amount > 0 ? amount.divBasis().divBasis() : 0;
 		return (result, nextReward);
 	}
 
@@ -525,7 +523,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		uint256 priceGap = price.sub(_last);
 		uint256 lockedUpValue = lockupStorage.getValue(_property, _user);
 		uint256 value = priceGap.mul(lockedUpValue);
-		return value.div(Decimals.basis());
+		return value.divBasis();
 	}
 
 	function __updateLegacyWithdrawableInterestAmount(
