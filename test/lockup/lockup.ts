@@ -30,7 +30,6 @@ contract('LockupTest', ([deployer, user1]) => {
 		await dev.generateAddressConfig()
 		await Promise.all([
 			dev.generateAllocator(),
-			dev.generateAllocatorStorage(),
 			dev.generateMarketFactory(),
 			dev.generateMarketGroup(),
 			dev.generateMetricsFactory(),

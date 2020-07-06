@@ -244,7 +244,6 @@ contract(
 					dev.generateVoteTimes(),
 					dev.generateVoteTimesStorage(),
 					dev.generateAllocator(),
-					dev.generateAllocatorStorage(),
 					dev.generateMetricsGroup(),
 					dev.generateWithdraw(),
 					dev.generateWithdrawStorage(),
