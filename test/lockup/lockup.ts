@@ -14,10 +14,7 @@ import {
 import {getWithdrawInterestAmount} from '../test-lib/utils/mint-amount'
 import {getPropertyAddress} from '../test-lib/utils/log'
 import {waitForEvent, getEventValue} from '../test-lib/utils/event'
-import {
-	validateErrorMessage,
-	validatePauseErrorMessage,
-} from '../test-lib/utils/error'
+import {validateErrorMessage} from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
 contract('LockupTest', ([deployer, user1]) => {
@@ -113,14 +110,6 @@ contract('LockupTest', ([deployer, user1]) => {
 		})
 	})
 	describe('Lockup; lockup', () => {
-		it('should fail to call when paused', async () => {
-			const [dev, ,] = await init()
-
-			await dev.lockup.pause()
-
-			const res = await dev.lockup.getAllValue().catch(err)
-			validatePauseErrorMessage(res, false)
-		})
 		it('should fail to call when sent from other than Dev Contract', async () => {
 			const [dev, property] = await init()
 

@@ -9,11 +9,6 @@ const handler = async (
 	const [config] = await Promise.all([
 		artifacts.require('AddressConfig').at(CONFIG),
 	])
-	// Generate current Lockup contract and Withdraw contract
-	const [oldLockup, oldWithdraw] = await Promise.all([
-		artifacts.require('Lockup').at(await config.lockup()),
-		artifacts.require('Withdraw').at(await config.withdraw()),
-	])
 
 	const [lockupStorage] = await Promise.all([
 		artifacts.require('LockupStorage').at(await config.lockupStorage()),
@@ -30,10 +25,6 @@ const handler = async (
 	const lockupStorageAddress = await lockupStorage.getStorageAddress()
 	await nextLockup.setStorage(lockupStorageAddress)
 	await lockupStorage.changeOwner(nextLockup.address)
-
-	// Pause current Lockup contract and Withdraw contract
-	await oldLockup.pause()
-	await oldWithdraw.pause()
 
 	// Enable new Lockup and new Withdraw
 	await config.setLockup(nextLockup.address)

@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 // prettier-ignore
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Property} from "contracts/src/property/Property.sol";
@@ -16,7 +15,6 @@ import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
 contract Lockup is
 	ILockup,
-	Pausable,
 	UsingConfig,
 	UsingValidator,
 	LockupStorage

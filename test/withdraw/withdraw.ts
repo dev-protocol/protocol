@@ -471,19 +471,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 		})
 	})
-	describe('Withdraw; pause', () => {
-		it('should fail to call when paused.', async () => {
-			const [dev, , property] = await init()
-			await dev.withdraw.pause()
-			let res = await dev.withdraw
-				.getRewardsAmount(property.address)
-				.catch((err: Error) => err)
-			validatePauseErrorMessage(res, false)
-			await dev.withdraw.unpause()
-			res = await dev.withdraw.getRewardsAmount(property.address)
-			expect(res.toNumber()).to.be.equal(0)
-		})
-	})
 	describe('Withdraw; calculateWithdrawableAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,

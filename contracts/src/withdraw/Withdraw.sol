@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 // prettier-ignore
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
@@ -11,7 +10,7 @@ import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
-contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
+contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -216,7 +215,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {
-		require(paused() == false, "You cannot use that");
 		return WithdrawStorage(config().withdrawStorage());
 	}
 }

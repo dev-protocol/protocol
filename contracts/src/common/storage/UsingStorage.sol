@@ -1,10 +1,9 @@
 pragma solidity ^0.5.0;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {EternalStorage} from "contracts/src/common/storage/EternalStorage.sol";
 
-contract UsingStorage is Ownable, Pausable {
+contract UsingStorage is Ownable {
 	address private _storage;
 
 	modifier hasStorage() {
@@ -18,7 +17,6 @@ contract UsingStorage is Ownable, Pausable {
 		hasStorage
 		returns (EternalStorage)
 	{
-		require(paused() == false, "You cannot use that");
 		return EternalStorage(_storage);
 	}
 
