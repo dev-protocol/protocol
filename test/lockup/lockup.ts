@@ -143,10 +143,11 @@ contract('LockupTest', ([deployer, user1]) => {
 				.getStorageAddress()
 				.then((x) => artifacts.require('EternalStorage').at(x))
 			await storage.setUint(
-				keccak256('_lastBlockNumber', property.address, deployer),
+				keccak256('_withdrawalStatus', property.address, deployer),
 				1
 			)
 			await storage.changeOwner(dev.lockup.address)
+			await dev.addressConfig.setToken(deployer)
 
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 10000)
@@ -161,13 +162,11 @@ contract('LockupTest', ([deployer, user1]) => {
 				.getStorageAddress()
 				.then((x) => artifacts.require('EternalStorage').at(x))
 			await storage.setUint(
-				await dev.lockup.getStorageWithdrawalStatusKey(
-					property.address,
-					deployer
-				),
+				keccak256('_withdrawalStatus', property.address, deployer),
 				1
 			)
-			await dev.lockup.changeOwner(dev.lockup.address)
+			await storage.changeOwner(dev.lockup.address)
+			await dev.addressConfig.setToken(deployer)
 
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 0)
@@ -231,13 +230,10 @@ contract('LockupTest', ([deployer, user1]) => {
 				.getStorageAddress()
 				.then((x) => artifacts.require('EternalStorage').at(x))
 			await storage.setUint(
-				await dev.lockup.getStorageWithdrawalStatusKey(
-					property.address,
-					deployer
-				),
+				keccak256('_withdrawalStatus', property.address, deployer),
 				1
 			)
-			await dev.lockup.changeOwner(dev.lockup.address)
+			await storage.changeOwner(dev.lockup.address)
 
 			const res = await dev.lockup.withdraw(property.address).catch(err)
 			validateErrorMessage(res, 'dev token is not locked')
@@ -255,13 +251,10 @@ contract('LockupTest', ([deployer, user1]) => {
 				.getStorageAddress()
 				.then((x) => artifacts.require('EternalStorage').at(x))
 			await storage.setUint(
-				await dev.lockup.getStorageWithdrawalStatusKey(
-					property.address,
-					deployer
-				),
+				keccak256('_withdrawalStatus', property.address, deployer),
 				1
 			)
-			await dev.lockup.changeOwner(dev.lockup.address)
+			await storage.changeOwner(dev.lockup.address)
 
 			await dev.lockup.withdraw(property.address)
 			lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
@@ -371,12 +364,13 @@ contract('LockupTest', ([deployer, user1]) => {
 			const storage = await dev.lockup
 				.getStorageAddress()
 				.then((x) => artifacts.require('EternalStorage').at(x))
-			await storage.setUint(await dev.lockup.getStorageAllValueKey(), 6457)
+			await storage.setUint(keccak256('_allValue'), 6457)
+			await storage.setUint(keccak256('_propertyValue', property.address), 6457)
 			await storage.setUint(
-				await dev.lockup.getStorageValueKey(property.address, deployer),
+				keccak256('_value', property.address, deployer),
 				6457
 			)
-			await dev.lockup.changeOwner(dev.lockup.address)
+			await storage.changeOwner(dev.lockup.address)
 
 			const block = await getBlock().then(toBigNumber)
 			await dev.dev.deposit(property.address, 123456)
@@ -443,12 +437,13 @@ contract('LockupTest', ([deployer, user1]) => {
 			const storage = await dev.lockup
 				.getStorageAddress()
 				.then((x) => artifacts.require('EternalStorage').at(x))
-			await storage.setUint(await dev.lockup.getStorageAllValueKey(), 5475)
+			await storage.setUint(keccak256('_allValue'), 5475)
+			await storage.setUint(keccak256('_propertyValue', property.address), 5475)
 			await storage.setUint(
-				await dev.lockup.getStorageValueKey(property.address, deployer),
+				keccak256('_value', property.address, deployer),
 				5475
 			)
-			await dev.lockup.changeOwner(dev.lockup.address)
+			await storage.changeOwner(dev.lockup.address)
 
 			const block = await getBlock().then(toBigNumber)
 			await dev.dev.deposit(property.address, 123456)
@@ -1321,45 +1316,34 @@ contract('LockupTest', ([deployer, user1]) => {
 				const storage = await dev.lockup
 					.getStorageAddress()
 					.then((x) => artifacts.require('EternalStorage').at(x))
+				await storage.setUint(keccak256('_allValue'), totalLocked)
 				await storage.setUint(
-					await dev.lockup.getStorageAllValueKey(),
-					totalLocked
-				)
-				await storage.setUint(
-					await dev.lockup.getStorageValueKey(property.address, alice),
+					keccak256('_value', property.address, alice),
 					lockedAlice
 				)
 				await storage.setUint(
-					await dev.lockup.getStorageValueKey(property.address, bob),
+					keccak256('_value', property.address, bob),
 					lockedBob
 				)
 				await storage.setUint(
-					await dev.lockup.getStoragePropertyValueKey(property.address),
+					keccak256('_propertyValue', property.address),
 					totalLocked
 				)
+				await storage.setUint(keccak256('_allValue'), totalLocked)
 				await storage.setUint(
-					await dev.lockup.getStorageAllValueKey(),
-					totalLocked
-				)
-				await storage.setUint(
-					await dev.lockup.getStorageInterestPriceKey(property.address),
+					keccak256('_interestTotals', property.address),
 					legacyPrice
 				)
 				await storage.setUint(
-					await dev.lockup.getStorageLastInterestPriceKey(
-						property.address,
-						alice
-					),
+					keccak256('_lastLastInterestPrice', property.address, alice),
 					legacyLastPriceAlice
 				)
 				await storage.setUint(
-					await dev.lockup.getStorageLastInterestPriceKey(
-						property.address,
-						bob
-					),
+					keccak256('_lastLastInterestPrice', property.address, bob),
 					legacyLastPriceBob
 				)
-				await dev.lockup.changeOwner(dev.lockup.address)
+				await storage.changeOwner(dev.lockup.address)
+
 				await dev.lockup.update()
 				lastBlock = await getBlock().then(toBigNumber)
 				await mine(1)
@@ -1527,45 +1511,34 @@ contract('LockupTest', ([deployer, user1]) => {
 				const storage = await dev.lockup
 					.getStorageAddress()
 					.then((x) => artifacts.require('EternalStorage').at(x))
+				await storage.setUint(keccak256('_allValue'), totalLocked)
 				await storage.setUint(
-					await dev.lockup.getStorageAllValueKey(),
-					totalLocked
-				)
-				await storage.setUint(
-					await dev.lockup.getStorageValueKey(property.address, alice),
+					keccak256('_value', property.address, alice),
 					lockedAlice
 				)
 				await storage.setUint(
-					await dev.lockup.getStorageValueKey(property.address, bob),
+					keccak256('_value', property.address, bob),
 					lockedBob
 				)
 				await storage.setUint(
-					await dev.lockup.getStoragePropertyValueKey(property.address),
+					keccak256('_propertyValue', property.address),
 					totalLocked
 				)
+				await storage.setUint(keccak256('_allValue'), totalLocked)
 				await storage.setUint(
-					await dev.lockup.getStorageAllValueKey(),
-					totalLocked
-				)
-				await storage.setUint(
-					await dev.lockup.getStorageInterestPriceKey(property.address),
+					keccak256('_interestTotals', property.address),
 					legacyPrice
 				)
 				await storage.setUint(
-					await dev.lockup.getStorageLastInterestPriceKey(
-						property.address,
-						alice
-					),
+					keccak256('_lastLastInterestPrice', property.address, alice),
 					legacyLastPriceAlice
 				)
 				await storage.setUint(
-					await dev.lockup.getStorageLastInterestPriceKey(
-						property.address,
-						bob
-					),
+					keccak256('_lastLastInterestPrice', property.address, bob),
 					legacyLastPriceBob
 				)
-				await dev.lockup.changeOwner(dev.lockup.address)
+				await storage.changeOwner(dev.lockup.address)
+
 				await dev.dev.deposit(property.address, 200000000, {from: alice})
 				blockAlice = await getBlock().then(toBigNumber)
 				await dev.dev.deposit(property.address, 100000000, {from: bob})
