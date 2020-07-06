@@ -15,12 +15,21 @@ const handler = async (
 		artifacts.require('Withdraw').at(await config.withdraw()),
 	])
 
+	const [lockupStorage] = await Promise.all([
+		artifacts.require('LockupStorage').at(await config.lockupStorage()),
+	])
+
 	// Deploy new Lockup and new Withdraw
 	const nextLockup = await artifacts.require('Lockup').new(config.address)
 	const nextWithdraw = await artifacts.require('Withdraw').new(config.address)
 
 	// Update DIP4GenesisBlock
 	await nextLockup.setDIP4GenesisBlock(DEPLOYED_BLOCK)
+
+	// Delegation of authority
+	const lockupStorageAddress = await lockupStorage.getStorageAddress()
+	await nextLockup.setStorage(lockupStorageAddress)
+	await lockupStorage.changeOwner(nextLockup.address)
 
 	// Pause current Lockup contract and Withdraw contract
 	await oldLockup.pause()
@@ -29,6 +38,10 @@ const handler = async (
 	// Enable new Lockup and new Withdraw
 	await config.setLockup(nextLockup.address)
 	await config.setWithdraw(nextWithdraw.address)
+
+	// Set Default Address
+	await config.setAllocatorStorage('0x0000000000000000000000000000000000000000')
+	await config.setLockupStorage('0x0000000000000000000000000000000000000000')
 
 	callback(null)
 }
