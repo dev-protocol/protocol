@@ -22,6 +22,7 @@ import {
 	IMarketInstance,
 	WithdrawInstance,
 } from '../../types/truffle-contracts'
+import {getBlock} from './utils/common'
 
 const contract = artifacts.require
 
@@ -166,7 +167,9 @@ export class DevProtocolInstance {
 			this.addressConfig.address,
 			this.fromDeployer
 		)
+		const block = await getBlock()
 		await this._lockup.createStorage()
+		await this._lockup.setDIP4GenesisBlock(block)
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 	}
 

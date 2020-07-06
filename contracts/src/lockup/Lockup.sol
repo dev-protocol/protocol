@@ -23,14 +23,10 @@ contract Lockup is
 {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	uint256 public deployedBlock;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {
-		// Save a deployed block number locally for a fallback of getCumulativeLockedUpUnitAndBlock.
-		deployedBlock = block.number;
-	}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function lockup(
 		address _from,
@@ -97,8 +93,8 @@ contract Lockup is
 		unit = _property == address(0)
 			? getStorageAllValue()
 			: getStoragePropertyValue(_property);
-		// Assign lastBlock as deployedBlock because when AllValue or PropertyValue is not 0, already locked-up when deployed this contract.
-		lastBlock = deployedBlock;
+		// Assign lastBlock as DIP4GenesisBlock because when AllValue or PropertyValue is not 0, already locked-up when started DIP4.
+		lastBlock = getStorageDIP4GenesisBlock();
 		return (unit, lastBlock);
 	}
 
@@ -478,5 +474,9 @@ contract Lockup is
 	) private {
 		uint256 interestPrice = getStorageInterestPrice(_property);
 		setStorageLastInterestPrice(_property, _user, interestPrice);
+	}
+
+	function setDIP4GenesisBlock(uint256 _block) external onlyPauser {
+		setStorageDIP4GenesisBlock(_block);
 	}
 }
