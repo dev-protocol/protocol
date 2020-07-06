@@ -1,7 +1,6 @@
 import {
 	AddressConfigInstance,
 	AllocatorInstance,
-	AllocatorStorageInstance,
 	VoteCounterInstance,
 	VoteCounterStorageInstance,
 	VoteTimesInstance,
@@ -9,7 +8,6 @@ import {
 	PropertyGroupInstance,
 	DevInstance,
 	LockupInstance,
-	LockupStorageInstance,
 	PropertyFactoryInstance,
 	PolicyFactoryInstance,
 	PolicySetInstance,
@@ -23,6 +21,7 @@ import {
 	IMarketInstance,
 	WithdrawInstance,
 } from '../../types/truffle-contracts'
+import {getBlock} from './utils/common'
 
 const contract = artifacts.require
 
@@ -31,10 +30,8 @@ export class DevProtocolInstance {
 
 	private _addressConfig!: AddressConfigInstance
 	private _allocator!: AllocatorInstance
-	private _allocatorStorage!: AllocatorStorageInstance
 	private _dev!: DevInstance
 	private _lockup!: LockupInstance
-	private _lockupStorage!: LockupStorageInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _voteCounter!: VoteCounterInstance
 	private _voteCounterStorage!: VoteCounterStorageInstance
@@ -67,20 +64,12 @@ export class DevProtocolInstance {
 		return this._allocator
 	}
 
-	public get allocatorStorage(): AllocatorStorageInstance {
-		return this._allocatorStorage
-	}
-
 	public get dev(): DevInstance {
 		return this._dev
 	}
 
 	public get lockup(): LockupInstance {
 		return this._lockup
-	}
-
-	public get lockupStorage(): LockupStorageInstance {
-		return this._lockupStorage
 	}
 
 	public get propertyFactory(): PropertyFactoryInstance {
@@ -167,35 +156,15 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generateAllocatorStorage(): Promise<void> {
-		this._allocatorStorage = await contract('AllocatorStorage').new(
-			this.fromDeployer
-		)
-		await this._addressConfig.setAllocatorStorage(
-			this._allocatorStorage.address,
-			this.fromDeployer
-		)
-		await this._allocatorStorage.createStorage(this.fromDeployer)
-	}
-
 	public async generateLockup(): Promise<void> {
 		this._lockup = await contract('Lockup').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
+		const block = await getBlock()
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
-	}
-
-	public async generateLockupStorage(): Promise<void> {
-		this._lockupStorage = await contract('LockupStorage').new(
-			this.addressConfig.address,
-			this.fromDeployer
-		)
-		await this._addressConfig.setLockupStorage(
-			this._lockupStorage.address,
-			this.fromDeployer
-		)
-		await this._lockupStorage.createStorage(this.fromDeployer)
+		await this._lockup.createStorage()
+		await this._lockup.setDIP4GenesisBlock(block)
 	}
 
 	public async generatePropertyFactory(): Promise<void> {

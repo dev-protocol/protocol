@@ -32,13 +32,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		await dev.generateAddressConfig()
 		await Promise.all([
 			dev.generateAllocator(),
-			dev.generateAllocatorStorage(),
 			dev.generateMarketFactory(),
 			dev.generateMarketGroup(),
 			dev.generateMetricsFactory(),
 			dev.generateMetricsGroup(),
 			dev.generateLockup(),
-			dev.generateLockupStorage(),
 			dev.generateWithdraw(),
 			dev.generateWithdrawStorage(),
 			dev.generatePropertyFactory(),

@@ -110,12 +110,10 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
-					dev.generateLockupStorage(),
 					dev.generateDev(),
 					dev.generateWithdraw(),
 					dev.generateWithdrawStorage(),
 					dev.generateAllocator(),
-					dev.generateAllocatorStorage(),
 				])
 				const behavuor1 = await dev.getMarket('MarketTest3', user)
 				const behavuor2 = await dev.getMarket('MarketTest3', user)
@@ -319,12 +317,10 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
-					dev.generateLockupStorage(),
 					dev.generateDev(),
 					dev.generateWithdraw(),
 					dev.generateWithdrawStorage(),
 					dev.generateAllocator(),
-					dev.generateAllocatorStorage(),
 					dev.generateMetricsFactory(),
 					dev.generateMetricsGroup(),
 				])

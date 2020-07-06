@@ -2,35 +2,30 @@ pragma solidity ^0.5.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
-contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
+contract LockupStorage is UsingStorage {
 	using SafeMath for uint256;
 
-	uint256 private constant basis = 100000000000000000000000000000000;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
+	uint256 public constant basis = 100000000000000000000000000000000;
 
 	//Last Block Number
-	function setLastBlockNumber(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getLastBlockNumberKey(_property);
+	function setStorageLastBlockNumber(address _property, uint256 _value)
+		internal
+	{
+		bytes32 key = getStorageLastBlockNumberKey(_property);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getLastBlockNumber(address _property)
-		external
+	function getStorageLastBlockNumber(address _property)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getLastBlockNumberKey(_property);
+		bytes32 key = getStorageLastBlockNumberKey(_property);
 		return eternalStorage().getUint(key);
 	}
 
-	function getLastBlockNumberKey(address _property)
+	function getStorageLastBlockNumberKey(address _property)
 		private
 		pure
 		returns (bytes32)
@@ -39,44 +34,40 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//AllValue
-	function setAllValue(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getAllValueKey();
+	function setStorageAllValue(uint256 _value) internal {
+		bytes32 key = getStorageAllValueKey();
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getAllValue() external view returns (uint256) {
-		bytes32 key = getAllValueKey();
+	function getStorageAllValue() public view returns (uint256) {
+		bytes32 key = getStorageAllValueKey();
 		return eternalStorage().getUint(key);
 	}
 
-	function getAllValueKey() private pure returns (bytes32) {
+	function getStorageAllValueKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_allValue"));
 	}
 
 	//Value
-	function setValue(
+	function setStorageValue(
 		address _property,
 		address _sender,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getValueKey(_property, _sender);
+	) internal {
+		bytes32 key = getStorageValueKey(_property, _sender);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getValue(address _property, address _sender)
-		external
+	function getStorageValue(address _property, address _sender)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getValueKey(_property, _sender);
+		bytes32 key = getStorageValueKey(_property, _sender);
 		return eternalStorage().getUint(key);
 	}
 
-	function getValueKey(address _property, address _sender)
+	function getStorageValueKey(address _property, address _sender)
 		private
 		pure
 		returns (bytes32)
@@ -85,23 +76,23 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//PropertyValue
-	function setPropertyValue(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getPropertyValueKey(_property);
+	function setStoragePropertyValue(address _property, uint256 _value)
+		internal
+	{
+		bytes32 key = getStoragePropertyValueKey(_property);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getPropertyValue(address _property)
-		external
+	function getStoragePropertyValue(address _property)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getPropertyValueKey(_property);
+		bytes32 key = getStoragePropertyValueKey(_property);
 		return eternalStorage().getUint(key);
 	}
 
-	function getPropertyValueKey(address _property)
+	function getStoragePropertyValueKey(address _property)
 		private
 		pure
 		returns (bytes32)
@@ -110,27 +101,25 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//WithdrawalStatus
-	function setWithdrawalStatus(
+	function setStorageWithdrawalStatus(
 		address _property,
 		address _from,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getWithdrawalStatusKey(_property, _from);
+	) internal {
+		bytes32 key = getStorageWithdrawalStatusKey(_property, _from);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getWithdrawalStatus(address _property, address _from)
-		external
+	function getStorageWithdrawalStatus(address _property, address _from)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getWithdrawalStatusKey(_property, _from);
+		bytes32 key = getStorageWithdrawalStatusKey(_property, _from);
 		return eternalStorage().getUint(key);
 	}
 
-	function getWithdrawalStatusKey(address _property, address _sender)
+	function getStorageWithdrawalStatusKey(address _property, address _sender)
 		private
 		pure
 		returns (bytes32)
@@ -142,23 +131,23 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//InterestPrice
-	function setInterestPrice(address _property, uint256 _value) external {
+	function setStorageInterestPrice(address _property, uint256 _value)
+		internal
+	{
 		// The previously used function
 		// This function is only used in testing
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getInterestPriceKey(_property), _value);
+		eternalStorage().setUint(getStorageInterestPriceKey(_property), _value);
 	}
 
-	function getInterestPrice(address _property)
-		external
+	function getStorageInterestPrice(address _property)
+		public
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getInterestPriceKey(_property));
+		return eternalStorage().getUint(getStorageInterestPriceKey(_property));
 	}
 
-	function getInterestPriceKey(address _property)
+	function getStorageInterestPriceKey(address _property)
 		private
 		pure
 		returns (bytes32)
@@ -167,29 +156,29 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//LastInterestPrice
-	function setLastInterestPrice(
+	function setStorageLastInterestPrice(
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	) internal {
 		eternalStorage().setUint(
-			getLastInterestPriceKey(_property, _user),
+			getStorageLastInterestPriceKey(_property, _user),
 			_value
 		);
 	}
 
-	function getLastInterestPrice(address _property, address _user)
-		external
+	function getStorageLastInterestPrice(address _property, address _user)
+		public
 		view
 		returns (uint256)
 	{
 		return
-			eternalStorage().getUint(getLastInterestPriceKey(_property, _user));
+			eternalStorage().getUint(
+				getStorageLastInterestPriceKey(_property, _user)
+			);
 	}
 
-	function getLastInterestPriceKey(address _property, address _user)
+	function getStorageLastInterestPriceKey(address _property, address _user)
 		private
 		pure
 		returns (bytes32)
@@ -201,29 +190,31 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//LastSameRewardsAmountAndBlock
-	function setLastSameRewardsAmountAndBlock(uint256 _amount, uint256 _block)
-		external
-	{
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	function setStorageLastSameRewardsAmountAndBlock(
+		uint256 _amount,
+		uint256 _block
+	) internal {
 		uint256 record = _amount.mul(basis).add(_block);
-		eternalStorage().setUint(getLastSameRewardsAmountAndBlockKey(), record);
+		eternalStorage().setUint(
+			getStorageLastSameRewardsAmountAndBlockKey(),
+			record
+		);
 	}
 
-	function getLastSameRewardsAmountAndBlock()
-		external
+	function getStorageLastSameRewardsAmountAndBlock()
+		public
 		view
 		returns (uint256 _amount, uint256 _block)
 	{
 		uint256 record = eternalStorage().getUint(
-			getLastSameRewardsAmountAndBlockKey()
+			getStorageLastSameRewardsAmountAndBlockKey()
 		);
 		uint256 amount = record.div(basis);
 		uint256 blockNumber = record.sub(amount.mul(basis));
 		return (amount, blockNumber);
 	}
 
-	function getLastSameRewardsAmountAndBlockKey()
+	function getStorageLastSameRewardsAmountAndBlockKey()
 		private
 		pure
 		returns (bytes32)
@@ -232,50 +223,51 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeGlobalRewards
-	function setCumulativeGlobalRewards(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getCumulativeGlobalRewardsKey(), _value);
-	}
-
-	function getCumulativeGlobalRewards() external view returns (uint256) {
-		return eternalStorage().getUint(getCumulativeGlobalRewardsKey());
-	}
-
-	function getCumulativeGlobalRewardsKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
-	}
-
-	//LastCumulativeGlobalReward
-	function setLastCumulativeGlobalReward(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	function setStorageCumulativeGlobalRewards(uint256 _value) internal {
 		eternalStorage().setUint(
-			getLastCumulativeGlobalRewardKey(_property, _user),
+			getStorageCumulativeGlobalRewardsKey(),
 			_value
 		);
 	}
 
-	function getLastCumulativeGlobalReward(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastCumulativeGlobalRewardKey(_property, _user)
-			);
+	function getStorageCumulativeGlobalRewards() public view returns (uint256) {
+		return eternalStorage().getUint(getStorageCumulativeGlobalRewardsKey());
 	}
 
-	function getLastCumulativeGlobalRewardKey(address _property, address _user)
+	function getStorageCumulativeGlobalRewardsKey()
 		private
 		pure
 		returns (bytes32)
 	{
+		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
+	}
+
+	//LastCumulativeGlobalReward
+	function setStorageLastCumulativeGlobalReward(
+		address _property,
+		address _user,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageLastCumulativeGlobalRewardKey(_property, _user),
+			_value
+		);
+	}
+
+	function getStorageLastCumulativeGlobalReward(
+		address _property,
+		address _user
+	) public view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getStorageLastCumulativeGlobalRewardKey(_property, _user)
+			);
+	}
+
+	function getStorageLastCumulativeGlobalRewardKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
 		return
 			keccak256(
 				abi.encodePacked(
@@ -287,34 +279,32 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeLockedUpUnitAndBlock
-	function setCumulativeLockedUpUnitAndBlock(
+	function setStorageCumulativeLockedUpUnitAndBlock(
 		address _addr,
 		uint256 _unit,
 		uint256 _block
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	) internal {
 		uint256 record = _unit.mul(basis).add(_block);
 		eternalStorage().setUint(
-			getCumulativeLockedUpUnitAndBlockKey(_addr),
+			getStorageCumulativeLockedUpUnitAndBlockKey(_addr),
 			record
 		);
 	}
 
-	function getCumulativeLockedUpUnitAndBlock(address _addr)
-		external
+	function getStorageCumulativeLockedUpUnitAndBlock(address _addr)
+		public
 		view
 		returns (uint256 _unit, uint256 _block)
 	{
 		uint256 record = eternalStorage().getUint(
-			getCumulativeLockedUpUnitAndBlockKey(_addr)
+			getStorageCumulativeLockedUpUnitAndBlockKey(_addr)
 		);
 		uint256 unit = record.div(basis);
 		uint256 blockNumber = record.sub(unit.mul(basis));
 		return (unit, blockNumber);
 	}
 
-	function getCumulativeLockedUpUnitAndBlockKey(address _addr)
+	function getStorageCumulativeLockedUpUnitAndBlockKey(address _addr)
 		private
 		pure
 		returns (bytes32)
@@ -326,23 +316,27 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeLockedUpValue
-	function setCumulativeLockedUpValue(address _addr, uint256 _value)
-		external
+	function setStorageCumulativeLockedUpValue(address _addr, uint256 _value)
+		internal
 	{
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getCumulativeLockedUpValueKey(_addr), _value);
+		eternalStorage().setUint(
+			getStorageCumulativeLockedUpValueKey(_addr),
+			_value
+		);
 	}
 
-	function getCumulativeLockedUpValue(address _addr)
-		external
+	function getStorageCumulativeLockedUpValue(address _addr)
+		public
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getCumulativeLockedUpValueKey(_addr));
+		return
+			eternalStorage().getUint(
+				getStorageCumulativeLockedUpValueKey(_addr)
+			);
 	}
 
-	function getCumulativeLockedUpValueKey(address _addr)
+	function getStorageCumulativeLockedUpValueKey(address _addr)
 		private
 		pure
 		returns (bytes32)
@@ -351,38 +345,47 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//PendingWithdrawal
-	function setPendingInterestWithdrawal(
+	function setStoragePendingInterestWithdrawal(
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	) internal {
 		eternalStorage().setUint(
-			getPendingInterestWithdrawalKey(_property, _user),
+			getStoragePendingInterestWithdrawalKey(_property, _user),
 			_value
 		);
 	}
 
-	function getPendingInterestWithdrawal(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
+	function getStoragePendingInterestWithdrawal(
+		address _property,
+		address _user
+	) public view returns (uint256) {
 		return
 			eternalStorage().getUint(
-				getPendingInterestWithdrawalKey(_property, _user)
+				getStoragePendingInterestWithdrawalKey(_property, _user)
 			);
 	}
 
-	function getPendingInterestWithdrawalKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
+	function getStoragePendingInterestWithdrawalKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
 		return
 			keccak256(
 				abi.encodePacked("_pendingInterestWithdrawal", _property, _user)
 			);
+	}
+
+	//DIP4GenesisBlock
+	function setStorageDIP4GenesisBlock(uint256 _block) internal {
+		eternalStorage().setUint(getStorageDIP4GenesisBlockKey(), _block);
+	}
+
+	function getStorageDIP4GenesisBlock() public view returns (uint256) {
+		return eternalStorage().getUint(getStorageDIP4GenesisBlockKey());
+	}
+
+	function getStorageDIP4GenesisBlockKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("dip4GenesisBlock"));
 	}
 }
