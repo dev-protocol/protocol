@@ -13,12 +13,7 @@ import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
-contract Lockup is
-	ILockup,
-	UsingConfig,
-	UsingValidator,
-	LockupStorage
-{
+contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event Lockedup(address _from, address _property, uint256 _value);
