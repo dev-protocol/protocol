@@ -26,7 +26,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageLastBlockNumberKey(address _property)
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -44,7 +44,7 @@ contract LockupStorage is UsingStorage {
 		return eternalStorage().getUint(key);
 	}
 
-	function getStorageAllValueKey() public pure returns (bytes32) {
+	function getStorageAllValueKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_allValue"));
 	}
 
@@ -68,7 +68,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageValueKey(address _property, address _sender)
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -93,7 +93,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStoragePropertyValueKey(address _property)
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -120,7 +120,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageWithdrawalStatusKey(address _property, address _sender)
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -148,7 +148,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageInterestPriceKey(address _property)
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -179,7 +179,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageLastInterestPriceKey(address _property, address _user)
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -215,7 +215,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageLastSameRewardsAmountAndBlockKey()
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -235,7 +235,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageCumulativeGlobalRewardsKey()
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -267,7 +267,7 @@ contract LockupStorage is UsingStorage {
 	function getStorageLastCumulativeGlobalRewardKey(
 		address _property,
 		address _user
-	) public pure returns (bytes32) {
+	) private pure returns (bytes32) {
 		return
 			keccak256(
 				abi.encodePacked(
@@ -305,7 +305,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageCumulativeLockedUpUnitAndBlockKey(address _addr)
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -337,7 +337,7 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageCumulativeLockedUpValueKey(address _addr)
-		public
+		private
 		pure
 		returns (bytes32)
 	{
@@ -369,7 +369,7 @@ contract LockupStorage is UsingStorage {
 	function getStoragePendingInterestWithdrawalKey(
 		address _property,
 		address _user
-	) public pure returns (bytes32) {
+	) private pure returns (bytes32) {
 		return
 			keccak256(
 				abi.encodePacked("_pendingInterestWithdrawal", _property, _user)
