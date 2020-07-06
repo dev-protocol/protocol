@@ -1,17 +1,18 @@
-import {expect, use} from 'chai'
-import {createMockProvider, solidity, getWallets} from 'ethereum-waffle'
+// Import {expect, use} from 'chai'
+// import {createMockProvider, solidity, getWallets} from 'ethereum-waffle'
+import {createMockProvider, getWallets} from 'ethereum-waffle'
 import {DevProtocolInstance} from '../../test-lib/instance'
 import BigNumber from 'bignumber.js'
-import {mine, toBigNumber} from '../../test-lib/common'
-import {getWithdrawInterestAmount} from '../../test-lib/mint-amount'
+// Import {mine, toBigNumber} from '../../test-lib/common'
+import {mine} from '../../test-lib/common'
+// Import {getWithdrawInterestAmount} from '../../test-lib/mint-amount'
 import {
 	validateErrorMessage,
-	validatePauseErrorMessage,
 	validateAddressErrorMessage,
 } from '../../test-lib/error'
 import * as PolicyTestForLockup from '../../../build/contracts/PolicyTestForLockup.json'
 
-use(solidity)
+// Use(solidity)
 
 describe('Lockup', () => {
 	const provider = createMockProvider({
@@ -22,27 +23,25 @@ describe('Lockup', () => {
 		const dev = new DevProtocolInstance(provider, wallet1)
 		await dev.linkDecimals()
 		await dev.generateAddressConfig()
-		await Promise.all([
-			dev.generateAllocator(),
-			dev.generateMarketFactory(),
-			dev.generateMarketGroup(),
-			dev.generateMetricsFactory(),
-			dev.generateMetricsGroup(),
-			dev.generateLockup(),
-			dev.generateLockupStorage(),
-			dev.generateWithdraw(),
-			dev.generateWithdrawStorage(),
-			dev.generatePropertyFactory(),
-			dev.generatePropertyGroup(),
-			dev.generateVoteTimes(),
-			dev.generateVoteTimesStorage(),
-			dev.generateVoteCounter(),
-			dev.generateVoteCounterStorage(),
-			dev.generatePolicyFactory(),
-			dev.generatePolicyGroup(),
-			dev.generatePolicySet(),
-			dev.generateDev(),
-		])
+		await dev.generateAllocator()
+		await dev.generateMarketFactory()
+		await dev.generateMarketGroup()
+		await dev.generateMetricsFactory()
+		await dev.generateMetricsGroup()
+		await dev.generateLockup()
+		await dev.generateLockupStorage()
+		await dev.generateWithdraw()
+		await dev.generateWithdrawStorage()
+		await dev.generatePropertyFactory()
+		await dev.generatePropertyGroup()
+		await dev.generateVoteTimes()
+		await dev.generateVoteTimesStorage()
+		await dev.generateVoteCounter()
+		await dev.generateVoteCounterStorage()
+		await dev.generatePolicyFactory()
+		await dev.generatePolicyGroup()
+		await dev.generatePolicySet()
+		await dev.generateDev()
 		await dev.dev.mint(
 			wallet1.address,
 			new BigNumber(1e18).times(10000000).toFixed()

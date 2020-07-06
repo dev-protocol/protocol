@@ -8,7 +8,7 @@ export async function mine(
 ): Promise<void> {
 	for (let i = 0; i < count; i++) {
 		// eslint-disable-next-line no-await-in-loop
-		await provider.send('eve_mine', [])
+		await provider.send('evm_mine', [])
 	}
 }
 

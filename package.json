@@ -4,6 +4,7 @@
 	"description": "Securitize for Internet assets",
 	"main": "cli/index.js",
 	"scripts": {
+		"test5": "mocha --require ts-node/register 'test/main/**/lockup.ts' --timeout 300000",
 		"test4": "mocha --require ts-node/register 'test/main/**/*.ts' --timeout 300000 --parallel",
 		"test3": "jest --silent=false --verbose false --testTimeout=300000 --forceExit",
 		"pretest": "npm run build",
