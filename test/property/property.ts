@@ -100,7 +100,6 @@ contract(
 				await dev.generateAddressConfig()
 				await Promise.all([
 					dev.generateAllocator(),
-					dev.generateAllocatorStorage(),
 					dev.generateWithdraw(),
 					dev.generateWithdrawStorage(),
 					dev.generateVoteTimes(),
@@ -157,7 +156,6 @@ contract(
 				await dev.generateAddressConfig()
 				await Promise.all([
 					dev.generateAllocator(),
-					dev.generateAllocatorStorage(),
 					dev.generateWithdraw(),
 					dev.generateWithdrawStorage(),
 					dev.generateVoteTimes(),

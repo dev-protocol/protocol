@@ -16,7 +16,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		await dev.generateAddressConfig()
 		await Promise.all([
 			dev.generateAllocator(),
-			dev.generateAllocatorStorage(),
 			dev.generateMarketFactory(),
 			dev.generateMarketGroup(),
 			dev.generateMetricsFactory(),

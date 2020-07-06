@@ -1,7 +1,6 @@
 import {
 	AddressConfigInstance,
 	AllocatorInstance,
-	AllocatorStorageInstance,
 	VoteCounterInstance,
 	VoteCounterStorageInstance,
 	VoteTimesInstance,
@@ -31,7 +30,6 @@ export class DevProtocolInstance {
 
 	private _addressConfig!: AddressConfigInstance
 	private _allocator!: AllocatorInstance
-	private _allocatorStorage!: AllocatorStorageInstance
 	private _dev!: DevInstance
 	private _lockup!: LockupInstance
 	private _lockupStorage!: LockupStorageInstance
@@ -65,10 +63,6 @@ export class DevProtocolInstance {
 
 	public get allocator(): AllocatorInstance {
 		return this._allocator
-	}
-
-	public get allocatorStorage(): AllocatorStorageInstance {
-		return this._allocatorStorage
 	}
 
 	public get dev(): DevInstance {
@@ -165,17 +159,6 @@ export class DevProtocolInstance {
 			this._allocator.address,
 			this.fromDeployer
 		)
-	}
-
-	public async generateAllocatorStorage(): Promise<void> {
-		this._allocatorStorage = await contract('AllocatorStorage').new(
-			this.fromDeployer
-		)
-		await this._addressConfig.setAllocatorStorage(
-			this._allocatorStorage.address,
-			this.fromDeployer
-		)
-		await this._allocatorStorage.createStorage(this.fromDeployer)
 	}
 
 	public async generateLockup(): Promise<void> {
