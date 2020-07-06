@@ -1,116 +1,93 @@
-import {DevProtocolInstance} from '../test-lib/instance'
-import {EternalStorageInstance} from '../../types/truffle-contracts'
-import {toBigNumber, keccak256} from '../test-lib/utils/common'
+import {LockupStorageTestInstance} from '../../types/truffle-contracts'
+import {toBigNumber} from '../test-lib/utils/common'
 
-contract('LockupStorageStorageTest', ([deployer, property, user]) => {
-	const dev = new DevProtocolInstance(deployer)
-	let storage: EternalStorageInstance
+contract('LockupStorageStorageTest', ([property, user]) => {
+	let storage: LockupStorageTestInstance
 	before(async () => {
-		await dev.generateAddressConfig()
-		await dev.generateLockupStorage()
-		await dev.lockupStorage.changeOwner(deployer)
-		storage = await dev.lockupStorage
-			.getStorageAddress()
-			.then((x) => artifacts.require('EternalStorage').at(x))
+		storage = await artifacts.require('LockupStorageTest').new()
+		await storage.createStorage()
 	})
 	describe('LockupStorageStorage; setAllValue, getAllValue', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStorageAllValue()
+			const result = await storage.getStorageAllValue()
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(keccak256('_allValue'), 3)
-			const result = await dev.lockupStorage.getStorageAllValue()
+			await storage.setStorageAllValueTest(3)
+			const result = await storage.getStorageAllValue()
 			expect(result.toNumber()).to.be.equal(3)
 		})
 	})
 	describe('LockupStorageStorage; setValue, getValue', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStorageValue(property, user)
+			const result = await storage.getStorageValue(property, user)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(keccak256('_value', property, user), 30)
-			const result = await dev.lockupStorage.getStorageValue(property, user)
+			await storage.setStorageValueTest(property, user, 30)
+			const result = await storage.getStorageValue(property, user)
 			expect(result.toNumber()).to.be.equal(30)
 		})
 	})
 	describe('LockupStorageStorage; setPropertyValue, getPropertyValue', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStoragePropertyValue(property)
+			const result = await storage.getStoragePropertyValue(property)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(keccak256('_propertyValue', property), 300)
-			const result = await dev.lockupStorage.getStoragePropertyValue(property)
+			await storage.setStoragePropertyValueTest(property, 300)
+			const result = await storage.getStoragePropertyValue(property)
 			expect(result.toNumber()).to.be.equal(300)
 		})
 	})
 	describe('LockupStorageStorage; setWithdrawalStatus, getWithdrawalStatus', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStorageWithdrawalStatus(
-				property,
-				user
-			)
+			const result = await storage.getStorageWithdrawalStatus(property, user)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(
-				keccak256('_withdrawalStatus', property, user),
-				3000
-			)
-			const result = await dev.lockupStorage.getStorageWithdrawalStatus(
-				property,
-				user
-			)
+			await storage.setStorageWithdrawalStatusTest(property, user, 3000)
+			const result = await storage.getStorageWithdrawalStatus(property, user)
 			expect(result.toNumber()).to.be.equal(3000)
 		})
 	})
 	describe('LockupStorageStorage; setInterestPrice, getInterestPrice', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStorageInterestPrice(property)
+			const result = await storage.getStorageInterestPrice(property)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(keccak256('_interestTotals', property), 30000)
-			const result = await dev.lockupStorage.getStorageInterestPrice(property)
+			await storage.setStorageInterestPriceTest(property, 30000)
+			const result = await storage.getStorageInterestPrice(property)
 			expect(result.toNumber()).to.be.equal(30000)
 		})
 	})
 	describe('LockupStorageStorage; setLastInterestPrice, getLastInterestPrice', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStorageLastInterestPrice(
-				property,
-				user
-			)
+			const result = await storage.getStorageLastInterestPrice(property, user)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(
-				keccak256('_lastLastInterestPrice', property, user),
-				300000
-			)
-			const result = await dev.lockupStorage.getStorageLastInterestPrice(
-				property,
-				user
-			)
+			await storage.setStorageLastInterestPriceTest(property, user, 300000)
+			const result = await storage.getStorageLastInterestPrice(property, user)
 			expect(result.toNumber()).to.be.equal(300000)
 		})
 	})
 	describe('LockupStorageStorage; setPendingInterestWithdrawal, getPendingInterestWithdrawal', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStoragePendingInterestWithdrawal(
+			const result = await storage.getStoragePendingInterestWithdrawal(
 				property,
 				user
 			)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(
-				keccak256('_pendingInterestWithdrawal', property, user),
+			await storage.setStoragePendingInterestWithdrawalTest(
+				property,
+				user,
 				3000000
 			)
-			const result = await dev.lockupStorage.getStoragePendingInterestWithdrawal(
+			const result = await storage.getStoragePendingInterestWithdrawal(
 				property,
 				user
 			)
@@ -119,18 +96,18 @@ contract('LockupStorageStorageTest', ([deployer, property, user]) => {
 	})
 	describe('LockupStorageStorage; setLastBlockNumber, getLastBlockNumber', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStorageLastBlockNumber(property)
+			const result = await storage.getStorageLastBlockNumber(property)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(keccak256('_lastBlockNumber', property), 30000000)
-			const result = await dev.lockupStorage.getStorageLastBlockNumber(property)
+			await storage.setStorageLastBlockNumberTest(property, 30000000)
+			const result = await storage.getStorageLastBlockNumber(property)
 			expect(result.toNumber()).to.be.equal(30000000)
 		})
 	})
 	describe('LockupStorageStorage; setLastSameRewardsAmountAndBlock, getLastSameRewardsAmountAndBlock', () => {
 		it('Initial value is 0 and 0.', async () => {
-			const result = await dev.lockupStorage.getStorageLastSameRewardsAmountAndBlock()
+			const result = await storage.getStorageLastSameRewardsAmountAndBlock()
 			expect(result[0].toNumber()).to.be.equal(0)
 			expect(result[1].toNumber()).to.be.equal(0)
 		})
@@ -140,40 +117,38 @@ contract('LockupStorageStorageTest', ([deployer, property, user]) => {
 			).times(1e18)
 			const block = '888888888888888888'
 
-			const tmp = amount.times(await dev.lockupStorage.basis()).plus(block)
-
-			await storage.setUint(keccak256('_LastSameRewardsAmountAndBlock'), tmp)
-
-			const result = await dev.lockupStorage.getStorageLastSameRewardsAmountAndBlock()
+			await storage.setStorageLastSameRewardsAmountAndBlockTest(amount, block)
+			const result = await storage.getStorageLastSameRewardsAmountAndBlock()
 			expect(toBigNumber(result[0]).toFixed()).to.be.equal(amount.toFixed())
 			expect(toBigNumber(result[1]).toFixed()).to.be.equal(block)
 		})
 	})
 	describe('LockupStorageStorage; setCumulativeGlobalRewards, getCumulativeGlobalRewards', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStorageCumulativeGlobalRewards()
+			const result = await storage.getStorageCumulativeGlobalRewards()
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(keccak256('_cumulativeGlobalRewards'), 3000000000)
-			const result = await dev.lockupStorage.getStorageCumulativeGlobalRewards()
+			await storage.setStorageCumulativeGlobalRewardsTest(3000000000)
+			const result = await storage.getStorageCumulativeGlobalRewards()
 			expect(result.toNumber()).to.be.equal(3000000000)
 		})
 	})
 	describe('LockupStorageStorage; setLastCumulativeGlobalReward, getLastCumulativeGlobalReward', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStorageLastCumulativeGlobalReward(
+			const result = await storage.getStorageLastCumulativeGlobalReward(
 				property,
 				user
 			)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(
-				keccak256('_LastCumulativeGlobalReward', property, user),
+			await storage.setStorageLastCumulativeGlobalRewardTest(
+				property,
+				user,
 				30000000000
 			)
-			const result = await dev.lockupStorage.getStorageLastCumulativeGlobalReward(
+			const result = await storage.getStorageLastCumulativeGlobalReward(
 				property,
 				user
 			)
@@ -182,7 +157,7 @@ contract('LockupStorageStorageTest', ([deployer, property, user]) => {
 	})
 	describe('LockupStorageStorage; setCumulativeLockedUpUnitAndBlock, getCumulativeLockedUpUnitAndBlock', () => {
 		it('Initial value is 0 and 0.', async () => {
-			const result = await dev.lockupStorage.getStorageCumulativeLockedUpUnitAndBlock(
+			const result = await storage.getStorageCumulativeLockedUpUnitAndBlock(
 				property
 			)
 			expect(result[0].toNumber()).to.be.equal(0)
@@ -193,12 +168,12 @@ contract('LockupStorageStorageTest', ([deployer, property, user]) => {
 				1e18
 			)
 			const block = '888888888888888888'
-			const tmp = unit.times(await dev.lockupStorage.basis()).plus(block)
-			await storage.setUint(
-				keccak256('_cumulativeLockedUpUnitAndBlock', property),
-				tmp
+			await storage.setStorageCumulativeLockedUpUnitAndBlockTest(
+				property,
+				unit,
+				block
 			)
-			const result = await dev.lockupStorage.getStorageCumulativeLockedUpUnitAndBlock(
+			const result = await storage.getStorageCumulativeLockedUpUnitAndBlock(
 				property
 			)
 			expect(toBigNumber(result[0]).toFixed()).to.be.equal(unit.toFixed())
@@ -207,19 +182,15 @@ contract('LockupStorageStorageTest', ([deployer, property, user]) => {
 	})
 	describe('LockupStorageStorage; setCumulativeLockedUpValue, getCumulativeLockedUpValue', () => {
 		it('Initial value is 0.', async () => {
-			const result = await dev.lockupStorage.getStorageCumulativeLockedUpValue(
-				property
-			)
+			const result = await storage.getStorageCumulativeLockedUpValue(property)
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setUint(
-				keccak256('_cumulativeLockedUpValue', property),
+			await storage.setStorageCumulativeLockedUpValueTest(
+				property,
 				300000000000
 			)
-			const result = await dev.lockupStorage.getStorageCumulativeLockedUpValue(
-				property
-			)
+			const result = await storage.getStorageCumulativeLockedUpValue(property)
 			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})
