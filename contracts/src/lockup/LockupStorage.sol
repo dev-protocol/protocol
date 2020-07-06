@@ -375,4 +375,17 @@ contract LockupStorage is UsingStorage {
 				abi.encodePacked("_pendingInterestWithdrawal", _property, _user)
 			);
 	}
+
+	//DIP4GenesisBlock
+	function setStorageDIP4GenesisBlock(uint256 _block) internal {
+		eternalStorage().setUint(getStorageDIP4GenesisBlockKey(), _block);
+	}
+
+	function getStorageDIP4GenesisBlock() public view returns (uint256) {
+		return eternalStorage().getUint(getStorageDIP4GenesisBlockKey());
+	}
+
+	function getStorageDIP4GenesisBlockKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("dip4GenesisBlock"));
+	}
 }

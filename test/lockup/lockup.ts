@@ -383,7 +383,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			const result = await dev.lockup
 				.getCumulativeLockedUp(property.address)
 				.then((x) => toBigNumber(x[0]))
-			const deployedBlock = await dev.lockup.deployedBlock().then(toBigNumber)
+			const deployedBlock = await dev.lockup
+				.getStorageDIP4GenesisBlock()
+				.then(toBigNumber)
 			const expected =
 				0 +
 				6457 +
@@ -464,7 +466,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			const result = await dev.lockup
 				.getCumulativeLockedUpAll()
 				.then((x) => toBigNumber(x[0]))
-			const deployedBlock = await dev.lockup.deployedBlock().then(toBigNumber)
+			const deployedBlock = await dev.lockup
+				.getStorageDIP4GenesisBlock()
+				.then(toBigNumber)
 			const expected =
 				0 +
 				5475 +
@@ -503,7 +507,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				dev.lockup
 					.getStorageLastSameRewardsAmountAndBlock()
 					.then((x: any) => x[1]),
-				dev.lockup.deployedBlock(),
+				dev.lockup.getStorageDIP4GenesisBlock(),
 				getBlock(),
 				dev.lockup.getStorageCumulativeGlobalRewards(),
 				dev.lockup.getPropertyValue(prop.address),
@@ -1702,6 +1706,26 @@ contract('LockupTest', ([deployer, user1]) => {
 					.then(toBigNumber)
 				expect(amount.toFixed()).to.be.equal('0')
 			})
+		})
+	})
+	describe('Lockup; setDIP4GenesisBlock', () => {
+		it('Store passed value to getStorageDIP4GenesisBlock as a block number', async () => {
+			const [dev] = await init()
+			await dev.lockup.setDIP4GenesisBlock(123456)
+			const stored = await dev.lockup.getStorageDIP4GenesisBlock()
+			expect(stored.toNumber()).to.be.equal(123456)
+		})
+		it('Should fail to call when sent from non-pauser account', async () => {
+			const [dev] = await init()
+			const before = await dev.lockup
+				.getStorageDIP4GenesisBlock()
+				.then(toBigNumber)
+			const res = await dev.lockup
+				.setDIP4GenesisBlock(before.plus(123456), {from: user1})
+				.catch(err)
+			const after = await dev.lockup.getStorageDIP4GenesisBlock()
+			expect(after.toNumber()).to.be.equal(before.toNumber())
+			expect(res).to.be.instanceOf(Error)
 		})
 	})
 })

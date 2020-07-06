@@ -44,7 +44,7 @@ module.exports = {
 			gas: 4000000,
 			gasPrice: 10000000000,
 		},
-		mock: {
+		test: {
 			host: ETHEREUM_MOCK_HOST,
 			port: ETHEREUM_MOCK_PORT,
 			network_id: '*',
