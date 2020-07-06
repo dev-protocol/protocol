@@ -2,6 +2,8 @@ pragma solidity ^0.5.0;
 
 // prettier-ignore
 
+
+
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -33,87 +35,74 @@ contract Context {
  * the optional functions; to access them see {ERC20Detailed}.
  */
 interface IERC20 {
-	/**
-	 * @dev Returns the amount of tokens in existence.
-	 */
-	function totalSupply() external view returns (uint256);
+    /**
+     * @dev Returns the amount of tokens in existence.
+     */
+    function totalSupply() external view returns (uint256);
 
-	/**
-	 * @dev Returns the amount of tokens owned by `account`.
-	 */
-	function balanceOf(address account) external view returns (uint256);
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
 
-	/**
-	 * @dev Moves `amount` tokens from the caller's account to `recipient`.
-	 *
-	 * Returns a boolean value indicating whether the operation succeeded.
-	 *
-	 * Emits a {Transfer} event.
-	 */
-	function transfer(address recipient, uint256 amount)
-		external
-		returns (bool);
+    /**
+     * @dev Moves `amount` tokens from the caller's account to `recipient`.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transfer(address recipient, uint256 amount) external returns (bool);
 
-	/**
-	 * @dev Returns the remaining number of tokens that `spender` will be
-	 * allowed to spend on behalf of `owner` through {transferFrom}. This is
-	 * zero by default.
-	 *
-	 * This value changes when {approve} or {transferFrom} are called.
-	 */
-	function allowance(address owner, address spender)
-		external
-		view
-		returns (uint256);
+    /**
+     * @dev Returns the remaining number of tokens that `spender` will be
+     * allowed to spend on behalf of `owner` through {transferFrom}. This is
+     * zero by default.
+     *
+     * This value changes when {approve} or {transferFrom} are called.
+     */
+    function allowance(address owner, address spender) external view returns (uint256);
 
-	/**
-	 * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
-	 *
-	 * Returns a boolean value indicating whether the operation succeeded.
-	 *
-	 * IMPORTANT: Beware that changing an allowance with this method brings the risk
-	 * that someone may use both the old and the new allowance by unfortunate
-	 * transaction ordering. One possible solution to mitigate this race
-	 * condition is to first reduce the spender's allowance to 0 and set the
-	 * desired value afterwards:
-	 * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-	 *
-	 * Emits an {Approval} event.
-	 */
-	function approve(address spender, uint256 amount) external returns (bool);
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * IMPORTANT: Beware that changing an allowance with this method brings the risk
+     * that someone may use both the old and the new allowance by unfortunate
+     * transaction ordering. One possible solution to mitigate this race
+     * condition is to first reduce the spender's allowance to 0 and set the
+     * desired value afterwards:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Emits an {Approval} event.
+     */
+    function approve(address spender, uint256 amount) external returns (bool);
 
-	/**
-	 * @dev Moves `amount` tokens from `sender` to `recipient` using the
-	 * allowance mechanism. `amount` is then deducted from the caller's
-	 * allowance.
-	 *
-	 * Returns a boolean value indicating whether the operation succeeded.
-	 *
-	 * Emits a {Transfer} event.
-	 */
-	function transferFrom(
-		address sender,
-		address recipient,
-		uint256 amount
-	) external returns (bool);
+    /**
+     * @dev Moves `amount` tokens from `sender` to `recipient` using the
+     * allowance mechanism. `amount` is then deducted from the caller's
+     * allowance.
+     *
+     * Returns a boolean value indicating whether the operation succeeded.
+     *
+     * Emits a {Transfer} event.
+     */
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
-	/**
-	 * @dev Emitted when `value` tokens are moved from one account (`from`) to
-	 * another (`to`).
-	 *
-	 * Note that `value` may be zero.
-	 */
-	event Transfer(address indexed from, address indexed to, uint256 value);
+    /**
+     * @dev Emitted when `value` tokens are moved from one account (`from`) to
+     * another (`to`).
+     *
+     * Note that `value` may be zero.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
-	/**
-	 * @dev Emitted when the allowance of a `spender` for an `owner` is set by
-	 * a call to {approve}. `value` is the new allowance.
-	 */
-	event Approval(
-		address indexed owner,
-		address indexed spender,
-		uint256 value
-	);
+    /**
+     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+     * a call to {approve}. `value` is the new allowance.
+     */
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 /**
@@ -130,157 +119,145 @@ interface IERC20 {
  * class of bugs, so it's recommended to use it always.
  */
 library SafeMath {
-	/**
-	 * @dev Returns the addition of two unsigned integers, reverting on
-	 * overflow.
-	 *
-	 * Counterpart to Solidity's `+` operator.
-	 *
-	 * Requirements:
-	 * - Addition cannot overflow.
-	 */
-	function add(uint256 a, uint256 b) internal pure returns (uint256) {
-		uint256 c = a + b;
-		require(c >= a, "SafeMath: addition overflow");
+    /**
+     * @dev Returns the addition of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `+` operator.
+     *
+     * Requirements:
+     * - Addition cannot overflow.
+     */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a, "SafeMath: addition overflow");
 
-		return c;
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the subtraction of two unsigned integers, reverting on
-	 * overflow (when the result is negative).
-	 *
-	 * Counterpart to Solidity's `-` operator.
-	 *
-	 * Requirements:
-	 * - Subtraction cannot overflow.
-	 */
-	function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-		return sub(a, b, "SafeMath: subtraction overflow");
-	}
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     * - Subtraction cannot overflow.
+     */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        return sub(a, b, "SafeMath: subtraction overflow");
+    }
 
-	/**
-	 * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
-	 * overflow (when the result is negative).
-	 *
-	 * Counterpart to Solidity's `-` operator.
-	 *
-	 * Requirements:
-	 * - Subtraction cannot overflow.
-	 *
-	 * _Available since v2.4.0._
-	 */
-	function sub(
-		uint256 a,
-		uint256 b,
-		string memory errorMessage
-	) internal pure returns (uint256) {
-		require(b <= a, errorMessage);
-		uint256 c = a - b;
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     * - Subtraction cannot overflow.
+     *
+     * _Available since v2.4.0._
+     */
+    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b <= a, errorMessage);
+        uint256 c = a - b;
 
-		return c;
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the multiplication of two unsigned integers, reverting on
-	 * overflow.
-	 *
-	 * Counterpart to Solidity's `*` operator.
-	 *
-	 * Requirements:
-	 * - Multiplication cannot overflow.
-	 */
-	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-		// Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-		// benefit is lost if 'b' is also tested.
-		// See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
-		if (a == 0) {
-			return 0;
-		}
+    /**
+     * @dev Returns the multiplication of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `*` operator.
+     *
+     * Requirements:
+     * - Multiplication cannot overflow.
+     */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+        // benefit is lost if 'b' is also tested.
+        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+        if (a == 0) {
+            return 0;
+        }
 
-		uint256 c = a * b;
-		require(c / a == b, "SafeMath: multiplication overflow");
+        uint256 c = a * b;
+        require(c / a == b, "SafeMath: multiplication overflow");
 
-		return c;
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the integer division of two unsigned integers. Reverts on
-	 * division by zero. The result is rounded towards zero.
-	 *
-	 * Counterpart to Solidity's `/` operator. Note: this function uses a
-	 * `revert` opcode (which leaves remaining gas untouched) while Solidity
-	 * uses an invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 */
-	function div(uint256 a, uint256 b) internal pure returns (uint256) {
-		return div(a, b, "SafeMath: division by zero");
-	}
+    /**
+     * @dev Returns the integer division of two unsigned integers. Reverts on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return div(a, b, "SafeMath: division by zero");
+    }
 
-	/**
-	 * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
-	 * division by zero. The result is rounded towards zero.
-	 *
-	 * Counterpart to Solidity's `/` operator. Note: this function uses a
-	 * `revert` opcode (which leaves remaining gas untouched) while Solidity
-	 * uses an invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 *
-	 * _Available since v2.4.0._
-	 */
-	function div(
-		uint256 a,
-		uint256 b,
-		string memory errorMessage
-	) internal pure returns (uint256) {
-		// Solidity only automatically asserts when dividing by 0
-		require(b > 0, errorMessage);
-		uint256 c = a / b;
-		// assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    /**
+     * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     *
+     * _Available since v2.4.0._
+     */
+    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        // Solidity only automatically asserts when dividing by 0
+        require(b > 0, errorMessage);
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
 
-		return c;
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-	 * Reverts when dividing by zero.
-	 *
-	 * Counterpart to Solidity's `%` operator. This function uses a `revert`
-	 * opcode (which leaves remaining gas untouched) while Solidity uses an
-	 * invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 */
-	function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-		return mod(a, b, "SafeMath: modulo by zero");
-	}
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * Reverts when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     */
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        return mod(a, b, "SafeMath: modulo by zero");
+    }
 
-	/**
-	 * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-	 * Reverts with custom message when dividing by zero.
-	 *
-	 * Counterpart to Solidity's `%` operator. This function uses a `revert`
-	 * opcode (which leaves remaining gas untouched) while Solidity uses an
-	 * invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 *
-	 * _Available since v2.4.0._
-	 */
-	function mod(
-		uint256 a,
-		uint256 b,
-		string memory errorMessage
-	) internal pure returns (uint256) {
-		require(b != 0, errorMessage);
-		return a % b;
-	}
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * Reverts with custom message when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     *
+     * _Available since v2.4.0._
+     */
+    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b != 0, errorMessage);
+        return a % b;
+    }
 }
 
 /**
@@ -308,339 +285,280 @@ library SafeMath {
  * allowances. See {IERC20-approve}.
  */
 contract ERC20 is Context, IERC20 {
-	using SafeMath for uint256;
+    using SafeMath for uint256;
 
-	mapping(address => uint256) private _balances;
+    mapping (address => uint256) private _balances;
 
-	mapping(address => mapping(address => uint256)) private _allowances;
+    mapping (address => mapping (address => uint256)) private _allowances;
 
-	uint256 private _totalSupply;
+    uint256 private _totalSupply;
 
-	/**
-	 * @dev See {IERC20-totalSupply}.
-	 */
-	function totalSupply() public view returns (uint256) {
-		return _totalSupply;
-	}
+    /**
+     * @dev See {IERC20-totalSupply}.
+     */
+    function totalSupply() public view returns (uint256) {
+        return _totalSupply;
+    }
 
-	/**
-	 * @dev See {IERC20-balanceOf}.
-	 */
-	function balanceOf(address account) public view returns (uint256) {
-		return _balances[account];
-	}
+    /**
+     * @dev See {IERC20-balanceOf}.
+     */
+    function balanceOf(address account) public view returns (uint256) {
+        return _balances[account];
+    }
 
-	/**
-	 * @dev See {IERC20-transfer}.
-	 *
-	 * Requirements:
-	 *
-	 * - `recipient` cannot be the zero address.
-	 * - the caller must have a balance of at least `amount`.
-	 */
-	function transfer(address recipient, uint256 amount) public returns (bool) {
-		_transfer(_msgSender(), recipient, amount);
-		return true;
-	}
+    /**
+     * @dev See {IERC20-transfer}.
+     *
+     * Requirements:
+     *
+     * - `recipient` cannot be the zero address.
+     * - the caller must have a balance of at least `amount`.
+     */
+    function transfer(address recipient, uint256 amount) public returns (bool) {
+        _transfer(_msgSender(), recipient, amount);
+        return true;
+    }
 
-	/**
-	 * @dev See {IERC20-allowance}.
-	 */
-	function allowance(address owner, address spender)
-		public
-		view
-		returns (uint256)
-	{
-		return _allowances[owner][spender];
-	}
+    /**
+     * @dev See {IERC20-allowance}.
+     */
+    function allowance(address owner, address spender) public view returns (uint256) {
+        return _allowances[owner][spender];
+    }
 
-	/**
-	 * @dev See {IERC20-approve}.
-	 *
-	 * Requirements:
-	 *
-	 * - `spender` cannot be the zero address.
-	 */
-	function approve(address spender, uint256 amount) public returns (bool) {
-		_approve(_msgSender(), spender, amount);
-		return true;
-	}
+    /**
+     * @dev See {IERC20-approve}.
+     *
+     * Requirements:
+     *
+     * - `spender` cannot be the zero address.
+     */
+    function approve(address spender, uint256 amount) public returns (bool) {
+        _approve(_msgSender(), spender, amount);
+        return true;
+    }
 
-	/**
-	 * @dev See {IERC20-transferFrom}.
-	 *
-	 * Emits an {Approval} event indicating the updated allowance. This is not
-	 * required by the EIP. See the note at the beginning of {ERC20};
-	 *
-	 * Requirements:
-	 * - `sender` and `recipient` cannot be the zero address.
-	 * - `sender` must have a balance of at least `amount`.
-	 * - the caller must have allowance for `sender`'s tokens of at least
-	 * `amount`.
-	 */
-	function transferFrom(
-		address sender,
-		address recipient,
-		uint256 amount
-	) public returns (bool) {
-		_transfer(sender, recipient, amount);
-		_approve(
-			sender,
-			_msgSender(),
-			_allowances[sender][_msgSender()].sub(
-				amount,
-				"ERC20: transfer amount exceeds allowance"
-			)
-		);
-		return true;
-	}
+    /**
+     * @dev See {IERC20-transferFrom}.
+     *
+     * Emits an {Approval} event indicating the updated allowance. This is not
+     * required by the EIP. See the note at the beginning of {ERC20};
+     *
+     * Requirements:
+     * - `sender` and `recipient` cannot be the zero address.
+     * - `sender` must have a balance of at least `amount`.
+     * - the caller must have allowance for `sender`'s tokens of at least
+     * `amount`.
+     */
+    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
+        _transfer(sender, recipient, amount);
+        _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
+        return true;
+    }
 
-	/**
-	 * @dev Atomically increases the allowance granted to `spender` by the caller.
-	 *
-	 * This is an alternative to {approve} that can be used as a mitigation for
-	 * problems described in {IERC20-approve}.
-	 *
-	 * Emits an {Approval} event indicating the updated allowance.
-	 *
-	 * Requirements:
-	 *
-	 * - `spender` cannot be the zero address.
-	 */
-	function increaseAllowance(address spender, uint256 addedValue)
-		public
-		returns (bool)
-	{
-		_approve(
-			_msgSender(),
-			spender,
-			_allowances[_msgSender()][spender].add(addedValue)
-		);
-		return true;
-	}
+    /**
+     * @dev Atomically increases the allowance granted to `spender` by the caller.
+     *
+     * This is an alternative to {approve} that can be used as a mitigation for
+     * problems described in {IERC20-approve}.
+     *
+     * Emits an {Approval} event indicating the updated allowance.
+     *
+     * Requirements:
+     *
+     * - `spender` cannot be the zero address.
+     */
+    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+        return true;
+    }
 
-	/**
-	 * @dev Atomically decreases the allowance granted to `spender` by the caller.
-	 *
-	 * This is an alternative to {approve} that can be used as a mitigation for
-	 * problems described in {IERC20-approve}.
-	 *
-	 * Emits an {Approval} event indicating the updated allowance.
-	 *
-	 * Requirements:
-	 *
-	 * - `spender` cannot be the zero address.
-	 * - `spender` must have allowance for the caller of at least
-	 * `subtractedValue`.
-	 */
-	function decreaseAllowance(address spender, uint256 subtractedValue)
-		public
-		returns (bool)
-	{
-		_approve(
-			_msgSender(),
-			spender,
-			_allowances[_msgSender()][spender].sub(
-				subtractedValue,
-				"ERC20: decreased allowance below zero"
-			)
-		);
-		return true;
-	}
+    /**
+     * @dev Atomically decreases the allowance granted to `spender` by the caller.
+     *
+     * This is an alternative to {approve} that can be used as a mitigation for
+     * problems described in {IERC20-approve}.
+     *
+     * Emits an {Approval} event indicating the updated allowance.
+     *
+     * Requirements:
+     *
+     * - `spender` cannot be the zero address.
+     * - `spender` must have allowance for the caller of at least
+     * `subtractedValue`.
+     */
+    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
+        return true;
+    }
 
-	/**
-	 * @dev Moves tokens `amount` from `sender` to `recipient`.
-	 *
-	 * This is internal function is equivalent to {transfer}, and can be used to
-	 * e.g. implement automatic token fees, slashing mechanisms, etc.
-	 *
-	 * Emits a {Transfer} event.
-	 *
-	 * Requirements:
-	 *
-	 * - `sender` cannot be the zero address.
-	 * - `recipient` cannot be the zero address.
-	 * - `sender` must have a balance of at least `amount`.
-	 */
-	function _transfer(
-		address sender,
-		address recipient,
-		uint256 amount
-	) internal {
-		require(sender != address(0), "ERC20: transfer from the zero address");
-		require(recipient != address(0), "ERC20: transfer to the zero address");
+    /**
+     * @dev Moves tokens `amount` from `sender` to `recipient`.
+     *
+     * This is internal function is equivalent to {transfer}, and can be used to
+     * e.g. implement automatic token fees, slashing mechanisms, etc.
+     *
+     * Emits a {Transfer} event.
+     *
+     * Requirements:
+     *
+     * - `sender` cannot be the zero address.
+     * - `recipient` cannot be the zero address.
+     * - `sender` must have a balance of at least `amount`.
+     */
+    function _transfer(address sender, address recipient, uint256 amount) internal {
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
 
-		_balances[sender] = _balances[sender].sub(
-			amount,
-			"ERC20: transfer amount exceeds balance"
-		);
-		_balances[recipient] = _balances[recipient].add(amount);
-		emit Transfer(sender, recipient, amount);
-	}
+        _balances[sender] = _balances[sender].sub(amount, "ERC20: transfer amount exceeds balance");
+        _balances[recipient] = _balances[recipient].add(amount);
+        emit Transfer(sender, recipient, amount);
+    }
 
-	/** @dev Creates `amount` tokens and assigns them to `account`, increasing
-	 * the total supply.
-	 *
-	 * Emits a {Transfer} event with `from` set to the zero address.
-	 *
-	 * Requirements
-	 *
-	 * - `to` cannot be the zero address.
-	 */
-	function _mint(address account, uint256 amount) internal {
-		require(account != address(0), "ERC20: mint to the zero address");
+    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+     * the total supply.
+     *
+     * Emits a {Transfer} event with `from` set to the zero address.
+     *
+     * Requirements
+     *
+     * - `to` cannot be the zero address.
+     */
+    function _mint(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: mint to the zero address");
 
-		_totalSupply = _totalSupply.add(amount);
-		_balances[account] = _balances[account].add(amount);
-		emit Transfer(address(0), account, amount);
-	}
+        _totalSupply = _totalSupply.add(amount);
+        _balances[account] = _balances[account].add(amount);
+        emit Transfer(address(0), account, amount);
+    }
 
-	/**
-	 * @dev Destroys `amount` tokens from `account`, reducing the
-	 * total supply.
-	 *
-	 * Emits a {Transfer} event with `to` set to the zero address.
-	 *
-	 * Requirements
-	 *
-	 * - `account` cannot be the zero address.
-	 * - `account` must have at least `amount` tokens.
-	 */
-	function _burn(address account, uint256 amount) internal {
-		require(account != address(0), "ERC20: burn from the zero address");
+    /**
+     * @dev Destroys `amount` tokens from `account`, reducing the
+     * total supply.
+     *
+     * Emits a {Transfer} event with `to` set to the zero address.
+     *
+     * Requirements
+     *
+     * - `account` cannot be the zero address.
+     * - `account` must have at least `amount` tokens.
+     */
+    function _burn(address account, uint256 amount) internal {
+        require(account != address(0), "ERC20: burn from the zero address");
 
-		_balances[account] = _balances[account].sub(
-			amount,
-			"ERC20: burn amount exceeds balance"
-		);
-		_totalSupply = _totalSupply.sub(amount);
-		emit Transfer(account, address(0), amount);
-	}
+        _balances[account] = _balances[account].sub(amount, "ERC20: burn amount exceeds balance");
+        _totalSupply = _totalSupply.sub(amount);
+        emit Transfer(account, address(0), amount);
+    }
 
-	/**
-	 * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
-	 *
-	 * This is internal function is equivalent to `approve`, and can be used to
-	 * e.g. set automatic allowances for certain subsystems, etc.
-	 *
-	 * Emits an {Approval} event.
-	 *
-	 * Requirements:
-	 *
-	 * - `owner` cannot be the zero address.
-	 * - `spender` cannot be the zero address.
-	 */
-	function _approve(
-		address owner,
-		address spender,
-		uint256 amount
-	) internal {
-		require(owner != address(0), "ERC20: approve from the zero address");
-		require(spender != address(0), "ERC20: approve to the zero address");
+    /**
+     * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
+     *
+     * This is internal function is equivalent to `approve`, and can be used to
+     * e.g. set automatic allowances for certain subsystems, etc.
+     *
+     * Emits an {Approval} event.
+     *
+     * Requirements:
+     *
+     * - `owner` cannot be the zero address.
+     * - `spender` cannot be the zero address.
+     */
+    function _approve(address owner, address spender, uint256 amount) internal {
+        require(owner != address(0), "ERC20: approve from the zero address");
+        require(spender != address(0), "ERC20: approve to the zero address");
 
-		_allowances[owner][spender] = amount;
-		emit Approval(owner, spender, amount);
-	}
+        _allowances[owner][spender] = amount;
+        emit Approval(owner, spender, amount);
+    }
 
-	/**
-	 * @dev Destroys `amount` tokens from `account`.`amount` is then deducted
-	 * from the caller's allowance.
-	 *
-	 * See {_burn} and {_approve}.
-	 */
-	function _burnFrom(address account, uint256 amount) internal {
-		_burn(account, amount);
-		_approve(
-			account,
-			_msgSender(),
-			_allowances[account][_msgSender()].sub(
-				amount,
-				"ERC20: burn amount exceeds allowance"
-			)
-		);
-	}
+    /**
+     * @dev Destroys `amount` tokens from `account`.`amount` is then deducted
+     * from the caller's allowance.
+     *
+     * See {_burn} and {_approve}.
+     */
+    function _burnFrom(address account, uint256 amount) internal {
+        _burn(account, amount);
+        _approve(account, _msgSender(), _allowances[account][_msgSender()].sub(amount, "ERC20: burn amount exceeds allowance"));
+    }
 }
+
 
 /**
  * @title Roles
  * @dev Library for managing addresses assigned to a Role.
  */
 library Roles {
-	struct Role {
-		mapping(address => bool) bearer;
-	}
+    struct Role {
+        mapping (address => bool) bearer;
+    }
 
-	/**
-	 * @dev Give an account access to this role.
-	 */
-	function add(Role storage role, address account) internal {
-		require(!has(role, account), "Roles: account already has role");
-		role.bearer[account] = true;
-	}
+    /**
+     * @dev Give an account access to this role.
+     */
+    function add(Role storage role, address account) internal {
+        require(!has(role, account), "Roles: account already has role");
+        role.bearer[account] = true;
+    }
 
-	/**
-	 * @dev Remove an account's access to this role.
-	 */
-	function remove(Role storage role, address account) internal {
-		require(has(role, account), "Roles: account does not have role");
-		role.bearer[account] = false;
-	}
+    /**
+     * @dev Remove an account's access to this role.
+     */
+    function remove(Role storage role, address account) internal {
+        require(has(role, account), "Roles: account does not have role");
+        role.bearer[account] = false;
+    }
 
-	/**
-	 * @dev Check if an account has this role.
-	 * @return bool
-	 */
-	function has(Role storage role, address account)
-		internal
-		view
-		returns (bool)
-	{
-		require(account != address(0), "Roles: account is the zero address");
-		return role.bearer[account];
-	}
+    /**
+     * @dev Check if an account has this role.
+     * @return bool
+     */
+    function has(Role storage role, address account) internal view returns (bool) {
+        require(account != address(0), "Roles: account is the zero address");
+        return role.bearer[account];
+    }
 }
 
 contract MinterRole is Context {
-	using Roles for Roles.Role;
+    using Roles for Roles.Role;
 
-	event MinterAdded(address indexed account);
-	event MinterRemoved(address indexed account);
+    event MinterAdded(address indexed account);
+    event MinterRemoved(address indexed account);
 
-	Roles.Role private _minters;
+    Roles.Role private _minters;
 
-	constructor() internal {
-		_addMinter(_msgSender());
-	}
+    constructor () internal {
+        _addMinter(_msgSender());
+    }
 
-	modifier onlyMinter() {
-		require(
-			isMinter(_msgSender()),
-			"MinterRole: caller does not have the Minter role"
-		);
-		_;
-	}
+    modifier onlyMinter() {
+        require(isMinter(_msgSender()), "MinterRole: caller does not have the Minter role");
+        _;
+    }
 
-	function isMinter(address account) public view returns (bool) {
-		return _minters.has(account);
-	}
+    function isMinter(address account) public view returns (bool) {
+        return _minters.has(account);
+    }
 
-	function addMinter(address account) public onlyMinter {
-		_addMinter(account);
-	}
+    function addMinter(address account) public onlyMinter {
+        _addMinter(account);
+    }
 
-	function renounceMinter() public {
-		_removeMinter(_msgSender());
-	}
+    function renounceMinter() public {
+        _removeMinter(_msgSender());
+    }
 
-	function _addMinter(address account) internal {
-		_minters.add(account);
-		emit MinterAdded(account);
-	}
+    function _addMinter(address account) internal {
+        _minters.add(account);
+        emit MinterAdded(account);
+    }
 
-	function _removeMinter(address account) internal {
-		_minters.remove(account);
-		emit MinterRemoved(account);
-	}
+    function _removeMinter(address account) internal {
+        _minters.remove(account);
+        emit MinterRemoved(account);
+    }
 }
 
 /**
@@ -650,64 +568,59 @@ contract MinterRole is Context {
  * At construction, the deployer of the contract is the only minter.
  */
 contract ERC20Mintable is ERC20, MinterRole {
-	/**
-	 * @dev See {ERC20-_mint}.
-	 *
-	 * Requirements:
-	 *
-	 * - the caller must have the {MinterRole}.
-	 */
-	function mint(address account, uint256 amount)
-		public
-		onlyMinter
-		returns (bool)
-	{
-		_mint(account, amount);
-		return true;
-	}
+    /**
+     * @dev See {ERC20-_mint}.
+     *
+     * Requirements:
+     *
+     * - the caller must have the {MinterRole}.
+     */
+    function mint(address account, uint256 amount) public onlyMinter returns (bool) {
+        _mint(account, amount);
+        return true;
+    }
 }
 
+
+
 contract PauserRole is Context {
-	using Roles for Roles.Role;
+    using Roles for Roles.Role;
 
-	event PauserAdded(address indexed account);
-	event PauserRemoved(address indexed account);
+    event PauserAdded(address indexed account);
+    event PauserRemoved(address indexed account);
 
-	Roles.Role private _pausers;
+    Roles.Role private _pausers;
 
-	constructor() internal {
-		_addPauser(_msgSender());
-	}
+    constructor () internal {
+        _addPauser(_msgSender());
+    }
 
-	modifier onlyPauser() {
-		require(
-			isPauser(_msgSender()),
-			"PauserRole: caller does not have the Pauser role"
-		);
-		_;
-	}
+    modifier onlyPauser() {
+        require(isPauser(_msgSender()), "PauserRole: caller does not have the Pauser role");
+        _;
+    }
 
-	function isPauser(address account) public view returns (bool) {
-		return _pausers.has(account);
-	}
+    function isPauser(address account) public view returns (bool) {
+        return _pausers.has(account);
+    }
 
-	function addPauser(address account) public onlyPauser {
-		_addPauser(account);
-	}
+    function addPauser(address account) public onlyPauser {
+        _addPauser(account);
+    }
 
-	function renouncePauser() public {
-		_removePauser(_msgSender());
-	}
+    function renouncePauser() public {
+        _removePauser(_msgSender());
+    }
 
-	function _addPauser(address account) internal {
-		_pausers.add(account);
-		emit PauserAdded(account);
-	}
+    function _addPauser(address account) internal {
+        _pausers.add(account);
+        emit PauserAdded(account);
+    }
 
-	function _removePauser(address account) internal {
-		_pausers.remove(account);
-		emit PauserRemoved(account);
-	}
+    function _removePauser(address account) internal {
+        _pausers.remove(account);
+        emit PauserRemoved(account);
+    }
 }
 
 /**
@@ -720,65 +633,66 @@ contract PauserRole is Context {
  * simply including this module, only once the modifiers are put in place.
  */
 contract Pausable is Context, PauserRole {
-	/**
-	 * @dev Emitted when the pause is triggered by a pauser (`account`).
-	 */
-	event Paused(address account);
+    /**
+     * @dev Emitted when the pause is triggered by a pauser (`account`).
+     */
+    event Paused(address account);
 
-	/**
-	 * @dev Emitted when the pause is lifted by a pauser (`account`).
-	 */
-	event Unpaused(address account);
+    /**
+     * @dev Emitted when the pause is lifted by a pauser (`account`).
+     */
+    event Unpaused(address account);
 
-	bool private _paused;
+    bool private _paused;
 
-	/**
-	 * @dev Initializes the contract in unpaused state. Assigns the Pauser role
-	 * to the deployer.
-	 */
-	constructor() internal {
-		_paused = false;
-	}
+    /**
+     * @dev Initializes the contract in unpaused state. Assigns the Pauser role
+     * to the deployer.
+     */
+    constructor () internal {
+        _paused = false;
+    }
 
-	/**
-	 * @dev Returns true if the contract is paused, and false otherwise.
-	 */
-	function paused() public view returns (bool) {
-		return _paused;
-	}
+    /**
+     * @dev Returns true if the contract is paused, and false otherwise.
+     */
+    function paused() public view returns (bool) {
+        return _paused;
+    }
 
-	/**
-	 * @dev Modifier to make a function callable only when the contract is not paused.
-	 */
-	modifier whenNotPaused() {
-		require(!_paused, "Pausable: paused");
-		_;
-	}
+    /**
+     * @dev Modifier to make a function callable only when the contract is not paused.
+     */
+    modifier whenNotPaused() {
+        require(!_paused, "Pausable: paused");
+        _;
+    }
 
-	/**
-	 * @dev Modifier to make a function callable only when the contract is paused.
-	 */
-	modifier whenPaused() {
-		require(_paused, "Pausable: not paused");
-		_;
-	}
+    /**
+     * @dev Modifier to make a function callable only when the contract is paused.
+     */
+    modifier whenPaused() {
+        require(_paused, "Pausable: not paused");
+        _;
+    }
 
-	/**
-	 * @dev Called by a pauser to pause, triggers stopped state.
-	 */
-	function pause() public onlyPauser whenNotPaused {
-		_paused = true;
-		emit Paused(_msgSender());
-	}
+    /**
+     * @dev Called by a pauser to pause, triggers stopped state.
+     */
+    function pause() public onlyPauser whenNotPaused {
+        _paused = true;
+        emit Paused(_msgSender());
+    }
 
-	/**
-	 * @dev Called by a pauser to unpause, returns to normal state.
-	 */
-	function unpause() public onlyPauser whenPaused {
-		_paused = false;
-		emit Unpaused(_msgSender());
-	}
+    /**
+     * @dev Called by a pauser to unpause, returns to normal state.
+     */
+    function unpause() public onlyPauser whenPaused {
+        _paused = false;
+        emit Unpaused(_msgSender());
+    }
 }
+
 
 library Decimals {
 	using SafeMath for uint256;
@@ -799,12 +713,17 @@ library Decimals {
 		return (a.div(_b));
 	}
 
-	function basis() external pure returns (uint120) {
-		return basisValue;
+	function mulBasis(uint256 _a) internal pure returns (uint256) {
+		return _a.mul(basisValue);
+	}
+
+	function divBasis(uint256 _a) internal pure returns (uint256) {
+		return _a.div(basisValue);
 	}
 }
 
 // prettier-ignore
+
 
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
@@ -883,6 +802,7 @@ contract UsingValidator {
 
 // prettier-ignore
 
+
 /**
  * @dev Optional functions from the ERC20 standard.
  */
@@ -934,6 +854,8 @@ contract ERC20Detailed is IERC20 {
     }
 }
 
+
+
 contract Killable {
 	address payable public _owner;
 
@@ -957,75 +879,69 @@ contract Killable {
  * the owner.
  */
 contract Ownable is Context {
-	address private _owner;
+    address private _owner;
 
-	event OwnershipTransferred(
-		address indexed previousOwner,
-		address indexed newOwner
-	);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-	/**
-	 * @dev Initializes the contract setting the deployer as the initial owner.
-	 */
-	constructor() internal {
-		address msgSender = _msgSender();
-		_owner = msgSender;
-		emit OwnershipTransferred(address(0), msgSender);
-	}
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    constructor () internal {
+        address msgSender = _msgSender();
+        _owner = msgSender;
+        emit OwnershipTransferred(address(0), msgSender);
+    }
 
-	/**
-	 * @dev Returns the address of the current owner.
-	 */
-	function owner() public view returns (address) {
-		return _owner;
-	}
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view returns (address) {
+        return _owner;
+    }
 
-	/**
-	 * @dev Throws if called by any account other than the owner.
-	 */
-	modifier onlyOwner() {
-		require(isOwner(), "Ownable: caller is not the owner");
-		_;
-	}
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(isOwner(), "Ownable: caller is not the owner");
+        _;
+    }
 
-	/**
-	 * @dev Returns true if the caller is the current owner.
-	 */
-	function isOwner() public view returns (bool) {
-		return _msgSender() == _owner;
-	}
+    /**
+     * @dev Returns true if the caller is the current owner.
+     */
+    function isOwner() public view returns (bool) {
+        return _msgSender() == _owner;
+    }
 
-	/**
-	 * @dev Leaves the contract without owner. It will not be possible to call
-	 * `onlyOwner` functions anymore. Can only be called by the current owner.
-	 *
-	 * NOTE: Renouncing ownership will leave the contract without an owner,
-	 * thereby removing any functionality that is only available to the owner.
-	 */
-	function renounceOwnership() public onlyOwner {
-		emit OwnershipTransferred(_owner, address(0));
-		_owner = address(0);
-	}
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 * Can only be called by the current owner.
-	 */
-	function transferOwnership(address newOwner) public onlyOwner {
-		_transferOwnership(newOwner);
-	}
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        _transferOwnership(newOwner);
+    }
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 */
-	function _transferOwnership(address newOwner) internal {
-		require(
-			newOwner != address(0),
-			"Ownable: new owner is the zero address"
-		);
-		emit OwnershipTransferred(_owner, newOwner);
-		_owner = newOwner;
-	}
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     */
+    function _transferOwnership(address newOwner) internal {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
+    }
 }
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
@@ -1153,6 +1069,7 @@ contract UsingConfig {
 	}
 }
 
+
 contract IAllocator {
 	function calculateMaxRewardsPerBlock() public view returns (uint256);
 
@@ -1163,6 +1080,8 @@ contract IAllocator {
 		// solium-disable-next-line indentation
 	) external;
 }
+
+
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
@@ -1376,6 +1295,8 @@ contract IWithdraw {
 		returns (uint256);
 }
 
+
+
 contract ILockup {
 	function lockup(
 		address _from,
@@ -1468,8 +1389,8 @@ contract IVoteCounter {
 
 	function getOppositeCount(address _sender) external view returns (uint256);
 }
-
 // prettier-ignore
+
 
 contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
 	// solium-disable-next-line no-empty-blocks
@@ -1624,6 +1545,7 @@ contract VoteCounter is IVoteCounter, UsingConfig, UsingValidator, Pausable {
 	}
 }
 
+
 contract PropertyGroup is
 	UsingConfig,
 	UsingStorage,
@@ -1688,6 +1610,9 @@ contract IPolicy {
 
 	function lockUpBlocks() external view returns (uint256);
 }
+
+
+
 
 contract VoteTimesStorage is
 	UsingStorage,
@@ -1834,6 +1759,8 @@ contract VoteTimes is IVoteTimes, UsingConfig, UsingValidator, Pausable {
 	}
 }
 
+
+
 contract MarketGroup is
 	UsingConfig,
 	UsingStorage,
@@ -1928,6 +1855,7 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 		return keccak256(abi.encodePacked("_policySetIndex"));
 	}
 }
+
 
 contract PolicyGroup is
 	UsingConfig,
@@ -2222,32 +2150,30 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	}
 }
 
-contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
+
+contract LockupStorage is UsingStorage {
 	using SafeMath for uint256;
 
-	uint256 private constant basis = 100000000000000000000000000000000;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
+	uint256 public constant basis = 100000000000000000000000000000000;
 
 	//Last Block Number
-	function setLastBlockNumber(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getLastBlockNumberKey(_property);
+	function setStorageLastBlockNumber(address _property, uint256 _value)
+		internal
+	{
+		bytes32 key = getStorageLastBlockNumberKey(_property);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getLastBlockNumber(address _property)
-		external
+	function getStorageLastBlockNumber(address _property)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getLastBlockNumberKey(_property);
+		bytes32 key = getStorageLastBlockNumberKey(_property);
 		return eternalStorage().getUint(key);
 	}
 
-	function getLastBlockNumberKey(address _property)
+	function getStorageLastBlockNumberKey(address _property)
 		private
 		pure
 		returns (bytes32)
@@ -2256,44 +2182,40 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//AllValue
-	function setAllValue(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getAllValueKey();
+	function setStorageAllValue(uint256 _value) internal {
+		bytes32 key = getStorageAllValueKey();
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getAllValue() external view returns (uint256) {
-		bytes32 key = getAllValueKey();
+	function getStorageAllValue() public view returns (uint256) {
+		bytes32 key = getStorageAllValueKey();
 		return eternalStorage().getUint(key);
 	}
 
-	function getAllValueKey() private pure returns (bytes32) {
+	function getStorageAllValueKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_allValue"));
 	}
 
 	//Value
-	function setValue(
+	function setStorageValue(
 		address _property,
 		address _sender,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getValueKey(_property, _sender);
+	) internal {
+		bytes32 key = getStorageValueKey(_property, _sender);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getValue(address _property, address _sender)
-		external
+	function getStorageValue(address _property, address _sender)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getValueKey(_property, _sender);
+		bytes32 key = getStorageValueKey(_property, _sender);
 		return eternalStorage().getUint(key);
 	}
 
-	function getValueKey(address _property, address _sender)
+	function getStorageValueKey(address _property, address _sender)
 		private
 		pure
 		returns (bytes32)
@@ -2302,23 +2224,23 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//PropertyValue
-	function setPropertyValue(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getPropertyValueKey(_property);
+	function setStoragePropertyValue(address _property, uint256 _value)
+		internal
+	{
+		bytes32 key = getStoragePropertyValueKey(_property);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getPropertyValue(address _property)
-		external
+	function getStoragePropertyValue(address _property)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getPropertyValueKey(_property);
+		bytes32 key = getStoragePropertyValueKey(_property);
 		return eternalStorage().getUint(key);
 	}
 
-	function getPropertyValueKey(address _property)
+	function getStoragePropertyValueKey(address _property)
 		private
 		pure
 		returns (bytes32)
@@ -2327,27 +2249,25 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//WithdrawalStatus
-	function setWithdrawalStatus(
+	function setStorageWithdrawalStatus(
 		address _property,
 		address _from,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getWithdrawalStatusKey(_property, _from);
+	) internal {
+		bytes32 key = getStorageWithdrawalStatusKey(_property, _from);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getWithdrawalStatus(address _property, address _from)
-		external
+	function getStorageWithdrawalStatus(address _property, address _from)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getWithdrawalStatusKey(_property, _from);
+		bytes32 key = getStorageWithdrawalStatusKey(_property, _from);
 		return eternalStorage().getUint(key);
 	}
 
-	function getWithdrawalStatusKey(address _property, address _sender)
+	function getStorageWithdrawalStatusKey(address _property, address _sender)
 		private
 		pure
 		returns (bytes32)
@@ -2359,23 +2279,23 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//InterestPrice
-	function setInterestPrice(address _property, uint256 _value) external {
+	function setStorageInterestPrice(address _property, uint256 _value)
+		internal
+	{
 		// The previously used function
 		// This function is only used in testing
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getInterestPriceKey(_property), _value);
+		eternalStorage().setUint(getStorageInterestPriceKey(_property), _value);
 	}
 
-	function getInterestPrice(address _property)
-		external
+	function getStorageInterestPrice(address _property)
+		public
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getInterestPriceKey(_property));
+		return eternalStorage().getUint(getStorageInterestPriceKey(_property));
 	}
 
-	function getInterestPriceKey(address _property)
+	function getStorageInterestPriceKey(address _property)
 		private
 		pure
 		returns (bytes32)
@@ -2384,29 +2304,29 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//LastInterestPrice
-	function setLastInterestPrice(
+	function setStorageLastInterestPrice(
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	) internal {
 		eternalStorage().setUint(
-			getLastInterestPriceKey(_property, _user),
+			getStorageLastInterestPriceKey(_property, _user),
 			_value
 		);
 	}
 
-	function getLastInterestPrice(address _property, address _user)
-		external
+	function getStorageLastInterestPrice(address _property, address _user)
+		public
 		view
 		returns (uint256)
 	{
 		return
-			eternalStorage().getUint(getLastInterestPriceKey(_property, _user));
+			eternalStorage().getUint(
+				getStorageLastInterestPriceKey(_property, _user)
+			);
 	}
 
-	function getLastInterestPriceKey(address _property, address _user)
+	function getStorageLastInterestPriceKey(address _property, address _user)
 		private
 		pure
 		returns (bytes32)
@@ -2418,29 +2338,31 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//LastSameRewardsAmountAndBlock
-	function setLastSameRewardsAmountAndBlock(uint256 _amount, uint256 _block)
-		external
-	{
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	function setStorageLastSameRewardsAmountAndBlock(
+		uint256 _amount,
+		uint256 _block
+	) internal {
 		uint256 record = _amount.mul(basis).add(_block);
-		eternalStorage().setUint(getLastSameRewardsAmountAndBlockKey(), record);
+		eternalStorage().setUint(
+			getStorageLastSameRewardsAmountAndBlockKey(),
+			record
+		);
 	}
 
-	function getLastSameRewardsAmountAndBlock()
-		external
+	function getStorageLastSameRewardsAmountAndBlock()
+		public
 		view
 		returns (uint256 _amount, uint256 _block)
 	{
 		uint256 record = eternalStorage().getUint(
-			getLastSameRewardsAmountAndBlockKey()
+			getStorageLastSameRewardsAmountAndBlockKey()
 		);
 		uint256 amount = record.div(basis);
 		uint256 blockNumber = record.sub(amount.mul(basis));
 		return (amount, blockNumber);
 	}
 
-	function getLastSameRewardsAmountAndBlockKey()
+	function getStorageLastSameRewardsAmountAndBlockKey()
 		private
 		pure
 		returns (bytes32)
@@ -2449,50 +2371,51 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeGlobalRewards
-	function setCumulativeGlobalRewards(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getCumulativeGlobalRewardsKey(), _value);
-	}
-
-	function getCumulativeGlobalRewards() external view returns (uint256) {
-		return eternalStorage().getUint(getCumulativeGlobalRewardsKey());
-	}
-
-	function getCumulativeGlobalRewardsKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
-	}
-
-	//LastCumulativeGlobalReward
-	function setLastCumulativeGlobalReward(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	function setStorageCumulativeGlobalRewards(uint256 _value) internal {
 		eternalStorage().setUint(
-			getLastCumulativeGlobalRewardKey(_property, _user),
+			getStorageCumulativeGlobalRewardsKey(),
 			_value
 		);
 	}
 
-	function getLastCumulativeGlobalReward(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastCumulativeGlobalRewardKey(_property, _user)
-			);
+	function getStorageCumulativeGlobalRewards() public view returns (uint256) {
+		return eternalStorage().getUint(getStorageCumulativeGlobalRewardsKey());
 	}
 
-	function getLastCumulativeGlobalRewardKey(address _property, address _user)
+	function getStorageCumulativeGlobalRewardsKey()
 		private
 		pure
 		returns (bytes32)
 	{
+		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
+	}
+
+	//LastCumulativeGlobalReward
+	function setStorageLastCumulativeGlobalReward(
+		address _property,
+		address _user,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageLastCumulativeGlobalRewardKey(_property, _user),
+			_value
+		);
+	}
+
+	function getStorageLastCumulativeGlobalReward(
+		address _property,
+		address _user
+	) public view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getStorageLastCumulativeGlobalRewardKey(_property, _user)
+			);
+	}
+
+	function getStorageLastCumulativeGlobalRewardKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
 		return
 			keccak256(
 				abi.encodePacked(
@@ -2504,34 +2427,32 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeLockedUpUnitAndBlock
-	function setCumulativeLockedUpUnitAndBlock(
+	function setStorageCumulativeLockedUpUnitAndBlock(
 		address _addr,
 		uint256 _unit,
 		uint256 _block
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	) internal {
 		uint256 record = _unit.mul(basis).add(_block);
 		eternalStorage().setUint(
-			getCumulativeLockedUpUnitAndBlockKey(_addr),
+			getStorageCumulativeLockedUpUnitAndBlockKey(_addr),
 			record
 		);
 	}
 
-	function getCumulativeLockedUpUnitAndBlock(address _addr)
-		external
+	function getStorageCumulativeLockedUpUnitAndBlock(address _addr)
+		public
 		view
 		returns (uint256 _unit, uint256 _block)
 	{
 		uint256 record = eternalStorage().getUint(
-			getCumulativeLockedUpUnitAndBlockKey(_addr)
+			getStorageCumulativeLockedUpUnitAndBlockKey(_addr)
 		);
 		uint256 unit = record.div(basis);
 		uint256 blockNumber = record.sub(unit.mul(basis));
 		return (unit, blockNumber);
 	}
 
-	function getCumulativeLockedUpUnitAndBlockKey(address _addr)
+	function getStorageCumulativeLockedUpUnitAndBlockKey(address _addr)
 		private
 		pure
 		returns (bytes32)
@@ -2543,23 +2464,27 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeLockedUpValue
-	function setCumulativeLockedUpValue(address _addr, uint256 _value)
-		external
+	function setStorageCumulativeLockedUpValue(address _addr, uint256 _value)
+		internal
 	{
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getCumulativeLockedUpValueKey(_addr), _value);
+		eternalStorage().setUint(
+			getStorageCumulativeLockedUpValueKey(_addr),
+			_value
+		);
 	}
 
-	function getCumulativeLockedUpValue(address _addr)
-		external
+	function getStorageCumulativeLockedUpValue(address _addr)
+		public
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getCumulativeLockedUpValueKey(_addr));
+		return
+			eternalStorage().getUint(
+				getStorageCumulativeLockedUpValueKey(_addr)
+			);
 	}
 
-	function getCumulativeLockedUpValueKey(address _addr)
+	function getStorageCumulativeLockedUpValueKey(address _addr)
 		private
 		pure
 		returns (bytes32)
@@ -2568,53 +2493,64 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//PendingWithdrawal
-	function setPendingInterestWithdrawal(
+	function setStoragePendingInterestWithdrawal(
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	) internal {
 		eternalStorage().setUint(
-			getPendingInterestWithdrawalKey(_property, _user),
+			getStoragePendingInterestWithdrawalKey(_property, _user),
 			_value
 		);
 	}
 
-	function getPendingInterestWithdrawal(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
+	function getStoragePendingInterestWithdrawal(
+		address _property,
+		address _user
+	) public view returns (uint256) {
 		return
 			eternalStorage().getUint(
-				getPendingInterestWithdrawalKey(_property, _user)
+				getStoragePendingInterestWithdrawalKey(_property, _user)
 			);
 	}
 
-	function getPendingInterestWithdrawalKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
+	function getStoragePendingInterestWithdrawalKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
 		return
 			keccak256(
 				abi.encodePacked("_pendingInterestWithdrawal", _property, _user)
 			);
 	}
+
+	//DIP4GenesisBlock
+	function setStorageDIP4GenesisBlock(uint256 _block) internal {
+		eternalStorage().setUint(getStorageDIP4GenesisBlockKey(), _block);
+	}
+
+	function getStorageDIP4GenesisBlock() public view returns (uint256) {
+		return eternalStorage().getUint(getStorageDIP4GenesisBlockKey());
+	}
+
+	function getStorageDIP4GenesisBlockKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("dip4GenesisBlock"));
+	}
 }
 
-contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
+contract Lockup is
+	ILockup,
+	Pausable,
+	UsingConfig,
+	UsingValidator,
+	LockupStorage
+{
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	uint256 public deployedBlock;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {
-		// Save a deployed block number locally for a fallback of getCumulativeLockedUpUnitAndBlock.
-		deployedBlock = block.number;
-	}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function lockup(
 		address _from,
@@ -2624,23 +2560,20 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateAddress(msg.sender, config().token());
 		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(_value != 0, "illegal lockup value");
-		LockupStorage lockupStorage = getStorage();
 
-		bool isWaiting = lockupStorage.getWithdrawalStatus(_property, _from) !=
-			0;
+		bool isWaiting = getStorageWithdrawalStatus(_property, _from) != 0;
 		require(isWaiting == false, "lockup is already canceled");
-		if (lockupStorage.getLastBlockNumber(_property) == 0) {
+		if (getStorageLastBlockNumber(_property) == 0) {
 			// Set the block that has been locked-up for the first time as the starting block.
-			lockupStorage.setLastBlockNumber(_property, block.number);
+			setStorageLastBlockNumber(_property, block.number);
 		}
-		updatePendingInterestWithdrawal(lockupStorage, _property, _from);
+		updatePendingInterestWithdrawal(_property, _from);
 		(, uint256 last) = _calculateWithdrawableInterestAmount(
-			lockupStorage,
 			_property,
 			_from
 		);
-		updateLastPriceForProperty(lockupStorage, _property, _from, last);
-		updateValues(lockupStorage, true, _from, _property, _value);
+		updateLastPriceForProperty(_property, _from, last);
+		updateValues(true, _from, _property, _value);
 		emit Lockedup(_from, _property, _value);
 	}
 
@@ -2648,52 +2581,44 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(hasValue(_property, msg.sender), "dev token is not locked");
-		LockupStorage lockupStorage = getStorage();
-		bool isWaiting = lockupStorage.getWithdrawalStatus(
-			_property,
-			msg.sender
-		) != 0;
+		bool isWaiting = getStorageWithdrawalStatus(_property, msg.sender) != 0;
 		require(isWaiting == false, "lockup is already canceled");
 		uint256 blockNumber = Policy(config().policy()).lockUpBlocks();
 		blockNumber = blockNumber.add(block.number);
-		lockupStorage.setWithdrawalStatus(_property, msg.sender, blockNumber);
+		setStorageWithdrawalStatus(_property, msg.sender, blockNumber);
 	}
 
 	function withdraw(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(possible(_property, msg.sender), "waiting for release");
-		LockupStorage lockupStorage = getStorage();
-		uint256 lockedUpValue = lockupStorage.getValue(_property, msg.sender);
+		uint256 lockedUpValue = getStorageValue(_property, msg.sender);
 		require(lockedUpValue != 0, "dev token is not locked");
-		updatePendingInterestWithdrawal(lockupStorage, _property, msg.sender);
+		updatePendingInterestWithdrawal(_property, msg.sender);
 		Property(_property).withdraw(msg.sender, lockedUpValue);
-		updateValues(
-			lockupStorage,
-			false,
-			msg.sender,
-			_property,
-			lockedUpValue
-		);
-		lockupStorage.setValue(_property, msg.sender, 0);
-		lockupStorage.setWithdrawalStatus(_property, msg.sender, 0);
+		updateValues(false, msg.sender, _property, lockedUpValue);
+		setStorageValue(_property, msg.sender, 0);
+		setStorageWithdrawalStatus(_property, msg.sender, 0);
 	}
 
-	function getCumulativeLockedUpUnitAndBlock(
-		LockupStorage lockupStorage,
-		address _property
-	) private view returns (uint256 _unit, uint256 _block) {
-		(uint256 unit, uint256 lastBlock) = lockupStorage
-			.getCumulativeLockedUpUnitAndBlock(_property);
+	function getCumulativeLockedUpUnitAndBlock(address _property)
+		private
+		view
+		returns (uint256 _unit, uint256 _block)
+	{
+		(
+			uint256 unit,
+			uint256 lastBlock
+		) = getStorageCumulativeLockedUpUnitAndBlock(_property);
 		if (lastBlock > 0) {
 			return (unit, lastBlock);
 		}
 		// When lastBlock is 0, CumulativeLockedUpUnitAndBlock is not saved yet so failback to AllValue or PropertyValue.
 		unit = _property == address(0)
-			? lockupStorage.getAllValue()
-			: lockupStorage.getPropertyValue(_property);
-		// Assign lastBlock as deployedBlock because when AllValue or PropertyValue is not 0, already locked-up when deployed this contract.
-		lastBlock = deployedBlock;
+			? getStorageAllValue()
+			: getStoragePropertyValue(_property);
+		// Assign lastBlock as DIP4GenesisBlock because when AllValue or PropertyValue is not 0, already locked-up when started DIP4.
+		lastBlock = getStorageDIP4GenesisBlock();
 		return (unit, lastBlock);
 	}
 
@@ -2706,12 +2631,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			uint256 _block
 		)
 	{
-		LockupStorage lockupStorage = getStorage();
 		(uint256 unit, uint256 lastBlock) = getCumulativeLockedUpUnitAndBlock(
-			lockupStorage,
 			_property
 		);
-		uint256 lastValue = lockupStorage.getCumulativeLockedUpValue(_property);
+		uint256 lastValue = getStorageCumulativeLockedUpValue(_property);
 		return (
 			lastValue.add(unit.mul(block.number.sub(lastBlock))),
 			unit,
@@ -2732,7 +2655,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function updateCumulativeLockedUp(
-		LockupStorage lockupStorage,
 		bool _addition,
 		address _property,
 		uint256 _unit
@@ -2744,20 +2666,20 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		(uint256 lastValueAll, uint256 lastUnitAll, ) = getCumulativeLockedUp(
 			zero
 		);
-		lockupStorage.setCumulativeLockedUpValue(
+		setStorageCumulativeLockedUpValue(
 			_property,
 			_addition ? lastValue.add(_unit) : lastValue.sub(_unit)
 		);
-		lockupStorage.setCumulativeLockedUpValue(
+		setStorageCumulativeLockedUpValue(
 			zero,
 			_addition ? lastValueAll.add(_unit) : lastValueAll.sub(_unit)
 		);
-		lockupStorage.setCumulativeLockedUpUnitAndBlock(
+		setStorageCumulativeLockedUpUnitAndBlock(
 			_property,
 			_addition ? lastUnit.add(_unit) : lastUnit.sub(_unit),
 			block.number
 		);
-		lockupStorage.setCumulativeLockedUpUnitAndBlock(
+		setStorageCumulativeLockedUpUnitAndBlock(
 			zero,
 			_addition ? lastUnitAll.add(_unit) : lastUnitAll.sub(_unit),
 			block.number
@@ -2765,24 +2687,18 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function update() public {
-		LockupStorage lockupStorage = getStorage();
-		(uint256 _nextRewards, uint256 _amount) = dry(lockupStorage);
-		lockupStorage.setCumulativeGlobalRewards(_nextRewards);
-		lockupStorage.setLastSameRewardsAmountAndBlock(_amount, block.number);
+		(uint256 _nextRewards, uint256 _amount) = dry();
+		setStorageCumulativeGlobalRewards(_nextRewards);
+		setStorageLastSameRewardsAmountAndBlock(_amount, block.number);
 	}
 
 	function updateLastPriceForProperty(
-		LockupStorage lockupStorage,
 		address _property,
 		address _user,
 		uint256 _lastInterest
 	) private {
-		lockupStorage.setLastCumulativeGlobalReward(
-			_property,
-			_user,
-			_lastInterest
-		);
-		lockupStorage.setLastBlockNumber(_property, block.number);
+		setStorageLastCumulativeGlobalReward(_property, _user, _lastInterest);
+		setStorageLastBlockNumber(_property, block.number);
 	}
 
 	function validateTargetPeriod(address _property) private {
@@ -2804,25 +2720,27 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256 begin, uint256 end)
 	{
-		return (getStorage().getLastBlockNumber(_property), block.number);
+		return (getStorageLastBlockNumber(_property), block.number);
 	}
 
-	function dry(LockupStorage lockupStorage)
+	function dry()
 		private
 		view
 		returns (uint256 _nextRewards, uint256 _amount)
 	{
 		uint256 rewardsAmount = IAllocator(config().allocator())
 			.calculateMaxRewardsPerBlock();
-		(uint256 lastAmount, uint256 lastBlock) = lockupStorage
-			.getLastSameRewardsAmountAndBlock();
+		(
+			uint256 lastAmount,
+			uint256 lastBlock
+		) = getStorageLastSameRewardsAmountAndBlock();
 		uint256 lastMaxRewards = lastAmount == rewardsAmount
 			? rewardsAmount
 			: lastAmount;
 
 		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
 		uint256 additionalRewards = lastMaxRewards.mul(blocks);
-		uint256 nextRewards = lockupStorage.getCumulativeGlobalRewards().add(
+		uint256 nextRewards = getStorageCumulativeGlobalRewards().add(
 			additionalRewards
 		);
 		return (nextRewards, rewardsAmount);
@@ -2839,14 +2757,13 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			uint256 _interestPrice
 		)
 	{
-		LockupStorage lockupStorage = getStorage();
-		(uint256 rewards, ) = dry(lockupStorage);
+		(uint256 rewards, ) = dry();
 		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
 		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
 		uint256 propertyRewards = rewards.sub(_lastReward).mul(
-			valuePerProperty.mul(Decimals.basis()).outOf(valueAll)
+			valuePerProperty.mulBasis().outOf(valueAll)
 		);
-		uint256 lockedUpPerProperty = lockupStorage.getPropertyValue(_property);
+		uint256 lockedUpPerProperty = getStoragePropertyValue(_property);
 		uint256 totalSupply = ERC20Mintable(_property).totalSupply();
 		uint256 holders = Policy(config().policy()).holdersShare(
 			propertyRewards,
@@ -2872,13 +2789,12 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			uint256 _interestPrice
 		)
 	{
-		LockupStorage lockupStorage = getStorage();
-		(uint256 nextRewards, ) = dry(lockupStorage);
+		(uint256 nextRewards, ) = dry();
 		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
 		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
-		uint256 share = valuePerProperty.mul(Decimals.basis()).outOf(valueAll);
+		uint256 share = valuePerProperty.mulBasis().outOf(valueAll);
 		uint256 propertyRewards = nextRewards.mul(share);
-		uint256 lockedUp = lockupStorage.getPropertyValue(_property);
+		uint256 lockedUp = getStoragePropertyValue(_property);
 		uint256 holders = Policy(config().policy()).holdersShare(
 			propertyRewards,
 			lockedUp
@@ -2891,40 +2807,26 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return (holders, interest, holdersPrice, interestPrice);
 	}
 
-	function _calculateInterestAmount(
-		LockupStorage lockupStorage,
-		address _property,
-		address _user
-	) private view returns (uint256 _amount, uint256 _interest) {
-		uint256 last = lockupStorage.getLastCumulativeGlobalReward(
-			_property,
-			_user
-		);
+	function _calculateInterestAmount(address _property, address _user)
+		private
+		view
+		returns (uint256 _amount, uint256 _interest)
+	{
+		uint256 last = getStorageLastCumulativeGlobalReward(_property, _user);
 		(uint256 nextReward, , , , uint256 price) = difference(_property, last);
-		uint256 lockedUpPerAccount = lockupStorage.getValue(_property, _user);
+		uint256 lockedUpPerAccount = getStorageValue(_property, _user);
 		uint256 amount = price.mul(lockedUpPerAccount);
-		uint256 result = amount > 0
-			? amount.div(Decimals.basis()).div(Decimals.basis())
-			: 0;
+		uint256 result = amount > 0 ? amount.divBasis().divBasis() : 0;
 		return (result, nextReward);
 	}
 
 	function _calculateWithdrawableInterestAmount(
-		LockupStorage lockupStorage,
 		address _property,
 		address _user
 	) private view returns (uint256 _amount, uint256 _reward) {
-		uint256 pending = lockupStorage.getPendingInterestWithdrawal(
-			_property,
-			_user
-		);
-		uint256 legacy = __legacyWithdrawableInterestAmount(
-			lockupStorage,
-			_property,
-			_user
-		);
+		uint256 pending = getStoragePendingInterestWithdrawal(_property, _user);
+		uint256 legacy = __legacyWithdrawableInterestAmount(_property, _user);
 		(uint256 amount, uint256 reward) = _calculateInterestAmount(
-			lockupStorage,
 			_property,
 			_user
 		);
@@ -2939,7 +2841,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		address _user
 	) public view returns (uint256) {
 		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
-			getStorage(),
 			_property,
 			_user
 		);
@@ -2950,59 +2851,52 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		validateTargetPeriod(_property);
-		LockupStorage lockupStorage = getStorage();
 		(uint256 value, uint256 last) = _calculateWithdrawableInterestAmount(
-			lockupStorage,
 			_property,
 			msg.sender
 		);
 		require(value > 0, "your interest amount is 0");
-		lockupStorage.setPendingInterestWithdrawal(_property, msg.sender, 0);
+		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		updateLastPriceForProperty(lockupStorage, _property, msg.sender, last);
-		__updateLegacyWithdrawableInterestAmount(
-			lockupStorage,
-			_property,
-			msg.sender
-		);
+		updateLastPriceForProperty(_property, msg.sender, last);
+		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 		update();
 	}
 
 	function updateValues(
-		LockupStorage lockupStorage,
 		bool _addition,
 		address _account,
 		address _property,
 		uint256 _value
 	) private {
 		if (_addition) {
-			updateCumulativeLockedUp(lockupStorage, true, _property, _value);
-			addAllValue(lockupStorage, _value);
-			addPropertyValue(lockupStorage, _property, _value);
-			addValue(lockupStorage, _property, _account, _value);
+			updateCumulativeLockedUp(true, _property, _value);
+			addAllValue(_value);
+			addPropertyValue(_property, _value);
+			addValue(_property, _account, _value);
 		} else {
-			updateCumulativeLockedUp(lockupStorage, false, _property, _value);
-			subAllValue(lockupStorage, _value);
-			subPropertyValue(lockupStorage, _property, _value);
+			updateCumulativeLockedUp(false, _property, _value);
+			subAllValue(_value);
+			subPropertyValue(_property, _value);
 		}
 		update();
 	}
 
 	function getAllValue() external view returns (uint256) {
-		return getStorage().getAllValue();
+		return getStorageAllValue();
 	}
 
-	function addAllValue(LockupStorage lockupStorage, uint256 _value) private {
-		uint256 value = lockupStorage.getAllValue();
+	function addAllValue(uint256 _value) private {
+		uint256 value = getStorageAllValue();
 		value = value.add(_value);
-		lockupStorage.setAllValue(value);
+		setStorageAllValue(value);
 	}
 
-	function subAllValue(LockupStorage lockupStorage, uint256 _value) private {
-		uint256 value = lockupStorage.getAllValue();
+	function subAllValue(uint256 _value) private {
+		uint256 value = getStorageAllValue();
 		value = value.sub(_value);
-		lockupStorage.setAllValue(value);
+		setStorageAllValue(value);
 	}
 
 	function getValue(address _property, address _sender)
@@ -3010,18 +2904,17 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		return getStorage().getValue(_property, _sender);
+		return getStorageValue(_property, _sender);
 	}
 
 	function addValue(
-		LockupStorage lockupStorage,
 		address _property,
 		address _sender,
 		uint256 _value
 	) private {
-		uint256 value = lockupStorage.getValue(_property, _sender);
+		uint256 value = getStorageValue(_property, _sender);
 		value = value.add(_value);
-		lockupStorage.setValue(_property, _sender, value);
+		setStorageValue(_property, _sender, value);
 	}
 
 	function hasValue(address _property, address _sender)
@@ -3029,7 +2922,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (bool)
 	{
-		uint256 value = getStorage().getValue(_property, _sender);
+		uint256 value = getStorageValue(_property, _sender);
 		return value != 0;
 	}
 
@@ -3038,49 +2931,34 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		return getStorage().getPropertyValue(_property);
+		return getStoragePropertyValue(_property);
 	}
 
-	function addPropertyValue(
-		LockupStorage lockupStorage,
-		address _property,
-		uint256 _value
-	) private {
-		uint256 value = lockupStorage.getPropertyValue(_property);
+	function addPropertyValue(address _property, uint256 _value) private {
+		uint256 value = getStoragePropertyValue(_property);
 		value = value.add(_value);
-		lockupStorage.setPropertyValue(_property, value);
+		setStoragePropertyValue(_property, value);
 	}
 
-	function subPropertyValue(
-		LockupStorage lockupStorage,
-		address _property,
-		uint256 _value
-	) private {
-		uint256 value = lockupStorage.getPropertyValue(_property);
+	function subPropertyValue(address _property, uint256 _value) private {
+		uint256 value = getStoragePropertyValue(_property);
 		uint256 nextValue = value.sub(_value);
-		lockupStorage.setPropertyValue(_property, nextValue);
+		setStoragePropertyValue(_property, nextValue);
 	}
 
-	function updatePendingInterestWithdrawal(
-		LockupStorage lockupStorage,
-		address _property,
-		address _user
-	) private {
+	function updatePendingInterestWithdrawal(address _property, address _user)
+		private
+	{
 		(uint256 withdrawableAmount, ) = _calculateWithdrawableInterestAmount(
-			lockupStorage,
 			_property,
 			_user
 		);
-		lockupStorage.setPendingInterestWithdrawal(
+		setStoragePendingInterestWithdrawal(
 			_property,
 			_user,
 			withdrawableAmount
 		);
-		__updateLegacyWithdrawableInterestAmount(
-			lockupStorage,
-			_property,
-			_user
-		);
+		__updateLegacyWithdrawableInterestAmount(_property, _user);
 	}
 
 	function possible(address _property, address _from)
@@ -3088,10 +2966,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (bool)
 	{
-		uint256 blockNumber = getStorage().getWithdrawalStatus(
-			_property,
-			_from
-		);
+		uint256 blockNumber = getStorageWithdrawalStatus(_property, _from);
 		if (blockNumber == 0) {
 			return false;
 		}
@@ -3106,29 +2981,26 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function __legacyWithdrawableInterestAmount(
-		LockupStorage lockupStorage,
 		address _property,
 		address _user
 	) private view returns (uint256) {
-		uint256 _last = lockupStorage.getLastInterestPrice(_property, _user);
-		uint256 price = lockupStorage.getInterestPrice(_property);
+		uint256 _last = getStorageLastInterestPrice(_property, _user);
+		uint256 price = getStorageInterestPrice(_property);
 		uint256 priceGap = price.sub(_last);
-		uint256 lockedUpValue = lockupStorage.getValue(_property, _user);
+		uint256 lockedUpValue = getStorageValue(_property, _user);
 		uint256 value = priceGap.mul(lockedUpValue);
-		return value.div(Decimals.basis());
+		return value.divBasis();
 	}
 
 	function __updateLegacyWithdrawableInterestAmount(
-		LockupStorage lockupStorage,
 		address _property,
 		address _user
 	) private {
-		uint256 interestPrice = lockupStorage.getInterestPrice(_property);
-		lockupStorage.setLastInterestPrice(_property, _user, interestPrice);
+		uint256 interestPrice = getStorageInterestPrice(_property);
+		setStorageLastInterestPrice(_property, _user, interestPrice);
 	}
 
-	function getStorage() private view returns (LockupStorage) {
-		require(paused() == false, "You cannot use that");
-		return LockupStorage(config().lockupStorage());
+	function setDIP4GenesisBlock(uint256 _block) external onlyPauser {
+		setStorageDIP4GenesisBlock(_block);
 	}
 }
