@@ -667,119 +667,6 @@ contract ERC20Mintable is ERC20, MinterRole {
 	}
 }
 
-contract PauserRole is Context {
-	using Roles for Roles.Role;
-
-	event PauserAdded(address indexed account);
-	event PauserRemoved(address indexed account);
-
-	Roles.Role private _pausers;
-
-	constructor() internal {
-		_addPauser(_msgSender());
-	}
-
-	modifier onlyPauser() {
-		require(
-			isPauser(_msgSender()),
-			"PauserRole: caller does not have the Pauser role"
-		);
-		_;
-	}
-
-	function isPauser(address account) public view returns (bool) {
-		return _pausers.has(account);
-	}
-
-	function addPauser(address account) public onlyPauser {
-		_addPauser(account);
-	}
-
-	function renouncePauser() public {
-		_removePauser(_msgSender());
-	}
-
-	function _addPauser(address account) internal {
-		_pausers.add(account);
-		emit PauserAdded(account);
-	}
-
-	function _removePauser(address account) internal {
-		_pausers.remove(account);
-		emit PauserRemoved(account);
-	}
-}
-
-/**
- * @dev Contract module which allows children to implement an emergency stop
- * mechanism that can be triggered by an authorized account.
- *
- * This module is used through inheritance. It will make available the
- * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
- * the functions of your contract. Note that they will not be pausable by
- * simply including this module, only once the modifiers are put in place.
- */
-contract Pausable is Context, PauserRole {
-	/**
-	 * @dev Emitted when the pause is triggered by a pauser (`account`).
-	 */
-	event Paused(address account);
-
-	/**
-	 * @dev Emitted when the pause is lifted by a pauser (`account`).
-	 */
-	event Unpaused(address account);
-
-	bool private _paused;
-
-	/**
-	 * @dev Initializes the contract in unpaused state. Assigns the Pauser role
-	 * to the deployer.
-	 */
-	constructor() internal {
-		_paused = false;
-	}
-
-	/**
-	 * @dev Returns true if the contract is paused, and false otherwise.
-	 */
-	function paused() public view returns (bool) {
-		return _paused;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is not paused.
-	 */
-	modifier whenNotPaused() {
-		require(!_paused, "Pausable: paused");
-		_;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is paused.
-	 */
-	modifier whenPaused() {
-		require(_paused, "Pausable: not paused");
-		_;
-	}
-
-	/**
-	 * @dev Called by a pauser to pause, triggers stopped state.
-	 */
-	function pause() public onlyPauser whenNotPaused {
-		_paused = true;
-		emit Paused(_msgSender());
-	}
-
-	/**
-	 * @dev Called by a pauser to unpause, returns to normal state.
-	 */
-	function unpause() public onlyPauser whenPaused {
-		_paused = false;
-		emit Unpaused(_msgSender());
-	}
-}
-
 library Decimals {
 	using SafeMath for uint256;
 	uint120 private constant basisValue = 1000000000000000000;
@@ -799,8 +686,12 @@ library Decimals {
 		return (a.div(_b));
 	}
 
-	function basis() external pure returns (uint120) {
-		return basisValue;
+	function mulBasis(uint256 _a) internal pure returns (uint256) {
+		return _a.mul(basisValue);
+	}
+
+	function divBasis(uint256 _a) internal pure returns (uint256) {
+		return _a.div(basisValue);
 	}
 }
 
@@ -1202,7 +1093,7 @@ contract EternalStorage {
 	}
 }
 
-contract UsingStorage is Ownable, Pausable {
+contract UsingStorage is Ownable {
 	address private _storage;
 
 	modifier hasStorage() {
@@ -1216,7 +1107,6 @@ contract UsingStorage is Ownable, Pausable {
 		hasStorage
 		returns (EternalStorage)
 	{
-		require(paused() == false, "You cannot use that");
 		return EternalStorage(_storage);
 	}
 
@@ -1557,7 +1447,7 @@ contract ILockup {
 	function withdrawInterest(address _property) external;
 }
 
-contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
+contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -1699,7 +1589,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			balance = balanceLimit;
 		}
 		uint256 value = _holdersPrice.mul(balance);
-		return (value.div(Decimals.basis()).div(Decimals.basis()), reward);
+		return (value.divBasis().divBasis(), reward);
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)
@@ -1733,7 +1623,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			0
 		);
-		return _amount.div(Decimals.basis()).div(Decimals.basis());
+		return _amount.divBasis().divBasis();
 	}
 
 	function __legacyWithdrawableAmount(address _property, address _user)
@@ -1750,7 +1640,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		uint256 priceGap = price.sub(_last);
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
 		uint256 value = priceGap.mul(balance);
-		return value.div(Decimals.basis());
+		return value.divBasis();
 	}
 
 	function __updateLegacyWithdrawableAmount(address _property, address _user)
@@ -1762,7 +1652,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {
-		require(paused() == false, "You cannot use that");
 		return WithdrawStorage(config().withdrawStorage());
 	}
 }

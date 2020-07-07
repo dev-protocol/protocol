@@ -13,7 +13,6 @@ contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(
 			msg.sender,
 			config().metricsFactory()
@@ -27,7 +26,6 @@ contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	}
 
 	function removeGroup(address _addr) external {
-		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(
 			msg.sender,
 			config().metricsFactory()

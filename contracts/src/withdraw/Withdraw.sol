@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 // prettier-ignore
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
@@ -11,7 +10,7 @@ import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
-contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
+contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 
@@ -153,7 +152,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			balance = balanceLimit;
 		}
 		uint256 value = _holdersPrice.mul(balance);
-		return (value.div(Decimals.basis()).div(Decimals.basis()), reward);
+		return (value.divBasis().divBasis(), reward);
 	}
 
 	function _calculateWithdrawableAmount(address _property, address _user)
@@ -187,7 +186,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 			_property,
 			0
 		);
-		return _amount.div(Decimals.basis()).div(Decimals.basis());
+		return _amount.divBasis().divBasis();
 	}
 
 	function __legacyWithdrawableAmount(address _property, address _user)
@@ -204,7 +203,7 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 		uint256 priceGap = price.sub(_last);
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
 		uint256 value = priceGap.mul(balance);
-		return value.div(Decimals.basis());
+		return value.divBasis();
 	}
 
 	function __updateLegacyWithdrawableAmount(address _property, address _user)
@@ -216,7 +215,6 @@ contract Withdraw is IWithdraw, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function getStorage() private view returns (WithdrawStorage) {
-		require(paused() == false, "You cannot use that");
 		return WithdrawStorage(config().withdrawStorage());
 	}
 }

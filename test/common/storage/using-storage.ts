@@ -1,7 +1,7 @@
 import {UsingStorageTestInstance} from '../../../types/truffle-contracts'
 import {validateErrorMessage} from '../../test-lib/utils/error'
 
-contract('UsingStorageTest', ([deployer, account]) => {
+contract('UsingStorageTest', ([deployer]) => {
 	const UsingStorageTestContract = artifacts.require('UsingStorageTest')
 	let usingStorageTest: UsingStorageTestInstance
 	before(async () => {
@@ -16,27 +16,6 @@ contract('UsingStorageTest', ([deployer, account]) => {
 			const result = await usingStorage.getEternalStorageAddress()
 			const expected = await usingStorage.getStorageAddress()
 			expect(result).to.be.equal(expected)
-		})
-		it('should fail to returns EternalStorage instance when the contract is pausing', async () => {
-			const usingStorage = await UsingStorageTestContract.new()
-			await usingStorage.createStorage()
-			await usingStorage.pause()
-			const result = await usingStorage
-				.getEternalStorageAddress()
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'You cannot use that', false)
-		})
-		it('should fail to set to pause when sent from a non-owner account', async () => {
-			const usingStorage = await UsingStorageTestContract.new({from: deployer})
-			await usingStorage.createStorage({from: deployer})
-			const result = await usingStorage
-				.pause({from: account})
-				.catch((err: Error) => err)
-			validateErrorMessage(
-				result,
-				'PauserRole: caller does not have the Pauser role',
-				false
-			)
 		})
 	})
 	describe('UsingStorage; hasStorage, createStorage', () => {

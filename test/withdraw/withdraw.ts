@@ -32,13 +32,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		await dev.generateAddressConfig()
 		await Promise.all([
 			dev.generateAllocator(),
-			dev.generateAllocatorStorage(),
 			dev.generateMarketFactory(),
 			dev.generateMarketGroup(),
 			dev.generateMetricsFactory(),
 			dev.generateMetricsGroup(),
 			dev.generateLockup(),
-			dev.generateLockupStorage(),
 			dev.generateWithdraw(),
 			dev.generateWithdrawStorage(),
 			dev.generatePropertyFactory(),
@@ -471,19 +469,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					expect(bobAmount.toFixed()).to.be.equal('0')
 				})
 			})
-		})
-	})
-	describe('Withdraw; pause', () => {
-		it('should fail to call when paused.', async () => {
-			const [dev, , property] = await init()
-			await dev.withdraw.pause()
-			let res = await dev.withdraw
-				.getRewardsAmount(property.address)
-				.catch((err: Error) => err)
-			validatePauseErrorMessage(res, false)
-			await dev.withdraw.unpause()
-			res = await dev.withdraw.getRewardsAmount(property.address)
-			expect(res.toNumber()).to.be.equal(0)
 		})
 	})
 	describe('Withdraw; calculateWithdrawableAmount', () => {

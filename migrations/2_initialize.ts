@@ -20,7 +20,6 @@ const handler = function (deployer, network) {
 	// Lockup
 	deployer.link(decimals, artifacts.require('Lockup'))
 	deployer.deploy(artifacts.require('Lockup'), address)
-	deployer.deploy(artifacts.require('LockupStorage'), address)
 
 	// Market
 	deployer.deploy(artifacts.require('MarketFactory'), address)

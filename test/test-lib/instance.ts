@@ -1,7 +1,6 @@
 import {
 	AddressConfigInstance,
 	AllocatorInstance,
-	AllocatorStorageInstance,
 	VoteCounterInstance,
 	VoteCounterStorageInstance,
 	VoteTimesInstance,
@@ -9,9 +8,7 @@ import {
 	PropertyGroupInstance,
 	DevInstance,
 	LockupInstance,
-	LockupStorageInstance,
 	PropertyFactoryInstance,
-	DecimalsInstance,
 	PolicyFactoryInstance,
 	PolicySetInstance,
 	PolicyGroupInstance,
@@ -24,6 +21,7 @@ import {
 	IMarketInstance,
 	WithdrawInstance,
 } from '../../types/truffle-contracts'
+import {getBlock} from './utils/common'
 
 const contract = artifacts.require
 
@@ -32,10 +30,8 @@ export class DevProtocolInstance {
 
 	private _addressConfig!: AddressConfigInstance
 	private _allocator!: AllocatorInstance
-	private _allocatorStorage!: AllocatorStorageInstance
 	private _dev!: DevInstance
 	private _lockup!: LockupInstance
-	private _lockupStorage!: LockupStorageInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _voteCounter!: VoteCounterInstance
 	private _voteCounterStorage!: VoteCounterStorageInstance
@@ -68,20 +64,12 @@ export class DevProtocolInstance {
 		return this._allocator
 	}
 
-	public get allocatorStorage(): AllocatorStorageInstance {
-		return this._allocatorStorage
-	}
-
 	public get dev(): DevInstance {
 		return this._dev
 	}
 
 	public get lockup(): LockupInstance {
 		return this._lockup
-	}
-
-	public get lockupStorage(): LockupStorageInstance {
-		return this._lockupStorage
 	}
 
 	public get propertyFactory(): PropertyFactoryInstance {
@@ -158,51 +146,25 @@ export class DevProtocolInstance {
 	}
 
 	public async generateAllocator(): Promise<void> {
-		this._allocator = await (async (x) => {
-			;(x as any).link(
-				'Decimals',
-				await this.generateDecimals().then((x) => x.address)
-			)
-			return x.new(this.addressConfig.address, this.fromDeployer)
-		})(contract('Allocator'))
+		this._allocator = await contract('Allocator').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
 		await this._addressConfig.setAllocator(
 			this._allocator.address,
 			this.fromDeployer
 		)
 	}
 
-	public async generateAllocatorStorage(): Promise<void> {
-		this._allocatorStorage = await contract('AllocatorStorage').new(
-			this.fromDeployer
-		)
-		await this._addressConfig.setAllocatorStorage(
-			this._allocatorStorage.address,
-			this.fromDeployer
-		)
-		await this._allocatorStorage.createStorage(this.fromDeployer)
-	}
-
 	public async generateLockup(): Promise<void> {
-		this._lockup = await (async (x) => {
-			;(x as any).link(
-				'Decimals',
-				await this.generateDecimals().then((x) => x.address)
-			)
-			return x.new(this.addressConfig.address, this.fromDeployer)
-		})(contract('Lockup'))
-		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
-	}
-
-	public async generateLockupStorage(): Promise<void> {
-		this._lockupStorage = await contract('LockupStorage').new(
+		this._lockup = await contract('Lockup').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setLockupStorage(
-			this._lockupStorage.address,
-			this.fromDeployer
-		)
-		await this._lockupStorage.createStorage(this.fromDeployer)
+		const block = await getBlock()
+		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
+		await this._lockup.createStorage()
+		await this._lockup.setDIP4GenesisBlock(block)
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
@@ -356,13 +318,10 @@ export class DevProtocolInstance {
 	}
 
 	public async generateWithdraw(): Promise<void> {
-		this._withdraw = await (async (x) => {
-			;(x as any).link(
-				'Decimals',
-				await this.generateDecimals().then((x) => x.address)
-			)
-			return x.new(this.addressConfig.address, this.fromDeployer)
-		})(contract('Withdraw'))
+		this._withdraw = await contract('Withdraw').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
 		await this._addressConfig.setWithdraw(
 			this._withdraw.address,
 			this.fromDeployer
@@ -381,22 +340,11 @@ export class DevProtocolInstance {
 		await this._withdrawStorage.createStorage(this.fromDeployer)
 	}
 
-	public async generateDecimals(): Promise<DecimalsInstance> {
-		return artifacts.require('Decimals').new(this.fromDeployer)
-	}
-
 	public async getPolicy(
 		contractName: string,
 		user: string
 	): Promise<IPolicyInstance> {
-		const tmp = await (async (x) => {
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-			;(x as any).link(
-				'Decimals',
-				await this.generateDecimals().then((x) => x.address)
-			)
-			return x.new({from: user})
-		})(contract(contractName))
+		const tmp = await contract(contractName).new({from: user})
 		return tmp
 	}
 

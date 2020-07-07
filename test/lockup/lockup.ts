@@ -4,14 +4,17 @@ import {
 	PolicyTestForLockupInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
-import {mine, toBigNumber, getBlock, gasLogger} from '../test-lib/utils/common'
+import {
+	mine,
+	toBigNumber,
+	getBlock,
+	gasLogger,
+	keccak256,
+} from '../test-lib/utils/common'
 import {getWithdrawInterestAmount} from '../test-lib/utils/mint-amount'
 import {getPropertyAddress} from '../test-lib/utils/log'
 import {waitForEvent, getEventValue} from '../test-lib/utils/event'
-import {
-	validateErrorMessage,
-	validatePauseErrorMessage,
-} from '../test-lib/utils/error'
+import {validateErrorMessage} from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
 contract('LockupTest', ([deployer, user1]) => {
@@ -24,13 +27,11 @@ contract('LockupTest', ([deployer, user1]) => {
 		await dev.generateAddressConfig()
 		await Promise.all([
 			dev.generateAllocator(),
-			dev.generateAllocatorStorage(),
 			dev.generateMarketFactory(),
 			dev.generateMarketGroup(),
 			dev.generateMetricsFactory(),
 			dev.generateMetricsGroup(),
 			dev.generateLockup(),
-			dev.generateLockupStorage(),
 			dev.generateWithdraw(),
 			dev.generateWithdrawStorage(),
 			dev.generatePropertyFactory(),
@@ -109,14 +110,6 @@ contract('LockupTest', ([deployer, user1]) => {
 		})
 	})
 	describe('Lockup; lockup', () => {
-		it('should fail to call when paused', async () => {
-			const [dev, ,] = await init()
-
-			await dev.lockup.pause()
-
-			const res = await dev.lockup.getAllValue().catch(err)
-			validatePauseErrorMessage(res, false)
-		})
 		it('should fail to call when sent from other than Dev Contract', async () => {
 			const [dev, property] = await init()
 
@@ -134,10 +127,16 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('should fail to call when lockup is canceling', async () => {
 			const [dev, property] = await init()
 
+			await dev.lockup.changeOwner(deployer)
+			const storage = await dev.lockup
+				.getStorageAddress()
+				.then((x) => artifacts.require('EternalStorage').at(x))
+			await storage.setUint(
+				keccak256('_withdrawalStatus', property.address, deployer),
+				1
+			)
+			await storage.changeOwner(dev.lockup.address)
 			await dev.addressConfig.setToken(deployer)
-			await dev.addressConfig.setLockup(deployer)
-			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-			await dev.addressConfig.setLockup(dev.lockup.address)
 
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 10000)
@@ -147,10 +146,16 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('should fail to call when a passed value is 0', async () => {
 			const [dev, property] = await init()
 
+			await dev.lockup.changeOwner(deployer)
+			const storage = await dev.lockup
+				.getStorageAddress()
+				.then((x) => artifacts.require('EternalStorage').at(x))
+			await storage.setUint(
+				keccak256('_withdrawalStatus', property.address, deployer),
+				1
+			)
+			await storage.changeOwner(dev.lockup.address)
 			await dev.addressConfig.setToken(deployer)
-			await dev.addressConfig.setLockup(deployer)
-			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-			await dev.addressConfig.setLockup(dev.lockup.address)
 
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 0)
@@ -209,9 +214,15 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('should fail to call when dev token is not locked', async () => {
 			const [dev, property] = await init()
 
-			await dev.addressConfig.setLockup(deployer)
-			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-			await dev.addressConfig.setLockup(dev.lockup.address)
+			await dev.lockup.changeOwner(deployer)
+			const storage = await dev.lockup
+				.getStorageAddress()
+				.then((x) => artifacts.require('EternalStorage').at(x))
+			await storage.setUint(
+				keccak256('_withdrawalStatus', property.address, deployer),
+				1
+			)
+			await storage.changeOwner(dev.lockup.address)
 
 			const res = await dev.lockup.withdraw(property.address).catch(err)
 			validateErrorMessage(res, 'dev token is not locked')
@@ -224,9 +235,15 @@ contract('LockupTest', ([deployer, user1]) => {
 			await dev.dev.deposit(property.address, 10000)
 			let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
 			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
-			await dev.addressConfig.setLockup(deployer)
-			await dev.lockupStorage.setWithdrawalStatus(property.address, deployer, 1)
-			await dev.addressConfig.setLockup(dev.lockup.address)
+			await dev.lockup.changeOwner(deployer)
+			const storage = await dev.lockup
+				.getStorageAddress()
+				.then((x) => artifacts.require('EternalStorage').at(x))
+			await storage.setUint(
+				keccak256('_withdrawalStatus', property.address, deployer),
+				1
+			)
+			await storage.changeOwner(dev.lockup.address)
 
 			await dev.lockup.withdraw(property.address)
 			lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
@@ -331,11 +348,19 @@ contract('LockupTest', ([deployer, user1]) => {
 		})
 		it('getCumulativeLockedUp returns cumulative sum of locking-ups on the Property from PropertyValue when the last block is 0', async () => {
 			await dev.dev.transfer(property.address, 6457)
-			await dev.addressConfig.setLockup(deployer)
-			await dev.lockupStorage.setAllValue(6457)
-			await dev.lockupStorage.setPropertyValue(property.address, 6457)
-			await dev.lockupStorage.setValue(property.address, deployer, 6457)
-			await dev.addressConfig.setLockup(dev.lockup.address)
+
+			await dev.lockup.changeOwner(deployer)
+			const storage = await dev.lockup
+				.getStorageAddress()
+				.then((x) => artifacts.require('EternalStorage').at(x))
+			await storage.setUint(keccak256('_allValue'), 6457)
+			await storage.setUint(keccak256('_propertyValue', property.address), 6457)
+			await storage.setUint(
+				keccak256('_value', property.address, deployer),
+				6457
+			)
+			await storage.changeOwner(dev.lockup.address)
+
 			const block = await getBlock().then(toBigNumber)
 			await dev.dev.deposit(property.address, 123456)
 			await mine(3)
@@ -347,7 +372,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			const result = await dev.lockup
 				.getCumulativeLockedUp(property.address)
 				.then((x) => toBigNumber(x[0]))
-			const deployedBlock = await dev.lockup.deployedBlock().then(toBigNumber)
+			const deployedBlock = await dev.lockup
+				.getStorageDIP4GenesisBlock()
+				.then(toBigNumber)
 			const expected =
 				0 +
 				6457 +
@@ -396,11 +423,19 @@ contract('LockupTest', ([deployer, user1]) => {
 		})
 		it('getCumulativeLockedUpAll returns cumulative sum of total locking-ups on the protocol from AllValue when the last block is 0', async () => {
 			await dev.dev.transfer(property.address, 5475)
-			await dev.addressConfig.setLockup(deployer)
-			await dev.lockupStorage.setAllValue(5475)
-			await dev.lockupStorage.setPropertyValue(property.address, 5475)
-			await dev.lockupStorage.setValue(property.address, deployer, 5475)
-			await dev.addressConfig.setLockup(dev.lockup.address)
+
+			await dev.lockup.changeOwner(deployer)
+			const storage = await dev.lockup
+				.getStorageAddress()
+				.then((x) => artifacts.require('EternalStorage').at(x))
+			await storage.setUint(keccak256('_allValue'), 5475)
+			await storage.setUint(keccak256('_propertyValue', property.address), 5475)
+			await storage.setUint(
+				keccak256('_value', property.address, deployer),
+				5475
+			)
+			await storage.changeOwner(dev.lockup.address)
+
 			const block = await getBlock().then(toBigNumber)
 			await dev.dev.deposit(property.address, 123456)
 			await mine(3)
@@ -420,7 +455,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			const result = await dev.lockup
 				.getCumulativeLockedUpAll()
 				.then((x) => toBigNumber(x[0]))
-			const deployedBlock = await dev.lockup.deployedBlock().then(toBigNumber)
+			const deployedBlock = await dev.lockup
+				.getStorageDIP4GenesisBlock()
+				.then(toBigNumber)
 			const expected =
 				0 +
 				5475 +
@@ -453,23 +490,23 @@ contract('LockupTest', ([deployer, user1]) => {
 		): Promise<BigNumber> =>
 			Promise.all([
 				dev.allocator.calculateMaxRewardsPerBlock(),
-				dev.lockupStorage
-					.getLastSameRewardsAmountAndBlock()
+				dev.lockup
+					.getStorageLastSameRewardsAmountAndBlock()
 					.then((x: any) => x[0]),
-				dev.lockupStorage
-					.getLastSameRewardsAmountAndBlock()
+				dev.lockup
+					.getStorageLastSameRewardsAmountAndBlock()
 					.then((x: any) => x[1]),
-				dev.lockup.deployedBlock(),
+				dev.lockup.getStorageDIP4GenesisBlock(),
 				getBlock(),
-				dev.lockupStorage.getCumulativeGlobalRewards(),
+				dev.lockup.getStorageCumulativeGlobalRewards(),
 				dev.lockup.getPropertyValue(prop.address),
 				dev.lockup.getValue(prop.address, account),
-				dev.lockupStorage.getLastCumulativeGlobalReward(prop.address, account),
+				dev.lockup.getStorageLastCumulativeGlobalReward(prop.address, account),
 				dev.lockup.getCumulativeLockedUp(prop.address).then((x) => x[0]),
 				dev.lockup.getCumulativeLockedUpAll().then((x) => x[0]),
-				dev.lockupStorage.getPendingInterestWithdrawal(prop.address, account),
-				dev.lockupStorage.getInterestPrice(prop.address),
-				dev.lockupStorage.getLastInterestPrice(prop.address, account),
+				dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),
+				dev.lockup.getStorageInterestPrice(prop.address),
+				dev.lockup.getStorageLastInterestPrice(prop.address, account),
 			]).then((results) => {
 				const [
 					maxRewards,
@@ -646,8 +683,8 @@ contract('LockupTest', ([deployer, user1]) => {
 				await dev.dev
 					.deposit(property.address, 10000, {from: alice})
 					.then(gasLogger)
-				lastBlock = await dev.lockupStorage
-					.getLastBlockNumber(property.address)
+				lastBlock = await dev.lockup
+					.getStorageLastBlockNumber(property.address)
 					.then(toBigNumber)
 			})
 
@@ -681,8 +718,8 @@ contract('LockupTest', ([deployer, user1]) => {
 			describe('after second run', () => {
 				before(async () => {
 					await dev.lockup.withdrawInterest(property.address, {from: alice})
-					lastBlock = await dev.lockupStorage
-						.getLastBlockNumber(property.address)
+					lastBlock = await dev.lockup
+						.getStorageLastBlockNumber(property.address)
 						.then(toBigNumber)
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
@@ -1267,23 +1304,39 @@ contract('LockupTest', ([deployer, user1]) => {
 				legacyLastPriceBob = legacyPrice.div(2)
 				await dev.dev.transfer(property.address, lockedAlice, {from: alice})
 				await dev.dev.transfer(property.address, lockedBob, {from: bob})
-				await dev.addressConfig.setLockup(deployer)
-				await dev.lockupStorage.setValue(property.address, alice, lockedAlice)
-				await dev.lockupStorage.setValue(property.address, bob, lockedBob)
-				await dev.lockupStorage.setPropertyValue(property.address, totalLocked)
-				await dev.lockupStorage.setAllValue(totalLocked)
-				await dev.lockupStorage.setInterestPrice(property.address, legacyPrice)
-				await dev.lockupStorage.setLastInterestPrice(
-					property.address,
-					alice,
+
+				await dev.lockup.changeOwner(deployer)
+				const storage = await dev.lockup
+					.getStorageAddress()
+					.then((x) => artifacts.require('EternalStorage').at(x))
+				await storage.setUint(keccak256('_allValue'), totalLocked)
+				await storage.setUint(
+					keccak256('_value', property.address, alice),
+					lockedAlice
+				)
+				await storage.setUint(
+					keccak256('_value', property.address, bob),
+					lockedBob
+				)
+				await storage.setUint(
+					keccak256('_propertyValue', property.address),
+					totalLocked
+				)
+				await storage.setUint(keccak256('_allValue'), totalLocked)
+				await storage.setUint(
+					keccak256('_interestTotals', property.address),
+					legacyPrice
+				)
+				await storage.setUint(
+					keccak256('_lastLastInterestPrice', property.address, alice),
 					legacyLastPriceAlice
 				)
-				await dev.lockupStorage.setLastInterestPrice(
-					property.address,
-					bob,
+				await storage.setUint(
+					keccak256('_lastLastInterestPrice', property.address, bob),
 					legacyLastPriceBob
 				)
-				await dev.addressConfig.setLockup(dev.lockup.address)
+				await storage.changeOwner(dev.lockup.address)
+
 				await dev.lockup.update()
 				lastBlock = await getBlock().then(toBigNumber)
 				await mine(1)
@@ -1447,23 +1500,38 @@ contract('LockupTest', ([deployer, user1]) => {
 				legacyLastPriceBob = legacyPrice.div(2)
 				await dev.dev.transfer(property.address, lockedAlice, {from: alice})
 				await dev.dev.transfer(property.address, lockedBob, {from: bob})
-				await dev.addressConfig.setLockup(deployer)
-				await dev.lockupStorage.setValue(property.address, alice, lockedAlice)
-				await dev.lockupStorage.setValue(property.address, bob, lockedBob)
-				await dev.lockupStorage.setPropertyValue(property.address, totalLocked)
-				await dev.lockupStorage.setAllValue(totalLocked)
-				await dev.lockupStorage.setInterestPrice(property.address, legacyPrice)
-				await dev.lockupStorage.setLastInterestPrice(
-					property.address,
-					alice,
+				await dev.lockup.changeOwner(deployer)
+				const storage = await dev.lockup
+					.getStorageAddress()
+					.then((x) => artifacts.require('EternalStorage').at(x))
+				await storage.setUint(keccak256('_allValue'), totalLocked)
+				await storage.setUint(
+					keccak256('_value', property.address, alice),
+					lockedAlice
+				)
+				await storage.setUint(
+					keccak256('_value', property.address, bob),
+					lockedBob
+				)
+				await storage.setUint(
+					keccak256('_propertyValue', property.address),
+					totalLocked
+				)
+				await storage.setUint(keccak256('_allValue'), totalLocked)
+				await storage.setUint(
+					keccak256('_interestTotals', property.address),
+					legacyPrice
+				)
+				await storage.setUint(
+					keccak256('_lastLastInterestPrice', property.address, alice),
 					legacyLastPriceAlice
 				)
-				await dev.lockupStorage.setLastInterestPrice(
-					property.address,
-					bob,
+				await storage.setUint(
+					keccak256('_lastLastInterestPrice', property.address, bob),
 					legacyLastPriceBob
 				)
-				await dev.addressConfig.setLockup(dev.lockup.address)
+				await storage.changeOwner(dev.lockup.address)
+
 				await dev.dev.deposit(property.address, 200000000, {from: alice})
 				blockAlice = await getBlock().then(toBigNumber)
 				await dev.dev.deposit(property.address, 100000000, {from: bob})
@@ -1627,6 +1695,26 @@ contract('LockupTest', ([deployer, user1]) => {
 					.then(toBigNumber)
 				expect(amount.toFixed()).to.be.equal('0')
 			})
+		})
+	})
+	describe('Lockup; setDIP4GenesisBlock', () => {
+		it('Store passed value to getStorageDIP4GenesisBlock as a block number', async () => {
+			const [dev] = await init()
+			await dev.lockup.setDIP4GenesisBlock(123456)
+			const stored = await dev.lockup.getStorageDIP4GenesisBlock()
+			expect(stored.toNumber()).to.be.equal(123456)
+		})
+		it('Should fail to call when sent from non-pauser account', async () => {
+			const [dev] = await init()
+			const before = await dev.lockup
+				.getStorageDIP4GenesisBlock()
+				.then(toBigNumber)
+			const res = await dev.lockup
+				.setDIP4GenesisBlock(before.plus(123456), {from: user1})
+				.catch(err)
+			const after = await dev.lockup.getStorageDIP4GenesisBlock()
+			expect(after.toNumber()).to.be.equal(before.toNumber())
+			expect(res).to.be.instanceOf(Error)
 		})
 	})
 })

@@ -68,3 +68,8 @@ export async function getAbstentionTimes(
 export function gasLogger(txRes: Truffle.TransactionResponse) {
 	console.log(txRes.receipt.gasUsed)
 }
+
+export function keccak256(...values: string[]): string {
+	// eslint-disable-next-line no-undef
+	return (web3 as Web3).utils.soliditySha3(...values)!
+}
