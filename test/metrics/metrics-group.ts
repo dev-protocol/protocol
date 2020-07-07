@@ -2,8 +2,6 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
-	validatePauseErrorMessage,
-	validatePauseOnlyOwnerErrorMessage,
 } from '../test-lib/utils/error'
 
 contract(
@@ -15,7 +13,6 @@ contract(
 		metrics1,
 		metrics2,
 		dummyMetrics,
-		user1,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
 		before(async () => {
@@ -39,6 +36,14 @@ contract(
 				const result = await dev.metricsGroup.isGroup(dummyMetrics)
 				expect(result).to.be.equal(false)
 			})
+			it('Should fail to call addGroup when sent from other than MetricsFactory', async () => {
+				const result = await dev.metricsGroup
+					.addGroup(metrics1, {
+						from: deployer,
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
 			it('Existing metrics cannot be added.', async () => {
 				const result = await dev.metricsGroup
 					.addGroup(metrics1, {
@@ -51,6 +56,14 @@ contract(
 				const result = await dev.metricsGroup
 					.addGroup(dummyMetrics, {
 						from: dummyMetricsFactory,
+					})
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
+			})
+			it('Should fail to call removeGroup when sent from other than MetricsFactory', async () => {
+				const result = await dev.metricsGroup
+					.removeGroup(metrics1, {
+						from: deployer,
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
@@ -93,25 +106,6 @@ contract(
 				})
 				result = await dev.metricsGroup.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(0)
-			})
-		})
-		describe('MetricsGroup; pause', () => {
-			it('if you pause, you cannot execute functions.', async () => {
-				await dev.metricsGroup.pause()
-				let res = await dev.metricsGroup
-					.addGroup(metrics1)
-					.catch((err: Error) => err)
-				validatePauseErrorMessage(res)
-				res = await dev.metricsGroup
-					.removeGroup(metrics1)
-					.catch((err: Error) => err)
-				validatePauseErrorMessage(res)
-			})
-			it('if you pause, you cannot execute functions.', async () => {
-				const res = await dev.metricsGroup
-					.pause({from: user1})
-					.catch((err: Error) => err)
-				validatePauseOnlyOwnerErrorMessage(res)
 			})
 		})
 	}
