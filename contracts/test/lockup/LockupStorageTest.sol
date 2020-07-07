@@ -90,4 +90,8 @@ contract LockupStorageTest is LockupStorage {
 	) external {
 		setStoragePendingInterestWithdrawal(_property, _user, _value);
 	}
+
+	function setStorageDIP4GenesisBlockTest(uint256 _block) external {
+		setStorageDIP4GenesisBlock(_block);
+	}
 }

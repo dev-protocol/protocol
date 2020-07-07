@@ -194,4 +194,15 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})
+	describe('LockupStorage; setStorageDIP4GenesisBlock, getStorageDIP4GenesisBlock', () => {
+		it('Initial value is 0.', async () => {
+			const result = await storage.getStorageDIP4GenesisBlock()
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageDIP4GenesisBlockTest(300000000000)
+			const result = await storage.getStorageDIP4GenesisBlock()
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
 })
