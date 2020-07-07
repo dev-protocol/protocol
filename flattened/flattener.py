@@ -1,6 +1,6 @@
 import os
 
-PROJECT_PATH = '/Users/hogehoge/frame00/protocol'
+PROJECT_PATH = '/Users/hoge/frame00/protocol'
 
 def get_target_file_path_list():
 	path_list = []
@@ -15,14 +15,14 @@ def edit_zeppelin_import(line):
 	splited = line.split(' ')
 	tmp = splited[3][:-3]
 	tmp = tmp[1:]
-	tmp = '../../../../../../../..' + PROJECT_PATH + '/node_modules/' + tmp
+	tmp = '../../../../../../../../../../..' + PROJECT_PATH + '/node_modules/' + tmp
 	return 'import "' + tmp + '";\n'
 
 def edit_import(line):
 	splited = line.split(' ')
 	tmp = splited[3][:-3]
 	tmp = tmp[1:]
-	tmp = '../../../../../../../..' + PROJECT_PATH + '/' + tmp
+	tmp = '../../../../../../../../../../..' + PROJECT_PATH + '/' + tmp
 	return 'import "' + tmp + '";\n'
 
 def edit_file(file_path):

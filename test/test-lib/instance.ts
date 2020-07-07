@@ -1,12 +1,10 @@
 import {Contract, Wallet, providers} from 'ethers'
-import {deployContract, link} from 'ethereum-waffle'
+import {deployContract} from 'ethereum-waffle'
 import {ContractJSON} from 'ethereum-waffle/dist/esm/ContractJSON'
 import * as AddressConfig from '../../build/contracts/AddressConfig.json'
 import * as Allocator from '../../build/contracts/Allocator.json'
 import * as Dev from '../../build/contracts/Dev.json'
-import * as Decimals from '../../build/contracts/Decimals.json'
 import * as Lockup from '../../build/contracts/Lockup.json'
-import * as LockupStorage from '../../build/contracts/LockupStorage.json'
 import * as PropertyFactory from '../../build/contracts/PropertyFactory.json'
 import * as VoteCounter from '../../build/contracts/VoteCounter.json'
 import * as VoteCounterStorage from '../../build/contracts/VoteCounterStorage.json'
@@ -25,42 +23,6 @@ import * as WithdrawStorage from '../../build/contracts/WithdrawStorage.json'
 import * as Market from '../../build/contracts/Market.json'
 import * as Property from '../../build/contracts/Property.json'
 import * as Policy from '../../build/contracts/Policy.json'
-
-class Link {
-	private static instance: Link
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	private constructor() {}
-
-	static getInstance() {
-		if (!Link.instance) {
-			Link.instance = new Link()
-		}
-
-		return Link.instance
-	}
-
-	// eslint-disable-next-line @typescript-eslint/member-ordering
-	private _alreadyExecute = false
-
-	public async linkLibrary(deployer: Wallet): Promise<void> {
-		if (this._alreadyExecute) {
-			return
-		}
-
-		this._alreadyExecute = true
-		const decimals = await deployContract(deployer, Decimals)
-		link(
-			Lockup,
-			'contracts/src/common/libs/Decimals.sol:Decimals',
-			decimals.address
-		)
-		link(
-			Withdraw,
-			'contracts/src/common/libs/Decimals.sol:Decimals',
-			decimals.address
-		)
-	}
-}
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class NonceProvider {
@@ -179,10 +141,6 @@ export class DevProtocolInstance {
 		return this._lockup
 	}
 
-	public get lockupStorage(): Contract {
-		return this._lockupStorage
-	}
-
 	public get propertyFactory(): Contract {
 		return this._propertyFactory
 	}
@@ -241,11 +199,6 @@ export class DevProtocolInstance {
 
 	public get withdrawStorage(): Contract {
 		return this._withdrawStorage
-	}
-
-	public async linkDecimals(): Promise<void> {
-		const instance = Link.getInstance()
-		await instance.linkLibrary(this._deployer)
 	}
 
 	public async startToAddNonceOption(): Promise<void> {
@@ -308,24 +261,7 @@ export class DevProtocolInstance {
 				this._lockup.address,
 				this.getTransactionOption()
 			)
-		}
-
-		await this.retryNonceError(func)
-	}
-
-	public async generateLockupStorage(): Promise<void> {
-		const func = async (): Promise<void> => {
-			this._lockupStorage = await deployContract(
-				this._deployer,
-				LockupStorage,
-				[this._addressConfig.address],
-				this.getTransactionOption(6700000)
-			)
-			await this._addressConfig.setLockupStorage(
-				this._lockupStorage.address,
-				this.getTransactionOption()
-			)
-			await this._lockupStorage.createStorage(this.getTransactionOption())
+			this._lockup.createStorage(this.getTransactionOption())
 		}
 
 		await this.retryNonceError(func)

@@ -21,7 +21,7 @@ contract PolicyTest1 is IPolicy {
 	{
 		uint256 sum = _amount + _lockups;
 		uint256 share = _lockups.outOf(sum);
-		return _amount - ((_amount * share) / Decimals.basis());
+		return _amount - (_amount * share).divBasis();
 	}
 
 	function assetValue(uint256 _value, uint256 _lockups)

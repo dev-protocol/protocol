@@ -667,119 +667,6 @@ contract ERC20Mintable is ERC20, MinterRole {
 	}
 }
 
-contract PauserRole is Context {
-	using Roles for Roles.Role;
-
-	event PauserAdded(address indexed account);
-	event PauserRemoved(address indexed account);
-
-	Roles.Role private _pausers;
-
-	constructor() internal {
-		_addPauser(_msgSender());
-	}
-
-	modifier onlyPauser() {
-		require(
-			isPauser(_msgSender()),
-			"PauserRole: caller does not have the Pauser role"
-		);
-		_;
-	}
-
-	function isPauser(address account) public view returns (bool) {
-		return _pausers.has(account);
-	}
-
-	function addPauser(address account) public onlyPauser {
-		_addPauser(account);
-	}
-
-	function renouncePauser() public {
-		_removePauser(_msgSender());
-	}
-
-	function _addPauser(address account) internal {
-		_pausers.add(account);
-		emit PauserAdded(account);
-	}
-
-	function _removePauser(address account) internal {
-		_pausers.remove(account);
-		emit PauserRemoved(account);
-	}
-}
-
-/**
- * @dev Contract module which allows children to implement an emergency stop
- * mechanism that can be triggered by an authorized account.
- *
- * This module is used through inheritance. It will make available the
- * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
- * the functions of your contract. Note that they will not be pausable by
- * simply including this module, only once the modifiers are put in place.
- */
-contract Pausable is Context, PauserRole {
-	/**
-	 * @dev Emitted when the pause is triggered by a pauser (`account`).
-	 */
-	event Paused(address account);
-
-	/**
-	 * @dev Emitted when the pause is lifted by a pauser (`account`).
-	 */
-	event Unpaused(address account);
-
-	bool private _paused;
-
-	/**
-	 * @dev Initializes the contract in unpaused state. Assigns the Pauser role
-	 * to the deployer.
-	 */
-	constructor() internal {
-		_paused = false;
-	}
-
-	/**
-	 * @dev Returns true if the contract is paused, and false otherwise.
-	 */
-	function paused() public view returns (bool) {
-		return _paused;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is not paused.
-	 */
-	modifier whenNotPaused() {
-		require(!_paused, "Pausable: paused");
-		_;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is paused.
-	 */
-	modifier whenPaused() {
-		require(_paused, "Pausable: not paused");
-		_;
-	}
-
-	/**
-	 * @dev Called by a pauser to pause, triggers stopped state.
-	 */
-	function pause() public onlyPauser whenNotPaused {
-		_paused = true;
-		emit Paused(_msgSender());
-	}
-
-	/**
-	 * @dev Called by a pauser to unpause, returns to normal state.
-	 */
-	function unpause() public onlyPauser whenPaused {
-		_paused = false;
-		emit Unpaused(_msgSender());
-	}
-}
-
 library Decimals {
 	using SafeMath for uint256;
 	uint120 private constant basisValue = 1000000000000000000;
@@ -799,8 +686,12 @@ library Decimals {
 		return (a.div(_b));
 	}
 
-	function basis() external pure returns (uint120) {
-		return basisValue;
+	function mulBasis(uint256 _a) internal pure returns (uint256) {
+		return _a.mul(basisValue);
+	}
+
+	function divBasis(uint256 _a) internal pure returns (uint256) {
+		return _a.div(basisValue);
 	}
 }
 
@@ -1153,6 +1044,119 @@ contract UsingConfig {
 	}
 }
 
+contract PauserRole is Context {
+	using Roles for Roles.Role;
+
+	event PauserAdded(address indexed account);
+	event PauserRemoved(address indexed account);
+
+	Roles.Role private _pausers;
+
+	constructor() internal {
+		_addPauser(_msgSender());
+	}
+
+	modifier onlyPauser() {
+		require(
+			isPauser(_msgSender()),
+			"PauserRole: caller does not have the Pauser role"
+		);
+		_;
+	}
+
+	function isPauser(address account) public view returns (bool) {
+		return _pausers.has(account);
+	}
+
+	function addPauser(address account) public onlyPauser {
+		_addPauser(account);
+	}
+
+	function renouncePauser() public {
+		_removePauser(_msgSender());
+	}
+
+	function _addPauser(address account) internal {
+		_pausers.add(account);
+		emit PauserAdded(account);
+	}
+
+	function _removePauser(address account) internal {
+		_pausers.remove(account);
+		emit PauserRemoved(account);
+	}
+}
+
+/**
+ * @dev Contract module which allows children to implement an emergency stop
+ * mechanism that can be triggered by an authorized account.
+ *
+ * This module is used through inheritance. It will make available the
+ * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
+ * the functions of your contract. Note that they will not be pausable by
+ * simply including this module, only once the modifiers are put in place.
+ */
+contract Pausable is Context, PauserRole {
+	/**
+	 * @dev Emitted when the pause is triggered by a pauser (`account`).
+	 */
+	event Paused(address account);
+
+	/**
+	 * @dev Emitted when the pause is lifted by a pauser (`account`).
+	 */
+	event Unpaused(address account);
+
+	bool private _paused;
+
+	/**
+	 * @dev Initializes the contract in unpaused state. Assigns the Pauser role
+	 * to the deployer.
+	 */
+	constructor() internal {
+		_paused = false;
+	}
+
+	/**
+	 * @dev Returns true if the contract is paused, and false otherwise.
+	 */
+	function paused() public view returns (bool) {
+		return _paused;
+	}
+
+	/**
+	 * @dev Modifier to make a function callable only when the contract is not paused.
+	 */
+	modifier whenNotPaused() {
+		require(!_paused, "Pausable: paused");
+		_;
+	}
+
+	/**
+	 * @dev Modifier to make a function callable only when the contract is paused.
+	 */
+	modifier whenPaused() {
+		require(_paused, "Pausable: not paused");
+		_;
+	}
+
+	/**
+	 * @dev Called by a pauser to pause, triggers stopped state.
+	 */
+	function pause() public onlyPauser whenNotPaused {
+		_paused = true;
+		emit Paused(_msgSender());
+	}
+
+	/**
+	 * @dev Called by a pauser to unpause, returns to normal state.
+	 */
+	function unpause() public onlyPauser whenPaused {
+		_paused = false;
+		emit Unpaused(_msgSender());
+	}
+}
+
 contract IAllocator {
 	function calculateMaxRewardsPerBlock() public view returns (uint256);
 
@@ -1266,7 +1270,7 @@ contract EternalStorage {
 	}
 }
 
-contract UsingStorage is Ownable, Pausable {
+contract UsingStorage is Ownable {
 	address private _storage;
 
 	modifier hasStorage() {
@@ -1280,7 +1284,6 @@ contract UsingStorage is Ownable, Pausable {
 		hasStorage
 		returns (EternalStorage)
 	{
-		require(paused() == false, "You cannot use that");
 		return EternalStorage(_storage);
 	}
 
@@ -1310,7 +1313,6 @@ contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(
 			msg.sender,
 			config().metricsFactory()
@@ -1324,7 +1326,6 @@ contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	}
 
 	function removeGroup(address _addr) external {
-		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(
 			msg.sender,
 			config().metricsFactory()
@@ -2222,32 +2223,29 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	}
 }
 
-contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
+contract LockupStorage is UsingStorage {
 	using SafeMath for uint256;
 
-	uint256 private constant basis = 100000000000000000000000000000000;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
+	uint256 public constant basis = 100000000000000000000000000000000;
 
 	//Last Block Number
-	function setLastBlockNumber(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getLastBlockNumberKey(_property);
+	function setStorageLastBlockNumber(address _property, uint256 _value)
+		internal
+	{
+		bytes32 key = getStorageLastBlockNumberKey(_property);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getLastBlockNumber(address _property)
-		external
+	function getStorageLastBlockNumber(address _property)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getLastBlockNumberKey(_property);
+		bytes32 key = getStorageLastBlockNumberKey(_property);
 		return eternalStorage().getUint(key);
 	}
 
-	function getLastBlockNumberKey(address _property)
+	function getStorageLastBlockNumberKey(address _property)
 		private
 		pure
 		returns (bytes32)
@@ -2256,44 +2254,40 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//AllValue
-	function setAllValue(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getAllValueKey();
+	function setStorageAllValue(uint256 _value) internal {
+		bytes32 key = getStorageAllValueKey();
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getAllValue() external view returns (uint256) {
-		bytes32 key = getAllValueKey();
+	function getStorageAllValue() public view returns (uint256) {
+		bytes32 key = getStorageAllValueKey();
 		return eternalStorage().getUint(key);
 	}
 
-	function getAllValueKey() private pure returns (bytes32) {
+	function getStorageAllValueKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_allValue"));
 	}
 
 	//Value
-	function setValue(
+	function setStorageValue(
 		address _property,
 		address _sender,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getValueKey(_property, _sender);
+	) internal {
+		bytes32 key = getStorageValueKey(_property, _sender);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getValue(address _property, address _sender)
-		external
+	function getStorageValue(address _property, address _sender)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getValueKey(_property, _sender);
+		bytes32 key = getStorageValueKey(_property, _sender);
 		return eternalStorage().getUint(key);
 	}
 
-	function getValueKey(address _property, address _sender)
+	function getStorageValueKey(address _property, address _sender)
 		private
 		pure
 		returns (bytes32)
@@ -2302,23 +2296,23 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//PropertyValue
-	function setPropertyValue(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getPropertyValueKey(_property);
+	function setStoragePropertyValue(address _property, uint256 _value)
+		internal
+	{
+		bytes32 key = getStoragePropertyValueKey(_property);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getPropertyValue(address _property)
-		external
+	function getStoragePropertyValue(address _property)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getPropertyValueKey(_property);
+		bytes32 key = getStoragePropertyValueKey(_property);
 		return eternalStorage().getUint(key);
 	}
 
-	function getPropertyValueKey(address _property)
+	function getStoragePropertyValueKey(address _property)
 		private
 		pure
 		returns (bytes32)
@@ -2327,27 +2321,25 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//WithdrawalStatus
-	function setWithdrawalStatus(
+	function setStorageWithdrawalStatus(
 		address _property,
 		address _from,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getWithdrawalStatusKey(_property, _from);
+	) internal {
+		bytes32 key = getStorageWithdrawalStatusKey(_property, _from);
 		eternalStorage().setUint(key, _value);
 	}
 
-	function getWithdrawalStatus(address _property, address _from)
-		external
+	function getStorageWithdrawalStatus(address _property, address _from)
+		public
 		view
 		returns (uint256)
 	{
-		bytes32 key = getWithdrawalStatusKey(_property, _from);
+		bytes32 key = getStorageWithdrawalStatusKey(_property, _from);
 		return eternalStorage().getUint(key);
 	}
 
-	function getWithdrawalStatusKey(address _property, address _sender)
+	function getStorageWithdrawalStatusKey(address _property, address _sender)
 		private
 		pure
 		returns (bytes32)
@@ -2359,23 +2351,23 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//InterestPrice
-	function setInterestPrice(address _property, uint256 _value) external {
+	function setStorageInterestPrice(address _property, uint256 _value)
+		internal
+	{
 		// The previously used function
 		// This function is only used in testing
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getInterestPriceKey(_property), _value);
+		eternalStorage().setUint(getStorageInterestPriceKey(_property), _value);
 	}
 
-	function getInterestPrice(address _property)
-		external
+	function getStorageInterestPrice(address _property)
+		public
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getInterestPriceKey(_property));
+		return eternalStorage().getUint(getStorageInterestPriceKey(_property));
 	}
 
-	function getInterestPriceKey(address _property)
+	function getStorageInterestPriceKey(address _property)
 		private
 		pure
 		returns (bytes32)
@@ -2384,29 +2376,29 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//LastInterestPrice
-	function setLastInterestPrice(
+	function setStorageLastInterestPrice(
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	) internal {
 		eternalStorage().setUint(
-			getLastInterestPriceKey(_property, _user),
+			getStorageLastInterestPriceKey(_property, _user),
 			_value
 		);
 	}
 
-	function getLastInterestPrice(address _property, address _user)
-		external
+	function getStorageLastInterestPrice(address _property, address _user)
+		public
 		view
 		returns (uint256)
 	{
 		return
-			eternalStorage().getUint(getLastInterestPriceKey(_property, _user));
+			eternalStorage().getUint(
+				getStorageLastInterestPriceKey(_property, _user)
+			);
 	}
 
-	function getLastInterestPriceKey(address _property, address _user)
+	function getStorageLastInterestPriceKey(address _property, address _user)
 		private
 		pure
 		returns (bytes32)
@@ -2418,29 +2410,31 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//LastSameRewardsAmountAndBlock
-	function setLastSameRewardsAmountAndBlock(uint256 _amount, uint256 _block)
-		external
-	{
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	function setStorageLastSameRewardsAmountAndBlock(
+		uint256 _amount,
+		uint256 _block
+	) internal {
 		uint256 record = _amount.mul(basis).add(_block);
-		eternalStorage().setUint(getLastSameRewardsAmountAndBlockKey(), record);
+		eternalStorage().setUint(
+			getStorageLastSameRewardsAmountAndBlockKey(),
+			record
+		);
 	}
 
-	function getLastSameRewardsAmountAndBlock()
-		external
+	function getStorageLastSameRewardsAmountAndBlock()
+		public
 		view
 		returns (uint256 _amount, uint256 _block)
 	{
 		uint256 record = eternalStorage().getUint(
-			getLastSameRewardsAmountAndBlockKey()
+			getStorageLastSameRewardsAmountAndBlockKey()
 		);
 		uint256 amount = record.div(basis);
 		uint256 blockNumber = record.sub(amount.mul(basis));
 		return (amount, blockNumber);
 	}
 
-	function getLastSameRewardsAmountAndBlockKey()
+	function getStorageLastSameRewardsAmountAndBlockKey()
 		private
 		pure
 		returns (bytes32)
@@ -2449,50 +2443,51 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeGlobalRewards
-	function setCumulativeGlobalRewards(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getCumulativeGlobalRewardsKey(), _value);
-	}
-
-	function getCumulativeGlobalRewards() external view returns (uint256) {
-		return eternalStorage().getUint(getCumulativeGlobalRewardsKey());
-	}
-
-	function getCumulativeGlobalRewardsKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
-	}
-
-	//LastCumulativeGlobalReward
-	function setLastCumulativeGlobalReward(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	function setStorageCumulativeGlobalRewards(uint256 _value) internal {
 		eternalStorage().setUint(
-			getLastCumulativeGlobalRewardKey(_property, _user),
+			getStorageCumulativeGlobalRewardsKey(),
 			_value
 		);
 	}
 
-	function getLastCumulativeGlobalReward(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastCumulativeGlobalRewardKey(_property, _user)
-			);
+	function getStorageCumulativeGlobalRewards() public view returns (uint256) {
+		return eternalStorage().getUint(getStorageCumulativeGlobalRewardsKey());
 	}
 
-	function getLastCumulativeGlobalRewardKey(address _property, address _user)
+	function getStorageCumulativeGlobalRewardsKey()
 		private
 		pure
 		returns (bytes32)
 	{
+		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
+	}
+
+	//LastCumulativeGlobalReward
+	function setStorageLastCumulativeGlobalReward(
+		address _property,
+		address _user,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageLastCumulativeGlobalRewardKey(_property, _user),
+			_value
+		);
+	}
+
+	function getStorageLastCumulativeGlobalReward(
+		address _property,
+		address _user
+	) public view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getStorageLastCumulativeGlobalRewardKey(_property, _user)
+			);
+	}
+
+	function getStorageLastCumulativeGlobalRewardKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
 		return
 			keccak256(
 				abi.encodePacked(
@@ -2504,34 +2499,32 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeLockedUpUnitAndBlock
-	function setCumulativeLockedUpUnitAndBlock(
+	function setStorageCumulativeLockedUpUnitAndBlock(
 		address _addr,
 		uint256 _unit,
 		uint256 _block
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	) internal {
 		uint256 record = _unit.mul(basis).add(_block);
 		eternalStorage().setUint(
-			getCumulativeLockedUpUnitAndBlockKey(_addr),
+			getStorageCumulativeLockedUpUnitAndBlockKey(_addr),
 			record
 		);
 	}
 
-	function getCumulativeLockedUpUnitAndBlock(address _addr)
-		external
+	function getStorageCumulativeLockedUpUnitAndBlock(address _addr)
+		public
 		view
 		returns (uint256 _unit, uint256 _block)
 	{
 		uint256 record = eternalStorage().getUint(
-			getCumulativeLockedUpUnitAndBlockKey(_addr)
+			getStorageCumulativeLockedUpUnitAndBlockKey(_addr)
 		);
 		uint256 unit = record.div(basis);
 		uint256 blockNumber = record.sub(unit.mul(basis));
 		return (unit, blockNumber);
 	}
 
-	function getCumulativeLockedUpUnitAndBlockKey(address _addr)
+	function getStorageCumulativeLockedUpUnitAndBlockKey(address _addr)
 		private
 		pure
 		returns (bytes32)
@@ -2543,23 +2536,27 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//CumulativeLockedUpValue
-	function setCumulativeLockedUpValue(address _addr, uint256 _value)
-		external
+	function setStorageCumulativeLockedUpValue(address _addr, uint256 _value)
+		internal
 	{
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getCumulativeLockedUpValueKey(_addr), _value);
+		eternalStorage().setUint(
+			getStorageCumulativeLockedUpValueKey(_addr),
+			_value
+		);
 	}
 
-	function getCumulativeLockedUpValue(address _addr)
-		external
+	function getStorageCumulativeLockedUpValue(address _addr)
+		public
 		view
 		returns (uint256)
 	{
-		return eternalStorage().getUint(getCumulativeLockedUpValueKey(_addr));
+		return
+			eternalStorage().getUint(
+				getStorageCumulativeLockedUpValueKey(_addr)
+			);
 	}
 
-	function getCumulativeLockedUpValueKey(address _addr)
+	function getStorageCumulativeLockedUpValueKey(address _addr)
 		private
 		pure
 		returns (bytes32)
@@ -2568,53 +2565,58 @@ contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
 	}
 
 	//PendingWithdrawal
-	function setPendingInterestWithdrawal(
+	function setStoragePendingInterestWithdrawal(
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
+	) internal {
 		eternalStorage().setUint(
-			getPendingInterestWithdrawalKey(_property, _user),
+			getStoragePendingInterestWithdrawalKey(_property, _user),
 			_value
 		);
 	}
 
-	function getPendingInterestWithdrawal(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
+	function getStoragePendingInterestWithdrawal(
+		address _property,
+		address _user
+	) public view returns (uint256) {
 		return
 			eternalStorage().getUint(
-				getPendingInterestWithdrawalKey(_property, _user)
+				getStoragePendingInterestWithdrawalKey(_property, _user)
 			);
 	}
 
-	function getPendingInterestWithdrawalKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
+	function getStoragePendingInterestWithdrawalKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
 		return
 			keccak256(
 				abi.encodePacked("_pendingInterestWithdrawal", _property, _user)
 			);
 	}
+
+	//DIP4GenesisBlock
+	function setStorageDIP4GenesisBlock(uint256 _block) internal {
+		eternalStorage().setUint(getStorageDIP4GenesisBlockKey(), _block);
+	}
+
+	function getStorageDIP4GenesisBlock() public view returns (uint256) {
+		return eternalStorage().getUint(getStorageDIP4GenesisBlockKey());
+	}
+
+	function getStorageDIP4GenesisBlockKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_dip4GenesisBlock"));
+	}
 }
 
-contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
+contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	uint256 public deployedBlock;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {
-		// Save a deployed block number locally for a fallback of getCumulativeLockedUpUnitAndBlock.
-		deployedBlock = block.number;
-	}
+	constructor(address _config) public UsingConfig(_config) {}
 
 	function lockup(
 		address _from,
@@ -2624,23 +2626,20 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateAddress(msg.sender, config().token());
 		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(_value != 0, "illegal lockup value");
-		LockupStorage lockupStorage = getStorage();
 
-		bool isWaiting = lockupStorage.getWithdrawalStatus(_property, _from) !=
-			0;
+		bool isWaiting = getStorageWithdrawalStatus(_property, _from) != 0;
 		require(isWaiting == false, "lockup is already canceled");
-		if (lockupStorage.getLastBlockNumber(_property) == 0) {
+		if (getStorageLastBlockNumber(_property) == 0) {
 			// Set the block that has been locked-up for the first time as the starting block.
-			lockupStorage.setLastBlockNumber(_property, block.number);
+			setStorageLastBlockNumber(_property, block.number);
 		}
-		updatePendingInterestWithdrawal(lockupStorage, _property, _from);
+		updatePendingInterestWithdrawal(_property, _from);
 		(, uint256 last) = _calculateWithdrawableInterestAmount(
-			lockupStorage,
 			_property,
 			_from
 		);
-		updateLastPriceForProperty(lockupStorage, _property, _from, last);
-		updateValues(lockupStorage, true, _from, _property, _value);
+		updateLastPriceForProperty(_property, _from, last);
+		updateValues(true, _from, _property, _value);
 		emit Lockedup(_from, _property, _value);
 	}
 
@@ -2648,52 +2647,44 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(hasValue(_property, msg.sender), "dev token is not locked");
-		LockupStorage lockupStorage = getStorage();
-		bool isWaiting = lockupStorage.getWithdrawalStatus(
-			_property,
-			msg.sender
-		) != 0;
+		bool isWaiting = getStorageWithdrawalStatus(_property, msg.sender) != 0;
 		require(isWaiting == false, "lockup is already canceled");
 		uint256 blockNumber = Policy(config().policy()).lockUpBlocks();
 		blockNumber = blockNumber.add(block.number);
-		lockupStorage.setWithdrawalStatus(_property, msg.sender, blockNumber);
+		setStorageWithdrawalStatus(_property, msg.sender, blockNumber);
 	}
 
 	function withdraw(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(possible(_property, msg.sender), "waiting for release");
-		LockupStorage lockupStorage = getStorage();
-		uint256 lockedUpValue = lockupStorage.getValue(_property, msg.sender);
+		uint256 lockedUpValue = getStorageValue(_property, msg.sender);
 		require(lockedUpValue != 0, "dev token is not locked");
-		updatePendingInterestWithdrawal(lockupStorage, _property, msg.sender);
+		updatePendingInterestWithdrawal(_property, msg.sender);
 		Property(_property).withdraw(msg.sender, lockedUpValue);
-		updateValues(
-			lockupStorage,
-			false,
-			msg.sender,
-			_property,
-			lockedUpValue
-		);
-		lockupStorage.setValue(_property, msg.sender, 0);
-		lockupStorage.setWithdrawalStatus(_property, msg.sender, 0);
+		updateValues(false, msg.sender, _property, lockedUpValue);
+		setStorageValue(_property, msg.sender, 0);
+		setStorageWithdrawalStatus(_property, msg.sender, 0);
 	}
 
-	function getCumulativeLockedUpUnitAndBlock(
-		LockupStorage lockupStorage,
-		address _property
-	) private view returns (uint256 _unit, uint256 _block) {
-		(uint256 unit, uint256 lastBlock) = lockupStorage
-			.getCumulativeLockedUpUnitAndBlock(_property);
+	function getCumulativeLockedUpUnitAndBlock(address _property)
+		private
+		view
+		returns (uint256 _unit, uint256 _block)
+	{
+		(
+			uint256 unit,
+			uint256 lastBlock
+		) = getStorageCumulativeLockedUpUnitAndBlock(_property);
 		if (lastBlock > 0) {
 			return (unit, lastBlock);
 		}
 		// When lastBlock is 0, CumulativeLockedUpUnitAndBlock is not saved yet so failback to AllValue or PropertyValue.
 		unit = _property == address(0)
-			? lockupStorage.getAllValue()
-			: lockupStorage.getPropertyValue(_property);
-		// Assign lastBlock as deployedBlock because when AllValue or PropertyValue is not 0, already locked-up when deployed this contract.
-		lastBlock = deployedBlock;
+			? getStorageAllValue()
+			: getStoragePropertyValue(_property);
+		// Assign lastBlock as DIP4GenesisBlock because when AllValue or PropertyValue is not 0, already locked-up when started DIP4.
+		lastBlock = getStorageDIP4GenesisBlock();
 		return (unit, lastBlock);
 	}
 
@@ -2706,12 +2697,10 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			uint256 _block
 		)
 	{
-		LockupStorage lockupStorage = getStorage();
 		(uint256 unit, uint256 lastBlock) = getCumulativeLockedUpUnitAndBlock(
-			lockupStorage,
 			_property
 		);
-		uint256 lastValue = lockupStorage.getCumulativeLockedUpValue(_property);
+		uint256 lastValue = getStorageCumulativeLockedUpValue(_property);
 		return (
 			lastValue.add(unit.mul(block.number.sub(lastBlock))),
 			unit,
@@ -2732,7 +2721,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function updateCumulativeLockedUp(
-		LockupStorage lockupStorage,
 		bool _addition,
 		address _property,
 		uint256 _unit
@@ -2744,20 +2732,20 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		(uint256 lastValueAll, uint256 lastUnitAll, ) = getCumulativeLockedUp(
 			zero
 		);
-		lockupStorage.setCumulativeLockedUpValue(
+		setStorageCumulativeLockedUpValue(
 			_property,
 			_addition ? lastValue.add(_unit) : lastValue.sub(_unit)
 		);
-		lockupStorage.setCumulativeLockedUpValue(
+		setStorageCumulativeLockedUpValue(
 			zero,
 			_addition ? lastValueAll.add(_unit) : lastValueAll.sub(_unit)
 		);
-		lockupStorage.setCumulativeLockedUpUnitAndBlock(
+		setStorageCumulativeLockedUpUnitAndBlock(
 			_property,
 			_addition ? lastUnit.add(_unit) : lastUnit.sub(_unit),
 			block.number
 		);
-		lockupStorage.setCumulativeLockedUpUnitAndBlock(
+		setStorageCumulativeLockedUpUnitAndBlock(
 			zero,
 			_addition ? lastUnitAll.add(_unit) : lastUnitAll.sub(_unit),
 			block.number
@@ -2765,24 +2753,18 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function update() public {
-		LockupStorage lockupStorage = getStorage();
-		(uint256 _nextRewards, uint256 _amount) = dry(lockupStorage);
-		lockupStorage.setCumulativeGlobalRewards(_nextRewards);
-		lockupStorage.setLastSameRewardsAmountAndBlock(_amount, block.number);
+		(uint256 _nextRewards, uint256 _amount) = dry();
+		setStorageCumulativeGlobalRewards(_nextRewards);
+		setStorageLastSameRewardsAmountAndBlock(_amount, block.number);
 	}
 
 	function updateLastPriceForProperty(
-		LockupStorage lockupStorage,
 		address _property,
 		address _user,
 		uint256 _lastInterest
 	) private {
-		lockupStorage.setLastCumulativeGlobalReward(
-			_property,
-			_user,
-			_lastInterest
-		);
-		lockupStorage.setLastBlockNumber(_property, block.number);
+		setStorageLastCumulativeGlobalReward(_property, _user, _lastInterest);
+		setStorageLastBlockNumber(_property, block.number);
 	}
 
 	function validateTargetPeriod(address _property) private {
@@ -2804,25 +2786,27 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256 begin, uint256 end)
 	{
-		return (getStorage().getLastBlockNumber(_property), block.number);
+		return (getStorageLastBlockNumber(_property), block.number);
 	}
 
-	function dry(LockupStorage lockupStorage)
+	function dry()
 		private
 		view
 		returns (uint256 _nextRewards, uint256 _amount)
 	{
 		uint256 rewardsAmount = IAllocator(config().allocator())
 			.calculateMaxRewardsPerBlock();
-		(uint256 lastAmount, uint256 lastBlock) = lockupStorage
-			.getLastSameRewardsAmountAndBlock();
+		(
+			uint256 lastAmount,
+			uint256 lastBlock
+		) = getStorageLastSameRewardsAmountAndBlock();
 		uint256 lastMaxRewards = lastAmount == rewardsAmount
 			? rewardsAmount
 			: lastAmount;
 
 		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
 		uint256 additionalRewards = lastMaxRewards.mul(blocks);
-		uint256 nextRewards = lockupStorage.getCumulativeGlobalRewards().add(
+		uint256 nextRewards = getStorageCumulativeGlobalRewards().add(
 			additionalRewards
 		);
 		return (nextRewards, rewardsAmount);
@@ -2839,14 +2823,13 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			uint256 _interestPrice
 		)
 	{
-		LockupStorage lockupStorage = getStorage();
-		(uint256 rewards, ) = dry(lockupStorage);
+		(uint256 rewards, ) = dry();
 		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
 		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
 		uint256 propertyRewards = rewards.sub(_lastReward).mul(
-			valuePerProperty.mul(Decimals.basis()).outOf(valueAll)
+			valuePerProperty.mulBasis().outOf(valueAll)
 		);
-		uint256 lockedUpPerProperty = lockupStorage.getPropertyValue(_property);
+		uint256 lockedUpPerProperty = getStoragePropertyValue(_property);
 		uint256 totalSupply = ERC20Mintable(_property).totalSupply();
 		uint256 holders = Policy(config().policy()).holdersShare(
 			propertyRewards,
@@ -2872,13 +2855,12 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 			uint256 _interestPrice
 		)
 	{
-		LockupStorage lockupStorage = getStorage();
-		(uint256 nextRewards, ) = dry(lockupStorage);
+		(uint256 nextRewards, ) = dry();
 		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
 		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
-		uint256 share = valuePerProperty.mul(Decimals.basis()).outOf(valueAll);
+		uint256 share = valuePerProperty.mulBasis().outOf(valueAll);
 		uint256 propertyRewards = nextRewards.mul(share);
-		uint256 lockedUp = lockupStorage.getPropertyValue(_property);
+		uint256 lockedUp = getStoragePropertyValue(_property);
 		uint256 holders = Policy(config().policy()).holdersShare(
 			propertyRewards,
 			lockedUp
@@ -2891,40 +2873,26 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		return (holders, interest, holdersPrice, interestPrice);
 	}
 
-	function _calculateInterestAmount(
-		LockupStorage lockupStorage,
-		address _property,
-		address _user
-	) private view returns (uint256 _amount, uint256 _interest) {
-		uint256 last = lockupStorage.getLastCumulativeGlobalReward(
-			_property,
-			_user
-		);
+	function _calculateInterestAmount(address _property, address _user)
+		private
+		view
+		returns (uint256 _amount, uint256 _interest)
+	{
+		uint256 last = getStorageLastCumulativeGlobalReward(_property, _user);
 		(uint256 nextReward, , , , uint256 price) = difference(_property, last);
-		uint256 lockedUpPerAccount = lockupStorage.getValue(_property, _user);
+		uint256 lockedUpPerAccount = getStorageValue(_property, _user);
 		uint256 amount = price.mul(lockedUpPerAccount);
-		uint256 result = amount > 0
-			? amount.div(Decimals.basis()).div(Decimals.basis())
-			: 0;
+		uint256 result = amount > 0 ? amount.divBasis().divBasis() : 0;
 		return (result, nextReward);
 	}
 
 	function _calculateWithdrawableInterestAmount(
-		LockupStorage lockupStorage,
 		address _property,
 		address _user
 	) private view returns (uint256 _amount, uint256 _reward) {
-		uint256 pending = lockupStorage.getPendingInterestWithdrawal(
-			_property,
-			_user
-		);
-		uint256 legacy = __legacyWithdrawableInterestAmount(
-			lockupStorage,
-			_property,
-			_user
-		);
+		uint256 pending = getStoragePendingInterestWithdrawal(_property, _user);
+		uint256 legacy = __legacyWithdrawableInterestAmount(_property, _user);
 		(uint256 amount, uint256 reward) = _calculateInterestAmount(
-			lockupStorage,
 			_property,
 			_user
 		);
@@ -2939,7 +2907,6 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		address _user
 	) public view returns (uint256) {
 		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
-			getStorage(),
 			_property,
 			_user
 		);
@@ -2950,59 +2917,52 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		validateTargetPeriod(_property);
-		LockupStorage lockupStorage = getStorage();
 		(uint256 value, uint256 last) = _calculateWithdrawableInterestAmount(
-			lockupStorage,
 			_property,
 			msg.sender
 		);
 		require(value > 0, "your interest amount is 0");
-		lockupStorage.setPendingInterestWithdrawal(_property, msg.sender, 0);
+		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		updateLastPriceForProperty(lockupStorage, _property, msg.sender, last);
-		__updateLegacyWithdrawableInterestAmount(
-			lockupStorage,
-			_property,
-			msg.sender
-		);
+		updateLastPriceForProperty(_property, msg.sender, last);
+		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 		update();
 	}
 
 	function updateValues(
-		LockupStorage lockupStorage,
 		bool _addition,
 		address _account,
 		address _property,
 		uint256 _value
 	) private {
 		if (_addition) {
-			updateCumulativeLockedUp(lockupStorage, true, _property, _value);
-			addAllValue(lockupStorage, _value);
-			addPropertyValue(lockupStorage, _property, _value);
-			addValue(lockupStorage, _property, _account, _value);
+			updateCumulativeLockedUp(true, _property, _value);
+			addAllValue(_value);
+			addPropertyValue(_property, _value);
+			addValue(_property, _account, _value);
 		} else {
-			updateCumulativeLockedUp(lockupStorage, false, _property, _value);
-			subAllValue(lockupStorage, _value);
-			subPropertyValue(lockupStorage, _property, _value);
+			updateCumulativeLockedUp(false, _property, _value);
+			subAllValue(_value);
+			subPropertyValue(_property, _value);
 		}
 		update();
 	}
 
 	function getAllValue() external view returns (uint256) {
-		return getStorage().getAllValue();
+		return getStorageAllValue();
 	}
 
-	function addAllValue(LockupStorage lockupStorage, uint256 _value) private {
-		uint256 value = lockupStorage.getAllValue();
+	function addAllValue(uint256 _value) private {
+		uint256 value = getStorageAllValue();
 		value = value.add(_value);
-		lockupStorage.setAllValue(value);
+		setStorageAllValue(value);
 	}
 
-	function subAllValue(LockupStorage lockupStorage, uint256 _value) private {
-		uint256 value = lockupStorage.getAllValue();
+	function subAllValue(uint256 _value) private {
+		uint256 value = getStorageAllValue();
 		value = value.sub(_value);
-		lockupStorage.setAllValue(value);
+		setStorageAllValue(value);
 	}
 
 	function getValue(address _property, address _sender)
@@ -3010,18 +2970,17 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		return getStorage().getValue(_property, _sender);
+		return getStorageValue(_property, _sender);
 	}
 
 	function addValue(
-		LockupStorage lockupStorage,
 		address _property,
 		address _sender,
 		uint256 _value
 	) private {
-		uint256 value = lockupStorage.getValue(_property, _sender);
+		uint256 value = getStorageValue(_property, _sender);
 		value = value.add(_value);
-		lockupStorage.setValue(_property, _sender, value);
+		setStorageValue(_property, _sender, value);
 	}
 
 	function hasValue(address _property, address _sender)
@@ -3029,7 +2988,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (bool)
 	{
-		uint256 value = getStorage().getValue(_property, _sender);
+		uint256 value = getStorageValue(_property, _sender);
 		return value != 0;
 	}
 
@@ -3038,49 +2997,34 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (uint256)
 	{
-		return getStorage().getPropertyValue(_property);
+		return getStoragePropertyValue(_property);
 	}
 
-	function addPropertyValue(
-		LockupStorage lockupStorage,
-		address _property,
-		uint256 _value
-	) private {
-		uint256 value = lockupStorage.getPropertyValue(_property);
+	function addPropertyValue(address _property, uint256 _value) private {
+		uint256 value = getStoragePropertyValue(_property);
 		value = value.add(_value);
-		lockupStorage.setPropertyValue(_property, value);
+		setStoragePropertyValue(_property, value);
 	}
 
-	function subPropertyValue(
-		LockupStorage lockupStorage,
-		address _property,
-		uint256 _value
-	) private {
-		uint256 value = lockupStorage.getPropertyValue(_property);
+	function subPropertyValue(address _property, uint256 _value) private {
+		uint256 value = getStoragePropertyValue(_property);
 		uint256 nextValue = value.sub(_value);
-		lockupStorage.setPropertyValue(_property, nextValue);
+		setStoragePropertyValue(_property, nextValue);
 	}
 
-	function updatePendingInterestWithdrawal(
-		LockupStorage lockupStorage,
-		address _property,
-		address _user
-	) private {
+	function updatePendingInterestWithdrawal(address _property, address _user)
+		private
+	{
 		(uint256 withdrawableAmount, ) = _calculateWithdrawableInterestAmount(
-			lockupStorage,
 			_property,
 			_user
 		);
-		lockupStorage.setPendingInterestWithdrawal(
+		setStoragePendingInterestWithdrawal(
 			_property,
 			_user,
 			withdrawableAmount
 		);
-		__updateLegacyWithdrawableInterestAmount(
-			lockupStorage,
-			_property,
-			_user
-		);
+		__updateLegacyWithdrawableInterestAmount(_property, _user);
 	}
 
 	function possible(address _property, address _from)
@@ -3088,10 +3032,7 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 		view
 		returns (bool)
 	{
-		uint256 blockNumber = getStorage().getWithdrawalStatus(
-			_property,
-			_from
-		);
+		uint256 blockNumber = getStorageWithdrawalStatus(_property, _from);
 		if (blockNumber == 0) {
 			return false;
 		}
@@ -3106,29 +3047,28 @@ contract Lockup is ILockup, Pausable, UsingConfig, UsingValidator {
 	}
 
 	function __legacyWithdrawableInterestAmount(
-		LockupStorage lockupStorage,
 		address _property,
 		address _user
 	) private view returns (uint256) {
-		uint256 _last = lockupStorage.getLastInterestPrice(_property, _user);
-		uint256 price = lockupStorage.getInterestPrice(_property);
+		uint256 _last = getStorageLastInterestPrice(_property, _user);
+		uint256 price = getStorageInterestPrice(_property);
 		uint256 priceGap = price.sub(_last);
-		uint256 lockedUpValue = lockupStorage.getValue(_property, _user);
+		uint256 lockedUpValue = getStorageValue(_property, _user);
 		uint256 value = priceGap.mul(lockedUpValue);
-		return value.div(Decimals.basis());
+		return value.divBasis();
 	}
 
 	function __updateLegacyWithdrawableInterestAmount(
-		LockupStorage lockupStorage,
 		address _property,
 		address _user
 	) private {
-		uint256 interestPrice = lockupStorage.getInterestPrice(_property);
-		lockupStorage.setLastInterestPrice(_property, _user, interestPrice);
+		uint256 interestPrice = getStorageInterestPrice(_property);
+		if (getStorageLastInterestPrice(_property, _user) != interestPrice) {
+			setStorageLastInterestPrice(_property, _user, interestPrice);
+		}
 	}
 
-	function getStorage() private view returns (LockupStorage) {
-		require(paused() == false, "You cannot use that");
-		return LockupStorage(config().lockupStorage());
+	function setDIP4GenesisBlock(uint256 _block) external onlyOwner {
+		setStorageDIP4GenesisBlock(_block);
 	}
 }

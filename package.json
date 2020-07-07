@@ -18,7 +18,7 @@
 		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
 		"prepack": "npm run build",
 		"build": "tsc -p tsconfig.build.json",
-		"prebuild": "rm -f migrations/*.js && rm -f migrations/*/*.js && npm run generate"
+		"prebuild": "rimraf ['migrations/**/*.js', 'scripts/**/*.js'] && npm run generate"
 	},
 	"bin": {
 		"dev-protocol": "cli/index.js"
@@ -33,16 +33,16 @@
 	"devDependencies": {
 		"@types/chai": "^4.2.11",
 		"@types/dotenv": "8.2.0",
-		"@types/node": "13.13.12",
+		"@types/node": "13.13.13",
 		"@types/shelljs": "0.8.8",
-		"@typescript-eslint/eslint-plugin": "3.5.0",
-		"@typescript-eslint/parser": "3.5.0",
+		"@typescript-eslint/eslint-plugin": "3.6.0",
+		"@typescript-eslint/parser": "3.6.0",
 		"bignumber.js": "9.0.0",
 		"chai": "^4.2.0",
 		"dotenv": "8.2.0",
-		"eslint": "7.3.1",
+		"eslint": "7.4.0",
 		"eslint-config-prettier": "6.11.0",
-		"eslint-config-xo": "0.31.0",
+		"eslint-config-xo": "0.32.0",
 		"eslint-config-xo-typescript": "0.31.0",
 		"eslint-plugin-prettier": "3.1.4",
 		"ethereum-waffle": "^2.2.0",
@@ -50,11 +50,12 @@
 		"husky": "4.2.5",
 		"prettier": "2.0.5",
 		"prettier-plugin-solidity": "1.0.0-alpha.54",
+		"rimraf": "^3.0.2",
 		"ts-generator": "0.0.8",
 		"ts-jest": "^26.1.1",
 		"ts-node": "8.10.2",
 		"typechain": "2.0.0",
-		"typescript": "3.9.5",
+		"typescript": "3.9.6",
 		"web3": "1.2.9"
 	},
 	"dependencies": {

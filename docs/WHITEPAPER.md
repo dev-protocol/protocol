@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`2.1.6`**
+Version: **`3.1.0`**
 
 _There is a possibility that this white paper will be updated. When there is an update, the version number will increase according to [Semantic Versioning](https://semver.org/)._
 
@@ -21,11 +21,11 @@ Individuals produce value through activities. Dev Protocol possesses market, sta
 
 Staking is a new form of trading money that uses the inflation mechanism. Through staking, the sustainability of users’ activities is secured, and users receive value at zero real cost. This is a mechanism that provides profit for all properties that had previously been released for free. Dev Protocol aims for a total value staked that surpasses donation activities that have been taking place through legal tender.
 
-Dev Protocol transfers the formulation of its policy, which serves as the guiding principle for its governance, to the community so that it can be updated depending on the circumstances. Users can freely propose a new policy through the protocol. In order for a policy to take effect, approval must be granted through a vote of property holders. A policy is related to a decision on the inflation rate and more. The initial policy is [here](./POLICY.md).
+Dev Protocol transfers the formulation of its policy, which serves as the guiding principle for its governance, to the community so that it can be updated depending on the circumstances. Users can freely propose a new policy through the protocol. In order for a policy to take effect, approval must be granted through a vote of property holders. A policy is related to a decision on the inflation rate and more. The current policy is [here](./POLICY.md).
 
 ## Market
 
-The market serves to provide social fairness by certifying an individual’s activity on the blockchain and evaluating it fairly. A market is created for each evaluation index for activities, and the community can propose the opening of a new market.
+The market serves to provide assuring identity by certifying an individual’s activity on the blockchain. A market is created for each authentication target, and the community can propose the opening of a new market.
 
 ## Capitalization
 
@@ -34,10 +34,6 @@ As a premise, ownership of a user’s activities is certified to belong to the u
 ## Capitalization Method
 
 By authenticating an external account that expresses ownership of the activity on Dev Protocol, users can define their activity as a “property” on the market and certify that they are the owner of the property. When authenticating a property, the user pays a commission in DEV that has been defined by the policy, and the commission that has been paid is automatically burned. Users can authenticate multiple properties and connect them to multiple markets. The maximum number of properties that can be authenticated is defined by the policy.
-
-## Evaluation
-
-An owner of a property can request the evaluation of the property at any time in order to receive market rewards. The evaluation index for the evaluation of properties is defined for each market.
 
 ## Profit, Market Reward, Inflation, Deflation
 
@@ -80,29 +76,32 @@ By staking their DEV toward an activity participant, users receive some sort of 
 - Receive a portion of the rewards by inheriting a portion of the activity participant’s Property
 - Collect commission from the user
 
+# Token Distribution
+
+The Dev Protocol plans a token distribution of the core token "DEV."
+
+The following graph shows the latest allocation plan.
+
+![Token Distribution](https://devprtcl.com/image/token-distribution.svg)
+
+See [the Medium post](https://medium.com/devprtcl/dev-token-allocation-update-e1d7dd424087) for more information on token distribution.
+
 # Mechanism
 
-Dev Protocol is comprised of the following 20 contracts.
+Dev Protocol is comprised of the following 13 main contracts.
 
 - Market
 - Market Factory
-- Market Group
 - Property
 - Property Factory
-- Property Group
 - Metrics
-- Metrics Group
-- IPolicy
 - Policy
 - Policy Factory
-- Vote Counter
-- Vote Times
 - Lockup
 - Allocator
 - Policy
 - Policy Factory
 - Address Config
-- Using Config
 - DEV
 
 Synoptic Chart of Contracts:
@@ -110,15 +109,11 @@ Synoptic Chart of Contracts:
 
 ## Market
 
-The Market Contract represents a specific group of properties. The properties handled by Dev Protocol can be defined through the 2 interfaces of the `authenticate` function, which authenticates properties, and the `calculate` function, which evaluates property values.
+The Market Contract represents a specific group of properties. The properties handled by Dev Protocol can be defined through the `authenticate` function.
 
 Anybody can freely propose a Market Contract. However, in order for it to take effect, it must be approved through a vote of existing Property Contract owners. The number of votes will be the sum of the count staked in the Property Contract and the `totals`. Generally, votes are expected to be carried out by property owners, but stake executors can use their own count of stakes as the number of votes in order to vote. In this case, the address of the Property Contract subject to staking will be assigned.
 
-The `cauthenticate` function expresses the property to be authenticated and authenticates whether the executor is the owner of the property. For example, 1 GitHub repository is assigned, and the fact that the executor is the owner of this GitHub repository is authenticated. Therefore, it should not be possible for anybody other than the owner of the Property Contract to execute the `authenticate` function. This function is called directly by a user, and it is expected for `authenticatedCallback` to be called for a successful authentication. When executing the `authenticate` function, a commission defined by the Policy Contract is paid in DEV, and the commission paid is automatically burned.
-
-The `calculate` function calculates the property value to decide the market rewards. It is expected that this function will be called from the Allocator Contract, but it can also be called directly by a user. However, it produces no effect unless it is called from the Allocator Contract. There is no need to validate the context when executing, as this is all carried out by the Allocator Contract. The results of the calculation are reported to the Allocator Contract by calling the `calculatedCallback` in the Allocator Contract.
-
-`authenticate` defines what a single Market Contract handles as a property, and `calculate` defines how it is evaluated.
+The `authenticate` function expresses the property to be authenticated and authenticates whether the executor is the owner of the property. For example, 1 GitHub repository is assigned, and the fact that the executor is the owner of this GitHub repository is authenticated. Therefore, it should not be possible for anybody other than the owner of the Property Contract to execute the `authenticate` function. This function is called directly by a user, and it is expected for `authenticatedCallback` to be called for a successful authentication. When executing the `authenticate` function, a commission defined by the Policy Contract is paid in DEV, and the commission paid is automatically burned.
 
 ## Market Factory
 
@@ -138,23 +133,7 @@ contract IMarketBehavior {
 		string memory _args4,
 		string memory _args5,
 		address market
-	)
-		public
-		returns (
-			// solium-disable-next-line indentation
-			address
-		);
-
-	function calculate(
-		address _metrics,
-		uint256 _start,
-		uint256 _end
-	)
-		external
-		returns (
-			// solium-disable-next-line indentation
-			bool
-		);
+	) public returns (address);
 
 	function getId(address _metrics) external view returns (string memory);
 }
@@ -178,7 +157,9 @@ And the following schema is a correct example.
 string public schema = "['Your GitHub repository(e.g. your-name/repos)', 'Read-only token']";
 ```
 
-The Market Factory Contract creates a new Market Contract that has the proxy method and other elements for the contract. There are 2 proxy methods, which are authenticate and calculate. The authenticatedCallback function, which receives the successful authentication, and the vote function, which accepts votes, are also added.
+The `getId` function receives an argument as a Metrics contract address and returns the authenticated asset name. For example, that return value is like `dev-protocol/dev-kit-js`.
+
+The Market Factory Contract creates a new Market Contract that has the proxy method and other elements for the contract. There are 3 proxy methods, which are `authenticate`, `schema`, and `getId`. The `authenticatedCallback` function, which receives the successful authentication, and the vote function, which accepts votes, are also added.
 
 ## Property
 
@@ -188,15 +169,15 @@ Each Property Contract(Token) holder will receive market rewards based on the ba
 
 The `transfer` function for the Property Contract requests the Allocator Contract to adjust the amount that can be withdrawn, since the amount of market rewards that can be withdrawn varies based on changes to the balance.
 
-A Property Contract in its initial state cannot receive market rewards. Since market rewards are determined based on staking and property value, a property must be associated in order to receive market rewards.
+A Property Contract in its initial state is not assuring assets.
 
-In order for a property to be associated with a Property Contract, a Market Contract must be associated with the Property Contract. The association is established by the `authenticatedCallback` function for the Market Contract. Multiple Market Contracts can be associated with a Property Contract. 1 Property Contract can represent a specific property group or a Property Contract can be created for each property.
+In order for a Property to be associated with an asset, a Market Contract must be associated with the Property Contract. The association is established by the `authenticatedCallback` function for the Market Contract. Multiple Market Contracts can be associated with a Property Contract. 1 Property Contract can represent a specific assets group or a Property Contract can be created for each asset.
 
 ## Property Factory
 
 The Property Factory Contract generates a new Property Contract.
 
-The generation of a Property Contract is carried out by executing the `create` function. The `name` and `symbol` are specified as an argument. For ease of comparison of Property Contracts, `totalSupply` is fixed as `10000000`, and `decimals` is fixed as `18`.
+The generation of a Property Contract is carried out by executing the `create` function. The `name` and `symbol` are specified as an argument. For ease of comparison of Property Contracts, `totalSupply` is fixed as `10000000`(in Solidity, it's `10000000000000000000000000`), and `decimals` is fixed as `18`.
 
 ## Metrics
 
@@ -217,6 +198,37 @@ By assigning the address of the Property Contract to stake in and the quantity o
 
 By staking DEV, users can receive some sort of utility from the owner of the corresponding Property Contract. Staking continues until this utility is needed, increasing the scarcity value of DEV.
 
+A cumulative total reward amount at a time of staking (accumulation of the return value of the `calculateMaxRewardsPerBlock` function of the Allocator Contract according to the elapsed block) is recorded and used for the withdrawal reward calculation.
+
+An amount of remuneration is determined by a staking ratio of a Property Contract. Therefore, the Lockup Contract also records a cumulative staking amount of a Property contract (cumulative staking amount according to elapsed block), and a total cumulative staking amount (all cumulative staking amount according to elapsed block).
+
+A total reward allocation is determined from a ratio of a cumulative staking amount of a Property and a cumulative total staking amount.
+
+The following variables are used to calculate a reward amount for a staking person.
+
+- `r`: Cumulative total reward amount(accumulation of a return value of the `calculateMaxRewardsPerBlock` function of the Allocator Contract according to elapsed block)
+- `p`: Cumulative staking amount(cumulative staking amount according to elapsed block)
+- `t`: Total cumulative staking amount(all cumulative staking amount according to elapsed block)
+- `l`: `r` at a time of staking
+- `Policy.holdersShare`: Reward rate function receive by a Property Contract holder
+
+The calculation formula is as follows.
+
+```
+total interest = (p / t * (r -l)) - Policy.holdersShare(p / t * (r -l))
+```
+
+That withdrawable interest amount is calculated by dividing its result by a staking amount for a Property Contract and multiplying by a staking amount by a staking person.
+
+When a staking person gets a reward, a value of `l` overrides with the latest value. In this way, a withdrawable interest amount does not exceed the maximum amount that one person can withdraw. This is exemplified below. `p` and `t` are not considered for simplicity.
+
+1. Alice is staking 500 DEV for the first time when the `r` is 100. When `r` reaches 500, the withdrawable interest amount is `(500-100) × 500 = 200000`.
+2. `r` becomes 520, and Alice withdraws again. The withdrawable interest amount is `(520-500) × 500 = 10000`.
+
+Alice withdraws it twice and earns `200000 + 10000 = 210000`. If Alice didn't make the first withdrawal, Alice's withdrawable interest amount is `(520-100) × 500 = 210000` now. From this, it is clear that the withdrawable interest amount does not change regardless of the timing of withdrawal.
+
+This formula holds only when the staking amount of a staking person is constant. Therefore, it is necessary to update `l` when executing the `withdraw` function of the Lockup Contract.
+
 ### cancel
 
 The DEV that the user has staked in the Property Contract is released. Staking continues for a certain amount of time after the release has been requested. This period is determined by the number of blocks defined in the Policy Contract.
@@ -231,28 +243,11 @@ If the block count that has been set by the release request is reached, the full
 
 The Allocator Contract plays several roles to determine market rewards.
 
-### allocate
+### calculateMaxRewardsPerBlock
 
-The market rewards for the Property Contract are calculated and added to the amount that can be withdrawn. The address for the Metrics Contract is received as an argument. The following variables are used to determine market rewards.
+Calculate and return a value per block of a total reward given to all users.
 
-- `t`= The period (number of blocks) since the `allocate` function was last executed
-- `a`= The number obtained by taking the property value that is obtained by calling the `calculate` function for the Market Contract that is associated by the Metrics Contract and dividing it by `t`
-- `l`= The number of stakes for the Property Contract that is associated by the Metrics Contract
-- `v`= The total property value (for each blocks) decided by the Policy Contract based on `a` and `l`
-- `p` = The previous `v`
-- `d` = The sum of total property values (for each block) for Market Contracts associated by the Metrics Contract
-- `m` = The total rewards (for each block) calculated by the Policy Contract
-- `s` = The share of issued Metrics for the Market Contract associated by the Metrics Contract
-
-The basic idea is that it is decided by the sum of the total property values (for each block) and the ratio of each total property value (for each block). Each time a calculation is executed, the sum of the total property values is overridden and used for the next calculation.
-
-The formula is as follows.
-
-```
-distributions = v / (d - p + v) * m * s * t
-```
-
-After this calculation, `d` is overridden by the value of `(d - p + v)`.
+Take a total staking amount of DEV at a time of a calculation and a total number of authenticated assets. This function acts as a proxy for the `rewards` function of Policy Contract. Correlation between arguments and return values is defined by [Policy](./POLICY.md#rewards).
 
 ## Withdraw
 
@@ -262,36 +257,34 @@ The Winthdraw Contract plays several roles for managing the amount of market rew
 
 Withdraws the market rewards for the Property Contract. The executor withdraws the amount that can be withdrawn when it is called.
 
-The Allocator Contract sets the sum of the market rewards for the Property Contract as `totals` and sets the cumulative price of the market rewards as `prices` and records them. If the Property Contract has been staked in, `lockTotals` and [lockPrices are also recorded as values for the stake executor. The shares of market rewards between the Property Contract(Token) holder and the stake executor are defined by the Policy Contract.
+An amount of remuneration is determined by a staking ratio of a Property Contract. Therefore, the Withdraw Contract queries to the Lockup Contract a cumulative staking amount of property contract (cumulative staking amount according to elapsed block), and a total cumulative staking amount (all cumulative staking amount according to elapsed block), and calculate a withdrawable amount.
 
-```solidity
-mapping(address => uint) totals;
-mapping(address => uint) prices;
-mapping(address => uint) lockTotals;
-mapping(address => uint) lockPrices;
+A total reward allocation is determined from a ratio of a cumulative staking amounts of a Property and a cumulative total staking amounts.
+
+The following variables are used to calculate a reward amount for a Property holder.
+
+- `r`: Cumulative total reward amount(accumulation of a return value of the `calculateMaxRewardsPerBlock` function of the Allocator Contract according to elapsed block)
+- `p`: Cumulative staking amount(cumulative staking amount according to elapsed block)
+- `t`: Total cumulative staking amount(all cumulative staking amount according to elapsed block)
+- `l`: `r` at a time of last withdrawal
+- `Policy.holdersShare`: Reward rate function receive by a Property Contract holder
+
+The calculation formula is as follows.
+
+```
+total reward = Policy.holdersShare(p / t * (r -l)
 ```
 
-When a user calls the `withdraw` function, the number of DEV that the user receives is `price` multiplied by the user’s balance for the Property Contract.
+That withdrawable amount is calculated by dividing its result by a `totalSupply` for a Property Contract and multiplying by a balance of a user.
 
-Updates for `totals` and `prices` are carried out by the `increment` function for the Allocator Contract.
+When a Property holder gets a reward, a value of `l` overrides with the latest value. In this way, a withdrawable amount does not exceed the maximum amount that one person can withdraw. This is exemplified below. `p` and `t` are not considered for simplicity.
 
-```solidity
-function increment(address _property, uint _value) internal {
-	totals[_property] += _value;
-	prices[_property] += _value / ERC20(_token).totalSupply();
-}
-```
+1. Alice has 500 tokens of a Property Contract. When `r` reaches 100, the withdrawal amount is `(100-0) × 500 = 50000`.
+2. `r` becomes 120 and Alice withdraws again. The withdrawal amount is `(120-100) × 500 = 10000`.
 
-`totals` is the cumulative sum of market rewards, and `prices` is the cumulative sum of market rewards that can be withdrawn for 1 Property Contract(Token).
+Alice withdraws it twice and earns `50000 + 10000 = 60000`. If Alice didn't make the first withdrawal, Alice's withdrawable amount is `(120 - 0) × 500 = 60000` now. From this, it is clear that the withdrawable amount does not change regardless of the timing of withdrawal.
 
-`prices` is mapped for each user account for the Property Contract and is subtracted from the value when the same user calls the `withdraw` function next. In this manner, the amount that can be withdrawn will not exceed the maximum amount that an individual can withdraw. This is illustrated below.
-
-1. Alice, who owns 500 Property Contracts, withdraws for the first time when `prices` is 100. The amount that can be withdrawn is `(100 - 0) × 500 = 50000`.
-2. Alice withdraws again when `prices` becomes 120. The amount that can be withdrawn is `(120 - 100) × 500 = 10000`.
-
-As a result of withdrawing 2 separate times, Alice obtains a total of `50000 + 10000 = 60000`. Hypothetically, if she had not withdrawn the 1st time, the amount would have been `120 × 500 = 60000`, demonstrating how the amount that can be withdrawn is the same.
-
-This formula is only valid when the user’s balance is consistent. Therefore, when executing the `transfer` function for the Property Contract, the Allocator Contract must be notified, and there is a need to adjust the amounts that can be withdrawn by the sender and the recipient.
+This formula holds only when the balance of a Property holder is constant. Therefore, it is necessary to update `l` when executing the `transfer` function of a Property Contract.
 
 ## Policy
 
