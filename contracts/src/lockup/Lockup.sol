@@ -471,7 +471,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		}
 	}
 
-	function setDIP4GenesisBlock(uint256 _block) external onlyPauser {
+	function setDIP4GenesisBlock(uint256 _block) external onlyOwner {
 		setStorageDIP4GenesisBlock(_block);
 	}
 }
