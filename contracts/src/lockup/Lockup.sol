@@ -466,7 +466,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		address _user
 	) private {
 		uint256 interestPrice = getStorageInterestPrice(_property);
-		setStorageLastInterestPrice(_property, _user, interestPrice);
+		if (getStorageLastInterestPrice(_property, _user) != interestPrice) {
+			setStorageLastInterestPrice(_property, _user, interestPrice);
+		}
 	}
 
 	function setDIP4GenesisBlock(uint256 _block) external onlyPauser {
