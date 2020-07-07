@@ -324,22 +324,6 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
 			expect(res).to.be.an.instanceOf(Error)
 		})
-		it('should fail to lockup token when the protocol is paused', async () => {
-			const dev = await generateEnv()
-			const prop = await createProperty(dev)
-			await dev.dev.mint(user1, 100)
-			await dev.lockup.pause()
-			const res = await dev.dev
-				.deposit(prop, 50, {from: user1})
-				.catch((err: Error) => err)
-			const balance = await dev.dev.balanceOf(user1)
-
-			expect(balance.toNumber()).to.be.equal(100)
-			expect(await dev.lockup.paused()).to.be.equal(true)
-			expect(res).to.be.an.instanceOf(Error)
-			await dev.lockup.unpause()
-			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
-		})
 		it('should fail to lockup token when the lockup amount is 0', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
