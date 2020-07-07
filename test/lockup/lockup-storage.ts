@@ -1,13 +1,13 @@
 import {LockupStorageTestInstance} from '../../types/truffle-contracts'
 import {toBigNumber} from '../test-lib/utils/common'
 
-contract('LockupStorageStorageTest', ([property, user]) => {
+contract('LockupStorageTest', ([property, user]) => {
 	let storage: LockupStorageTestInstance
 	before(async () => {
 		storage = await artifacts.require('LockupStorageTest').new()
 		await storage.createStorage()
 	})
-	describe('LockupStorageStorage; setAllValue, getAllValue', () => {
+	describe('LockupStorage; setAllValue, getAllValue', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageAllValue()
 			expect(result.toNumber()).to.be.equal(0)
@@ -18,7 +18,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(3)
 		})
 	})
-	describe('LockupStorageStorage; setValue, getValue', () => {
+	describe('LockupStorage; setValue, getValue', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageValue(property, user)
 			expect(result.toNumber()).to.be.equal(0)
@@ -29,7 +29,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(30)
 		})
 	})
-	describe('LockupStorageStorage; setPropertyValue, getPropertyValue', () => {
+	describe('LockupStorage; setPropertyValue, getPropertyValue', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStoragePropertyValue(property)
 			expect(result.toNumber()).to.be.equal(0)
@@ -40,7 +40,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(300)
 		})
 	})
-	describe('LockupStorageStorage; setWithdrawalStatus, getWithdrawalStatus', () => {
+	describe('LockupStorage; setWithdrawalStatus, getWithdrawalStatus', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageWithdrawalStatus(property, user)
 			expect(result.toNumber()).to.be.equal(0)
@@ -51,7 +51,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(3000)
 		})
 	})
-	describe('LockupStorageStorage; setInterestPrice, getInterestPrice', () => {
+	describe('LockupStorage; setInterestPrice, getInterestPrice', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageInterestPrice(property)
 			expect(result.toNumber()).to.be.equal(0)
@@ -62,7 +62,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(30000)
 		})
 	})
-	describe('LockupStorageStorage; setLastInterestPrice, getLastInterestPrice', () => {
+	describe('LockupStorage; setLastInterestPrice, getLastInterestPrice', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageLastInterestPrice(property, user)
 			expect(result.toNumber()).to.be.equal(0)
@@ -73,7 +73,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(300000)
 		})
 	})
-	describe('LockupStorageStorage; setPendingInterestWithdrawal, getPendingInterestWithdrawal', () => {
+	describe('LockupStorage; setPendingInterestWithdrawal, getPendingInterestWithdrawal', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStoragePendingInterestWithdrawal(
 				property,
@@ -94,7 +94,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(3000000)
 		})
 	})
-	describe('LockupStorageStorage; setLastBlockNumber, getLastBlockNumber', () => {
+	describe('LockupStorage; setLastBlockNumber, getLastBlockNumber', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageLastBlockNumber(property)
 			expect(result.toNumber()).to.be.equal(0)
@@ -105,7 +105,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(30000000)
 		})
 	})
-	describe('LockupStorageStorage; setLastSameRewardsAmountAndBlock, getLastSameRewardsAmountAndBlock', () => {
+	describe('LockupStorage; setLastSameRewardsAmountAndBlock, getLastSameRewardsAmountAndBlock', () => {
 		it('Initial value is 0 and 0.', async () => {
 			const result = await storage.getStorageLastSameRewardsAmountAndBlock()
 			expect(result[0].toNumber()).to.be.equal(0)
@@ -123,7 +123,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(toBigNumber(result[1]).toFixed()).to.be.equal(block)
 		})
 	})
-	describe('LockupStorageStorage; setCumulativeGlobalRewards, getCumulativeGlobalRewards', () => {
+	describe('LockupStorage; setCumulativeGlobalRewards, getCumulativeGlobalRewards', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageCumulativeGlobalRewards()
 			expect(result.toNumber()).to.be.equal(0)
@@ -134,7 +134,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(3000000000)
 		})
 	})
-	describe('LockupStorageStorage; setLastCumulativeGlobalReward, getLastCumulativeGlobalReward', () => {
+	describe('LockupStorage; setLastCumulativeGlobalReward, getLastCumulativeGlobalReward', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageLastCumulativeGlobalReward(
 				property,
@@ -155,7 +155,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(30000000000)
 		})
 	})
-	describe('LockupStorageStorage; setCumulativeLockedUpUnitAndBlock, getCumulativeLockedUpUnitAndBlock', () => {
+	describe('LockupStorage; setCumulativeLockedUpUnitAndBlock, getCumulativeLockedUpUnitAndBlock', () => {
 		it('Initial value is 0 and 0.', async () => {
 			const result = await storage.getStorageCumulativeLockedUpUnitAndBlock(
 				property
@@ -180,7 +180,7 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 			expect(toBigNumber(result[1]).toFixed()).to.be.equal(block)
 		})
 	})
-	describe('LockupStorageStorage; setCumulativeLockedUpValue, getCumulativeLockedUpValue', () => {
+	describe('LockupStorage; setCumulativeLockedUpValue, getCumulativeLockedUpValue', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageCumulativeLockedUpValue(property)
 			expect(result.toNumber()).to.be.equal(0)
@@ -191,6 +191,17 @@ contract('LockupStorageStorageTest', ([property, user]) => {
 				300000000000
 			)
 			const result = await storage.getStorageCumulativeLockedUpValue(property)
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
+	describe('LockupStorage; setStorageDIP4GenesisBlock, getStorageDIP4GenesisBlock', () => {
+		it('Initial value is 0.', async () => {
+			const result = await storage.getStorageDIP4GenesisBlock()
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageDIP4GenesisBlockTest(300000000000)
+			const result = await storage.getStorageDIP4GenesisBlock()
 			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})

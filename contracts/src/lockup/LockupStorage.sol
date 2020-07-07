@@ -386,6 +386,6 @@ contract LockupStorage is UsingStorage {
 	}
 
 	function getStorageDIP4GenesisBlockKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("dip4GenesisBlock"));
+		return keccak256(abi.encodePacked("_dip4GenesisBlock"));
 	}
 }
