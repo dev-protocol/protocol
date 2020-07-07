@@ -1,4 +1,4 @@
-// import {DevProtocolInstance} from '../test-lib/instance'
+// Import {DevProtocolInstance} from '../test-lib/instance'
 // import {DevInstance} from '../../types/truffle-contracts'
 // import {validateErrorMessage} from '../test-lib/utils/error'
 

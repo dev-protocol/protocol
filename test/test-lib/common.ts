@@ -12,6 +12,6 @@ export async function mine(
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/promise-function-async
-export const sleep = (msec: number) =>
-	new Promise((resolve) => setTimeout(resolve, msec))
+// // eslint-disable-next-line @typescript-eslint/promise-function-async
+// export const sleep = (msec: number) =>
+// 	new Promise((resolve) => setTimeout(resolve, msec))

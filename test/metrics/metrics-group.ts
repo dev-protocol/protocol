@@ -1,4 +1,4 @@
-// import {DevProtocolInstance} from '../test-lib/instance'
+// Import {DevProtocolInstance} from '../test-lib/instance'
 // import {
 // 	validateErrorMessage,
 // 	validateAddressErrorMessage,

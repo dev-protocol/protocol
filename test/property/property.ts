@@ -1,4 +1,4 @@
-// import {DevProtocolInstance} from '../test-lib/instance'
+// Import {DevProtocolInstance} from '../test-lib/instance'
 // import {getPropertyAddress, getTransferToAddress} from '../test-lib/utils/log'
 // import {
 // 	validateErrorMessage,

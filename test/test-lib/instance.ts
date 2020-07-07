@@ -79,7 +79,7 @@ export class DevProtocolInstance {
 	private _allocator!: Contract
 	private _dev!: Contract
 	private _lockup!: Contract
-	private _lockupStorage!: Contract
+	private readonly _lockupStorage!: Contract
 	private _propertyFactory!: Contract
 	private _voteCounter!: Contract
 	private _voteCounterStorage!: Contract
@@ -611,6 +611,7 @@ class PropertyProvider {
 	}
 
 	public getOne(): Contract | undefined {
+		// eslint-disable-next-line no-unreachable-loop
 		for (let key of this._properties.keys()) {
 			return this._properties.get(key)
 		}
@@ -684,6 +685,7 @@ class PolicyProvider {
 	}
 
 	public getOne(): Contract | undefined {
+		// eslint-disable-next-line no-unreachable-loop
 		for (let key of this._policies.keys()) {
 			return this._policies.get(key)
 		}

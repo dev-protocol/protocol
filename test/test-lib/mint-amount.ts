@@ -1,4 +1,4 @@
-// import BigNumber from 'bignumber.js'
+// Import BigNumber from 'bignumber.js'
 // import {DevProtocolInstance} from './instance'
 // import {toBigNumber} from './common'
 // import {Contract} from 'ethers'

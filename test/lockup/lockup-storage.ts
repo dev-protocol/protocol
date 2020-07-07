@@ -1,4 +1,4 @@
-// import {LockupStorageTestInstance} from '../../types/truffle-contracts'
+// Import {LockupStorageTestInstance} from '../../types/truffle-contracts'
 // import {toBigNumber} from '../test-lib/utils/common'
 
 // contract('LockupStorageTest', ([property, user]) => {

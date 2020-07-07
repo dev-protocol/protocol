@@ -1,4 +1,4 @@
-// import {DevProtocolInstance} from '../test-lib/instance'
+// Import {DevProtocolInstance} from '../test-lib/instance'
 // import {MarketInstance} from '../../types/truffle-contracts'
 // import {mine} from '../test-lib/utils/common'
 // import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'

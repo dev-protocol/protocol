@@ -1,4 +1,4 @@
-// import {IPolicyInstance, PolicyInstance} from '../../types/truffle-contracts'
+// Import {IPolicyInstance, PolicyInstance} from '../../types/truffle-contracts'
 // import {DevProtocolInstance} from '../test-lib/instance'
 
 // import {mine, collectsEth, getAbstentionTimes} from '../test-lib/utils/common'

@@ -1,4 +1,4 @@
-// import {UsingStorageTestInstance} from '../../../types/truffle-contracts'
+// Import {UsingStorageTestInstance} from '../../../types/truffle-contracts'
 // import {validateErrorMessage} from '../../test-lib/utils/error'
 
 // contract('UsingStorageTest', ([deployer]) => {

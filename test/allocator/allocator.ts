@@ -1,4 +1,4 @@
-// import {DevProtocolInstance} from '../test-lib/instance'
+// Import {DevProtocolInstance} from '../test-lib/instance'
 // import BigNumber from 'bignumber.js'
 // import {toBigNumber} from '../test-lib/utils/common'
 // import {PropertyInstance} from '../../types/truffle-contracts'

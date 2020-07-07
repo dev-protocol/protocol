@@ -1,4 +1,4 @@
-// import BigNumber from 'bignumber.js'
+// Import BigNumber from 'bignumber.js'
 // import {toBigNumber} from '../../test-lib/utils/common'
 // import {validateErrorMessage} from '../../test-lib/utils/error'
 // contract('DecimalsTest', ([deployer]) => {
