@@ -1,91 +1,121 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {Property} from "contracts/src/property/Property.sol";
+import {VoteCounterStorage} from "contracts/src/vote/counter/VoteCounterStorage.sol";
+import {Policy} from "contracts/src/policy/Policy.sol";
+import {IProperty} from "contracts/src/property/IProperty.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
-import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
+import {IMarket} from "contracts/src/market/IMarket.sol";
 import {IVoteCounter} from "contracts/src/vote/counter/IVoteCounter.sol";
 // prettier-ignore
-import {VoteCounterStorage} from "contracts/src/vote/counter/VoteCounterStorage.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
+import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
-contract VoteCounter is IVoteCounter, UsingConfig, UsingValidator, Pausable {
+contract VoteCounter is IVoteCounter, UsingConfig, UsingValidator, VoteCounterStorage {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addVoteCount(
-		address _user,
-		address _property,
-		bool _agree
-	) external {
-		addressValidator().validateGroups(
-			msg.sender,
-			config().marketGroup(),
+
+	function voteMarket(address _target, address[] calldata _properties, bool _agree) external {
+		addressValidator().validateGroup(
+			_target,
+			config().marketGroup()
+		);
+		IMarket market = IMarket(_target);
+		require(market.enabled() == false, "market is already enabled");
+		require(block.number <= market.votingEndBlockNumber(), "voting deadline is over");
+		vote(_target, _properties, _agree);
+		bool result = Policy(config().policy()).marketApproval(
+			getStorageAgreeCount(_target),
+			getStorageOppositeCount(_target)
+		);
+		if (result == false) {
+			return;
+		}
+		market.toEnable();
+	}
+
+	function votePolicy(address _target, address[] calldata _properties, bool _agree) external {
+		addressValidator().validateGroup(
+			_target,
 			config().policyGroup()
 		);
+		require(config().policy() != _target, "this policy is current");
+		Policy policy = Policy(_target);
+		require(policy.voting(), "voting deadline is over");
+		vote(_target, _properties, _agree);
+		bool result = Policy(config().policy()).policyApproval(
+			getStorageAgreeCount(_target),
+			getStorageOppositeCount(_target)
+		);
+		if (result == false) {
+			return;
+		}
+		IPolicyFactory(config().policyFactory()).convergePolicy(_target);
+	}
 
-		bool alreadyVote = getStorage().getAlreadyVoteFlg(
-			_user,
+	// TODO アドレスを渡せば渡すほどガス代が多くなるか確認する
+	function vote(address _target, address[] memory _properties, bool _agree) private {
+		bool alreadyVote = getStorageAlreadyVoteFlg(
 			msg.sender,
-			_property
+			_target
 		);
 		require(alreadyVote == false, "already vote");
-		uint256 voteCount = getVoteCount(_user, _property);
-		require(voteCount != 0, "vote count is 0");
-		getStorage().setAlreadyVoteFlg(_user, msg.sender, _property);
+		uint256 count = getAllPropertyVoteCount(_properties);
+		require(count != 0, "vote count is 0");
+		setStorageAlreadyVoteFlg(msg.sender, _target);
 		if (_agree) {
-			addAgreeCount(msg.sender, voteCount);
+			addAgreeCount(_target, count);
 		} else {
-			addOppositeCount(msg.sender, voteCount);
+			addOppositeCount(_target, count);
 		}
 	}
 
-	function getAgreeCount(address _sender) external view returns (uint256) {
-		return getStorage().getAgreeCount(_sender);
+	function getTargetAllVoteCount(address _target) external view returns (uint256) {
+		return getStorageAgreeCount(_target).add(getStorageOppositeCount(_target));
 	}
 
-	function getOppositeCount(address _sender) external view returns (uint256) {
-		return getStorage().getOppositeCount(_sender);
+	function isAlreadyVote(address _target) external view returns (bool) {
+		return getStorageAlreadyVoteFlg(
+			msg.sender,
+			_target
+		);
 	}
 
-	function getVoteCount(address _sender, address _property)
-		private
+	function getAllPropertyVoteCount(address[] memory _properties)
+		public view
 		returns (uint256)
 	{
-		uint256 voteCount;
-		if (Property(_property).author() == _sender) {
-			// solium-disable-next-line operator-whitespace
-			voteCount = ILockup(config().lockup())
-				.getPropertyValue(_property)
-				.add(
-				IWithdraw(config().withdraw()).getRewardsAmount(_property)
-			);
-			IVoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
-		} else {
-			voteCount = ILockup(config().lockup()).getValue(_property, _sender);
+		uint256 count = 0;
+		for (uint i = 0; i < _properties.length; i++) {
+			uint256 tmp = getVoteCountByProperty(msg.sender, _properties[i]);
+			count.add(tmp);
 		}
-		return voteCount;
+		return count;
+	}
+
+	function getVoteCount(address property) external view  returns (uint256){
+		return getVoteCountByProperty(msg.sender, property);
+	}
+
+	function getVoteCountByProperty(address _sender, address property) private view returns (uint256){
+		require(_sender == IProperty(property).author(), "illegal property address");
+		return ILockup(config().lockup()).getValue(property, _sender);
 	}
 
 	function addAgreeCount(address _target, uint256 _voteCount) private {
-		uint256 agreeCount = getStorage().getAgreeCount(_target);
+		uint256 agreeCount = getStorageAgreeCount(_target);
 		agreeCount = agreeCount.add(_voteCount);
-		getStorage().setAgreeCount(_target, agreeCount);
+		setStorageAgreeCount(_target, agreeCount);
 	}
 
 	function addOppositeCount(address _target, uint256 _voteCount) private {
-		uint256 oppositeCount = getStorage().getOppositeCount(_target);
+		uint256 oppositeCount = getStorageOppositeCount(_target);
 		oppositeCount = oppositeCount.add(_voteCount);
-		getStorage().setOppositeCount(_target, oppositeCount);
-	}
-
-	function getStorage() private view returns (VoteCounterStorage) {
-		require(paused() == false, "You cannot use that");
-		return VoteCounterStorage(config().voteCounterStorage());
+		setStorageOppositeCount(_target, oppositeCount);
 	}
 }

@@ -2,7 +2,6 @@ pragma solidity ^0.5.0;
 
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 
@@ -29,9 +28,6 @@ contract PropertyFactory is Pausable, UsingConfig {
 		);
 		PropertyGroup(config().propertyGroup()).addGroup(address(property));
 		emit Create(msg.sender, address(property));
-		VoteTimes(config().voteTimes()).resetVoteTimesByProperty(
-			address(property)
-		);
 		return address(property);
 	}
 

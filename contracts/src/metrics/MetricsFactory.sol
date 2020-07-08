@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 

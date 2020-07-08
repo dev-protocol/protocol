@@ -3,12 +3,10 @@ pragma solidity ^0.5.0;
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
-import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {MarketGroup} from "contracts/src/market/MarketGroup.sol";
 
-contract MarketFactory is Pausable, UsingConfig, UsingValidator, Killable {
+contract MarketFactory is Pausable, UsingConfig, UsingValidator {
 	event Create(address indexed _from, address _market);
 
 	// solium-disable-next-line no-empty-blocks
@@ -26,7 +24,6 @@ contract MarketFactory is Pausable, UsingConfig, UsingValidator, Killable {
 			market.toEnable();
 		}
 		emit Create(msg.sender, marketAddr);
-		VoteTimes(config().voteTimes()).addVoteTime();
 		return marketAddr;
 	}
 }

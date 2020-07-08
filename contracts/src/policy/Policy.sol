@@ -95,24 +95,6 @@ contract Policy is Killable, UsingConfig, UsingValidator {
 		return _policy.lockUpBlocks();
 	}
 
-	function vote(address _property, bool _agree) external {
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
-		require(config().policy() != address(this), "this policy is current");
-		require(voting(), "voting deadline is over");
-		VoteCounter voteCounter = VoteCounter(config().voteCounter());
-		voteCounter.addVoteCount(msg.sender, _property, _agree);
-		bool result = Policy(config().policy()).policyApproval(
-			voteCounter.getAgreeCount(address(this)),
-			voteCounter.getOppositeCount(address(this))
-		);
-		if (result == false) {
-			return;
-		}
-		PolicyFactory(config().policyFactory()).convergePolicy(address(this));
-		_votingEndBlockNumber = 0;
-	}
-
 	function setVotingEndBlockNumber() private {
 		if (config().policy() == address(0)) {
 			return;

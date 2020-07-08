@@ -26,4 +26,12 @@ contract IMarket {
 	function schema() external view returns (string memory);
 
 	function behavior() external view returns (address);
+
+	function enabled() external view returns (bool);
+
+	function votingEndBlockNumber() external view returns (uint256);
+
+	function toEnable() external;
+
+	// TODO 他のやつもやる
 }

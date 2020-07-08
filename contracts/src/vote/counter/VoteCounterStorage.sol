@@ -1,58 +1,46 @@
 pragma solidity ^0.5.0;
 
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
+
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
-contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
+contract VoteCounterStorage is UsingStorage {
 	// Already Vote Flg
-	function setAlreadyVoteFlg(
+	function setStorageAlreadyVoteFlg(
 		address _user,
-		address _sender,
-		address _property
-	) external {
-		addressValidator().validateAddress(msg.sender, config().voteCounter());
-
-		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
+		address _target
+	) internal {
+		bytes32 alreadyVoteKey = getStorageAlreadyVoteKey(_user, _target);
 		return eternalStorage().setBool(alreadyVoteKey, true);
 	}
 
-	function getAlreadyVoteFlg(
+	function getStorageAlreadyVoteFlg(
 		address _user,
-		address _sender,
-		address _property
-	) external view returns (bool) {
-		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
+		address _target
+	) public view returns (bool) {
+		bytes32 alreadyVoteKey = getStorageAlreadyVoteKey(_user, _target);
 		return eternalStorage().getBool(alreadyVoteKey);
 	}
 
-	function getAlreadyVoteKey(
+	function getStorageAlreadyVoteKey(
 		address _sender,
-		address _target,
-		address _property
+		address _target
 	) private pure returns (bytes32) {
 		return
 			keccak256(
-				abi.encodePacked("_alreadyVote", _sender, _target, _property)
+				abi.encodePacked("_alreadyVote", _sender, _target)
 			);
 	}
 
 	// Agree Count
-	function getAgreeCount(address _sender) external view returns (uint256) {
-		return eternalStorage().getUint(getAgreeVoteCountKey(_sender));
+	function setStorageAgreeCount(address _sender, uint256 count) internal {
+		eternalStorage().setUint(getStorageAgreeVoteCountKey(_sender), count);
 	}
 
-	function setAgreeCount(address _sender, uint256 count) external {
-		addressValidator().validateAddress(msg.sender, config().voteCounter());
-
-		eternalStorage().setUint(getAgreeVoteCountKey(_sender), count);
+	function getStorageAgreeCount(address _sender) public view returns (uint256) {
+		return eternalStorage().getUint(getStorageAgreeVoteCountKey(_sender));
 	}
 
-	function getAgreeVoteCountKey(address _sender)
+	function getStorageAgreeVoteCountKey(address _sender)
 		private
 		pure
 		returns (bytes32)
@@ -61,17 +49,15 @@ contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 
 	// Opposite Count
-	function getOppositeCount(address _sender) external view returns (uint256) {
-		return eternalStorage().getUint(getOppositeVoteCountKey(_sender));
+	function setStorageOppositeCount(address _sender, uint256 count) internal {
+		eternalStorage().setUint(getStorageOppositeVoteCountKey(_sender), count);
 	}
 
-	function setOppositeCount(address _sender, uint256 count) external {
-		addressValidator().validateAddress(msg.sender, config().voteCounter());
-
-		eternalStorage().setUint(getOppositeVoteCountKey(_sender), count);
+	function getStorageOppositeCount(address _sender) public view returns (uint256) {
+		return eternalStorage().getUint(getStorageOppositeVoteCountKey(_sender));
 	}
 
-	function getOppositeVoteCountKey(address _sender)
+	function getStorageOppositeVoteCountKey(address _sender)
 		private
 		pure
 		returns (bytes32)
