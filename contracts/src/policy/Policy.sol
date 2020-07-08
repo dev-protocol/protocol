@@ -4,7 +4,6 @@ import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
 import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {PolicyFactory} from "contracts/src/policy/PolicyFactory.sol";

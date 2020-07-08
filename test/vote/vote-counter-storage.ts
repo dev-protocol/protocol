@@ -1,5 +1,5 @@
-import {DevProtocolInstance} from '../../test-lib/instance'
-import {validateAddressErrorMessage} from '../../test-lib/utils/error'
+import {DevProtocolInstance} from '../test-lib/instance'
+import {validateAddressErrorMessage} from '../test-lib/utils/error'
 
 contract(
 	'VoteCounterStorageTest',

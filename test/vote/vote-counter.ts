@@ -1,10 +1,10 @@
-import {DevProtocolInstance} from '../../test-lib/instance'
-import {getPropertyAddress} from '../../test-lib/utils/log'
+import {DevProtocolInstance} from '../test-lib/instance'
+import {getPropertyAddress} from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 	validatePauseErrorMessage,
-} from '../../test-lib/utils/error'
+} from '../test-lib/utils/error'
 
 contract(
 	'VoteCounterTest',

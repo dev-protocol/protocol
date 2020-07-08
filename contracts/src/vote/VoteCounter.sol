@@ -3,15 +3,12 @@ pragma solidity ^0.5.0;
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {
-	VoteCounterStorage
-} from "contracts/src/vote/counter/VoteCounterStorage.sol";
+import {VoteCounterStorage} from "contracts/src/vote/VoteCounterStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {IProperty} from "contracts/src/property/IProperty.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
-import {IVoteCounter} from "contracts/src/vote/counter/IVoteCounter.sol";
-// prettier-ignore
+import {IVoteCounter} from "contracts/src/vote/IVoteCounter.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
