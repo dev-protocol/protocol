@@ -4,9 +4,11 @@ import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
-import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
+import {IGroup} from "contracts/src/common/interface/IGroup.sol";
+import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
+import {IMetricsFactory} from "contracts/src/metrics/IMetricsFactory.sol";
 
-contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
+contract MetricsFactory is Pausable, UsingConfig, UsingValidator, IMetricsFactory {
 	event Create(address indexed _from, address _metrics);
 	event Destroy(address indexed _from, address _metrics);
 
@@ -18,7 +20,7 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 		addressValidator().validateGroup(msg.sender, config().marketGroup());
 
 		Metrics metrics = new Metrics(msg.sender, _property);
-		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
+		IGroup metricsGroup = IGroup(config().metricsGroup());
 		address metricsAddress = address(metrics);
 		metricsGroup.addGroup(metricsAddress);
 		emit Create(msg.sender, metricsAddress);
@@ -28,12 +30,12 @@ contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
 	function destroy(address _metrics) external {
 		require(paused() == false, "You cannot use that");
 
-		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
+		IGroup metricsGroup = IGroup(config().metricsGroup());
 		require(metricsGroup.isGroup(_metrics), "address is not metrics");
 		addressValidator().validateGroup(msg.sender, config().marketGroup());
 		Metrics metrics = Metrics(_metrics);
 		addressValidator().validateAddress(msg.sender, metrics.market());
-		metricsGroup.removeGroup(_metrics);
+		IMetricsGroup(config().metricsGroup()).removeGroup(_metrics);
 		emit Destroy(msg.sender, _metrics);
 	}
 }

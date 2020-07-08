@@ -32,6 +32,4 @@ contract IMarket {
 	function votingEndBlockNumber() external view returns (uint256);
 
 	function toEnable() external;
-
-	// TODO 他のやつもやる
 }

@@ -5,7 +5,7 @@ import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.s
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {Property} from "contracts/src/property/Property.sol";
+import {IProperty} from "contracts/src/property/IProperty.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
@@ -63,7 +63,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 lockedUpValue = getStorageValue(_property, msg.sender);
 		require(lockedUpValue != 0, "dev token is not locked");
 		updatePendingInterestWithdrawal(_property, msg.sender);
-		Property(_property).withdraw(msg.sender, lockedUpValue);
+		IProperty(_property).withdraw(msg.sender, lockedUpValue);
 		updateValues(false, msg.sender, _property, lockedUpValue);
 		setStorageValue(_property, msg.sender, 0);
 		setStorageWithdrawalStatus(_property, msg.sender, 0);
