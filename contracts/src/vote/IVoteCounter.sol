@@ -26,4 +26,6 @@ contract IVoteCounter {
 		public
 		view
 		returns (uint256);
+
+	function getVoteCount(address property) external view returns (uint256);
 }
