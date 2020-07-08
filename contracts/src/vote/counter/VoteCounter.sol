@@ -3,7 +3,9 @@ pragma solidity ^0.5.0;
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {VoteCounterStorage} from "contracts/src/vote/counter/VoteCounterStorage.sol";
+import {
+	VoteCounterStorage
+} from "contracts/src/vote/counter/VoteCounterStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {IProperty} from "contracts/src/property/IProperty.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
@@ -13,21 +15,29 @@ import {IVoteCounter} from "contracts/src/vote/counter/IVoteCounter.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
-contract VoteCounter is IVoteCounter, UsingConfig, UsingValidator, VoteCounterStorage {
+contract VoteCounter is
+	IVoteCounter,
+	UsingConfig,
+	UsingValidator,
+	VoteCounterStorage
+{
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-
-	function voteMarket(address _target, address[] calldata _properties, bool _agree) external {
-		addressValidator().validateGroup(
-			_target,
-			config().marketGroup()
-		);
+	function voteMarket(
+		address _target,
+		address[] calldata _properties,
+		bool _agree
+	) external {
+		addressValidator().validateGroup(_target, config().marketGroup());
 		IMarket market = IMarket(_target);
 		require(market.enabled() == false, "market is already enabled");
-		require(block.number <= market.votingEndBlockNumber(), "voting deadline is over");
+		require(
+			block.number <= market.votingEndBlockNumber(),
+			"voting deadline is over"
+		);
 		vote(_target, _properties, _agree);
 		bool result = Policy(config().policy()).marketApproval(
 			getStorageAgreeCount(_target),
@@ -39,11 +49,12 @@ contract VoteCounter is IVoteCounter, UsingConfig, UsingValidator, VoteCounterSt
 		market.toEnable();
 	}
 
-	function votePolicy(address _target, address[] calldata _properties, bool _agree) external {
-		addressValidator().validateGroup(
-			_target,
-			config().policyGroup()
-		);
+	function votePolicy(
+		address _target,
+		address[] calldata _properties,
+		bool _agree
+	) external {
+		addressValidator().validateGroup(_target, config().policyGroup());
 		require(config().policy() != _target, "this policy is current");
 		Policy policy = Policy(_target);
 		require(policy.voting(), "voting deadline is over");
@@ -59,11 +70,12 @@ contract VoteCounter is IVoteCounter, UsingConfig, UsingValidator, VoteCounterSt
 	}
 
 	// TODO アドレスを渡せば渡すほどガス代が多くなるか確認する
-	function vote(address _target, address[] memory _properties, bool _agree) private {
-		bool alreadyVote = getStorageAlreadyVoteFlg(
-			msg.sender,
-			_target
-		);
+	function vote(
+		address _target,
+		address[] memory _properties,
+		bool _agree
+	) private {
+		bool alreadyVote = getStorageAlreadyVoteFlg(msg.sender, _target);
 		require(alreadyVote == false, "already vote");
 		uint256 count = getAllPropertyVoteCount(_properties);
 		require(count != 0, "vote count is 0");
@@ -75,35 +87,45 @@ contract VoteCounter is IVoteCounter, UsingConfig, UsingValidator, VoteCounterSt
 		}
 	}
 
-	function getTargetAllVoteCount(address _target) external view returns (uint256) {
-		return getStorageAgreeCount(_target).add(getStorageOppositeCount(_target));
+	function getTargetAllVoteCount(address _target)
+		external
+		view
+		returns (uint256)
+	{
+		return
+			getStorageAgreeCount(_target).add(getStorageOppositeCount(_target));
 	}
 
 	function isAlreadyVote(address _target) external view returns (bool) {
-		return getStorageAlreadyVoteFlg(
-			msg.sender,
-			_target
-		);
+		return getStorageAlreadyVoteFlg(msg.sender, _target);
 	}
 
 	function getAllPropertyVoteCount(address[] memory _properties)
-		public view
+		public
+		view
 		returns (uint256)
 	{
 		uint256 count = 0;
-		for (uint i = 0; i < _properties.length; i++) {
+		for (uint256 i = 0; i < _properties.length; i++) {
 			uint256 tmp = getVoteCountByProperty(msg.sender, _properties[i]);
 			count.add(tmp);
 		}
 		return count;
 	}
 
-	function getVoteCount(address property) external view  returns (uint256){
+	function getVoteCount(address property) external view returns (uint256) {
 		return getVoteCountByProperty(msg.sender, property);
 	}
 
-	function getVoteCountByProperty(address _sender, address property) private view returns (uint256){
-		require(_sender == IProperty(property).author(), "illegal property address");
+	function getVoteCountByProperty(address _sender, address property)
+		private
+		view
+		returns (uint256)
+	{
+		require(
+			_sender == IProperty(property).author(),
+			"illegal property address"
+		);
 		return ILockup(config().lockup()).getValue(property, _sender);
 	}
 

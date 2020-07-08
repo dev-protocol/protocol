@@ -9,7 +9,13 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {IProperty} from "contracts/src/property/IProperty.sol";
 
-contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator, IProperty {
+contract Property is
+	ERC20,
+	ERC20Detailed,
+	UsingConfig,
+	UsingValidator,
+	IProperty
+{
 	using SafeMath for uint256;
 	uint8 private constant _property_decimals = 18;
 	uint256 private constant _supply = 10000000000000000000000000;

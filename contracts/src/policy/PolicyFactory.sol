@@ -8,7 +8,12 @@ import {PolicySet} from "contracts/src/policy/PolicySet.sol";
 import {PolicyGroup} from "contracts/src/policy/PolicyGroup.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
-contract PolicyFactory is Pausable, UsingConfig, UsingValidator, IPolicyFactory {
+contract PolicyFactory is
+	Pausable,
+	UsingConfig,
+	UsingValidator,
+	IPolicyFactory
+{
 	event Create(address indexed _from, address _policy, address _innerPolicy);
 
 	// solium-disable-next-line no-empty-blocks
