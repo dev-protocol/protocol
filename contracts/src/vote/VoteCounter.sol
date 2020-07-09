@@ -57,14 +57,22 @@ contract VoteCounter is
 		require(config().policy() != _target, "this policy is current");
 		IPolicyFactory policyfactory = IPolicyFactory(config().policyFactory());
 		uint256 votingGroupIndex = policyfactory.getVotingGroupIndex();
-		bool alreadyVote = getStorageAlreadyUsePropertyFlg(msg.sender, _property, votingGroupIndex);
+		bool alreadyVote = getStorageAlreadyUsePropertyFlg(
+			msg.sender,
+			_property,
+			votingGroupIndex
+		);
 		require(alreadyVote == false, "already use property");
 		Policy policy = Policy(_target);
 		require(policy.voting(), "voting deadline is over");
 		uint256 count = getVoteCountByProperty(msg.sender, _property);
 		require(count != 0, "vote count is 0");
 		vote(_target, count, _agree);
-		setStorageAlreadyUsePropertyFlg(msg.sender, _property, votingGroupIndex);
+		setStorageAlreadyUsePropertyFlg(
+			msg.sender,
+			_property,
+			votingGroupIndex
+		);
 		bool result = Policy(config().policy()).policyApproval(
 			getStorageAgreeCount(_target),
 			getStorageOppositeCount(_target)
