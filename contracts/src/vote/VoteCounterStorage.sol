@@ -18,12 +18,35 @@ contract VoteCounterStorage is UsingStorage {
 		return eternalStorage().getBool(alreadyVoteKey);
 	}
 
-	function getStorageAlreadyVoteKey(address _sender, address _target)
+	function getStorageAlreadyVoteKey(address _user, address _target)
 		private
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_alreadyVote", _sender, _target));
+		return keccak256(abi.encodePacked("_alreadyVote", _user, _target));
+	}
+
+	// Already Vote Flg
+	function setStorageAlreadyUsePropertyFlg(address _user, address _property, uint256 _votingGroupIndex) internal {
+		bytes32 key = getStorageAlreadyUsePropertyKey(_user, _property, _votingGroupIndex);
+		return eternalStorage().setBool(key, true);
+	}
+
+	function getStorageAlreadyUsePropertyFlg(address _user, address _property, uint256 _votingGroupIndex)
+		public
+		view
+		returns (bool)
+	{
+		bytes32 key = getStorageAlreadyUsePropertyKey(_user, _property, _votingGroupIndex);
+		return eternalStorage().getBool(key);
+	}
+
+	function getStorageAlreadyUsePropertyKey(address _user, address _property, uint256 _votingGroupIndex)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_alreadyUseProperty", _user, _property, _votingGroupIndex));
 	}
 
 	// Agree Count

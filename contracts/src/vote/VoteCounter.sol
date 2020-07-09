@@ -35,7 +35,9 @@ contract VoteCounter is
 			block.number <= market.votingEndBlockNumber(),
 			"voting deadline is over"
 		);
-		vote(_target, _properties, _agree);
+		uint256 count = getAllPropertyVoteCount(_properties);
+		require(count != 0, "vote count is 0");
+		vote(_target, count, _agree);
 		bool result = Policy(config().policy()).marketApproval(
 			getStorageAgreeCount(_target),
 			getStorageOppositeCount(_target)
@@ -48,14 +50,21 @@ contract VoteCounter is
 
 	function votePolicy(
 		address _target,
-		address[] calldata _properties,
+		address _property,
 		bool _agree
 	) external {
 		addressValidator().validateGroup(_target, config().policyGroup());
 		require(config().policy() != _target, "this policy is current");
+		IPolicyFactory policyfactory = IPolicyFactory(config().policyFactory());
+		uint256 votingGroupIndex = policyfactory.getVotingGroupIndex();
+		bool alreadyVote = getStorageAlreadyUsePropertyFlg(msg.sender, _property, votingGroupIndex);
+		require(alreadyVote == false, "already use property");
 		Policy policy = Policy(_target);
 		require(policy.voting(), "voting deadline is over");
-		vote(_target, _properties, _agree);
+		uint256 count = getVoteCountByProperty(msg.sender, _property);
+		require(count != 0, "vote count is 0");
+		vote(_target, count, _agree);
+		setStorageAlreadyUsePropertyFlg(msg.sender, _property, votingGroupIndex);
 		bool result = Policy(config().policy()).policyApproval(
 			getStorageAgreeCount(_target),
 			getStorageOppositeCount(_target)
@@ -63,19 +72,17 @@ contract VoteCounter is
 		if (result == false) {
 			return;
 		}
-		IPolicyFactory(config().policyFactory()).convergePolicy(_target);
+		policyfactory.convergePolicy(_target);
 	}
 
 	// TODO アドレスを渡せば渡すほどガス代が多くなるか確認する
 	function vote(
 		address _target,
-		address[] memory _properties,
+		uint256 count,
 		bool _agree
 	) private {
 		bool alreadyVote = getStorageAlreadyVoteFlg(msg.sender, _target);
 		require(alreadyVote == false, "already vote");
-		uint256 count = getAllPropertyVoteCount(_properties);
-		require(count != 0, "vote count is 0");
 		setStorageAlreadyVoteFlg(msg.sender, _target);
 		if (_agree) {
 			addAgreeCount(_target, count);

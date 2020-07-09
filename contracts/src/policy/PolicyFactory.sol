@@ -4,8 +4,9 @@ import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
-import {PolicySet} from "contracts/src/policy/PolicySet.sol";
-import {PolicyGroup} from "contracts/src/policy/PolicyGroup.sol";
+import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
+import {IPolicySet} from "contracts/src/policy/IPolicySet.sol";
+import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
 contract PolicyFactory is
@@ -29,9 +30,9 @@ contract PolicyFactory is
 		if (config().policy() == address(0)) {
 			config().setPolicy(policyAddress);
 		}
-		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
+		IGroup policyGroup = IGroup(config().policyGroup());
 		policyGroup.addGroup(policyAddress);
-		PolicySet policySet = PolicySet(config().policySet());
+		IPolicySet policySet = IPolicySet(config().policySet());
 		policySet.addSet(policyAddress);
 		return policyAddress;
 	}
@@ -40,8 +41,8 @@ contract PolicyFactory is
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
 		config().setPolicy(_currentPolicyAddress);
-		PolicySet policySet = PolicySet(config().policySet());
-		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
+		IPolicySet policySet = IPolicySet(config().policySet());
+		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		for (uint256 i = 0; i < policySet.count(); i++) {
 			address policyAddress = policySet.get(i);
 			if (policyAddress == _currentPolicyAddress) {
@@ -52,5 +53,11 @@ contract PolicyFactory is
 		}
 		policySet.deleteAll();
 		policySet.addSet(_currentPolicyAddress);
+		policySet.incrementVotingGroupIndex();
+	}
+
+	function getVotingGroupIndex() external view returns (uint256) {
+		IPolicySet policySet = IPolicySet(config().policySet());
+		return policySet.getVotingGroupIndex();
 	}
 }
