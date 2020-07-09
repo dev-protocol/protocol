@@ -65,7 +65,10 @@ contract VoteCounter is
 		require(alreadyVote == false, "already use property");
 		Policy policy = Policy(_target);
 		require(policy.voting(), "voting deadline is over");
-		uint256 count = ILockup(config().lockup()).getValue(_property, msg.sender);
+		uint256 count = ILockup(config().lockup()).getValue(
+			_property,
+			msg.sender
+		);
 		require(count != 0, "vote count is 0");
 		vote(_target, count, _agree);
 		setStorageAlreadyUsePropertyFlg(
@@ -118,7 +121,10 @@ contract VoteCounter is
 	{
 		uint256 count = 0;
 		for (uint256 i = 0; i < _properties.length; i++) {
-			uint256 tmp = ILockup(config().lockup()).getValue(_properties[i], msg.sender);
+			uint256 tmp = ILockup(config().lockup()).getValue(
+				_properties[i],
+				msg.sender
+			);
 			count.add(tmp);
 		}
 		return count;
