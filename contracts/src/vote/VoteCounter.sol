@@ -5,7 +5,6 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {VoteCounterStorage} from "contracts/src/vote/VoteCounterStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
-import {IProperty} from "contracts/src/property/IProperty.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {IVoteCounter} from "contracts/src/vote/IVoteCounter.sol";
@@ -23,6 +22,7 @@ contract VoteCounter is
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	// TODO アドレスを渡せば渡すほどガス代が多くなるか確認する
 	function voteMarket(
 		address _target,
 		address[] calldata _properties,
@@ -65,7 +65,7 @@ contract VoteCounter is
 		require(alreadyVote == false, "already use property");
 		Policy policy = Policy(_target);
 		require(policy.voting(), "voting deadline is over");
-		uint256 count = getVoteCountByProperty(msg.sender, _property);
+		uint256 count = ILockup(config().lockup()).getValue(_property, msg.sender);
 		require(count != 0, "vote count is 0");
 		vote(_target, count, _agree);
 		setStorageAlreadyUsePropertyFlg(
@@ -83,7 +83,6 @@ contract VoteCounter is
 		policyfactory.convergePolicy(_target);
 	}
 
-	// TODO アドレスを渡せば渡すほどガス代が多くなるか確認する
 	function vote(
 		address _target,
 		uint256 count,
@@ -119,26 +118,14 @@ contract VoteCounter is
 	{
 		uint256 count = 0;
 		for (uint256 i = 0; i < _properties.length; i++) {
-			uint256 tmp = getVoteCountByProperty(msg.sender, _properties[i]);
+			uint256 tmp = ILockup(config().lockup()).getValue(_properties[i], msg.sender);
 			count.add(tmp);
 		}
 		return count;
 	}
 
 	function getVoteCount(address property) external view returns (uint256) {
-		return getVoteCountByProperty(msg.sender, property);
-	}
-
-	function getVoteCountByProperty(address _sender, address property)
-		private
-		view
-		returns (uint256)
-	{
-		require(
-			_sender == IProperty(property).author(),
-			"illegal property address"
-		);
-		return ILockup(config().lockup()).getValue(property, _sender);
+		return ILockup(config().lockup()).getValue(property, msg.sender);
 	}
 
 	function addAgreeCount(address _target, uint256 _voteCount) private {
