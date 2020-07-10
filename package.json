@@ -45,7 +45,7 @@
 		"husky": "4.2.5",
 		"prettier": "2.0.5",
 		"prettier-plugin-solidity": "1.0.0-alpha.54",
-		"rimraf": "^3.0.2",
+		"rimraf": "3.0.2",
 		"truffle": "5.1.34",
 		"truffle-typings": "1.0.8",
 		"ts-generator": "0.0.8",
