@@ -8,7 +8,10 @@ contract IVoteCounter {
 		// solium-disable-next-line indentation
 	) external;
 
-	function isAlreadyVoteMarket(address _target, address _property) external view returns (bool);
+	function isAlreadyVoteMarket(address _target, address _property)
+		external
+		view
+		returns (bool);
 
 	function votePolicy(
 		address _policy,
