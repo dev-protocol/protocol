@@ -42,12 +42,12 @@ contract VoteCounterStorage is UsingStorage {
 	function setStorageAlreadyUseProperty(
 		address _user,
 		address _property,
-		uint256 votingGroupIndex
+		uint256 _votingGroupIndex
 	) internal {
 		bytes32 key = getStorageAlreadyUsePropertyKey(
 			_user,
 			_property,
-			votingGroupIndex
+			_votingGroupIndex
 		);
 		eternalStorage().setBool(key, true);
 	}
@@ -55,12 +55,12 @@ contract VoteCounterStorage is UsingStorage {
 	function getStorageAlreadyUseProperty(
 		address _user,
 		address _property,
-		uint256 votingGroupIndex
+		uint256 _votingGroupIndex
 	) public view returns (bool) {
 		bytes32 key = getStorageAlreadyUsePropertyKey(
 			_user,
 			_property,
-			votingGroupIndex
+			_votingGroupIndex
 		);
 		return eternalStorage().getBool(key);
 	}
@@ -68,7 +68,7 @@ contract VoteCounterStorage is UsingStorage {
 	function getStorageAlreadyUsePropertyKey(
 		address _user,
 		address _property,
-		uint256 votingGroupIndex
+		uint256 _votingGroupIndex
 	) private pure returns (bytes32) {
 		return
 			keccak256(
@@ -76,7 +76,7 @@ contract VoteCounterStorage is UsingStorage {
 					"_alreadyUseProperty",
 					_user,
 					_property,
-					votingGroupIndex
+					_votingGroupIndex
 				)
 			);
 	}
@@ -85,12 +85,12 @@ contract VoteCounterStorage is UsingStorage {
 	function setStorageAlreadyVotePolicy(
 		address _user,
 		address _property,
-		uint256 votingGroupIndex
+		uint256 _votingGroupIndex
 	) internal {
 		bytes32 key = getStorageAlreadyVotePolicyKey(
 			_user,
 			_property,
-			votingGroupIndex
+			_votingGroupIndex
 		);
 		eternalStorage().setBool(key, true);
 	}
@@ -98,12 +98,12 @@ contract VoteCounterStorage is UsingStorage {
 	function getStorageAlreadyVotePolicy(
 		address _user,
 		address _property,
-		uint256 votingGroupIndex
+		uint256 _votingGroupIndex
 	) public view returns (bool) {
 		bytes32 key = getStorageAlreadyVotePolicyKey(
 			_user,
 			_property,
-			votingGroupIndex
+			_votingGroupIndex
 		);
 		return eternalStorage().getBool(key);
 	}
@@ -111,7 +111,7 @@ contract VoteCounterStorage is UsingStorage {
 	function getStorageAlreadyVotePolicyKey(
 		address _user,
 		address _property,
-		uint256 votingGroupIndex
+		uint256 _votingGroupIndex
 	) private pure returns (bytes32) {
 		return
 			keccak256(
@@ -119,7 +119,7 @@ contract VoteCounterStorage is UsingStorage {
 					"_alreadyVotePolicy",
 					_user,
 					_property,
-					votingGroupIndex
+					_votingGroupIndex
 				)
 			);
 	}

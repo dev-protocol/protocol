@@ -572,11 +572,3 @@
 // 		expect(agreeCount.toNumber()).to.be.equal(100)
 // 	})
 // })
-
-// voteCounterからMarket.enabledが実行できる
-// voteCounterからMarketのvoteができる
-// voteCounterからPolicyのvoteができる
-
-// Policyset円パン
-
-// votecounter全般
