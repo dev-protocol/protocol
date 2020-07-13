@@ -577,8 +577,6 @@
 // voteCounterからMarketのvoteができる
 // voteCounterからPolicyのvoteができる
 
-// policyFactory. getVotingGroupIndexのテスト
-
 // Policyset円パン
 
 // votecounter全般
