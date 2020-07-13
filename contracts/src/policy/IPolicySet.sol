@@ -5,8 +5,6 @@ contract IPolicySet {
 
 	function reset() external;
 
-	function deleteAll() external;
-
 	function count() external view returns (uint256);
 
 	function get(uint256 _index) external view returns (address);

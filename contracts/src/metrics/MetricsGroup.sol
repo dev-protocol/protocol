@@ -4,14 +4,12 @@ import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 
 contract MetricsGroup is
 	UsingConfig,
 	UsingStorage,
 	UsingValidator,
-	IGroup,
 	IMetricsGroup
 {
 	using SafeMath for uint256;

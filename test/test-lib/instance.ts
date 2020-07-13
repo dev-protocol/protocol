@@ -2,9 +2,6 @@ import {
 	AddressConfigInstance,
 	AllocatorInstance,
 	VoteCounterInstance,
-	VoteCounterStorageInstance,
-	VoteTimesInstance,
-	VoteTimesStorageInstance,
 	PropertyGroupInstance,
 	DevInstance,
 	LockupInstance,
@@ -34,9 +31,6 @@ export class DevProtocolInstance {
 	private _lockup!: LockupInstance
 	private _propertyFactory!: PropertyFactoryInstance
 	private _voteCounter!: VoteCounterInstance
-	private _voteCounterStorage!: VoteCounterStorageInstance
-	private _voteTimes!: VoteTimesInstance
-	private _voteTimesStorage!: VoteTimesStorageInstance
 	private _propertyGroup!: PropertyGroupInstance
 	private _policyFactory!: PolicyFactoryInstance
 	private _policySet!: PolicySetInstance
@@ -78,18 +72,6 @@ export class DevProtocolInstance {
 
 	public get voteCounter(): VoteCounterInstance {
 		return this._voteCounter
-	}
-
-	public get voteCounterStorage(): VoteCounterStorageInstance {
-		return this._voteCounterStorage
-	}
-
-	public get voteTimes(): VoteTimesInstance {
-		return this._voteTimes
-	}
-
-	public get voteTimesStorage(): VoteTimesStorageInstance {
-		return this._voteTimesStorage
 	}
 
 	public get propertyGroup(): PropertyGroupInstance {
@@ -187,41 +169,7 @@ export class DevProtocolInstance {
 			this._voteCounter.address,
 			this.fromDeployer
 		)
-	}
-
-	public async generateVoteCounterStorage(): Promise<void> {
-		this._voteCounterStorage = await contract('VoteCounterStorage').new(
-			this.addressConfig.address,
-			this.fromDeployer
-		)
-		await this._addressConfig.setVoteCounterStorage(
-			this._voteCounterStorage.address,
-			this.fromDeployer
-		)
-		await this._voteCounterStorage.createStorage(this.fromDeployer)
-	}
-
-	public async generateVoteTimes(): Promise<void> {
-		this._voteTimes = await contract('VoteTimes').new(
-			this.addressConfig.address,
-			this.fromDeployer
-		)
-		await this._addressConfig.setVoteTimes(
-			this._voteTimes.address,
-			this.fromDeployer
-		)
-	}
-
-	public async generateVoteTimesStorage(): Promise<void> {
-		this._voteTimesStorage = await contract('VoteTimesStorage').new(
-			this.addressConfig.address,
-			this.fromDeployer
-		)
-		await this._addressConfig.setVoteTimesStorage(
-			this._voteTimesStorage.address,
-			this.fromDeployer
-		)
-		await this._voteTimesStorage.createStorage(this.fromDeployer)
+		await this._voteCounter.createStorage(this.fromDeployer)
 	}
 
 	public async generatePropertyGroup(): Promise<void> {

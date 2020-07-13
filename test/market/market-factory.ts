@@ -1,13 +1,12 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {getMarketAddress} from '../test-lib/utils/log'
-import {getAbstentionTimes} from '../test-lib/utils/common'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 import {DEFAULT_ADDRESS} from '../test-lib/const'
 
-contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
+contract('MarketFactoryTest', ([deployer, user]) => {
 	const dev = new DevProtocolInstance(deployer)
 	const marketContract = artifacts.require('Market')
 	describe('MarketFactory; create', () => {
@@ -19,8 +18,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 				dev.generatePolicyGroup(),
 				dev.generatePolicySet(),
 				dev.generatePolicyFactory(),
-				dev.generateVoteTimes(),
-				dev.generateVoteTimesStorage(),
 				dev.generateMarketFactory(),
 				dev.generateMarketGroup(),
 			])
@@ -52,20 +49,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyProperty]) => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(marketAddress)
 			expect(await deployedMarket.enabled()).to.be.equal(true)
-		})
-		it('The maximum number of votes is incremented.', async () => {
-			let sub = await getAbstentionTimes(dev, dummyProperty)
-			expect(sub).to.be.equal(1)
-			const market = await dev.getMarket('MarketTest2', user)
-			const result = await dev.marketFactory.create(market.address, {
-				from: user,
-			})
-			sub = await getAbstentionTimes(dev, dummyProperty)
-			expect(sub).to.be.equal(2)
-			const tmpMarketAddress = getMarketAddress(result)
-			// eslint-disable-next-line @typescript-eslint/await-thenable
-			const deployedMarket = await marketContract.at(tmpMarketAddress)
-			expect(await deployedMarket.enabled()).to.be.equal(false)
 		})
 		it('An error occurs if the default address is specified.', async () => {
 			const result = await dev.marketFactory

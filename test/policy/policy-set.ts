@@ -48,7 +48,7 @@ contract(
 		})
 		describe('PolicySet; deleteAll', () => {
 			it('Can not get setted policy using index', async () => {
-				await dev.policySet.deleteAll({from: policyFactory})
+				await dev.policySet.reset({from: policyFactory})
 				let result = await dev.policySet.get(0)
 				expect(result).to.be.equal(DEFAULT_ADDRESS)
 				result = await dev.policySet.get(1)
@@ -56,7 +56,7 @@ contract(
 			})
 			it('Can not execute deleteAll without policyFactory address', async () => {
 				const result = await dev.policySet
-					.deleteAll({from: dummyPolicyFactory})
+					.reset({from: dummyPolicyFactory})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})

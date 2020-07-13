@@ -1,6 +1,5 @@
 import {DevProtocolInstance} from '../test-lib/instance'
 import {MarketInstance} from '../../types/truffle-contracts'
-import {mine} from '../test-lib/utils/common'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {watch} from '../test-lib/utils/event'
 import {
@@ -102,8 +101,6 @@ contract(
 					dev.generateMarketGroup(),
 					dev.generateMetricsFactory(),
 					dev.generateMetricsGroup(),
-					dev.generateVoteTimes(),
-					dev.generateVoteTimesStorage(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 					dev.generatePolicySet(),
@@ -294,132 +291,6 @@ contract(
 					})
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'not authenticated')
-			})
-		})
-
-		describe('Market; vote', () => {
-			const dev = new DevProtocolInstance(deployer)
-			let marketAddress: string
-			let propertyAddress: string
-			const iPolicyContract = artifacts.require('IPolicy')
-			beforeEach(async () => {
-				await dev.generateAddressConfig()
-				await Promise.all([
-					dev.generateMarketFactory(),
-					dev.generateMarketGroup(),
-					dev.generateVoteTimes(),
-					dev.generateVoteTimesStorage(),
-					dev.generatePolicyFactory(),
-					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
-					dev.generateVoteCounter(),
-					dev.generateVoteCounterStorage(),
-					dev.generatePropertyFactory(),
-					dev.generatePropertyGroup(),
-					dev.generateLockup(),
-					dev.generateDev(),
-					dev.generateWithdraw(),
-					dev.generateWithdrawStorage(),
-					dev.generateAllocator(),
-					dev.generateMetricsFactory(),
-					dev.generateMetricsGroup(),
-				])
-				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
-				await dev.policyFactory.create(iPolicyInstance.address)
-				const createMarketResult = await dev.marketFactory.create(behavuor)
-				marketAddress = getMarketAddress(createMarketResult)
-				const createPropertyResult = await dev.propertyFactory.create(
-					'test',
-					'TEST',
-					propertyAuther
-				)
-				propertyAddress = getPropertyAddress(createPropertyResult)
-				await dev.dev.mint(user, 10000, {from: deployer})
-			})
-
-			it('An error occurs if anything other than property address is specified.', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress)
-				const result = await marketInstance
-					.vote(deployer, true, {from: user})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
-			})
-			it('voting deadline is over.', async () => {
-				const createMarketResult = await dev.marketFactory.create(behavuor)
-				marketAddress = getMarketAddress(createMarketResult)
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const iPolicyInstance = await iPolicyContract.at(
-					await dev.addressConfig.policy()
-				)
-				const marketVotingBlocks = await iPolicyInstance.marketVotingBlocks()
-				await mine(marketVotingBlocks.toNumber())
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress)
-				const result = await marketInstance
-					.vote(propertyAddress, true)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'voting deadline is over')
-			})
-			it('Should fail to vote when already determined enabled.', async () => {
-				await dev.dev.deposit(propertyAddress, 10000, {from: user})
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress)
-				// Await marketInstance.vote(propertyAddress, true, {from: user})
-				expect(await marketInstance.enabled()).to.be.equal(true)
-				const result = await marketInstance
-					.vote(propertyAddress, true, {from: user})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'market is already enabled')
-			})
-
-			it('If you specify true, it becomes a valid vote.', async () => {
-				const createMarketResult = await dev.marketFactory.create(behavuor)
-				marketAddress = getMarketAddress(createMarketResult)
-				await dev.dev.deposit(propertyAddress, 10000, {from: user})
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress)
-				await marketInstance.vote(propertyAddress, true, {from: user})
-				const agreeCount = await dev.voteCounter.getAgreeCount(marketAddress)
-				const oppositeCount = await dev.voteCounter.getOppositeCount(
-					marketAddress
-				)
-				expect(agreeCount.toNumber()).to.be.equal(10000)
-				expect(oppositeCount.toNumber()).to.be.equal(0)
-			})
-
-			it('If false is specified, it becomes an invalid vote.', async () => {
-				const createMarketResult = await dev.marketFactory.create(behavuor)
-				marketAddress = getMarketAddress(createMarketResult)
-				await dev.dev.deposit(propertyAddress, 10000, {from: user})
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress)
-				await marketInstance.vote(propertyAddress, false, {from: user})
-				const agreeCount = await dev.voteCounter.getAgreeCount(marketAddress)
-				const oppositeCount = await dev.voteCounter.getOppositeCount(
-					marketAddress
-				)
-				expect(agreeCount.toNumber()).to.be.equal(0)
-				expect(oppositeCount.toNumber()).to.be.equal(10000)
-			})
-
-			it('If the number of valid votes is not enough, it remains invalid.', async () => {
-				const createMarketResult = await dev.marketFactory.create(behavuor)
-				marketAddress = getMarketAddress(createMarketResult)
-				await dev.dev.deposit(propertyAddress, 9000, {from: user})
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress)
-				await marketInstance.vote(propertyAddress, true, {from: user})
-				expect(await marketInstance.enabled()).to.be.equal(false)
-			})
-			it('Becomes valid when the number of valid votes exceeds the specified number.', async () => {
-				const createMarketResult = await dev.marketFactory.create(behavuor)
-				marketAddress = getMarketAddress(createMarketResult)
-				await dev.dev.deposit(propertyAddress, 10000, {from: user})
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				const marketInstance = await marketContract.at(marketAddress)
-				await marketInstance.vote(propertyAddress, true, {from: user})
-				expect(await marketInstance.enabled()).to.be.equal(true)
 			})
 		})
 	}

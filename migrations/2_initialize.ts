@@ -40,9 +40,6 @@ const handler = function (deployer, network) {
 
 	// Vote
 	deployer.deploy(artifacts.require('VoteCounter'), address)
-	deployer.deploy(artifacts.require('VoteCounterStorage'), address)
-	deployer.deploy(artifacts.require('VoteTimes'), address)
-	deployer.deploy(artifacts.require('VoteTimesStorage'), address)
 
 	// Withdraw
 	deployer.link(decimals, artifacts.require('Withdraw'))

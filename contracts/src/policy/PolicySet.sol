@@ -40,13 +40,6 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, IPolicySet {
 		incrementVotingGroupIndex();
 	}
 
-	function incrementVotingGroupIndex() private {
-		bytes32 key = getVotingGroupIndexKey();
-		uint256 idx = eternalStorage().getUint(key);
-		idx++;
-		eternalStorage().setUint(key, idx);
-	}
-
 	function count() external view returns (uint256) {
 		return eternalStorage().getUint(getPlicySetIndexKey());
 	}
@@ -59,6 +52,13 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, IPolicySet {
 	function getVotingGroupIndex() external view returns (uint256) {
 		bytes32 key = getVotingGroupIndexKey();
 		return eternalStorage().getUint(key);
+	}
+
+	function incrementVotingGroupIndex() private {
+		bytes32 key = getVotingGroupIndexKey();
+		uint256 idx = eternalStorage().getUint(key);
+		idx++;
+		eternalStorage().setUint(key, idx);
 	}
 
 	function getVotingGroupIndexKey() private pure returns (bytes32) {

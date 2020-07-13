@@ -6,7 +6,6 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
 import {IPolicySet} from "contracts/src/policy/IPolicySet.sol";
-import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
 contract PolicyFactory is
@@ -30,7 +29,7 @@ contract PolicyFactory is
 		if (config().policy() == address(0)) {
 			config().setPolicy(policyAddress);
 		}
-		IGroup policyGroup = IGroup(config().policyGroup());
+		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		policyGroup.addGroup(policyAddress);
 		IPolicySet policySet = IPolicySet(config().policySet());
 		policySet.addSet(policyAddress);

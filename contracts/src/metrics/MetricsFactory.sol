@@ -4,7 +4,6 @@ import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
-import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 import {IMetricsFactory} from "contracts/src/metrics/IMetricsFactory.sol";
 
@@ -25,7 +24,7 @@ contract MetricsFactory is
 		addressValidator().validateGroup(msg.sender, config().marketGroup());
 
 		Metrics metrics = new Metrics(msg.sender, _property);
-		IGroup metricsGroup = IGroup(config().metricsGroup());
+		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
 		address metricsAddress = address(metrics);
 		metricsGroup.addGroup(metricsAddress);
 		emit Create(msg.sender, metricsAddress);
@@ -35,7 +34,7 @@ contract MetricsFactory is
 	function destroy(address _metrics) external {
 		require(paused() == false, "You cannot use that");
 
-		IGroup metricsGroup = IGroup(config().metricsGroup());
+		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
 		require(metricsGroup.isGroup(_metrics), "address is not metrics");
 		addressValidator().validateGroup(msg.sender, config().marketGroup());
 		Metrics metrics = Metrics(_metrics);

@@ -61,9 +61,10 @@ async function vote(
 			marketAddresses[marketIndex],
 			artifacts
 		)
-		await market.vote(addressInfo[0].property!, true, {
-			from: addressInfo[0].account,
-		})
+		// TODO vote counter
+		// await market.vote(addressInfo[0].property!, true, {
+		// 	from: addressInfo[0].account,
+		// })
 		const result = await market.enabled()
 		console.log(
 			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
