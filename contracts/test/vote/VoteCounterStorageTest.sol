@@ -2,7 +2,6 @@ pragma solidity ^0.5.0;
 
 import {VoteCounterStorage} from "contracts/src/vote/VoteCounterStorage.sol";
 
-
 contract VoteCounterStorageTest is VoteCounterStorage {
 	function setStorageAlreadyVoteMarketTest(
 		address _user,
@@ -41,7 +40,9 @@ contract VoteCounterStorageTest is VoteCounterStorage {
 		setStorageAgreeCount(_target, count);
 	}
 
-	function setStorageOppositeCountTest(address _target, uint256 count) external {
+	function setStorageOppositeCountTest(address _target, uint256 count)
+		external
+	{
 		setStorageOppositeCount(_target, count);
 	}
 }
