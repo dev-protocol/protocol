@@ -4,95 +4,155 @@ import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
 contract VoteCounterStorage is UsingStorage {
 	// Already Vote Market
-	function setStorageAlreadyVoteMarket(address _user, address _market, address _property) internal {
+	function setStorageAlreadyVoteMarket(
+		address _user,
+		address _market,
+		address _property
+	) internal {
 		bytes32 key = getStorageAlreadyVoteMarketKey(_user, _market, _property);
 		eternalStorage().setBool(key, true);
 	}
 
-	function getStorageAlreadyVoteMarket(address _user, address _market, address _property)
-		public
-		view
-		returns (bool)
-	{
+	function getStorageAlreadyVoteMarket(
+		address _user,
+		address _market,
+		address _property
+	) public view returns (bool) {
 		bytes32 key = getStorageAlreadyVoteMarketKey(_user, _market, _property);
 		return eternalStorage().getBool(key);
 	}
 
-	function getStorageAlreadyVoteMarketKey(address _user, address _market, address _property)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_alreadyVoteMarket", _user, _market, _property));
+	function getStorageAlreadyVoteMarketKey(
+		address _user,
+		address _market,
+		address _property
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_alreadyVoteMarket",
+					_user,
+					_market,
+					_property
+				)
+			);
 	}
 
 	// Already Use Property
-	function setStorageAlreadyUseProperty(address _user, address _property, uint256 votingGroupIndex) internal {
-		bytes32 key = getStorageAlreadyUsePropertyKey(_user, _property, votingGroupIndex);
+	function setStorageAlreadyUseProperty(
+		address _user,
+		address _property,
+		uint256 votingGroupIndex
+	) internal {
+		bytes32 key = getStorageAlreadyUsePropertyKey(
+			_user,
+			_property,
+			votingGroupIndex
+		);
 		eternalStorage().setBool(key, true);
 	}
 
-	function getStorageAlreadyUseProperty(address _user, address _property, uint256 votingGroupIndex)
-		public
-		view
-		returns (bool)
-	{
-		bytes32 key = getStorageAlreadyUsePropertyKey(_user, _property, votingGroupIndex);
+	function getStorageAlreadyUseProperty(
+		address _user,
+		address _property,
+		uint256 votingGroupIndex
+	) public view returns (bool) {
+		bytes32 key = getStorageAlreadyUsePropertyKey(
+			_user,
+			_property,
+			votingGroupIndex
+		);
 		return eternalStorage().getBool(key);
 	}
 
-	function getStorageAlreadyUsePropertyKey(address _user, address _property, uint256 votingGroupIndex)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_alreadyUseProperty", _user, _property, votingGroupIndex));
+	function getStorageAlreadyUsePropertyKey(
+		address _user,
+		address _property,
+		uint256 votingGroupIndex
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_alreadyUseProperty",
+					_user,
+					_property,
+					votingGroupIndex
+				)
+			);
 	}
 
 	// Already Vote Policy
-	function setStorageAlreadyVotePolicy(address _user, address _property, uint256 votingGroupIndex) internal {
-		bytes32 key = getStorageAlreadyVotePolicyKey(_user, _property, votingGroupIndex);
+	function setStorageAlreadyVotePolicy(
+		address _user,
+		address _property,
+		uint256 votingGroupIndex
+	) internal {
+		bytes32 key = getStorageAlreadyVotePolicyKey(
+			_user,
+			_property,
+			votingGroupIndex
+		);
 		eternalStorage().setBool(key, true);
 	}
 
-	function getStorageAlreadyVotePolicy(address _user, address _property, uint256 votingGroupIndex)
-		public
-		view
-		returns (bool)
-	{
-		bytes32 key = getStorageAlreadyVotePolicyKey(_user, _property, votingGroupIndex);
+	function getStorageAlreadyVotePolicy(
+		address _user,
+		address _property,
+		uint256 votingGroupIndex
+	) public view returns (bool) {
+		bytes32 key = getStorageAlreadyVotePolicyKey(
+			_user,
+			_property,
+			votingGroupIndex
+		);
 		return eternalStorage().getBool(key);
 	}
 
-	function getStorageAlreadyVotePolicyKey(address _user, address _property, uint256 votingGroupIndex)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_alreadyVotePolicy", _user, _property, votingGroupIndex));
+	function getStorageAlreadyVotePolicyKey(
+		address _user,
+		address _property,
+		uint256 votingGroupIndex
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_alreadyVotePolicy",
+					_user,
+					_property,
+					votingGroupIndex
+				)
+			);
 	}
 
 	// Policy Vote Count
-	function setStoragePolicyVoteCount(address _user, address _policy, bool _agree, uint256 _count) internal {
+	function setStoragePolicyVoteCount(
+		address _user,
+		address _policy,
+		bool _agree,
+		uint256 _count
+	) internal {
 		bytes32 key = getStoragePolicyVoteCountKey(_user, _policy, _agree);
 		eternalStorage().setUint(key, _count);
 	}
 
-	function getStoragePolicyVoteCount(address _user, address _policy, bool _agree)
-		public
-		view
-		returns (uint256)
-	{
+	function getStoragePolicyVoteCount(
+		address _user,
+		address _policy,
+		bool _agree
+	) public view returns (uint256) {
 		bytes32 key = getStoragePolicyVoteCountKey(_user, _policy, _agree);
 		return eternalStorage().getUint(key);
 	}
 
-	function getStoragePolicyVoteCountKey(address _user, address _policy, bool _agree)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_policyVoteCount", _user, _policy, _agree));
+	function getStoragePolicyVoteCountKey(
+		address _user,
+		address _policy,
+		bool _agree
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked("_policyVoteCount", _user, _policy, _agree)
+			);
 	}
 
 	// Agree Count

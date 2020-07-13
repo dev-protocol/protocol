@@ -35,9 +35,16 @@ contract VoteCounter is
 			block.number <= market.votingEndBlockNumber(),
 			"voting deadline is over"
 		);
-		uint256 count = ILockup(config().lockup()).getValue(_property, msg.sender);
+		uint256 count = ILockup(config().lockup()).getValue(
+			_property,
+			msg.sender
+		);
 		require(count != 0, "vote count is 0");
-		bool alreadyVote = getStorageAlreadyVoteMarket(msg.sender, _market, _property);
+		bool alreadyVote = getStorageAlreadyVoteMarket(
+			msg.sender,
+			_market,
+			_property
+		);
 		require(alreadyVote == false, "already vote");
 		vote(_market, count, _agree);
 		setStorageAlreadyVoteMarket(msg.sender, _market, _property);
@@ -51,7 +58,11 @@ contract VoteCounter is
 		market.toEnable();
 	}
 
-	function isAlreadyVoteMarket(address _target, address _property) external view returns (bool) {
+	function isAlreadyVoteMarket(address _target, address _property)
+		external
+		view
+		returns (bool)
+	{
 		return getStorageAlreadyVoteMarket(msg.sender, _target, _property);
 	}
 
@@ -85,22 +96,9 @@ contract VoteCounter is
 		);
 		require(count != 0, "vote count is 0");
 		vote(_policy, count, _agree);
-		setStorageAlreadyUseProperty(
-			msg.sender,
-			_property,
-			votingGroupIndex
-		);
-		setStorageAlreadyVotePolicy(
-			msg.sender,
-			_policy,
-			votingGroupIndex
-		);
-		setStoragePolicyVoteCount(
-			msg.sender,
-			_policy,
-			_agree,
-			count
-		);
+		setStorageAlreadyUseProperty(msg.sender, _property, votingGroupIndex);
+		setStorageAlreadyVotePolicy(msg.sender, _policy, votingGroupIndex);
+		setStoragePolicyVoteCount(msg.sender, _policy, _agree, count);
 		// どっちにしたかも記録する
 		bool result = Policy(config().policy()).policyApproval(
 			getStorageAgreeCount(_policy),
@@ -129,18 +127,10 @@ contract VoteCounter is
 		);
 		require(alreadyVote, "not vote policy");
 		bool agree = true;
-		uint256 count = getStoragePolicyVoteCount(
-			msg.sender,
-			_policy,
-			agree
-		);
-		if (count == 0){
+		uint256 count = getStoragePolicyVoteCount(msg.sender, _policy, agree);
+		if (count == 0) {
 			agree = false;
-			count = getStoragePolicyVoteCount(
-				msg.sender,
-				_policy,
-				agree
-			);
+			count = getStoragePolicyVoteCount(msg.sender, _policy, agree);
 			require(count != 0, "not vote policy");
 		}
 		cancelVote(_policy, count, agree);
