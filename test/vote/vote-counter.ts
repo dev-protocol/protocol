@@ -572,3 +572,13 @@
 // 		expect(agreeCount.toNumber()).to.be.equal(100)
 // 	})
 // })
+
+// voteCounterからMarket.enabledが実行できる
+// voteCounterからMarketのvoteができる
+// voteCounterからPolicyのvoteができる
+
+// policyFactory. getVotingGroupIndexのテスト
+
+// Policyset円パン
+
+// votecounter全般
