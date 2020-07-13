@@ -3,9 +3,9 @@ pragma solidity ^0.5.0;
 contract IPolicySet {
 	function addSet(address _addr) external;
 
-	function deleteAll() external;
+	function reset() external;
 
-	function incrementVotingGroupIndex() external;
+	function deleteAll() external;
 
 	function count() external view returns (uint256);
 

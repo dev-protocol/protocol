@@ -24,23 +24,26 @@ contract VoteCounter is
 
 	// TODO アドレスを渡せば渡すほどガス代が多くなるか確認する
 	function voteMarket(
-		address _target,
-		address[] calldata _properties,
+		address _market,
+		address _property,
 		bool _agree
 	) external {
-		addressValidator().validateGroup(_target, config().marketGroup());
-		IMarket market = IMarket(_target);
+		addressValidator().validateGroup(_market, config().marketGroup());
+		IMarket market = IMarket(_market);
 		require(market.enabled() == false, "market is already enabled");
 		require(
 			block.number <= market.votingEndBlockNumber(),
 			"voting deadline is over"
 		);
-		uint256 count = getAllPropertyVoteCount(_properties);
+		uint256 count = ILockup(config().lockup()).getValue(_property, msg.sender);
 		require(count != 0, "vote count is 0");
-		vote(_target, count, _agree);
+		bool alreadyVote = getStorageAlreadyVoteMarket(msg.sender, _market, _property);
+		require(alreadyVote == false, "already vote");
+		vote(_market, count, _agree);
+		setStorageAlreadyVoteMarket(msg.sender, _market, _property);
 		bool result = Policy(config().policy()).marketApproval(
-			getStorageAgreeCount(_target),
-			getStorageOppositeCount(_target)
+			getStorageAgreeCount(_market),
+			getStorageOppositeCount(_market)
 		);
 		if (result == false) {
 			return;
@@ -48,42 +51,99 @@ contract VoteCounter is
 		market.toEnable();
 	}
 
+	function isAlreadyVoteMarket(address _target, address _property) external view returns (bool) {
+		return getStorageAlreadyVoteMarket(msg.sender, _target, _property);
+	}
+
 	function votePolicy(
-		address _target,
+		address _policy,
 		address _property,
 		bool _agree
 	) external {
-		addressValidator().validateGroup(_target, config().policyGroup());
-		require(config().policy() != _target, "this policy is current");
+		addressValidator().validateGroup(_policy, config().policyGroup());
+		require(config().policy() != _policy, "this policy is current");
+		Policy policy = Policy(_policy);
+		require(policy.voting(), "voting deadline is over");
 		IPolicyFactory policyfactory = IPolicyFactory(config().policyFactory());
 		uint256 votingGroupIndex = policyfactory.getVotingGroupIndex();
-		bool alreadyVote = getStorageAlreadyUsePropertyFlg(
+		bool alreadyVote = getStorageAlreadyUseProperty(
 			msg.sender,
 			_property,
 			votingGroupIndex
 		);
 		require(alreadyVote == false, "already use property");
-		Policy policy = Policy(_target);
-		require(policy.voting(), "voting deadline is over");
+		alreadyVote = getStorageAlreadyVotePolicy(
+			msg.sender,
+			_policy,
+			votingGroupIndex
+		);
+		require(alreadyVote == false, "already vote policy");
+
 		uint256 count = ILockup(config().lockup()).getValue(
 			_property,
 			msg.sender
 		);
 		require(count != 0, "vote count is 0");
-		vote(_target, count, _agree);
-		setStorageAlreadyUsePropertyFlg(
+		vote(_policy, count, _agree);
+		setStorageAlreadyUseProperty(
 			msg.sender,
 			_property,
 			votingGroupIndex
 		);
+		setStorageAlreadyVotePolicy(
+			msg.sender,
+			_policy,
+			votingGroupIndex
+		);
+		setStoragePolicyVoteCount(
+			msg.sender,
+			_policy,
+			_agree,
+			count
+		);
+		// どっちにしたかも記録する
 		bool result = Policy(config().policy()).policyApproval(
-			getStorageAgreeCount(_target),
-			getStorageOppositeCount(_target)
+			getStorageAgreeCount(_policy),
+			getStorageOppositeCount(_policy)
 		);
 		if (result == false) {
 			return;
 		}
-		policyfactory.convergePolicy(_target);
+		policyfactory.convergePolicy(_policy);
+	}
+
+	function cancelVotePolicy(address _policy, address _property) external {
+		addressValidator().validateGroup(_policy, config().policyGroup());
+		IPolicyFactory policyfactory = IPolicyFactory(config().policyFactory());
+		uint256 votingGroupIndex = policyfactory.getVotingGroupIndex();
+		bool alreadyVote = getStorageAlreadyUseProperty(
+			msg.sender,
+			_property,
+			votingGroupIndex
+		);
+		require(alreadyVote, "not use property");
+		alreadyVote = getStorageAlreadyVotePolicy(
+			msg.sender,
+			_policy,
+			votingGroupIndex
+		);
+		require(alreadyVote, "not vote policy");
+		bool agree = true;
+		uint256 count = getStoragePolicyVoteCount(
+			msg.sender,
+			_policy,
+			agree
+		);
+		if (count == 0){
+			agree = false;
+			count = getStoragePolicyVoteCount(
+				msg.sender,
+				_policy,
+				agree
+			);
+			require(count != 0, "not vote policy");
+		}
+		cancelVote(_policy, count, agree);
 	}
 
 	function vote(
@@ -91,9 +151,6 @@ contract VoteCounter is
 		uint256 count,
 		bool _agree
 	) private {
-		bool alreadyVote = getStorageAlreadyVoteFlg(msg.sender, _target);
-		require(alreadyVote == false, "already vote");
-		setStorageAlreadyVoteFlg(msg.sender, _target);
 		if (_agree) {
 			addAgreeCount(_target, count);
 		} else {
@@ -101,37 +158,16 @@ contract VoteCounter is
 		}
 	}
 
-	function getTargetAllVoteCount(address _target)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			getStorageAgreeCount(_target).add(getStorageOppositeCount(_target));
-	}
-
-	function isAlreadyVote(address _target) external view returns (bool) {
-		return getStorageAlreadyVoteFlg(msg.sender, _target);
-	}
-
-	function getAllPropertyVoteCount(address[] memory _properties)
-		public
-		view
-		returns (uint256)
-	{
-		uint256 count = 0;
-		for (uint256 i = 0; i < _properties.length; i++) {
-			uint256 tmp = ILockup(config().lockup()).getValue(
-				_properties[i],
-				msg.sender
-			);
-			count.add(tmp);
+	function cancelVote(
+		address _target,
+		uint256 count,
+		bool _agree
+	) private {
+		if (_agree) {
+			subAgreeCount(_target, count);
+		} else {
+			subOppositeCount(_target, count);
 		}
-		return count;
-	}
-
-	function getVoteCount(address property) external view returns (uint256) {
-		return ILockup(config().lockup()).getValue(property, msg.sender);
 	}
 
 	function addAgreeCount(address _target, uint256 _voteCount) private {
@@ -143,6 +179,18 @@ contract VoteCounter is
 	function addOppositeCount(address _target, uint256 _voteCount) private {
 		uint256 oppositeCount = getStorageOppositeCount(_target);
 		oppositeCount = oppositeCount.add(_voteCount);
+		setStorageOppositeCount(_target, oppositeCount);
+	}
+
+	function subAgreeCount(address _target, uint256 _voteCount) private {
+		uint256 agreeCount = getStorageAgreeCount(_target);
+		agreeCount = agreeCount.sub(_voteCount);
+		setStorageAgreeCount(_target, agreeCount);
+	}
+
+	function subOppositeCount(address _target, uint256 _voteCount) private {
+		uint256 oppositeCount = getStorageOppositeCount(_target);
+		oppositeCount = oppositeCount.sub(_voteCount);
 		setStorageOppositeCount(_target, oppositeCount);
 	}
 }

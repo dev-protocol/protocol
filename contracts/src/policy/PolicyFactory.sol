@@ -51,9 +51,8 @@ contract PolicyFactory is
 			Policy(policyAddress).kill();
 			policyGroup.deleteGroup(policyAddress);
 		}
-		policySet.deleteAll();
+		policySet.reset();
 		policySet.addSet(_currentPolicyAddress);
-		policySet.incrementVotingGroupIndex();
 	}
 
 	function getVotingGroupIndex() external view returns (uint256) {

@@ -21,8 +21,6 @@ contract IMarket {
 
 	function deauthenticate(address _metrics) external;
 
-	function vote(address _property, bool _agree) external;
-
 	function schema() external view returns (string memory);
 
 	function behavior() external view returns (address);

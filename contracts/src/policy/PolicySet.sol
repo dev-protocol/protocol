@@ -25,7 +25,7 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, IPolicySet {
 		eternalStorage().setUint(getPlicySetIndexKey(), index);
 	}
 
-	function deleteAll() external {
+	function reset() external {
 		addressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
@@ -37,13 +37,10 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, IPolicySet {
 			eternalStorage().setAddress(key, address(0));
 		}
 		eternalStorage().setUint(getPlicySetIndexKey(), 0);
+		incrementVotingGroupIndex();
 	}
 
-	function incrementVotingGroupIndex() external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
+	function incrementVotingGroupIndex() private {
 		bytes32 key = getVotingGroupIndexKey();
 		uint256 idx = eternalStorage().getUint(key);
 		idx++;
