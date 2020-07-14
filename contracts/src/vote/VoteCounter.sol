@@ -96,10 +96,9 @@ contract VoteCounter is
 		);
 		require(count != 0, "vote count is 0");
 		vote(_policy, count, _agree);
-		setStorageAlreadyUseProperty(msg.sender, _property, votingGroupIndex);
-		setStorageAlreadyVotePolicy(msg.sender, _policy, votingGroupIndex);
+		setStorageAlreadyUseProperty(msg.sender, _property, votingGroupIndex, true);
+		setStorageAlreadyVotePolicy(msg.sender, _policy, votingGroupIndex, true);
 		setStoragePolicyVoteCount(msg.sender, _policy, _agree, count);
-		// どっちにしたかも記録する
 		bool result = Policy(config().policy()).policyApproval(
 			getStorageAgreeCount(_policy),
 			getStorageOppositeCount(_policy)
@@ -111,7 +110,6 @@ contract VoteCounter is
 	}
 
 	function cancelVotePolicy(address _policy, address _property) external {
-		addressValidator().validateGroup(_policy, config().policyGroup());
 		IPolicyFactory policyfactory = IPolicyFactory(config().policyFactory());
 		uint256 votingGroupIndex = policyfactory.getVotingGroupIndex();
 		bool alreadyVote = getStorageAlreadyUseProperty(
@@ -134,6 +132,9 @@ contract VoteCounter is
 			require(count != 0, "not vote policy");
 		}
 		cancelVote(_policy, count, agree);
+		setStoragePolicyVoteCount(msg.sender, _policy, agree, 0);
+		setStorageAlreadyUseProperty(msg.sender, _property, votingGroupIndex, false);
+		setStorageAlreadyVotePolicy(msg.sender, _policy, votingGroupIndex, false);
 	}
 
 	function vote(

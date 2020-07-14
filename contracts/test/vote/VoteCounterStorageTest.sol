@@ -14,17 +14,19 @@ contract VoteCounterStorageTest is VoteCounterStorage {
 	function setStorageAlreadyUsePropertyTest(
 		address _user,
 		address _property,
-		uint256 _votingGroupIndex
+		uint256 _votingGroupIndex,
+		bool _flg
 	) external {
-		setStorageAlreadyUseProperty(_user, _property, _votingGroupIndex);
+		setStorageAlreadyUseProperty(_user, _property, _votingGroupIndex, _flg);
 	}
 
 	function setStorageAlreadyVotePolicyTest(
 		address _user,
 		address _policy,
-		uint256 _votingGroupIndex
+		uint256 _votingGroupIndex,
+		bool _flg
 	) external {
-		setStorageAlreadyVotePolicy(_user, _policy, _votingGroupIndex);
+		setStorageAlreadyVotePolicy(_user, _policy, _votingGroupIndex, _flg);
 	}
 
 	function setStoragePolicyVoteCountTest(

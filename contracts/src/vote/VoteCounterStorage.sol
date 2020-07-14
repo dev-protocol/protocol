@@ -42,14 +42,15 @@ contract VoteCounterStorage is UsingStorage {
 	function setStorageAlreadyUseProperty(
 		address _user,
 		address _property,
-		uint256 _votingGroupIndex
+		uint256 _votingGroupIndex,
+		bool _flg
 	) internal {
 		bytes32 key = getStorageAlreadyUsePropertyKey(
 			_user,
 			_property,
 			_votingGroupIndex
 		);
-		eternalStorage().setBool(key, true);
+		eternalStorage().setBool(key, _flg);
 	}
 
 	function getStorageAlreadyUseProperty(
@@ -85,14 +86,15 @@ contract VoteCounterStorage is UsingStorage {
 	function setStorageAlreadyVotePolicy(
 		address _user,
 		address _property,
-		uint256 _votingGroupIndex
+		uint256 _votingGroupIndex,
+		bool _flg
 	) internal {
 		bytes32 key = getStorageAlreadyVotePolicyKey(
 			_user,
 			_property,
 			_votingGroupIndex
 		);
-		eternalStorage().setBool(key, true);
+		eternalStorage().setBool(key, _flg);
 	}
 
 	function getStorageAlreadyVotePolicy(

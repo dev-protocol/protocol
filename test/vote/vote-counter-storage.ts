@@ -36,7 +36,7 @@ contract('VoteCounterStorageTest', ([sender, target, property, policy]) => {
 			expect(result).to.be.equal(false)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageAlreadyUsePropertyTest(sender, property, 1)
+			await storage.setStorageAlreadyUsePropertyTest(sender, property, 1, true)
 			const result = await storage.getStorageAlreadyUseProperty(
 				sender,
 				property,
@@ -55,7 +55,7 @@ contract('VoteCounterStorageTest', ([sender, target, property, policy]) => {
 			expect(result).to.be.equal(false)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageAlreadyVotePolicyTest(sender, policy, 2)
+			await storage.setStorageAlreadyVotePolicyTest(sender, policy, 2, true)
 			const result = await storage.getStorageAlreadyVotePolicy(
 				sender,
 				policy,
