@@ -96,8 +96,18 @@ contract VoteCounter is
 		);
 		require(count != 0, "vote count is 0");
 		vote(_policy, count, _agree);
-		setStorageAlreadyUseProperty(msg.sender, _property, votingGroupIndex, true);
-		setStorageAlreadyVotePolicy(msg.sender, _policy, votingGroupIndex, true);
+		setStorageAlreadyUseProperty(
+			msg.sender,
+			_property,
+			votingGroupIndex,
+			true
+		);
+		setStorageAlreadyVotePolicy(
+			msg.sender,
+			_policy,
+			votingGroupIndex,
+			true
+		);
 		setStoragePolicyVoteCount(msg.sender, _policy, _agree, count);
 		bool result = Policy(config().policy()).policyApproval(
 			getStorageAgreeCount(_policy),
@@ -133,8 +143,18 @@ contract VoteCounter is
 		}
 		cancelVote(_policy, count, agree);
 		setStoragePolicyVoteCount(msg.sender, _policy, agree, 0);
-		setStorageAlreadyUseProperty(msg.sender, _property, votingGroupIndex, false);
-		setStorageAlreadyVotePolicy(msg.sender, _policy, votingGroupIndex, false);
+		setStorageAlreadyUseProperty(
+			msg.sender,
+			_property,
+			votingGroupIndex,
+			false
+		);
+		setStorageAlreadyVotePolicy(
+			msg.sender,
+			_policy,
+			votingGroupIndex,
+			false
+		);
 	}
 
 	function vote(
