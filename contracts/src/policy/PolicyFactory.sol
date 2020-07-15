@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
@@ -9,7 +8,6 @@ import {IPolicySet} from "contracts/src/policy/IPolicySet.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
 contract PolicyFactory is
-	Pausable,
 	UsingConfig,
 	UsingValidator,
 	IPolicyFactory
@@ -20,7 +18,6 @@ contract PolicyFactory is
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function create(address _newPolicyAddress) external returns (address) {
-		require(paused() == false, "You cannot use that");
 		addressValidator().validateIllegalAddress(_newPolicyAddress);
 
 		Policy policy = new Policy(address(config()), _newPolicyAddress);

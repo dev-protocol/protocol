@@ -8,7 +8,6 @@ import {Policy} from "contracts/src/policy/Policy.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {IVoteCounter} from "contracts/src/vote/IVoteCounter.sol";
-import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
 contract VoteCounter is
@@ -22,7 +21,6 @@ contract VoteCounter is
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	// TODO アドレスを渡せば渡すほどガス代が多くなるか確認する
 	function voteMarket(
 		address _market,
 		address _property,
