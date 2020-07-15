@@ -1,11 +1,7 @@
-import {MarketInstance, PolicyInstance} from '../../types/truffle-contracts'
+import {MarketInstance, IPolicyInstance} from '../../types/truffle-contracts'
 import {DevProtocolInstance} from '../test-lib/instance'
 import {mine, toBigNumber} from '../test-lib/utils/common'
-import {
-	getPropertyAddress,
-	getMarketAddress,
-	getPolicyAddress,
-} from '../test-lib/utils/log'
+import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -50,7 +46,7 @@ contract(
 		}
 
 		const init2 = async (): Promise<
-			[DevProtocolInstance, string, PolicyInstance]
+			[DevProtocolInstance, string, IPolicyInstance]
 		> => {
 			const [dev, propertyAddress] = await init()
 			const policy = await createPolicy(dev)
@@ -82,13 +78,10 @@ contract(
 
 		const createPolicy = async (
 			dev: DevProtocolInstance
-		): Promise<PolicyInstance> => {
+		): Promise<IPolicyInstance> => {
 			const policy = await artifacts.require('PolicyTestForVoteCounter').new()
-			const result = await dev.policyFactory.create(policy.address)
-			const policyAddress = getPolicyAddress(result)
-			// eslint-disable-next-line @typescript-eslint/await-thenable
-			const policyInstance = await artifacts.require('Policy').at(policyAddress)
-			return policyInstance
+			await dev.policyFactory.create(policy.address)
+			return policy
 		}
 
 		describe('VoteCounter; voteMarket', () => {

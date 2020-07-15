@@ -3,7 +3,7 @@ import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	MetricsInstance,
 	PropertyInstance,
-	PolicyInstance,
+	IPolicyInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {mine, toBigNumber, getBlock} from '../test-lib/utils/common'
@@ -11,11 +11,7 @@ import {
 	getWithdrawHolderAmount,
 	getWithdrawHolderSplitAmount,
 } from '../test-lib/utils/mint-amount'
-import {
-	getPropertyAddress,
-	getMarketAddress,
-	getPolicyAddress,
-} from '../test-lib/utils/log'
+import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
@@ -25,7 +21,7 @@ import {WEB3_URI} from '../test-lib/const'
 
 contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 	const init = async (): Promise<
-		[DevProtocolInstance, MetricsInstance, PropertyInstance, PolicyInstance]
+		[DevProtocolInstance, MetricsInstance, PropertyInstance, IPolicyInstance]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
@@ -50,10 +46,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
 		const policy = await artifacts.require('PolicyTestForWithdraw').new()
 
-		const policyCreateResult = await dev.policyFactory.create(policy.address)
-		const policyAddress = getPolicyAddress(policyCreateResult)
-		// eslint-disable-next-line @typescript-eslint/await-thenable
-		const policyInstance = await artifacts.require('Policy').at(policyAddress)
+		await dev.policyFactory.create(policy.address)
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', deployer)
 		)
@@ -79,7 +72,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		await dev.dev.addMinter(dev.withdraw.address)
 		await dev.lockup.update()
 
-		return [dev, metrics, property, policyInstance]
+		return [dev, metrics, property, policy]
 	}
 
 	describe('Withdraw; withdraw', () => {
@@ -101,7 +94,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		describe('withdrawing interest amount', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
-			let policy: PolicyInstance
+			let policy: IPolicyInstance
 
 			before(async () => {
 				;[dev, , property, policy] = await init()

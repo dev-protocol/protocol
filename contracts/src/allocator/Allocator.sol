@@ -5,7 +5,7 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
-import {Policy} from "contracts/src/policy/Policy.sol";
+import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
 contract Allocator is UsingConfig, IAllocator, UsingValidator {
@@ -16,7 +16,7 @@ contract Allocator is UsingConfig, IAllocator, UsingValidator {
 		uint256 totalAssets = IMetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
 		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
-		return Policy(config().policy()).rewards(totalLockedUps, totalAssets);
+		return IPolicy(config().policy()).rewards(totalLockedUps, totalAssets);
 	}
 
 	function beforeBalanceChange(

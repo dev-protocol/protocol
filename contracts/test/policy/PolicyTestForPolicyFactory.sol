@@ -66,7 +66,7 @@ contract PolicyTestForPolicyFactory is IPolicy {
 	}
 
 	function policyVotingBlocks() external view returns (uint256) {
-		return 20;
+		return 10;
 	}
 
 	function abstentionPenalty(uint256 _count) external view returns (uint256) {

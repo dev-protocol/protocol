@@ -6,7 +6,7 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IProperty} from "contracts/src/property/IProperty.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
-import {Policy} from "contracts/src/policy/Policy.sol";
+import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {IMetricsFactory} from "contracts/src/metrics/IMetricsFactory.sol";
 import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
@@ -33,7 +33,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 
 		behavior = _behavior;
 		enabled = false;
-		uint256 marketVotingBlocks = Policy(config().policy())
+		uint256 marketVotingBlocks = IPolicy(config().policy())
 			.marketVotingBlocks();
 		votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
@@ -97,7 +97,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		uint256 tokenValue = ILockup(config().lockup()).getPropertyValue(
 			_property
 		);
-		Policy policy = Policy(config().policy());
+		IPolicy policy = IPolicy(config().policy());
 		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
 		return
 			policy.authenticationFee(
