@@ -1,4 +1,4 @@
-![Dev Protocol](https://raw.githubusercontent.com/dev-protocol/repository-token/master/public/asset/logo.png)
+![Dev Protocol](https://raw.githubusercontent.com/dev-protocol/repository-token/main/public/asset/logo.png)
 
 [![CI Status](https://github.com/dev-protocol/protocol/workflows/Node/badge.svg)](https://github.com/dev-protocol/protocol/actions)
 [![code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
@@ -8,8 +8,8 @@
 
 This repository is the place to develop smart contracts for Dev Protocol.
 
-- Whitepaper: https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.md
-- ホワイトペーパー(日本語): https://github.com/dev-protocol/protocol/blob/master/docs/WHITEPAPER.JA.md
+- Whitepaper: https://github.com/dev-protocol/protocol/blob/main/docs/WHITEPAPER.md
+- ホワイトペーパー(日本語): https://github.com/dev-protocol/protocol/blob/main/docs/WHITEPAPER.JA.md
 
 ## How to use
 
@@ -31,7 +31,7 @@ Finally, run the following command to deploy a mock.
 
 ## How to contribute:
 
-Read the [contributing guide](https://github.com/dev-protocol/protocol/blob/master/.github/CONTRIBUTING.md), and create PR when you have time. 🧚✨
+Read the [contributing guide](https://github.com/dev-protocol/protocol/blob/main/.github/CONTRIBUTING.md), and create PR when you have time. 🧚✨
 
 ## How to setup
 
