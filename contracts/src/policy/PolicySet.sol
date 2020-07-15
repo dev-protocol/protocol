@@ -52,7 +52,7 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, IPolicySet {
 		eternalStorage().setUint(key, votingEndBlockNumber);
 	}
 
-	function voting(address _policy) external view returns (bool){
+	function voting(address _policy) external view returns (bool) {
 		bytes32 key = getVotingEndBlockNumberKey(_policy);
 		uint256 limit = eternalStorage().getUint(key);
 		return block.number <= limit;
@@ -83,7 +83,11 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, IPolicySet {
 		return keccak256(abi.encodePacked("_votingGroupIndex"));
 	}
 
-	function getVotingEndBlockNumberKey(address _policy) private pure returns (bytes32) {
+	function getVotingEndBlockNumberKey(address _policy)
+		private
+		pure
+		returns (bytes32)
+	{
 		return keccak256(abi.encodePacked("_votingEndBlockNumber", _policy));
 	}
 
