@@ -12,7 +12,7 @@ async function getWithdrawAmount(
 		.then(toBigNumber)
 	const policyAddress = await dev.addressConfig.policy()
 	// eslint-disable-next-line @typescript-eslint/await-thenable
-	const policyInstance = await artifacts.require('Policy').at(policyAddress)
+	const policyInstance = await artifacts.require('IPolicy').at(policyAddress)
 	const value = await dev.lockup.getPropertyValue(propertyAddress)
 	const share = await policyInstance
 		.holdersShare(cal.toFixed(), value.toNumber())

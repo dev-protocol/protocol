@@ -1,12 +1,3 @@
-export function getPolicyAddress(
-	transaction: Truffle.TransactionResponse
-): string {
-	const tmp = transaction.logs.filter(
-		(e: {event: string}) => e.event === 'Create'
-	)[0].args._policy
-	return tmp
-}
-
 export function getMarketAddress(
 	transaction: Truffle.TransactionResponse
 ): string {

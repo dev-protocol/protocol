@@ -4,10 +4,11 @@ import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {VoteCounterStorage} from "contracts/src/vote/VoteCounterStorage.sol";
-import {Policy} from "contracts/src/policy/Policy.sol";
+import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {IVoteCounter} from "contracts/src/vote/IVoteCounter.sol";
+import {IPolicySet} from "contracts/src/policy/IPolicySet.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
 contract VoteCounter is
@@ -46,7 +47,7 @@ contract VoteCounter is
 		require(alreadyVote == false, "already vote");
 		vote(_market, count, _agree);
 		setStorageAlreadyVoteMarket(msg.sender, _market, _property);
-		bool result = Policy(config().policy()).marketApproval(
+		bool result = IPolicy(config().policy()).marketApproval(
 			getStorageAgreeCount(_market),
 			getStorageOppositeCount(_market)
 		);
@@ -71,10 +72,10 @@ contract VoteCounter is
 	) external {
 		addressValidator().validateGroup(_policy, config().policyGroup());
 		require(config().policy() != _policy, "this policy is current");
-		Policy policy = Policy(_policy);
-		require(policy.voting(), "voting deadline is over");
-		IPolicyFactory policyfactory = IPolicyFactory(config().policyFactory());
-		uint256 votingGroupIndex = policyfactory.getVotingGroupIndex();
+		IPolicySet policySet = IPolicySet(config().policySet());
+		require(policySet.voting(_policy), "voting deadline is over");
+
+		uint256 votingGroupIndex = policySet.getVotingGroupIndex();
 		bool alreadyVote = getStorageAlreadyUseProperty(
 			msg.sender,
 			_property,
@@ -107,19 +108,20 @@ contract VoteCounter is
 			true
 		);
 		setStoragePolicyVoteCount(msg.sender, _policy, _agree, count);
-		bool result = Policy(config().policy()).policyApproval(
+		bool result = IPolicy(config().policy()).policyApproval(
 			getStorageAgreeCount(_policy),
 			getStorageOppositeCount(_policy)
 		);
 		if (result == false) {
 			return;
 		}
-		policyfactory.convergePolicy(_policy);
+		IPolicyFactory policyFactory = IPolicyFactory(config().policyFactory());
+		policyFactory.convergePolicy(_policy);
 	}
 
 	function cancelVotePolicy(address _policy, address _property) external {
-		IPolicyFactory policyfactory = IPolicyFactory(config().policyFactory());
-		uint256 votingGroupIndex = policyfactory.getVotingGroupIndex();
+		IPolicySet policySet = IPolicySet(config().policySet());
+		uint256 votingGroupIndex = policySet.getVotingGroupIndex();
 		bool alreadyVote = getStorageAlreadyUseProperty(
 			msg.sender,
 			_property,

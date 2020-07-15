@@ -8,7 +8,7 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IProperty} from "contracts/src/property/IProperty.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
-import {Policy} from "contracts/src/policy/Policy.sol";
+import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
@@ -51,7 +51,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		require(hasValue(_property, msg.sender), "dev token is not locked");
 		bool isWaiting = getStorageWithdrawalStatus(_property, msg.sender) != 0;
 		require(isWaiting == false, "lockup is already canceled");
-		uint256 blockNumber = Policy(config().policy()).lockUpBlocks();
+		uint256 blockNumber = IPolicy(config().policy()).lockUpBlocks();
 		blockNumber = blockNumber.add(block.number);
 		setStorageWithdrawalStatus(_property, msg.sender, blockNumber);
 	}
@@ -219,7 +219,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 		uint256 lockedUpPerProperty = getStoragePropertyValue(_property);
 		uint256 totalSupply = ERC20Mintable(_property).totalSupply();
-		uint256 holders = Policy(config().policy()).holdersShare(
+		uint256 holders = IPolicy(config().policy()).holdersShare(
 			propertyRewards,
 			lockedUpPerProperty
 		);
@@ -249,7 +249,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 share = valuePerProperty.mulBasis().outOf(valueAll);
 		uint256 propertyRewards = nextRewards.mul(share);
 		uint256 lockedUp = getStoragePropertyValue(_property);
-		uint256 holders = Policy(config().policy()).holdersShare(
+		uint256 holders = IPolicy(config().policy()).holdersShare(
 			propertyRewards,
 			lockedUp
 		);
@@ -426,7 +426,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		if (blockNumber <= block.number) {
 			return true;
 		} else {
-			if (Policy(config().policy()).lockUpBlocks() == 1) {
+			if (IPolicy(config().policy()).lockUpBlocks() == 1) {
 				return true;
 			}
 		}
