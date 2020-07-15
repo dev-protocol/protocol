@@ -139,48 +139,5 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			const isProperty = await dev.propertyGroup.isGroup(propertyAddress)
 			expect(isProperty).to.be.equal(true)
 		})
-		it('Pause and release of pause can only be executed by deployer.', async () => {
-			let result = await dev.propertyFactory
-				.pause({from: user})
-				.catch((err: Error) => err)
-			validateErrorMessage(
-				result,
-				'PauserRole: caller does not have the Pauser role'
-			)
-			await dev.propertyFactory.pause({from: deployer})
-			result = await dev.propertyFactory
-				.unpause({from: user})
-				.catch((err: Error) => err)
-			validateErrorMessage(
-				result,
-				'PauserRole: caller does not have the Pauser role'
-			)
-			await dev.propertyFactory.unpause({from: deployer})
-		})
-		it('Cannot run if paused.', async () => {
-			await dev.propertyFactory.pause({from: deployer})
-			const result = await dev.propertyFactory
-				.create('sample2', 'SAMPLE2', user, {
-					from: user2,
-				})
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'You cannot use that')
-		})
-		it('Can be executed when pause is released', async () => {
-			await dev.propertyFactory.unpause({from: deployer})
-			const createResult = await dev.propertyFactory.create(
-				'sample2',
-				'SAMPLE2',
-				user,
-				{
-					from: user2,
-				}
-			)
-			const tmpPropertyAddress = getPropertyAddress(createResult)
-			const result = await dev.propertyGroup.isGroup(tmpPropertyAddress, {
-				from: deployer,
-			})
-			expect(result).to.be.equal(true)
-		})
 	})
 })

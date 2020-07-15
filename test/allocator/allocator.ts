@@ -3,11 +3,7 @@ import BigNumber from 'bignumber.js'
 import {toBigNumber} from '../test-lib/utils/common'
 import {PropertyInstance} from '../../types/truffle-contracts'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {
-	validateAddressErrorMessage,
-	validatePauseErrorMessage,
-	validatePauseOnlyOwnerErrorMessage,
-} from '../test-lib/utils/error'
+import {validateAddressErrorMessage} from '../test-lib/utils/error'
 
 contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	const marketContract = artifacts.require('Market')
@@ -121,27 +117,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			)
 			// We'll just check the fact that it's "done" here.
 			expect(beforeValue.toString() !== afterValue.toString()).to.be.equal(true)
-		})
-	})
-
-	describe('Allocator; pause', () => {
-		it('pause and unpause this contract', async () => {
-			const [dev] = await init()
-			await dev.allocator.pause()
-			const res = await dev.allocator
-				.calculateMaxRewardsPerBlock()
-				.catch((err: Error) => err)
-			validatePauseErrorMessage(res, false)
-			await dev.allocator.unpause()
-			await dev.allocator.calculateMaxRewardsPerBlock()
-		})
-
-		it('Should fail to pause this contract when sent from the non-owner account', async () => {
-			const [dev] = await init()
-			const res = await dev.allocator
-				.pause({from: user1})
-				.catch((err: Error) => err)
-			validatePauseOnlyOwnerErrorMessage(res)
 		})
 	})
 })

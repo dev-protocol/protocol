@@ -4,8 +4,6 @@ import {watch} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
-	validatePauseErrorMessage,
-	validatePauseOnlyOwnerErrorMessage,
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
@@ -60,38 +58,6 @@ contract(
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
-			})
-			it('Pause and release of pause can only be executed by deployer.', async () => {
-				let result = await dev.metricsFactory
-					.pause({from: user})
-					.catch((err: Error) => err)
-				validatePauseOnlyOwnerErrorMessage(result)
-				await dev.metricsFactory.pause({from: deployer})
-				result = await dev.metricsFactory
-					.unpause({from: user})
-					.catch((err: Error) => err)
-				validatePauseOnlyOwnerErrorMessage(result)
-				await dev.metricsFactory.unpause({from: deployer})
-			})
-			it('Cannot run if paused.', async () => {
-				await dev.metricsFactory.pause({from: deployer})
-				const result = await dev.metricsFactory
-					.create(property2, {
-						from: market,
-					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'You cannot use that')
-			})
-			it('Can be executed when pause is released.', async () => {
-				await dev.metricsFactory.unpause({from: deployer})
-				let createResult = await dev.metricsFactory.create(property2, {
-					from: market,
-				})
-				const tmpMetricsAddress = getMetricsAddress(createResult)
-				const result = await dev.metricsGroup.isGroup(tmpMetricsAddress, {
-					from: deployer,
-				})
-				expect(result).to.be.equal(true)
 			})
 		})
 		describe('MetircsFactory; destroy', () => {
@@ -166,15 +132,6 @@ contract(
 					})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(destroｙResult)
-			})
-			it('Should fail to destroy when the pausing.', async () => {
-				await dev.metricsFactory.pause({from: deployer})
-				const result = await dev.metricsFactory
-					.destroy(metricsAddress1, {
-						from: market,
-					})
-					.catch((err: Error) => err)
-				validatePauseErrorMessage(result)
 			})
 		})
 	}

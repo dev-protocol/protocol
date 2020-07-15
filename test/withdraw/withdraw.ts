@@ -20,7 +20,6 @@ import {getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
-	validatePauseErrorMessage,
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
