@@ -5,12 +5,11 @@ import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.s
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {Property} from "contracts/src/property/Property.sol";
+import {IProperty} from "contracts/src/property/IProperty.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
-import {IVoteTimes} from "contracts/src/vote/times/IVoteTimes.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
 contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
@@ -64,7 +63,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 lockedUpValue = getStorageValue(_property, msg.sender);
 		require(lockedUpValue != 0, "dev token is not locked");
 		updatePendingInterestWithdrawal(_property, msg.sender);
-		Property(_property).withdraw(msg.sender, lockedUpValue);
+		IProperty(_property).withdraw(msg.sender, lockedUpValue);
 		updateValues(false, msg.sender, _property, lockedUpValue);
 		setStorageValue(_property, msg.sender, 0);
 		setStorageWithdrawalStatus(_property, msg.sender, 0);
@@ -168,20 +167,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	) private {
 		setStorageLastCumulativeGlobalReward(_property, _user, _lastInterest);
 		setStorageLastBlockNumber(_property, block.number);
-	}
-
-	function validateTargetPeriod(address _property) private {
-		(uint256 begin, uint256 end) = term(_property);
-		uint256 blocks = end.sub(begin);
-		require(
-			blocks == 0 ||
-				IVoteTimes(config().voteTimes()).validateTargetPeriod(
-					_property,
-					begin,
-					end
-				),
-			"now abstention penalty"
-		);
 	}
 
 	function term(address _property)
@@ -319,7 +304,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	function withdrawInterest(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
-		validateTargetPeriod(_property);
 		(uint256 value, uint256 last) = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender

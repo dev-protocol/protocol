@@ -1,12 +1,11 @@
 pragma solidity ^0.5.0;
 
-import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {VoteTimes} from "contracts/src/vote/times/VoteTimes.sol";
 import {Property} from "contracts/src/property/Property.sol";
-import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
+import {IGroup} from "contracts/src/property/PropertyGroup.sol";
+import {IPropertyFactory} from "contracts/src/property/IPropertyFactory.sol";
 
-contract PropertyFactory is Pausable, UsingConfig {
+contract PropertyFactory is UsingConfig, IPropertyFactory {
 	event Create(address indexed _from, address _property);
 
 	// solium-disable-next-line no-empty-blocks
@@ -17,7 +16,6 @@ contract PropertyFactory is Pausable, UsingConfig {
 		string calldata _symbol,
 		address _author
 	) external returns (address) {
-		require(paused() == false, "You cannot use that");
 		validatePropertyName(_name);
 		validatePropertySymbol(_symbol);
 
@@ -27,11 +25,8 @@ contract PropertyFactory is Pausable, UsingConfig {
 			_name,
 			_symbol
 		);
-		PropertyGroup(config().propertyGroup()).addGroup(address(property));
+		IGroup(config().propertyGroup()).addGroup(address(property));
 		emit Create(msg.sender, address(property));
-		VoteTimes(config().voteTimes()).resetVoteTimesByProperty(
-			address(property)
-		);
 		return address(property);
 	}
 

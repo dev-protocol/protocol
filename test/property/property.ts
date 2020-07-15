@@ -52,8 +52,6 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
-					dev.generateVoteTimes(),
-					dev.generateVoteTimesStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateDev(),
@@ -102,8 +100,6 @@ contract(
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
 					dev.generateWithdrawStorage(),
-					dev.generateVoteTimes(),
-					dev.generateVoteTimesStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
@@ -157,8 +153,6 @@ contract(
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
 					dev.generateWithdrawStorage(),
-					dev.generateVoteTimes(),
-					dev.generateVoteTimesStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),

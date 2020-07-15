@@ -6,10 +6,16 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {Allocator} from "contracts/src/allocator/Allocator.sol";
-import {Lockup} from "contracts/src/lockup/Lockup.sol";
+import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
+import {IProperty} from "contracts/src/property/IProperty.sol";
 
-contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
+contract Property is
+	ERC20,
+	ERC20Detailed,
+	UsingConfig,
+	UsingValidator,
+	IProperty
+{
 	using SafeMath for uint256;
 	uint8 private constant _property_decimals = 18;
 	uint256 private constant _supply = 10000000000000000000000000;
@@ -38,7 +44,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		addressValidator().validateIllegalAddress(_to);
 		require(_value != 0, "illegal transfer value");
 
-		Allocator(config().allocator()).beforeBalanceChange(
+		IAllocator(config().allocator()).beforeBalanceChange(
 			address(this),
 			msg.sender,
 			_to
@@ -56,7 +62,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		addressValidator().validateIllegalAddress(_to);
 		require(_value != 0, "illegal transfer value");
 
-		Allocator(config().allocator()).beforeBalanceChange(
+		IAllocator(config().allocator()).beforeBalanceChange(
 			address(this),
 			_from,
 			_to

@@ -4,10 +4,7 @@ import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
-import {PropertyGroup} from "contracts/src/property/PropertyGroup.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
-import {PolicyFactory} from "contracts/src/policy/PolicyFactory.sol";
 
 contract Policy is Killable, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
@@ -93,24 +90,6 @@ contract Policy is Killable, UsingConfig, UsingValidator {
 
 	function lockUpBlocks() external view returns (uint256) {
 		return _policy.lockUpBlocks();
-	}
-
-	function vote(address _property, bool _agree) external {
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
-		require(config().policy() != address(this), "this policy is current");
-		require(voting(), "voting deadline is over");
-		VoteCounter voteCounter = VoteCounter(config().voteCounter());
-		voteCounter.addVoteCount(msg.sender, _property, _agree);
-		bool result = Policy(config().policy()).policyApproval(
-			voteCounter.getAgreeCount(address(this)),
-			voteCounter.getOppositeCount(address(this))
-		);
-		if (result == false) {
-			return;
-		}
-		PolicyFactory(config().policyFactory()).convergePolicy(address(this));
-		_votingEndBlockNumber = 0;
 	}
 
 	function setVotingEndBlockNumber() private {

@@ -3,22 +3,21 @@ pragma solidity ^0.5.0;
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {Property} from "contracts/src/property/Property.sol";
-import {VoteCounter} from "contracts/src/vote/counter/VoteCounter.sol";
+import {IProperty} from "contracts/src/property/IProperty.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Policy} from "contracts/src/policy/Policy.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
-import {MetricsFactory} from "contracts/src/metrics/MetricsFactory.sol";
-import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
-import {Lockup} from "contracts/src/lockup/Lockup.sol";
+import {IMetricsFactory} from "contracts/src/metrics/IMetricsFactory.sol";
+import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
+import {ILockup} from "contracts/src/lockup/ILockup.sol";
 import {Dev} from "contracts/src/dev/Dev.sol";
 
 contract Market is UsingConfig, IMarket, UsingValidator {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
-	uint256 private _votingEndBlockNumber;
+	uint256 public votingEndBlockNumber;
 	uint256 public issuedMetrics;
 	mapping(bytes32 => bool) private idMap;
 	mapping(address => bytes32) private idHashMetricsMap;
@@ -36,13 +35,13 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		enabled = false;
 		uint256 marketVotingBlocks = Policy(config().policy())
 			.marketVotingBlocks();
-		_votingEndBlockNumber = block.number.add(marketVotingBlocks);
+		votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
 
-	function propertyValidation(address _prop) internal view {
+	function propertyValidation(address _prop) private view {
 		addressValidator().validateAddress(
 			msg.sender,
-			Property(_prop).author()
+			IProperty(_prop).author()
 		);
 		require(enabled, "market is not enabled");
 	}
@@ -59,9 +58,10 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	}
 
 	function toEnable() external {
-		addressValidator().validateAddress(
+		addressValidator().validateAddresses(
 			msg.sender,
-			config().marketFactory()
+			config().marketFactory(),
+			config().voteCounter()
 		);
 		enabled = true;
 	}
@@ -94,11 +94,11 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		view
 		returns (uint256)
 	{
-		uint256 tokenValue = Lockup(config().lockup()).getPropertyValue(
+		uint256 tokenValue = ILockup(config().lockup()).getPropertyValue(
 			_property
 		);
 		Policy policy = Policy(config().policy());
-		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
+		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
 		return
 			policy.authenticationFee(
 				metricsGroup.totalIssuedMetrics(),
@@ -115,8 +115,8 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 
 		require(idMap[_idHash] == false, "id is duplicated");
 		idMap[_idHash] = true;
-		address sender = Property(_property).author();
-		MetricsFactory metricsFactory = MetricsFactory(
+		address sender = IProperty(_property).author();
+		IMetricsFactory metricsFactory = IMetricsFactory(
 			config().metricsFactory()
 		);
 		address metrics = metricsFactory.create(_property);
@@ -138,27 +138,11 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		require(idMap[idHash], "not authenticated");
 		idMap[idHash] = false;
 		idHashMetricsMap[_metrics] = bytes32(0);
-		MetricsFactory metricsFactory = MetricsFactory(
+		IMetricsFactory metricsFactory = IMetricsFactory(
 			config().metricsFactory()
 		);
 		metricsFactory.destroy(_metrics);
 		issuedMetrics = issuedMetrics.sub(1);
-	}
-
-	function vote(address _property, bool _agree) external {
-		addressValidator().validateGroup(_property, config().propertyGroup());
-		require(enabled == false, "market is already enabled");
-		require(
-			block.number <= _votingEndBlockNumber,
-			"voting deadline is over"
-		);
-
-		VoteCounter voteCounter = VoteCounter(config().voteCounter());
-		voteCounter.addVoteCount(msg.sender, _property, _agree);
-		enabled = Policy(config().policy()).marketApproval(
-			voteCounter.getAgreeCount(address(this)),
-			voteCounter.getOppositeCount(address(this))
-		);
 	}
 
 	function schema() external view returns (string memory) {

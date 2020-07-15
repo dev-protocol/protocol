@@ -7,8 +7,8 @@ import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.s
 // prettier-ignore
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {UsingConfig} from "../common/config/UsingConfig.sol";
-import {Lockup} from "../lockup/Lockup.sol";
+import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {Lockup} from "contracts/src/lockup/Lockup.sol";
 
 contract Dev is
 	ERC20Detailed,

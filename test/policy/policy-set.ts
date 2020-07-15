@@ -46,17 +46,21 @@ contract(
 				expect(result).to.be.equal(policy2)
 			})
 		})
-		describe('PolicySet; deleteAll', () => {
+		describe('PolicySet; reset', () => {
 			it('Can not get setted policy using index', async () => {
-				await dev.policySet.deleteAll({from: policyFactory})
+				let idx = await dev.policySet.getVotingGroupIndex()
+				expect(idx.toNumber()).to.be.equal(0)
+				await dev.policySet.reset({from: policyFactory})
 				let result = await dev.policySet.get(0)
 				expect(result).to.be.equal(DEFAULT_ADDRESS)
 				result = await dev.policySet.get(1)
 				expect(result).to.be.equal(DEFAULT_ADDRESS)
+				idx = await dev.policySet.getVotingGroupIndex()
+				expect(idx.toNumber()).to.be.equal(1)
 			})
-			it('Can not execute deleteAll without policyFactory address', async () => {
+			it('Can not execute reset without policyFactory address', async () => {
 				const result = await dev.policySet
-					.deleteAll({from: dummyPolicyFactory})
+					.reset({from: dummyPolicyFactory})
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})

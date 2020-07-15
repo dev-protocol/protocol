@@ -20,7 +20,6 @@ import {getEventValue} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
-	validatePauseErrorMessage,
 } from '../test-lib/utils/error'
 import {WEB3_URI} from '../test-lib/const'
 
@@ -41,10 +40,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			dev.generateWithdrawStorage(),
 			dev.generatePropertyFactory(),
 			dev.generatePropertyGroup(),
-			dev.generateVoteTimes(),
-			dev.generateVoteTimesStorage(),
 			dev.generateVoteCounter(),
-			dev.generateVoteCounterStorage(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
 			dev.generatePolicySet(),

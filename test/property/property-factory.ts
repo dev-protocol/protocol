@@ -13,8 +13,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await Promise.all([
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
-				dev.generateVoteTimes(),
-				dev.generateVoteTimesStorage(),
 			])
 			await dev.addressConfig.setMarketFactory(marketFactory)
 			const result = await dev.propertyFactory.create(
@@ -140,69 +138,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		it('Adds a new property contract address to state contract', async () => {
 			const isProperty = await dev.propertyGroup.isGroup(propertyAddress)
 			expect(isProperty).to.be.equal(true)
-		})
-		it('Pause and release of pause can only be executed by deployer.', async () => {
-			let result = await dev.propertyFactory
-				.pause({from: user})
-				.catch((err: Error) => err)
-			validateErrorMessage(
-				result,
-				'PauserRole: caller does not have the Pauser role'
-			)
-			await dev.propertyFactory.pause({from: deployer})
-			result = await dev.propertyFactory
-				.unpause({from: user})
-				.catch((err: Error) => err)
-			validateErrorMessage(
-				result,
-				'PauserRole: caller does not have the Pauser role'
-			)
-			await dev.propertyFactory.unpause({from: deployer})
-		})
-		it('Cannot run if paused.', async () => {
-			await dev.propertyFactory.pause({from: deployer})
-			const result = await dev.propertyFactory
-				.create('sample2', 'SAMPLE2', user, {
-					from: user2,
-				})
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'You cannot use that')
-		})
-		it('Can be executed when pause is released', async () => {
-			await dev.propertyFactory.unpause({from: deployer})
-			const createResult = await dev.propertyFactory.create(
-				'sample2',
-				'SAMPLE2',
-				user,
-				{
-					from: user2,
-				}
-			)
-			const tmpPropertyAddress = getPropertyAddress(createResult)
-			const result = await dev.propertyGroup.isGroup(tmpPropertyAddress, {
-				from: deployer,
-			})
-			expect(result).to.be.equal(true)
-		})
-		it('The number of votes for each property is the total number of votes at the creation timing', async () => {
-			await dev.voteTimes.addVoteTime({from: marketFactory})
-			const createResult = await dev.propertyFactory.create(
-				'sample3',
-				'SAMPLE3',
-				user,
-				{
-					from: user2,
-				}
-			)
-			const tmpPropertyAddress = getPropertyAddress(createResult)
-			const voteTimeByProperty = await dev.voteTimesStorage.getVoteTimesByProperty(
-				propertyAddress
-			)
-			expect(voteTimeByProperty.toNumber()).to.be.equal(0)
-			const voteTimeByPropertyNow = await dev.voteTimesStorage.getVoteTimesByProperty(
-				tmpPropertyAddress
-			)
-			expect(voteTimeByPropertyNow.toNumber()).to.be.equal(1)
 		})
 	})
 })

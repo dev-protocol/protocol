@@ -1,18 +1,16 @@
 pragma solidity ^0.5.0;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IGroup} from "contracts/src/common/interface/IGroup.sol";
+import {IMarketGroup} from "contracts/src/market/IMarketGroup.sol";
 
 contract MarketGroup is
 	UsingConfig,
 	UsingStorage,
-	IGroup,
 	UsingValidator,
-	Killable
+	IMarketGroup
 {
 	using SafeMath for uint256;
 
