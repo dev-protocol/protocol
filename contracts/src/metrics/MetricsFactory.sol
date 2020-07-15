@@ -6,11 +6,7 @@ import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 import {IMetricsFactory} from "contracts/src/metrics/IMetricsFactory.sol";
 
-contract MetricsFactory is
-	UsingConfig,
-	UsingValidator,
-	IMetricsFactory
-{
+contract MetricsFactory is UsingConfig, UsingValidator, IMetricsFactory {
 	event Create(address indexed _from, address _metrics);
 	event Destroy(address indexed _from, address _metrics);
 

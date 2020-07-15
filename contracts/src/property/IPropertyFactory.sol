@@ -5,6 +5,10 @@ contract IPropertyFactory {
 		string calldata _name,
 		string calldata _symbol,
 		address _author
-		// solium-disable-next-line indentation
-	) external returns (address);
+	)
+		external
+		returns (
+			// solium-disable-next-line indentation
+			address
+		);
 }

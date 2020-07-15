@@ -61,7 +61,9 @@ async function vote(
 			marketAddresses[marketIndex],
 			artifacts
 		)
-		// TODO vote counter
+		// I commented out to get the compilation through.
+		// I'm deleting this source itself, so I'll leave it as is.
+		//
 		// await market.vote(addressInfo[0].property!, true, {
 		// 	from: addressInfo[0].account,
 		// })

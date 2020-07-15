@@ -7,11 +7,7 @@ import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
 import {IPolicySet} from "contracts/src/policy/IPolicySet.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
-contract PolicyFactory is
-	UsingConfig,
-	UsingValidator,
-	IPolicyFactory
-{
+contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 	event Create(address indexed _from, address _policy, address _innerPolicy);
 
 	// solium-disable-next-line no-empty-blocks
