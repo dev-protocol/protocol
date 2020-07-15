@@ -13,7 +13,14 @@ import {
 
 contract(
 	'VoteCounterTest',
-	([deployer, marketCreator, propertyAuther, dummy]) => {
+	([
+		deployer,
+		marketCreator,
+		propertyAuther,
+		propertyAuther2,
+		propertyAuther3,
+		dummy,
+	]) => {
 		const init = async (): Promise<
 			[DevProtocolInstance, string, MarketInstance, MarketInstance]
 		> => {
@@ -86,7 +93,7 @@ contract(
 
 		describe('VoteCounter; voteMarket', () => {
 			describe('success', () => {
-				it('賛成に投票されて、marketが有効になる.', async () => {
+				it('The vote is cast in agree and the market is enabled.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
@@ -99,10 +106,15 @@ contract(
 					)
 					expect(await marketInstance.enabled()).to.be.equal(true)
 				})
-				it('賛成に投票されたが、票数がたらず、marketが有効にならない.', async () => {
+				it('Multiple users keep voting agree.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
+					await dev.dev.mint(propertyAuther2, 10000, {from: deployer})
+					await dev.dev.mint(propertyAuther3, 10000, {from: deployer})
+					const property2 = await createProperty(dev)
 
-					await dev.dev.deposit(propertyAddress, 9999, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 4000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 4000, {from: propertyAuther2})
+					await dev.dev.deposit(property2, 4000, {from: propertyAuther3})
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
@@ -111,8 +123,22 @@ contract(
 						{from: propertyAuther}
 					)
 					expect(await marketInstance.enabled()).to.be.equal(false)
+					await dev.voteCounter.voteMarket(
+						marketInstance.address,
+						propertyAddress,
+						true,
+						{from: propertyAuther2}
+					)
+					expect(await marketInstance.enabled()).to.be.equal(false)
+					await dev.voteCounter.voteMarket(
+						marketInstance.address,
+						property2,
+						true,
+						{from: propertyAuther3}
+					)
+					expect(await marketInstance.enabled()).to.be.equal(true)
 				})
-				it('反対に投票されて、かつmarketが有効にならない.', async () => {
+				it('Voted opposite, and the market is not enabled.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
@@ -125,7 +151,7 @@ contract(
 					)
 					expect(await marketInstance.enabled()).to.be.equal(false)
 				})
-				it('すでに投票したMarketに別propertyで投票する.', async () => {
+				it('Vote for the Market that has already voted.But use a property address that you have not used yet.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
@@ -148,7 +174,7 @@ contract(
 					)
 					expect(await marketInstance.enabled()).to.be.equal(true)
 				})
-				it('すでに利用したpropertyで別Marketに投票する.', async () => {
+				it('Vote for a Market that you have not yet voted for. When you do so, reuse the property address.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
@@ -172,7 +198,7 @@ contract(
 				})
 			})
 			describe('failure', () => {
-				it('MarketアドレスにMarketアドレスを指定しない.', async () => {
+				it('Incorrect Market address.', async () => {
 					const [dev, propertyAddress] = await init()
 
 					const result = await dev.voteCounter
@@ -180,7 +206,7 @@ contract(
 						.catch((err: Error) => err)
 					validateAddressErrorMessage(result, false)
 				})
-				it('PropertyアドレスにPropertyアドレスを指定しない.', async () => {
+				it('Incorrect Property address.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
@@ -189,7 +215,7 @@ contract(
 						.catch((err: Error) => err)
 					validateErrorMessage(result, 'vote count is 0')
 				})
-				it('すでに有効なMarketアドレスを指定する.', async () => {
+				it('Specify an already valid Market address.', async () => {
 					const [dev, propertyAddress, , marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
@@ -198,7 +224,7 @@ contract(
 						.catch((err: Error) => err)
 					validateErrorMessage(result, 'market is already enabled')
 				})
-				it('投票期限が切れたMarketアドレスを指定する.', async () => {
+				it('Specify a Market address that has expired.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
@@ -208,7 +234,7 @@ contract(
 						.catch((err: Error) => err)
 					validateErrorMessage(result, 'voting deadline is over')
 				})
-				it('ステーキングしていないPropertyアドレスを指定する.', async () => {
+				it('Specifies an unstaked Property address.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					const result = await dev.voteCounter
@@ -216,7 +242,7 @@ contract(
 						.catch((err: Error) => err)
 					validateErrorMessage(result, 'vote count is 0')
 				})
-				it('同一Market、同一Prioertyで投票する.', async () => {
+				it('Vote in the same Market, same Property.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
@@ -258,7 +284,7 @@ contract(
 				voteMarket = _voteMarket
 				notVoteMrket = _notVoteMrket
 			})
-			it('投票していないMarketアドレスと利用していないPropertyアドレスを指定する.', async () => {
+			it('Specify market addresses that have not been voted on and property addresses that are not used.', async () => {
 				const result = await dev.voteCounter.isAlreadyVoteMarket(
 					notVoteMrket.address,
 					notUseProperty,
@@ -266,7 +292,7 @@ contract(
 				)
 				expect(result).to.be.equal(false)
 			})
-			it('投票していないMarketアドレスと利用したPropertyアドレスを指定する.', async () => {
+			it('Specifying non-voting Market Addresses and Property Addresses used', async () => {
 				const result = await dev.voteCounter.isAlreadyVoteMarket(
 					notVoteMrket.address,
 					useProperty,
@@ -274,7 +300,7 @@ contract(
 				)
 				expect(result).to.be.equal(false)
 			})
-			it('投票したMarketアドレスと利用していないPropertyアドレスを指定する.', async () => {
+			it('Specify the Market address you voted for and the Property address you are not using.', async () => {
 				const result = await dev.voteCounter.isAlreadyVoteMarket(
 					voteMarket.address,
 					notUseProperty,
@@ -282,7 +308,7 @@ contract(
 				)
 				expect(result).to.be.equal(false)
 			})
-			it('投票したMarketアドレスと利用したPropertyアドレスを指定する.', async () => {
+			it('Specify the Market address you voted for and the Property address you used.', async () => {
 				const result = await dev.voteCounter.isAlreadyVoteMarket(
 					voteMarket.address,
 					useProperty,
@@ -293,7 +319,7 @@ contract(
 		})
 		describe('VoteCounter; votePolicy', () => {
 			describe('success', () => {
-				it('賛成に投票されて、Policyが有効になる.', async () => {
+				it('Voted in agree, Policy becomes enabled.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const currentPolicyAddress = await dev.addressConfig.policy()
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
@@ -309,10 +335,17 @@ contract(
 					)
 					expect(policy.address).to.be.equal(await dev.addressConfig.policy())
 				})
-				it('賛成に投票されたが、Policyが有効にならない.', async () => {
+				it('Multiple users keep voting agree.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
+					await dev.dev.mint(propertyAuther2, 10000, {from: deployer})
+					await dev.dev.mint(propertyAuther3, 10000, {from: deployer})
+					const property2 = await createProperty(dev)
+					await dev.dev.deposit(propertyAddress, 4000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 4000, {from: propertyAuther2})
+					await dev.dev.deposit(property2, 4000, {from: propertyAuther3})
+
 					const currentPolicyAddress = await dev.addressConfig.policy()
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
@@ -326,8 +359,31 @@ contract(
 					expect(policy.address).to.be.not.equal(
 						await dev.addressConfig.policy()
 					)
+
+					await dev.voteCounter.votePolicy(
+						policy.address,
+						propertyAddress,
+						true,
+						{from: propertyAuther2}
+					)
+
+					expect(currentPolicyAddress).to.be.equal(
+						await dev.addressConfig.policy()
+					)
+					expect(policy.address).to.be.not.equal(
+						await dev.addressConfig.policy()
+					)
+
+					await dev.voteCounter.votePolicy(policy.address, property2, true, {
+						from: propertyAuther3,
+					})
+
+					expect(currentPolicyAddress).to.be.not.equal(
+						await dev.addressConfig.policy()
+					)
+					expect(policy.address).to.be.equal(await dev.addressConfig.policy())
 				})
-				it('反対に投票されて、Policyが有効にならない.', async () => {
+				it('Voted opposite and the Policy is not enabled.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const currentPolicyAddress = await dev.addressConfig.policy()
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
@@ -345,7 +401,7 @@ contract(
 						await dev.addressConfig.policy()
 					)
 				})
-				it('同一投票期間中、別Policyに別Propertyを使って投票する.', async () => {
+				it('Voting in a different Policy with a different Property during the same voting period.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const currentPolicyAddress = await dev.addressConfig.policy()
 					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
@@ -378,7 +434,7 @@ contract(
 						await dev.addressConfig.policy()
 					)
 				})
-				it('投票期間が終わったあと、同じPropertyアドレスを指定して投票する.', async () => {
+				it('Vote with the same Property address after the voting period is over.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const currentPolicyAddress = await dev.addressConfig.policy()
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
@@ -407,7 +463,7 @@ contract(
 				})
 			})
 			describe('failure', () => {
-				it('Policyアドレスを指定しない.', async () => {
+				it('Incorrect Policy address.', async () => {
 					const [dev, propertyAddress] = await init2()
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
 					const result = await dev.voteCounter
@@ -417,7 +473,7 @@ contract(
 						.catch((err: Error) => err)
 					validateAddressErrorMessage(result)
 				})
-				it('現在有効なPolicyに投票する.', async () => {
+				it('Vote for the current policy.', async () => {
 					const [dev, propertyAddress] = await init2()
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
 					const currentPolicy = await dev.addressConfig.policy()
@@ -428,7 +484,7 @@ contract(
 						.catch((err: Error) => err)
 					validateErrorMessage(result, 'this policy is current')
 				})
-				it('投票期限が切れたPolicyに投票する.', async () => {
+				it('Vote for expired policies.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
 					await mine(10)
@@ -439,7 +495,7 @@ contract(
 						.catch((err: Error) => err)
 					validateErrorMessage(result, 'voting deadline is over')
 				})
-				it('同一投票期間中、投票に利用したPropertyを使って別Policyへ投票する.', async () => {
+				it('Vote for a different policy during the same voting period, using the same Property used for the vote.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
 					await dev.voteCounter.votePolicy(
@@ -458,7 +514,7 @@ contract(
 						.catch((err: Error) => err)
 					validateErrorMessage(result, 'already use property')
 				})
-				it('同一投票期間中、同じPolicyに別のPropertyを指定して投票する.', async () => {
+				it('Voting for a different Property in the same Policy during the same voting period.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const property2 = await createProperty(dev)
 					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
@@ -478,7 +534,7 @@ contract(
 						.catch((err: Error) => err)
 					validateErrorMessage(result, 'already vote policy')
 				})
-				it('ステーキング数が0の場合.', async () => {
+				it('If the number of staking is zero.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const result = await dev.voteCounter
 						.votePolicy(policy.address, propertyAddress, true, {
@@ -491,7 +547,7 @@ contract(
 		})
 		describe('VoteCounter; cancelVotePolicy', () => {
 			describe('success', () => {
-				it('賛成投票がキャンセルできる.', async () => {
+				it('can cancel agree vote.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
 					await dev.voteCounter.votePolicy(
@@ -522,7 +578,7 @@ contract(
 					expect(agree.toNumber()).to.be.equal(0)
 					expect(opposite.toNumber()).to.be.equal(0)
 				})
-				it('反対投票がキャンセルできる.', async () => {
+				it('can cancel opposite vote.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
 					await dev.voteCounter.votePolicy(
@@ -553,7 +609,7 @@ contract(
 					expect(agree.toNumber()).to.be.equal(0)
 					expect(opposite.toNumber()).to.be.equal(0)
 				})
-				it('キャンセルされた投票のPolicyとpropertyは再利用可能.', async () => {
+				it('Policies and properties of cancelled votes can be reused.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
 					await dev.voteCounter.votePolicy(
@@ -613,7 +669,7 @@ contract(
 				})
 			})
 			describe('failure', () => {
-				it('投票に利用していないPropertyアドレスを指定した.', async () => {
+				it('A Property address that is not used for voting.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const property = await createProperty(dev)
 
@@ -631,7 +687,7 @@ contract(
 						.catch((err: Error) => err)
 					validateErrorMessage(result, 'not use property')
 				})
-				it('投票していないPolicyアドレスを指定した.', async () => {
+				it('A Policy address that is not used for voting.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const policy2 = await createPolicy(dev)
 
@@ -653,7 +709,3 @@ contract(
 		})
 	}
 )
-
-// 服数ユーザからの追加テスト
-// アサーションもうちょっと入れる
-// 英語化
