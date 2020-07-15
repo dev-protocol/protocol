@@ -89,7 +89,7 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 			)
 			createdPropertyAddress = getPropertyAddress(propertyCreateResult)
 		})
-		it.only('Calling `convergePolicy` method when approved by Policy.policyApproval.', async () => {
+		it('Calling `convergePolicy` method when approved by Policy.policyApproval.', async () => {
 			const second = await dev.getPolicy('PolicyTestForPolicyFactory', user1)
 			await dev.policyFactory.create(second.address, {
 				from: user1,
