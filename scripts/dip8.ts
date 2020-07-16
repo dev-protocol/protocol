@@ -11,6 +11,10 @@ const handler = async (
 	])
 	____log('Generated AddressConfig contract', config.address)
 
+	const [dev] = await Promise.all([
+		artifacts.require('Dev').at(await config.token()),
+	])
+
 	const [lockup] = await Promise.all([
 		artifacts.require('Lockup').at(await config.lockup()),
 	])
@@ -132,6 +136,10 @@ const handler = async (
 	____log('Set EternalStorage address to the new VoteCounter')
 	await voteCounterStorage.changeOwner(nextVoteCounter.address)
 	____log('Delegate authority to the new VoteCounter')
+
+	// Add minter
+	await dev.addMinter(nextLockup.address)
+	____log('Added next Lockup as a minter')
 
 	// Enable new Contract
 	await config.setAllocator(nextAllocator.address)
