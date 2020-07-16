@@ -660,18 +660,416 @@ contract UsingStorage is Ownable {
 	}
 }
 
-// File: contracts/src/metrics/IMetricsGroup.sol
+// File: contracts/src/vote/VoteCounterStorage.sol
 
 pragma solidity ^0.5.0;
 
 
-contract IMetricsGroup is IGroup {
-	function removeGroup(address _addr) external;
+contract VoteCounterStorage is UsingStorage {
+	// Already Vote Market
+	function setStorageAlreadyVoteMarket(
+		address _user,
+		address _market,
+		address _property
+	) internal {
+		bytes32 key = getStorageAlreadyVoteMarketKey(_user, _market, _property);
+		eternalStorage().setBool(key, true);
+	}
 
-	function totalIssuedMetrics() external view returns (uint256);
+	function getStorageAlreadyVoteMarket(
+		address _user,
+		address _market,
+		address _property
+	) public view returns (bool) {
+		bytes32 key = getStorageAlreadyVoteMarketKey(_user, _market, _property);
+		return eternalStorage().getBool(key);
+	}
+
+	function getStorageAlreadyVoteMarketKey(
+		address _user,
+		address _market,
+		address _property
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_alreadyVoteMarket",
+					_user,
+					_market,
+					_property
+				)
+			);
+	}
+
+	// Already Use Property
+	function setStorageAlreadyUseProperty(
+		address _user,
+		address _property,
+		uint256 _votingGroupIndex,
+		bool _flg
+	) internal {
+		bytes32 key = getStorageAlreadyUsePropertyKey(
+			_user,
+			_property,
+			_votingGroupIndex
+		);
+		eternalStorage().setBool(key, _flg);
+	}
+
+	function getStorageAlreadyUseProperty(
+		address _user,
+		address _property,
+		uint256 _votingGroupIndex
+	) public view returns (bool) {
+		bytes32 key = getStorageAlreadyUsePropertyKey(
+			_user,
+			_property,
+			_votingGroupIndex
+		);
+		return eternalStorage().getBool(key);
+	}
+
+	function getStorageAlreadyUsePropertyKey(
+		address _user,
+		address _property,
+		uint256 _votingGroupIndex
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_alreadyUseProperty",
+					_user,
+					_property,
+					_votingGroupIndex
+				)
+			);
+	}
+
+	// Already Vote Policy
+	function setStorageAlreadyVotePolicy(
+		address _user,
+		address _property,
+		uint256 _votingGroupIndex,
+		bool _flg
+	) internal {
+		bytes32 key = getStorageAlreadyVotePolicyKey(
+			_user,
+			_property,
+			_votingGroupIndex
+		);
+		eternalStorage().setBool(key, _flg);
+	}
+
+	function getStorageAlreadyVotePolicy(
+		address _user,
+		address _property,
+		uint256 _votingGroupIndex
+	) public view returns (bool) {
+		bytes32 key = getStorageAlreadyVotePolicyKey(
+			_user,
+			_property,
+			_votingGroupIndex
+		);
+		return eternalStorage().getBool(key);
+	}
+
+	function getStorageAlreadyVotePolicyKey(
+		address _user,
+		address _property,
+		uint256 _votingGroupIndex
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_alreadyVotePolicy",
+					_user,
+					_property,
+					_votingGroupIndex
+				)
+			);
+	}
+
+	// Policy Vote Count
+	function setStoragePolicyVoteCount(
+		address _user,
+		address _policy,
+		bool _agree,
+		uint256 _count
+	) internal {
+		bytes32 key = getStoragePolicyVoteCountKey(_user, _policy, _agree);
+		eternalStorage().setUint(key, _count);
+	}
+
+	function getStoragePolicyVoteCount(
+		address _user,
+		address _policy,
+		bool _agree
+	) public view returns (uint256) {
+		bytes32 key = getStoragePolicyVoteCountKey(_user, _policy, _agree);
+		return eternalStorage().getUint(key);
+	}
+
+	function getStoragePolicyVoteCountKey(
+		address _user,
+		address _policy,
+		bool _agree
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked("_policyVoteCount", _user, _policy, _agree)
+			);
+	}
+
+	// Agree Count
+	function setStorageAgreeCount(address _sender, uint256 count) internal {
+		eternalStorage().setUint(getStorageAgreeVoteCountKey(_sender), count);
+	}
+
+	function getStorageAgreeCount(address _sender)
+		public
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getStorageAgreeVoteCountKey(_sender));
+	}
+
+	function getStorageAgreeVoteCountKey(address _sender)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked(_sender, "_agreeVoteCount"));
+	}
+
+	// Opposite Count
+	function setStorageOppositeCount(address _sender, uint256 count) internal {
+		eternalStorage().setUint(
+			getStorageOppositeVoteCountKey(_sender),
+			count
+		);
+	}
+
+	function getStorageOppositeCount(address _sender)
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(getStorageOppositeVoteCountKey(_sender));
+	}
+
+	function getStorageOppositeVoteCountKey(address _sender)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked(_sender, "_oppositeVoteCount"));
+	}
 }
 
-// File: contracts/src/metrics/MetricsGroup.sol
+// File: contracts/src/policy/IPolicy.sol
+
+pragma solidity ^0.5.0;
+
+contract IPolicy {
+	function rewards(uint256 _lockups, uint256 _assets)
+		external
+		view
+		returns (uint256);
+
+	function holdersShare(uint256 _amount, uint256 _lockups)
+		external
+		view
+		returns (uint256);
+
+	function assetValue(uint256 _value, uint256 _lockups)
+		external
+		view
+		returns (uint256);
+
+	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
+		external
+		view
+		returns (uint256);
+
+	function marketApproval(uint256 _agree, uint256 _opposite)
+		external
+		view
+		returns (bool);
+
+	function policyApproval(uint256 _agree, uint256 _opposite)
+		external
+		view
+		returns (bool);
+
+	function marketVotingBlocks() external view returns (uint256);
+
+	function policyVotingBlocks() external view returns (uint256);
+
+	function abstentionPenalty(uint256 _count) external view returns (uint256);
+
+	function lockUpBlocks() external view returns (uint256);
+}
+
+// File: contracts/src/lockup/ILockup.sol
+
+pragma solidity ^0.5.0;
+
+contract ILockup {
+	function lockup(
+		address _from,
+		address _property,
+		uint256 _value
+		// solium-disable-next-line indentation
+	) external;
+
+	function update() public;
+
+	function cancel(address _property) external;
+
+	function withdraw(address _property) external;
+
+	function difference(address _property, uint256 _lastReward)
+		public
+		view
+		returns (
+			uint256 _reward,
+			uint256 _holdersAmount,
+			uint256 _holdersPrice,
+			uint256 _interestAmount,
+			uint256 _interestPrice
+		);
+
+	function next(address _property)
+		public
+		view
+		returns (
+			uint256 _holders,
+			uint256 _interest,
+			uint256 _holdersPrice,
+			uint256 _interestPrice
+		);
+
+	function getPropertyValue(address _property)
+		external
+		view
+		returns (uint256);
+
+	function getAllValue() external view returns (uint256);
+
+	function getValue(address _property, address _sender)
+		external
+		view
+		returns (uint256);
+
+	function calculateWithdrawableInterestAmount(
+		address _property,
+		address _user
+	)
+		public
+		view
+		returns (
+			// solium-disable-next-line indentation
+			uint256
+		);
+
+	function withdrawInterest(address _property) external;
+}
+
+// File: contracts/src/market/IMarket.sol
+
+pragma solidity ^0.5.0;
+
+contract IMarket {
+	function authenticate(
+		address _prop,
+		string memory _args1,
+		string memory _args2,
+		string memory _args3,
+		string memory _args4,
+		string memory _args5
+	)
+		public
+		returns (
+			// solium-disable-next-line indentation
+			address
+		);
+
+	function authenticatedCallback(address _property, bytes32 _idHash)
+		external
+		returns (address);
+
+	function deauthenticate(address _metrics) external;
+
+	function schema() external view returns (string memory);
+
+	function behavior() external view returns (address);
+
+	function enabled() external view returns (bool);
+
+	function votingEndBlockNumber() external view returns (uint256);
+
+	function toEnable() external;
+}
+
+// File: contracts/src/vote/IVoteCounter.sol
+
+pragma solidity ^0.5.0;
+
+contract IVoteCounter {
+	function voteMarket(
+		address _market,
+		address _property,
+		bool _agree
+		// solium-disable-next-line indentation
+	) external;
+
+	function isAlreadyVoteMarket(address _target, address _property)
+		external
+		view
+		returns (bool);
+
+	function votePolicy(
+		address _policy,
+		address _property,
+		bool _agree
+		// solium-disable-next-line indentation
+	) external;
+
+	function cancelVotePolicy(address _policy, address _property) external;
+}
+
+// File: contracts/src/policy/IPolicySet.sol
+
+pragma solidity ^0.5.0;
+
+contract IPolicySet {
+	function addSet(address _addr) external;
+
+	function reset() external;
+
+	function count() external view returns (uint256);
+
+	function get(uint256 _index) external view returns (address);
+
+	function getVotingGroupIndex() external view returns (uint256);
+
+	function setVotingEndBlockNumber(address _policy) external;
+
+	function voting(address _policy) external view returns (bool);
+}
+
+// File: contracts/src/policy/IPolicyFactory.sol
+
+pragma solidity ^0.5.0;
+
+contract IPolicyFactory {
+	function create(address _newPolicyAddress) external;
+
+	function convergePolicy(address _currentPolicyAddress) external;
+}
+
+// File: contracts/src/vote/VoteCounter.sol
 
 pragma solidity ^0.5.0;
 
@@ -680,52 +1078,202 @@ pragma solidity ^0.5.0;
 
 
 
-contract MetricsGroup is
+
+
+
+
+
+contract VoteCounter is
+	IVoteCounter,
 	UsingConfig,
-	UsingStorage,
 	UsingValidator,
-	IMetricsGroup
+	VoteCounterStorage
 {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function addGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().metricsFactory()
+	function voteMarket(
+		address _market,
+		address _property,
+		bool _agree
+	) external {
+		addressValidator().validateGroup(_market, config().marketGroup());
+		IMarket market = IMarket(_market);
+		require(market.enabled() == false, "market is already enabled");
+		require(
+			block.number <= market.votingEndBlockNumber(),
+			"voting deadline is over"
 		);
-
-		require(isGroup(_addr) == false, "already enabled");
-		eternalStorage().setBool(getGroupKey(_addr), true);
-		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
-		totalCount = totalCount.add(1);
-		eternalStorage().setUint(getTotalCountKey(), totalCount);
-	}
-
-	function removeGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().metricsFactory()
+		uint256 count = ILockup(config().lockup()).getValue(
+			_property,
+			msg.sender
 		);
-
-		require(isGroup(_addr), "address is not group");
-		eternalStorage().setBool(getGroupKey(_addr), false);
-		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
-		totalCount = totalCount.sub(1);
-		eternalStorage().setUint(getTotalCountKey(), totalCount);
+		require(count != 0, "vote count is 0");
+		bool alreadyVote = getStorageAlreadyVoteMarket(
+			msg.sender,
+			_market,
+			_property
+		);
+		require(alreadyVote == false, "already vote");
+		vote(_market, count, _agree);
+		setStorageAlreadyVoteMarket(msg.sender, _market, _property);
+		bool result = IPolicy(config().policy()).marketApproval(
+			getStorageAgreeCount(_market),
+			getStorageOppositeCount(_market)
+		);
+		if (result == false) {
+			return;
+		}
+		market.toEnable();
 	}
 
-	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
+	function isAlreadyVoteMarket(address _target, address _property)
+		external
+		view
+		returns (bool)
+	{
+		return getStorageAlreadyVoteMarket(msg.sender, _target, _property);
 	}
 
-	function totalIssuedMetrics() external view returns (uint256) {
-		return eternalStorage().getUint(getTotalCountKey());
+	function votePolicy(
+		address _policy,
+		address _property,
+		bool _agree
+	) external {
+		addressValidator().validateGroup(_policy, config().policyGroup());
+		require(config().policy() != _policy, "this policy is current");
+		IPolicySet policySet = IPolicySet(config().policySet());
+		require(policySet.voting(_policy), "voting deadline is over");
+
+		uint256 votingGroupIndex = policySet.getVotingGroupIndex();
+		bool alreadyVote = getStorageAlreadyUseProperty(
+			msg.sender,
+			_property,
+			votingGroupIndex
+		);
+		require(alreadyVote == false, "already use property");
+		alreadyVote = getStorageAlreadyVotePolicy(
+			msg.sender,
+			_policy,
+			votingGroupIndex
+		);
+		require(alreadyVote == false, "already vote policy");
+
+		uint256 count = ILockup(config().lockup()).getValue(
+			_property,
+			msg.sender
+		);
+		require(count != 0, "vote count is 0");
+		vote(_policy, count, _agree);
+		setStorageAlreadyUseProperty(
+			msg.sender,
+			_property,
+			votingGroupIndex,
+			true
+		);
+		setStorageAlreadyVotePolicy(
+			msg.sender,
+			_policy,
+			votingGroupIndex,
+			true
+		);
+		setStoragePolicyVoteCount(msg.sender, _policy, _agree, count);
+		bool result = IPolicy(config().policy()).policyApproval(
+			getStorageAgreeCount(_policy),
+			getStorageOppositeCount(_policy)
+		);
+		if (result == false) {
+			return;
+		}
+		IPolicyFactory policyFactory = IPolicyFactory(config().policyFactory());
+		policyFactory.convergePolicy(_policy);
 	}
 
-	function getTotalCountKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_totalCount"));
+	function cancelVotePolicy(address _policy, address _property) external {
+		IPolicySet policySet = IPolicySet(config().policySet());
+		uint256 votingGroupIndex = policySet.getVotingGroupIndex();
+		bool alreadyVote = getStorageAlreadyUseProperty(
+			msg.sender,
+			_property,
+			votingGroupIndex
+		);
+		require(alreadyVote, "not use property");
+		alreadyVote = getStorageAlreadyVotePolicy(
+			msg.sender,
+			_policy,
+			votingGroupIndex
+		);
+		require(alreadyVote, "not vote policy");
+		bool agree = true;
+		uint256 count = getStoragePolicyVoteCount(msg.sender, _policy, agree);
+		if (count == 0) {
+			agree = false;
+			count = getStoragePolicyVoteCount(msg.sender, _policy, agree);
+			require(count != 0, "not vote policy");
+		}
+		cancelVote(_policy, count, agree);
+		setStoragePolicyVoteCount(msg.sender, _policy, agree, 0);
+		setStorageAlreadyUseProperty(
+			msg.sender,
+			_property,
+			votingGroupIndex,
+			false
+		);
+		setStorageAlreadyVotePolicy(
+			msg.sender,
+			_policy,
+			votingGroupIndex,
+			false
+		);
+	}
+
+	function vote(
+		address _target,
+		uint256 count,
+		bool _agree
+	) private {
+		if (_agree) {
+			addAgreeCount(_target, count);
+		} else {
+			addOppositeCount(_target, count);
+		}
+	}
+
+	function cancelVote(
+		address _target,
+		uint256 count,
+		bool _agree
+	) private {
+		if (_agree) {
+			subAgreeCount(_target, count);
+		} else {
+			subOppositeCount(_target, count);
+		}
+	}
+
+	function addAgreeCount(address _target, uint256 _voteCount) private {
+		uint256 agreeCount = getStorageAgreeCount(_target);
+		agreeCount = agreeCount.add(_voteCount);
+		setStorageAgreeCount(_target, agreeCount);
+	}
+
+	function addOppositeCount(address _target, uint256 _voteCount) private {
+		uint256 oppositeCount = getStorageOppositeCount(_target);
+		oppositeCount = oppositeCount.add(_voteCount);
+		setStorageOppositeCount(_target, oppositeCount);
+	}
+
+	function subAgreeCount(address _target, uint256 _voteCount) private {
+		uint256 agreeCount = getStorageAgreeCount(_target);
+		agreeCount = agreeCount.sub(_voteCount);
+		setStorageAgreeCount(_target, agreeCount);
+	}
+
+	function subOppositeCount(address _target, uint256 _voteCount) private {
+		uint256 oppositeCount = getStorageOppositeCount(_target);
+		oppositeCount = oppositeCount.sub(_voteCount);
+		setStorageOppositeCount(_target, oppositeCount);
 	}
 }

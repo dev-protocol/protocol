@@ -353,43 +353,164 @@ contract UsingConfig {
 	}
 }
 
-// File: contracts/src/metrics/Metrics.sol
+// File: contracts/src/common/storage/EternalStorage.sol
 
 pragma solidity ^0.5.0;
 
-contract Metrics {
-	address public market;
-	address public property;
+contract EternalStorage {
+	address private currentOwner = msg.sender;
 
-	constructor(address _market, address _property) public {
-		//Do not validate because there is no AddressConfig
-		market = _market;
-		property = _property;
+	mapping(bytes32 => uint256) private uIntStorage;
+	mapping(bytes32 => string) private stringStorage;
+	mapping(bytes32 => address) private addressStorage;
+	mapping(bytes32 => bytes32) private bytesStorage;
+	mapping(bytes32 => bool) private boolStorage;
+	mapping(bytes32 => int256) private intStorage;
+
+	modifier onlyCurrentOwner() {
+		require(msg.sender == currentOwner, "not current owner");
+		_;
+	}
+
+	function changeOwner(address _newOwner) external {
+		require(msg.sender == currentOwner, "not current owner");
+		currentOwner = _newOwner;
+	}
+
+	// *** Getter Methods ***
+	function getUint(bytes32 _key) external view returns (uint256) {
+		return uIntStorage[_key];
+	}
+
+	function getString(bytes32 _key) external view returns (string memory) {
+		return stringStorage[_key];
+	}
+
+	function getAddress(bytes32 _key) external view returns (address) {
+		return addressStorage[_key];
+	}
+
+	function getBytes(bytes32 _key) external view returns (bytes32) {
+		return bytesStorage[_key];
+	}
+
+	function getBool(bytes32 _key) external view returns (bool) {
+		return boolStorage[_key];
+	}
+
+	function getInt(bytes32 _key) external view returns (int256) {
+		return intStorage[_key];
+	}
+
+	// *** Setter Methods ***
+	function setUint(bytes32 _key, uint256 _value) external onlyCurrentOwner {
+		uIntStorage[_key] = _value;
+	}
+
+	function setString(bytes32 _key, string calldata _value)
+		external
+		onlyCurrentOwner
+	{
+		stringStorage[_key] = _value;
+	}
+
+	function setAddress(bytes32 _key, address _value)
+		external
+		onlyCurrentOwner
+	{
+		addressStorage[_key] = _value;
+	}
+
+	function setBytes(bytes32 _key, bytes32 _value) external onlyCurrentOwner {
+		bytesStorage[_key] = _value;
+	}
+
+	function setBool(bytes32 _key, bool _value) external onlyCurrentOwner {
+		boolStorage[_key] = _value;
+	}
+
+	function setInt(bytes32 _key, int256 _value) external onlyCurrentOwner {
+		intStorage[_key] = _value;
+	}
+
+	// *** Delete Methods ***
+	function deleteUint(bytes32 _key) external onlyCurrentOwner {
+		delete uIntStorage[_key];
+	}
+
+	function deleteString(bytes32 _key) external onlyCurrentOwner {
+		delete stringStorage[_key];
+	}
+
+	function deleteAddress(bytes32 _key) external onlyCurrentOwner {
+		delete addressStorage[_key];
+	}
+
+	function deleteBytes(bytes32 _key) external onlyCurrentOwner {
+		delete bytesStorage[_key];
+	}
+
+	function deleteBool(bytes32 _key) external onlyCurrentOwner {
+		delete boolStorage[_key];
+	}
+
+	function deleteInt(bytes32 _key) external onlyCurrentOwner {
+		delete intStorage[_key];
 	}
 }
 
-// File: contracts/src/metrics/IMetricsGroup.sol
+// File: contracts/src/common/storage/UsingStorage.sol
 
 pragma solidity ^0.5.0;
 
 
-contract IMetricsGroup is IGroup {
-	function removeGroup(address _addr) external;
 
-	function totalIssuedMetrics() external view returns (uint256);
+contract UsingStorage is Ownable {
+	address private _storage;
+
+	modifier hasStorage() {
+		require(_storage != address(0), "storage is not setted");
+		_;
+	}
+
+	function eternalStorage()
+		internal
+		view
+		hasStorage
+		returns (EternalStorage)
+	{
+		return EternalStorage(_storage);
+	}
+
+	function getStorageAddress() external view hasStorage returns (address) {
+		return _storage;
+	}
+
+	function createStorage() external onlyOwner {
+		require(_storage == address(0), "storage is setted");
+		EternalStorage tmp = new EternalStorage();
+		_storage = address(tmp);
+	}
+
+	function setStorage(address _storageAddress) external onlyOwner {
+		_storage = _storageAddress;
+	}
+
+	function changeOwner(address newOwner) external onlyOwner {
+		EternalStorage(_storage).changeOwner(newOwner);
+	}
 }
 
-// File: contracts/src/metrics/IMetricsFactory.sol
+// File: contracts/src/policy/IPolicyGroup.sol
 
 pragma solidity ^0.5.0;
 
-contract IMetricsFactory {
-	function create(address _property) external returns (address);
 
-	function destroy(address _metrics) external;
+contract IPolicyGroup is IGroup {
+	function deleteGroup(address _addr) external;
 }
 
-// File: contracts/src/metrics/MetricsFactory.sol
+// File: contracts/src/policy/PolicyGroup.sol
 
 pragma solidity ^0.5.0;
 
@@ -397,32 +518,36 @@ pragma solidity ^0.5.0;
 
 
 
-
-contract MetricsFactory is UsingConfig, UsingValidator, IMetricsFactory {
-	event Create(address indexed _from, address _metrics);
-	event Destroy(address indexed _from, address _metrics);
-
+contract PolicyGroup is
+	UsingConfig,
+	UsingStorage,
+	UsingValidator,
+	IPolicyGroup
+{
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function create(address _property) external returns (address) {
-		addressValidator().validateGroup(msg.sender, config().marketGroup());
+	function addGroup(address _addr) external {
+		addressValidator().validateAddress(
+			msg.sender,
+			config().policyFactory()
+		);
 
-		Metrics metrics = new Metrics(msg.sender, _property);
-		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
-		address metricsAddress = address(metrics);
-		metricsGroup.addGroup(metricsAddress);
-		emit Create(msg.sender, metricsAddress);
-		return metricsAddress;
+		require(isGroup(_addr) == false, "already enabled");
+		eternalStorage().setBool(getGroupKey(_addr), true);
 	}
 
-	function destroy(address _metrics) external {
-		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
-		require(metricsGroup.isGroup(_metrics), "address is not metrics");
-		addressValidator().validateGroup(msg.sender, config().marketGroup());
-		Metrics metrics = Metrics(_metrics);
-		addressValidator().validateAddress(msg.sender, metrics.market());
-		IMetricsGroup(config().metricsGroup()).removeGroup(_metrics);
-		emit Destroy(msg.sender, _metrics);
+	function deleteGroup(address _addr) external {
+		addressValidator().validateAddress(
+			msg.sender,
+			config().policyFactory()
+		);
+
+		require(isGroup(_addr), "not enabled");
+		return eternalStorage().setBool(getGroupKey(_addr), false);
+	}
+
+	function isGroup(address _addr) public view returns (bool) {
+		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 }

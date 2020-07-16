@@ -1,3 +1,6 @@
+
+// File: contracts/src/common/lifecycle/Killable.sol
+
 pragma solidity ^0.5.0;
 
 contract Killable {
@@ -13,6 +16,10 @@ contract Killable {
 	}
 }
 
+// File: @openzeppelin/contracts/GSN/Context.sol
+
+pragma solidity ^0.5.0;
+
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -24,20 +31,24 @@ contract Killable {
  * This contract is only required for intermediate, library-like contracts.
  */
 contract Context {
-	// Empty internal constructor, to prevent people from mistakenly deploying
-	// an instance of this contract, which should be used via inheritance.
-	constructor() internal {}
+    // Empty internal constructor, to prevent people from mistakenly deploying
+    // an instance of this contract, which should be used via inheritance.
+    constructor () internal { }
+    // solhint-disable-previous-line no-empty-blocks
 
-	// solhint-disable-previous-line no-empty-blocks
-	function _msgSender() internal view returns (address payable) {
-		return msg.sender;
-	}
+    function _msgSender() internal view returns (address payable) {
+        return msg.sender;
+    }
 
-	function _msgData() internal view returns (bytes memory) {
-		this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
-		return msg.data;
-	}
+    function _msgData() internal view returns (bytes memory) {
+        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        return msg.data;
+    }
 }
+
+// File: @openzeppelin/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -49,83 +60,89 @@ contract Context {
  * the owner.
  */
 contract Ownable is Context {
-	address private _owner;
-	event OwnershipTransferred(
-		address indexed previousOwner,
-		address indexed newOwner
-	);
+    address private _owner;
 
-	/**
-	 * @dev Initializes the contract setting the deployer as the initial owner.
-	 */
-	constructor() internal {
-		_owner = _msgSender();
-		emit OwnershipTransferred(address(0), _owner);
-	}
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-	/**
-	 * @dev Returns the address of the current owner.
-	 */
-	function owner() public view returns (address) {
-		return _owner;
-	}
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    constructor () internal {
+        address msgSender = _msgSender();
+        _owner = msgSender;
+        emit OwnershipTransferred(address(0), msgSender);
+    }
 
-	/**
-	 * @dev Throws if called by any account other than the owner.
-	 */
-	modifier onlyOwner() {
-		require(isOwner(), "Ownable: caller is not the owner");
-		_;
-	}
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view returns (address) {
+        return _owner;
+    }
 
-	/**
-	 * @dev Returns true if the caller is the current owner.
-	 */
-	function isOwner() public view returns (bool) {
-		return _msgSender() == _owner;
-	}
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(isOwner(), "Ownable: caller is not the owner");
+        _;
+    }
 
-	/**
-	 * @dev Leaves the contract without owner. It will not be possible to call
-	 * `onlyOwner` functions anymore. Can only be called by the current owner.
-	 *
-	 * NOTE: Renouncing ownership will leave the contract without an owner,
-	 * thereby removing any functionality that is only available to the owner.
-	 */
-	function renounceOwnership() public onlyOwner {
-		emit OwnershipTransferred(_owner, address(0));
-		_owner = address(0);
-	}
+    /**
+     * @dev Returns true if the caller is the current owner.
+     */
+    function isOwner() public view returns (bool) {
+        return _msgSender() == _owner;
+    }
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 * Can only be called by the current owner.
-	 */
-	function transferOwnership(address newOwner) public onlyOwner {
-		_transferOwnership(newOwner);
-	}
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 */
-	function _transferOwnership(address newOwner) internal {
-		require(
-			newOwner != address(0),
-			"Ownable: new owner is the zero address"
-		);
-		emit OwnershipTransferred(_owner, newOwner);
-		_owner = newOwner;
-	}
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     */
+    function _transferOwnership(address newOwner) internal {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
+    }
 }
 
-// prettier-ignore
+// File: contracts/src/common/interface/IGroup.sol
+
+pragma solidity ^0.5.0;
+
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
+
 	function addGroup(address _addr) external;
+
 	function getGroupKey(address _addr) internal pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
+
+// File: contracts/src/common/validate/AddressValidator.sol
+
+pragma solidity ^0.5.0;
+
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -163,7 +180,29 @@ contract AddressValidator {
 		}
 		require(_addr == _target2, errorMessage);
 	}
+
+	function validate3Addresses(
+		address _addr,
+		address _target1,
+		address _target2,
+		address _target3
+	) external pure {
+		if (_addr == _target1) {
+			return;
+		}
+		if (_addr == _target2) {
+			return;
+		}
+		require(_addr == _target3, errorMessage);
+	}
 }
+
+// File: contracts/src/common/validate/UsingValidator.sol
+
+pragma solidity ^0.5.0;
+
+// prettier-ignore
+
 
 contract UsingValidator {
 	AddressValidator private _validator;
@@ -176,6 +215,13 @@ contract UsingValidator {
 		return _validator;
 	}
 }
+
+// File: contracts/src/common/config/AddressConfig.sol
+
+pragma solidity ^0.5.0;
+
+
+
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;

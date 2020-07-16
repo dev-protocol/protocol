@@ -4,38 +4,37 @@
 
 # ツール
 
-結合ファイルは[Solidity Flattener](https://github.com/bokkypoobah/SolidityFlattener)を使って作成する。
-
-[truffle-flattener](https://www.npmjs.com/package/truffle-flattener)というツールも存在するが、このツールを使って結合ファイルを作成したところ、循環参照エラーが発生したので、Solidity Flattener を使っている
+結合ファイルは[truffle-flattener](https://www.npmjs.com/package/truffle-flattener)を使って作成する。
 
 ## 準備
 
-[Solidity Flattener インストール手順](https://github.com/bokkypoobah/SolidityFlattener#installation)を参考にして pl ファイルを配置し、権限設定を行う
+```
+npm install truffle-flattener -g
+```
+
 
 ## 実行手順
 
-```
-cd ~/frame00/protpcol
-solidityFlattener.pl --mainsol=src/metrics/MetricsGroup.sol --outputsol=flattened/metrics/MetricsGroup.flattened.sol --verbose
-```
-
---verbose オプションをつけると詳細なログがでてくるので、おすすめ。
-Solidity Flattener が Solidity 推奨の import 記述形式に対応していないため。エラーがでたところを順に修正していくこととなる。
+必要に応じて下記コマンドを実行してください。
 
 ```
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
-↓
-import "../../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../common/lifecycle/Killable.sol";
-```
-
-下記のスクリプトを実行すれば、一気に修正可能。sol ファイルが修正されるので、コミットしてしまわないように注意すること。
-また実行前にスクリプト内の PROJECT_PATH を修正すること。
-
-```
-cd flattened
-python flattener.py
+cd protocol
+truffle-flattener contracts/src/allocator/Allocator.sol > flattened/allocator/Allocator.flattened.sol
+truffle-flattener contracts/src/common/config/AddressConfig.sol > flattened/common/config/AddressConfig.flattened.sol
+truffle-flattener contracts/src/dev/Dev.sol > flattened/dev/Dev.flattened.sol
+truffle-flattener contracts/src/dev/DevMigration.sol > flattened/dev/DevMigration.flattened.sol
+truffle-flattener contracts/src/lockup/Lockup.sol > flattened/lockup/Lockup.flattened.sol
+truffle-flattener contracts/src/market/MarketFactory.sol > flattened/market/MarketFactory.flattened.sol
+truffle-flattener contracts/src/market/MarketGroup.sol > flattened/market/MarketGroup.flattened.sol
+truffle-flattener contracts/src/metrics/MetricsFactory.sol > flattened/metrics/MetricsFactory.flattened.sol
+truffle-flattener contracts/src/metrics/MetricsGroup.sol > flattened/metrics/MetricsGroup.flattened.sol
+truffle-flattener contracts/src/policy/PolicyFactory.sol > flattened/policy/PolicyFactory.flattened.sol
+truffle-flattener contracts/src/policy/PolicyGroup.sol > flattened/policy/PolicyGroup.flattened.sol
+truffle-flattener contracts/src/policy/PolicySet.sol > flattened/policy/PolicySet.flattened.sol
+truffle-flattener contracts/src/property/PropertyFactory.sol > flattened/property/PropertyFactory.flattened.sol
+truffle-flattener contracts/src/property/PropertyGroup.sol > flattened/property/PropertyGroup.flattened.sol
+truffle-flattener contracts/src/vote/VoteCounter.sol > flattened/vote/VoteCounter.flattened.sol
+truffle-flattener contracts/src/withdraw/Withdraw.sol > flattened/withdraw/Withdraw.flattened.sol
 ```
 
 # Etherscan 登録
@@ -46,7 +45,7 @@ python flattener.py
 
 ```
 Compiler Type->Solidity(Single File)
-Compiler Version->0.5.16
+Compiler Version->0.5.17
 License Type->MPL-2.0
 ```
 

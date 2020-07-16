@@ -1,3 +1,6 @@
+
+// File: @openzeppelin/contracts/math/SafeMath.sol
+
 pragma solidity ^0.5.0;
 
 /**
@@ -14,153 +17,150 @@ pragma solidity ^0.5.0;
  * class of bugs, so it's recommended to use it always.
  */
 library SafeMath {
-	/**
-	 * @dev Returns the addition of two unsigned integers, reverting on
-	 * overflow.
-	 *
-	 * Counterpart to Solidity's `+` operator.
-	 *
-	 * Requirements:
-	 * - Addition cannot overflow.
-	 */
-	function add(uint256 a, uint256 b) internal pure returns (uint256) {
-		uint256 c = a + b;
-		require(c >= a, "SafeMath: addition overflow");
-		return c;
-	}
+    /**
+     * @dev Returns the addition of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `+` operator.
+     *
+     * Requirements:
+     * - Addition cannot overflow.
+     */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a, "SafeMath: addition overflow");
 
-	/**
-	 * @dev Returns the subtraction of two unsigned integers, reverting on
-	 * overflow (when the result is negative).
-	 *
-	 * Counterpart to Solidity's `-` operator.
-	 *
-	 * Requirements:
-	 * - Subtraction cannot overflow.
-	 */
-	function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-		return sub(a, b, "SafeMath: subtraction overflow");
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
-	 * overflow (when the result is negative).
-	 *
-	 * Counterpart to Solidity's `-` operator.
-	 *
-	 * Requirements:
-	 * - Subtraction cannot overflow.
-	 *
-	 * _Available since v2.4.0._
-	 */
-	function sub(
-		uint256 a,
-		uint256 b,
-		string memory errorMessage
-	) internal pure returns (uint256) {
-		require(b <= a, errorMessage);
-		uint256 c = a - b;
-		return c;
-	}
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     * - Subtraction cannot overflow.
+     */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        return sub(a, b, "SafeMath: subtraction overflow");
+    }
 
-	/**
-	 * @dev Returns the multiplication of two unsigned integers, reverting on
-	 * overflow.
-	 *
-	 * Counterpart to Solidity's `*` operator.
-	 *
-	 * Requirements:
-	 * - Multiplication cannot overflow.
-	 */
-	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-		// Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-		// benefit is lost if 'b' is also tested.
-		// See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
-		if (a == 0) {
-			return 0;
-		}
-		uint256 c = a * b;
-		require(c / a == b, "SafeMath: multiplication overflow");
-		return c;
-	}
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     * - Subtraction cannot overflow.
+     *
+     * _Available since v2.4.0._
+     */
+    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b <= a, errorMessage);
+        uint256 c = a - b;
 
-	/**
-	 * @dev Returns the integer division of two unsigned integers. Reverts on
-	 * division by zero. The result is rounded towards zero.
-	 *
-	 * Counterpart to Solidity's `/` operator. Note: this function uses a
-	 * `revert` opcode (which leaves remaining gas untouched) while Solidity
-	 * uses an invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 */
-	function div(uint256 a, uint256 b) internal pure returns (uint256) {
-		return div(a, b, "SafeMath: division by zero");
-	}
+        return c;
+    }
 
-	/**
-	 * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
-	 * division by zero. The result is rounded towards zero.
-	 *
-	 * Counterpart to Solidity's `/` operator. Note: this function uses a
-	 * `revert` opcode (which leaves remaining gas untouched) while Solidity
-	 * uses an invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 *
-	 * _Available since v2.4.0._
-	 */
-	function div(
-		uint256 a,
-		uint256 b,
-		string memory errorMessage
-	) internal pure returns (uint256) {
-		// Solidity only automatically asserts when dividing by 0
-		require(b > 0, errorMessage);
-		uint256 c = a / b;
-		// assert(a == b * c + a % b); // There is no case in which this doesn't hold
-		return c;
-	}
+    /**
+     * @dev Returns the multiplication of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `*` operator.
+     *
+     * Requirements:
+     * - Multiplication cannot overflow.
+     */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+        // benefit is lost if 'b' is also tested.
+        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+        if (a == 0) {
+            return 0;
+        }
 
-	/**
-	 * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-	 * Reverts when dividing by zero.
-	 *
-	 * Counterpart to Solidity's `%` operator. This function uses a `revert`
-	 * opcode (which leaves remaining gas untouched) while Solidity uses an
-	 * invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 */
-	function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-		return mod(a, b, "SafeMath: modulo by zero");
-	}
+        uint256 c = a * b;
+        require(c / a == b, "SafeMath: multiplication overflow");
 
-	/**
-	 * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-	 * Reverts with custom message when dividing by zero.
-	 *
-	 * Counterpart to Solidity's `%` operator. This function uses a `revert`
-	 * opcode (which leaves remaining gas untouched) while Solidity uses an
-	 * invalid opcode to revert (consuming all remaining gas).
-	 *
-	 * Requirements:
-	 * - The divisor cannot be zero.
-	 *
-	 * _Available since v2.4.0._
-	 */
-	function mod(
-		uint256 a,
-		uint256 b,
-		string memory errorMessage
-	) internal pure returns (uint256) {
-		require(b != 0, errorMessage);
-		return a % b;
-	}
+        return c;
+    }
+
+    /**
+     * @dev Returns the integer division of two unsigned integers. Reverts on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        return div(a, b, "SafeMath: division by zero");
+    }
+
+    /**
+     * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     *
+     * _Available since v2.4.0._
+     */
+    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        // Solidity only automatically asserts when dividing by 0
+        require(b > 0, errorMessage);
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
+        return c;
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * Reverts when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     */
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        return mod(a, b, "SafeMath: modulo by zero");
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * Reverts with custom message when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     *
+     * _Available since v2.4.0._
+     */
+    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+        require(b != 0, errorMessage);
+        return a % b;
+    }
 }
+
+// File: contracts/src/common/lifecycle/Killable.sol
+
+pragma solidity ^0.5.0;
 
 contract Killable {
 	address payable public _owner;
@@ -175,6 +175,10 @@ contract Killable {
 	}
 }
 
+// File: @openzeppelin/contracts/GSN/Context.sol
+
+pragma solidity ^0.5.0;
+
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -186,20 +190,24 @@ contract Killable {
  * This contract is only required for intermediate, library-like contracts.
  */
 contract Context {
-	// Empty internal constructor, to prevent people from mistakenly deploying
-	// an instance of this contract, which should be used via inheritance.
-	constructor() internal {}
+    // Empty internal constructor, to prevent people from mistakenly deploying
+    // an instance of this contract, which should be used via inheritance.
+    constructor () internal { }
+    // solhint-disable-previous-line no-empty-blocks
 
-	// solhint-disable-previous-line no-empty-blocks
-	function _msgSender() internal view returns (address payable) {
-		return msg.sender;
-	}
+    function _msgSender() internal view returns (address payable) {
+        return msg.sender;
+    }
 
-	function _msgData() internal view returns (bytes memory) {
-		this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
-		return msg.data;
-	}
+    function _msgData() internal view returns (bytes memory) {
+        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
+        return msg.data;
+    }
 }
+
+// File: @openzeppelin/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -211,83 +219,89 @@ contract Context {
  * the owner.
  */
 contract Ownable is Context {
-	address private _owner;
-	event OwnershipTransferred(
-		address indexed previousOwner,
-		address indexed newOwner
-	);
+    address private _owner;
 
-	/**
-	 * @dev Initializes the contract setting the deployer as the initial owner.
-	 */
-	constructor() internal {
-		_owner = _msgSender();
-		emit OwnershipTransferred(address(0), _owner);
-	}
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-	/**
-	 * @dev Returns the address of the current owner.
-	 */
-	function owner() public view returns (address) {
-		return _owner;
-	}
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    constructor () internal {
+        address msgSender = _msgSender();
+        _owner = msgSender;
+        emit OwnershipTransferred(address(0), msgSender);
+    }
 
-	/**
-	 * @dev Throws if called by any account other than the owner.
-	 */
-	modifier onlyOwner() {
-		require(isOwner(), "Ownable: caller is not the owner");
-		_;
-	}
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view returns (address) {
+        return _owner;
+    }
 
-	/**
-	 * @dev Returns true if the caller is the current owner.
-	 */
-	function isOwner() public view returns (bool) {
-		return _msgSender() == _owner;
-	}
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(isOwner(), "Ownable: caller is not the owner");
+        _;
+    }
 
-	/**
-	 * @dev Leaves the contract without owner. It will not be possible to call
-	 * `onlyOwner` functions anymore. Can only be called by the current owner.
-	 *
-	 * NOTE: Renouncing ownership will leave the contract without an owner,
-	 * thereby removing any functionality that is only available to the owner.
-	 */
-	function renounceOwnership() public onlyOwner {
-		emit OwnershipTransferred(_owner, address(0));
-		_owner = address(0);
-	}
+    /**
+     * @dev Returns true if the caller is the current owner.
+     */
+    function isOwner() public view returns (bool) {
+        return _msgSender() == _owner;
+    }
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 * Can only be called by the current owner.
-	 */
-	function transferOwnership(address newOwner) public onlyOwner {
-		_transferOwnership(newOwner);
-	}
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public onlyOwner {
+        emit OwnershipTransferred(_owner, address(0));
+        _owner = address(0);
+    }
 
-	/**
-	 * @dev Transfers ownership of the contract to a new account (`newOwner`).
-	 */
-	function _transferOwnership(address newOwner) internal {
-		require(
-			newOwner != address(0),
-			"Ownable: new owner is the zero address"
-		);
-		emit OwnershipTransferred(_owner, newOwner);
-		_owner = newOwner;
-	}
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     */
+    function _transferOwnership(address newOwner) internal {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        emit OwnershipTransferred(_owner, newOwner);
+        _owner = newOwner;
+    }
 }
 
-// prettier-ignore
+// File: contracts/src/common/interface/IGroup.sol
+
+pragma solidity ^0.5.0;
+
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
+
 	function addGroup(address _addr) external;
+
 	function getGroupKey(address _addr) internal pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
+
+// File: contracts/src/common/validate/AddressValidator.sol
+
+pragma solidity ^0.5.0;
+
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -325,7 +339,29 @@ contract AddressValidator {
 		}
 		require(_addr == _target2, errorMessage);
 	}
+
+	function validate3Addresses(
+		address _addr,
+		address _target1,
+		address _target2,
+		address _target3
+	) external pure {
+		if (_addr == _target1) {
+			return;
+		}
+		if (_addr == _target2) {
+			return;
+		}
+		require(_addr == _target3, errorMessage);
+	}
 }
+
+// File: contracts/src/common/validate/UsingValidator.sol
+
+pragma solidity ^0.5.0;
+
+// prettier-ignore
+
 
 contract UsingValidator {
 	AddressValidator private _validator;
@@ -338,6 +374,13 @@ contract UsingValidator {
 		return _validator;
 	}
 }
+
+// File: contracts/src/common/config/AddressConfig.sol
+
+pragma solidity ^0.5.0;
+
+
+
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -448,6 +491,11 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
+// File: contracts/src/common/config/UsingConfig.sol
+
+pragma solidity ^0.5.0;
+
+
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -464,14 +512,20 @@ contract UsingConfig {
 	}
 }
 
+// File: contracts/src/common/storage/EternalStorage.sol
+
+pragma solidity ^0.5.0;
+
 contract EternalStorage {
 	address private currentOwner = msg.sender;
+
 	mapping(bytes32 => uint256) private uIntStorage;
 	mapping(bytes32 => string) private stringStorage;
 	mapping(bytes32 => address) private addressStorage;
 	mapping(bytes32 => bytes32) private bytesStorage;
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
+
 	modifier onlyCurrentOwner() {
 		require(msg.sender == currentOwner, "not current owner");
 		_;
@@ -564,8 +618,15 @@ contract EternalStorage {
 	}
 }
 
+// File: contracts/src/common/storage/UsingStorage.sol
+
+pragma solidity ^0.5.0;
+
+
+
 contract UsingStorage is Ownable {
 	address private _storage;
+
 	modifier hasStorage() {
 		require(_storage != address(0), "storage is not setted");
 		_;
@@ -599,50 +660,81 @@ contract UsingStorage is Ownable {
 	}
 }
 
-contract MarketGroup is
-	UsingConfig,
-	UsingStorage,
-	IGroup,
-	UsingValidator,
-	Killable
-{
-	using SafeMath for uint256;
+// File: contracts/src/policy/IPolicySet.sol
 
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
+pragma solidity ^0.5.0;
 
-	function addGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().marketFactory()
-		);
-		require(isGroup(_addr) == false, "already enabled");
-		eternalStorage().setBool(getGroupKey(_addr), true);
-		addCount();
-	}
+contract IPolicySet {
+	function addSet(address _addr) external;
 
-	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
-	}
+	function reset() external;
 
-	function addCount() private {
-		bytes32 key = getCountKey();
-		uint256 number = eternalStorage().getUint(key);
-		number = number.add(1);
-		eternalStorage().setUint(key, number);
-	}
+	function count() external view returns (uint256);
 
-	function getCount() external view returns (uint256) {
-		bytes32 key = getCountKey();
-		return eternalStorage().getUint(key);
-	}
+	function get(uint256 _index) external view returns (address);
 
-	function getCountKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_count"));
-	}
+	function getVotingGroupIndex() external view returns (uint256);
+
+	function setVotingEndBlockNumber(address _policy) external;
+
+	function voting(address _policy) external view returns (bool);
 }
 
-contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
+// File: contracts/src/policy/IPolicy.sol
+
+pragma solidity ^0.5.0;
+
+contract IPolicy {
+	function rewards(uint256 _lockups, uint256 _assets)
+		external
+		view
+		returns (uint256);
+
+	function holdersShare(uint256 _amount, uint256 _lockups)
+		external
+		view
+		returns (uint256);
+
+	function assetValue(uint256 _value, uint256 _lockups)
+		external
+		view
+		returns (uint256);
+
+	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
+		external
+		view
+		returns (uint256);
+
+	function marketApproval(uint256 _agree, uint256 _opposite)
+		external
+		view
+		returns (bool);
+
+	function policyApproval(uint256 _agree, uint256 _opposite)
+		external
+		view
+		returns (bool);
+
+	function marketVotingBlocks() external view returns (uint256);
+
+	function policyVotingBlocks() external view returns (uint256);
+
+	function abstentionPenalty(uint256 _count) external view returns (uint256);
+
+	function lockUpBlocks() external view returns (uint256);
+}
+
+// File: contracts/src/policy/PolicySet.sol
+
+pragma solidity ^0.5.0;
+
+
+
+
+
+
+
+contract PolicySet is UsingConfig, UsingStorage, UsingValidator, IPolicySet {
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
@@ -653,6 +745,7 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 			msg.sender,
 			config().policyFactory()
 		);
+
 		uint256 index = eternalStorage().getUint(getPlicySetIndexKey());
 		bytes32 key = getIndexKey(index);
 		eternalStorage().setAddress(key, _addr);
@@ -660,17 +753,36 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 		eternalStorage().setUint(getPlicySetIndexKey(), index);
 	}
 
-	function deleteAll() external {
+	function reset() external {
 		addressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
 		);
+
 		uint256 index = eternalStorage().getUint(getPlicySetIndexKey());
 		for (uint256 i = 0; i < index; i++) {
 			bytes32 key = getIndexKey(i);
 			eternalStorage().setAddress(key, address(0));
 		}
 		eternalStorage().setUint(getPlicySetIndexKey(), 0);
+		incrementVotingGroupIndex();
+	}
+
+	function setVotingEndBlockNumber(address _policy) external {
+		addressValidator().validateAddress(
+			msg.sender,
+			config().policyFactory()
+		);
+		bytes32 key = getVotingEndBlockNumberKey(_policy);
+		uint256 tmp = IPolicy(config().policy()).policyVotingBlocks();
+		uint256 votingEndBlockNumber = block.number.add(tmp);
+		eternalStorage().setUint(key, votingEndBlockNumber);
+	}
+
+	function voting(address _policy) external view returns (bool) {
+		bytes32 key = getVotingEndBlockNumberKey(_policy);
+		uint256 limit = eternalStorage().getUint(key);
+		return block.number <= limit;
 	}
 
 	function count() external view returns (uint256) {
@@ -680,6 +792,30 @@ contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
 	function get(uint256 _index) external view returns (address) {
 		bytes32 key = getIndexKey(_index);
 		return eternalStorage().getAddress(key);
+	}
+
+	function getVotingGroupIndex() external view returns (uint256) {
+		bytes32 key = getVotingGroupIndexKey();
+		return eternalStorage().getUint(key);
+	}
+
+	function incrementVotingGroupIndex() private {
+		bytes32 key = getVotingGroupIndexKey();
+		uint256 idx = eternalStorage().getUint(key);
+		idx++;
+		eternalStorage().setUint(key, idx);
+	}
+
+	function getVotingGroupIndexKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_votingGroupIndex"));
+	}
+
+	function getVotingEndBlockNumberKey(address _policy)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_votingEndBlockNumber", _policy));
 	}
 
 	function getIndexKey(uint256 _index) private pure returns (bytes32) {
