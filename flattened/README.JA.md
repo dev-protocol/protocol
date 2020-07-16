@@ -12,7 +12,6 @@
 npm install truffle-flattener -g
 ```
 
-
 ## 実行手順
 
 必要に応じて下記コマンドを実行してください。
