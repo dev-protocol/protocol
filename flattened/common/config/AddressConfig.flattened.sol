@@ -1,3 +1,5 @@
+// File: contracts/src/common/lifecycle/Killable.sol
+
 pragma solidity ^0.5.0;
 
 contract Killable {
@@ -12,6 +14,10 @@ contract Killable {
 		selfdestruct(_owner);
 	}
 }
+
+// File: @openzeppelin/contracts/GSN/Context.sol
+
+pragma solidity ^0.5.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -29,6 +35,7 @@ contract Context {
 	constructor() internal {}
 
 	// solhint-disable-previous-line no-empty-blocks
+
 	function _msgSender() internal view returns (address payable) {
 		return msg.sender;
 	}
@@ -38,6 +45,10 @@ contract Context {
 		return msg.data;
 	}
 }
+
+// File: @openzeppelin/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -50,6 +61,7 @@ contract Context {
  */
 contract Ownable is Context {
 	address private _owner;
+
 	event OwnershipTransferred(
 		address indexed previousOwner,
 		address indexed newOwner
@@ -59,8 +71,9 @@ contract Ownable is Context {
 	 * @dev Initializes the contract setting the deployer as the initial owner.
 	 */
 	constructor() internal {
-		_owner = _msgSender();
-		emit OwnershipTransferred(address(0), _owner);
+		address msgSender = _msgSender();
+		_owner = msgSender;
+		emit OwnershipTransferred(address(0), msgSender);
 	}
 
 	/**
@@ -118,14 +131,23 @@ contract Ownable is Context {
 	}
 }
 
-// prettier-ignore
+// File: contracts/src/common/interface/IGroup.sol
+
+pragma solidity ^0.5.0;
+
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
+
 	function addGroup(address _addr) external;
+
 	function getGroupKey(address _addr) internal pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
+
+// File: contracts/src/common/validate/AddressValidator.sol
+
+pragma solidity ^0.5.0;
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -163,7 +185,28 @@ contract AddressValidator {
 		}
 		require(_addr == _target2, errorMessage);
 	}
+
+	function validate3Addresses(
+		address _addr,
+		address _target1,
+		address _target2,
+		address _target3
+	) external pure {
+		if (_addr == _target1) {
+			return;
+		}
+		if (_addr == _target2) {
+			return;
+		}
+		require(_addr == _target3, errorMessage);
+	}
 }
+
+// File: contracts/src/common/validate/UsingValidator.sol
+
+pragma solidity ^0.5.0;
+
+// prettier-ignore
 
 contract UsingValidator {
 	AddressValidator private _validator;
@@ -176,6 +219,10 @@ contract UsingValidator {
 		return _validator;
 	}
 }
+
+// File: contracts/src/common/config/AddressConfig.sol
+
+pragma solidity ^0.5.0;
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;

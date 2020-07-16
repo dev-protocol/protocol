@@ -1,3 +1,22 @@
+// File: contracts/src/common/lifecycle/Killable.sol
+
+pragma solidity ^0.5.0;
+
+contract Killable {
+	address payable public _owner;
+
+	constructor() internal {
+		_owner = msg.sender;
+	}
+
+	function kill() public {
+		require(msg.sender == _owner, "only owner method");
+		selfdestruct(_owner);
+	}
+}
+
+// File: @openzeppelin/contracts/GSN/Context.sol
+
 pragma solidity ^0.5.0;
 
 /*
@@ -27,170 +46,9 @@ contract Context {
 	}
 }
 
-/**
- * @title Roles
- * @dev Library for managing addresses assigned to a Role.
- */
-library Roles {
-	struct Role {
-		mapping(address => bool) bearer;
-	}
+// File: @openzeppelin/contracts/ownership/Ownable.sol
 
-	/**
-	 * @dev Give an account access to this role.
-	 */
-	function add(Role storage role, address account) internal {
-		require(!has(role, account), "Roles: account already has role");
-		role.bearer[account] = true;
-	}
-
-	/**
-	 * @dev Remove an account's access to this role.
-	 */
-	function remove(Role storage role, address account) internal {
-		require(has(role, account), "Roles: account does not have role");
-		role.bearer[account] = false;
-	}
-
-	/**
-	 * @dev Check if an account has this role.
-	 * @return bool
-	 */
-	function has(Role storage role, address account)
-		internal
-		view
-		returns (bool)
-	{
-		require(account != address(0), "Roles: account is the zero address");
-		return role.bearer[account];
-	}
-}
-
-contract PauserRole is Context {
-	using Roles for Roles.Role;
-
-	event PauserAdded(address indexed account);
-	event PauserRemoved(address indexed account);
-
-	Roles.Role private _pausers;
-
-	constructor() internal {
-		_addPauser(_msgSender());
-	}
-
-	modifier onlyPauser() {
-		require(
-			isPauser(_msgSender()),
-			"PauserRole: caller does not have the Pauser role"
-		);
-		_;
-	}
-
-	function isPauser(address account) public view returns (bool) {
-		return _pausers.has(account);
-	}
-
-	function addPauser(address account) public onlyPauser {
-		_addPauser(account);
-	}
-
-	function renouncePauser() public {
-		_removePauser(_msgSender());
-	}
-
-	function _addPauser(address account) internal {
-		_pausers.add(account);
-		emit PauserAdded(account);
-	}
-
-	function _removePauser(address account) internal {
-		_pausers.remove(account);
-		emit PauserRemoved(account);
-	}
-}
-
-/**
- * @dev Contract module which allows children to implement an emergency stop
- * mechanism that can be triggered by an authorized account.
- *
- * This module is used through inheritance. It will make available the
- * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
- * the functions of your contract. Note that they will not be pausable by
- * simply including this module, only once the modifiers are put in place.
- */
-contract Pausable is Context, PauserRole {
-	/**
-	 * @dev Emitted when the pause is triggered by a pauser (`account`).
-	 */
-	event Paused(address account);
-
-	/**
-	 * @dev Emitted when the pause is lifted by a pauser (`account`).
-	 */
-	event Unpaused(address account);
-
-	bool private _paused;
-
-	/**
-	 * @dev Initializes the contract in unpaused state. Assigns the Pauser role
-	 * to the deployer.
-	 */
-	constructor() internal {
-		_paused = false;
-	}
-
-	/**
-	 * @dev Returns true if the contract is paused, and false otherwise.
-	 */
-	function paused() public view returns (bool) {
-		return _paused;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is not paused.
-	 */
-	modifier whenNotPaused() {
-		require(!_paused, "Pausable: paused");
-		_;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is paused.
-	 */
-	modifier whenPaused() {
-		require(_paused, "Pausable: not paused");
-		_;
-	}
-
-	/**
-	 * @dev Called by a pauser to pause, triggers stopped state.
-	 */
-	function pause() public onlyPauser whenNotPaused {
-		_paused = true;
-		emit Paused(_msgSender());
-	}
-
-	/**
-	 * @dev Called by a pauser to unpause, returns to normal state.
-	 */
-	function unpause() public onlyPauser whenPaused {
-		_paused = false;
-		emit Unpaused(_msgSender());
-	}
-}
-
-contract Killable {
-	address payable public _owner;
-
-	constructor() internal {
-		_owner = msg.sender;
-	}
-
-	function kill() public {
-		require(msg.sender == _owner, "only owner method");
-		selfdestruct(_owner);
-	}
-}
+pragma solidity ^0.5.0;
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -273,7 +131,9 @@ contract Ownable is Context {
 	}
 }
 
-// prettier-ignore
+// File: contracts/src/common/interface/IGroup.sol
+
+pragma solidity ^0.5.0;
 
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
@@ -284,6 +144,10 @@ contract IGroup {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
+
+// File: contracts/src/common/validate/AddressValidator.sol
+
+pragma solidity ^0.5.0;
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -321,7 +185,28 @@ contract AddressValidator {
 		}
 		require(_addr == _target2, errorMessage);
 	}
+
+	function validate3Addresses(
+		address _addr,
+		address _target1,
+		address _target2,
+		address _target3
+	) external pure {
+		if (_addr == _target1) {
+			return;
+		}
+		if (_addr == _target2) {
+			return;
+		}
+		require(_addr == _target3, errorMessage);
+	}
 }
+
+// File: contracts/src/common/validate/UsingValidator.sol
+
+pragma solidity ^0.5.0;
+
+// prettier-ignore
 
 contract UsingValidator {
 	AddressValidator private _validator;
@@ -334,6 +219,10 @@ contract UsingValidator {
 		return _validator;
 	}
 }
+
+// File: contracts/src/common/config/AddressConfig.sol
+
+pragma solidity ^0.5.0;
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -444,6 +333,10 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
+// File: contracts/src/common/config/UsingConfig.sol
+
+pragma solidity ^0.5.0;
+
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -459,6 +352,10 @@ contract UsingConfig {
 		return address(_config);
 	}
 }
+
+// File: @openzeppelin/contracts/math/SafeMath.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -627,252 +524,9 @@ library SafeMath {
 	}
 }
 
-contract EternalStorage {
-	address private currentOwner = msg.sender;
+// File: @openzeppelin/contracts/token/ERC20/IERC20.sol
 
-	mapping(bytes32 => uint256) private uIntStorage;
-	mapping(bytes32 => string) private stringStorage;
-	mapping(bytes32 => address) private addressStorage;
-	mapping(bytes32 => bytes32) private bytesStorage;
-	mapping(bytes32 => bool) private boolStorage;
-	mapping(bytes32 => int256) private intStorage;
-
-	modifier onlyCurrentOwner() {
-		require(msg.sender == currentOwner, "not current owner");
-		_;
-	}
-
-	function changeOwner(address _newOwner) external {
-		require(msg.sender == currentOwner, "not current owner");
-		currentOwner = _newOwner;
-	}
-
-	// *** Getter Methods ***
-	function getUint(bytes32 _key) external view returns (uint256) {
-		return uIntStorage[_key];
-	}
-
-	function getString(bytes32 _key) external view returns (string memory) {
-		return stringStorage[_key];
-	}
-
-	function getAddress(bytes32 _key) external view returns (address) {
-		return addressStorage[_key];
-	}
-
-	function getBytes(bytes32 _key) external view returns (bytes32) {
-		return bytesStorage[_key];
-	}
-
-	function getBool(bytes32 _key) external view returns (bool) {
-		return boolStorage[_key];
-	}
-
-	function getInt(bytes32 _key) external view returns (int256) {
-		return intStorage[_key];
-	}
-
-	// *** Setter Methods ***
-	function setUint(bytes32 _key, uint256 _value) external onlyCurrentOwner {
-		uIntStorage[_key] = _value;
-	}
-
-	function setString(bytes32 _key, string calldata _value)
-		external
-		onlyCurrentOwner
-	{
-		stringStorage[_key] = _value;
-	}
-
-	function setAddress(bytes32 _key, address _value)
-		external
-		onlyCurrentOwner
-	{
-		addressStorage[_key] = _value;
-	}
-
-	function setBytes(bytes32 _key, bytes32 _value) external onlyCurrentOwner {
-		bytesStorage[_key] = _value;
-	}
-
-	function setBool(bytes32 _key, bool _value) external onlyCurrentOwner {
-		boolStorage[_key] = _value;
-	}
-
-	function setInt(bytes32 _key, int256 _value) external onlyCurrentOwner {
-		intStorage[_key] = _value;
-	}
-
-	// *** Delete Methods ***
-	function deleteUint(bytes32 _key) external onlyCurrentOwner {
-		delete uIntStorage[_key];
-	}
-
-	function deleteString(bytes32 _key) external onlyCurrentOwner {
-		delete stringStorage[_key];
-	}
-
-	function deleteAddress(bytes32 _key) external onlyCurrentOwner {
-		delete addressStorage[_key];
-	}
-
-	function deleteBytes(bytes32 _key) external onlyCurrentOwner {
-		delete bytesStorage[_key];
-	}
-
-	function deleteBool(bytes32 _key) external onlyCurrentOwner {
-		delete boolStorage[_key];
-	}
-
-	function deleteInt(bytes32 _key) external onlyCurrentOwner {
-		delete intStorage[_key];
-	}
-}
-
-contract UsingStorage is Ownable, Pausable {
-	address private _storage;
-
-	modifier hasStorage() {
-		require(_storage != address(0), "storage is not setted");
-		_;
-	}
-
-	function eternalStorage()
-		internal
-		view
-		hasStorage
-		returns (EternalStorage)
-	{
-		require(paused() == false, "You cannot use that");
-		return EternalStorage(_storage);
-	}
-
-	function getStorageAddress() external view hasStorage returns (address) {
-		return _storage;
-	}
-
-	function createStorage() external onlyOwner {
-		require(_storage == address(0), "storage is setted");
-		EternalStorage tmp = new EternalStorage();
-		_storage = address(tmp);
-	}
-
-	function setStorage(address _storageAddress) external onlyOwner {
-		_storage = _storageAddress;
-	}
-
-	function changeOwner(address newOwner) external onlyOwner {
-		EternalStorage(_storage).changeOwner(newOwner);
-	}
-}
-
-contract VoteTimesStorage is
-	UsingStorage,
-	UsingConfig,
-	UsingValidator,
-	Killable
-{
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	// Vote Times
-	function getVoteTimes() external view returns (uint256) {
-		return eternalStorage().getUint(getVoteTimesKey());
-	}
-
-	function setVoteTimes(uint256 times) external {
-		addressValidator().validateAddress(msg.sender, config().voteTimes());
-
-		return eternalStorage().setUint(getVoteTimesKey(), times);
-	}
-
-	function getVoteTimesKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_voteTimes"));
-	}
-
-	//Vote Times By Property
-	function getVoteTimesByProperty(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return eternalStorage().getUint(getVoteTimesByPropertyKey(_property));
-	}
-
-	function setVoteTimesByProperty(address _property, uint256 times) external {
-		addressValidator().validateAddress(msg.sender, config().voteTimes());
-
-		return
-			eternalStorage().setUint(
-				getVoteTimesByPropertyKey(_property),
-				times
-			);
-	}
-
-	function getVoteTimesByPropertyKey(address _property)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_voteTimesByProperty", _property));
-	}
-}
-
-contract VoteTimes is UsingConfig, UsingValidator, Killable {
-	using SafeMath for uint256;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function addVoteTime() external {
-		addressValidator().validateAddresses(
-			msg.sender,
-			config().marketFactory(),
-			config().policyFactory()
-		);
-
-		uint256 voteTimes = getStorage().getVoteTimes();
-		voteTimes = voteTimes.add(1);
-		getStorage().setVoteTimes(voteTimes);
-	}
-
-	function addVoteTimesByProperty(address _property) external {
-		addressValidator().validateAddress(msg.sender, config().voteCounter());
-
-		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(
-			_property
-		);
-		voteTimesByProperty = voteTimesByProperty.add(1);
-		getStorage().setVoteTimesByProperty(_property, voteTimesByProperty);
-	}
-
-	function resetVoteTimesByProperty(address _property) external {
-		addressValidator().validateAddresses(
-			msg.sender,
-			config().allocator(),
-			config().propertyFactory()
-		);
-
-		uint256 voteTimes = getStorage().getVoteTimes();
-		getStorage().setVoteTimesByProperty(_property, voteTimes);
-	}
-
-	function getAbstentionTimes(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		uint256 voteTimes = getStorage().getVoteTimes();
-		uint256 voteTimesByProperty = getStorage().getVoteTimesByProperty(
-			_property
-		);
-		return voteTimes.sub(voteTimesByProperty);
-	}
-
-	function getStorage() private view returns (VoteTimesStorage) {
-		return VoteTimesStorage(config().voteTimesStorage());
-	}
-}
+pragma solidity ^0.5.0;
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -961,6 +615,10 @@ interface IERC20 {
 		uint256 value
 	);
 }
+
+// File: @openzeppelin/contracts/token/ERC20/ERC20.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Implementation of the {IERC20} interface.
@@ -1240,63 +898,71 @@ contract ERC20 is Context, IERC20 {
 	}
 }
 
-// prettier-ignore
+// File: @openzeppelin/contracts/token/ERC20/ERC20Detailed.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Optional functions from the ERC20 standard.
  */
 contract ERC20Detailed is IERC20 {
-    string private _name;
-    string private _symbol;
-    uint8 private _decimals;
+	string private _name;
+	string private _symbol;
+	uint8 private _decimals;
 
-    /**
-     * @dev Sets the values for `name`, `symbol`, and `decimals`. All three of
-     * these values are immutable: they can only be set once during
-     * construction.
-     */
-    constructor (string memory name, string memory symbol, uint8 decimals) public {
-        _name = name;
-        _symbol = symbol;
-        _decimals = decimals;
-    }
+	/**
+	 * @dev Sets the values for `name`, `symbol`, and `decimals`. All three of
+	 * these values are immutable: they can only be set once during
+	 * construction.
+	 */
+	constructor(
+		string memory name,
+		string memory symbol,
+		uint8 decimals
+	) public {
+		_name = name;
+		_symbol = symbol;
+		_decimals = decimals;
+	}
 
-    /**
-     * @dev Returns the name of the token.
-     */
-    function name() public view returns (string memory) {
-        return _name;
-    }
+	/**
+	 * @dev Returns the name of the token.
+	 */
+	function name() public view returns (string memory) {
+		return _name;
+	}
 
-    /**
-     * @dev Returns the symbol of the token, usually a shorter version of the
-     * name.
-     */
-    function symbol() public view returns (string memory) {
-        return _symbol;
-    }
+	/**
+	 * @dev Returns the symbol of the token, usually a shorter version of the
+	 * name.
+	 */
+	function symbol() public view returns (string memory) {
+		return _symbol;
+	}
 
-    /**
-     * @dev Returns the number of decimals used to get its user representation.
-     * For example, if `decimals` equals `2`, a balance of `505` tokens should
-     * be displayed to a user as `5,05` (`505 / 10 ** 2`).
-     *
-     * Tokens usually opt for a value of 18, imitating the relationship between
-     * Ether and Wei.
-     *
-     * NOTE: This information is only used for _display_ purposes: it in
-     * no way affects any of the arithmetic of the contract, including
-     * {IERC20-balanceOf} and {IERC20-transfer}.
-     */
-    function decimals() public view returns (uint8) {
-        return _decimals;
-    }
+	/**
+	 * @dev Returns the number of decimals used to get its user representation.
+	 * For example, if `decimals` equals `2`, a balance of `505` tokens should
+	 * be displayed to a user as `5,05` (`505 / 10 ** 2`).
+	 *
+	 * Tokens usually opt for a value of 18, imitating the relationship between
+	 * Ether and Wei.
+	 *
+	 * NOTE: This information is only used for _display_ purposes: it in
+	 * no way affects any of the arithmetic of the contract, including
+	 * {IERC20-balanceOf} and {IERC20-transfer}.
+	 */
+	function decimals() public view returns (uint8) {
+		return _decimals;
+	}
 }
 
-contract IAllocator {
-	function allocate(address _metrics) external;
+// File: contracts/src/allocator/IAllocator.sol
 
-	function calculatedCallback(address _metrics, uint256 _value) external;
+pragma solidity ^0.5.0;
+
+contract IAllocator {
+	function calculateMaxRewardsPerBlock() public view returns (uint256);
 
 	function beforeBalanceChange(
 		address _property,
@@ -1304,2112 +970,31 @@ contract IAllocator {
 		address _to
 		// solium-disable-next-line indentation
 	) external;
-
-	function getRewardsAmount(address _property)
-		external
-		view
-		returns (uint256);
-
-	function allocation(
-		uint256 _blocks,
-		uint256 _mint,
-		uint256 _value,
-		uint256 _marketValue,
-		uint256 _assets,
-		uint256 _totalAssets
-	)
-		public
-		pure
-		returns (
-			// solium-disable-next-line indentation
-			uint256
-		);
 }
 
-library Decimals {
-	using SafeMath for uint256;
-	uint120 private constant basisValue = 1000000000000000000;
+// File: contracts/src/property/IProperty.sol
 
-	function outOf(uint256 _a, uint256 _b)
-		internal
-		pure
-		returns (uint256 result)
-	{
-		if (_a == 0) {
-			return 0;
-		}
-		uint256 a = _a.mul(basisValue);
-		if (a < _b) {
-			return 0;
-		}
-		return (a.div(_b));
-	}
+pragma solidity ^0.5.0;
 
-	function basis() external pure returns (uint120) {
-		return basisValue;
-	}
+contract IProperty {
+	function author() external view returns (address);
+
+	function withdraw(address _sender, uint256 _value) external;
 }
+
+// File: contracts/src/property/Property.sol
+
+pragma solidity ^0.5.0;
 
 // prettier-ignore
 
-contract MinterRole is Context {
-    using Roles for Roles.Role;
-
-    event MinterAdded(address indexed account);
-    event MinterRemoved(address indexed account);
-
-    Roles.Role private _minters;
-
-    constructor () internal {
-        _addMinter(_msgSender());
-    }
-
-    modifier onlyMinter() {
-        require(isMinter(_msgSender()), "MinterRole: caller does not have the Minter role");
-        _;
-    }
-
-    function isMinter(address account) public view returns (bool) {
-        return _minters.has(account);
-    }
-
-    function addMinter(address account) public onlyMinter {
-        _addMinter(account);
-    }
-
-    function renounceMinter() public {
-        _removeMinter(_msgSender());
-    }
-
-    function _addMinter(address account) internal {
-        _minters.add(account);
-        emit MinterAdded(account);
-    }
-
-    function _removeMinter(address account) internal {
-        _minters.remove(account);
-        emit MinterRemoved(account);
-    }
-}
-
-/**
- * @dev Extension of {ERC20} that adds a set of accounts with the {MinterRole},
- * which have permission to mint (create) new tokens as they see fit.
- *
- * At construction, the deployer of the contract is the only minter.
- */
-contract ERC20Mintable is ERC20, MinterRole {
-	/**
-	 * @dev See {ERC20-_mint}.
-	 *
-	 * Requirements:
-	 *
-	 * - the caller must have the {MinterRole}.
-	 */
-	function mint(address account, uint256 amount)
-		public
-		onlyMinter
-		returns (bool)
-	{
-		_mint(account, amount);
-		return true;
-	}
-}
-
-contract PropertyGroup is
-	UsingConfig,
-	UsingStorage,
-	UsingValidator,
-	IGroup,
-	Killable
-{
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function addGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().propertyFactory()
-		);
-
-		require(isGroup(_addr) == false, "already enabled");
-		eternalStorage().setBool(getGroupKey(_addr), true);
-	}
-
-	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
-	}
-}
-
-contract LockupStorage is UsingConfig, UsingStorage, UsingValidator {
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	//AllValue
-	function setAllValue(uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getAllValueKey();
-		eternalStorage().setUint(key, _value);
-	}
-
-	function getAllValue() external view returns (uint256) {
-		bytes32 key = getAllValueKey();
-		return eternalStorage().getUint(key);
-	}
-
-	function getAllValueKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_allValue"));
-	}
-
-	//Value
-	function setValue(
-		address _property,
-		address _sender,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getValueKey(_property, _sender);
-		eternalStorage().setUint(key, _value);
-	}
-
-	function getValue(address _property, address _sender)
-		external
-		view
-		returns (uint256)
-	{
-		bytes32 key = getValueKey(_property, _sender);
-		return eternalStorage().getUint(key);
-	}
-
-	function getValueKey(address _property, address _sender)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_value", _property, _sender));
-	}
-
-	//PropertyValue
-	function setPropertyValue(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getPropertyValueKey(_property);
-		eternalStorage().setUint(key, _value);
-	}
-
-	function getPropertyValue(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		bytes32 key = getPropertyValueKey(_property);
-		return eternalStorage().getUint(key);
-	}
-
-	function getPropertyValueKey(address _property)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_propertyValue", _property));
-	}
-
-	//WithdrawalStatus
-	function setWithdrawalStatus(
-		address _property,
-		address _from,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		bytes32 key = getWithdrawalStatusKey(_property, _from);
-		eternalStorage().setUint(key, _value);
-	}
-
-	function getWithdrawalStatus(address _property, address _from)
-		external
-		view
-		returns (uint256)
-	{
-		bytes32 key = getWithdrawalStatusKey(_property, _from);
-		return eternalStorage().getUint(key);
-	}
-
-	function getWithdrawalStatusKey(address _property, address _sender)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_withdrawalStatus", _property, _sender)
-			);
-	}
-
-	//InterestPrice
-	function setInterestPrice(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(getInterestPriceKey(_property), _value);
-	}
-
-	function getInterestPrice(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return eternalStorage().getUint(getInterestPriceKey(_property));
-	}
-
-	function getInterestPriceKey(address _property)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_interestTotals", _property));
-	}
-
-	//LastInterestPrice
-	function setLastInterestPrice(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(
-			getLastInterestPriceKey(_property, _user),
-			_value
-		);
-	}
-
-	function getLastInterestPrice(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(getLastInterestPriceKey(_property, _user));
-	}
-
-	function getLastInterestPriceKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_lastLastInterestPrice", _property, _user)
-			);
-	}
-
-	//PendingWithdrawal
-	function setPendingInterestWithdrawal(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().lockup());
-
-		eternalStorage().setUint(
-			getPendingInterestWithdrawalKey(_property, _user),
-			_value
-		);
-	}
-
-	function getPendingInterestWithdrawal(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getPendingInterestWithdrawalKey(_property, _user)
-			);
-	}
-
-	function getPendingInterestWithdrawalKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_pendingInterestWithdrawal", _property, _user)
-			);
-	}
-}
-
-contract IPolicy {
-	function rewards(uint256 _lockups, uint256 _assets)
-		external
-		view
-		returns (uint256);
-
-	function holdersShare(uint256 _amount, uint256 _lockups)
-		external
-		view
-		returns (uint256);
-
-	function assetValue(uint256 _value, uint256 _lockups)
-		external
-		view
-		returns (uint256);
-
-	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
-		external
-		view
-		returns (uint256);
-
-	function marketApproval(uint256 _agree, uint256 _opposite)
-		external
-		view
-		returns (bool);
-
-	function policyApproval(uint256 _agree, uint256 _opposite)
-		external
-		view
-		returns (bool);
-
-	function marketVotingBlocks() external view returns (uint256);
-
-	function policyVotingBlocks() external view returns (uint256);
-
-	function abstentionPenalty(uint256 _count) external view returns (uint256);
-
-	function lockUpBlocks() external view returns (uint256);
-}
-
-contract MarketGroup is
-	UsingConfig,
-	UsingStorage,
-	IGroup,
-	UsingValidator,
-	Killable
-{
-	using SafeMath for uint256;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
-
-	function addGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().marketFactory()
-		);
-
-		require(isGroup(_addr) == false, "already enabled");
-		eternalStorage().setBool(getGroupKey(_addr), true);
-		addCount();
-	}
-
-	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
-	}
-
-	function addCount() private {
-		bytes32 key = getCountKey();
-		uint256 number = eternalStorage().getUint(key);
-		number = number.add(1);
-		eternalStorage().setUint(key, number);
-	}
-
-	function getCount() external view returns (uint256) {
-		bytes32 key = getCountKey();
-		return eternalStorage().getUint(key);
-	}
-
-	function getCountKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_count"));
-	}
-}
-
-contract PolicySet is UsingConfig, UsingStorage, UsingValidator, Killable {
-	using SafeMath for uint256;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function addSet(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
-
-		uint256 index = eternalStorage().getUint(getPlicySetIndexKey());
-		bytes32 key = getIndexKey(index);
-		eternalStorage().setAddress(key, _addr);
-		index = index.add(1);
-		eternalStorage().setUint(getPlicySetIndexKey(), index);
-	}
-
-	function deleteAll() external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
-
-		uint256 index = eternalStorage().getUint(getPlicySetIndexKey());
-		for (uint256 i = 0; i < index; i++) {
-			bytes32 key = getIndexKey(i);
-			eternalStorage().setAddress(key, address(0));
-		}
-		eternalStorage().setUint(getPlicySetIndexKey(), 0);
-	}
-
-	function count() external view returns (uint256) {
-		return eternalStorage().getUint(getPlicySetIndexKey());
-	}
-
-	function get(uint256 _index) external view returns (address) {
-		bytes32 key = getIndexKey(_index);
-		return eternalStorage().getAddress(key);
-	}
-
-	function getIndexKey(uint256 _index) private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_index", _index));
-	}
-
-	function getPlicySetIndexKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_policySetIndex"));
-	}
-}
-
-contract PolicyGroup is
-	UsingConfig,
-	UsingStorage,
-	UsingValidator,
-	IGroup,
-	Killable
-{
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function addGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
-
-		require(isGroup(_addr) == false, "already enabled");
-		eternalStorage().setBool(getGroupKey(_addr), true);
-	}
-
-	function deleteGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
-
-		require(isGroup(_addr), "not enabled");
-		return eternalStorage().setBool(getGroupKey(_addr), false);
-	}
-
-	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
-	}
-}
-
-contract PolicyFactory is Pausable, UsingConfig, UsingValidator, Killable {
-	event Create(address indexed _from, address _policy, address _innerPolicy);
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function create(address _newPolicyAddress) external returns (address) {
-		require(paused() == false, "You cannot use that");
-		addressValidator().validateIllegalAddress(_newPolicyAddress);
-
-		Policy policy = new Policy(address(config()), _newPolicyAddress);
-		address policyAddress = address(policy);
-		emit Create(msg.sender, policyAddress, _newPolicyAddress);
-		if (config().policy() == address(0)) {
-			config().setPolicy(policyAddress);
-		} else {
-			VoteTimes(config().voteTimes()).addVoteTime();
-		}
-		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
-		policyGroup.addGroup(policyAddress);
-		PolicySet policySet = PolicySet(config().policySet());
-		policySet.addSet(policyAddress);
-		return policyAddress;
-	}
-
-	function convergePolicy(address _currentPolicyAddress) external {
-		addressValidator().validateGroup(msg.sender, config().policyGroup());
-
-		config().setPolicy(_currentPolicyAddress);
-		PolicySet policySet = PolicySet(config().policySet());
-		PolicyGroup policyGroup = PolicyGroup(config().policyGroup());
-		for (uint256 i = 0; i < policySet.count(); i++) {
-			address policyAddress = policySet.get(i);
-			if (policyAddress == _currentPolicyAddress) {
-				continue;
-			}
-			Policy(policyAddress).kill();
-			policyGroup.deleteGroup(policyAddress);
-		}
-		policySet.deleteAll();
-		policySet.addSet(_currentPolicyAddress);
-	}
-}
-
-contract Policy is Killable, UsingConfig, UsingValidator {
-	using SafeMath for uint256;
-	IPolicy private _policy;
-	uint256 private _votingEndBlockNumber;
-
-	constructor(address _config, address _innerPolicyAddress)
-		public
-		UsingConfig(_config)
-	{
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
-
-		_policy = IPolicy(_innerPolicyAddress);
-		setVotingEndBlockNumber();
-	}
-
-	function voting() public view returns (bool) {
-		return block.number <= _votingEndBlockNumber;
-	}
-
-	function rewards(uint256 _lockups, uint256 _assets)
-		external
-		view
-		returns (uint256)
-	{
-		return _policy.rewards(_lockups, _assets);
-	}
-
-	function holdersShare(uint256 _amount, uint256 _lockups)
-		external
-		view
-		returns (uint256)
-	{
-		return _policy.holdersShare(_amount, _lockups);
-	}
-
-	function assetValue(uint256 _value, uint256 _lockups)
-		external
-		view
-		returns (uint256)
-	{
-		return _policy.assetValue(_value, _lockups);
-	}
-
-	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
-		external
-		view
-		returns (uint256)
-	{
-		return _policy.authenticationFee(_assets, _propertyAssets);
-	}
-
-	function marketApproval(uint256 _agree, uint256 _opposite)
-		external
-		view
-		returns (bool)
-	{
-		return _policy.marketApproval(_agree, _opposite);
-	}
-
-	function policyApproval(uint256 _agree, uint256 _opposite)
-		external
-		view
-		returns (bool)
-	{
-		return _policy.policyApproval(_agree, _opposite);
-	}
-
-	function marketVotingBlocks() external view returns (uint256) {
-		return _policy.marketVotingBlocks();
-	}
-
-	function policyVotingBlocks() external view returns (uint256) {
-		return _policy.policyVotingBlocks();
-	}
-
-	function abstentionPenalty(uint256 _count) external view returns (uint256) {
-		return _policy.abstentionPenalty(_count);
-	}
-
-	function lockUpBlocks() external view returns (uint256) {
-		return _policy.lockUpBlocks();
-	}
-
-	function vote(address _property, bool _agree) external {
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
-		require(config().policy() != address(this), "this policy is current");
-		require(voting(), "voting deadline is over");
-		VoteCounter voteCounter = VoteCounter(config().voteCounter());
-		voteCounter.addVoteCount(msg.sender, _property, _agree);
-		bool result = Policy(config().policy()).policyApproval(
-			voteCounter.getAgreeCount(address(this)),
-			voteCounter.getOppositeCount(address(this))
-		);
-		if (result == false) {
-			return;
-		}
-		PolicyFactory(config().policyFactory()).convergePolicy(address(this));
-		_votingEndBlockNumber = 0;
-	}
-
-	function setVotingEndBlockNumber() private {
-		if (config().policy() == address(0)) {
-			return;
-		}
-		uint256 tmp = Policy(config().policy()).policyVotingBlocks();
-		_votingEndBlockNumber = block.number.add(tmp);
-	}
-}
-
-contract Lockup is Pausable, UsingConfig, UsingValidator {
-	using SafeMath for uint256;
-	using Decimals for uint256;
-	event Lockedup(address _from, address _property, uint256 _value);
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function lockup(
-		address _from,
-		address _property,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().token());
-		addressValidator().validateGroup(_property, config().propertyGroup());
-		require(_value != 0, "illegal lockup value");
-
-		bool isWaiting = getStorage().getWithdrawalStatus(_property, _from) !=
-			0;
-		require(isWaiting == false, "lockup is already canceled");
-		updatePendingInterestWithdrawal(_property, _from);
-		addValue(_property, _from, _value);
-		addPropertyValue(_property, _value);
-		addAllValue(_value);
-		getStorage().setLastInterestPrice(
-			_property,
-			_from,
-			getStorage().getInterestPrice(_property)
-		);
-		emit Lockedup(_from, _property, _value);
-	}
-
-	function cancel(address _property) external {
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
-		require(hasValue(_property, msg.sender), "dev token is not locked");
-		bool isWaiting = getStorage().getWithdrawalStatus(
-			_property,
-			msg.sender
-		) != 0;
-		require(isWaiting == false, "lockup is already canceled");
-		uint256 blockNumber = Policy(config().policy()).lockUpBlocks();
-		blockNumber = blockNumber.add(block.number);
-		getStorage().setWithdrawalStatus(_property, msg.sender, blockNumber);
-	}
-
-	function withdraw(address _property) external {
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
-		require(possible(_property, msg.sender), "waiting for release");
-		uint256 lockupedValue = getStorage().getValue(_property, msg.sender);
-		require(lockupedValue != 0, "dev token is not locked");
-		updatePendingInterestWithdrawal(_property, msg.sender);
-		Property(_property).withdraw(msg.sender, lockupedValue);
-		getStorage().setValue(_property, msg.sender, 0);
-		subPropertyValue(_property, lockupedValue);
-		subAllValue(lockupedValue);
-		getStorage().setWithdrawalStatus(_property, msg.sender, 0);
-	}
-
-	function increment(address _property, uint256 _interestResult) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		uint256 priceValue = _interestResult.outOf(
-			getStorage().getPropertyValue(_property)
-		);
-		incrementInterest(_property, priceValue);
-	}
-
-	function _calculateInterestAmount(address _property, address _user)
-		private
-		view
-		returns (uint256)
-	{
-		uint256 _last = getStorage().getLastInterestPrice(_property, _user);
-		uint256 price = getStorage().getInterestPrice(_property);
-		uint256 priceGap = price.sub(_last);
-		uint256 lockupedValue = getStorage().getValue(_property, _user);
-		uint256 value = priceGap.mul(lockupedValue);
-		return value.div(Decimals.basis());
-	}
-
-	function calculateInterestAmount(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return _calculateInterestAmount(_property, _user);
-	}
-
-	function _calculateWithdrawableInterestAmount(
-		address _property,
-		address _user
-	) private view returns (uint256) {
-		uint256 pending = getStorage().getPendingInterestWithdrawal(
-			_property,
-			_user
-		);
-		return _calculateInterestAmount(_property, _user).add(pending);
-	}
-
-	function calculateWithdrawableInterestAmount(
-		address _property,
-		address _user
-	) external view returns (uint256) {
-		return _calculateWithdrawableInterestAmount(_property, _user);
-	}
-
-	function withdrawInterest(address _property) external {
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
-		uint256 value = _calculateWithdrawableInterestAmount(
-			_property,
-			msg.sender
-		);
-		require(value > 0, "your interest amount is 0");
-		getStorage().setLastInterestPrice(
-			_property,
-			msg.sender,
-			getStorage().getInterestPrice(_property)
-		);
-		getStorage().setPendingInterestWithdrawal(_property, msg.sender, 0);
-		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		require(erc20.mint(msg.sender, value), "dev mint failed");
-	}
-
-	function getAllValue() external view returns (uint256) {
-		return getStorage().getAllValue();
-	}
-
-	function addAllValue(uint256 _value) private {
-		uint256 value = getStorage().getAllValue();
-		value = value.add(_value);
-		getStorage().setAllValue(value);
-	}
-
-	function subAllValue(uint256 _value) private {
-		uint256 value = getStorage().getAllValue();
-		value = value.sub(_value);
-		getStorage().setAllValue(value);
-	}
-
-	function getPropertyValue(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return getStorage().getPropertyValue(_property);
-	}
-
-	function getValue(address _property, address _sender)
-		external
-		view
-		returns (uint256)
-	{
-		return getStorage().getValue(_property, _sender);
-	}
-
-	function addValue(
-		address _property,
-		address _sender,
-		uint256 _value
-	) private {
-		uint256 value = getStorage().getValue(_property, _sender);
-		value = value.add(_value);
-		getStorage().setValue(_property, _sender, value);
-	}
-
-	function hasValue(address _property, address _sender)
-		private
-		view
-		returns (bool)
-	{
-		uint256 value = getStorage().getValue(_property, _sender);
-		return value != 0;
-	}
-
-	function addPropertyValue(address _property, uint256 _value) private {
-		uint256 value = getStorage().getPropertyValue(_property);
-		value = value.add(_value);
-		getStorage().setPropertyValue(_property, value);
-	}
-
-	function subPropertyValue(address _property, uint256 _value) private {
-		uint256 value = getStorage().getPropertyValue(_property);
-		value = value.sub(_value);
-		getStorage().setPropertyValue(_property, value);
-	}
-
-	function incrementInterest(address _property, uint256 _priceValue) private {
-		uint256 price = getStorage().getInterestPrice(_property);
-		getStorage().setInterestPrice(_property, price.add(_priceValue));
-	}
-
-	function updatePendingInterestWithdrawal(address _property, address _user)
-		private
-	{
-		uint256 pending = getStorage().getPendingInterestWithdrawal(
-			_property,
-			_user
-		);
-		getStorage().setPendingInterestWithdrawal(
-			_property,
-			_user,
-			_calculateInterestAmount(_property, _user).add(pending)
-		);
-	}
-
-	function possible(address _property, address _from)
-		private
-		view
-		returns (bool)
-	{
-		uint256 blockNumber = getStorage().getWithdrawalStatus(
-			_property,
-			_from
-		);
-		if (blockNumber == 0) {
-			return false;
-		}
-		return blockNumber <= block.number;
-	}
-
-	function getStorage() private view returns (LockupStorage) {
-		require(paused() == false, "You cannot use that");
-		return LockupStorage(config().lockupStorage());
-	}
-}
-
-// prettier-ignore
-
-contract VoteCounterStorage is UsingStorage, UsingConfig, UsingValidator {
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	// Already Vote Flg
-	function setAlreadyVoteFlg(
-		address _user,
-		address _sender,
-		address _property
-	) external {
-		addressValidator().validateAddress(msg.sender, config().voteCounter());
-
-		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
-		return eternalStorage().setBool(alreadyVoteKey, true);
-	}
-
-	function getAlreadyVoteFlg(
-		address _user,
-		address _sender,
-		address _property
-	) external view returns (bool) {
-		bytes32 alreadyVoteKey = getAlreadyVoteKey(_user, _sender, _property);
-		return eternalStorage().getBool(alreadyVoteKey);
-	}
-
-	function getAlreadyVoteKey(
-		address _sender,
-		address _target,
-		address _property
-	) private pure returns (bytes32) {
-		return
-			keccak256(
-				abi.encodePacked("_alreadyVote", _sender, _target, _property)
-			);
-	}
-
-	// Agree Count
-	function getAgreeCount(address _sender) external view returns (uint256) {
-		return eternalStorage().getUint(getAgreeVoteCountKey(_sender));
-	}
-
-	function setAgreeCount(address _sender, uint256 count) external {
-		addressValidator().validateAddress(msg.sender, config().voteCounter());
-
-		eternalStorage().setUint(getAgreeVoteCountKey(_sender), count);
-	}
-
-	function getAgreeVoteCountKey(address _sender)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked(_sender, "_agreeVoteCount"));
-	}
-
-	// Opposite Count
-	function getOppositeCount(address _sender) external view returns (uint256) {
-		return eternalStorage().getUint(getOppositeVoteCountKey(_sender));
-	}
-
-	function setOppositeCount(address _sender, uint256 count) external {
-		addressValidator().validateAddress(msg.sender, config().voteCounter());
-
-		eternalStorage().setUint(getOppositeVoteCountKey(_sender), count);
-	}
-
-	function getOppositeVoteCountKey(address _sender)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked(_sender, "_oppositeVoteCount"));
-	}
-}
-
-contract VoteCounter is UsingConfig, UsingValidator, Killable {
-	using SafeMath for uint256;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function addVoteCount(
-		address _user,
-		address _property,
-		bool _agree
-	) external {
-		addressValidator().validateGroups(
-			msg.sender,
-			config().marketGroup(),
-			config().policyGroup()
-		);
-
-		bool alreadyVote = getStorage().getAlreadyVoteFlg(
-			_user,
-			msg.sender,
-			_property
-		);
-		require(alreadyVote == false, "already vote");
-		uint256 voteCount = getVoteCount(_user, _property);
-		require(voteCount != 0, "vote count is 0");
-		getStorage().setAlreadyVoteFlg(_user, msg.sender, _property);
-		if (_agree) {
-			addAgreeCount(msg.sender, voteCount);
-		} else {
-			addOppositeCount(msg.sender, voteCount);
-		}
-	}
-
-	function getAgreeCount(address _sender) external view returns (uint256) {
-		return getStorage().getAgreeCount(_sender);
-	}
-
-	function getOppositeCount(address _sender) external view returns (uint256) {
-		return getStorage().getOppositeCount(_sender);
-	}
-
-	function getVoteCount(address _sender, address _property)
-		private
-		returns (uint256)
-	{
-		uint256 voteCount;
-		if (Property(_property).author() == _sender) {
-			// solium-disable-next-line operator-whitespace
-			voteCount = Lockup(config().lockup())
-				.getPropertyValue(_property)
-				.add(
-				Allocator(config().allocator()).getRewardsAmount(_property)
-			);
-			VoteTimes(config().voteTimes()).addVoteTimesByProperty(_property);
-		} else {
-			voteCount = Lockup(config().lockup()).getValue(_property, _sender);
-		}
-		return voteCount;
-	}
-
-	function addAgreeCount(address _target, uint256 _voteCount) private {
-		uint256 agreeCount = getStorage().getAgreeCount(_target);
-		agreeCount = agreeCount.add(_voteCount);
-		getStorage().setAgreeCount(_target, agreeCount);
-	}
-
-	function addOppositeCount(address _target, uint256 _voteCount) private {
-		uint256 oppositeCount = getStorage().getOppositeCount(_target);
-		oppositeCount = oppositeCount.add(_voteCount);
-		getStorage().setOppositeCount(_target, oppositeCount);
-	}
-
-	function getStorage() private view returns (VoteCounterStorage) {
-		return VoteCounterStorage(config().voteCounterStorage());
-	}
-}
-
-contract IMarket {
-	function authenticate(
-		address _prop,
-		string memory _args1,
-		string memory _args2,
-		string memory _args3,
-		string memory _args4,
-		string memory _args5
-	)
-		public
-		returns (
-			// solium-disable-next-line indentation
-			address
-		);
-
-	function authenticatedCallback(address _property, bytes32 _idHash)
-		external
-		returns (address);
-
-	function deauthenticate(address _metrics) external;
-
-	function vote(address _property, bool _agree) external;
-
-	function schema() external view returns (string memory);
-
-	function behavior() external view returns (address);
-}
-
-contract IMarketBehavior {
-	string public schema;
-
-	function authenticate(
-		address _prop,
-		string memory _args1,
-		string memory _args2,
-		string memory _args3,
-		string memory _args4,
-		string memory _args5,
-		address market
-	)
-		public
-		returns (
-			// solium-disable-next-line indentation
-			address
-		);
-
-	function calculate(
-		address _metrics,
-		uint256 _start,
-		uint256 _end
-	)
-		external
-		returns (
-			// solium-disable-next-line indentation
-			bool
-		);
-
-	function getId(address _metrics) external view returns (string memory);
-}
-
-contract Metrics {
-	address public market;
-	address public property;
-
-	constructor(address _market, address _property) public {
-		//Do not validate because there is no AddressConfig
-		market = _market;
-		property = _property;
-	}
-}
-
-contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
-	using SafeMath for uint256;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function addGroup(address _addr) external {
-		require(paused() == false, "You cannot use that");
-		addressValidator().validateAddress(
-			msg.sender,
-			config().metricsFactory()
-		);
-
-		require(isGroup(_addr) == false, "already enabled");
-		eternalStorage().setBool(getGroupKey(_addr), true);
-		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
-		totalCount = totalCount.add(1);
-		eternalStorage().setUint(getTotalCountKey(), totalCount);
-	}
-
-	function removeGroup(address _addr) external {
-		require(paused() == false, "You cannot use that");
-		addressValidator().validateAddress(
-			msg.sender,
-			config().metricsFactory()
-		);
-
-		require(isGroup(_addr), "address is not group");
-		eternalStorage().setBool(getGroupKey(_addr), false);
-		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
-		totalCount = totalCount.sub(1);
-		eternalStorage().setUint(getTotalCountKey(), totalCount);
-	}
-
-	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
-	}
-
-	function totalIssuedMetrics() external view returns (uint256) {
-		return eternalStorage().getUint(getTotalCountKey());
-	}
-
-	function getTotalCountKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_totalCount"));
-	}
-}
-
-contract MetricsFactory is Pausable, UsingConfig, UsingValidator {
-	event Create(address indexed _from, address _metrics);
-	event Destroy(address indexed _from, address _metrics);
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function create(address _property) external returns (address) {
-		require(paused() == false, "You cannot use that");
-		addressValidator().validateGroup(msg.sender, config().marketGroup());
-
-		Metrics metrics = new Metrics(msg.sender, _property);
-		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
-		address metricsAddress = address(metrics);
-		metricsGroup.addGroup(metricsAddress);
-		emit Create(msg.sender, metricsAddress);
-		return metricsAddress;
-	}
-
-	function destroy(address _metrics) external {
-		require(paused() == false, "You cannot use that");
-
-		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
-		require(metricsGroup.isGroup(_metrics), "address is not metrics");
-		addressValidator().validateGroup(msg.sender, config().marketGroup());
-		Metrics metrics = Metrics(_metrics);
-		addressValidator().validateAddress(msg.sender, metrics.market());
-		metricsGroup.removeGroup(_metrics);
-		emit Destroy(msg.sender, _metrics);
-	}
-}
-
-// prettier-ignore
-// prettier-ignore
-// prettier-ignore
-
-/**
- * @dev Extension of {ERC20} that allows token holders to destroy both their own
- * tokens and those that they have an allowance for, in a way that can be
- * recognized off-chain (via event analysis).
- */
-contract ERC20Burnable is Context, ERC20 {
-    /**
-     * @dev Destroys `amount` tokens from the caller.
-     *
-     * See {ERC20-_burn}.
-     */
-    function burn(uint256 amount) public {
-        _burn(_msgSender(), amount);
-    }
-
-    /**
-     * @dev See {ERC20-_burnFrom}.
-     */
-    function burnFrom(address account, uint256 amount) public {
-        _burnFrom(account, amount);
-    }
-}
-
-contract Dev is
+contract Property is
+	ERC20,
 	ERC20Detailed,
-	ERC20Mintable,
-	ERC20Burnable,
 	UsingConfig,
-	UsingValidator
+	UsingValidator,
+	IProperty
 {
-	constructor(address _config)
-		public
-		ERC20Detailed("Dev", "DEV", 18)
-		UsingConfig(_config)
-	{}
-
-	function deposit(address _to, uint256 _amount) external returns (bool) {
-		require(transfer(_to, _amount), "dev transfer failed");
-		lock(msg.sender, _to, _amount);
-		return true;
-	}
-
-	function depositFrom(
-		address _from,
-		address _to,
-		uint256 _amount
-	) external returns (bool) {
-		require(transferFrom(_from, _to, _amount), "dev transferFrom failed");
-		lock(_from, _to, _amount);
-		return true;
-	}
-
-	function fee(address _from, uint256 _amount) external returns (bool) {
-		addressValidator().validateGroup(msg.sender, config().marketGroup());
-		_burn(_from, _amount);
-		return true;
-	}
-
-	function lock(
-		address _from,
-		address _to,
-		uint256 _amount
-	) private {
-		Lockup(config().lockup()).lockup(_from, _to, _amount);
-	}
-}
-
-contract Market is UsingConfig, IMarket, UsingValidator {
-	using SafeMath for uint256;
-	bool public enabled;
-	address public behavior;
-	uint256 private _votingEndBlockNumber;
-	uint256 public issuedMetrics;
-	mapping(bytes32 => bool) private idMap;
-	mapping(address => bytes32) private idHashMetricsMap;
-
-	constructor(address _config, address _behavior)
-		public
-		UsingConfig(_config)
-	{
-		addressValidator().validateAddress(
-			msg.sender,
-			config().marketFactory()
-		);
-
-		behavior = _behavior;
-		enabled = false;
-		uint256 marketVotingBlocks = Policy(config().policy())
-			.marketVotingBlocks();
-		_votingEndBlockNumber = block.number.add(marketVotingBlocks);
-	}
-
-	function propertyValidation(address _prop) internal view {
-		addressValidator().validateAddress(
-			msg.sender,
-			Property(_prop).author()
-		);
-		require(enabled, "market is not enabled");
-	}
-
-	modifier onlyPropertyAuthor(address _prop) {
-		propertyValidation(_prop);
-		_;
-	}
-
-	modifier onlyLinkedPropertyAuthor(address _metrics) {
-		address _prop = Metrics(_metrics).property();
-		propertyValidation(_prop);
-		_;
-	}
-
-	function toEnable() external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().marketFactory()
-		);
-		enabled = true;
-	}
-
-	function authenticate(
-		address _prop,
-		string memory _args1,
-		string memory _args2,
-		string memory _args3,
-		string memory _args4,
-		string memory _args5
-	) public onlyPropertyAuthor(_prop) returns (address) {
-		uint256 len = bytes(_args1).length;
-		require(len > 0, "id is required");
-
-		return
-			IMarketBehavior(behavior).authenticate(
-				_prop,
-				_args1,
-				_args2,
-				_args3,
-				_args4,
-				_args5,
-				address(this)
-			);
-	}
-
-	function getAuthenticationFee(address _property)
-		private
-		view
-		returns (uint256)
-	{
-		uint256 tokenValue = Lockup(config().lockup()).getPropertyValue(
-			_property
-		);
-		Policy policy = Policy(config().policy());
-		MetricsGroup metricsGroup = MetricsGroup(config().metricsGroup());
-		return
-			policy.authenticationFee(
-				metricsGroup.totalIssuedMetrics(),
-				tokenValue
-			);
-	}
-
-	function authenticatedCallback(address _property, bytes32 _idHash)
-		external
-		returns (address)
-	{
-		addressValidator().validateAddress(msg.sender, behavior);
-		require(enabled, "market is not enabled");
-
-		require(idMap[_idHash] == false, "id is duplicated");
-		idMap[_idHash] = true;
-		address sender = Property(_property).author();
-		MetricsFactory metricsFactory = MetricsFactory(
-			config().metricsFactory()
-		);
-		address metrics = metricsFactory.create(_property);
-		idHashMetricsMap[metrics] = _idHash;
-		uint256 authenticationFee = getAuthenticationFee(_property);
-		require(
-			Dev(config().token()).fee(sender, authenticationFee),
-			"dev fee failed"
-		);
-		issuedMetrics = issuedMetrics.add(1);
-		return metrics;
-	}
-
-	function deauthenticate(address _metrics)
-		external
-		onlyLinkedPropertyAuthor(_metrics)
-	{
-		bytes32 idHash = idHashMetricsMap[_metrics];
-		require(idMap[idHash], "not authenticated");
-		idMap[idHash] = false;
-		idHashMetricsMap[_metrics] = bytes32(0);
-		MetricsFactory metricsFactory = MetricsFactory(
-			config().metricsFactory()
-		);
-		metricsFactory.destroy(_metrics);
-		issuedMetrics = issuedMetrics.sub(1);
-	}
-
-	function vote(address _property, bool _agree) external {
-		addressValidator().validateGroup(_property, config().propertyGroup());
-		require(enabled == false, "market is already enabled");
-		require(
-			block.number <= _votingEndBlockNumber,
-			"voting deadline is over"
-		);
-
-		VoteCounter voteCounter = VoteCounter(config().voteCounter());
-		voteCounter.addVoteCount(msg.sender, _property, _agree);
-		enabled = Policy(config().policy()).marketApproval(
-			voteCounter.getAgreeCount(address(this)),
-			voteCounter.getOppositeCount(address(this))
-		);
-	}
-
-	function schema() external view returns (string memory) {
-		return IMarketBehavior(behavior).schema();
-	}
-}
-
-// prettier-ignore
-
-contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	// RewardsAmount
-	function setRewardsAmount(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
-		eternalStorage().setUint(getRewardsAmountKey(_property), _value);
-	}
-
-	function getRewardsAmount(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return eternalStorage().getUint(getRewardsAmountKey(_property));
-	}
-
-	function getRewardsAmountKey(address _property)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_rewardsAmount", _property));
-	}
-
-	// CumulativePrice
-	function setCumulativePrice(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
-		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
-	}
-
-	function getCumulativePrice(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return eternalStorage().getUint(getCumulativePriceKey(_property));
-	}
-
-	function getCumulativePriceKey(address _property)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_cumulativePrice", _property));
-	}
-
-	// WithdrawalLimitTotal
-	function setWithdrawalLimitTotal(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
-		eternalStorage().setUint(
-			getWithdrawalLimitTotalKey(_property, _user),
-			_value
-		);
-	}
-
-	function getWithdrawalLimitTotal(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getWithdrawalLimitTotalKey(_property, _user)
-			);
-	}
-
-	function getWithdrawalLimitTotalKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_withdrawalLimitTotal", _property, _user)
-			);
-	}
-
-	// WithdrawalLimitBalance
-	function setWithdrawalLimitBalance(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
-		eternalStorage().setUint(
-			getWithdrawalLimitBalanceKey(_property, _user),
-			_value
-		);
-	}
-
-	function getWithdrawalLimitBalance(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getWithdrawalLimitBalanceKey(_property, _user)
-			);
-	}
-
-	function getWithdrawalLimitBalanceKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_withdrawalLimitBalance", _property, _user)
-			);
-	}
-
-	//LastWithdrawalPrice
-	function setLastWithdrawalPrice(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
-		eternalStorage().setUint(
-			getLastWithdrawalPriceKey(_property, _user),
-			_value
-		);
-	}
-
-	function getLastWithdrawalPrice(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastWithdrawalPriceKey(_property, _user)
-			);
-	}
-
-	function getLastWithdrawalPriceKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_lastWithdrawalPrice", _property, _user)
-			);
-	}
-
-	//PendingWithdrawal
-	function setPendingWithdrawal(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
-		eternalStorage().setUint(
-			getPendingWithdrawalKey(_property, _user),
-			_value
-		);
-	}
-
-	function getPendingWithdrawal(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(getPendingWithdrawalKey(_property, _user));
-	}
-
-	function getPendingWithdrawalKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
-	}
-}
-
-contract Withdraw is Pausable, UsingConfig, UsingValidator {
-	using SafeMath for uint256;
-	using Decimals for uint256;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function withdraw(address _property) external {
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
-		uint256 value = _calculateWithdrawableAmount(_property, msg.sender);
-		require(value != 0, "withdraw value is 0");
-		uint256 price = getStorage().getCumulativePrice(_property);
-		getStorage().setLastWithdrawalPrice(_property, msg.sender, price);
-		getStorage().setPendingWithdrawal(_property, msg.sender, 0);
-		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		require(erc20.mint(msg.sender, value), "dev mint failed");
-	}
-
-	function beforeBalanceChange(
-		address _property,
-		address _from,
-		address _to
-	) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		uint256 price = getStorage().getCumulativePrice(_property);
-		uint256 amountFrom = _calculateAmount(_property, _from);
-		uint256 amountTo = _calculateAmount(_property, _to);
-		getStorage().setLastWithdrawalPrice(_property, _from, price);
-		getStorage().setLastWithdrawalPrice(_property, _to, price);
-		uint256 pendFrom = getStorage().getPendingWithdrawal(_property, _from);
-		uint256 pendTo = getStorage().getPendingWithdrawal(_property, _to);
-		getStorage().setPendingWithdrawal(
-			_property,
-			_from,
-			pendFrom.add(amountFrom)
-		);
-		getStorage().setPendingWithdrawal(_property, _to, pendTo.add(amountTo));
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
-			_property,
-			_to
-		);
-		uint256 total = getStorage().getRewardsAmount(_property);
-		if (totalLimit != total) {
-			getStorage().setWithdrawalLimitTotal(_property, _to, total);
-			getStorage().setWithdrawalLimitBalance(
-				_property,
-				_to,
-				ERC20(_property).balanceOf(_to)
-			);
-		}
-	}
-
-	function increment(address _property, uint256 _allocationResult) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-		uint256 priceValue = _allocationResult.outOf(
-			ERC20(_property).totalSupply()
-		);
-		uint256 total = getStorage().getRewardsAmount(_property);
-		getStorage().setRewardsAmount(_property, total.add(_allocationResult));
-		uint256 price = getStorage().getCumulativePrice(_property);
-		getStorage().setCumulativePrice(_property, price.add(priceValue));
-	}
-
-	function getRewardsAmount(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return getStorage().getRewardsAmount(_property);
-	}
-
-	function _calculateAmount(address _property, address _user)
-		private
-		view
-		returns (uint256)
-	{
-		uint256 _last = getStorage().getLastWithdrawalPrice(_property, _user);
-		uint256 totalLimit = getStorage().getWithdrawalLimitTotal(
-			_property,
-			_user
-		);
-		uint256 balanceLimit = getStorage().getWithdrawalLimitBalance(
-			_property,
-			_user
-		);
-		uint256 price = getStorage().getCumulativePrice(_property);
-		uint256 priceGap = price.sub(_last);
-		uint256 balance = ERC20(_property).balanceOf(_user);
-		uint256 total = getStorage().getRewardsAmount(_property);
-		if (totalLimit == total) {
-			balance = balanceLimit;
-		}
-		uint256 value = priceGap.mul(balance);
-		return value.div(Decimals.basis());
-	}
-
-	function calculateAmount(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return _calculateAmount(_property, _user);
-	}
-
-	function _calculateWithdrawableAmount(address _property, address _user)
-		private
-		view
-		returns (uint256)
-	{
-		uint256 _value = _calculateAmount(_property, _user);
-		uint256 value = _value.add(
-			getStorage().getPendingWithdrawal(_property, _user)
-		);
-		return value;
-	}
-
-	function calculateWithdrawableAmount(address _property, address _user)
-		external
-		view
-		returns (uint256)
-	{
-		return _calculateWithdrawableAmount(_property, _user);
-	}
-
-	function getStorage() private view returns (WithdrawStorage) {
-		require(paused() == false, "You cannot use that");
-		return WithdrawStorage(config().withdrawStorage());
-	}
-}
-
-contract AllocatorStorage is UsingStorage, UsingConfig, UsingValidator {
-	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
-
-	// Last Block Number
-	function setLastBlockNumber(address _metrics, uint256 _blocks) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		eternalStorage().setUint(getLastBlockNumberKey(_metrics), _blocks);
-	}
-
-	function getLastBlockNumber(address _metrics)
-		external
-		view
-		returns (uint256)
-	{
-		return eternalStorage().getUint(getLastBlockNumberKey(_metrics));
-	}
-
-	function getLastBlockNumberKey(address _metrics)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_lastBlockNumber", _metrics));
-	}
-
-	// Base Block Number
-	function setBaseBlockNumber(uint256 _blockNumber) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		eternalStorage().setUint(getBaseBlockNumberKey(), _blockNumber);
-	}
-
-	function getBaseBlockNumber() external view returns (uint256) {
-		return eternalStorage().getUint(getBaseBlockNumberKey());
-	}
-
-	function getBaseBlockNumberKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_baseBlockNumber"));
-	}
-
-	// PendingIncrement
-	function setPendingIncrement(address _metrics, bool value) external {
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		eternalStorage().setBool(getPendingIncrementKey(_metrics), value);
-	}
-
-	function getPendingIncrement(address _metrics)
-		external
-		view
-		returns (bool)
-	{
-		return eternalStorage().getBool(getPendingIncrementKey(_metrics));
-	}
-
-	function getPendingIncrementKey(address _metrics)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_pendingIncrement", _metrics));
-	}
-
-	// LastAssetValueEachMetrics
-	function setLastAssetValueEachMetrics(address _metrics, uint256 value)
-		external
-	{
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		eternalStorage().setUint(
-			getLastAssetValueEachMetricsKey(_metrics),
-			value
-		);
-	}
-
-	function getLastAssetValueEachMetrics(address _metrics)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(getLastAssetValueEachMetricsKey(_metrics));
-	}
-
-	function getLastAssetValueEachMetricsKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_lastAssetValueEachMetrics", _addr));
-	}
-
-	// lastAssetValueEachMarketPerBlock
-	function setLastAssetValueEachMarketPerBlock(address _market, uint256 value)
-		external
-	{
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		eternalStorage().setUint(
-			getLastAssetValueEachMarketPerBlockKey(_market),
-			value
-		);
-	}
-
-	function getLastAssetValueEachMarketPerBlock(address _market)
-		external
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastAssetValueEachMarketPerBlockKey(_market)
-			);
-	}
-
-	function getLastAssetValueEachMarketPerBlockKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_lastAssetValueEachMarketPerBlock", _addr)
-			);
-	}
-
-	// pendingLastBlockNumber
-	function setPendingLastBlockNumber(address _metrics, uint256 value)
-		external
-	{
-		addressValidator().validateAddress(msg.sender, config().allocator());
-
-		eternalStorage().setUint(getPendingLastBlockNumberKey(_metrics), value);
-	}
-
-	function getPendingLastBlockNumber(address _metrics)
-		external
-		view
-		returns (uint256)
-	{
-		return eternalStorage().getUint(getPendingLastBlockNumberKey(_metrics));
-	}
-
-	function getPendingLastBlockNumberKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_pendingLastBlockNumber", _addr));
-	}
-}
-
-contract Allocator is Pausable, UsingConfig, IAllocator, UsingValidator {
-	using SafeMath for uint256;
-	using Decimals for uint256;
-
-	event BeforeAllocation(
-		uint256 _blocks,
-		uint256 _mint,
-		uint256 _value,
-		uint256 _marketValue,
-		uint256 _assets,
-		uint256 _totalAssets
-	);
-	event AllocationResult(
-		address _metrics,
-		uint256 _value,
-		address _market,
-		address _property,
-		uint256 _lockupValue,
-		uint256 _result
-	);
-
-	uint64 public constant basis = 1000000000000000000;
-
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
-	function allocate(address _metrics) external {
-		addressValidator().validateGroup(_metrics, config().metricsGroup());
-
-		validateTargetPeriod(_metrics);
-		address market = Metrics(_metrics).market();
-		getStorage().setPendingIncrement(_metrics, true);
-		getStorage().setPendingLastBlockNumber(_metrics, block.number);
-		IMarketBehavior(Market(market).behavior()).calculate(
-			_metrics,
-			getLastAllocationBlockNumber(_metrics),
-			block.number
-		);
-	}
-
-	function calculatedCallback(address _metrics, uint256 _value) external {
-		addressValidator().validateGroup(_metrics, config().metricsGroup());
-
-		Metrics metrics = Metrics(_metrics);
-		Market market = Market(metrics.market());
-		require(
-			msg.sender == market.behavior(),
-			"don't call from other than market behavior"
-		);
-		require(
-			getStorage().getPendingIncrement(_metrics),
-			"not asking for an indicator"
-		);
-		uint256 totalAssets = MetricsGroup(config().metricsGroup())
-			.totalIssuedMetrics();
-		uint256 lockupValue = Lockup(config().lockup()).getPropertyValue(
-			metrics.property()
-		);
-		uint256 lastBlock = getStorage().getPendingLastBlockNumber(_metrics);
-		uint256 blocks = lastBlock.sub(getLastAllocationBlockNumber(_metrics));
-		blocks = blocks > 0 ? blocks : 1;
-		uint256 mint = Policy(config().policy()).rewards(
-			Lockup(config().lockup()).getAllValue(),
-			totalAssets
-		);
-		uint256 value = (
-			Policy(config().policy()).assetValue(_value, lockupValue).mul(basis)
-		)
-			.div(blocks);
-		uint256 marketValue = getStorage()
-			.getLastAssetValueEachMarketPerBlock(metrics.market())
-			.sub(getStorage().getLastAssetValueEachMetrics(_metrics))
-			.add(value);
-		uint256 assets = market.issuedMetrics();
-		getStorage().setLastAssetValueEachMetrics(_metrics, value);
-		getStorage().setLastAssetValueEachMarketPerBlock(
-			metrics.market(),
-			marketValue
-		);
-		emit BeforeAllocation(
-			blocks,
-			mint,
-			value,
-			marketValue,
-			assets,
-			totalAssets
-		);
-		uint256 result = allocation(
-			blocks,
-			mint,
-			value,
-			marketValue,
-			assets,
-			totalAssets
-		);
-		emit AllocationResult(
-			_metrics,
-			_value,
-			metrics.market(),
-			metrics.property(),
-			lockupValue,
-			result
-		);
-		increment(metrics.property(), result, lockupValue);
-		getStorage().setPendingIncrement(_metrics, false);
-		getStorage().setLastBlockNumber(_metrics, lastBlock);
-	}
-
-	function increment(
-		address _property,
-		uint256 _reward,
-		uint256 _lockup
-	) private {
-		uint256 holders = Policy(config().policy()).holdersShare(
-			_reward,
-			_lockup
-		);
-		uint256 interest = _reward.sub(holders);
-		Withdraw(config().withdraw()).increment(_property, holders);
-		Lockup(config().lockup()).increment(_property, interest);
-	}
-
-	function beforeBalanceChange(
-		address _property,
-		address _from,
-		address _to
-	) external {
-		addressValidator().validateGroup(msg.sender, config().propertyGroup());
-
-		Withdraw(config().withdraw()).beforeBalanceChange(
-			_property,
-			_from,
-			_to
-		);
-	}
-
-	function getRewardsAmount(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		return Withdraw(config().withdraw()).getRewardsAmount(_property);
-	}
-
-	function allocation(
-		uint256 _blocks,
-		uint256 _mint,
-		uint256 _value,
-		uint256 _marketValue,
-		uint256 _assets,
-		uint256 _totalAssets
-	) public pure returns (uint256) {
-		uint256 aShare = _totalAssets > 0
-			? _assets.outOf(_totalAssets)
-			: Decimals.basis();
-		uint256 vShare = _marketValue > 0
-			? _value.outOf(_marketValue)
-			: Decimals.basis();
-		uint256 mint = _mint.mul(_blocks);
-		return
-			mint.mul(aShare).mul(vShare).div(Decimals.basis()).div(
-				Decimals.basis()
-			);
-	}
-
-	function validateTargetPeriod(address _metrics) private {
-		address property = Metrics(_metrics).property();
-		VoteTimes voteTimes = VoteTimes(config().voteTimes());
-		uint256 abstentionCount = voteTimes.getAbstentionTimes(property);
-		uint256 notTargetPeriod = Policy(config().policy()).abstentionPenalty(
-			abstentionCount
-		);
-		if (notTargetPeriod == 0) {
-			return;
-		}
-		uint256 blockNumber = getLastAllocationBlockNumber(_metrics);
-		uint256 notTargetBlockNumber = blockNumber.add(notTargetPeriod);
-		require(
-			notTargetBlockNumber < block.number,
-			"outside the target period"
-		);
-		getStorage().setLastBlockNumber(_metrics, notTargetBlockNumber);
-		voteTimes.resetVoteTimesByProperty(property);
-	}
-
-	function getLastAllocationBlockNumber(address _metrics)
-		private
-		returns (uint256)
-	{
-		uint256 blockNumber = getStorage().getLastBlockNumber(_metrics);
-		uint256 baseBlockNumber = getStorage().getBaseBlockNumber();
-		if (baseBlockNumber == 0) {
-			getStorage().setBaseBlockNumber(block.number);
-		}
-		uint256 lastAllocationBlockNumber = blockNumber > 0
-			? blockNumber
-			: getStorage().getBaseBlockNumber();
-		return lastAllocationBlockNumber;
-	}
-
-	function getStorage() private view returns (AllocatorStorage) {
-		require(paused() == false, "You cannot use that");
-		return AllocatorStorage(config().allocatorStorage());
-	}
-}
-
-contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	uint8 private constant _property_decimals = 18;
 	uint256 private constant _supply = 10000000000000000000000000;
@@ -3438,7 +1023,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		addressValidator().validateIllegalAddress(_to);
 		require(_value != 0, "illegal transfer value");
 
-		Allocator(config().allocator()).beforeBalanceChange(
+		IAllocator(config().allocator()).beforeBalanceChange(
 			address(this),
 			msg.sender,
 			_to
@@ -3456,7 +1041,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 		addressValidator().validateIllegalAddress(_to);
 		require(_value != 0, "illegal transfer value");
 
-		Allocator(config().allocator()).beforeBalanceChange(
+		IAllocator(config().allocator()).beforeBalanceChange(
 			address(this),
 			_from,
 			_to
@@ -3482,7 +1067,197 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, UsingValidator {
 	}
 }
 
-contract PropertyFactory is Pausable, UsingConfig {
+// File: contracts/src/common/storage/EternalStorage.sol
+
+pragma solidity ^0.5.0;
+
+contract EternalStorage {
+	address private currentOwner = msg.sender;
+
+	mapping(bytes32 => uint256) private uIntStorage;
+	mapping(bytes32 => string) private stringStorage;
+	mapping(bytes32 => address) private addressStorage;
+	mapping(bytes32 => bytes32) private bytesStorage;
+	mapping(bytes32 => bool) private boolStorage;
+	mapping(bytes32 => int256) private intStorage;
+
+	modifier onlyCurrentOwner() {
+		require(msg.sender == currentOwner, "not current owner");
+		_;
+	}
+
+	function changeOwner(address _newOwner) external {
+		require(msg.sender == currentOwner, "not current owner");
+		currentOwner = _newOwner;
+	}
+
+	// *** Getter Methods ***
+	function getUint(bytes32 _key) external view returns (uint256) {
+		return uIntStorage[_key];
+	}
+
+	function getString(bytes32 _key) external view returns (string memory) {
+		return stringStorage[_key];
+	}
+
+	function getAddress(bytes32 _key) external view returns (address) {
+		return addressStorage[_key];
+	}
+
+	function getBytes(bytes32 _key) external view returns (bytes32) {
+		return bytesStorage[_key];
+	}
+
+	function getBool(bytes32 _key) external view returns (bool) {
+		return boolStorage[_key];
+	}
+
+	function getInt(bytes32 _key) external view returns (int256) {
+		return intStorage[_key];
+	}
+
+	// *** Setter Methods ***
+	function setUint(bytes32 _key, uint256 _value) external onlyCurrentOwner {
+		uIntStorage[_key] = _value;
+	}
+
+	function setString(bytes32 _key, string calldata _value)
+		external
+		onlyCurrentOwner
+	{
+		stringStorage[_key] = _value;
+	}
+
+	function setAddress(bytes32 _key, address _value)
+		external
+		onlyCurrentOwner
+	{
+		addressStorage[_key] = _value;
+	}
+
+	function setBytes(bytes32 _key, bytes32 _value) external onlyCurrentOwner {
+		bytesStorage[_key] = _value;
+	}
+
+	function setBool(bytes32 _key, bool _value) external onlyCurrentOwner {
+		boolStorage[_key] = _value;
+	}
+
+	function setInt(bytes32 _key, int256 _value) external onlyCurrentOwner {
+		intStorage[_key] = _value;
+	}
+
+	// *** Delete Methods ***
+	function deleteUint(bytes32 _key) external onlyCurrentOwner {
+		delete uIntStorage[_key];
+	}
+
+	function deleteString(bytes32 _key) external onlyCurrentOwner {
+		delete stringStorage[_key];
+	}
+
+	function deleteAddress(bytes32 _key) external onlyCurrentOwner {
+		delete addressStorage[_key];
+	}
+
+	function deleteBytes(bytes32 _key) external onlyCurrentOwner {
+		delete bytesStorage[_key];
+	}
+
+	function deleteBool(bytes32 _key) external onlyCurrentOwner {
+		delete boolStorage[_key];
+	}
+
+	function deleteInt(bytes32 _key) external onlyCurrentOwner {
+		delete intStorage[_key];
+	}
+}
+
+// File: contracts/src/common/storage/UsingStorage.sol
+
+pragma solidity ^0.5.0;
+
+contract UsingStorage is Ownable {
+	address private _storage;
+
+	modifier hasStorage() {
+		require(_storage != address(0), "storage is not setted");
+		_;
+	}
+
+	function eternalStorage()
+		internal
+		view
+		hasStorage
+		returns (EternalStorage)
+	{
+		return EternalStorage(_storage);
+	}
+
+	function getStorageAddress() external view hasStorage returns (address) {
+		return _storage;
+	}
+
+	function createStorage() external onlyOwner {
+		require(_storage == address(0), "storage is setted");
+		EternalStorage tmp = new EternalStorage();
+		_storage = address(tmp);
+	}
+
+	function setStorage(address _storageAddress) external onlyOwner {
+		_storage = _storageAddress;
+	}
+
+	function changeOwner(address newOwner) external onlyOwner {
+		EternalStorage(_storage).changeOwner(newOwner);
+	}
+}
+
+// File: contracts/src/property/PropertyGroup.sol
+
+pragma solidity ^0.5.0;
+
+contract PropertyGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
+	// solium-disable-next-line no-empty-blocks
+	constructor(address _config) public UsingConfig(_config) {}
+
+	function addGroup(address _addr) external {
+		addressValidator().validateAddress(
+			msg.sender,
+			config().propertyFactory()
+		);
+
+		require(isGroup(_addr) == false, "already enabled");
+		eternalStorage().setBool(getGroupKey(_addr), true);
+	}
+
+	function isGroup(address _addr) public view returns (bool) {
+		return eternalStorage().getBool(getGroupKey(_addr));
+	}
+}
+
+// File: contracts/src/property/IPropertyFactory.sol
+
+pragma solidity ^0.5.0;
+
+contract IPropertyFactory {
+	function create(
+		string calldata _name,
+		string calldata _symbol,
+		address _author
+	)
+		external
+		returns (
+			// solium-disable-next-line indentation
+			address
+		);
+}
+
+// File: contracts/src/property/PropertyFactory.sol
+
+pragma solidity ^0.5.0;
+
+contract PropertyFactory is UsingConfig, IPropertyFactory {
 	event Create(address indexed _from, address _property);
 
 	// solium-disable-next-line no-empty-blocks
@@ -3493,7 +1268,6 @@ contract PropertyFactory is Pausable, UsingConfig {
 		string calldata _symbol,
 		address _author
 	) external returns (address) {
-		require(paused() == false, "You cannot use that");
 		validatePropertyName(_name);
 		validatePropertySymbol(_symbol);
 
@@ -3503,11 +1277,8 @@ contract PropertyFactory is Pausable, UsingConfig {
 			_name,
 			_symbol
 		);
-		PropertyGroup(config().propertyGroup()).addGroup(address(property));
+		IGroup(config().propertyGroup()).addGroup(address(property));
 		emit Create(msg.sender, address(property));
-		VoteTimes(config().voteTimes()).resetVoteTimesByProperty(
-			address(property)
-		);
 		return address(property);
 	}
 

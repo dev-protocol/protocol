@@ -1,3 +1,5 @@
+// File: @openzeppelin/contracts/math/SafeMath.sol
+
 pragma solidity ^0.5.0;
 
 /**
@@ -26,6 +28,7 @@ library SafeMath {
 	function add(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a + b;
 		require(c >= a, "SafeMath: addition overflow");
+
 		return c;
 	}
 
@@ -60,6 +63,7 @@ library SafeMath {
 	) internal pure returns (uint256) {
 		require(b <= a, errorMessage);
 		uint256 c = a - b;
+
 		return c;
 	}
 
@@ -79,8 +83,10 @@ library SafeMath {
 		if (a == 0) {
 			return 0;
 		}
+
 		uint256 c = a * b;
 		require(c / a == b, "SafeMath: multiplication overflow");
+
 		return c;
 	}
 
@@ -121,6 +127,7 @@ library SafeMath {
 		require(b > 0, errorMessage);
 		uint256 c = a / b;
 		// assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
 		return c;
 	}
 
@@ -162,6 +169,10 @@ library SafeMath {
 	}
 }
 
+// File: contracts/src/common/lifecycle/Killable.sol
+
+pragma solidity ^0.5.0;
+
 contract Killable {
 	address payable public _owner;
 
@@ -174,6 +185,10 @@ contract Killable {
 		selfdestruct(_owner);
 	}
 }
+
+// File: @openzeppelin/contracts/GSN/Context.sol
+
+pragma solidity ^0.5.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -191,6 +206,7 @@ contract Context {
 	constructor() internal {}
 
 	// solhint-disable-previous-line no-empty-blocks
+
 	function _msgSender() internal view returns (address payable) {
 		return msg.sender;
 	}
@@ -200,6 +216,10 @@ contract Context {
 		return msg.data;
 	}
 }
+
+// File: @openzeppelin/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -212,6 +232,7 @@ contract Context {
  */
 contract Ownable is Context {
 	address private _owner;
+
 	event OwnershipTransferred(
 		address indexed previousOwner,
 		address indexed newOwner
@@ -221,8 +242,9 @@ contract Ownable is Context {
 	 * @dev Initializes the contract setting the deployer as the initial owner.
 	 */
 	constructor() internal {
-		_owner = _msgSender();
-		emit OwnershipTransferred(address(0), _owner);
+		address msgSender = _msgSender();
+		_owner = msgSender;
+		emit OwnershipTransferred(address(0), msgSender);
 	}
 
 	/**
@@ -280,14 +302,23 @@ contract Ownable is Context {
 	}
 }
 
-// prettier-ignore
+// File: contracts/src/common/interface/IGroup.sol
+
+pragma solidity ^0.5.0;
+
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
+
 	function addGroup(address _addr) external;
+
 	function getGroupKey(address _addr) internal pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
+
+// File: contracts/src/common/validate/AddressValidator.sol
+
+pragma solidity ^0.5.0;
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -325,7 +356,28 @@ contract AddressValidator {
 		}
 		require(_addr == _target2, errorMessage);
 	}
+
+	function validate3Addresses(
+		address _addr,
+		address _target1,
+		address _target2,
+		address _target3
+	) external pure {
+		if (_addr == _target1) {
+			return;
+		}
+		if (_addr == _target2) {
+			return;
+		}
+		require(_addr == _target3, errorMessage);
+	}
 }
+
+// File: contracts/src/common/validate/UsingValidator.sol
+
+pragma solidity ^0.5.0;
+
+// prettier-ignore
 
 contract UsingValidator {
 	AddressValidator private _validator;
@@ -338,6 +390,10 @@ contract UsingValidator {
 		return _validator;
 	}
 }
+
+// File: contracts/src/common/config/AddressConfig.sol
+
+pragma solidity ^0.5.0;
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -448,6 +504,10 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
+// File: contracts/src/common/config/UsingConfig.sol
+
+pragma solidity ^0.5.0;
+
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -464,14 +524,20 @@ contract UsingConfig {
 	}
 }
 
+// File: contracts/src/common/storage/EternalStorage.sol
+
+pragma solidity ^0.5.0;
+
 contract EternalStorage {
 	address private currentOwner = msg.sender;
+
 	mapping(bytes32 => uint256) private uIntStorage;
 	mapping(bytes32 => string) private stringStorage;
 	mapping(bytes32 => address) private addressStorage;
 	mapping(bytes32 => bytes32) private bytesStorage;
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
+
 	modifier onlyCurrentOwner() {
 		require(msg.sender == currentOwner, "not current owner");
 		_;
@@ -564,8 +630,13 @@ contract EternalStorage {
 	}
 }
 
+// File: contracts/src/common/storage/UsingStorage.sol
+
+pragma solidity ^0.5.0;
+
 contract UsingStorage is Ownable {
 	address private _storage;
+
 	modifier hasStorage() {
 		require(_storage != address(0), "storage is not setted");
 		_;
@@ -599,12 +670,23 @@ contract UsingStorage is Ownable {
 	}
 }
 
+// File: contracts/src/market/IMarketGroup.sol
+
+pragma solidity ^0.5.0;
+
+contract IMarketGroup is IGroup {
+	function getCount() external view returns (uint256);
+}
+
+// File: contracts/src/market/MarketGroup.sol
+
+pragma solidity ^0.5.0;
+
 contract MarketGroup is
 	UsingConfig,
 	UsingStorage,
-	IGroup,
 	UsingValidator,
-	Killable
+	IMarketGroup
 {
 	using SafeMath for uint256;
 
@@ -616,6 +698,7 @@ contract MarketGroup is
 			msg.sender,
 			config().marketFactory()
 		);
+
 		require(isGroup(_addr) == false, "already enabled");
 		eternalStorage().setBool(getGroupKey(_addr), true);
 		addCount();

@@ -1,6 +1,7 @@
+// File: @openzeppelin/contracts/GSN/Context.sol
+
 pragma solidity ^0.5.0;
 
-// prettier-ignore
 /*
  * @dev Provides information about the current execution context, including the
  * sender of the transaction and its data. While these are generally available
@@ -14,16 +15,23 @@ pragma solidity ^0.5.0;
 contract Context {
 	// Empty internal constructor, to prevent people from mistakenly deploying
 	// an instance of this contract, which should be used via inheritance.
-	constructor () internal { }
+	constructor() internal {}
+
 	// solhint-disable-previous-line no-empty-blocks
+
 	function _msgSender() internal view returns (address payable) {
 		return msg.sender;
 	}
+
 	function _msgData() internal view returns (bytes memory) {
 		this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
 		return msg.data;
 	}
 }
+
+// File: @openzeppelin/contracts/token/ERC20/IERC20.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -101,6 +109,7 @@ interface IERC20 {
 	 * Note that `value` may be zero.
 	 */
 	event Transfer(address indexed from, address indexed to, uint256 value);
+
 	/**
 	 * @dev Emitted when the allowance of a `spender` for an `owner` is set by
 	 * a call to {approve}. `value` is the new allowance.
@@ -111,6 +120,10 @@ interface IERC20 {
 		uint256 value
 	);
 }
+
+// File: @openzeppelin/contracts/math/SafeMath.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -138,6 +151,7 @@ library SafeMath {
 	function add(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a + b;
 		require(c >= a, "SafeMath: addition overflow");
+
 		return c;
 	}
 
@@ -172,6 +186,7 @@ library SafeMath {
 	) internal pure returns (uint256) {
 		require(b <= a, errorMessage);
 		uint256 c = a - b;
+
 		return c;
 	}
 
@@ -191,8 +206,10 @@ library SafeMath {
 		if (a == 0) {
 			return 0;
 		}
+
 		uint256 c = a * b;
 		require(c / a == b, "SafeMath: multiplication overflow");
+
 		return c;
 	}
 
@@ -233,6 +250,7 @@ library SafeMath {
 		require(b > 0, errorMessage);
 		uint256 c = a / b;
 		// assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
 		return c;
 	}
 
@@ -274,6 +292,10 @@ library SafeMath {
 	}
 }
 
+// File: @openzeppelin/contracts/token/ERC20/ERC20.sol
+
+pragma solidity ^0.5.0;
+
 /**
  * @dev Implementation of the {IERC20} interface.
  *
@@ -300,8 +322,11 @@ library SafeMath {
  */
 contract ERC20 is Context, IERC20 {
 	using SafeMath for uint256;
+
 	mapping(address => uint256) private _balances;
+
 	mapping(address => mapping(address => uint256)) private _allowances;
+
 	uint256 private _totalSupply;
 
 	/**
@@ -457,6 +482,7 @@ contract ERC20 is Context, IERC20 {
 	) internal {
 		require(sender != address(0), "ERC20: transfer from the zero address");
 		require(recipient != address(0), "ERC20: transfer to the zero address");
+
 		_balances[sender] = _balances[sender].sub(
 			amount,
 			"ERC20: transfer amount exceeds balance"
@@ -476,6 +502,7 @@ contract ERC20 is Context, IERC20 {
 	 */
 	function _mint(address account, uint256 amount) internal {
 		require(account != address(0), "ERC20: mint to the zero address");
+
 		_totalSupply = _totalSupply.add(amount);
 		_balances[account] = _balances[account].add(amount);
 		emit Transfer(address(0), account, amount);
@@ -494,6 +521,7 @@ contract ERC20 is Context, IERC20 {
 	 */
 	function _burn(address account, uint256 amount) internal {
 		require(account != address(0), "ERC20: burn from the zero address");
+
 		_balances[account] = _balances[account].sub(
 			amount,
 			"ERC20: burn amount exceeds balance"
@@ -522,6 +550,7 @@ contract ERC20 is Context, IERC20 {
 	) internal {
 		require(owner != address(0), "ERC20: approve from the zero address");
 		require(spender != address(0), "ERC20: approve to the zero address");
+
 		_allowances[owner][spender] = amount;
 		emit Approval(owner, spender, amount);
 	}
@@ -544,6 +573,10 @@ contract ERC20 is Context, IERC20 {
 		);
 	}
 }
+
+// File: @openzeppelin/contracts/access/Roles.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @title Roles
@@ -584,10 +617,16 @@ library Roles {
 	}
 }
 
+// File: @openzeppelin/contracts/access/roles/MinterRole.sol
+
+pragma solidity ^0.5.0;
+
 contract MinterRole is Context {
 	using Roles for Roles.Role;
+
 	event MinterAdded(address indexed account);
 	event MinterRemoved(address indexed account);
+
 	Roles.Role private _minters;
 
 	constructor() internal {
@@ -625,6 +664,10 @@ contract MinterRole is Context {
 	}
 }
 
+// File: @openzeppelin/contracts/token/ERC20/ERC20Mintable.sol
+
+pragma solidity ^0.5.0;
+
 /**
  * @dev Extension of {ERC20} that adds a set of accounts with the {MinterRole},
  * which have permission to mint (create) new tokens as they see fit.
@@ -649,7 +692,10 @@ contract ERC20Mintable is ERC20, MinterRole {
 	}
 }
 
-// prettier-ignore
+// File: @openzeppelin/contracts/token/ERC20/ERC20Burnable.sol
+
+pragma solidity ^0.5.0;
+
 /**
  * @dev Extension of {ERC20} that allows token holders to destroy both their own
  * tokens and those that they have an allowance for, in a way that can be
@@ -664,6 +710,7 @@ contract ERC20Burnable is Context, ERC20 {
 	function burn(uint256 amount) public {
 		_burn(_msgSender(), amount);
 	}
+
 	/**
 	 * @dev See {ERC20-_burnFrom}.
 	 */
@@ -671,6 +718,14 @@ contract ERC20Burnable is Context, ERC20 {
 		_burnFrom(account, amount);
 	}
 }
+
+// File: contracts/src/dev/DevMigration.sol
+
+pragma solidity ^0.5.0;
+
+// prettier-ignore
+
+// prettier-ignore
 
 contract DevMigration {
 	address public legacy;

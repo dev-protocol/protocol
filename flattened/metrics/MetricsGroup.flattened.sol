@@ -1,3 +1,5 @@
+// File: @openzeppelin/contracts/math/SafeMath.sol
+
 pragma solidity ^0.5.0;
 
 /**
@@ -167,6 +169,10 @@ library SafeMath {
 	}
 }
 
+// File: contracts/src/common/lifecycle/Killable.sol
+
+pragma solidity ^0.5.0;
+
 contract Killable {
 	address payable public _owner;
 
@@ -179,6 +185,10 @@ contract Killable {
 		selfdestruct(_owner);
 	}
 }
+
+// File: @openzeppelin/contracts/GSN/Context.sol
+
+pragma solidity ^0.5.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -206,6 +216,10 @@ contract Context {
 		return msg.data;
 	}
 }
+
+// File: @openzeppelin/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -288,7 +302,9 @@ contract Ownable is Context {
 	}
 }
 
-// prettier-ignore
+// File: contracts/src/common/interface/IGroup.sol
+
+pragma solidity ^0.5.0;
 
 contract IGroup {
 	function isGroup(address _addr) public view returns (bool);
@@ -299,6 +315,10 @@ contract IGroup {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }
+
+// File: contracts/src/common/validate/AddressValidator.sol
+
+pragma solidity ^0.5.0;
 
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
@@ -336,7 +356,28 @@ contract AddressValidator {
 		}
 		require(_addr == _target2, errorMessage);
 	}
+
+	function validate3Addresses(
+		address _addr,
+		address _target1,
+		address _target2,
+		address _target3
+	) external pure {
+		if (_addr == _target1) {
+			return;
+		}
+		if (_addr == _target2) {
+			return;
+		}
+		require(_addr == _target3, errorMessage);
+	}
 }
+
+// File: contracts/src/common/validate/UsingValidator.sol
+
+pragma solidity ^0.5.0;
+
+// prettier-ignore
 
 contract UsingValidator {
 	AddressValidator private _validator;
@@ -349,6 +390,10 @@ contract UsingValidator {
 		return _validator;
 	}
 }
+
+// File: contracts/src/common/config/AddressConfig.sol
+
+pragma solidity ^0.5.0;
 
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
@@ -459,6 +504,10 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	}
 }
 
+// File: contracts/src/common/config/UsingConfig.sol
+
+pragma solidity ^0.5.0;
+
 contract UsingConfig {
 	AddressConfig private _config;
 
@@ -475,157 +524,9 @@ contract UsingConfig {
 	}
 }
 
-/**
- * @title Roles
- * @dev Library for managing addresses assigned to a Role.
- */
-library Roles {
-	struct Role {
-		mapping(address => bool) bearer;
-	}
+// File: contracts/src/common/storage/EternalStorage.sol
 
-	/**
-	 * @dev Give an account access to this role.
-	 */
-	function add(Role storage role, address account) internal {
-		require(!has(role, account), "Roles: account already has role");
-		role.bearer[account] = true;
-	}
-
-	/**
-	 * @dev Remove an account's access to this role.
-	 */
-	function remove(Role storage role, address account) internal {
-		require(has(role, account), "Roles: account does not have role");
-		role.bearer[account] = false;
-	}
-
-	/**
-	 * @dev Check if an account has this role.
-	 * @return bool
-	 */
-	function has(Role storage role, address account)
-		internal
-		view
-		returns (bool)
-	{
-		require(account != address(0), "Roles: account is the zero address");
-		return role.bearer[account];
-	}
-}
-
-contract PauserRole is Context {
-	using Roles for Roles.Role;
-
-	event PauserAdded(address indexed account);
-	event PauserRemoved(address indexed account);
-
-	Roles.Role private _pausers;
-
-	constructor() internal {
-		_addPauser(_msgSender());
-	}
-
-	modifier onlyPauser() {
-		require(
-			isPauser(_msgSender()),
-			"PauserRole: caller does not have the Pauser role"
-		);
-		_;
-	}
-
-	function isPauser(address account) public view returns (bool) {
-		return _pausers.has(account);
-	}
-
-	function addPauser(address account) public onlyPauser {
-		_addPauser(account);
-	}
-
-	function renouncePauser() public {
-		_removePauser(_msgSender());
-	}
-
-	function _addPauser(address account) internal {
-		_pausers.add(account);
-		emit PauserAdded(account);
-	}
-
-	function _removePauser(address account) internal {
-		_pausers.remove(account);
-		emit PauserRemoved(account);
-	}
-}
-
-/**
- * @dev Contract module which allows children to implement an emergency stop
- * mechanism that can be triggered by an authorized account.
- *
- * This module is used through inheritance. It will make available the
- * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
- * the functions of your contract. Note that they will not be pausable by
- * simply including this module, only once the modifiers are put in place.
- */
-contract Pausable is Context, PauserRole {
-	/**
-	 * @dev Emitted when the pause is triggered by a pauser (`account`).
-	 */
-	event Paused(address account);
-
-	/**
-	 * @dev Emitted when the pause is lifted by a pauser (`account`).
-	 */
-	event Unpaused(address account);
-
-	bool private _paused;
-
-	/**
-	 * @dev Initializes the contract in unpaused state. Assigns the Pauser role
-	 * to the deployer.
-	 */
-	constructor() internal {
-		_paused = false;
-	}
-
-	/**
-	 * @dev Returns true if the contract is paused, and false otherwise.
-	 */
-	function paused() public view returns (bool) {
-		return _paused;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is not paused.
-	 */
-	modifier whenNotPaused() {
-		require(!_paused, "Pausable: paused");
-		_;
-	}
-
-	/**
-	 * @dev Modifier to make a function callable only when the contract is paused.
-	 */
-	modifier whenPaused() {
-		require(_paused, "Pausable: not paused");
-		_;
-	}
-
-	/**
-	 * @dev Called by a pauser to pause, triggers stopped state.
-	 */
-	function pause() public onlyPauser whenNotPaused {
-		_paused = true;
-		emit Paused(_msgSender());
-	}
-
-	/**
-	 * @dev Called by a pauser to unpause, returns to normal state.
-	 */
-	function unpause() public onlyPauser whenPaused {
-		_paused = false;
-		emit Unpaused(_msgSender());
-	}
-}
+pragma solidity ^0.5.0;
 
 contract EternalStorage {
 	address private currentOwner = msg.sender;
@@ -729,7 +630,11 @@ contract EternalStorage {
 	}
 }
 
-contract UsingStorage is Ownable, Pausable {
+// File: contracts/src/common/storage/UsingStorage.sol
+
+pragma solidity ^0.5.0;
+
+contract UsingStorage is Ownable {
 	address private _storage;
 
 	modifier hasStorage() {
@@ -743,7 +648,6 @@ contract UsingStorage is Ownable, Pausable {
 		hasStorage
 		returns (EternalStorage)
 	{
-		require(paused() == false, "You cannot use that");
 		return EternalStorage(_storage);
 	}
 
@@ -766,14 +670,32 @@ contract UsingStorage is Ownable, Pausable {
 	}
 }
 
-contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
+// File: contracts/src/metrics/IMetricsGroup.sol
+
+pragma solidity ^0.5.0;
+
+contract IMetricsGroup is IGroup {
+	function removeGroup(address _addr) external;
+
+	function totalIssuedMetrics() external view returns (uint256);
+}
+
+// File: contracts/src/metrics/MetricsGroup.sol
+
+pragma solidity ^0.5.0;
+
+contract MetricsGroup is
+	UsingConfig,
+	UsingStorage,
+	UsingValidator,
+	IMetricsGroup
+{
 	using SafeMath for uint256;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(
 			msg.sender,
 			config().metricsFactory()
@@ -787,7 +709,6 @@ contract MetricsGroup is UsingConfig, UsingStorage, UsingValidator, IGroup {
 	}
 
 	function removeGroup(address _addr) external {
-		require(paused() == false, "You cannot use that");
 		addressValidator().validateAddress(
 			msg.sender,
 			config().metricsFactory()
