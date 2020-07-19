@@ -57,7 +57,7 @@
 	},
 	"dependencies": {
 		"@openzeppelin/contracts": "^2.5.0",
-		"commander": "^5.0.0",
+		"commander": "^6.0.0",
 		"shelljs": "^0.8.3"
 	},
 	"bundleddependencies": [
