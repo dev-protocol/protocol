@@ -34,6 +34,7 @@ truffle-flattener contracts/src/property/PropertyFactory.sol > flattened/propert
 truffle-flattener contracts/src/property/PropertyGroup.sol > flattened/property/PropertyGroup.flattened.sol
 truffle-flattener contracts/src/vote/VoteCounter.sol > flattened/vote/VoteCounter.flattened.sol
 truffle-flattener contracts/src/withdraw/Withdraw.sol > flattened/withdraw/Withdraw.flattened.sol
+truffle-flattener contracts/src/withdraw/WithdrawStorage.sol > flattened/withdraw/WithdrawStorage.flattened.sol
 ```
 
 # Etherscan 登録
