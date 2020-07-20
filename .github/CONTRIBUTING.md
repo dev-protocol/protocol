@@ -19,8 +19,8 @@ First as follows:
 ```
 git clone git@github.com:YOUR/repository-token.git
 cd repository-token
-npm i
-npm run generate
+yarn
+yarn generate
 ```
 
 If you change something, please update the test code as well.
@@ -28,7 +28,7 @@ If you change something, please update the test code as well.
 Run all tests:
 
 ```
-npm test
+yarn test
 ```
 
 If there is no problem tests succeed!

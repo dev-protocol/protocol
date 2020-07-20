@@ -5,17 +5,17 @@
 	"main": "cli/index.js",
 	"scripts": {
 		"test": "truffle test test/**/*.ts",
-		"pretest": "npm run build",
+		"pretest": "yarn build",
 		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
 		"deploy": "truffle migrate --network",
-		"predeploy": "npm run build",
-		"lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
+		"predeploy": "yarn build",
+		"lint": "yarn lint:eslint && yarn lint:solium && yarn lint:format",
 		"lint:eslint": "eslint . --ext .ts,.js --fix",
 		"lint:solium": "solium --dir contracts --fix",
 		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
-		"prepack": "npm run build",
+		"prepack": "yarn build",
 		"build": "tsc -p tsconfig.build.json",
-		"prebuild": "rimraf ['migrations/**/*.js', 'scripts/**/*.js'] && npm run generate"
+		"prebuild": "rimraf ['migrations/**/*.js', 'scripts/**/*.js'] && yarn generate"
 	},
 	"bin": {
 		"dev-protocol": "cli/index.js"
@@ -82,7 +82,7 @@
 	"homepage": "https://github.com/dev-protocol/protocol#readme",
 	"husky": {
 		"hooks": {
-			"pre-commit": "npm run lint"
+			"pre-commit": "yarn lint"
 		}
 	}
 }

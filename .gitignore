@@ -95,3 +95,6 @@ types
 # output of tsc
 *.js
 !truffle-config.js
+
+# use yarn
+package-lock.json
