@@ -52,7 +52,7 @@
 		"ts-node": "8.10.2",
 		"typechain": "2.0.0",
 		"typechain-target-truffle": "1.0.2",
-		"typescript": "3.9.6",
+		"typescript": "3.9.7",
 		"web3": "1.2.11"
 	},
 	"dependencies": {
