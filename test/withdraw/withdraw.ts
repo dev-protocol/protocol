@@ -459,6 +459,36 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 			})
 		})
+
+		describe('Transferring the property creates an event.', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			const alice = deployer
+			const bob = user1
+
+			before(async () => {
+				;[dev, , property] = await init()
+
+				const totalSupply = await property.totalSupply().then(toBigNumber)
+				await property.transfer(bob, totalSupply.times(0.2), {
+					from: alice,
+				})
+			})
+
+			it(`event is generated`, async () => {
+				const [_property, _from, _to] = await Promise.all([
+					getEventValue(dev.withdraw, WEB3_URI)(
+						'PropertyTransfer',
+						'_property'
+					),
+					getEventValue(dev.withdraw, WEB3_URI)('PropertyTransfer', '_from'),
+					getEventValue(dev.withdraw, WEB3_URI)('PropertyTransfer', '_to'),
+				])
+				expect(_property).to.be.equal(property.address)
+				expect(_from).to.be.equal(alice)
+				expect(_to).to.be.equal(bob)
+			})
+		})
 	})
 	describe('Withdraw; calculateWithdrawableAmount', () => {
 		type Calculator = (
