@@ -15,6 +15,7 @@ import {ILockup} from "contracts/src/lockup/ILockup.sol";
 contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	uint256 private one = 1;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	// solium-disable-next-line no-empty-blocks
@@ -278,34 +279,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 	}
 
-	function next(address _property)
-		public
-		view
-		returns (
-			uint256 _holders,
-			uint256 _interest,
-			uint256 _holdersPrice,
-			uint256 _interestPrice
-		)
-	{
-		(uint256 nextRewards, ) = dry();
-		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
-		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
-		uint256 share = valuePerProperty.mulBasis().outOf(valueAll);
-		uint256 propertyRewards = nextRewards.mul(share);
-		uint256 lockedUp = getStoragePropertyValue(_property);
-		uint256 holders = IPolicy(config().policy()).holdersShare(
-			propertyRewards,
-			lockedUp
-		);
-		uint256 interest = propertyRewards.sub(holders);
-		uint256 holdersPrice = holders.div(
-			ERC20Mintable(_property).totalSupply()
-		);
-		uint256 interestPrice = lockedUp > 0 ? interest.div(lockedUp) : 0;
-		return (holders, interest, holdersPrice, interestPrice);
-	}
-
 	function _calculateInterestAmount(address _property, address _user)
 		private
 		view
@@ -316,7 +289,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			uint256 lastCLocked,
 			uint256 lastBlock
 		) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
-		(uint256 nextReward, , , uint256 interest, uint256 price) = difference(
+		(uint256 nextReward, , , uint256 interest, ) = difference(
 			_property,
 			last
 		);
@@ -324,12 +297,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 lockedUpPerProperty = getStoragePropertyValue(_property);
 		(uint256 cLockProperty, , ) = getCumulativeLockedUp(_property);
 		uint256 cLockUser = lockedUpPerAccount.mul(block.number.sub(lastBlock));
-		uint256 one = 1;
 		uint256 share = lockedUpPerAccount > 0 &&
 			lockedUpPerAccount == lockedUpPerProperty
 			? one.mulBasis()
 			: cLockUser.outOf(cLockProperty.sub(lastCLocked));
-		// uint256 amount = price.mul(lockedUpPerAccount);
 		uint256 amount = interest.mul(share).divBasis();
 		uint256 result = amount > 0 ? amount.divBasis().divBasis() : 0;
 		return (result, nextReward);

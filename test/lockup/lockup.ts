@@ -639,17 +639,8 @@ contract('LockupTest', ([deployer, user1]) => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, {from: bob})
 					.then(gasLogger)
-				await dev.lockup.getCumulativeLockedUp(property.address).then((x) => {
-					console.log('*', x[0].toString())
-				})
 				await dev.lockup.withdrawInterest(property.address, {from: alice})
-				await dev.lockup.getCumulativeLockedUp(property.address).then((x) => {
-					console.log('*', x[0].toString())
-				})
 				await mine(1)
-				await dev.lockup.getCumulativeLockedUp(property.address).then((x) => {
-					console.log('*', x[0].toString())
-				})
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
 					.then(toBigNumber)
@@ -665,23 +656,11 @@ contract('LockupTest', ([deployer, user1]) => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, {from: alice})
 					.then(gasLogger)
-				await dev.lockup.getCumulativeLockedUp(property.address).then((x) => {
-					console.log('*', x[0].toString())
-				})
 				await dev.dev
 					.deposit(property.address, 1000000000000, {from: alice})
 					.then(gasLogger)
-				await dev.lockup.getCumulativeLockedUp(property.address).then((x) => {
-					console.log('*', x[0].toString())
-				})
 				await dev.lockup.withdrawInterest(property.address, {from: alice})
-				await dev.lockup.getCumulativeLockedUp(property.address).then((x) => {
-					console.log('*', x[0].toString())
-				})
 				await mine(1)
-				await dev.lockup.getCumulativeLockedUp(property.address).then((x) => {
-					console.log('*', x[0].toString())
-				})
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
 					.then(toBigNumber)
