@@ -98,6 +98,11 @@ contract LockupStorageTest is LockupStorage {
 		uint256 _cLocked,
 		uint256 _block
 	) external {
-		setStorageLastCumulativeLockedUpAndBlock(_property, _user, _cLocked, _block);
+		setStorageLastCumulativeLockedUpAndBlock(
+			_property,
+			_user,
+			_cLocked,
+			_block
+		);
 	}
 }

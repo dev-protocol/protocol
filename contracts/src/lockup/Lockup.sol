@@ -160,7 +160,12 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	) private {
 		setStorageLastCumulativeGlobalReward(_property, _user, _reward);
 		(uint256 cLocked, , ) = getCumulativeLockedUp(_property);
-		setStorageLastCumulativeLockedUpAndBlock(_property, _user, cLocked, block.number);
+		setStorageLastCumulativeLockedUpAndBlock(
+			_property,
+			_user,
+			cLocked,
+			block.number
+		);
 	}
 
 	function initializeStatesAtLockup(
@@ -173,9 +178,17 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		if (getStorageLastCumulativeGlobalReward(_property, _user) == 0) {
 			setStorageLastCumulativeGlobalReward(_property, _user, _reward);
 		}
-		(uint256 cLocked, uint256 blockNumber) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
+		(
+			uint256 cLocked,
+			uint256 blockNumber
+		) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
 		if (cLocked == 0 && blockNumber == 0) {
-			setStorageLastCumulativeLockedUpAndBlock(_property, _user, _cLocked, _block);
+			setStorageLastCumulativeLockedUpAndBlock(
+				_property,
+				_user,
+				_cLocked,
+				_block
+			);
 		}
 	}
 
@@ -184,7 +197,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		view
 		returns (uint256)
 	{
-		(, uint256 blockNumber) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
+		(, uint256 blockNumber) = getStorageLastCumulativeLockedUpAndBlock(
+			_property,
+			_user
+		);
 		uint256 lastReward = getStorageLastCumulativeGlobalReward(
 			_property,
 			_user
@@ -296,10 +312,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		returns (uint256 _amount, uint256 _interest)
 	{
 		uint256 last = getStorageLastCumulativeGlobalReward(_property, _user);
-		(uint256 lastCLocked, uint256 lastBlock) = getStorageLastCumulativeLockedUpAndBlock(
-			_property,
-			_user
-		);
+		(
+			uint256 lastCLocked,
+			uint256 lastBlock
+		) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
 		(uint256 nextReward, , , uint256 interest, uint256 price) = difference(
 			_property,
 			last

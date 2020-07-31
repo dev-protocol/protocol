@@ -378,11 +378,10 @@ contract LockupStorage is UsingStorage {
 		);
 	}
 
-	function getStorageLastCumulativeLockedUpAndBlock(address _property, address _user)
-		public
-		view
-		returns (uint256 _cLocked, uint256 _block)
-	{
+	function getStorageLastCumulativeLockedUpAndBlock(
+		address _property,
+		address _user
+	) public view returns (uint256 _cLocked, uint256 _block) {
 		uint256 record = eternalStorage().getUint(
 			getStorageLastCumulativeLockedUpAndBlockKey(_property, _user)
 		);
@@ -392,12 +391,17 @@ contract LockupStorage is UsingStorage {
 		return (cLocked, blockNumber);
 	}
 
-	function getStorageLastCumulativeLockedUpAndBlockKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
+	function getStorageLastCumulativeLockedUpAndBlockKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
 		return
-			keccak256(abi.encodePacked("_lastCumulativeLockedUpAndBlock", _property, _user));
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativeLockedUpAndBlock",
+					_property,
+					_user
+				)
+			);
 	}
 }
