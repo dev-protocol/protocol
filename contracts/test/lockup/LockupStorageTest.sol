@@ -3,12 +3,6 @@ pragma solidity ^0.5.0;
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 
 contract LockupStorageTest is LockupStorage {
-	function setStorageLastBlockNumberTest(address _property, uint256 _value)
-		external
-	{
-		setStorageLastBlockNumber(_property, _value);
-	}
-
 	function setStorageAllValueTest(uint256 _value) external {
 		setStorageAllValue(_value);
 	}
@@ -19,12 +13,6 @@ contract LockupStorageTest is LockupStorage {
 		uint256 _value
 	) external {
 		setStorageValue(_property, _sender, _value);
-	}
-
-	function setStoragePropertyValueTest(address _property, uint256 _value)
-		external
-	{
-		setStoragePropertyValue(_property, _value);
 	}
 
 	function setStorageWithdrawalStatusTest(
@@ -65,7 +53,16 @@ contract LockupStorageTest is LockupStorage {
 		address _user,
 		uint256 _value
 	) external {
-		setStorageLastCumulativeGlobalReward(_property, _user, _value);
+		eternalStorage().setUint(
+			keccak256(
+				abi.encodePacked(
+					"_LastCumulativeGlobalReward",
+					_property,
+					_user
+				)
+			),
+			_value
+		);
 	}
 
 	function setStorageCumulativeLockedUpUnitAndBlockTest(
@@ -93,5 +90,14 @@ contract LockupStorageTest is LockupStorage {
 
 	function setStorageDIP4GenesisBlockTest(uint256 _block) external {
 		setStorageDIP4GenesisBlock(_block);
+	}
+
+	function setStorageLastLockupStatesTest(
+		address _property,
+		address _user,
+		uint256 _cLocked,
+		uint256 _block
+	) external {
+		setStorageLastLockupStates(_property, _user, _cLocked, _block);
 	}
 }

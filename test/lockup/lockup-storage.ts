@@ -29,17 +29,6 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(30)
 		})
 	})
-	describe('LockupStorage; setPropertyValue, getPropertyValue', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getStoragePropertyValue(property)
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setStoragePropertyValueTest(property, 300)
-			const result = await storage.getStoragePropertyValue(property)
-			expect(result.toNumber()).to.be.equal(300)
-		})
-	})
 	describe('LockupStorage; setWithdrawalStatus, getWithdrawalStatus', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageWithdrawalStatus(property, user)
@@ -92,17 +81,6 @@ contract('LockupStorageTest', ([property, user]) => {
 				user
 			)
 			expect(result.toNumber()).to.be.equal(3000000)
-		})
-	})
-	describe('LockupStorage; setLastBlockNumber, getLastBlockNumber', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getStorageLastBlockNumber(property)
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageLastBlockNumberTest(property, 30000000)
-			const result = await storage.getStorageLastBlockNumber(property)
-			expect(result.toNumber()).to.be.equal(30000000)
 		})
 	})
 	describe('LockupStorage; setLastSameRewardsAmountAndBlock, getLastSameRewardsAmountAndBlock', () => {
@@ -203,6 +181,29 @@ contract('LockupStorageTest', ([property, user]) => {
 			await storage.setStorageDIP4GenesisBlockTest(300000000000)
 			const result = await storage.getStorageDIP4GenesisBlock()
 			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
+	describe('LockupStorage; setStorageLastLockupStates, getStorageLastLockupStates', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastLockupStates(property, user)
+			expect(result[0].toNumber()).to.be.equal(0)
+			expect(result[1].toNumber()).to.be.equal(0)
+		})
+		it('Save two values combine to one value.', async () => {
+			const cLocked = toBigNumber(
+				'99999999999999999999.999999999999999999'
+			).times(1e18)
+			const block = '888888888888888888'
+
+			await storage.setStorageLastLockupStatesTest(
+				property,
+				user,
+				cLocked,
+				block
+			)
+			const result = await storage.getStorageLastLockupStates(property, user)
+			expect(toBigNumber(result[0]).toFixed()).to.be.equal(cLocked.toFixed())
+			expect(toBigNumber(result[1]).toFixed()).to.be.equal(block)
 		})
 	})
 })
