@@ -601,7 +601,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				return res
 			})
 
-		describe('returns correct amount', () => {
+		describe.only('returns correct amount', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
@@ -672,26 +672,23 @@ contract('LockupTest', ([deployer, user1]) => {
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
 				expect(result.toFixed()).to.be.equal(calculated.toFixed())
 			})
-			it('Bob has a XX% of interests before withdrawal', async () => {
+			it('Bob has a 30% of interests before withdrawal', async () => {
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, bob)
 					.then(toBigNumber)
+				const cLocked = await dev.lockup
+					.getCumulativeLockedUp(property.address)
+					.then((x) => toBigNumber(x[0]))
 				const expected = toBigNumber(10)
 					.times(1e18)
-					.times(1000000000000 / (1000000000000 * 2))
-					.times(2)
-					.plus(
-						toBigNumber(10)
-							.times(1e18)
-							.times(1000000000000 / (1000000000000 * 3))
+					.times(10)
+					.minus(toBigNumber(10).times(1e18).times(4))
+					.times(
+						toBigNumber(1000000000000)
+							.times(6)
+							.div(cLocked.minus(toBigNumber(1000000000000).times(3)))
 					)
-					.plus(
-						toBigNumber(10)
-							.times(1e18)
-							.times(1000000000000 / (1000000000000 * 4))
-							.times(2)
-					)
-				const calculated = await calc(property, bob, true)
+				const calculated = await calc(property, bob)
 
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
 				expect(result.toFixed()).to.be.equal(calculated.toFixed())
