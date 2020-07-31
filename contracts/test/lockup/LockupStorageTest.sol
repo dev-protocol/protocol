@@ -92,12 +92,12 @@ contract LockupStorageTest is LockupStorage {
 		setStorageDIP4GenesisBlock(_block);
 	}
 
-	function setStorageLastLockupStatesTest(
+	function setStorageLastCumulativeLockedUpAndBlockTest(
 		address _property,
 		address _user,
 		uint256 _cLocked,
 		uint256 _block
 	) external {
-		setStorageLastLockupStates(_property, _user, _cLocked, _block);
+		setStorageLastCumulativeLockedUpAndBlock(_property, _user, _cLocked, _block);
 	}
 }

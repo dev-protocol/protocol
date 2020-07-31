@@ -364,8 +364,8 @@ contract LockupStorage is UsingStorage {
 		return keccak256(abi.encodePacked("_dip4GenesisBlock"));
 	}
 
-	//LastLockupStates
-	function setStorageLastLockupStates(
+	//LastCumulativeLockedUpAndBlock
+	function setStorageLastCumulativeLockedUpAndBlock(
 		address _property,
 		address _user,
 		uint256 _cLocked,
@@ -373,18 +373,18 @@ contract LockupStorage is UsingStorage {
 	) internal {
 		uint256 record = _cLocked.mul(basis).add(_block);
 		eternalStorage().setUint(
-			getStorageLastLockupStatesKey(_property, _user),
+			getStorageLastCumulativeLockedUpAndBlockKey(_property, _user),
 			record
 		);
 	}
 
-	function getStorageLastLockupStates(address _property, address _user)
+	function getStorageLastCumulativeLockedUpAndBlock(address _property, address _user)
 		public
 		view
 		returns (uint256 _cLocked, uint256 _block)
 	{
 		uint256 record = eternalStorage().getUint(
-			getStorageLastLockupStatesKey(_property, _user)
+			getStorageLastCumulativeLockedUpAndBlockKey(_property, _user)
 		);
 		uint256 cLocked = record.div(basis);
 		uint256 blockNumber = record.sub(cLocked.mul(basis));
@@ -392,12 +392,12 @@ contract LockupStorage is UsingStorage {
 		return (cLocked, blockNumber);
 	}
 
-	function getStorageLastLockupStatesKey(address _property, address _user)
+	function getStorageLastCumulativeLockedUpAndBlockKey(address _property, address _user)
 		private
 		pure
 		returns (bytes32)
 	{
 		return
-			keccak256(abi.encodePacked("_lastLockupStates", _property, _user));
+			keccak256(abi.encodePacked("_lastCumulativeLockedUpAndBlock", _property, _user));
 	}
 }

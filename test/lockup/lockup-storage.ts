@@ -91,7 +91,7 @@ contract('LockupStorageTest', ([property, user]) => {
 		})
 		it('Save two values combine to one value.', async () => {
 			const amount = toBigNumber(
-				'99999999999999999999.999999999999999999'
+				'999999999999999999999999999.999999999999999999'
 			).times(1e18)
 			const block = '888888888888888888'
 
@@ -142,9 +142,9 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result[1].toNumber()).to.be.equal(0)
 		})
 		it('Save two values combine to one value.', async () => {
-			const unit = toBigNumber('99999999999999999999.999999999999999999').times(
-				1e18
-			)
+			const unit = toBigNumber(
+				'999999999999999999999999999.999999999999999999'
+			).times(1e18)
 			const block = '888888888888888888'
 			await storage.setStorageCumulativeLockedUpUnitAndBlockTest(
 				property,
@@ -183,25 +183,31 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})
-	describe('LockupStorage; setStorageLastLockupStates, getStorageLastLockupStates', () => {
+	describe('LockupStorage; setStorageLastCumulativeLockedUpAndBlock, getStorageLastCumulativeLockedUpAndBlock', () => {
 		it('Initial value is 0 and 0.', async () => {
-			const result = await storage.getStorageLastLockupStates(property, user)
+			const result = await storage.getStorageLastCumulativeLockedUpAndBlock(
+				property,
+				user
+			)
 			expect(result[0].toNumber()).to.be.equal(0)
 			expect(result[1].toNumber()).to.be.equal(0)
 		})
 		it('Save two values combine to one value.', async () => {
 			const cLocked = toBigNumber(
-				'99999999999999999999.999999999999999999'
+				'999999999999999999999999999.999999999999999999'
 			).times(1e18)
 			const block = '888888888888888888'
 
-			await storage.setStorageLastLockupStatesTest(
+			await storage.setStorageLastCumulativeLockedUpAndBlockTest(
 				property,
 				user,
 				cLocked,
 				block
 			)
-			const result = await storage.getStorageLastLockupStates(property, user)
+			const result = await storage.getStorageLastCumulativeLockedUpAndBlock(
+				property,
+				user
+			)
 			expect(toBigNumber(result[0]).toFixed()).to.be.equal(cLocked.toFixed())
 			expect(toBigNumber(result[1]).toFixed()).to.be.equal(block)
 		})
