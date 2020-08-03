@@ -560,7 +560,23 @@ contract('LockupTest', ([deployer, user1]) => {
 						: lockedUpPerUser.isEqualTo(0)
 						? toBigNumber(0)
 						: lockedUpPerUser
-								.times(currentBlock.minus(lastLockupBlock))
+								.times(
+									currentBlock.minus(
+										lastLockupBlock.isEqualTo(0) && last.isGreaterThan(0)
+											? last
+													.times(1e18)
+													.div(rewards)
+													.times(
+														currentBlock
+															.minus(deployedBlock)
+															.div(1e18)
+															.plus(deployedBlock)
+													)
+											: lastLockupBlock.isEqualTo(0)
+											? deployedBlock
+											: 0
+									)
+								)
 								.integerValue(BigNumber.ROUND_DOWN)
 								.times(1e18)
 								.div(cumulativeLockedUp.minus(lastCLocked))
@@ -601,7 +617,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				return res
 			})
 
-		describe.only('returns correct amount', () => {
+		describe('returns correct amount', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
@@ -1329,7 +1345,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			let blockAlice: BigNumber
 			let legacyLastPriceAlice: BigNumber
 			let legacyLastPriceBob: BigNumber
-			let lastBlock: BigNumber
 			let calc: Calculator
 			const alice = deployer
 			const bob = user1
@@ -1390,27 +1405,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				await storage.changeOwner(dev.lockup.address)
 
 				await dev.lockup.update()
-				lastBlock = await getBlock().then(toBigNumber)
-				const globalRewards = await dev.lockup
-					.difference(property.address, 0)
-					.then((x) => toBigNumber(x[0]))
-				const cLock = await dev.lockup
-					.getCumulativeLockedUp(property.address)
-					.then((x) => toBigNumber(x[0]))
-				await dev.lockup.initializeStatesAtLockup(
-					property.address,
-					alice,
-					globalRewards,
-					cLock,
-					lastBlock
-				)
-				await dev.lockup.initializeStatesAtLockup(
-					property.address,
-					bob,
-					globalRewards,
-					cLock,
-					lastBlock
-				)
 				await mine(1)
 			})
 			describe('before withdraw interest', () => {
@@ -1423,38 +1417,18 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(expected.toFixed()).to.be.equal('0')
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const result = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
-					const latest = toBigNumber(10)
-						.times(1e18)
-						.times(8)
-						.div(10)
-						.times(block.minus(lastBlock))
-					const legacy = lockedAlice
-						.times(legacyPrice.minus(legacyLastPriceAlice))
-						.div(1e18)
 					const expected = await calc(property, alice)
 					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(latest.plus(legacy).toFixed()).to.be.equal(result.toFixed())
 				})
 				it(`Bob's withdrawable interest is correct`, async () => {
-					const block = await getBlock().then(toBigNumber)
 					const result = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, bob)
 						.then(toBigNumber)
-					const latest = toBigNumber(10)
-						.times(1e18)
-						.times(2)
-						.div(10)
-						.times(block.minus(lastBlock))
-					const legacy = lockedBob
-						.times(legacyPrice.minus(legacyLastPriceBob))
-						.div(1e18)
 					const expected = await calc(property, bob)
 					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(latest.plus(legacy).toFixed()).to.be.equal(result.toFixed())
 				})
 			})
 			describe('after withdraw interest', () => {
@@ -1786,94 +1760,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				.catch(err)
 			const after = await dev.lockup.getStorageDIP4GenesisBlock()
 			expect(after.toNumber()).to.be.equal(before.toNumber())
-			expect(res).to.be.instanceOf(Error)
-		})
-	})
-	describe('Lockup; initializeStatesAtLockup', () => {
-		it('Store passed value to getStorageLastCumulativeGlobalReward and getStorageLastLockupStates', async () => {
-			const [dev, property] = await init()
-			await dev.lockup.initializeStatesAtLockup(
-				property.address,
-				user1,
-				123,
-				456,
-				789
-			)
-			const rewards = await dev.lockup.getStorageLastCumulativeGlobalReward(
-				property.address,
-				user1
-			)
-			await dev.lockup
-				.getStorageLastCumulativeLockedUpAndBlock(property.address, user1)
-				.catch((err) => {
-					console.log(1, err)
-				})
-			const cLockBlock: any = await dev.lockup.getStorageLastCumulativeLockedUpAndBlock(
-				property.address,
-				user1
-			)
-			expect(rewards.toNumber()).to.be.equal(123)
-			expect(cLockBlock._cLocked.toNumber()).to.be.equal(456)
-			expect(cLockBlock._block.toNumber()).to.be.equal(789)
-		})
-		it('Should not override when already any value ', async () => {
-			const [dev, property] = await init()
-			await dev.lockup.initializeStatesAtLockup(
-				property.address,
-				user1,
-				123,
-				456,
-				789
-			)
-			await dev.lockup.initializeStatesAtLockup(
-				property.address,
-				user1,
-				1230,
-				4560,
-				7890
-			)
-			const rewards = await dev.lockup.getStorageLastCumulativeGlobalReward(
-				property.address,
-				user1
-			)
-			const cLockBLock: any = await dev.lockup.getStorageLastCumulativeLockedUpAndBlock(
-				property.address,
-				user1
-			)
-			expect(rewards.toNumber()).to.be.equal(123)
-			expect(cLockBLock._cLocked.toNumber()).to.be.equal(456)
-			expect(cLockBLock._block.toNumber()).to.be.equal(789)
-		})
-		it('Should fail to call when sent from non-pauser account', async () => {
-			const [dev, property] = await init()
-			const beforeRewards = await dev.lockup.getStorageLastCumulativeGlobalReward(
-				property.address,
-				user1
-			)
-			const beforeCLockBlock: any = await dev.lockup.getStorageLastCumulativeLockedUpAndBlock(
-				property.address,
-				user1
-			)
-			const res = await dev.lockup
-				.initializeStatesAtLockup(property.address, user1, 123, 456, 789, {
-					from: user1,
-				})
-				.catch(err)
-			const afterRewards = await dev.lockup.getStorageLastCumulativeGlobalReward(
-				property.address,
-				user1
-			)
-			const afterCLockBlock: any = await dev.lockup.getStorageLastCumulativeLockedUpAndBlock(
-				property.address,
-				user1
-			)
-			expect(afterRewards.toNumber()).to.be.equal(beforeRewards.toNumber())
-			expect(afterCLockBlock._cLocked.toNumber()).to.be.equal(
-				beforeCLockBlock._cLocked.toNumber()
-			)
-			expect(afterCLockBlock._block.toNumber()).to.be.equal(
-				beforeCLockBlock._block.toNumber()
-			)
 			expect(res).to.be.instanceOf(Error)
 		})
 	})

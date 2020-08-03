@@ -169,30 +169,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 	}
 
-	function initializeStatesAtLockup(
-		address _property,
-		address _user,
-		uint256 _reward,
-		uint256 _cLocked,
-		uint256 _block
-	) external onlyOwner {
-		if (getStorageLastCumulativeGlobalReward(_property, _user) == 0) {
-			setStorageLastCumulativeGlobalReward(_property, _user, _reward);
-		}
-		(
-			uint256 cLocked,
-			uint256 blockNumber
-		) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
-		if (cLocked == 0 && blockNumber == 0) {
-			setStorageLastCumulativeLockedUpAndBlock(
-				_property,
-				_user,
-				_cLocked,
-				_block
-			);
-		}
-	}
-
 	function getLastCumulativeLockedUpAndBlock(address _property, address _user)
 		private
 		view
@@ -210,14 +186,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			// Fallback when locked-ups that after DIP4 but before the patch.
 			// The number of last cumulative locked-ups is 0, the block number of the last locked-up is estimated value.
 			uint256 begin = getStorageDIP4GenesisBlock();
+			(uint256 _reward, ) = dry();
 			blockNumber = (
-				(
-					lastReward.outOf(
-						IAllocator(config().allocator())
-							.calculateMaxRewardsPerBlock()
-					)
-				)
-					.mul(block.number.sub(begin))
+				(lastReward.outOf(_reward)).mul(block.number.sub(begin))
 			)
 				.divBasis()
 				.add(begin);
