@@ -3,9 +3,7 @@ export type GraphQLResponse = {
 		account_lockup: Array<{
 			property_address: string
 			account_address: string
-			lockedup: {
-				block_number: number
-			}
+			block_number: number
 		}>
 	}
 }

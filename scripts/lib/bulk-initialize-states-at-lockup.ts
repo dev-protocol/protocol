@@ -23,18 +23,11 @@ export const createGraphQLFetcher = (
 		query: `{
 			account_lockup(
 				offset: ${offset},
-				distinct_on: [account_address, property_address],
-				order_by: [
-					{account_address: desc_nulls_last},
-					{property_address: desc_nulls_last}
-					{lockedup: {block_number: desc_nulls_last}}
-			  	]
+				order_by: {block_number: desc}
 			) {
 				property_address
 				account_address
-				lockedup {
-					block_number
-				}
+				block_number
 			}
 		}`,
 	}).then((r) => (r as unknown) as GraphQLResponse)

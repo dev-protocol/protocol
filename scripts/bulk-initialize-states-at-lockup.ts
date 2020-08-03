@@ -66,10 +66,9 @@ const handler = async (
 	const getCumulativeLockedUp = createGetCumulativeLockedUpCaller(lockup)
 	const initializeStatesAtLockup = createInitializeStatesAtLockup(lockup)(from)
 
-	const targets = all.filter(({lockedup}) => Boolean(lockedup))
-	____log('all targets', targets.length)
+	____log('all targets', all.length)
 
-	const filteringTacks = targets.map(
+	const filteringTacks = all.map(
 		({property_address, account_address, ...x}) => async () => {
 			const [cReward, {_cLocked, _block}] = await Promise.all([
 				lastCumulativeGlobalReward()(property_address, account_address),
@@ -90,12 +89,11 @@ const handler = async (
 	const shouldInitilizeItems = await createQueue(10)
 		.addAll(filteringTacks)
 		.then((done) => done.filter((x) => !x.skip))
-	____log('Should skip items', targets.length - shouldInitilizeItems.length)
+	____log('Should skip items', all.length - shouldInitilizeItems.length)
 	____log('Should initilize items', shouldInitilizeItems.length)
 
 	const initializeTasks = shouldInitilizeItems.map(
-		({property_address, account_address, lockedup}) => async () => {
-			const {block_number} = lockedup
+		({property_address, account_address, block_number}) => async () => {
 			const res = await Promise.all([
 				difference(block_number)(property_address),
 				getCumulativeLockedUp(block_number)(property_address, account_address),
