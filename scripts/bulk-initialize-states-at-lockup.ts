@@ -76,7 +76,14 @@ const handler = async (
 				lastCumulativeLockedUpAndBlock()(property_address, account_address),
 			])
 			const skip = [cReward, _cLocked, _block].every((y) => y !== '0')
-			____log('Should skip item', property_address, account_address)
+			____log(
+				'Should skip item',
+				property_address,
+				account_address,
+				cReward,
+				_cLocked,
+				_block
+			)
 			return {property_address, account_address, skip, ...x}
 		}
 	)
