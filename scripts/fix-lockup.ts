@@ -34,12 +34,11 @@ const handler = async (
 	____log('Got EternalStorage address that uses by Lockup')
 	await nextLockup.setStorage(lockupStorageAddress)
 	____log('Set EternalStorage address to the new Lockup')
-	await lockup.changeOwner(nextLockup.address)
-	____log('Delegate authority to the new Lockup')
 
-	// Enable new Contract
-	await config.setLockup(nextLockup.address)
-	____log('Updated Lockup address')
+	____log('Confirm behavior, execute the rest process manually.')
+	// The following operations should execute manually.
+	// await lockup.changeOwner(nextLockup.address)
+	// await config.setLockup(nextLockup.address)
 
 	callback(null)
 }
