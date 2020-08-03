@@ -63,7 +63,7 @@ export const createGetStorageLastCumulativeLockedUpAndBlock = (
 export const createDifferenceCaller = (lockup: Contract) => (
 	blockNumber?: number
 ) => async (property: string): Promise<{_reward: string}> =>
-	lockup.methods.difference(property).call(undefined, blockNumber)
+	lockup.methods.difference(property, 0).call(undefined, blockNumber)
 export const createGetCumulativeLockedUpCaller = (lockup: Contract) => (
 	blockNumber?: number
 ) => async (property: string, user: string): Promise<{_value: string}> =>
