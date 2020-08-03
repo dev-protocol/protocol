@@ -90,7 +90,7 @@ const handler = async (
 	const shouldInitilizeItems = await createQueue(10)
 		.addAll(filteringTacks)
 		.then((done) => done.filter((x) => !x.skip))
-	____log('Should slip items', targets.length - shouldInitilizeItems.length)
+	____log('Should skip items', targets.length - shouldInitilizeItems.length)
 	____log('Should initilize items', shouldInitilizeItems.length)
 
 	const initializeTasks = shouldInitilizeItems.map(
