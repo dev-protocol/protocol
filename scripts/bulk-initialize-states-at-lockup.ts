@@ -31,6 +31,9 @@ type EGSResponse = {
 	fastestWait: number
 }
 type GasPriceFetcher = () => Promise<string>
+type SendTx = {
+	on: (event: 'confirmation' | 'error', callback: () => void) => SendTx
+}
 
 const graphql = () =>
 	bent('https://api.devprtcl.com/v1/graphql', 'POST', 'json')
@@ -98,19 +101,18 @@ const createGetCumulativeLockedUpCaller = (lockup: Contract) => (
 	lockup.methods
 		.getCumulativeLockedUp(property, user)
 		.call(undefined, blockNumber)
-const createInitializeStatesAtLockup = (lockup: Contract) => (
-	gasPriceFetcher: GasPriceFetcher
-) => (from: string) => async (
+const createInitializeStatesAtLockup = (lockup: Contract) => (from: string) => (
 	property: string,
 	user: string,
 	reward: string,
 	cLocked: string,
-	block: string
+	block: string,
+	gasPrice: string
 	// eslint-disable-next-line max-params
-) =>
+): SendTx =>
 	lockup.methods
 		.initializeStatesAtLockup(property, user, reward, cLocked, block)
-		.send({gasPrice: await gasPriceFetcher(), from})
+		.send({gasPrice, from})
 const createQueue = (concurrency: number) => new Queue({concurrency})
 
 const handler = async (
@@ -162,9 +164,7 @@ const handler = async (
 	)
 	const difference = createDifferenceCaller(lockup)
 	const getCumulativeLockedUp = createGetCumulativeLockedUpCaller(lockup)
-	const initializeStatesAtLockup = createInitializeStatesAtLockup(lockup)(
-		fetchFastestGasPrice
-	)(from)
+	const initializeStatesAtLockup = createInitializeStatesAtLockup(lockup)(from)
 
 	const targets = all.filter(({lockedup}) => Boolean(lockedup))
 	const filteringTacks = targets.map(
@@ -191,14 +191,21 @@ const handler = async (
 			])
 			const reward = res[0]._reward
 			const cLocked = res[1]._value
-			console.log(property_address, account_address, reward, cLocked)
-			initializeStatesAtLockup(
-				property_address,
-				account_address,
-				reward,
-				cLocked,
-				block_number.toString()
-			).catch(console.error)
+			____log(property_address, account_address, reward, cLocked)
+
+			const gasPrice = await fetchFastestGasPrice()
+			await new Promise((resolve, reject) => {
+				initializeStatesAtLockup(
+					property_address,
+					account_address,
+					reward,
+					cLocked,
+					block_number.toString(),
+					gasPrice
+				)
+					.on('confirmation', resolve)
+					.on('error', reject)
+			})
 		}
 	)
 
