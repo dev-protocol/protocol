@@ -5,17 +5,17 @@
 	"main": "cli/index.js",
 	"scripts": {
 		"test": "truffle test test/**/*.ts",
-		"pretest": "npm run build",
+		"pretest": "yarn build",
 		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
 		"deploy": "truffle migrate --network",
-		"predeploy": "npm run build",
-		"lint": "npm run lint:eslint && npm run lint:solium && npm run lint:format",
+		"predeploy": "yarn build",
+		"lint": "yarn lint:eslint && yarn lint:solium && yarn lint:format",
 		"lint:eslint": "eslint . --ext .ts,.js --fix",
 		"lint:solium": "solium --dir contracts --fix",
 		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
-		"prepack": "npm run build",
+		"prepack": "yarn build",
 		"build": "tsc -p tsconfig.build.json",
-		"prebuild": "rimraf ['migrations/**/*.js', 'scripts/**/*.js'] && npm run generate"
+		"prebuild": "rimraf ['migrations/**/*.js', 'scripts/**/*.js'] && yarn generate"
 	},
 	"bin": {
 		"dev-protocol": "cli/index.js"
@@ -28,36 +28,39 @@
 	"author": "aggre",
 	"license": "MPL-2.0",
 	"devDependencies": {
-		"@truffle/hdwallet-provider": "1.0.38",
+		"@truffle/hdwallet-provider": "1.0.40",
+		"@types/bent": "7.3.0",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "13.13.14",
 		"@types/shelljs": "0.8.8",
-		"@typescript-eslint/eslint-plugin": "3.6.1",
-		"@typescript-eslint/parser": "3.6.1",
+		"@typescript-eslint/eslint-plugin": "3.7.1",
+		"@typescript-eslint/parser": "3.7.1",
+		"bent": "7.3.9",
 		"bignumber.js": "9.0.0",
 		"dotenv": "8.2.0",
-		"eslint": "7.4.0",
+		"eslint": "7.6.0",
 		"eslint-config-prettier": "6.11.0",
-		"eslint-config-xo": "0.32.0",
+		"eslint-config-xo": "0.32.1",
 		"eslint-config-xo-typescript": "0.31.0",
 		"eslint-plugin-prettier": "3.1.4",
 		"ethlint": "1.2.5",
 		"husky": "4.2.5",
+		"p-queue": "6.6.0",
 		"prettier": "2.0.5",
-		"prettier-plugin-solidity": "1.0.0-alpha.54",
+		"prettier-plugin-solidity": "1.0.0-alpha.55",
 		"rimraf": "3.0.2",
-		"truffle": "5.1.34",
+		"truffle": "5.1.37",
 		"truffle-typings": "1.0.8",
 		"ts-generator": "0.0.8",
 		"ts-node": "8.10.2",
 		"typechain": "2.0.0",
 		"typechain-target-truffle": "1.0.2",
-		"typescript": "3.9.6",
-		"web3": "1.2.9"
+		"typescript": "3.9.7",
+		"web3": "1.2.11"
 	},
 	"dependencies": {
 		"@openzeppelin/contracts": "^2.5.0",
-		"commander": "^5.0.0",
+		"commander": "^6.0.0",
 		"shelljs": "^0.8.3"
 	},
 	"bundleddependencies": [
@@ -82,7 +85,7 @@
 	"homepage": "https://github.com/dev-protocol/protocol#readme",
 	"husky": {
 		"hooks": {
-			"pre-commit": "npm run lint"
+			"pre-commit": "yarn lint"
 		}
 	}
 }

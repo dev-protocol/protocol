@@ -12,14 +12,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install, build, and test
-        run: |
-          npm ci
-          npm run build --if-present
-          npm test
-        env:
-          CI: true
+
+      - name: install deps
+        run: yarn
+
+      - name: build
+        run: yarn build
+
+      - name: lint
+        run: yarn lint
+
+      - name: test
+        run: yarn test

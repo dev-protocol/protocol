@@ -15,6 +15,7 @@ import {ILockup} from "contracts/src/lockup/ILockup.sol";
 contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	uint256 private one = 1;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	// solium-disable-next-line no-empty-blocks
@@ -31,16 +32,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 
 		bool isWaiting = getStorageWithdrawalStatus(_property, _from) != 0;
 		require(isWaiting == false, "lockup is already canceled");
-		if (getStorageLastBlockNumber(_property) == 0) {
-			// Set the block that has been locked-up for the first time as the starting block.
-			setStorageLastBlockNumber(_property, block.number);
-		}
 		updatePendingInterestWithdrawal(_property, _from);
-		(, uint256 last) = _calculateWithdrawableInterestAmount(
-			_property,
-			_from
-		);
-		updateLastPriceForProperty(_property, _from, last);
+		(uint256 last, ) = dry();
+		updateStatesAtLockup(_property, _from, last);
 		updateValues(true, _from, _property, _value);
 		emit Lockedup(_from, _property, _value);
 	}
@@ -160,21 +154,73 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		setStorageLastSameRewardsAmountAndBlock(_amount, block.number);
 	}
 
-	function updateLastPriceForProperty(
+	function updateStatesAtLockup(
 		address _property,
 		address _user,
-		uint256 _lastInterest
+		uint256 _reward
 	) private {
-		setStorageLastCumulativeGlobalReward(_property, _user, _lastInterest);
-		setStorageLastBlockNumber(_property, block.number);
+		setStorageLastCumulativeGlobalReward(_property, _user, _reward);
+		(uint256 cLocked, , ) = getCumulativeLockedUp(_property);
+		setStorageLastCumulativeLockedUpAndBlock(
+			_property,
+			_user,
+			cLocked,
+			block.number
+		);
 	}
 
-	function term(address _property)
-		private
+	function initializeStatesAtLockup(
+		address _property,
+		address _user,
+		uint256 _reward,
+		uint256 _cLocked,
+		uint256 _block
+	) external onlyOwner {
+		if (getStorageLastCumulativeGlobalReward(_property, _user) == 0) {
+			setStorageLastCumulativeGlobalReward(_property, _user, _reward);
+		}
+		(
+			uint256 cLocked,
+			uint256 blockNumber
+		) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
+		if (cLocked == 0 && blockNumber == 0) {
+			setStorageLastCumulativeLockedUpAndBlock(
+				_property,
+				_user,
+				_cLocked,
+				_block
+			);
+		}
+	}
+
+	function getLastLockupBlock(address _property, address _user)
+		public
 		view
-		returns (uint256 begin, uint256 end)
+		returns (uint256)
 	{
-		return (getStorageLastBlockNumber(_property), block.number);
+		(, uint256 blockNumber) = getStorageLastCumulativeLockedUpAndBlock(
+			_property,
+			_user
+		);
+		uint256 lastReward = getStorageLastCumulativeGlobalReward(
+			_property,
+			_user
+		);
+		if (blockNumber == 0 && lastReward > 0) {
+			uint256 begin = getStorageDIP4GenesisBlock();
+			blockNumber = (
+				(
+					lastReward.outOf(
+						IAllocator(config().allocator())
+							.calculateMaxRewardsPerBlock()
+					)
+				)
+					.mul(block.number.sub(begin))
+			)
+				.divBasis()
+				.add(begin);
+		}
+		return blockNumber;
 	}
 
 	function dry()
@@ -233,43 +279,29 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 	}
 
-	function next(address _property)
-		public
-		view
-		returns (
-			uint256 _holders,
-			uint256 _interest,
-			uint256 _holdersPrice,
-			uint256 _interestPrice
-		)
-	{
-		(uint256 nextRewards, ) = dry();
-		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
-		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
-		uint256 share = valuePerProperty.mulBasis().outOf(valueAll);
-		uint256 propertyRewards = nextRewards.mul(share);
-		uint256 lockedUp = getStoragePropertyValue(_property);
-		uint256 holders = IPolicy(config().policy()).holdersShare(
-			propertyRewards,
-			lockedUp
-		);
-		uint256 interest = propertyRewards.sub(holders);
-		uint256 holdersPrice = holders.div(
-			ERC20Mintable(_property).totalSupply()
-		);
-		uint256 interestPrice = lockedUp > 0 ? interest.div(lockedUp) : 0;
-		return (holders, interest, holdersPrice, interestPrice);
-	}
-
 	function _calculateInterestAmount(address _property, address _user)
 		private
 		view
 		returns (uint256 _amount, uint256 _interest)
 	{
 		uint256 last = getStorageLastCumulativeGlobalReward(_property, _user);
-		(uint256 nextReward, , , , uint256 price) = difference(_property, last);
+		(
+			uint256 lastCLocked,
+			uint256 lastBlock
+		) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
+		(uint256 nextReward, , , uint256 interest, ) = difference(
+			_property,
+			last
+		);
 		uint256 lockedUpPerAccount = getStorageValue(_property, _user);
-		uint256 amount = price.mul(lockedUpPerAccount);
+		uint256 lockedUpPerProperty = getStoragePropertyValue(_property);
+		(uint256 cLockProperty, , ) = getCumulativeLockedUp(_property);
+		uint256 cLockUser = lockedUpPerAccount.mul(block.number.sub(lastBlock));
+		uint256 share = lockedUpPerAccount > 0 &&
+			lockedUpPerAccount == lockedUpPerProperty
+			? one.mulBasis()
+			: cLockUser.outOf(cLockProperty.sub(lastCLocked));
+		uint256 amount = interest.mul(share).divBasis();
 		uint256 result = amount > 0 ? amount.divBasis().divBasis() : 0;
 		return (result, nextReward);
 	}
@@ -311,7 +343,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		require(value > 0, "your interest amount is 0");
 		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		updateLastPriceForProperty(_property, msg.sender, last);
+		updateStatesAtLockup(_property, msg.sender, last);
 		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 		update();

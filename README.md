@@ -40,14 +40,14 @@ Executing the following command will compile each contract.
 ```
 git clone https://github.com/dev-protocol/protocol.git
 cd protocol
-npm i
-npm run generate
+yarn
+yarn generate
 ```
 
 run the following command to test each contract.
 
 ```
-npm test
+yarn test
 ```
 
 create a `.env` file like following, and run the command to deploy a mock. ( Beforehand, please prepare a local network using [Ganache](https://www.trufflesuite.com/ganache), etc. )
@@ -59,7 +59,7 @@ ETHEREUM_MOCK_PORT=7545
 ```
 
 ```
-npm run deploy mock
+yarn deploy mock
 ```
 
 If you use Visual Studio Code, we recommend that you install the following plug-ins:
@@ -75,7 +75,7 @@ solidity
 First, deploy this protocol:
 
 ```bash
-npm run deploy <network>
+yarn deploy <network>
 ```
 
 Then, calling `PolicyFactory.create` using Truffle console:

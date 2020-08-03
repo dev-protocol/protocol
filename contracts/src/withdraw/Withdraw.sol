@@ -13,6 +13,7 @@ import {ILockup} from "contracts/src/lockup/ILockup.sol";
 contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	event PropertyTransfer(address _property, address _from, address _to);
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -94,6 +95,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 				ERC20Mintable(_property).balanceOf(_to)
 			);
 		}
+		emit PropertyTransfer(_property, _from, _to);
 	}
 
 	function getRewardsAmount(address _property)
