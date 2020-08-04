@@ -5,12 +5,18 @@ import Queue from 'p-queue'
 import Web3 from 'web3'
 import {Contract} from 'web3-eth-contract/types'
 import {GraphQLResponse, EGSResponse, SendTx} from './types'
-export const prepare = async (configAddress: string) => {
-	const [config] = await Promise.all([
+export const prepare = async (configAddress: string, blockNumber?: number) => {
+	const [config] = await Promise.all<any>([
 		artifacts.require('AddressConfig').at(configAddress),
 	])
+	const configContract = new (web3 as Web3).eth.Contract(
+		config.abi,
+		config.address
+	)
 	const [lockup] = await Promise.all<any>([
-		artifacts.require('Lockup').at(await config.lockup()),
+		artifacts
+			.require('Lockup')
+			.at(await configContract.methods.lockup().call(undefined, blockNumber)),
 	])
 	const contract = new (web3 as Web3).eth.Contract(lockup.abi, lockup.address)
 	return contract
