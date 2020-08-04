@@ -1345,6 +1345,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			let blockAlice: BigNumber
 			let legacyLastPriceAlice: BigNumber
 			let legacyLastPriceBob: BigNumber
+			let lastBlock: BigNumber
 			let calc: Calculator
 			const alice = deployer
 			const bob = user1
@@ -1405,6 +1406,27 @@ contract('LockupTest', ([deployer, user1]) => {
 				await storage.changeOwner(dev.lockup.address)
 
 				await dev.lockup.update()
+				lastBlock = await getBlock().then(toBigNumber)
+				const globalRewards = await dev.lockup
+					.difference(property.address, 0)
+					.then((x) => toBigNumber(x[0]))
+				const cLock = await dev.lockup
+					.getCumulativeLockedUp(property.address)
+					.then((x) => toBigNumber(x[0]))
+				await dev.lockup.initializeStatesAtLockup(
+					property.address,
+					alice,
+					globalRewards,
+					cLock,
+					lastBlock
+				)
+				await dev.lockup.initializeStatesAtLockup(
+					property.address,
+					bob,
+					globalRewards,
+					cLock,
+					lastBlock
+				)
 				await mine(1)
 			})
 			describe('before withdraw interest', () => {
@@ -1417,18 +1439,38 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(expected.toFixed()).to.be.equal('0')
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
+					const block = await getBlock().then(toBigNumber)
 					const result = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
+					const latest = toBigNumber(10)
+						.times(1e18)
+						.times(8)
+						.div(10)
+						.times(block.minus(lastBlock))
+					const legacy = lockedAlice
+						.times(legacyPrice.minus(legacyLastPriceAlice))
+						.div(1e18)
 					const expected = await calc(property, alice)
 					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					expect(latest.plus(legacy).toFixed()).to.be.equal(result.toFixed())
 				})
 				it(`Bob's withdrawable interest is correct`, async () => {
+					const block = await getBlock().then(toBigNumber)
 					const result = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, bob)
 						.then(toBigNumber)
+					const latest = toBigNumber(10)
+						.times(1e18)
+						.times(2)
+						.div(10)
+						.times(block.minus(lastBlock))
+					const legacy = lockedBob
+						.times(legacyPrice.minus(legacyLastPriceBob))
+						.div(1e18)
 					const expected = await calc(property, bob)
 					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					expect(latest.plus(legacy).toFixed()).to.be.equal(result.toFixed())
 				})
 			})
 			describe('after withdraw interest', () => {
