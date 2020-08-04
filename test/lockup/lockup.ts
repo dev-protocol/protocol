@@ -566,15 +566,12 @@ contract('LockupTest', ([deployer, user1]) => {
 											? last
 													.times(1e18)
 													.div(rewards)
-													.times(
-														currentBlock
-															.minus(deployedBlock)
-															.div(1e18)
-															.plus(deployedBlock)
-													)
+													.times(currentBlock.minus(deployedBlock))
+													.div(1e18)
+													.plus(deployedBlock)
 											: lastLockupBlock.isEqualTo(0)
 											? deployedBlock
-											: 0
+											: lastLockupBlock
 									)
 								)
 								.integerValue(BigNumber.ROUND_DOWN)
