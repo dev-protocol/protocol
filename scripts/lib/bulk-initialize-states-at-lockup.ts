@@ -1,25 +1,28 @@
-/* eslint-disable no-undef */
 /* eslint-disable no-useless-call */
 import bent from 'bent'
 import Queue from 'p-queue'
 import Web3 from 'web3'
 import {Contract} from 'web3-eth-contract/types'
 import {GraphQLResponse, SendTx} from './types'
+import builtConfig from '../../build/contracts/AddressConfig.json'
+import builtLockup from '../../build/contracts/Lockup.json'
+import {AbiItem} from 'web3-utils/types'
 export const prepare = async (
 	configAddress: string,
 	libWeb3: Web3,
 	blockNumber?: number
 ) => {
-	const [config] = await Promise.all<any>([
-		artifacts.require('AddressConfig').at(configAddress),
-	])
-	const configContract = new libWeb3.eth.Contract(config.abi, config.address)
-	const [lockup] = await Promise.all<any>([
-		artifacts
-			.require('Lockup')
-			.at(await configContract.methods.lockup().call(undefined, blockNumber)),
-	])
-	const contract = new libWeb3.eth.Contract(lockup.abi, lockup.address)
+	const configContract = new libWeb3.eth.Contract(
+		builtConfig.abi as AbiItem[],
+		configAddress
+	)
+	const lockupAddress = await configContract.methods
+		.lockup()
+		.call(undefined, blockNumber)
+	const contract = new libWeb3.eth.Contract(
+		builtLockup.abi as AbiItem[],
+		lockupAddress
+	)
 	return contract
 }
 
