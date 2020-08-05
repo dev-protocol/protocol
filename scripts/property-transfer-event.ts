@@ -23,7 +23,7 @@ const handler = async (
 		artifacts.require('Dev').at(await config.token()),
 	])
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
+	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
 
 	// Deploy new Lockup and new Withdraw
 	const nextWithdraw = await artifacts

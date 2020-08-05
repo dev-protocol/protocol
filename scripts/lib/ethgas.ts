@@ -9,9 +9,10 @@ export const createEGSFetcher = (
 	fetcher('').then((r) => (r as unknown) as EGSResponse)
 
 export const createFastestGasPriceFetcher = (
-	fetcher: bent.RequestFunction<bent.ValidResponse>
+	fetcher: bent.RequestFunction<bent.ValidResponse>,
+	libWeb3: Web3
 ) =>
 	((egs) => async () =>
-		egs().then((res) =>
-			(web3 as Web3).utils.toWei(`${res.fastest / 10}`, 'Gwei')
-		))(createEGSFetcher(fetcher))
+		egs().then((res) => libWeb3.utils.toWei(`${res.fastest / 10}`, 'Gwei')))(
+		createEGSFetcher(fetcher)
+	)
