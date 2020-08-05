@@ -1332,7 +1332,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 			})
 		})
-		describe('scenario: fallback legacy locking-ups', () => {
+		describe.only('scenario: fallback legacy locking-ups', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let property2: PropertyInstance
@@ -1404,26 +1404,6 @@ contract('LockupTest', ([deployer, user1]) => {
 
 				await dev.lockup.update()
 				lastBlock = await getBlock().then(toBigNumber)
-				const globalRewards = await dev.lockup
-					.difference(property.address, 0)
-					.then((x) => toBigNumber(x[0]))
-				const cLock = await dev.lockup
-					.getCumulativeLockedUp(property.address)
-					.then((x) => toBigNumber(x[0]))
-				await dev.lockup.initializeStatesAtLockup(
-					property.address,
-					alice,
-					globalRewards,
-					cLock,
-					lastBlock
-				)
-				await dev.lockup.initializeStatesAtLockup(
-					property.address,
-					bob,
-					globalRewards,
-					cLock,
-					lastBlock
-				)
 				await mine(1)
 			})
 			describe('before withdraw interest', () => {
@@ -1799,94 +1779,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				.catch(err)
 			const after = await dev.lockup.getStorageDIP4GenesisBlock()
 			expect(after.toNumber()).to.be.equal(before.toNumber())
-			expect(res).to.be.instanceOf(Error)
-		})
-	})
-	describe('Lockup; initializeStatesAtLockup', () => {
-		it('Store passed value to getStorageLastCumulativeGlobalReward and getStorageLastLockupStates', async () => {
-			const [dev, property] = await init()
-			await dev.lockup.initializeStatesAtLockup(
-				property.address,
-				user1,
-				123,
-				456,
-				789
-			)
-			const rewards = await dev.lockup.getStorageLastCumulativeGlobalReward(
-				property.address,
-				user1
-			)
-			await dev.lockup
-				.getStorageLastCumulativeLockedUpAndBlock(property.address, user1)
-				.catch((err) => {
-					console.log(1, err)
-				})
-			const cLockBlock: any = await dev.lockup.getStorageLastCumulativeLockedUpAndBlock(
-				property.address,
-				user1
-			)
-			expect(rewards.toNumber()).to.be.equal(123)
-			expect(cLockBlock._cLocked.toNumber()).to.be.equal(456)
-			expect(cLockBlock._block.toNumber()).to.be.equal(789)
-		})
-		it('Should not override when already any value ', async () => {
-			const [dev, property] = await init()
-			await dev.lockup.initializeStatesAtLockup(
-				property.address,
-				user1,
-				123,
-				456,
-				789
-			)
-			await dev.lockup.initializeStatesAtLockup(
-				property.address,
-				user1,
-				1230,
-				4560,
-				7890
-			)
-			const rewards = await dev.lockup.getStorageLastCumulativeGlobalReward(
-				property.address,
-				user1
-			)
-			const cLockBLock: any = await dev.lockup.getStorageLastCumulativeLockedUpAndBlock(
-				property.address,
-				user1
-			)
-			expect(rewards.toNumber()).to.be.equal(123)
-			expect(cLockBLock._cLocked.toNumber()).to.be.equal(456)
-			expect(cLockBLock._block.toNumber()).to.be.equal(789)
-		})
-		it('Should fail to call when sent from non-pauser account', async () => {
-			const [dev, property] = await init()
-			const beforeRewards = await dev.lockup.getStorageLastCumulativeGlobalReward(
-				property.address,
-				user1
-			)
-			const beforeCLockBlock: any = await dev.lockup.getStorageLastCumulativeLockedUpAndBlock(
-				property.address,
-				user1
-			)
-			const res = await dev.lockup
-				.initializeStatesAtLockup(property.address, user1, 123, 456, 789, {
-					from: user1,
-				})
-				.catch(err)
-			const afterRewards = await dev.lockup.getStorageLastCumulativeGlobalReward(
-				property.address,
-				user1
-			)
-			const afterCLockBlock: any = await dev.lockup.getStorageLastCumulativeLockedUpAndBlock(
-				property.address,
-				user1
-			)
-			expect(afterRewards.toNumber()).to.be.equal(beforeRewards.toNumber())
-			expect(afterCLockBlock._cLocked.toNumber()).to.be.equal(
-				beforeCLockBlock._cLocked.toNumber()
-			)
-			expect(afterCLockBlock._block.toNumber()).to.be.equal(
-				beforeCLockBlock._block.toNumber()
-			)
 			expect(res).to.be.instanceOf(Error)
 		})
 	})
