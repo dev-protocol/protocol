@@ -72,7 +72,8 @@ const handler = async (
 			])
 			const skip = [cReward, _cLocked, _block].every((y) => y !== '0')
 			____log(
-				'Should skip item',
+				'Should skip item?',
+				skip,
 				property_address,
 				account_address,
 				cReward,
@@ -102,8 +103,8 @@ const handler = async (
 						PromiseReturn<ReturnType<ReturnType<typeof getCumulativeLockedUp>>>
 				  ] = await Promise.all([
 				difference(block_number)(property_address),
-				getCumulativeLockedUp(block_number)(property_address, account_address),
-			]).catch((err: Error) => err)
+				getCumulativeLockedUp(block_number)(property_address),
+			]).catch((err) => new Error(err))
 			if (res instanceof Error) {
 				____log(
 					'Could be pre-DIP4 staking',
@@ -145,7 +146,7 @@ const handler = async (
 		}
 	)
 
-	createQueue(2).addAll(initializeTasks).catch(console.error)
+	await createQueue(2).addAll(initializeTasks).catch(console.error)
 
 	callback(null)
 }
