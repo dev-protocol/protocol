@@ -65,10 +65,8 @@ export const createDifferenceCaller = (lockup: Contract) => (
 	lockup.methods.difference(property, 0).call(undefined, blockNumber)
 export const createGetCumulativeLockedUpCaller = (lockup: Contract) => (
 	blockNumber?: number
-) => async (property: string, user: string): Promise<{_value: string}> =>
-	lockup.methods
-		.getCumulativeLockedUp(property, user)
-		.call(undefined, blockNumber)
+) => async (property: string): Promise<{_value: string}> =>
+	lockup.methods.getCumulativeLockedUp(property).call(undefined, blockNumber)
 export const createInitializeStatesAtLockup = (lockup: Contract) => (
 	from: string
 ) => (
