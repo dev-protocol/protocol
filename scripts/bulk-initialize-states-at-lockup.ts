@@ -25,7 +25,7 @@ const handler = async (
 
 	const [from] = await (web3 as Web3).eth.getAccounts()
 
-	const lockup = await prepare(CONFIG)
+	const lockup = await prepare(CONFIG, web3)
 	____log('Generated Lockup contract', lockup.options)
 
 	const fetchGraphQL = createGraphQLFetcher(graphql())
@@ -49,7 +49,10 @@ const handler = async (
 		}))()
 	____log('GraphQL fetched', all)
 
-	const fetchFastestGasPrice = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
+	const fetchFastestGasPrice = createFastestGasPriceFetcher(
+		ethgas(EGS_TOKEN),
+		web3
+	)
 
 	const lastCumulativeGlobalReward = createGetStorageLastCumulativeGlobalReward(
 		lockup
@@ -87,7 +90,7 @@ const handler = async (
 
 	const initializeTasks = shouldInitilizeItems.map(
 		({property_address, account_address, block_number}) => async () => {
-			const lockupAtThisTime = await prepare(CONFIG, block_number)
+			const lockupAtThisTime = await prepare(CONFIG, web3, block_number)
 			const difference = createDifferenceCaller(lockupAtThisTime)
 			const getCumulativeLockedUp = createGetCumulativeLockedUpCaller(
 				lockupAtThisTime

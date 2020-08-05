@@ -26,7 +26,7 @@ const handler = async (
 	____log('Generated current Lockup contract', lockup.address)
 	____log('Generated current Dev contract', dev.address)
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
+	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
 
 	// Deploy new Lockup
 	const nextLockup = await artifacts
