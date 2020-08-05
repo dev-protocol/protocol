@@ -3,7 +3,6 @@ import Web3 from 'web3'
 import {
 	prepare,
 	createGraphQLFetcher,
-	createEGSFetcher,
 	createGetStorageLastCumulativeGlobalReward,
 	createGetStorageLastCumulativeLockedUpAndBlock,
 	createDifferenceCaller,
@@ -11,8 +10,9 @@ import {
 	createInitializeStatesAtLockup,
 	createQueue,
 } from './lib/bulk-initialize-states-at-lockup'
+import {createFastestGasPriceFetcher} from './lib/ethgas'
 import {graphql, ethgas} from './lib/api'
-import {GraphQLResponse} from './lib/types'
+import {GraphQLResponse, PromiseReturn} from './lib/types'
 const {CONFIG, EGS_TOKEN} = process.env
 const {log: ____log} = console
 
@@ -49,12 +49,7 @@ const handler = async (
 		}))()
 	____log('GraphQL fetched', all)
 
-	const fetchGasPrice = createEGSFetcher(ethgas(EGS_TOKEN))
-
-	const fetchFastestGasPrice = async () =>
-		fetchGasPrice().then((res) =>
-			(web3 as Web3).utils.toWei(`${res.fastest / 10}`, 'Gwei')
-		)
+	const fetchFastestGasPrice = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
 
 	const lastCumulativeGlobalReward = createGetStorageLastCumulativeGlobalReward(
 		lockup
@@ -62,8 +57,6 @@ const handler = async (
 	const lastCumulativeLockedUpAndBlock = createGetStorageLastCumulativeLockedUpAndBlock(
 		lockup
 	)
-	const difference = createDifferenceCaller(lockup)
-	const getCumulativeLockedUp = createGetCumulativeLockedUpCaller(lockup)
 	const initializeStatesAtLockup = createInitializeStatesAtLockup(lockup)(from)
 
 	____log('all targets', all.length)
@@ -94,10 +87,30 @@ const handler = async (
 
 	const initializeTasks = shouldInitilizeItems.map(
 		({property_address, account_address, block_number}) => async () => {
-			const res = await Promise.all([
+			const lockupAtThisTime = await prepare(CONFIG, block_number)
+			const difference = createDifferenceCaller(lockupAtThisTime)
+			const getCumulativeLockedUp = createGetCumulativeLockedUpCaller(
+				lockupAtThisTime
+			)
+			const res:
+				| Error
+				| [
+						PromiseReturn<ReturnType<ReturnType<typeof difference>>>,
+						PromiseReturn<ReturnType<ReturnType<typeof getCumulativeLockedUp>>>
+				  ] = await Promise.all([
 				difference(block_number)(property_address),
 				getCumulativeLockedUp(block_number)(property_address, account_address),
-			])
+			]).catch((err: Error) => err)
+			if (res instanceof Error) {
+				____log(
+					'Could be pre-DIP4 staking',
+					property_address,
+					account_address,
+					block_number
+				)
+				return
+			}
+
 			const reward = res[0]._reward
 			const cLocked = res[1]._value
 			const gasPrice = await fetchFastestGasPrice()

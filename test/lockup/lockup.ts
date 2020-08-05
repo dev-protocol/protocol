@@ -560,7 +560,20 @@ contract('LockupTest', ([deployer, user1]) => {
 						: lockedUpPerUser.isEqualTo(0)
 						? toBigNumber(0)
 						: lockedUpPerUser
-								.times(currentBlock.minus(lastLockupBlock))
+								.times(
+									currentBlock.minus(
+										lastLockupBlock.isEqualTo(0) && last.isGreaterThan(0)
+											? last
+													.times(1e18)
+													.div(rewards)
+													.times(currentBlock.minus(deployedBlock))
+													.div(1e18)
+													.plus(deployedBlock)
+											: lastLockupBlock.isEqualTo(0)
+											? deployedBlock
+											: lastLockupBlock
+									)
+								)
 								.integerValue(BigNumber.ROUND_DOWN)
 								.times(1e18)
 								.div(cumulativeLockedUp.minus(lastCLocked))
@@ -601,7 +614,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				return res
 			})
 
-		describe.only('returns correct amount', () => {
+		describe('returns correct amount', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
