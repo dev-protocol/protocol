@@ -87,10 +87,10 @@ const handler = async (
 
 	const initializeTasks = shouldInitilizeItems.map(
 		({property_address, account_address, block_number}) => async () => {
-			const lockupThisTime = await prepare(CONFIG, block_number)
-			const difference = createDifferenceCaller(lockupThisTime)
+			const lockupAtThisTime = await prepare(CONFIG, block_number)
+			const difference = createDifferenceCaller(lockupAtThisTime)
 			const getCumulativeLockedUp = createGetCumulativeLockedUpCaller(
-				lockupThisTime
+				lockupAtThisTime
 			)
 			const res:
 				| Error
