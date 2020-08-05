@@ -1,11 +1,15 @@
+import {createFastestGasPriceFetcher} from './lib/ethgas'
+import {ethgas} from './lib/api'
+
 /* eslint-disable no-undef */
-const {CONFIG} = process.env
+const {CONFIG, EGS_TOKEN} = process.env
 const {log: ____log} = console
+const gas = 6721975
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!CONFIG) {
+	if (!CONFIG || !EGS_TOKEN) {
 		return
 	}
 
@@ -22,17 +26,24 @@ const handler = async (
 	____log('Generated current Lockup contract', lockup.address)
 	____log('Generated current Dev contract', dev.address)
 
+	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
+
 	// Deploy new Lockup
-	const nextLockup = await artifacts.require('Lockup').new(config.address)
+	const nextLockup = await artifacts
+		.require('Lockup')
+		.new(config.address, {gasPrice: await fastest(), gas})
 	____log('Deployed the new Lockup', nextLockup.address)
 
 	// Add minter
-	await dev.addMinter(nextLockup.address)
+	await dev.addMinter(nextLockup.address, {gasPrice: await fastest(), gas})
 	____log('Added next Lockup as a minter')
 
 	const lockupStorageAddress = await lockup.getStorageAddress()
 	____log('Got EternalStorage address that uses by Lockup')
-	await nextLockup.setStorage(lockupStorageAddress)
+	await nextLockup.setStorage(lockupStorageAddress, {
+		gasPrice: await fastest(),
+		gas,
+	})
 	____log('Set EternalStorage address to the new Lockup')
 
 	____log('Confirm behavior, execute the rest process manually.')

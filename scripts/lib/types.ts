@@ -20,6 +20,9 @@ export type EGSResponse = {
 	fastWait: number
 	fastestWait: number
 }
+export type PromiseReturn<T extends Promise<any>> = T extends Promise<infer P>
+	? P
+	: never
 type GasPriceFetcher = () => Promise<string>
 export type ReceiptEvent = {
 	readonly [key: string]: Event
