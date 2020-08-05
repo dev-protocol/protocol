@@ -4,7 +4,7 @@ import bent from 'bent'
 import Queue from 'p-queue'
 import Web3 from 'web3'
 import {Contract} from 'web3-eth-contract/types'
-import {GraphQLResponse, EGSResponse, SendTx} from './types'
+import {GraphQLResponse, SendTx} from './types'
 export const prepare = async (configAddress: string, blockNumber?: number) => {
 	const [config] = await Promise.all<any>([
 		artifacts.require('AddressConfig').at(configAddress),
@@ -37,10 +37,6 @@ export const createGraphQLFetcher = (
 			}
 		}`,
 	}).then((r) => (r as unknown) as GraphQLResponse)
-export const createEGSFetcher = (
-	fetcher: bent.RequestFunction<bent.ValidResponse>
-) => async (): Promise<EGSResponse> =>
-	fetcher('').then((r) => (r as unknown) as EGSResponse)
 export const createGetStorageLastCumulativeGlobalReward = (
 	lockup: Contract
 ) => (blockNumber?: number) => async (

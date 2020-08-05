@@ -3,7 +3,6 @@ import Web3 from 'web3'
 import {
 	prepare,
 	createGraphQLFetcher,
-	createEGSFetcher,
 	createGetStorageLastCumulativeGlobalReward,
 	createGetStorageLastCumulativeLockedUpAndBlock,
 	createDifferenceCaller,
@@ -11,6 +10,7 @@ import {
 	createInitializeStatesAtLockup,
 	createQueue,
 } from './lib/bulk-initialize-states-at-lockup'
+import {createFastestGasPriceFetcher} from './lib/ethgas'
 import {graphql, ethgas} from './lib/api'
 import {GraphQLResponse, PromiseReturn} from './lib/types'
 const {CONFIG, EGS_TOKEN} = process.env
@@ -49,12 +49,7 @@ const handler = async (
 		}))()
 	____log('GraphQL fetched', all)
 
-	const fetchGasPrice = createEGSFetcher(ethgas(EGS_TOKEN))
-
-	const fetchFastestGasPrice = async () =>
-		fetchGasPrice().then((res) =>
-			(web3 as Web3).utils.toWei(`${res.fastest / 10}`, 'Gwei')
-		)
+	const fetchFastestGasPrice = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
 
 	const lastCumulativeGlobalReward = createGetStorageLastCumulativeGlobalReward(
 		lockup
