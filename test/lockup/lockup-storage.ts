@@ -212,4 +212,25 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(toBigNumber(result[1]).toFixed()).to.be.equal(block)
 		})
 	})
+	describe('LockupStorage; setStorageLastCumulativePropertyInterest, getStorageLastCumulativePropertyInterest', () => {
+		it('Initial value is 0.', async () => {
+			const result = await storage.getStorageLastCumulativePropertyInterest(
+				property,
+				user
+			)
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastCumulativePropertyInterestTest(
+				property,
+				user,
+				300000000000
+			)
+			const result = await storage.getStorageLastCumulativePropertyInterest(
+				property,
+				user
+			)
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
 })

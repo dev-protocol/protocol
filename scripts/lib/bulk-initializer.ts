@@ -59,10 +59,27 @@ export const createGetStorageLastCumulativeLockedUpAndBlock = (
 	lockup.methods
 		.getStorageLastCumulativeLockedUpAndBlock(property, user)
 		.call(undefined, blockNumber)
+export const createGetStorageLastCumulativePropertyInterest = (
+	lockup: Contract
+) => (blockNumber?: number) => async (
+	property: string,
+	user: string
+): Promise<string> =>
+	lockup.methods
+		.getStorageLastCumulativePropertyInterest(property, user)
+		.call(undefined, blockNumber)
+
 export const createDifferenceCaller = (lockup: Contract) => (
 	blockNumber?: number
-) => async (property: string): Promise<{_reward: string}> =>
-	lockup.methods.difference(property, 0).call(undefined, blockNumber)
+) => async (
+	property: string
+): Promise<{
+	_reward: string
+	_holdersAmount: string
+	_holdersPrice: string
+	_interestAmount: string
+	_interestPrice: string
+}> => lockup.methods.difference(property, 0).call(undefined, blockNumber)
 export const createGetCumulativeLockedUpCaller = (lockup: Contract) => (
 	blockNumber?: number
 ) => async (property: string): Promise<{_value: string}> =>
@@ -81,4 +98,16 @@ export const createInitializeStatesAtLockup = (lockup: Contract) => (
 	lockup.methods
 		.initializeStatesAtLockup(property, user, reward, cLocked, block)
 		.send({gasPrice, from})
+export const createInitializeLastCumulativePropertyInterest = (
+	lockup: Contract
+) => (from: string) => (
+	property: string,
+	user: string,
+	interest: string,
+	gasPrice: string
+): SendTx =>
+	lockup.methods
+		.initializeLastCumulativePropertyInterest(property, user, interest)
+		.send({gasPrice, from})
+
 export const createQueue = (concurrency: number) => new Queue({concurrency})
