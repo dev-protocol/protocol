@@ -3,11 +3,9 @@ import Web3 from 'web3'
 import {
 	prepare,
 	createGraphQLFetcher,
-	createGetStorageLastCumulativeGlobalReward,
-	createGetStorageLastCumulativeLockedUpAndBlock,
 	createDifferenceCaller,
-	createGetCumulativeLockedUpCaller,
-	createInitializeStatesAtLockup,
+	createGetStorageLastCumulativePropertyInterest,
+	createInitializeLastCumulativePropertyInterest,
 	createQueue,
 } from './lib/bulk-initializer'
 import {createFastestGasPriceFetcher} from './lib/ethgas'
@@ -54,33 +52,31 @@ const handler = async (
 		web3
 	)
 
-	const lastCumulativeGlobalReward = createGetStorageLastCumulativeGlobalReward(
+	const lastCumulativePropertyInterest = createGetStorageLastCumulativePropertyInterest(
 		lockup
 	)
-	const lastCumulativeLockedUpAndBlock = createGetStorageLastCumulativeLockedUpAndBlock(
+	const initializeLastCumulativePropertyInterest = createInitializeLastCumulativePropertyInterest(
 		lockup
-	)
-	const initializeStatesAtLockup = createInitializeStatesAtLockup(lockup)(from)
+	)(from)
 
 	____log('all targets', all.length)
 
 	const filteringTacks = all.map(
-		({property_address, account_address, ...x}) => async () => {
-			const [cReward, {_cLocked, _block}] = await Promise.all([
-				lastCumulativeGlobalReward()(property_address, account_address),
-				lastCumulativeLockedUpAndBlock()(property_address, account_address),
-			])
-			const skip = [cReward, _cLocked, _block].every((y) => y !== '0')
+		({property_address, account_address, block_number}) => async () => {
+			const res = await lastCumulativePropertyInterest()(
+				property_address,
+				account_address
+			)
+			const skip = res !== '0'
 			____log(
 				'Should skip item?',
 				skip,
 				property_address,
 				account_address,
-				cReward,
-				_cLocked,
-				_block
+				res,
+				block_number
 			)
-			return {property_address, account_address, skip, ...x}
+			return {property_address, account_address, skip, block_number}
 		}
 	)
 	const shouldInitilizeItems = await createQueue(10)
@@ -93,18 +89,13 @@ const handler = async (
 		({property_address, account_address, block_number}) => async () => {
 			const lockupAtThisTime = await prepare(CONFIG, web3, block_number)
 			const difference = createDifferenceCaller(lockupAtThisTime)
-			const getCumulativeLockedUp = createGetCumulativeLockedUpCaller(
-				lockupAtThisTime
-			)
 			const res:
 				| Error
-				| [
-						PromiseReturn<ReturnType<ReturnType<typeof difference>>>,
-						PromiseReturn<ReturnType<ReturnType<typeof getCumulativeLockedUp>>>
-				  ] = await Promise.all([
-				difference(block_number)(property_address),
-				getCumulativeLockedUp(block_number)(property_address),
-			]).catch((err) => new Error(err))
+				| PromiseReturn<
+						ReturnType<ReturnType<typeof difference>>
+				  > = await difference(block_number)(property_address).catch(
+				(err) => new Error(err)
+			)
 			if (res instanceof Error) {
 				____log(
 					'Could be pre-DIP4 staking',
@@ -115,25 +106,21 @@ const handler = async (
 				return
 			}
 
-			const reward = res[0]._reward
-			const cLocked = res[1]._value
+			const interest = res._interestAmount
 			const gasPrice = await fetchFastestGasPrice()
 			____log(
 				'Start initilization',
 				property_address,
 				account_address,
-				reward,
-				cLocked,
+				interest,
 				gasPrice
 			)
 
 			await new Promise((resolve, reject) => {
-				initializeStatesAtLockup(
+				initializeLastCumulativePropertyInterest(
 					property_address,
 					account_address,
-					reward,
-					cLocked,
-					block_number.toString(),
+					interest,
 					gasPrice
 				)
 					.on('transactionHash', (hash: string) =>
