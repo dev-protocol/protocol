@@ -169,30 +169,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 	}
 
-	function initializeStatesAtLockup(
-		address _property,
-		address _user,
-		uint256 _reward,
-		uint256 _cLocked,
-		uint256 _block
-	) external onlyOwner {
-		if (getStorageLastCumulativeGlobalReward(_property, _user) == 0) {
-			setStorageLastCumulativeGlobalReward(_property, _user, _reward);
-		}
-		(
-			uint256 cLocked,
-			uint256 blockNumber
-		) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
-		if (cLocked == 0 && blockNumber == 0) {
-			setStorageLastCumulativeLockedUpAndBlock(
-				_property,
-				_user,
-				_cLocked,
-				_block
-			);
-		}
-	}
-
 	function getLastCumulativeLockedUpAndBlock(address _property, address _user)
 		private
 		view
@@ -202,21 +178,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			uint256 cLocked,
 			uint256 blockNumber
 		) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
-		uint256 lastReward = getStorageLastCumulativeGlobalReward(
-			_property,
-			_user
-		);
-		if (blockNumber == 0 && lastReward > 0) {
-			// Fallback when locked-ups that after DIP4 but before the patch.
-			// The number of last cumulative locked-ups is 0, the block number of the last locked-up is estimated value.
-			uint256 begin = getStorageDIP4GenesisBlock();
-			(uint256 _reward, ) = dry();
-			blockNumber = (
-				(lastReward.outOf(_reward)).mul(block.number.sub(begin))
-			)
-				.divBasis()
-				.add(begin);
-		} else if (blockNumber == 0) {
+		if (blockNumber == 0) {
 			// Fallback when locked-ups that before DIP4.
 			// The number of last cumulative locked-ups is 0, the block number of the last locked-up is start block of DIP4.
 			blockNumber = getStorageDIP4GenesisBlock();
