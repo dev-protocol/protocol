@@ -545,7 +545,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					.div(cumulativeLockedUpAll)
 					.integerValue(BigNumber.ROUND_DOWN)
 				const propertyRewards = rewards
-					.minus(last)
+					// .minus(last)
 					.times(shareOfProperty)
 					.integerValue(BigNumber.ROUND_DOWN)
 				// const propertyRewards = rewards.times(shareOfProperty)

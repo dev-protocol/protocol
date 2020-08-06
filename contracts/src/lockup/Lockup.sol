@@ -247,14 +247,13 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		view
 		returns (uint256 _amount, uint256 _interest)
 	{
-		uint256 last = getStorageLastCumulativeGlobalReward(_property, _user);
 		(
 			uint256 lastCLocked,
 			uint256 lastBlock
 		) = getLastCumulativeLockedUpAndBlock(_property, _user);
 		(uint256 nextReward, , , uint256 interest, ) = difference(
 			_property,
-			last
+			0
 		);
 		uint256 lockedUpPerAccount = getStorageValue(_property, _user);
 		uint256 lockedUpPerProperty = getStoragePropertyValue(_property);
