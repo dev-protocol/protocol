@@ -177,7 +177,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 _interest
 	) external onlyOwner {
 		if (getStorageLastCumulativePropertyInterest(_property, _user) == 0) {
-			setStorageLastCumulativePropertyInterest(_property, _user, _interest);
+			setStorageLastCumulativePropertyInterest(
+				_property,
+				_user,
+				_interest
+			);
 		}
 	}
 
@@ -259,26 +263,40 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		view
 		returns (uint256 _amount, uint256 _interest)
 	{
-		(uint256 cLockProperty, uint256 unit, uint256 lastBlock) = getCumulativeLockedUp(_property);
+		(
+			uint256 cLockProperty,
+			uint256 unit,
+			uint256 lastBlock
+		) = getCumulativeLockedUp(_property);
 		(
 			uint256 lastCLocked,
 			uint256 lastBlockUser
 		) = getLastCumulativeLockedUpAndBlock(_property, _user);
 		uint256 lockedUpPerAccount = getStorageValue(_property, _user);
-		uint256 cLockUser = lockedUpPerAccount.mul(block.number.sub(lastBlockUser));
+		uint256 cLockUser = lockedUpPerAccount.mul(
+			block.number.sub(lastBlockUser)
+		);
 		bool isFirst = unit == lockedUpPerAccount && lastBlock <= lastBlockUser;
 		uint256 amount;
 		uint256 interest;
 		if (isFirst) {
-			uint256 lastReward = getStorageLastCumulativeGlobalReward(_property, _user);
+			uint256 lastReward = getStorageLastCumulativeGlobalReward(
+				_property,
+				_user
+			);
 			(, , , interest, ) = difference(_property, lastReward);
 			uint256 share = one.mulBasis();
 			amount = interest.mul(share).divBasis();
 		} else {
-			uint256 lastInterest = getStorageLastCumulativePropertyInterest(_property, _user);
+			uint256 lastInterest = getStorageLastCumulativePropertyInterest(
+				_property,
+				_user
+			);
 			(, , , interest, ) = difference(_property, 0);
 			uint256 share = cLockUser.outOf(cLockProperty.sub(lastCLocked));
-			amount = interest >= lastInterest ? interest.sub(lastInterest).mul(share).divBasis() : 0;
+			amount = interest >= lastInterest
+				? interest.sub(lastInterest).mul(share).divBasis()
+				: 0;
 		}
 		// (, , , uint256 interest, ) = difference(_property, isFirst ? lastReward : 0);
 		// uint256 share = isFirst ? one.mulBasis() : cLockUser.outOf(cLockProperty.sub(lastCLocked));
