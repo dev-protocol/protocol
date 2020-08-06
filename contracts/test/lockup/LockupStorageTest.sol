@@ -105,4 +105,12 @@ contract LockupStorageTest is LockupStorage {
 			_block
 		);
 	}
+
+	function setStorageLastCumulativePropertyInterestTest(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		setStorageLastCumulativePropertyInterest(_property, _user, _value);
+	}
 }

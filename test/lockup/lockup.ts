@@ -500,6 +500,10 @@ contract('LockupTest', ([deployer, user1]) => {
 				dev.lockup.getPropertyValue(prop.address),
 				dev.lockup.getValue(prop.address, account),
 				dev.lockup.getStorageLastCumulativeGlobalReward(prop.address, account),
+				dev.lockup.getStorageLastCumulativePropertyInterest(
+					prop.address,
+					account
+				),
 				dev.lockup.getCumulativeLockedUp(prop.address).then((x) => x[0]),
 				dev.lockup.getCumulativeLockedUpAll().then((x) => x[0]),
 				dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),
@@ -511,6 +515,8 @@ contract('LockupTest', ([deployer, user1]) => {
 				dev.lockup
 					.getStorageLastCumulativeLockedUpAndBlock(prop.address, account)
 					.then((x) => x[1]),
+				dev.lockup.getCumulativeLockedUp(prop.address).then((x) => x[1]),
+				dev.lockup.getCumulativeLockedUp(prop.address).then((x) => x[2]),
 			]).then((results) => {
 				const [
 					maxRewards,
@@ -522,6 +528,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					lockedUpPerProperty,
 					lockedUpPerUser,
 					last,
+					lastInterest,
 					cumulativeLockedUp,
 					cumulativeLockedUpAll,
 					pending,
@@ -529,6 +536,8 @@ contract('LockupTest', ([deployer, user1]) => {
 					legacyInterestPricePerUser,
 					lastCLocked,
 					lastLockupBlock,
+					lastLockupUnitProperty,
+					lastLockupBlockProperty,
 				] = results.map(toBigNumber)
 				const rewards = (maxRewards.isEqualTo(lastRewardsAmount)
 					? maxRewards
@@ -544,8 +553,18 @@ contract('LockupTest', ([deployer, user1]) => {
 					.times(1e36)
 					.div(cumulativeLockedUpAll)
 					.integerValue(BigNumber.ROUND_DOWN)
+				const cLockedUser = lockedUpPerUser
+					.times(
+						currentBlock.minus(
+							lastLockupBlock.isEqualTo(0) ? deployedBlock : lastLockupBlock
+						)
+					)
+					.integerValue(BigNumber.ROUND_DOWN)
+				const isFirst =
+					lastLockupUnitProperty.isEqualTo(lockedUpPerUser) &&
+					lastLockupBlockProperty.isLessThanOrEqualTo(lastLockupBlock)
 				const propertyRewards = rewards
-					// .minus(last)
+					.minus(isFirst ? last : 0)
 					.times(shareOfProperty)
 					.integerValue(BigNumber.ROUND_DOWN)
 				// const propertyRewards = rewards.times(shareOfProperty)
@@ -553,33 +572,25 @@ contract('LockupTest', ([deployer, user1]) => {
 				const interestPrice = lockedUpPerProperty.isGreaterThan(0)
 					? interest.div(lockedUpPerProperty)
 					: toBigNumber(0)
-				const share =
-					lockedUpPerUser.isGreaterThan(0) &&
-					lockedUpPerUser.isEqualTo(lockedUpPerProperty)
-						? toBigNumber(1e18)
-						: lockedUpPerUser.isEqualTo(0)
-						? toBigNumber(0)
-						: lockedUpPerUser
-								.times(
-									currentBlock.minus(
-										lastLockupBlock.isEqualTo(0) && last.isGreaterThan(0)
-											? last
-													.times(1e18)
-													.div(rewards)
-													.times(currentBlock.minus(deployedBlock))
-													.div(1e18)
-													.plus(deployedBlock)
-											: lastLockupBlock.isEqualTo(0)
-											? deployedBlock
-											: lastLockupBlock
-									)
-								)
-								.integerValue(BigNumber.ROUND_DOWN)
-								.times(1e18)
-								.div(cumulativeLockedUp.minus(lastCLocked))
-								.integerValue(BigNumber.ROUND_DOWN)
+				const share = lockedUpPerUser.isEqualTo(0)
+					? toBigNumber(0)
+					: isFirst
+					? toBigNumber(1e18)
+					: cLockedUser
+							.times(1e18)
+							.div(cumulativeLockedUp.minus(lastCLocked))
+							.integerValue(BigNumber.ROUND_DOWN)
 				// const amount = interestPrice.times(lockedUpPerUser).div(1e36)
-				const amount = interest.times(share).div(1e18).div(1e18).div(1e18)
+				const amount = isFirst
+					? interest.times(share).div(1e18).div(1e18).div(1e18)
+					: interest.isGreaterThanOrEqualTo(lastInterest)
+					? interest
+							.minus(lastInterest)
+							.times(share)
+							.div(1e18)
+							.div(1e18)
+							.div(1e18)
+					: toBigNumber(0)
 				const legacyValue = legacyInterestPrice
 					.minus(legacyInterestPricePerUser)
 					.times(lockedUpPerUser)
@@ -1332,7 +1343,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 			})
 		})
-		describe.only('scenario: fallback legacy locking-ups', () => {
+		describe('scenario: fallback legacy locking-ups', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let property2: PropertyInstance
@@ -1779,6 +1790,62 @@ contract('LockupTest', ([deployer, user1]) => {
 				.catch(err)
 			const after = await dev.lockup.getStorageDIP4GenesisBlock()
 			expect(after.toNumber()).to.be.equal(before.toNumber())
+			expect(res).to.be.instanceOf(Error)
+		})
+	})
+	describe.only('Lockup; initializeLastCumulativePropertyInterest', () => {
+		it('Store passed value to getStorageLastCumulativePropertyInterest', async () => {
+			const [dev, property] = await init()
+			await dev.lockup.initializeLastCumulativePropertyInterest(
+				property.address,
+				user1,
+				123
+			)
+			const interest = await dev.lockup.getStorageLastCumulativePropertyInterest(
+				property.address,
+				user1
+			)
+			expect(interest.toNumber()).to.be.equal(123)
+		})
+		it('Should not override when already any value ', async () => {
+			const [dev, property] = await init()
+			await dev.lockup.initializeLastCumulativePropertyInterest(
+				property.address,
+				user1,
+				123
+			)
+			await dev.lockup.initializeLastCumulativePropertyInterest(
+				property.address,
+				user1,
+				456
+			)
+			const interest = await dev.lockup.getStorageLastCumulativePropertyInterest(
+				property.address,
+				user1
+			)
+			expect(interest.toNumber()).to.be.equal(123)
+		})
+		it('Should fail to call when sent from non-pauser account', async () => {
+			const [dev, property] = await init()
+			const beforeValue = await dev.lockup.getStorageLastCumulativePropertyInterest(
+				property.address,
+				user1
+			)
+			const res = await dev.lockup
+				.initializeLastCumulativePropertyInterest(
+					property.address,
+					user1,
+					123,
+					{
+						from: user1,
+					}
+				)
+				.catch(err)
+			const afterValue = await dev.lockup.getStorageLastCumulativePropertyInterest(
+				property.address,
+				user1
+			)
+			expect(afterValue.toNumber()).to.be.equal(beforeValue.toNumber())
 			expect(res).to.be.instanceOf(Error)
 		})
 	})
