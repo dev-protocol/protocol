@@ -253,6 +253,42 @@ contract LockupStorage is UsingStorage {
 			);
 	}
 
+	//LastCumulativePropertyInterest
+	function setStorageLastCumulativePropertyInterest(
+		address _property,
+		address _user,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageLastCumulativePropertyInterestKey(_property, _user),
+			_value
+		);
+	}
+
+	function getStorageLastCumulativePropertyInterest(
+		address _property,
+		address _user
+	) public view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getStorageLastCumulativePropertyInterestKey(_property, _user)
+			);
+	}
+
+	function getStorageLastCumulativePropertyInterestKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativePropertyInterest",
+					_property,
+					_user
+				)
+			);
+	}
+
 	//CumulativeLockedUpUnitAndBlock
 	function setStorageCumulativeLockedUpUnitAndBlock(
 		address _addr,

@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import bent from 'bent'
 import Web3 from 'web3'
 import {EGSResponse} from './types'
