@@ -2036,10 +2036,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			block.number.sub(lastBlockUser)
 		);
 		bool isOnly = unit == lockedUpPerAccount && lastBlock <= lastBlockUser;
-		if (
-			(lastInterest == 0 ||
-				cLockProperty == cLockUser.add(lockedUpPerAccount)) && isOnly
-		) {
+		if (lastInterest == 0 && isOnly) {
 			(, , , uint256 interest, ) = difference(
 				_property,
 				getStorageLastCumulativeGlobalReward(

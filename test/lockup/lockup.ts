@@ -560,13 +560,7 @@ contract('LockupTest', ([deployer, user1]) => {
 						)
 					)
 					.integerValue(BigNumber.ROUND_DOWN)
-				const isFirst =
-					lastInterest.isEqualTo(0) ||
-					cumulativeLockedUp.isEqualTo(
-						lockedUpPerUser
-							.times(currentBlock.minus(lastLockupBlock))
-							.plus(lockedUpPerUser)
-					)
+				const isFirst = lastInterest.isEqualTo(0)
 				const isOnly =
 					lastLockupUnitProperty.isEqualTo(lockedUpPerUser) &&
 					lastLockupBlockProperty.isLessThanOrEqualTo(lastLockupBlock)
