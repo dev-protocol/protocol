@@ -46,10 +46,10 @@ const handler = async (
 	})
 	____log('Set EternalStorage address to the new Lockup')
 
-	await lockup.changeOwner(nextLockup.address)
+	await lockup.changeOwner(nextLockup.address, {gasPrice: await fastest(), gas})
 	____log('Delegated EternalStorage owner to the new Lockup')
 
-	await config.setLockup(nextLockup.address)
+	await config.setLockup(nextLockup.address, {gasPrice: await fastest(), gas})
 	____log('updated AddressConfig')
 
 	callback(null)
