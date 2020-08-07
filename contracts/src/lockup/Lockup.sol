@@ -261,7 +261,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	function _calculateInterestAmount(address _property, address _user)
 		private
 		view
-		returns (uint256 _amount, uint256 _interest)
+		returns (uint256)
 	{
 		(
 			uint256 cLockProperty,
@@ -273,76 +273,75 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			uint256 lastBlockUser
 		) = getLastCumulativeLockedUpAndBlock(_property, _user);
 		uint256 lockedUpPerAccount = getStorageValue(_property, _user);
+		uint256 lastInterest = getStorageLastCumulativePropertyInterest(
+			_property,
+			_user
+		);
 		uint256 cLockUser = lockedUpPerAccount.mul(
 			block.number.sub(lastBlockUser)
 		);
-		bool isFirst = unit == lockedUpPerAccount && lastBlock <= lastBlockUser;
-		uint256 amount;
-		uint256 interest;
-		if (isFirst) {
-			uint256 lastReward = getStorageLastCumulativeGlobalReward(
+		bool isOnly = unit == lockedUpPerAccount && lastBlock <= lastBlockUser;
+		if (
+			(lastInterest == 0 ||
+				cLockProperty == cLockUser.add(lastCLocked)) && isOnly
+		) {
+			(, , , uint256 interest, ) = difference(
 				_property,
-				_user
+				getStorageLastCumulativeGlobalReward(_property, _user)
 			);
-			(, , , interest, ) = difference(_property, lastReward);
-			uint256 share = one.mulBasis();
-			amount = interest.mul(share).divBasis();
-		} else {
-			uint256 lastInterest = getStorageLastCumulativePropertyInterest(
-				_property,
-				_user
-			);
-			(, , , interest, ) = difference(_property, 0);
-			uint256 share = cLockUser.outOf(cLockProperty.sub(lastCLocked));
-			amount = interest >= lastInterest
-				? interest.sub(lastInterest).mul(share).divBasis()
-				: 0;
+			uint256 result = interest.divBasis().divBasis();
+			return result;
+		} else if (isOnly) {
+			(, , , uint256 interest, ) = difference(_property, 0);
+			uint256 result = interest.sub(lastInterest).divBasis().divBasis();
+			return result;
 		}
-		// (, , , uint256 interest, ) = difference(_property, isFirst ? lastReward : 0);
-		// uint256 share = isFirst ? one.mulBasis() : cLockUser.outOf(cLockProperty.sub(lastCLocked));
-		// uint256 amount = interest.sub(isFirst ? 0 : lastInterest).mul(share).divBasis();
-		uint256 result = amount > 0 ? amount.divBasis().divBasis() : 0;
-		return (result, interest);
+		(, , , uint256 interest, ) = difference(_property, 0);
+		uint256 share = cLockUser.outOf(cLockProperty.sub(lastCLocked));
+		uint256 result = interest >= lastInterest
+			? interest
+				.sub(lastInterest)
+				.mul(share)
+				.divBasis()
+				.divBasis()
+				.divBasis()
+			: 0;
+		return result;
 	}
 
 	function _calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	) private view returns (uint256 _amount, uint256 _reward) {
+	) private view returns (uint256) {
 		uint256 pending = getStoragePendingInterestWithdrawal(_property, _user);
 		uint256 legacy = __legacyWithdrawableInterestAmount(_property, _user);
-		(uint256 amount, uint256 interest) = _calculateInterestAmount(
-			_property,
-			_user
-		);
+		uint256 amount = _calculateInterestAmount(_property, _user);
 		uint256 withdrawableAmount = amount
 			.add(pending) // solium-disable-next-line indentation
 			.add(legacy);
-		return (withdrawableAmount, interest);
+		return withdrawableAmount;
 	}
 
 	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
 	) public view returns (uint256) {
-		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
-			_property,
-			_user
-		);
+		uint256 amount = _calculateWithdrawableInterestAmount(_property, _user);
 		return amount;
 	}
 
 	function withdrawInterest(address _property) external {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
-		(uint256 value, uint256 last) = _calculateWithdrawableInterestAmount(
+		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
 		);
+		(, , , uint256 interest, ) = difference(_property, 0);
 		require(value > 0, "your interest amount is 0");
 		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		updateStatesAtLockup(_property, msg.sender, last);
+		updateStatesAtLockup(_property, msg.sender, interest);
 		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 		require(erc20.mint(msg.sender, value), "dev mint failed");
 		update();
@@ -433,7 +432,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	function updatePendingInterestWithdrawal(address _property, address _user)
 		private
 	{
-		(uint256 withdrawableAmount, ) = _calculateWithdrawableInterestAmount(
+		uint256 withdrawableAmount = _calculateWithdrawableInterestAmount(
 			_property,
 			_user
 		);
