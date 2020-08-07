@@ -565,7 +565,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					cumulativeLockedUp.isEqualTo(
 						lockedUpPerUser
 							.times(currentBlock.minus(lastLockupBlock))
-							.plus(lastCLocked)
+							.plus(lockedUpPerUser)
 					)
 				const isOnly =
 					lastLockupUnitProperty.isEqualTo(lockedUpPerUser) &&
@@ -608,6 +608,13 @@ contract('LockupTest', ([deployer, user1]) => {
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map(toBigNumber))
+					console.log(
+						'*',
+						cumulativeLockedUp.toFixed(),
+						lockedUpPerUser.toFixed(),
+						currentBlock.toFixed(),
+						lastLockupBlock.toFixed()
+					)
 					console.log('isFirst', isFirst)
 					console.log('isOnly', isOnly)
 					console.log('deployedBlock', deployedBlock.toFixed())
@@ -766,6 +773,26 @@ contract('LockupTest', ([deployer, user1]) => {
 					.times(1e18)
 					.times(3000000000000 / (1000000000000 * 4))
 					.times(5)
+				const calculated = await calc(property, alice)
+
+				expect(result.toFixed()).to.be.equal(expected.toFixed())
+				expect(result.toFixed()).to.be.equal(calculated.toFixed())
+			})
+			it('Alice has a 100% of interests', async () => {
+				await dev.lockup.cancel(property.address, {from: alice})
+				await dev.lockup.cancel(property.address, {from: bob})
+				await dev.lockup.withdraw(property.address, {from: alice})
+				await dev.lockup.withdraw(property.address, {from: bob})
+				await dev.lockup.withdrawInterest(property.address, {from: alice})
+				await dev.lockup.withdrawInterest(property.address, {from: bob})
+				await dev.dev
+					.deposit(property.address, 1000000000000, {from: alice})
+					.then(gasLogger)
+				await mine(1)
+				const result = await dev.lockup
+					.calculateWithdrawableInterestAmount(property.address, alice)
+					.then(toBigNumber)
+				const expected = toBigNumber(10).times(1e18)
 				const calculated = await calc(property, alice)
 
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
