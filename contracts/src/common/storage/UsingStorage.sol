@@ -13,7 +13,7 @@ contract UsingStorage is Ownable {
 	 * Modifier to verify that EternalStorage is set.
 	 */
 	modifier hasStorage() {
-		require(_storage != address(0), "storage is not setted");
+		require(_storage != address(0), "storage is not set");
 		_;
 	}
 
@@ -42,7 +42,7 @@ contract UsingStorage is Ownable {
 	 * Also, only the owner can execute it.
 	 */
 	function createStorage() external onlyOwner {
-		require(_storage == address(0), "storage is setted");
+		require(_storage == address(0), "storage is set");
 		EternalStorage tmp = new EternalStorage();
 		_storage = address(tmp);
 	}
