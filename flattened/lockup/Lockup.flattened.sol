@@ -1926,20 +1926,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 	}
 
-	function initializeLastCumulativePropertyInterest(
-		address _property,
-		address _user,
-		uint256 _interest
-	) external onlyOwner {
-		if (getStorageLastCumulativePropertyInterest(_property, _user) == 0) {
-			setStorageLastCumulativePropertyInterest(
-				_property,
-				_user,
-				_interest
-			);
-		}
-	}
-
 	function getLastCumulativeLockedUpAndBlock(address _property, address _user)
 		private
 		view
