@@ -13,6 +13,9 @@ import {ILockup} from "contracts/src/lockup/ILockup.sol";
  * Lockup contract and Withdraw contract mint new DEV tokens based on the total number of new mint determined by this contract.
  */
 contract Allocator is UsingConfig, IAllocator, UsingValidator {
+	/**
+	 * Initialize the argument as AddressConfig address.
+	 */
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
