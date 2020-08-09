@@ -3,6 +3,9 @@ pragma solidity ^0.5.0;
 import {DIP3} from "contracts/src/policy/DIP3.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
+/**
+ * DIP7 is a contract that changes the `rewards` of DIP3.
+ */
 contract DIP7 is DIP3 {
 	uint256 private constant basis = 10000000000000000000000000;
 	uint256 private constant power_basis = 10000000000;
