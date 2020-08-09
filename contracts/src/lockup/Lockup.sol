@@ -137,21 +137,57 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
+		/**
+		 * Validates the block number reaches the block number where staking can be released.
+		 */
 		require(possible(_property, msg.sender), "waiting for release");
+
+		/**
+		 * Validates the sender is staking to the target Property.
+		 */
 		uint256 lockedUpValue = getStorageValue(_property, msg.sender);
 		require(lockedUpValue != 0, "dev token is not locked");
+
+		/**
+		 * Since the increase of rewards will stop with the release of the staking,
+		 * saves the undrawn withdrawable reward before releasing it.
+		 */
 		updatePendingInterestWithdrawal(_property, msg.sender);
+
+		/**
+		 * Transfer the staked amount to the sender.
+		 */
 		IProperty(_property).withdraw(msg.sender, lockedUpValue);
+
+		/**
+		 * Saves variables that should change due to the canceling staking..
+		 */
 		updateValues(false, msg.sender, _property, lockedUpValue);
+
+		/**
+		 * Sets the staked amount to 0.
+		 */
 		setStorageValue(_property, msg.sender, 0);
+
+		/**
+		 * Sets the cancellation status to not have.
+		 */
 		setStorageWithdrawalStatus(_property, msg.sender, 0);
 	}
 
+	/**
+	 * Returns the current staking amount, and the block number in which the recorded last.
+	 * These values are used to calculate the cumulative sum of the staking.
+	 */
 	function getCumulativeLockedUpUnitAndBlock(address _property)
 		private
 		view
 		returns (uint256 _unit, uint256 _block)
 	{
+		/**
+		 * Get the current staking amount and the last recorded block number from the `CumulativeLockedUpUnitAndBlock` storage.
+		 * If the last recorded block number is not 0, it is returns as it is.
+		 */
 		(
 			uint256 unit,
 			uint256 lastBlock
@@ -159,15 +195,35 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		if (lastBlock > 0) {
 			return (unit, lastBlock);
 		}
-		// When lastBlock is 0, CumulativeLockedUpUnitAndBlock is not saved yet so failback to AllValue or PropertyValue.
+
+		/**
+		 * If the last recorded block number is 0, this function falls back as already staked before the current specs (before DIP4).
+		 * More detail for DIP4: https://github.com/dev-protocol/DIPs/issues/4
+		 *
+		 * When the passed address is 0, the caller wants to know the total staking amount on the protocol,
+		 * so gets the total staking amount from `AllValue` storage.
+		 * When the address is other than 0, the caller wants to know the staking amount of a Property,
+		 * so gets the staking amount from the `PropertyValue` storage.
+		 */
 		unit = _property == address(0)
 			? getStorageAllValue()
 			: getStoragePropertyValue(_property);
-		// Assign lastBlock as DIP4GenesisBlock because when AllValue or PropertyValue is not 0, already locked-up when started DIP4.
+
+
+		/**
+		 * Staking pre-DIP4 will be treated as staked simultaneously with the DIP4 release.
+		 * Therefore, the last recorded block number is the same as the DIP4 release block.
+		 */
 		lastBlock = getStorageDIP4GenesisBlock();
 		return (unit, lastBlock);
 	}
 
+	/**
+	 * Returns the cumulative sum of the staking on passed address, the current staking amount,
+	 * and the block number in which the recorded last.
+	 * The latest cumulative sum can be calculated using the following formula:
+	 * (current staking amount) * (current block number - last recorded block number) + (last cumulative sum)
+	 */
 	function getCumulativeLockedUp(address _property)
 		public
 		view
@@ -177,10 +233,21 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			uint256 _block
 		)
 	{
+		/**
+		 * Gets the current staking amount and the last recorded block number from the `getCumulativeLockedUpUnitAndBlock` function.
+		 */
 		(uint256 unit, uint256 lastBlock) = getCumulativeLockedUpUnitAndBlock(
 			_property
 		);
+
+		/**
+		 * Gets the last cumulative sum of the staking from `CumulativeLockedUpValue` storage.
+		 */
 		uint256 lastValue = getStorageCumulativeLockedUpValue(_property);
+
+		/**
+		 * Returns the latest cumulative sum, current staking amount as a unit, and last recorded block number.
+		 */
 		return (
 			lastValue.add(unit.mul(block.number.sub(lastBlock))),
 			unit,
