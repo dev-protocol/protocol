@@ -12,45 +12,129 @@ import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
+/**
+ * A contract that manages the staking of DEV tokens and calculates rewards.
+ * Staking and the following mechanism determines that reward calculation.
+ *
+ * Variables:
+ * -`M`: Maximum mint amount per block determined by Allocator contract
+ * -`B`: Number of blocks during staking
+ * -`P`: Total number of staking locked up in a Property contract
+ * -`S`: Total number of staking locked up in all Property contracts
+ * -`U`: Number of staking per account locked up in a Property contract
+ *
+ * Formula:
+ * Staking Rewards = M * B * (P / S) * (U / P)
+ *
+ * Note:
+ * -`M`, `P` and `S` vary from block to block, and the variation cannot be predicted.
+ * -`B` is added every time the Ethereum block is created.
+ * - Only `U` and `B` are predictable variables.
+ * - As `M`, `P` and `S` cannot be observed from a staker, the "cumulative sum" is often used to calculate ratio variation with history.
+ * - Reward withdrawal always withdraws the total withdrawable amount.
+ *
+ * Scenario:
+ * - Assume `M` is fixed at 500
+ * - Alice stakes 100 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=0, `P`=100, `S`=100, `U`=100)
+ * - After 10 blocks, Bob stakes 60 DEV on Property-B (Alice's staking state on Property-A: `M`=500, `B`=10, `P`=100, `S`=160, `U`=100)
+ * - After 10 blocks, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
+ * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
+ */
 contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	uint256 private one = 1;
 	event Lockedup(address _from, address _property, uint256 _value);
 
+	/**
+	 * Initialize the passed address as AddressConfig address.
+	 */
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	/**
+	 * Adds staking.
+	 * Only the Dev contract can execute this function.
+	 */
 	function lockup(
 		address _from,
 		address _property,
 		uint256 _value
 	) external {
+		/**
+		 * Validates the sender is Dev contract.
+		 */
 		addressValidator().validateAddress(msg.sender, config().token());
+
+		/**
+		 * Validates the target of staking is included Property set.
+		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(_value != 0, "illegal lockup value");
 
+		/**
+		 * Refuses new staking when after cancel staking and until release it.
+		 */
 		bool isWaiting = getStorageWithdrawalStatus(_property, _from) != 0;
 		require(isWaiting == false, "lockup is already canceled");
+
+		/**
+		 * Since the reward per block that can be withdrawn will change with the addition of staking,
+		 * saves the undrawn withdrawable reward before addition it.
+		 */
 		updatePendingInterestWithdrawal(_property, _from);
+
+		/**
+		 * Saves the variables at the time of staking to prepare for reward calculation.
+		 */
 		(, , , uint256 interest, ) = difference(_property, 0);
 		updateStatesAtLockup(_property, _from, interest);
+
+		/**
+		 * Saves variables that should change due to the addition of staking.
+		 */
 		updateValues(true, _from, _property, _value);
 		emit Lockedup(_from, _property, _value);
 	}
 
+	/**
+	 * Cancel staking.
+	 * The staking amount can be withdrawn after the blocks specified by `Policy.lockUpBlocks` have passed.
+	 */
 	function cancel(address _property) external {
+		/**
+		 * Validates the target of staked is included Property set.
+		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
+		/**
+		 * Validates the sender is staking to the target Property.
+		 */
 		require(hasValue(_property, msg.sender), "dev token is not locked");
+
+		/**
+		 * Validates not already been canceled.
+		 */
 		bool isWaiting = getStorageWithdrawalStatus(_property, msg.sender) != 0;
 		require(isWaiting == false, "lockup is already canceled");
+
+		/**
+		 * Get `Policy.lockUpBlocks`, add it to the current block number, and saves that block number in `WithdrawalStatus`.
+		 * Staking is cannot release until the block number saved in `WithdrawalStatus` is reached.
+		 */
 		uint256 blockNumber = IPolicy(config().policy()).lockUpBlocks();
 		blockNumber = blockNumber.add(block.number);
 		setStorageWithdrawalStatus(_property, msg.sender, blockNumber);
 	}
 
+	/**
+	 * Withdraw staking.
+	 * Releases canceled staking and transfer the staked amount to the sender.
+	 */
 	function withdraw(address _property) external {
+		/**
+		 * Validates the target of staked is included Property set.
+		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
 		require(possible(_property, msg.sender), "waiting for release");
