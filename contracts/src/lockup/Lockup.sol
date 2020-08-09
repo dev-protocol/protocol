@@ -599,9 +599,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			uint256 result = interest.divBasis().divBasis();
 			return result;
 
-		/**
-		 * If not the first but the only staker:
-		 */
+			/**
+			 * If not the first but the only staker:
+			 */
 		} else if (isOnly) {
 			/**
 			 * Pass 0 to the `difference` function to gets the Property's cumulative sum of the staker reward.
