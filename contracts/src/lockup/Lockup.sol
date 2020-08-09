@@ -648,19 +648,40 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		return result;
 	}
 
+	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
+	 */
 	function _calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
 	) private view returns (uint256) {
+		/**
+		 * Gets the reward amount in saved without withdrawal.
+		 */
 		uint256 pending = getStoragePendingInterestWithdrawal(_property, _user);
+
+		/**
+		 * Gets the reward amount of before DIP4.
+		 */
 		uint256 legacy = __legacyWithdrawableInterestAmount(_property, _user);
+
+		/**
+		 * Gets the latest withdrawal reward amount.
+		 */
 		uint256 amount = _calculateInterestAmount(_property, _user);
+
+		/**
+		 * Returns the sum of all values.
+		 */
 		uint256 withdrawableAmount = amount
 			.add(pending) // solium-disable-next-line indentation
 			.add(legacy);
 		return withdrawableAmount;
 	}
 
+	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
+	 */
 	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
@@ -669,20 +690,57 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		return amount;
 	}
 
+	/**
+	 * Withdraws staking reward as an interest.
+	 */
 	function withdrawInterest(address _property) external {
+		/**
+		 * Validates the target of staking is included Property set.
+		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
+		/**
+		 * Gets the withdrawable amount.
+		 */
 		uint256 value = _calculateWithdrawableInterestAmount(
 			_property,
 			msg.sender
 		);
+
+		/**
+		 * Gets the cumulative sum of staker rewards of the passed Property address.
+		 */
 		(, , , uint256 interest, ) = difference(_property, 0);
+
+		/**
+		 * Validates rewards amount there are 1 or more.
+		 */
 		require(value > 0, "your interest amount is 0");
+
+		/**
+		 * Sets the unwithdrawn reward amount to 0.
+		 */
 		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
+
+		/**
+		 * Creates a Dev token instance.
+		 */
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
+
+		/**
+		 * Updates the staking status to avoid double rewards.
+		 */
 		updateStatesAtLockup(_property, msg.sender, interest);
 		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
+
+		/**
+		 * Mints the reward.
+		 */
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+
+		/**
+		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
+		 */
 		update();
 	}
 
