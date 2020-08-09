@@ -209,7 +209,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			? getStorageAllValue()
 			: getStoragePropertyValue(_property);
 
-
 		/**
 		 * Staking pre-DIP4 will be treated as staked simultaneously with the DIP4 release.
 		 * Therefore, the last recorded block number is the same as the DIP4 release block.
