@@ -527,43 +527,116 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 	}
 
+	/**
+	 * Returns the staker reward as interest.
+	 */
 	function _calculateInterestAmount(address _property, address _user)
 		private
 		view
 		returns (uint256)
 	{
+		/**
+		 * Gets the cumulative sum of the staking amount, current staking amount, and last recorded block number of the Property.
+		 */
 		(
 			uint256 cLockProperty,
 			uint256 unit,
 			uint256 lastBlock
 		) = getCumulativeLockedUp(_property);
+
+		/**
+		 * Gets the cumulative sum of staking amount and block number of Property when the user staked.
+		 */
 		(
 			uint256 lastCLocked,
 			uint256 lastBlockUser
 		) = getLastCumulativeLockedUpAndBlock(_property, _user);
+
+		/**
+		 * Get the amount the user is staking for the Property.
+		 */
 		uint256 lockedUpPerAccount = getStorageValue(_property, _user);
+
+		/**
+		 * Gets the cumulative sum of the Property's staker reward when the user staked.
+		 */
 		uint256 lastInterest = getStorageLastCumulativePropertyInterest(
 			_property,
 			_user
 		);
+
+		/**
+		 * Calculates the cumulative sum of the staking amount from the time the user staked to the present.
+		 * It can be calculated by multiplying the staking amount by the number of elapsed blocks.
+		 */
 		uint256 cLockUser = lockedUpPerAccount.mul(
 			block.number.sub(lastBlockUser)
 		);
+
+		/**
+		 * Determines if the user is the only staker to the Property.
+		 */
 		bool isOnly = unit == lockedUpPerAccount && lastBlock <= lastBlockUser;
+
+		/**
+		 * If the user is the Property's only staker and the first staker:
+		 */
 		if (lastInterest == 0 && isOnly) {
+			/**
+			 * Passing the cumulative sum of the maximum mint amount when staked, to the `difference` function,
+			 * gets the staker reward amount that the user can receive from the time of staking to the present.
+			 * In the case of the first and only staker to the Property, the result of `LastCumulativePropertyInterest` is 0, and the correct difference calculation cannot be performed.
+			 * Therefore, it is necessary to calculate the difference using the cumulative sum of the maximum mint amounts at the time of staked.
+			 */
 			(, , , uint256 interest, ) = difference(
 				_property,
 				getStorageLastCumulativeGlobalReward(_property, _user)
 			);
+
+			/**
+			 * Since the result of the `difference` function has been multiplied by 10^36, so needs recalculates.
+			 */
 			uint256 result = interest.divBasis().divBasis();
 			return result;
+
+		/**
+		 * If not the first but the only staker:
+		 */
 		} else if (isOnly) {
+			/**
+			 * Pass 0 to the `difference` function to gets the Property's cumulative sum of the staker reward.
+			 */
 			(, , , uint256 interest, ) = difference(_property, 0);
+
+			/**
+			 * Calculates the difference in rewards that can be received by subtracting the Property's cumulative sum of staker rewards at the time of staking.
+			 */
 			uint256 result = interest.sub(lastInterest).divBasis().divBasis();
 			return result;
 		}
+
+		/**
+		 * If the user is the Property's not the first staker and not the only staker:
+		 */
+
+		/**
+		 * Pass 0 to the `difference` function to gets the Property's cumulative sum of the staker reward.
+		 */
 		(, , , uint256 interest, ) = difference(_property, 0);
+
+		/**
+		 * Calculates the share of rewards that can be received by the user among Property's staker rewards.
+		 * "Cumulative sum of the staking amount of the Property at the time of staking" is subtracted from "cumulative sum of the staking amount of the Property",
+		 * and calculates the cumulative sum of staking amounts from the time of staking to the present.
+		 * The ratio of the "cumulative sum of staking amount from the time the user staked to the present" to that value is the share.
+		 */
 		uint256 share = cLockUser.outOf(cLockProperty.sub(lastCLocked));
+
+		/**
+		 * If the Property's staker reward is greater than the value of the `CumulativePropertyInterest` storage,
+		 * calculates the difference and multiply by the share.
+		 * Otherwise, it returns 0.
+		 */
 		uint256 result = interest >= lastInterest
 			? interest
 				.sub(lastInterest)
