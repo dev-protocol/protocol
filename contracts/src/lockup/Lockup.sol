@@ -974,7 +974,18 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		}
 	}
 
+	/**
+	 * Updates the block number of the time of DIP4 release.
+	 */
 	function setDIP4GenesisBlock(uint256 _block) external onlyOwner {
+		/**
+		 * Validates the value is not set.
+		 */
+		require(getStorageDIP4GenesisBlock() == 0, "already set the value");
+
+		/**
+		 * Sets the value.
+		 */
 		setStorageDIP4GenesisBlock(_block);
 	}
 }

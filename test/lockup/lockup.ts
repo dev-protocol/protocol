@@ -1822,9 +1822,15 @@ contract('LockupTest', ([deployer, user1]) => {
 	describe('Lockup; setDIP4GenesisBlock', () => {
 		it('Store passed value to getStorageDIP4GenesisBlock as a block number', async () => {
 			const [dev] = await init()
-			await dev.lockup.setDIP4GenesisBlock(123456)
 			const stored = await dev.lockup.getStorageDIP4GenesisBlock()
-			expect(stored.toNumber()).to.be.equal(123456)
+			expect(stored.toNumber()).to.be.greaterThan(1)
+		})
+		it('Should fail to call when already updated the value', async () => {
+			const [dev] = await init()
+			const res = await dev.lockup.setDIP4GenesisBlock(456789).catch(err)
+			const stored = await dev.lockup.getStorageDIP4GenesisBlock()
+			expect(stored.toNumber()).to.be.greaterThan(1)
+			expect(res).to.be.instanceOf(Error)
 		})
 		it('Should fail to call when sent from non-pauser account', async () => {
 			const [dev] = await init()
