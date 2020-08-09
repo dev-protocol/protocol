@@ -5,7 +5,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
-contract TheInitialPolicy is IPolicy, UsingConfig {
+contract TheFirstPolicy is IPolicy, UsingConfig {
 	using SafeMath for uint256;
 	uint256 public marketVotingBlocks = 525600;
 	uint256 public policyVotingBlocks = 525600;
