@@ -744,41 +744,93 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		update();
 	}
 
+	/**
+	 * Status updates with the addition or release of staking.
+	 */
 	function updateValues(
 		bool _addition,
 		address _account,
 		address _property,
 		uint256 _value
 	) private {
+		/**
+		 * If added staking:
+		 */
 		if (_addition) {
+			/**
+			 * Updates the cumulative sum of the staking amount of the passed Property and the cumulative amount of the staking amount of the protocol total.
+			 */
 			updateCumulativeLockedUp(true, _property, _value);
+
+			/**
+			 * Updates the current staking amount of the protocol total.
+			 */
 			addAllValue(_value);
+
+			/**
+			 * Updates the current staking amount of the Property.
+			 */
 			addPropertyValue(_property, _value);
+
+			/**
+			 * Updates the user's current staking amount in the Property.
+			 */
 			addValue(_property, _account, _value);
+
+			/**
+			 * If released staking:
+			 */
 		} else {
+			/**
+			 * Updates the cumulative sum of the staking amount of the passed Property and the cumulative amount of the staking amount of the protocol total.
+			 */
 			updateCumulativeLockedUp(false, _property, _value);
+
+			/**
+			 * Updates the current staking amount of the protocol total.
+			 */
 			subAllValue(_value);
+
+			/**
+			 * Updates the current staking amount of the Property.
+			 */
 			subPropertyValue(_property, _value);
 		}
+
+		/**
+		 * Since each staking amount has changed, updates the latest maximum mint amount.
+		 */
 		update();
 	}
 
+	/**
+	 * Returns the staking amount of the protocol total.
+	 */
 	function getAllValue() external view returns (uint256) {
 		return getStorageAllValue();
 	}
 
+	/**
+	 * Adds the staking amount of the protocol total.
+	 */
 	function addAllValue(uint256 _value) private {
 		uint256 value = getStorageAllValue();
 		value = value.add(_value);
 		setStorageAllValue(value);
 	}
 
+	/**
+	 * Subtracts the staking amount of the protocol total.
+	 */
 	function subAllValue(uint256 _value) private {
 		uint256 value = getStorageAllValue();
 		value = value.sub(_value);
 		setStorageAllValue(value);
 	}
 
+	/**
+	 * Returns the user's staking amount in the Property.
+	 */
 	function getValue(address _property, address _sender)
 		external
 		view
@@ -787,6 +839,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		return getStorageValue(_property, _sender);
 	}
 
+	/**
+	 * Adds the user's staking amount in the Property.
+	 */
 	function addValue(
 		address _property,
 		address _sender,
@@ -797,6 +852,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		setStorageValue(_property, _sender, value);
 	}
 
+	/**
+	 * Returns whether the user is staking in the Property.
+	 */
 	function hasValue(address _property, address _sender)
 		private
 		view
@@ -806,6 +864,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		return value != 0;
 	}
 
+	/**
+	 * Returns the staking amount of the Property.
+	 */
 	function getPropertyValue(address _property)
 		external
 		view
@@ -814,33 +875,56 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		return getStoragePropertyValue(_property);
 	}
 
+	/**
+	 * Adds the staking amount of the Property.
+	 */
 	function addPropertyValue(address _property, uint256 _value) private {
 		uint256 value = getStoragePropertyValue(_property);
 		value = value.add(_value);
 		setStoragePropertyValue(_property, value);
 	}
 
+	/**
+	 * Subtracts the staking amount of the Property.
+	 */
 	function subPropertyValue(address _property, uint256 _value) private {
 		uint256 value = getStoragePropertyValue(_property);
 		uint256 nextValue = value.sub(_value);
 		setStoragePropertyValue(_property, nextValue);
 	}
 
+	/**
+	 * Saves the latest reward amount as an undrawn amount.
+	 */
 	function updatePendingInterestWithdrawal(address _property, address _user)
 		private
 	{
+		/**
+		 * Gets the latest reward amount.
+		 */
 		uint256 withdrawableAmount = _calculateWithdrawableInterestAmount(
 			_property,
 			_user
 		);
+
+		/**
+		 * Saves the amount to `PendingInterestWithdrawal` storage.
+		 */
 		setStoragePendingInterestWithdrawal(
 			_property,
 			_user,
 			withdrawableAmount
 		);
+
+		/**
+		 * Updates the reward amount of before DIP4 to prevent further addition it.
+		 */
 		__updateLegacyWithdrawableInterestAmount(_property, _user);
 	}
 
+	/**
+	 * Returns whether the staking can be released.
+	 */
 	function possible(address _property, address _from)
 		private
 		view
@@ -860,6 +944,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		return false;
 	}
 
+	/**
+	 * Returns the reward amount of the calculation model before DIP4.
+	 * It can be calculated by subtracting "the last cumulative sum of reward unit price" from
+	 * "the current cumulative sum of reward unit price," and multiplying by the staking amount.
+	 */
 	function __legacyWithdrawableInterestAmount(
 		address _property,
 		address _user
@@ -872,6 +961,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		return value.divBasis();
 	}
 
+	/**
+	 * Updates and treats the reward of before DIP4 as already received.
+	 */
 	function __updateLegacyWithdrawableInterestAmount(
 		address _property,
 		address _user
