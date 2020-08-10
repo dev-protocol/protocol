@@ -11,6 +11,11 @@ import {IVoteCounter} from "contracts/src/vote/IVoteCounter.sol";
 import {IPolicySet} from "contracts/src/policy/IPolicySet.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
+/**
+ * A contract that manages the activation votes for new markets and new policies.
+ * Voting rights of voters are determined by the staking amount to a Property.
+ * That is, at the voting, expecting to pass a Property address for specification the voting right.
+ */
 contract VoteCounter is
 	IVoteCounter,
 	UsingConfig,
@@ -19,41 +24,88 @@ contract VoteCounter is
 {
 	using SafeMath for uint256;
 
+	/**
+	 * Initialize the passed address as AddressConfig address.
+	 */
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	/**
+	 * Votes for or against new Market
+	 */
 	function voteMarket(
 		address _market,
 		address _property,
 		bool _agree
 	) external {
+		/**
+		 * Validates the passed Market address is included the Market address set
+		 */
 		addressValidator().validateGroup(_market, config().marketGroup());
+
+		/**
+		 * Validates the passed Market is still not enabled
+		 */
 		IMarket market = IMarket(_market);
 		require(market.enabled() == false, "market is already enabled");
+
+		/**
+		 * Validates the voting deadline has not passed.
+		 */
 		require(
 			block.number <= market.votingEndBlockNumber(),
 			"voting deadline is over"
 		);
+
+		/**
+		 * Gets the staking amount for the passed Property as a voting right.
+		 * If the voting right is 0, it cannot vote.
+		 */
 		uint256 count = ILockup(config().lockup()).getValue(
 			_property,
 			msg.sender
 		);
 		require(count != 0, "vote count is 0");
+
+		/**
+		 * Validates it does not become a double vote.
+		 */
 		bool alreadyVote = getStorageAlreadyVoteMarket(
 			msg.sender,
 			_market,
 			_property
 		);
 		require(alreadyVote == false, "already vote");
+
+		/**
+		 * Votes
+		 */
 		vote(_market, count, _agree);
+
+		/**
+		 * Records voting status to avoid double voting.
+		 */
 		setStorageAlreadyVoteMarket(msg.sender, _market, _property);
+
+		/**
+		 * Gets the votes for and against and gets whether or not the threshold
+		 * for enabling the Market is exceeded.
+		 */
 		bool result = IPolicy(config().policy()).marketApproval(
 			getStorageAgreeCount(_market),
 			getStorageOppositeCount(_market)
 		);
+
+		/**
+		 * If the result is false, the process ends.
+		 */
 		if (result == false) {
 			return;
 		}
+
+		/**
+		 * If the result is true, to enable the passed Market.
+		 */
 		market.toEnable();
 	}
 
@@ -65,13 +117,27 @@ contract VoteCounter is
 		return getStorageAlreadyVoteMarket(msg.sender, _target, _property);
 	}
 
+	/**
+	 * Votes for or against new Policy
+	 */
 	function votePolicy(
 		address _policy,
 		address _property,
 		bool _agree
 	) external {
+		/**
+		 * Validates the passed Policy address is included the Policy address set
+		 */
 		addressValidator().validateGroup(_policy, config().policyGroup());
+
+		/**
+		 * Validates the passed Policy is not the current Policy.
+		 */
 		require(config().policy() != _policy, "this policy is current");
+
+		/**
+		 * Validates the voting deadline has not passed.
+		 */
 		IPolicySet policySet = IPolicySet(config().policySet());
 		require(policySet.voting(_policy), "voting deadline is over");
 
