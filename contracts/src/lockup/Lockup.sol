@@ -594,7 +594,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			);
 
 			/**
-			 * Since the result of the `difference` function has been multiplied by 10^36, so needs recalculates.
+			 * Returns the result after adjusted decimals to 10^18.
 			 */
 			uint256 result = interest.divBasis().divBasis();
 			return result;

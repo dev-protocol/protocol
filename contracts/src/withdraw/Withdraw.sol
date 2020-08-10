@@ -187,6 +187,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 			uint256 _interestPrice
 		)
 	{
+		/**
+		 * Gets and passes the last recorded cumulative sum of the maximum mint amount.
+		 */
 		uint256 _last = withdrawStorage.getLastCumulativeGlobalHoldersPrice(
 			_property,
 			_user
@@ -203,29 +206,63 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		returns (uint256 _amount, uint256 _price)
 	{
 		WithdrawStorage withdrawStorage = getStorage();
+
+		/**
+		 * Gets the latest cumulative sum of the maximum mint amount,
+		 * and the difference to the previous withdrawal of holder reward unit price.
+		 */
 		(uint256 reward, , uint256 _holdersPrice, , ) = difference(
 			withdrawStorage,
 			_property,
 			_user
 		);
+
+		/**
+		 * Gets the ownership ratio of the passed user and the Property.
+		 */
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+
+		/**
+		 * Multiplied by the number of tokens to the holder reward unit price.
+		 */
 		uint256 value = _holdersPrice.mul(balance);
+
+		/**
+		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the maximum mint amount.
+		 */
 		return (value.divBasis().divBasis(), reward);
 	}
 
+	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
+	 */
 	function _calculateWithdrawableAmount(address _property, address _user)
 		private
 		view
 		returns (uint256 _amount, uint256 _price)
 	{
+		/**
+		 * Gets the latest withdrawal reward amount.
+		 */
 		(uint256 _value, uint256 price) = _calculateAmount(_property, _user);
+
+		/**
+		 * Gets the reward amount of before DIP4.
+		 */
 		uint256 legacy = __legacyWithdrawableAmount(_property, _user);
+
+		/**
+		 * Gets the reward amount in saved without withdrawal and returns the sum of all values.
+		 */
 		uint256 value = _value
 			.add(getStorage().getPendingWithdrawal(_property, _user))
 			.add(legacy);
 		return (value, price);
 	}
 
+	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
+	 */
 	function calculateWithdrawableAmount(address _property, address _user)
 		external
 		view
@@ -235,6 +272,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		return value;
 	}
 
+	/**
+	 * Returns the cumulative sum of the holder rewards of the passed Property.
+	 */
 	function calculateTotalWithdrawableAmount(address _property)
 		external
 		view
@@ -244,9 +284,18 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 			_property,
 			0
 		);
+
+		/**
+		 * Adjusts decimals to 10^18 and returns the result.
+		 */
 		return _amount.divBasis().divBasis();
 	}
 
+	/**
+	 * Returns the reward amount of the calculation model before DIP4.
+	 * It can be calculated by subtracting "the last cumulative sum of reward unit price" from
+	 * "the current cumulative sum of reward unit price," and multiplying by the balance of the user.
+	 */
 	function __legacyWithdrawableAmount(address _property, address _user)
 		private
 		view
@@ -264,6 +313,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		return value.divBasis();
 	}
 
+	/**
+	 * Updates and treats the reward of before DIP4 as already received.
+	 */
 	function __updateLegacyWithdrawableAmount(address _property, address _user)
 		private
 	{
@@ -272,6 +324,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		withdrawStorage.setLastWithdrawalPrice(_property, _user, price);
 	}
 
+	/**
+	 * Returns WithdrawStorage instance.
+	 */
 	function getStorage() private view returns (WithdrawStorage) {
 		return WithdrawStorage(config().withdrawStorage());
 	}
