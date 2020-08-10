@@ -155,22 +155,6 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 			pendTo.add(amountTo)
 		);
 
-		////////// Unnecessary? //////////
-		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
-			_property,
-			_to
-		);
-		(, uint256 total, , , ) = difference(withdrawStorage, _property, _to);
-		if (totalLimit != total) {
-			withdrawStorage.setWithdrawalLimitTotal(_property, _to, total);
-			withdrawStorage.setWithdrawalLimitBalance(
-				_property,
-				_to,
-				ERC20Mintable(_property).balanceOf(_to)
-			);
-		}
-		////////// Unnecessary? //////////
-
 		emit PropertyTransfer(_property, _from, _to);
 	}
 
@@ -219,25 +203,12 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		returns (uint256 _amount, uint256 _price)
 	{
 		WithdrawStorage withdrawStorage = getStorage();
-		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
+		(uint256 reward, , uint256 _holdersPrice, , ) = difference(
+			withdrawStorage,
 			_property,
 			_user
 		);
-		uint256 balanceLimit = withdrawStorage.getWithdrawalLimitBalance(
-			_property,
-			_user
-		);
-		(
-			uint256 reward,
-			uint256 _holders,
-			uint256 _holdersPrice,
-			,
-
-		) = difference(withdrawStorage, _property, _user);
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
-		if (totalLimit == _holders) {
-			balance = balanceLimit;
-		}
 		uint256 value = _holdersPrice.mul(balance);
 		return (value.divBasis().divBasis(), reward);
 	}
