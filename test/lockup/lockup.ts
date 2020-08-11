@@ -475,7 +475,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			expect(result.toNumber()).to.be.equal(expected)
 		})
 	})
-	describe('Lockup; calculateWithdrawableInterestAmount', () => {
+	describe.only('Lockup; calculateWithdrawableInterestAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,
 			account: string,
@@ -560,12 +560,14 @@ contract('LockupTest', ([deployer, user1]) => {
 						)
 					)
 					.integerValue(BigNumber.ROUND_DOWN)
-				const isFirst = lastInterest.isEqualTo(0)
+				const isSingle =
+					lockedUpPerUser.isEqualTo(lastLockupUnitProperty) &&
+					cumulativeLockedUp.isEqualTo(cumulativeLockedUpAll)
 				const isOnly =
 					lastLockupUnitProperty.isEqualTo(lockedUpPerUser) &&
 					lastLockupBlockProperty.isLessThanOrEqualTo(lastLockupBlock)
 				const propertyRewards = rewards
-					.minus(isFirst && isOnly ? last : 0)
+					.minus(isSingle ? last : 0)
 					.times(shareOfProperty)
 					.integerValue(BigNumber.ROUND_DOWN)
 				// const propertyRewards = rewards.times(shareOfProperty)
@@ -580,20 +582,19 @@ contract('LockupTest', ([deployer, user1]) => {
 							.div(cumulativeLockedUp.minus(lastCLocked))
 							.integerValue(BigNumber.ROUND_DOWN)
 				// const amount = interestPrice.times(lockedUpPerUser).div(1e36)
-				const amount =
-					isFirst && isOnly
-						? interest.div(1e18).div(1e18)
-						: isOnly
-						? interest.minus(lastInterest).div(1e18).div(1e18)
-						: interest.isGreaterThanOrEqualTo(lastInterest)
-						? interest
-								.minus(lastInterest)
-								.times(share)
-								.integerValue(BigNumber.ROUND_DOWN)
-								.div(1e18)
-								.div(1e18)
-								.div(1e18)
-						: toBigNumber(0)
+				const amount = isSingle
+					? interestPrice.times(lockedUpPerUser).div(1e18).div(1e18)
+					: isOnly
+					? interest.minus(lastInterest).div(1e18).div(1e18)
+					: interest.isGreaterThanOrEqualTo(lastInterest)
+					? interest
+							.minus(lastInterest)
+							.times(share)
+							.integerValue(BigNumber.ROUND_DOWN)
+							.div(1e18)
+							.div(1e18)
+							.div(1e18)
+					: toBigNumber(0)
 				const legacyValue = legacyInterestPrice
 					.minus(legacyInterestPricePerUser)
 					.times(lockedUpPerUser)
@@ -609,7 +610,7 @@ contract('LockupTest', ([deployer, user1]) => {
 						currentBlock.toFixed(),
 						lastLockupBlock.toFixed()
 					)
-					console.log('isFirst', isFirst)
+					console.log('isSingle', isSingle)
 					console.log('isOnly', isOnly)
 					console.log('deployedBlock', deployedBlock.toFixed())
 					console.log('rewards', rewards.toFixed())

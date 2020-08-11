@@ -371,7 +371,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Records each value and the latest block number.
 		 */
-		setStorageLastCumulativeGlobalReward(_property, _user, _reward);
+		if (isSingle(_property, _user)) {
+			setStorageLastCumulativeGlobalReward(_property, _user, _reward);
+		}
 		setStorageLastCumulativePropertyInterest(_property, _user, _interest);
 		(uint256 cLocked, , ) = getCumulativeLockedUp(_property);
 		setStorageLastCumulativeLockedUpAndBlock(
@@ -579,16 +581,17 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		bool isOnly = unit == lockedUpPerAccount && lastBlock <= lastBlockUser;
 
 		/**
-		 * If the user is the Property's only staker and the first staker:
+		 * If the user is the Property's only staker and the first staker, and the only staker on the protocol:
 		 */
-		if (lastInterest == 0 && isOnly) {
+		if (isSingle(_property, _user)) {
 			/**
 			 * Passing the cumulative sum of the maximum mint amount when staked, to the `difference` function,
 			 * gets the staker reward amount that the user can receive from the time of staking to the present.
-			 * In the case of the first and only staker to the Property, the result of `LastCumulativePropertyInterest` is 0, and the correct difference calculation cannot be performed.
+			 * In the case of the staking is single, the ratio of the Property and the user account for 100% of the cumulative sum of the maximum mint amount,
+			 * so the difference cannot be calculated with the value of `LastCumulativePropertyInterest`.
 			 * Therefore, it is necessary to calculate the difference using the cumulative sum of the maximum mint amounts at the time of staked.
 			 */
-			(, , , uint256 interest, ) = difference(
+			(, , , , uint256 interestPrice) = difference(
 				_property,
 				getStorageLastCumulativeGlobalReward(_property, _user)
 			);
@@ -596,11 +599,14 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			/**
 			 * Returns the result after adjusted decimals to 10^18.
 			 */
-			uint256 result = interest.divBasis().divBasis();
+			uint256 result = interestPrice
+				.mul(lockedUpPerAccount)
+				.divBasis()
+				.divBasis();
 			return result;
 
 			/**
-			 * If not the first but the only staker:
+			 * If not the single but the only staker:
 			 */
 		} else if (isOnly) {
 			/**
@@ -862,6 +868,23 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	{
 		uint256 value = getStorageValue(_property, _sender);
 		return value != 0;
+	}
+
+	/**
+	 * Returns whether a single user has all staking share.
+	 * This value is true when only one Property and one user is historically the only staker.
+	 */
+	function isSingle(address _property, address _user)
+		private
+		view
+		returns (bool)
+	{
+		uint256 perAccount = getStorageValue(_property, _user);
+		(uint256 cLockProperty, uint256 unitProperty, ) = getCumulativeLockedUp(
+			_property
+		);
+		(uint256 cLockTotal, , ) = getCumulativeLockedUpAll();
+		return perAccount == unitProperty && cLockProperty == cLockTotal;
 	}
 
 	/**
