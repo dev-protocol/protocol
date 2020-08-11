@@ -2,17 +2,29 @@ pragma solidity ^0.5.0;
 
 import {IGroup} from "contracts/src/common/interface/IGroup.sol";
 
+/**
+ * A module that provides common validations patterns.
+ */
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
 
+	/**
+	 * Validates passed address is not a zero address.
+	 */
 	function validateIllegalAddress(address _addr) external pure {
 		require(_addr != address(0), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in an address set.
+	 */
 	function validateGroup(address _addr, address _groupAddr) external view {
 		require(IGroup(_groupAddr).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in two address sets.
+	 */
 	function validateGroups(
 		address _addr,
 		address _groupAddr1,
@@ -24,10 +36,16 @@ contract AddressValidator {
 		require(IGroup(_groupAddr2).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates that the address of the first argument is equal to the address of the second argument.
+	 */
 	function validateAddress(address _addr, address _target) external pure {
 		require(_addr == _target, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the two addresses.
+	 */
 	function validateAddresses(
 		address _addr,
 		address _target1,
@@ -39,6 +57,9 @@ contract AddressValidator {
 		require(_addr == _target2, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the three addresses.
+	 */
 	function validate3Addresses(
 		address _addr,
 		address _target1,

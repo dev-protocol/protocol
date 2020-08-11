@@ -10,6 +10,13 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 
+/**
+ * The contract used as the DEV token.
+ * The DEV token is an ERC20 token used as the native token of the Dev Protocol.
+ * The DEV token is created by migration from its predecessor, the MVP, legacy DEV token. For that reason, the initial supply is 0.
+ * Also, mint will be performed based on the Allocator contract.
+ * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
+ */
 contract Dev is
 	ERC20Detailed,
 	ERC20Mintable,
@@ -17,18 +24,32 @@ contract Dev is
 	UsingConfig,
 	UsingValidator
 {
+	/**
+	 * Initialize the passed address as AddressConfig address.
+	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
+	 */
 	constructor(address _config)
 		public
 		ERC20Detailed("Dev", "DEV", 18)
 		UsingConfig(_config)
 	{}
 
+	/**
+	 * Staking DEV tokens.
+	 * The transfer destination must always be included in the address set for Property tokens.
+	 * This is because if the transfer destination is not a Property token, it is possible that the staked DEV token cannot be withdrawn.
+	 */
 	function deposit(address _to, uint256 _amount) external returns (bool) {
 		require(transfer(_to, _amount), "dev transfer failed");
 		lock(msg.sender, _to, _amount);
 		return true;
 	}
 
+	/**
+	 * Staking DEV tokens by an allowanced address.
+	 * The transfer destination must always be included in the address set for Property tokens.
+	 * This is because if the transfer destination is not a Property token, it is possible that the staked DEV token cannot be withdrawn.
+	 */
 	function depositFrom(
 		address _from,
 		address _to,
@@ -39,12 +60,19 @@ contract Dev is
 		return true;
 	}
 
+	/**
+	 * Burn the DEV tokens as an authentication fee.
+	 * Only Market contracts can execute this function.
+	 */
 	function fee(address _from, uint256 _amount) external returns (bool) {
 		addressValidator().validateGroup(msg.sender, config().marketGroup());
 		_burn(_from, _amount);
 		return true;
 	}
 
+	/**
+	 * Call `Lockup.lockup` to execute staking.
+	 */
 	function lock(
 		address _from,
 		address _to,

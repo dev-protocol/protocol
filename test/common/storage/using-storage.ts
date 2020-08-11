@@ -23,11 +23,11 @@ contract('UsingStorageTest', ([deployer]) => {
 			const result = await usingStorageTest
 				.getStorageAddress()
 				.catch((err: Error) => err)
-			validateErrorMessage(result, 'storage is not setted', false)
+			validateErrorMessage(result, 'storage is not set', false)
 		})
 		it('If storage has not been created, an error will occur when accessing storage.', async () => {
 			const result = await usingStorageTest.getUInt().catch((err: Error) => err)
-			validateErrorMessage(result, 'storage is not setted', false)
+			validateErrorMessage(result, 'storage is not set', false)
 		})
 		it('If storage has been created, the storage address can be obtained.', async () => {
 			await usingStorageTest.createStorage()

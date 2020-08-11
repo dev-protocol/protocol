@@ -1,5 +1,5 @@
 import {Dip1Instance} from '../../types/truffle-contracts'
-import {TheInitialPolicyInstance} from '../../types/truffle-contracts'
+import {TheFirstPolicyInstance} from '../../types/truffle-contracts'
 import {DevProtocolInstance} from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
 
@@ -24,7 +24,7 @@ const batchRandom = (): BigNumber[] => [
 
 contract('DIP1', ([deployer]) => {
 	let dip1: Dip1Instance
-	let theInitialPolicy: TheInitialPolicyInstance
+	let theFirstPolicy: TheFirstPolicyInstance
 
 	before(async () => {
 		const dev = new DevProtocolInstance(deployer)
@@ -32,35 +32,35 @@ contract('DIP1', ([deployer]) => {
 		await dev.generateDev()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		dip1 = await artifacts.require('DIP1').new(dev.addressConfig.address)
-		theInitialPolicy = await artifacts
-			.require('TheInitialPolicy')
+		theFirstPolicy = await artifacts
+			.require('TheFirstPolicy')
 			.new(dev.addressConfig.address)
 	})
 
 	describe('DIP1; rewards', () => {
-		it('rewards equals TheInitialPolicy', async () => {
+		it('rewards equals TheFirstPolicy', async () => {
 			const method = 'rewards'
 			const [a, b, c, d, e, f] = batchRandom()
 			expect((await dip1[method](a, b)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, b)).toString()
+				(await theFirstPolicy[method](a, b)).toString()
 			)
 			expect((await dip1[method](c, d)).toString()).to.be.equal(
-				(await theInitialPolicy[method](c, d)).toString()
+				(await theFirstPolicy[method](c, d)).toString()
 			)
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
-				(await theInitialPolicy[method](e, f)).toString()
+				(await theFirstPolicy[method](e, f)).toString()
 			)
 			expect((await dip1[method](a, 0)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 0)).toString()
+				(await theFirstPolicy[method](a, 0)).toString()
 			)
 			expect((await dip1[method](a, 1)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 1)).toString()
+				(await theFirstPolicy[method](a, 1)).toString()
 			)
 			expect((await dip1[method](0, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](0, a)).toString()
+				(await theFirstPolicy[method](0, a)).toString()
 			)
 			expect((await dip1[method](1, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](1, a)).toString()
+				(await theFirstPolicy[method](1, a)).toString()
 			)
 		})
 	})
@@ -85,155 +85,155 @@ contract('DIP1', ([deployer]) => {
 		})
 	})
 	describe('DIP1; assetValue', () => {
-		it('assetValue equals TheInitialPolicy', async () => {
+		it('assetValue equals TheFirstPolicy', async () => {
 			const method = 'assetValue'
 			const [a, b, c, d, e, f] = batchRandom()
 			expect((await dip1[method](a, b)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, b)).toString()
+				(await theFirstPolicy[method](a, b)).toString()
 			)
 			expect((await dip1[method](c, d)).toString()).to.be.equal(
-				(await theInitialPolicy[method](c, d)).toString()
+				(await theFirstPolicy[method](c, d)).toString()
 			)
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
-				(await theInitialPolicy[method](e, f)).toString()
+				(await theFirstPolicy[method](e, f)).toString()
 			)
 			expect((await dip1[method](a, 0)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 0)).toString()
+				(await theFirstPolicy[method](a, 0)).toString()
 			)
 			expect((await dip1[method](a, 1)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 1)).toString()
+				(await theFirstPolicy[method](a, 1)).toString()
 			)
 			expect((await dip1[method](0, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](0, a)).toString()
+				(await theFirstPolicy[method](0, a)).toString()
 			)
 			expect((await dip1[method](1, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](1, a)).toString()
+				(await theFirstPolicy[method](1, a)).toString()
 			)
 		})
 	})
 	describe('DIP1; authenticationFee', () => {
-		it('authenticationFee equals TheInitialPolicy', async () => {
+		it('authenticationFee equals TheFirstPolicy', async () => {
 			const method = 'authenticationFee'
 			const [a, b, c, d, e, f] = batchRandom()
 			expect((await dip1[method](a, b)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, b)).toString()
+				(await theFirstPolicy[method](a, b)).toString()
 			)
 			expect((await dip1[method](c, d)).toString()).to.be.equal(
-				(await theInitialPolicy[method](c, d)).toString()
+				(await theFirstPolicy[method](c, d)).toString()
 			)
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
-				(await theInitialPolicy[method](e, f)).toString()
+				(await theFirstPolicy[method](e, f)).toString()
 			)
 			expect((await dip1[method](a, 0)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 0)).toString()
+				(await theFirstPolicy[method](a, 0)).toString()
 			)
 			expect((await dip1[method](a, 1)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 1)).toString()
+				(await theFirstPolicy[method](a, 1)).toString()
 			)
 			expect((await dip1[method](0, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](0, a)).toString()
+				(await theFirstPolicy[method](0, a)).toString()
 			)
 			expect((await dip1[method](1, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](1, a)).toString()
+				(await theFirstPolicy[method](1, a)).toString()
 			)
 		})
 	})
 	describe('DIP1; marketApproval', () => {
-		it('marketApproval equals TheInitialPolicy', async () => {
+		it('marketApproval equals TheFirstPolicy', async () => {
 			const method = 'marketApproval'
 			const [a, b, c, d, e, f] = batchRandom()
 			expect((await dip1[method](a, b)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, b)).toString()
+				(await theFirstPolicy[method](a, b)).toString()
 			)
 			expect((await dip1[method](c, d)).toString()).to.be.equal(
-				(await theInitialPolicy[method](c, d)).toString()
+				(await theFirstPolicy[method](c, d)).toString()
 			)
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
-				(await theInitialPolicy[method](e, f)).toString()
+				(await theFirstPolicy[method](e, f)).toString()
 			)
 			expect((await dip1[method](a, 0)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 0)).toString()
+				(await theFirstPolicy[method](a, 0)).toString()
 			)
 			expect((await dip1[method](a, 1)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 1)).toString()
+				(await theFirstPolicy[method](a, 1)).toString()
 			)
 			expect((await dip1[method](0, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](0, a)).toString()
+				(await theFirstPolicy[method](0, a)).toString()
 			)
 			expect((await dip1[method](1, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](1, a)).toString()
+				(await theFirstPolicy[method](1, a)).toString()
 			)
 		})
 	})
 	describe('DIP1; policyApproval', () => {
-		it('policyApproval equals TheInitialPolicy', async () => {
+		it('policyApproval equals TheFirstPolicy', async () => {
 			const method = 'policyApproval'
 			const [a, b, c, d, e, f] = batchRandom()
 			expect((await dip1[method](a, b)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, b)).toString()
+				(await theFirstPolicy[method](a, b)).toString()
 			)
 			expect((await dip1[method](c, d)).toString()).to.be.equal(
-				(await theInitialPolicy[method](c, d)).toString()
+				(await theFirstPolicy[method](c, d)).toString()
 			)
 			expect((await dip1[method](e, f)).toString()).to.be.equal(
-				(await theInitialPolicy[method](e, f)).toString()
+				(await theFirstPolicy[method](e, f)).toString()
 			)
 			expect((await dip1[method](a, 0)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 0)).toString()
+				(await theFirstPolicy[method](a, 0)).toString()
 			)
 			expect((await dip1[method](a, 1)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a, 1)).toString()
+				(await theFirstPolicy[method](a, 1)).toString()
 			)
 			expect((await dip1[method](0, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](0, a)).toString()
+				(await theFirstPolicy[method](0, a)).toString()
 			)
 			expect((await dip1[method](1, a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](1, a)).toString()
+				(await theFirstPolicy[method](1, a)).toString()
 			)
 		})
 	})
 	describe('DIP1; marketVotingBlocks', () => {
-		it('marketVotingBlocks equals TheInitialPolicy', async () => {
+		it('marketVotingBlocks equals TheFirstPolicy', async () => {
 			const method = 'marketVotingBlocks'
 			expect((await dip1[method]()).toString()).to.be.equal(
-				(await theInitialPolicy[method]()).toString()
+				(await theFirstPolicy[method]()).toString()
 			)
 		})
 	})
 	describe('DIP1; policyVotingBlocks', () => {
-		it('policyVotingBlocks equals TheInitialPolicy', async () => {
+		it('policyVotingBlocks equals TheFirstPolicy', async () => {
 			const method = 'policyVotingBlocks'
 			expect((await dip1[method]()).toString()).to.be.equal(
-				(await theInitialPolicy[method]()).toString()
+				(await theFirstPolicy[method]()).toString()
 			)
 		})
 	})
 	describe('DIP1; abstentionPenalty', () => {
-		it('abstentionPenalty equals TheInitialPolicy', async () => {
+		it('abstentionPenalty equals TheFirstPolicy', async () => {
 			const method = 'abstentionPenalty'
 			const [a, b, c] = batchRandom()
 			expect((await dip1[method](a)).toString()).to.be.equal(
-				(await theInitialPolicy[method](a)).toString()
+				(await theFirstPolicy[method](a)).toString()
 			)
 			expect((await dip1[method](b)).toString()).to.be.equal(
-				(await theInitialPolicy[method](b)).toString()
+				(await theFirstPolicy[method](b)).toString()
 			)
 			expect((await dip1[method](c)).toString()).to.be.equal(
-				(await theInitialPolicy[method](c)).toString()
+				(await theFirstPolicy[method](c)).toString()
 			)
 			expect((await dip1[method](0)).toString()).to.be.equal(
-				(await theInitialPolicy[method](0)).toString()
+				(await theFirstPolicy[method](0)).toString()
 			)
 			expect((await dip1[method](1)).toString()).to.be.equal(
-				(await theInitialPolicy[method](1)).toString()
+				(await theFirstPolicy[method](1)).toString()
 			)
 		})
 	})
 	describe('DIP1; lockUpBlocks', () => {
-		it('lockUpBlocks equals TheInitialPolicy', async () => {
+		it('lockUpBlocks equals TheFirstPolicy', async () => {
 			const method = 'lockUpBlocks'
 			expect((await dip1[method]()).toString()).to.be.equal(
-				(await theInitialPolicy[method]()).toString()
+				(await theFirstPolicy[method]()).toString()
 			)
 		})
 	})

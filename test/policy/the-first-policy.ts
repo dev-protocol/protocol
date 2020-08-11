@@ -1,21 +1,21 @@
-import {TheInitialPolicyInstance} from '../../types/truffle-contracts'
+import {TheFirstPolicyInstance} from '../../types/truffle-contracts'
 import {DevProtocolInstance} from '../test-lib/instance'
 import {toBigNumber} from '../test-lib/utils/common'
 import BigNumber from 'bignumber.js'
 
-contract('TheInitialPolicy', ([deployer]) => {
-	const create = async (): Promise<TheInitialPolicyInstance> => {
+contract('TheFirstPolicy', ([deployer]) => {
+	const create = async (): Promise<TheFirstPolicyInstance> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		const theInitialPolicyInstance = await artifacts
-			.require('TheInitialPolicy')
+		const theFirstPolicyInstance = await artifacts
+			.require('TheFirstPolicy')
 			.new(dev.addressConfig.address)
-		return theInitialPolicyInstance
+		return theFirstPolicyInstance
 	}
 
-	describe('TheInitialPolicy; rewards', () => {
+	describe('TheFirstPolicy; rewards', () => {
 		const rewards = (stake: BigNumber, asset: BigNumber): BigNumber => {
 			// Rewards = Max*(1-StakingRate)^((12-(StakingRate*10))/2+1)
 			const max = new BigNumber('250000000000000').times(asset)
@@ -85,7 +85,7 @@ contract('TheInitialPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('TheInitialPolicy; holdersShare', () => {
+	describe('TheFirstPolicy; holdersShare', () => {
 		it('Returns the reward that the Property holders can receive when the reward per Property and the number of locked-ups is passed', async () => {
 			const policy = await create()
 			const result = await policy.holdersShare(1000000, 10000)
@@ -109,7 +109,7 @@ contract('TheInitialPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('TheInitialPolicy; assetValue', () => {
+	describe('TheFirstPolicy; assetValue', () => {
 		it('Returns the asset value when the value of index calculated by Market and the number of lockups is passed', async () => {
 			const policy = await create()
 			const result = await policy.assetValue(543666, 6788)
@@ -133,7 +133,7 @@ contract('TheInitialPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('TheInitialPolicy; authenticationFee', () => {
+	describe('TheFirstPolicy; authenticationFee', () => {
 		it('Returns the authentication fee when the total number of assets and the number of lockups is passed', async () => {
 			const policy = await create()
 			const result = await policy.authenticationFee(
@@ -182,7 +182,7 @@ contract('TheInitialPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('TheInitialPolicy; marketApproval', () => {
+	describe('TheFirstPolicy; marketApproval', () => {
 		it('Returns whether the next new Market can be approved when the number of agreements and the number of protests is passed', async () => {
 			const policy = await create()
 			const result = await policy.marketApproval(
@@ -200,7 +200,7 @@ contract('TheInitialPolicy', ([deployer]) => {
 			expect(result).to.be.equal(false)
 		})
 	})
-	describe('TheInitialPolicy; policyApproval', () => {
+	describe('TheFirstPolicy; policyApproval', () => {
 		it('Returns whether the next new Policy can be approved when the number of agreements and the number of protests is passed', async () => {
 			const policy = await create()
 			const result = await policy.policyApproval(
@@ -218,21 +218,21 @@ contract('TheInitialPolicy', ([deployer]) => {
 			expect(result).to.be.equal(false)
 		})
 	})
-	describe('TheInitialPolicy; marketVotingBlocks', () => {
+	describe('TheFirstPolicy; marketVotingBlocks', () => {
 		it('Returns the number of the blocks of the voting period for the new Market', async () => {
 			const policy = await create()
 			const result = await policy.marketVotingBlocks()
 			expect(result.toString()).to.be.equal('525600')
 		})
 	})
-	describe('TheInitialPolicy; policyVotingBlocks', () => {
+	describe('TheFirstPolicy; policyVotingBlocks', () => {
 		it('Returns the number of the blocks of the voting period for the new Policy', async () => {
 			const policy = await create()
 			const result = await policy.policyVotingBlocks()
 			expect(result.toString()).to.be.equal('525600')
 		})
 	})
-	describe('TheInitialPolicy; abstentionPenalty', () => {
+	describe('TheFirstPolicy; abstentionPenalty', () => {
 		it('Returns the number of penalty blocks when the number of abstentions is passed', async () => {
 			const policy = await create()
 			const result = await policy.abstentionPenalty(11)
@@ -244,7 +244,7 @@ contract('TheInitialPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('TheInitialPolicy; lockUpBlocks', () => {
+	describe('TheFirstPolicy; lockUpBlocks', () => {
 		it('Returns the minimum number of lockup blocks.', async () => {
 			const policy = await create()
 			const result = await policy.lockUpBlocks()
