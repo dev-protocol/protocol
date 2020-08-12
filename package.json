@@ -47,7 +47,7 @@
 		"husky": "4.2.5",
 		"p-queue": "6.6.0",
 		"prettier": "2.0.5",
-		"prettier-plugin-solidity": "1.0.0-alpha.55",
+		"prettier-plugin-solidity": "1.0.0-alpha.56",
 		"rimraf": "3.0.2",
 		"truffle": "5.1.37",
 		"truffle-typings": "1.0.8",
