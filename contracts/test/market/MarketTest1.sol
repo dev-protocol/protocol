@@ -12,6 +12,7 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 	uint256 lastBlock;
 	uint256 currentBlock;
 	mapping(address => string) private keys;
+	mapping(string => address) private addresses;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -25,14 +26,19 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		string memory,
 		// solium-disable-next-line no-trailing-whitespace
 		address market
-	) public returns (address) {
+	) public returns (bool) {
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
 		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
 		keys[_metrics] = _args1;
-		return _metrics;
+		addresses[_args1] = _metrics;
+		return true;
 	}
 
 	function getId(address _metrics) external view returns (string memory) {
 		return keys[_metrics];
+	}
+
+	function getMetrics(string calldata _id) external view returns (address) {
+		return addresses[_id];
 	}
 }

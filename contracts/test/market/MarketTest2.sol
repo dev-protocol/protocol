@@ -8,6 +8,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 contract MarketTest2 is IMarketBehavior, UsingConfig {
 	string public schema = "[]";
 	mapping(address => string) internal keys;
+	mapping(string => address) private addresses;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -21,14 +22,19 @@ contract MarketTest2 is IMarketBehavior, UsingConfig {
 		string memory,
 		// solium-disable-next-line no-trailing-whitespace
 		address market
-	) public returns (address) {
+	) public returns (bool) {
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
 		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
 		keys[_metrics] = _args1;
-		return _metrics;
+		addresses[_args1] = _metrics;
+		return true;
 	}
 
 	function getId(address _metrics) external view returns (string memory) {
 		return keys[_metrics];
+	}
+
+	function getMetrics(string calldata _id) external view returns (address) {
+		return addresses[_id];
 	}
 }

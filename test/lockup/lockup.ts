@@ -475,7 +475,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			expect(result.toNumber()).to.be.equal(expected)
 		})
 	})
-	describe.only('Lockup; calculateWithdrawableInterestAmount', () => {
+	describe('Lockup; calculateWithdrawableInterestAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,
 			account: string,
