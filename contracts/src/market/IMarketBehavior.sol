@@ -19,4 +19,9 @@ contract IMarketBehavior {
 		);
 
 	function getId(address _metrics) external view returns (string memory);
+
+	function getMetrics(string calldata _id1)
+		external
+		view
+		returns (address);
 }
