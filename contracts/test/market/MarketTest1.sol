@@ -34,11 +34,11 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		return true;
 	}
 
-	function getId(address _metrics) external view returns (string memory) {
+	function getId(address _metrics) public view returns (string memory) {
 		return keys[_metrics];
 	}
 
-	function getMetrics(string memory _id) external view returns (address) {
+	function getMetrics(string memory _id) public view returns (address) {
 		return addresses[_id];
 	}
 }
