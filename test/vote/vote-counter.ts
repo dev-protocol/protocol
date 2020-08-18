@@ -42,6 +42,7 @@ contract(
 			const marketInstance = await createMarket(dev)
 			await dev.dev.mint(propertyAuther, 10000, {from: deployer})
 			const marketInstance2 = await createMarket(dev)
+			await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 			return [dev, propertyAddress, marketInstance2, marketInstance]
 		}
 
@@ -73,6 +74,7 @@ contract(
 				propertyAuther
 			)
 			const propertyAddress = getPropertyAddress(result)
+			await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 			return propertyAddress
 		}
 

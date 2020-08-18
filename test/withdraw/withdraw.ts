@@ -572,6 +572,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 								)
 							),
 					])
+					await dev.metricsGroup.__setMetricsCountPerProperty(
+						property2.address,
+						1
+					)
 					await dev.dev.deposit(
 						property2.address,
 						toBigNumber(10000).times(1e18),

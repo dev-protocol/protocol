@@ -128,6 +128,7 @@ contract(
 					propertyAuther
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
+				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 				await dev.dev.mint(propertyAuther, 10000000000, {from: deployer})
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
