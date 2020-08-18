@@ -250,7 +250,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
-		if (IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false) {
+		if (
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+		) {
 			return (0, price);
 		}
 

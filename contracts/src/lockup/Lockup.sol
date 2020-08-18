@@ -73,11 +73,13 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(_value != 0, "illegal lockup value");
 
-
 		/**
 		 * Validates the passed Property has greater than 1 asset.
 		 */
-		require(IMetricsGroup(config().metricsGroup()).hasAssets(_property), "unable to stake to unauthenticated property");
+		require(
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property),
+			"unable to stake to unauthenticated property"
+		);
 
 		/**
 		 * Refuses new staking when after cancel staking and until release it.
@@ -671,7 +673,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
-		if (IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false) {
+		if (
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+		) {
 			return 0;
 		}
 
