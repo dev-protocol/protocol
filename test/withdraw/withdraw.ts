@@ -17,7 +17,6 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
-import {WEB3_URI} from '../test-lib/const'
 
 contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 	const init = async (): Promise<
@@ -65,7 +64,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		])
 		await market.authenticate(property.address, 'id1', '', '', '', '')
 		const metricsAddress = await (async () => {
-			return getEventValue(dev.metricsFactory, WEB3_URI)('Create', '_metrics')
+			return getEventValue(dev.metricsFactory)('Create', '_metrics')
 		})()
 		const [metrics] = await Promise.all([
 			artifacts.require('Metrics').at(metricsAddress as string),
@@ -478,12 +477,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 
 			it(`event is generated`, async () => {
 				const [_property, _from, _to] = await Promise.all([
-					getEventValue(dev.withdraw, WEB3_URI)(
-						'PropertyTransfer',
-						'_property'
-					),
-					getEventValue(dev.withdraw, WEB3_URI)('PropertyTransfer', '_from'),
-					getEventValue(dev.withdraw, WEB3_URI)('PropertyTransfer', '_to'),
+					getEventValue(dev.withdraw)('PropertyTransfer', '_property'),
+					getEventValue(dev.withdraw)('PropertyTransfer', '_from'),
+					getEventValue(dev.withdraw)('PropertyTransfer', '_to'),
 				])
 				expect(_property).to.be.equal(property.address)
 				expect(_from).to.be.equal(alice)

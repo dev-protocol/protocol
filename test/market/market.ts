@@ -6,7 +6,6 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
-import {WEB3_URI} from '../test-lib/const'
 
 contract(
 	'MarketTest',
@@ -145,7 +144,7 @@ contract(
 					{from: propertyAuther}
 				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) =>
 						resolve(values._metrics)
 					)
 				})
@@ -224,7 +223,7 @@ contract(
 					{from: propertyAuther}
 				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) =>
 						resolve(values._metrics)
 					)
 				})
@@ -246,7 +245,7 @@ contract(
 					{from: propertyAuther}
 				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) =>
 						resolve(values._metrics)
 					)
 				})
@@ -258,7 +257,7 @@ contract(
 				count = await marketInstance.issuedMetrics()
 				expect(count.toNumber()).to.be.equal(0)
 				const [_from, _metrics] = await new Promise<string[]>((resolve) => {
-					watch(dev.metricsFactory, WEB3_URI)('Destroy', (_, values) => {
+					watch(dev.metricsFactory)('Destroy', (_, values) => {
 						const {_from, _metrics} = values
 						resolve([_from, _metrics])
 					})
@@ -279,7 +278,7 @@ contract(
 					{from: propertyAuther}
 				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) =>
 						resolve(values._metrics)
 					)
 				})

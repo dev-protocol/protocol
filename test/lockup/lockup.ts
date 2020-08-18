@@ -16,7 +16,6 @@ import {getWithdrawInterestAmount} from '../test-lib/utils/mint-amount'
 import {getPropertyAddress} from '../test-lib/utils/log'
 import {waitForEvent, getEventValue} from '../test-lib/utils/event'
 import {validateErrorMessage} from '../test-lib/utils/error'
-import {WEB3_URI} from '../test-lib/const'
 
 contract('LockupTest', ([deployer, user1]) => {
 	const init = async (
@@ -183,7 +182,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const [dev, property] = await init()
 
 			dev.dev.deposit(property.address, 10000).catch(err)
-			await waitForEvent(dev.lockup, WEB3_URI)('Lockedup')
+			await waitForEvent(dev.lockup)('Lockedup')
 
 			const lockedupAmount = await dev.lockup
 				.getValue(property.address, deployer)
@@ -197,9 +196,9 @@ contract('LockupTest', ([deployer, user1]) => {
 
 			await dev.dev.deposit(property.address, 10000).catch(err)
 			const [_from, _property, _value] = await Promise.all([
-				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_from'),
-				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_property'),
-				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_value'),
+				getEventValue(dev.lockup)('Lockedup', '_from'),
+				getEventValue(dev.lockup)('Lockedup', '_property'),
+				getEventValue(dev.lockup)('Lockedup', '_value'),
 			])
 
 			expect(_from).to.be.equal(deployer)

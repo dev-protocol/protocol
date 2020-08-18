@@ -5,7 +5,6 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
-import {WEB3_URI} from '../test-lib/const'
 
 contract(
 	'MetricsFactoryTest',
@@ -39,7 +38,7 @@ contract(
 
 			it('Adds a new metrics contract address to state contract,', async () => {
 				const [from, metrics] = await new Promise<string[]>((resolve) => {
-					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) => {
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						const {_from, _metrics} = values
 						resolve([_from, _metrics])
 					})
@@ -113,7 +112,7 @@ contract(
 				})
 				expect(result).to.be.equal(false)
 				const [from, metrics] = await new Promise<string[]>((resolve) => {
-					watch(dev.metricsFactory, WEB3_URI)('Destroy', (_, values) => {
+					watch(dev.metricsFactory)('Destroy', (_, values) => {
 						const {_from, _metrics} = values
 						resolve([_from, _metrics])
 					})
