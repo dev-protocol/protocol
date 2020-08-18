@@ -5,22 +5,28 @@ import {
 } from '../test-lib/utils/error'
 
 contract(
-	'MetricsGroupTest',
+	'MetricsGroup',
 	([
 		deployer,
 		metricsFactory,
 		dummyMetricsFactory,
-		metrics1,
-		metrics2,
 		dummyMetrics,
+		dummyMarket,
+		dummyProperty,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
+		let metrics1: string
+		let metrics2: string
 		before(async () => {
 			await dev.generateAddressConfig()
 			await dev.generateMetricsGroup()
 			await dev.addressConfig.setMetricsFactory(metricsFactory, {
 				from: deployer,
 			})
+			;[metrics1, metrics2] = await Promise.all([
+				dev.createMetrics(dummyMarket, dummyProperty).then((x) => x.address),
+				dev.createMetrics(dummyMarket, dummyProperty).then((x) => x.address),
+			])
 		})
 		describe('MetricsGroup; addGroup, removeGroup, isGroup', () => {
 			before(async () => {
@@ -106,6 +112,44 @@ contract(
 				})
 				result = await dev.metricsGroup.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(0)
+			})
+		})
+		describe('MetricsGroup; getMetricsCountPerProperty', () => {
+			it('Count increases when metrics are added.', async () => {
+				let result = await dev.metricsGroup.getMetricsCountPerProperty(
+					dummyProperty
+				)
+				expect(result.toNumber()).to.be.equal(0)
+				await dev.metricsGroup.addGroup(metrics2, {
+					from: metricsFactory,
+				})
+				result = await dev.metricsGroup.getMetricsCountPerProperty(
+					dummyProperty
+				)
+				expect(result.toNumber()).to.be.equal(1)
+				await dev.metricsGroup.removeGroup(metrics2, {
+					from: metricsFactory,
+				})
+				result = await dev.metricsGroup.getMetricsCountPerProperty(
+					dummyProperty
+				)
+				expect(result.toNumber()).to.be.equal(0)
+			})
+		})
+		describe('MetricsGroup; hasAssets', () => {
+			it('Returns whether the passed Property has some assets', async () => {
+				let result = await dev.metricsGroup.hasAssets(dummyProperty)
+				expect(result).to.be.equal(false)
+				await dev.metricsGroup.addGroup(metrics2, {
+					from: metricsFactory,
+				})
+				result = await dev.metricsGroup.hasAssets(dummyProperty)
+				expect(result).to.be.equal(true)
+				await dev.metricsGroup.removeGroup(metrics2, {
+					from: metricsFactory,
+				})
+				result = await dev.metricsGroup.hasAssets(dummyProperty)
+				expect(result).to.be.equal(false)
 			})
 		})
 	}

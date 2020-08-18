@@ -17,6 +17,7 @@ import {
 	IPolicyInstance,
 	IMarketInstance,
 	WithdrawInstance,
+	MetricsInstance,
 } from '../../types/truffle-contracts'
 import {getBlock} from './utils/common'
 
@@ -304,5 +305,12 @@ export class DevProtocolInstance {
 			from: user,
 		})
 		return tmp
+	}
+
+	public async createMetrics(
+		market: string,
+		property: string
+	): Promise<MetricsInstance> {
+		return contract('Metrics').new(market, property)
 	}
 }
