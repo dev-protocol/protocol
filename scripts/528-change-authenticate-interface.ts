@@ -1,12 +1,9 @@
 /* eslint-disable no-undef */
-
 import {createFastestGasPriceFetcher} from './lib/ethgas'
 import {ethgas} from './lib/api'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config()
-const {log: ____log} = console
 const {CONFIG, EGS_TOKEN} = process.env
+const {log: ____log} = console
 const gas = 6721975
 
 const handler = async (
