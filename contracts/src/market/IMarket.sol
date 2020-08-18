@@ -12,7 +12,7 @@ contract IMarket {
 		public
 		returns (
 			// solium-disable-next-line indentation
-			address
+			bool
 		);
 
 	function authenticatedCallback(address _property, bytes32 _idHash)
