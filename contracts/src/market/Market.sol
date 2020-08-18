@@ -112,7 +112,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		string memory _args3,
 		string memory _args4,
 		string memory _args5
-	) public onlyPropertyAuthor(_prop) returns (address) {
+	) public onlyPropertyAuthor(_prop) returns (bool) {
 		uint256 len = bytes(_args1).length;
 		require(len > 0, "id is required");
 

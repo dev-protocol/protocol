@@ -15,8 +15,10 @@ contract IMarketBehavior {
 		public
 		returns (
 			// solium-disable-next-line indentation
-			address
+			bool
 		);
 
-	function getId(address _metrics) external view returns (string memory);
+	function getId(address _metrics) public view returns (string memory);
+
+	function getMetrics(string memory _id) public view returns (address);
 }
