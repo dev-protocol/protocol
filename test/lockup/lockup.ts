@@ -55,7 +55,9 @@ contract('LockupTest', ([deployer, user1]) => {
 		])
 
 		await dev.addressConfig.setMetricsFactory(deployer)
-		await dev.metricsGroup.addGroup(deployer)
+		await dev.metricsGroup.addGroup(
+			(await dev.createMetrics(deployer, property.address)).address
+		)
 
 		await dev.dev.addMinter(dev.lockup.address)
 		if (initialUpdate) {
@@ -167,6 +169,15 @@ contract('LockupTest', ([deployer, user1]) => {
 				.deposit(property.address, 10000, {from: user1})
 				.catch(err)
 			validateErrorMessage(res, 'ERC20: transfer amount exceeds balance')
+		})
+		it(`should fail to call when the passed property has not any authenticated assets`, async () => {
+			const [dev] = await init()
+			const propertyAddress = getPropertyAddress(
+				await dev.propertyFactory.create('test', 'TEST', deployer)
+			)
+
+			const res = await dev.dev.deposit(propertyAddress, 10000).catch(err)
+			validateErrorMessage(res, 'unable to stake to unauthenticated property')
 		})
 		it('record transferred token as a lockup', async () => {
 			const [dev, property] = await init()
@@ -327,6 +338,8 @@ contract('LockupTest', ([deployer, user1]) => {
 						)
 					),
 			])
+			await dev.metricsGroup.__setMetricsCountPerProperty(property2.address, 1)
+			await dev.metricsGroup.__setMetricsCountPerProperty(property3.address, 1)
 		})
 
 		it('getCumulativeLockedUp returns cumulative sum of locking-ups on the Property', async () => {
@@ -475,7 +488,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			expect(result.toNumber()).to.be.equal(expected)
 		})
 	})
-	describe.only('Lockup; calculateWithdrawableInterestAmount', () => {
+	describe('Lockup; calculateWithdrawableInterestAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,
 			account: string,
@@ -793,6 +806,27 @@ contract('LockupTest', ([deployer, user1]) => {
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
 				expect(result.toFixed()).to.be.equal(calculated.toFixed())
 			})
+			it('Property that unauthenticated but already staked before DIP9 has no reward', async () => {
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('test', 'TEST', deployer)
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
+				await dev.dev
+					.deposit(propertyAddress, 1000000000000, {from: alice})
+					.then(gasLogger)
+				await mine(1)
+				await dev.dev
+					.deposit(propertyAddress, 1000000000000, {from: alice})
+					.then(gasLogger)
+				await mine(1)
+				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 0)
+				const result = await dev.lockup
+					.calculateWithdrawableInterestAmount(propertyAddress, alice)
+					.then(toBigNumber)
+				const expected = toBigNumber(0)
+
+				expect(result.toFixed()).to.be.equal(expected.toFixed())
+			})
 		})
 
 		describe('scenario; single lockup', () => {
@@ -1106,6 +1140,18 @@ contract('LockupTest', ([deployer, user1]) => {
 							)
 						),
 				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property3.address,
+					1
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property4.address,
+					1
+				)
 
 				await dev.dev.deposit(property1.address, 10000, {from: alice})
 				await mine(3)
@@ -1415,6 +1461,10 @@ contract('LockupTest', ([deployer, user1]) => {
 							)
 						),
 				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
 
 				calc = createCalculator(dev)
 				await dev.dev.mint(bob, await dev.dev.balanceOf(alice))
@@ -1611,6 +1661,10 @@ contract('LockupTest', ([deployer, user1]) => {
 							)
 						),
 				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
 
 				calc = createCalculator(dev)
 				await dev.dev.mint(bob, await dev.dev.balanceOf(alice))

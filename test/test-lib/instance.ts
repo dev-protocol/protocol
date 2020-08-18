@@ -12,7 +12,7 @@ import {
 	MarketFactoryInstance,
 	MarketGroupInstance,
 	MetricsFactoryInstance,
-	MetricsGroupInstance,
+	MetricsGroupTestInstance,
 	WithdrawStorageInstance,
 	IPolicyInstance,
 	IMarketInstance,
@@ -39,7 +39,7 @@ export class DevProtocolInstance {
 	private _marketFactory!: MarketFactoryInstance
 	private _marketGroup!: MarketGroupInstance
 	private _metricsFactory!: MetricsFactoryInstance
-	private _metricsGroup!: MetricsGroupInstance
+	private _metricsGroup!: MetricsGroupTestInstance
 	private _withdraw!: WithdrawInstance
 	private _withdrawStorage!: WithdrawStorageInstance
 
@@ -103,7 +103,7 @@ export class DevProtocolInstance {
 		return this._metricsFactory
 	}
 
-	public get metricsGroup(): MetricsGroupInstance {
+	public get metricsGroup(): MetricsGroupTestInstance {
 		return this._metricsGroup
 	}
 
@@ -255,7 +255,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generateMetricsGroup(): Promise<void> {
-		this._metricsGroup = await contract('MetricsGroup').new(
+		this._metricsGroup = await contract('MetricsGroupTest').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)

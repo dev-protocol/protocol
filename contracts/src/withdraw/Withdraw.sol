@@ -9,6 +9,7 @@ import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
@@ -245,6 +246,13 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		 * Gets the latest withdrawal reward amount.
 		 */
 		(uint256 _value, uint256 price) = _calculateAmount(_property, _user);
+
+		/**
+		 * If the passed Property has not authenticated, returns always 0.
+		 */
+		if (IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false) {
+			return (0, price);
+		}
 
 		/**
 		 * Gets the reward amount of before DIP4.
