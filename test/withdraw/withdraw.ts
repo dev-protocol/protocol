@@ -62,7 +62,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		const [market] = await Promise.all([
 			artifacts.require('Market').at(marketAddress),
 		])
-		await market.authenticate(property.address, 'id1', '', '', '', '')
+		market
+			.authenticate(property.address, 'id1', '', '', '', '')
+			.catch(console.error)
 		const metricsAddress = await (async () => {
 			return getEventValue(dev.metricsFactory)('Create', '_metrics')
 		})()
@@ -76,7 +78,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 	}
 
 	describe('Withdraw; withdraw', () => {
-		it('should fail to call when passed address is not property contract', async () => {
+		it.only('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
 
 			const res = await dev.withdraw
@@ -468,14 +470,15 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 
 			before(async () => {
 				;[dev, , property] = await init()
-
-				const totalSupply = await property.totalSupply().then(toBigNumber)
-				await property.transfer(bob, totalSupply.times(0.2), {
-					from: alice,
-				})
 			})
 
 			it(`event is generated`, async () => {
+				const totalSupply = await property.totalSupply().then(toBigNumber)
+				property
+					.transfer(bob, totalSupply.times(0.2), {
+						from: alice,
+					})
+					.catch(console.error)
 				const [_property, _from, _to] = await Promise.all([
 					getEventValue(dev.withdraw)('PropertyTransfer', '_property'),
 					getEventValue(dev.withdraw)('PropertyTransfer', '_from'),
