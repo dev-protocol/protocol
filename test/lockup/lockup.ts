@@ -194,7 +194,7 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('emit an event that notifies token locked-up', async () => {
 			const [dev, property] = await init()
 
-			await dev.dev.deposit(property.address, 10000).catch(err)
+			dev.dev.deposit(property.address, 10000).catch(err)
 			const [_from, _property, _value] = await Promise.all([
 				getEventValue(dev.lockup)('Lockedup', '_from'),
 				getEventValue(dev.lockup)('Lockedup', '_property'),
