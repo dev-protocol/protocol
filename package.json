@@ -4,7 +4,7 @@
 	"description": "Securitize for Internet assets",
 	"main": "cli/index.js",
 	"scripts": {
-		"test": "truffle test test/**/*.ts",
+		"test": "truffle test",
 		"pretest": "yarn build",
 		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
 		"deploy": "truffle migrate --network",
