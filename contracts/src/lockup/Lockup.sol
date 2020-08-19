@@ -625,7 +625,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			/**
 			 * Calculates the difference in rewards that can be received by subtracting the Property's cumulative sum of staker rewards at the time of staking.
 			 */
-			uint256 result = interest.sub(lastInterest).divBasis().divBasis();
+			uint256 result = interest >= lastInterest
+				? interest.sub(lastInterest).divBasis().divBasis()
+				: 0;
 			return result;
 		}
 
