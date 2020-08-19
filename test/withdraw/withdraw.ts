@@ -78,7 +78,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 	}
 
 	describe('Withdraw; withdraw', () => {
-		it.only('should fail to call when passed address is not property contract', async () => {
+		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
 
 			const res = await dev.withdraw
