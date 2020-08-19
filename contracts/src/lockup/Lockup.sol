@@ -44,7 +44,6 @@ import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	uint256 private one = 1;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	/**
