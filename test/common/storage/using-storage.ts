@@ -32,7 +32,6 @@ contract('UsingStorageTest', ([deployer]) => {
 		it('If storage has been created, the storage address can be obtained.', async () => {
 			await usingStorageTest.createStorage()
 			const result = await usingStorageTest.getStorageAddress()
-			// eslint-disable-next-line no-undef
 			expect(web3.utils.isAddress(result)).to.be.equal(true)
 		})
 		it('If the storage has been created, you can access the storage.', async () => {
@@ -43,7 +42,7 @@ contract('UsingStorageTest', ([deployer]) => {
 			const result = await usingStorageTest
 				.createStorage()
 				.catch((err: Error) => err)
-			validateErrorMessage(result, 'storage is setted')
+			validateErrorMessage(result, 'storage is set')
 		})
 	})
 
