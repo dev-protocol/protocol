@@ -44,6 +44,12 @@ const handler = async (
 		nextMetricsGroup.address
 	)
 
+	// Deploy new MetricsFactory
+	const nextMetricsFactory = await artifacts
+		.require('MetricsFactory')
+		.new(config.address, {gasPrice: await fastest(), gas})
+	____log('Deployed the new MetricsFactory', nextMetricsFactory.address)
+
 	// Deploy new Withdraw
 	const nextWithdraw = await artifacts
 		.require('Withdraw')
@@ -98,6 +104,12 @@ const handler = async (
 		gas,
 	})
 	____log('updated AddressConfig for Withdraw')
+
+	await config.setMetricsFactory(nextMetricsFactory.address, {
+		gasPrice: await fastest(),
+		gas,
+	})
+	____log('updated AddressConfig for MetricsFactory')
 
 	callback(null)
 }
