@@ -42,6 +42,7 @@ contract(
 			const marketInstance = await createMarket(dev)
 			await dev.dev.mint(propertyAuther, 10000, {from: deployer})
 			const marketInstance2 = await createMarket(dev)
+			await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 			return [dev, propertyAddress, marketInstance2, marketInstance]
 		}
 
@@ -73,6 +74,7 @@ contract(
 				propertyAuther
 			)
 			const propertyAddress = getPropertyAddress(result)
+			await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 			return propertyAddress
 		}
 
@@ -221,7 +223,7 @@ contract(
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
-					await mine(10)
+					await mine(15)
 					const result = await dev.voteCounter
 						.voteMarket(marketInstance.address, propertyAddress, true)
 						.catch((err: Error) => err)

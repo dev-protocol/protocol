@@ -3,25 +3,56 @@ import bent from 'bent'
 import Queue from 'p-queue'
 import Web3 from 'web3'
 import {Contract} from 'web3-eth-contract/types'
-import {GraphQLResponse, SendTx} from './types'
+import {
+	GraphQLResponse,
+	SendTx,
+	GraphQLPropertyFactoryCreateResponse,
+} from './types'
 import builtConfig from '../../build/contracts/AddressConfig.json'
 import builtLockup from '../../build/contracts/Lockup.json'
+import builtMetricsGroup from '../../build/contracts/MetricsGroup.json'
+import builtMetricsGroupMigration from '../../build/contracts/MetricsGroupMigration.json'
 import {AbiItem} from 'web3-utils/types'
+export const createRegistry = (configAddress: string, libWeb3: Web3) =>
+	new libWeb3.eth.Contract(builtConfig.abi as AbiItem[], configAddress)
 export const prepare = async (
 	configAddress: string,
 	libWeb3: Web3,
 	blockNumber?: number
 ) => {
-	const configContract = new libWeb3.eth.Contract(
-		builtConfig.abi as AbiItem[],
-		configAddress
-	)
+	const configContract = createRegistry(configAddress, libWeb3)
 	const lockupAddress = await configContract.methods
 		.lockup()
 		.call(undefined, blockNumber)
 	const contract = new libWeb3.eth.Contract(
 		builtLockup.abi as AbiItem[],
 		lockupAddress
+	)
+	return contract
+}
+
+export const createMetricsGroup = async (
+	configAddress: string,
+	libWeb3: Web3
+) => {
+	const configContract = createRegistry(configAddress, libWeb3)
+	const metricsGroupAddress = await configContract.methods.metricsGroup().call()
+	const contract = new libWeb3.eth.Contract(
+		builtMetricsGroup.abi as AbiItem[],
+		metricsGroupAddress
+	)
+	return contract
+}
+
+export const createMetricsGroupMigration = async (
+	configAddress: string,
+	libWeb3: Web3
+) => {
+	const configContract = createRegistry(configAddress, libWeb3)
+	const metricsGroupAddress = await configContract.methods.metricsGroup().call()
+	const contract = new libWeb3.eth.Contract(
+		builtMetricsGroupMigration.abi as AbiItem[],
+		metricsGroupAddress
 	)
 	return contract
 }
@@ -41,6 +72,23 @@ export const createGraphQLFetcher = (
 			}
 		}`,
 	}).then((r) => (r as unknown) as GraphQLResponse)
+export const createGraphQLPropertyFactoryCreateFetcher = (
+	fetcher: bent.RequestFunction<bent.ValidResponse>
+) => async (offset = 0): Promise<GraphQLPropertyFactoryCreateResponse> =>
+	fetcher('/', {
+		query: `{
+				property_factory_create(
+					offset: ${offset}
+				) {
+					property
+					authentication_aggregate {
+						aggregate {
+							count
+						}
+					}
+				}
+			}`,
+	}).then((r) => (r as unknown) as GraphQLPropertyFactoryCreateResponse)
 export const createGetStorageLastCumulativeGlobalReward = (
 	lockup: Contract
 ) => (blockNumber?: number) => async (
@@ -68,6 +116,10 @@ export const createGetStorageLastCumulativePropertyInterest = (
 	lockup.methods
 		.getStorageLastCumulativePropertyInterest(property, user)
 		.call(undefined, blockNumber)
+export const createGetMetricsCountPerProperty = (
+	metricsGroup: Contract
+) => async (property: string): Promise<string> =>
+	metricsGroup.methods.getMetricsCountPerProperty(property).call()
 
 export const createDifferenceCaller = (lockup: Contract) => (
 	blockNumber?: number
@@ -108,6 +160,16 @@ export const createInitializeLastCumulativePropertyInterest = (
 ): SendTx =>
 	lockup.methods
 		.initializeLastCumulativePropertyInterest(property, user, interest)
+		.send({gasPrice, from})
+export const create__SetMetricsCountPerProperty = (
+	metricsGroupMigration: Contract
+) => (from: string) => (
+	property: string,
+	value: string,
+	gasPrice: string
+): SendTx =>
+	metricsGroupMigration.methods
+		.__setMetricsCountPerProperty(property, value)
 		.send({gasPrice, from})
 
 export const createQueue = (concurrency: number) => new Queue({concurrency})

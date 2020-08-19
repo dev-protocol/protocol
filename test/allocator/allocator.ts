@@ -37,6 +37,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress),
 		])
+		await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 1)
 		return [dev, property]
 	}
 
