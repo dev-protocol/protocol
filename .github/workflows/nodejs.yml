@@ -3,7 +3,7 @@ name: Node
 on: [push]
 
 env:
-  CACHE_KEY: ${{ runner.os }}-${{ GITHUB_SHA }}
+  CACHE_KEY: build-${{ GITHUB_SHA }}
 
 jobs:
   build:
