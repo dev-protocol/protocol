@@ -66,13 +66,13 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
 
   test-common:
     needs: build
 
     env:
-      DIR: common
+      DIR: common/**
 
     runs-on: ubuntu-latest
 
@@ -98,7 +98,7 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
 
   test-dev:
     needs: build
@@ -130,7 +130,7 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
 
   test-lockup:
     needs: build
@@ -162,7 +162,7 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
 
   test-market:
     needs: build
@@ -194,7 +194,7 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
 
   test-metrics:
     needs: build
@@ -226,7 +226,7 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
 
   test-policy:
     needs: build
@@ -258,7 +258,7 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
 
   test-property:
     needs: build
@@ -290,7 +290,7 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
 
   test-vote:
     needs: build
@@ -322,7 +322,7 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
 
   test-withdraw:
     needs: build
@@ -354,4 +354,4 @@ jobs:
           key: ${{ runner.os }}-${ GITHUB_SHA }
 
       - name: test
-        run: yarn test test/$DIR/**/*.ts
+        run: yarn test test/$DIR/*.ts
