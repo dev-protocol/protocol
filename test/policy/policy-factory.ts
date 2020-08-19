@@ -88,6 +88,10 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 				propertyAuther
 			)
 			createdPropertyAddress = getPropertyAddress(propertyCreateResult)
+			await dev.metricsGroup.__setMetricsCountPerProperty(
+				createdPropertyAddress,
+				1
+			)
 		})
 		it('Calling `convergePolicy` method when approved by Policy.policyApproval.', async () => {
 			const second = await dev.getPolicy('PolicyTestForPolicyFactory', user1)

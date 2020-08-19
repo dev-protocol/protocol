@@ -11,6 +11,7 @@ import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 
 /**
  * A contract that manages the staking of DEV tokens and calculates rewards.
@@ -43,7 +44,6 @@ import {ILockup} from "contracts/src/lockup/ILockup.sol";
 contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	uint256 private one = 1;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	/**
@@ -71,6 +71,14 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(_value != 0, "illegal lockup value");
+
+		/**
+		 * Validates the passed Property has greater than 1 asset.
+		 */
+		require(
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property),
+			"unable to stake to unauthenticated property"
+		);
 
 		/**
 		 * Refuses new staking when after cancel staking and until release it.
@@ -617,7 +625,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			/**
 			 * Calculates the difference in rewards that can be received by subtracting the Property's cumulative sum of staker rewards at the time of staking.
 			 */
-			uint256 result = interest.sub(lastInterest).divBasis().divBasis();
+			uint256 result = interest >= lastInterest
+				? interest.sub(lastInterest).divBasis().divBasis()
+				: 0;
 			return result;
 		}
 
@@ -661,6 +671,15 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		address _property,
 		address _user
 	) private view returns (uint256) {
+		/**
+		 * If the passed Property has not authenticated, returns always 0.
+		 */
+		if (
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+		) {
+			return 0;
+		}
+
 		/**
 		 * Gets the reward amount in saved without withdrawal.
 		 */
