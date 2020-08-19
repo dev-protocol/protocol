@@ -2,9 +2,6 @@ name: Node
 
 on: [push]
 
-env:
-  CACHE_KEY: build-${{ GITHUB_SHA }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,7 +25,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: install deps
         run: yarn
@@ -66,7 +63,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
@@ -98,7 +95,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
@@ -130,7 +127,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
@@ -162,7 +159,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
@@ -194,7 +191,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
@@ -226,7 +223,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
@@ -258,7 +255,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
@@ -290,7 +287,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
@@ -322,7 +319,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
@@ -354,7 +351,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ CACHE_KEY }}
+          key: ${{ runner.os }}-${{ GITHUB_SHA }}
 
       - name: test
         run: yarn test test/$DIR/**/*.ts
