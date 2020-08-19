@@ -62,7 +62,7 @@ contract PolicyTestForVoteCounter is IPolicy {
 	}
 
 	function marketVotingBlocks() external view returns (uint256) {
-		return 10;
+		return 15;
 	}
 
 	function policyVotingBlocks() external view returns (uint256) {

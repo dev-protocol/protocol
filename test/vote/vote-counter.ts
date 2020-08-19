@@ -223,7 +223,7 @@ contract(
 					const [dev, propertyAddress, marketInstance] = await init()
 
 					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
-					await mine(10)
+					await mine(15)
 					const result = await dev.voteCounter
 						.voteMarket(marketInstance.address, propertyAddress, true)
 						.catch((err: Error) => err)
