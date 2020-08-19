@@ -88,7 +88,10 @@ const handler = async (
 					____log('Created the transaction', hash)
 				)
 				.on('confirmation', resolve)
-				.on('error', console.error)
+				.on('error', (err) => {
+					console.error(err)
+					resolve(err)
+				})
 		})
 		____log('Done initilization', property, assets)
 	})
