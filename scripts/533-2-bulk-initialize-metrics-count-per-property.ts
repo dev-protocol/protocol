@@ -65,13 +65,14 @@ const handler = async (
 
 	const filteringTacks = all.map(({property, ...x}) => async () => {
 		const asses = await getMetricsCountPerProperty(property)
-		const skip = asses !== '0'
+		const skip =
+			asses !== '0' || x.authentication_aggregate.aggregate.count === 0
 		____log('Should skip item?', skip, property)
 		return {property, skip, ...x}
 	})
 	const shouldInitilizeItems = await createQueue(10)
 		.addAll(filteringTacks)
-		.then((done) => done.filter((x) => !x.skip))
+		.then((done) => done.filter(({skip}) => !skip))
 	____log('Should skip items', all.length - shouldInitilizeItems.length)
 	____log('Should initilize items', shouldInitilizeItems.length)
 
@@ -81,13 +82,13 @@ const handler = async (
 		const gasPrice = await fetchFastestGasPrice()
 		____log('Start initilization', property, assets, gasPrice)
 
-		await new Promise((resolve, reject) => {
+		await new Promise((resolve) => {
 			setMetricsCountPerProperty(property, assets.toString(), gasPrice)
 				.on('transactionHash', (hash: string) =>
 					____log('Created the transaction', hash)
 				)
 				.on('confirmation', resolve)
-				.on('error', reject)
+				.on('error', console.error)
 		})
 		____log('Done initilization', property, assets)
 	})
