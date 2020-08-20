@@ -2,13 +2,23 @@
 
 pragma solidity ^0.5.0;
 
+/**
+ * A module that allows contracts to self-destruct.
+ */
 contract Killable {
 	address payable public _owner;
 
+	/**
+	 * Initialized with the deployer as the owner.
+	 */
 	constructor() internal {
 		_owner = msg.sender;
 	}
 
+	/**
+	 * Self-destruct the contract.
+	 * This function can only be executed by the owner.
+	 */
 	function kill() public {
 		require(msg.sender == _owner, "only owner method");
 		selfdestruct(_owner);
@@ -149,17 +159,29 @@ contract IGroup {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A module that provides common validations patterns.
+ */
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
 
+	/**
+	 * Validates passed address is not a zero address.
+	 */
 	function validateIllegalAddress(address _addr) external pure {
 		require(_addr != address(0), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in an address set.
+	 */
 	function validateGroup(address _addr, address _groupAddr) external view {
 		require(IGroup(_groupAddr).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in two address sets.
+	 */
 	function validateGroups(
 		address _addr,
 		address _groupAddr1,
@@ -171,10 +193,16 @@ contract AddressValidator {
 		require(IGroup(_groupAddr2).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates that the address of the first argument is equal to the address of the second argument.
+	 */
 	function validateAddress(address _addr, address _target) external pure {
 		require(_addr == _target, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the two addresses.
+	 */
 	function validateAddresses(
 		address _addr,
 		address _target1,
@@ -186,6 +214,9 @@ contract AddressValidator {
 		require(_addr == _target2, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the three addresses.
+	 */
 	function validate3Addresses(
 		address _addr,
 		address _target1,
@@ -208,13 +239,22 @@ pragma solidity ^0.5.0;
 
 // prettier-ignore
 
+/**
+ * Module for contrast handling AddressValidator.
+ */
 contract UsingValidator {
 	AddressValidator private _validator;
 
+	/**
+	 * Create a new AddressValidator contract when initialize.
+	 */
 	constructor() public {
 		_validator = new AddressValidator();
 	}
 
+	/**
+	 * Returns the set AddressValidator address.
+	 */
 	function addressValidator() internal view returns (AddressValidator) {
 		return _validator;
 	}
@@ -224,6 +264,10 @@ contract UsingValidator {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A registry contract to hold the latest contract addresses.
+ * Dev Protocol will be upgradeable by this contract.
+ */
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
@@ -247,87 +291,176 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public voteCounter;
 	address public voteCounterStorage;
 
+	/**
+	 * Set the latest Allocator contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setAllocator(address _addr) external onlyOwner {
 		allocator = _addr;
 	}
 
+	/**
+	 * Set the latest AllocatorStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the AllocatorStorage contract is not used.
+	 */
 	function setAllocatorStorage(address _addr) external onlyOwner {
 		allocatorStorage = _addr;
 	}
 
+	/**
+	 * Set the latest Withdraw contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setWithdraw(address _addr) external onlyOwner {
 		withdraw = _addr;
 	}
 
+	/**
+	 * Set the latest WithdrawStorage contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setWithdrawStorage(address _addr) external onlyOwner {
 		withdrawStorage = _addr;
 	}
 
+	/**
+	 * Set the latest MarketFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMarketFactory(address _addr) external onlyOwner {
 		marketFactory = _addr;
 	}
 
+	/**
+	 * Set the latest MarketGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMarketGroup(address _addr) external onlyOwner {
 		marketGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PropertyFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPropertyFactory(address _addr) external onlyOwner {
 		propertyFactory = _addr;
 	}
 
+	/**
+	 * Set the latest PropertyGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPropertyGroup(address _addr) external onlyOwner {
 		propertyGroup = _addr;
 	}
 
+	/**
+	 * Set the latest MetricsFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMetricsFactory(address _addr) external onlyOwner {
 		metricsFactory = _addr;
 	}
 
+	/**
+	 * Set the latest MetricsGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMetricsGroup(address _addr) external onlyOwner {
 		metricsGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PolicyFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicyFactory(address _addr) external onlyOwner {
 		policyFactory = _addr;
 	}
 
+	/**
+	 * Set the latest PolicyGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicyGroup(address _addr) external onlyOwner {
 		policyGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PolicySet contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicySet(address _addr) external onlyOwner {
 		policySet = _addr;
 	}
 
+	/**
+	 * Set the latest Policy contract address.
+	 * Only the latest PolicyFactory contract can execute this function.
+	 */
 	function setPolicy(address _addr) external {
 		addressValidator().validateAddress(msg.sender, policyFactory);
 		policy = _addr;
 	}
 
+	/**
+	 * Set the latest Dev contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setToken(address _addr) external onlyOwner {
 		token = _addr;
 	}
 
+	/**
+	 * Set the latest Lockup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setLockup(address _addr) external onlyOwner {
 		lockup = _addr;
 	}
 
+	/**
+	 * Set the latest LockupStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the LockupStorage contract is not used as a stand-alone because it is inherited from the Lockup contract.
+	 */
 	function setLockupStorage(address _addr) external onlyOwner {
 		lockupStorage = _addr;
 	}
 
+	/**
+	 * Set the latest VoteTimes contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteTimes contract is not used.
+	 */
 	function setVoteTimes(address _addr) external onlyOwner {
 		voteTimes = _addr;
 	}
 
+	/**
+	 * Set the latest VoteTimesStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteTimesStorage contract is not used.
+	 */
 	function setVoteTimesStorage(address _addr) external onlyOwner {
 		voteTimesStorage = _addr;
 	}
 
+	/**
+	 * Set the latest VoteCounter contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setVoteCounter(address _addr) external onlyOwner {
 		voteCounter = _addr;
 	}
 
+	/**
+	 * Set the latest VoteCounterStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteCounterStorage contract is not used as a stand-alone because it is inherited from the VoteCounter contract.
+	 */
 	function setVoteCounterStorage(address _addr) external onlyOwner {
 		voteCounterStorage = _addr;
 	}
@@ -337,17 +470,29 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for using AddressConfig contracts.
+ */
 contract UsingConfig {
 	AddressConfig private _config;
 
+	/**
+	 * Initialize the argument as AddressConfig address.
+	 */
 	constructor(address _addressConfig) public {
 		_config = AddressConfig(_addressConfig);
 	}
 
+	/**
+	 * Returns the latest AddressConfig instance.
+	 */
 	function config() internal view returns (AddressConfig) {
 		return _config;
 	}
 
+	/**
+	 * Returns the latest AddressConfig address.
+	 */
 	function configAddress() external view returns (address) {
 		return address(_config);
 	}
@@ -395,33 +540,78 @@ contract IPolicyFactory {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A factory contract that creates a new Policy contract.
+ */
 contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
-	event Create(address indexed _from, address _innerPolicy);
+	event Create(address indexed _from, address _policy);
 
+	/**
+	 * Initialize the passed address as AddressConfig address.
+	 */
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	/**
+	 * Creates a new Policy contract.
+	 */
 	function create(address _newPolicyAddress) external {
+		/**
+		 * Validates the passed address is not 0 address.
+		 */
 		addressValidator().validateIllegalAddress(_newPolicyAddress);
 
 		emit Create(msg.sender, _newPolicyAddress);
+
+		/**
+		 * In the case of the first Policy, it will be activated immediately.
+		 */
 		if (config().policy() == address(0)) {
 			config().setPolicy(_newPolicyAddress);
 		}
+
+		/**
+		 * Adds the created Policy contract to the Policy address set.
+		 */
 		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		policyGroup.addGroup(_newPolicyAddress);
+
+		/**
+		 * Adds the created Policy contract to the Policy address set that is accepting votes.
+		 */
 		IPolicySet policySet = IPolicySet(config().policySet());
 		policySet.addSet(_newPolicyAddress);
+
+		/**
+		 * When the new Policy is the first Policy, the processing ends.
+		 */
 		if (config().policy() == _newPolicyAddress) {
 			return;
 		}
+
+		/**
+		 * Resets the voting period because a new Policy has been added.
+		 */
 		policySet.setVotingEndBlockNumber(_newPolicyAddress);
 	}
 
+	/**
+	 * Sets the Policy passed by a vote as an current Policy.
+	 */
 	function convergePolicy(address _currentPolicyAddress) external {
+		/**
+		 * Verify sender is VoteCounter contract
+		 */
 		addressValidator().validateAddress(msg.sender, config().voteCounter());
 
+		/**
+		 * Sets the passed Policy to current Policy.
+		 */
 		config().setPolicy(_currentPolicyAddress);
+
+		/**
+		 * Removes all unapproved Policies from the voting target.
+		 */
 		IPolicySet policySet = IPolicySet(config().policySet());
 		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		for (uint256 i = 0; i < policySet.count(); i++) {
@@ -431,6 +621,10 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 			}
 			policyGroup.deleteGroup(policyAddress);
 		}
+
+		/**
+		 * Resets the Policy address set that is accepting votes.
+		 */
 		policySet.reset();
 		policySet.addSet(_currentPolicyAddress);
 	}

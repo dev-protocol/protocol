@@ -173,13 +173,23 @@ library SafeMath {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A module that allows contracts to self-destruct.
+ */
 contract Killable {
 	address payable public _owner;
 
+	/**
+	 * Initialized with the deployer as the owner.
+	 */
 	constructor() internal {
 		_owner = msg.sender;
 	}
 
+	/**
+	 * Self-destruct the contract.
+	 * This function can only be executed by the owner.
+	 */
 	function kill() public {
 		require(msg.sender == _owner, "only owner method");
 		selfdestruct(_owner);
@@ -320,17 +330,29 @@ contract IGroup {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A module that provides common validations patterns.
+ */
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
 
+	/**
+	 * Validates passed address is not a zero address.
+	 */
 	function validateIllegalAddress(address _addr) external pure {
 		require(_addr != address(0), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in an address set.
+	 */
 	function validateGroup(address _addr, address _groupAddr) external view {
 		require(IGroup(_groupAddr).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in two address sets.
+	 */
 	function validateGroups(
 		address _addr,
 		address _groupAddr1,
@@ -342,10 +364,16 @@ contract AddressValidator {
 		require(IGroup(_groupAddr2).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates that the address of the first argument is equal to the address of the second argument.
+	 */
 	function validateAddress(address _addr, address _target) external pure {
 		require(_addr == _target, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the two addresses.
+	 */
 	function validateAddresses(
 		address _addr,
 		address _target1,
@@ -357,6 +385,9 @@ contract AddressValidator {
 		require(_addr == _target2, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the three addresses.
+	 */
 	function validate3Addresses(
 		address _addr,
 		address _target1,
@@ -379,13 +410,22 @@ pragma solidity ^0.5.0;
 
 // prettier-ignore
 
+/**
+ * Module for contrast handling AddressValidator.
+ */
 contract UsingValidator {
 	AddressValidator private _validator;
 
+	/**
+	 * Create a new AddressValidator contract when initialize.
+	 */
 	constructor() public {
 		_validator = new AddressValidator();
 	}
 
+	/**
+	 * Returns the set AddressValidator address.
+	 */
 	function addressValidator() internal view returns (AddressValidator) {
 		return _validator;
 	}
@@ -395,6 +435,10 @@ contract UsingValidator {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A registry contract to hold the latest contract addresses.
+ * Dev Protocol will be upgradeable by this contract.
+ */
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
@@ -418,87 +462,176 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public voteCounter;
 	address public voteCounterStorage;
 
+	/**
+	 * Set the latest Allocator contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setAllocator(address _addr) external onlyOwner {
 		allocator = _addr;
 	}
 
+	/**
+	 * Set the latest AllocatorStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the AllocatorStorage contract is not used.
+	 */
 	function setAllocatorStorage(address _addr) external onlyOwner {
 		allocatorStorage = _addr;
 	}
 
+	/**
+	 * Set the latest Withdraw contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setWithdraw(address _addr) external onlyOwner {
 		withdraw = _addr;
 	}
 
+	/**
+	 * Set the latest WithdrawStorage contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setWithdrawStorage(address _addr) external onlyOwner {
 		withdrawStorage = _addr;
 	}
 
+	/**
+	 * Set the latest MarketFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMarketFactory(address _addr) external onlyOwner {
 		marketFactory = _addr;
 	}
 
+	/**
+	 * Set the latest MarketGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMarketGroup(address _addr) external onlyOwner {
 		marketGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PropertyFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPropertyFactory(address _addr) external onlyOwner {
 		propertyFactory = _addr;
 	}
 
+	/**
+	 * Set the latest PropertyGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPropertyGroup(address _addr) external onlyOwner {
 		propertyGroup = _addr;
 	}
 
+	/**
+	 * Set the latest MetricsFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMetricsFactory(address _addr) external onlyOwner {
 		metricsFactory = _addr;
 	}
 
+	/**
+	 * Set the latest MetricsGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMetricsGroup(address _addr) external onlyOwner {
 		metricsGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PolicyFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicyFactory(address _addr) external onlyOwner {
 		policyFactory = _addr;
 	}
 
+	/**
+	 * Set the latest PolicyGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicyGroup(address _addr) external onlyOwner {
 		policyGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PolicySet contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicySet(address _addr) external onlyOwner {
 		policySet = _addr;
 	}
 
+	/**
+	 * Set the latest Policy contract address.
+	 * Only the latest PolicyFactory contract can execute this function.
+	 */
 	function setPolicy(address _addr) external {
 		addressValidator().validateAddress(msg.sender, policyFactory);
 		policy = _addr;
 	}
 
+	/**
+	 * Set the latest Dev contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setToken(address _addr) external onlyOwner {
 		token = _addr;
 	}
 
+	/**
+	 * Set the latest Lockup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setLockup(address _addr) external onlyOwner {
 		lockup = _addr;
 	}
 
+	/**
+	 * Set the latest LockupStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the LockupStorage contract is not used as a stand-alone because it is inherited from the Lockup contract.
+	 */
 	function setLockupStorage(address _addr) external onlyOwner {
 		lockupStorage = _addr;
 	}
 
+	/**
+	 * Set the latest VoteTimes contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteTimes contract is not used.
+	 */
 	function setVoteTimes(address _addr) external onlyOwner {
 		voteTimes = _addr;
 	}
 
+	/**
+	 * Set the latest VoteTimesStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteTimesStorage contract is not used.
+	 */
 	function setVoteTimesStorage(address _addr) external onlyOwner {
 		voteTimesStorage = _addr;
 	}
 
+	/**
+	 * Set the latest VoteCounter contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setVoteCounter(address _addr) external onlyOwner {
 		voteCounter = _addr;
 	}
 
+	/**
+	 * Set the latest VoteCounterStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteCounterStorage contract is not used as a stand-alone because it is inherited from the VoteCounter contract.
+	 */
 	function setVoteCounterStorage(address _addr) external onlyOwner {
 		voteCounterStorage = _addr;
 	}
@@ -508,17 +641,29 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for using AddressConfig contracts.
+ */
 contract UsingConfig {
 	AddressConfig private _config;
 
+	/**
+	 * Initialize the argument as AddressConfig address.
+	 */
 	constructor(address _addressConfig) public {
 		_config = AddressConfig(_addressConfig);
 	}
 
+	/**
+	 * Returns the latest AddressConfig instance.
+	 */
 	function config() internal view returns (AddressConfig) {
 		return _config;
 	}
 
+	/**
+	 * Returns the latest AddressConfig address.
+	 */
 	function configAddress() external view returns (address) {
 		return address(_config);
 	}
@@ -528,6 +673,10 @@ contract UsingConfig {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for persisting states.
+ * Stores a map for `uint256`, `string`, `address`, `bytes32`, `bool`, and `int256` type with `bytes32` type as a key.
+ */
 contract EternalStorage {
 	address private currentOwner = msg.sender;
 
@@ -538,46 +687,81 @@ contract EternalStorage {
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
 
+	/**
+	 * Modifiers to validate that only the owner can execute.
+	 */
 	modifier onlyCurrentOwner() {
 		require(msg.sender == currentOwner, "not current owner");
 		_;
 	}
 
+	/**
+	 * Transfer the owner.
+	 * Only the owner can execute this function.
+	 */
 	function changeOwner(address _newOwner) external {
 		require(msg.sender == currentOwner, "not current owner");
 		currentOwner = _newOwner;
 	}
 
 	// *** Getter Methods ***
+
+	/**
+	 * Returns the value of the `uint256` type that mapped to the given key.
+	 */
 	function getUint(bytes32 _key) external view returns (uint256) {
 		return uIntStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `string` type that mapped to the given key.
+	 */
 	function getString(bytes32 _key) external view returns (string memory) {
 		return stringStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `address` type that mapped to the given key.
+	 */
 	function getAddress(bytes32 _key) external view returns (address) {
 		return addressStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `bytes32` type that mapped to the given key.
+	 */
 	function getBytes(bytes32 _key) external view returns (bytes32) {
 		return bytesStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `bool` type that mapped to the given key.
+	 */
 	function getBool(bytes32 _key) external view returns (bool) {
 		return boolStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `int256` type that mapped to the given key.
+	 */
 	function getInt(bytes32 _key) external view returns (int256) {
 		return intStorage[_key];
 	}
 
 	// *** Setter Methods ***
+
+	/**
+	 * Maps a value of `uint256` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setUint(bytes32 _key, uint256 _value) external onlyCurrentOwner {
 		uIntStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `string` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setString(bytes32 _key, string calldata _value)
 		external
 		onlyCurrentOwner
@@ -585,6 +769,10 @@ contract EternalStorage {
 		stringStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `address` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setAddress(bytes32 _key, address _value)
 		external
 		onlyCurrentOwner
@@ -592,39 +780,76 @@ contract EternalStorage {
 		addressStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `bytes32` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setBytes(bytes32 _key, bytes32 _value) external onlyCurrentOwner {
 		bytesStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `bool` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setBool(bytes32 _key, bool _value) external onlyCurrentOwner {
 		boolStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `int256` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setInt(bytes32 _key, int256 _value) external onlyCurrentOwner {
 		intStorage[_key] = _value;
 	}
 
 	// *** Delete Methods ***
+
+	/**
+	 * Deletes the value of the `uint256` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteUint(bytes32 _key) external onlyCurrentOwner {
 		delete uIntStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `string` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteString(bytes32 _key) external onlyCurrentOwner {
 		delete stringStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `address` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteAddress(bytes32 _key) external onlyCurrentOwner {
 		delete addressStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `bytes32` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteBytes(bytes32 _key) external onlyCurrentOwner {
 		delete bytesStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `bool` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteBool(bytes32 _key) external onlyCurrentOwner {
 		delete boolStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `int256` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteInt(bytes32 _key) external onlyCurrentOwner {
 		delete intStorage[_key];
 	}
@@ -634,14 +859,23 @@ contract EternalStorage {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for contrast handling EternalStorage.
+ */
 contract UsingStorage is Ownable {
 	address private _storage;
 
+	/**
+	 * Modifier to verify that EternalStorage is set.
+	 */
 	modifier hasStorage() {
-		require(_storage != address(0), "storage is not setted");
+		require(_storage != address(0), "storage is not set");
 		_;
 	}
 
+	/**
+	 * Returns the set EternalStorage instance.
+	 */
 	function eternalStorage()
 		internal
 		view
@@ -651,20 +885,36 @@ contract UsingStorage is Ownable {
 		return EternalStorage(_storage);
 	}
 
+	/**
+	 * Returns the set EternalStorage address.
+	 */
 	function getStorageAddress() external view hasStorage returns (address) {
 		return _storage;
 	}
 
+	/**
+	 * Create a new EternalStorage contract.
+	 * This function call will fail if the EternalStorage contract is already set.
+	 * Also, only the owner can execute it.
+	 */
 	function createStorage() external onlyOwner {
-		require(_storage == address(0), "storage is setted");
+		require(_storage == address(0), "storage is set");
 		EternalStorage tmp = new EternalStorage();
 		_storage = address(tmp);
 	}
 
+	/**
+	 * Assigns the EternalStorage contract that has already been created.
+	 * Only the owner can execute this function.
+	 */
 	function setStorage(address _storageAddress) external onlyOwner {
 		_storage = _storageAddress;
 	}
 
+	/**
+	 * Delegates the owner of the current EternalStorage contract.
+	 * Only the owner can execute this function.
+	 */
 	function changeOwner(address newOwner) external onlyOwner {
 		EternalStorage(_storage).changeOwner(newOwner);
 	}
@@ -949,16 +1199,6 @@ contract ILockup {
 			uint256 _interestPrice
 		);
 
-	function next(address _property)
-		public
-		view
-		returns (
-			uint256 _holders,
-			uint256 _interest,
-			uint256 _holdersPrice,
-			uint256 _interestPrice
-		);
-
 	function getPropertyValue(address _property)
 		external
 		view
@@ -989,19 +1229,19 @@ contract ILockup {
 
 pragma solidity ^0.5.0;
 
-contract IMarket {
+interface IMarket {
 	function authenticate(
 		address _prop,
-		string memory _args1,
-		string memory _args2,
-		string memory _args3,
-		string memory _args4,
-		string memory _args5
+		string calldata _args1,
+		string calldata _args2,
+		string calldata _args3,
+		string calldata _args4,
+		string calldata _args5
 	)
-		public
+		external
 		returns (
 			// solium-disable-next-line indentation
-			address
+			bool
 		);
 
 	function authenticatedCallback(address _property, bytes32 _idHash)
@@ -1082,6 +1322,14 @@ contract IPolicyFactory {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A contract that manages the activation votes for new markets and new policies.
+ * Voting rights of voters are determined by the staking amount to a Property.
+ * That is, at the voting, expecting to pass a Property address for specification the voting right.
+ * Market voting is an election that selects out all that voters think is good.
+ * Policy voting is an election to select one that seems to be the best with Quadratic Voting.
+ * Quadratic Voting is realized by exercising multiple voting rights in Policy voting.
+ */
 contract VoteCounter is
 	IVoteCounter,
 	UsingConfig,
@@ -1090,41 +1338,88 @@ contract VoteCounter is
 {
 	using SafeMath for uint256;
 
+	/**
+	 * Initialize the passed address as AddressConfig address.
+	 */
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	/**
+	 * Votes for or against new Market
+	 */
 	function voteMarket(
 		address _market,
 		address _property,
 		bool _agree
 	) external {
+		/**
+		 * Validates the passed Market address is included the Market address set
+		 */
 		addressValidator().validateGroup(_market, config().marketGroup());
+
+		/**
+		 * Validates the passed Market is still not enabled
+		 */
 		IMarket market = IMarket(_market);
 		require(market.enabled() == false, "market is already enabled");
+
+		/**
+		 * Validates the voting deadline has not passed.
+		 */
 		require(
 			block.number <= market.votingEndBlockNumber(),
 			"voting deadline is over"
 		);
+
+		/**
+		 * Gets the staking amount for the passed Property as a voting right.
+		 * If the voting right is 0, it cannot vote.
+		 */
 		uint256 count = ILockup(config().lockup()).getValue(
 			_property,
 			msg.sender
 		);
 		require(count != 0, "vote count is 0");
+
+		/**
+		 * Validates it does not become a double vote.
+		 */
 		bool alreadyVote = getStorageAlreadyVoteMarket(
 			msg.sender,
 			_market,
 			_property
 		);
 		require(alreadyVote == false, "already vote");
+
+		/**
+		 * Votes
+		 */
 		vote(_market, count, _agree);
+
+		/**
+		 * Records voting status to avoid double voting.
+		 */
 		setStorageAlreadyVoteMarket(msg.sender, _market, _property);
+
+		/**
+		 * Gets the votes for and against and gets whether or not the threshold
+		 * for enabling the Market is exceeded.
+		 */
 		bool result = IPolicy(config().policy()).marketApproval(
 			getStorageAgreeCount(_market),
 			getStorageOppositeCount(_market)
 		);
+
+		/**
+		 * If the result is false, the process ends.
+		 */
 		if (result == false) {
 			return;
 		}
+
+		/**
+		 * If the result is true, to enable the passed Market.
+		 */
 		market.toEnable();
 	}
 
@@ -1136,16 +1431,34 @@ contract VoteCounter is
 		return getStorageAlreadyVoteMarket(msg.sender, _target, _property);
 	}
 
+	/**
+	 * Votes for or against new Policy
+	 */
 	function votePolicy(
 		address _policy,
 		address _property,
 		bool _agree
 	) external {
+		/**
+		 * Validates the passed Policy address is included the Policy address set
+		 */
 		addressValidator().validateGroup(_policy, config().policyGroup());
+
+		/**
+		 * Validates the passed Policy is not the current Policy.
+		 */
 		require(config().policy() != _policy, "this policy is current");
+
+		/**
+		 * Validates the voting deadline has not passed.
+		 */
 		IPolicySet policySet = IPolicySet(config().policySet());
 		require(policySet.voting(_policy), "voting deadline is over");
 
+		/**
+		 * Validates it does not become a double vote.
+		 * In a Policy vote, the Property used to vote for one of the Policies with the same voting period cannot be reused.
+		 */
 		uint256 votingGroupIndex = policySet.getVotingGroupIndex();
 		bool alreadyVote = getStorageAlreadyUseProperty(
 			msg.sender,
@@ -1153,6 +1466,10 @@ contract VoteCounter is
 			votingGroupIndex
 		);
 		require(alreadyVote == false, "already use property");
+
+		/**
+		 * Validates it does not become a double vote.
+		 */
 		alreadyVote = getStorageAlreadyVotePolicy(
 			msg.sender,
 			_policy,
@@ -1160,12 +1477,24 @@ contract VoteCounter is
 		);
 		require(alreadyVote == false, "already vote policy");
 
+		/**
+		 * Gets the staking amount for the passed Property as a voting right.
+		 * If the voting right is 0, it cannot vote.
+		 */
 		uint256 count = ILockup(config().lockup()).getValue(
 			_property,
 			msg.sender
 		);
 		require(count != 0, "vote count is 0");
+
+		/**
+		 * Votes
+		 */
 		vote(_policy, count, _agree);
+
+		/**
+		 * Records voting status to avoid double voting.
+		 */
 		setStorageAlreadyUseProperty(
 			msg.sender,
 			_property,
@@ -1178,19 +1507,43 @@ contract VoteCounter is
 			votingGroupIndex,
 			true
 		);
+
+		/**
+		 * Records the used number of voting rights.
+		 * The Policy vote is an election to select one, so voters can cancel an existing vote if voters think a later Policy is better.
+		 */
 		setStoragePolicyVoteCount(msg.sender, _policy, _agree, count);
+
+		/**
+		 * Gets the votes for and against and gets whether or not the threshold
+		 * for enabling the Policy is exceeded.
+		 */
 		bool result = IPolicy(config().policy()).policyApproval(
 			getStorageAgreeCount(_policy),
 			getStorageOppositeCount(_policy)
 		);
+
+		/**
+		 * If the result is false, the process ends.
+		 */
 		if (result == false) {
 			return;
 		}
+
+		/**
+		 * If the result is true, to enable the passed Policy.
+		 */
 		IPolicyFactory policyFactory = IPolicyFactory(config().policyFactory());
 		policyFactory.convergePolicy(_policy);
 	}
 
+	/**
+	 * Cancel voting for Policy
+	 */
 	function cancelVotePolicy(address _policy, address _property) external {
+		/**
+		 * Validates the passed Policy has already been voted using the passed Property.
+		 */
 		IPolicySet policySet = IPolicySet(config().policySet());
 		uint256 votingGroupIndex = policySet.getVotingGroupIndex();
 		bool alreadyVote = getStorageAlreadyUseProperty(
@@ -1199,21 +1552,45 @@ contract VoteCounter is
 			votingGroupIndex
 		);
 		require(alreadyVote, "not use property");
+
+		/**
+		 * Validates the passed Policy has already been voted.
+		 */
 		alreadyVote = getStorageAlreadyVotePolicy(
 			msg.sender,
 			_policy,
 			votingGroupIndex
 		);
 		require(alreadyVote, "not vote policy");
+
+		/**
+		 * Gets the number of for or against votes the sender has voted.
+		 */
 		bool agree = true;
 		uint256 count = getStoragePolicyVoteCount(msg.sender, _policy, agree);
 		if (count == 0) {
 			agree = false;
 			count = getStoragePolicyVoteCount(msg.sender, _policy, agree);
+
+			/**
+			 * Validates the voting rights are not 0.
+			 */
 			require(count != 0, "not vote policy");
 		}
+
+		/**
+		 * Subtracts the exercised voting rights to cancel the vote.
+		 */
 		cancelVote(_policy, count, agree);
+
+		/**
+		 * Sets the exercised voting rights to 0.
+		 */
 		setStoragePolicyVoteCount(msg.sender, _policy, agree, 0);
+
+		/**
+		 * Deletes a Property as voting rights and the exercise record.
+		 */
 		setStorageAlreadyUseProperty(
 			msg.sender,
 			_property,
@@ -1228,48 +1605,78 @@ contract VoteCounter is
 		);
 	}
 
+	/**
+	 * Exercises voting rights.
+	 */
 	function vote(
 		address _target,
 		uint256 count,
 		bool _agree
 	) private {
 		if (_agree) {
+			/**
+			 * For:
+			 */
 			addAgreeCount(_target, count);
 		} else {
+			/**
+			 * Against:
+			 */
 			addOppositeCount(_target, count);
 		}
 	}
 
+	/**
+	 * Subtracts the exercised voting rights to cancel the vote.
+	 */
 	function cancelVote(
 		address _target,
 		uint256 count,
 		bool _agree
 	) private {
 		if (_agree) {
+			/**
+			 * Cancel the yes:
+			 */
 			subAgreeCount(_target, count);
 		} else {
+			/**
+			 * Cancel the against:
+			 */
 			subOppositeCount(_target, count);
 		}
 	}
 
+	/**
+	 * Adds voting rights exercised as for.
+	 */
 	function addAgreeCount(address _target, uint256 _voteCount) private {
 		uint256 agreeCount = getStorageAgreeCount(_target);
 		agreeCount = agreeCount.add(_voteCount);
 		setStorageAgreeCount(_target, agreeCount);
 	}
 
+	/**
+	 * Adds voting rights exercised as against.
+	 */
 	function addOppositeCount(address _target, uint256 _voteCount) private {
 		uint256 oppositeCount = getStorageOppositeCount(_target);
 		oppositeCount = oppositeCount.add(_voteCount);
 		setStorageOppositeCount(_target, oppositeCount);
 	}
 
+	/**
+	 * Subtracts voting rights exercised as for.
+	 */
 	function subAgreeCount(address _target, uint256 _voteCount) private {
 		uint256 agreeCount = getStorageAgreeCount(_target);
 		agreeCount = agreeCount.sub(_voteCount);
 		setStorageAgreeCount(_target, agreeCount);
 	}
 
+	/**
+	 * Subtracts voting rights exercised as against.
+	 */
 	function subOppositeCount(address _target, uint256 _voteCount) private {
 		uint256 oppositeCount = getStorageOppositeCount(_target);
 		oppositeCount = oppositeCount.sub(_voteCount);

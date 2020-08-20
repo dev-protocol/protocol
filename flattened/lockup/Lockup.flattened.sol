@@ -2024,6 +2024,23 @@ contract ILockup {
 	function withdrawInterest(address _property) external;
 }
 
+// File: contracts/src/metrics/IMetricsGroup.sol
+
+pragma solidity ^0.5.0;
+
+contract IMetricsGroup is IGroup {
+	function removeGroup(address _addr) external;
+
+	function totalIssuedMetrics() external view returns (uint256);
+
+	function getMetricsCountPerProperty(address _property)
+		public
+		view
+		returns (uint256);
+
+	function hasAssets(address _property) public view returns (bool);
+}
+
 // File: contracts/src/lockup/Lockup.sol
 
 pragma solidity ^0.5.0;
@@ -2061,7 +2078,6 @@ pragma solidity ^0.5.0;
 contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	uint256 private one = 1;
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	/**
@@ -2089,6 +2105,14 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 		require(_value != 0, "illegal lockup value");
+
+		/**
+		 * Validates the passed Property has greater than 1 asset.
+		 */
+		require(
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property),
+			"unable to stake to unauthenticated property"
+		);
 
 		/**
 		 * Refuses new staking when after cancel staking and until release it.
@@ -2635,7 +2659,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			/**
 			 * Calculates the difference in rewards that can be received by subtracting the Property's cumulative sum of staker rewards at the time of staking.
 			 */
-			uint256 result = interest.sub(lastInterest).divBasis().divBasis();
+			uint256 result = interest >= lastInterest
+				? interest.sub(lastInterest).divBasis().divBasis()
+				: 0;
 			return result;
 		}
 
@@ -2679,6 +2705,15 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		address _property,
 		address _user
 	) private view returns (uint256) {
+		/**
+		 * If the passed Property has not authenticated, returns always 0.
+		 */
+		if (
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+		) {
+			return 0;
+		}
+
 		/**
 		 * Gets the reward amount in saved without withdrawal.
 		 */

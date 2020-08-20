@@ -173,13 +173,23 @@ library SafeMath {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A module that allows contracts to self-destruct.
+ */
 contract Killable {
 	address payable public _owner;
 
+	/**
+	 * Initialized with the deployer as the owner.
+	 */
 	constructor() internal {
 		_owner = msg.sender;
 	}
 
+	/**
+	 * Self-destruct the contract.
+	 * This function can only be executed by the owner.
+	 */
 	function kill() public {
 		require(msg.sender == _owner, "only owner method");
 		selfdestruct(_owner);
@@ -320,17 +330,29 @@ contract IGroup {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A module that provides common validations patterns.
+ */
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
 
+	/**
+	 * Validates passed address is not a zero address.
+	 */
 	function validateIllegalAddress(address _addr) external pure {
 		require(_addr != address(0), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in an address set.
+	 */
 	function validateGroup(address _addr, address _groupAddr) external view {
 		require(IGroup(_groupAddr).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in two address sets.
+	 */
 	function validateGroups(
 		address _addr,
 		address _groupAddr1,
@@ -342,10 +364,16 @@ contract AddressValidator {
 		require(IGroup(_groupAddr2).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates that the address of the first argument is equal to the address of the second argument.
+	 */
 	function validateAddress(address _addr, address _target) external pure {
 		require(_addr == _target, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the two addresses.
+	 */
 	function validateAddresses(
 		address _addr,
 		address _target1,
@@ -357,6 +385,9 @@ contract AddressValidator {
 		require(_addr == _target2, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the three addresses.
+	 */
 	function validate3Addresses(
 		address _addr,
 		address _target1,
@@ -379,13 +410,22 @@ pragma solidity ^0.5.0;
 
 // prettier-ignore
 
+/**
+ * Module for contrast handling AddressValidator.
+ */
 contract UsingValidator {
 	AddressValidator private _validator;
 
+	/**
+	 * Create a new AddressValidator contract when initialize.
+	 */
 	constructor() public {
 		_validator = new AddressValidator();
 	}
 
+	/**
+	 * Returns the set AddressValidator address.
+	 */
 	function addressValidator() internal view returns (AddressValidator) {
 		return _validator;
 	}
@@ -395,6 +435,10 @@ contract UsingValidator {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A registry contract to hold the latest contract addresses.
+ * Dev Protocol will be upgradeable by this contract.
+ */
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
@@ -418,87 +462,176 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public voteCounter;
 	address public voteCounterStorage;
 
+	/**
+	 * Set the latest Allocator contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setAllocator(address _addr) external onlyOwner {
 		allocator = _addr;
 	}
 
+	/**
+	 * Set the latest AllocatorStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the AllocatorStorage contract is not used.
+	 */
 	function setAllocatorStorage(address _addr) external onlyOwner {
 		allocatorStorage = _addr;
 	}
 
+	/**
+	 * Set the latest Withdraw contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setWithdraw(address _addr) external onlyOwner {
 		withdraw = _addr;
 	}
 
+	/**
+	 * Set the latest WithdrawStorage contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setWithdrawStorage(address _addr) external onlyOwner {
 		withdrawStorage = _addr;
 	}
 
+	/**
+	 * Set the latest MarketFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMarketFactory(address _addr) external onlyOwner {
 		marketFactory = _addr;
 	}
 
+	/**
+	 * Set the latest MarketGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMarketGroup(address _addr) external onlyOwner {
 		marketGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PropertyFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPropertyFactory(address _addr) external onlyOwner {
 		propertyFactory = _addr;
 	}
 
+	/**
+	 * Set the latest PropertyGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPropertyGroup(address _addr) external onlyOwner {
 		propertyGroup = _addr;
 	}
 
+	/**
+	 * Set the latest MetricsFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMetricsFactory(address _addr) external onlyOwner {
 		metricsFactory = _addr;
 	}
 
+	/**
+	 * Set the latest MetricsGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMetricsGroup(address _addr) external onlyOwner {
 		metricsGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PolicyFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicyFactory(address _addr) external onlyOwner {
 		policyFactory = _addr;
 	}
 
+	/**
+	 * Set the latest PolicyGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicyGroup(address _addr) external onlyOwner {
 		policyGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PolicySet contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicySet(address _addr) external onlyOwner {
 		policySet = _addr;
 	}
 
+	/**
+	 * Set the latest Policy contract address.
+	 * Only the latest PolicyFactory contract can execute this function.
+	 */
 	function setPolicy(address _addr) external {
 		addressValidator().validateAddress(msg.sender, policyFactory);
 		policy = _addr;
 	}
 
+	/**
+	 * Set the latest Dev contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setToken(address _addr) external onlyOwner {
 		token = _addr;
 	}
 
+	/**
+	 * Set the latest Lockup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setLockup(address _addr) external onlyOwner {
 		lockup = _addr;
 	}
 
+	/**
+	 * Set the latest LockupStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the LockupStorage contract is not used as a stand-alone because it is inherited from the Lockup contract.
+	 */
 	function setLockupStorage(address _addr) external onlyOwner {
 		lockupStorage = _addr;
 	}
 
+	/**
+	 * Set the latest VoteTimes contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteTimes contract is not used.
+	 */
 	function setVoteTimes(address _addr) external onlyOwner {
 		voteTimes = _addr;
 	}
 
+	/**
+	 * Set the latest VoteTimesStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteTimesStorage contract is not used.
+	 */
 	function setVoteTimesStorage(address _addr) external onlyOwner {
 		voteTimesStorage = _addr;
 	}
 
+	/**
+	 * Set the latest VoteCounter contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setVoteCounter(address _addr) external onlyOwner {
 		voteCounter = _addr;
 	}
 
+	/**
+	 * Set the latest VoteCounterStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteCounterStorage contract is not used as a stand-alone because it is inherited from the VoteCounter contract.
+	 */
 	function setVoteCounterStorage(address _addr) external onlyOwner {
 		voteCounterStorage = _addr;
 	}
@@ -508,17 +641,29 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for using AddressConfig contracts.
+ */
 contract UsingConfig {
 	AddressConfig private _config;
 
+	/**
+	 * Initialize the argument as AddressConfig address.
+	 */
 	constructor(address _addressConfig) public {
 		_config = AddressConfig(_addressConfig);
 	}
 
+	/**
+	 * Returns the latest AddressConfig instance.
+	 */
 	function config() internal view returns (AddressConfig) {
 		return _config;
 	}
 
+	/**
+	 * Returns the latest AddressConfig address.
+	 */
 	function configAddress() external view returns (address) {
 		return address(_config);
 	}
@@ -528,6 +673,10 @@ contract UsingConfig {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for persisting states.
+ * Stores a map for `uint256`, `string`, `address`, `bytes32`, `bool`, and `int256` type with `bytes32` type as a key.
+ */
 contract EternalStorage {
 	address private currentOwner = msg.sender;
 
@@ -538,46 +687,81 @@ contract EternalStorage {
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
 
+	/**
+	 * Modifiers to validate that only the owner can execute.
+	 */
 	modifier onlyCurrentOwner() {
 		require(msg.sender == currentOwner, "not current owner");
 		_;
 	}
 
+	/**
+	 * Transfer the owner.
+	 * Only the owner can execute this function.
+	 */
 	function changeOwner(address _newOwner) external {
 		require(msg.sender == currentOwner, "not current owner");
 		currentOwner = _newOwner;
 	}
 
 	// *** Getter Methods ***
+
+	/**
+	 * Returns the value of the `uint256` type that mapped to the given key.
+	 */
 	function getUint(bytes32 _key) external view returns (uint256) {
 		return uIntStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `string` type that mapped to the given key.
+	 */
 	function getString(bytes32 _key) external view returns (string memory) {
 		return stringStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `address` type that mapped to the given key.
+	 */
 	function getAddress(bytes32 _key) external view returns (address) {
 		return addressStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `bytes32` type that mapped to the given key.
+	 */
 	function getBytes(bytes32 _key) external view returns (bytes32) {
 		return bytesStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `bool` type that mapped to the given key.
+	 */
 	function getBool(bytes32 _key) external view returns (bool) {
 		return boolStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `int256` type that mapped to the given key.
+	 */
 	function getInt(bytes32 _key) external view returns (int256) {
 		return intStorage[_key];
 	}
 
 	// *** Setter Methods ***
+
+	/**
+	 * Maps a value of `uint256` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setUint(bytes32 _key, uint256 _value) external onlyCurrentOwner {
 		uIntStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `string` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setString(bytes32 _key, string calldata _value)
 		external
 		onlyCurrentOwner
@@ -585,6 +769,10 @@ contract EternalStorage {
 		stringStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `address` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setAddress(bytes32 _key, address _value)
 		external
 		onlyCurrentOwner
@@ -592,39 +780,76 @@ contract EternalStorage {
 		addressStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `bytes32` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setBytes(bytes32 _key, bytes32 _value) external onlyCurrentOwner {
 		bytesStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `bool` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setBool(bytes32 _key, bool _value) external onlyCurrentOwner {
 		boolStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `int256` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setInt(bytes32 _key, int256 _value) external onlyCurrentOwner {
 		intStorage[_key] = _value;
 	}
 
 	// *** Delete Methods ***
+
+	/**
+	 * Deletes the value of the `uint256` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteUint(bytes32 _key) external onlyCurrentOwner {
 		delete uIntStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `string` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteString(bytes32 _key) external onlyCurrentOwner {
 		delete stringStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `address` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteAddress(bytes32 _key) external onlyCurrentOwner {
 		delete addressStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `bytes32` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteBytes(bytes32 _key) external onlyCurrentOwner {
 		delete bytesStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `bool` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteBool(bytes32 _key) external onlyCurrentOwner {
 		delete boolStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `int256` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteInt(bytes32 _key) external onlyCurrentOwner {
 		delete intStorage[_key];
 	}
@@ -634,14 +859,23 @@ contract EternalStorage {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for contrast handling EternalStorage.
+ */
 contract UsingStorage is Ownable {
 	address private _storage;
 
+	/**
+	 * Modifier to verify that EternalStorage is set.
+	 */
 	modifier hasStorage() {
-		require(_storage != address(0), "storage is not setted");
+		require(_storage != address(0), "storage is not set");
 		_;
 	}
 
+	/**
+	 * Returns the set EternalStorage instance.
+	 */
 	function eternalStorage()
 		internal
 		view
@@ -651,20 +885,36 @@ contract UsingStorage is Ownable {
 		return EternalStorage(_storage);
 	}
 
+	/**
+	 * Returns the set EternalStorage address.
+	 */
 	function getStorageAddress() external view hasStorage returns (address) {
 		return _storage;
 	}
 
+	/**
+	 * Create a new EternalStorage contract.
+	 * This function call will fail if the EternalStorage contract is already set.
+	 * Also, only the owner can execute it.
+	 */
 	function createStorage() external onlyOwner {
-		require(_storage == address(0), "storage is setted");
+		require(_storage == address(0), "storage is set");
 		EternalStorage tmp = new EternalStorage();
 		_storage = address(tmp);
 	}
 
+	/**
+	 * Assigns the EternalStorage contract that has already been created.
+	 * Only the owner can execute this function.
+	 */
 	function setStorage(address _storageAddress) external onlyOwner {
 		_storage = _storageAddress;
 	}
 
+	/**
+	 * Delegates the owner of the current EternalStorage contract.
+	 * Only the owner can execute this function.
+	 */
 	function changeOwner(address newOwner) external onlyOwner {
 		EternalStorage(_storage).changeOwner(newOwner);
 	}
