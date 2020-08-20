@@ -14,7 +14,6 @@ contract MetricsGroupMigration is MetricsGroup {
 		external
 		onlyOwner
 	{
-		require(getMetricsCountPerProperty(_property) == 0, "already set");
 		setMetricsCountPerProperty(_property, _value);
 	}
 }

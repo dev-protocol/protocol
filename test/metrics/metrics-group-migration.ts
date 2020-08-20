@@ -4,6 +4,7 @@ import {
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 import {MetricsGroupMigrationInstance} from '../../types/truffle-contracts'
+import {gasLogger} from '../test-lib/utils/common'
 
 contract(
 	'MetricsGroupMigaration',
@@ -165,26 +166,18 @@ contract(
 		})
 		describe('MetricsGroupMigaration; __setMetricsCountPerProperty', () => {
 			it('Store passed value to getMetricsCountPerProperty as an authenticated assets count', async () => {
-				await metricsGroupMigaration.__setMetricsCountPerProperty(metrics1, 123)
+				await metricsGroupMigaration
+					.__setMetricsCountPerProperty(metrics1, 123)
+					.then(gasLogger)
 				const stored = await metricsGroupMigaration.getMetricsCountPerProperty(
 					metrics1
 				)
 				expect(stored.toNumber()).to.be.equal(123)
 			})
-			it('Should fail to call when already updated the value', async () => {
-				await metricsGroupMigaration.__setMetricsCountPerProperty(metrics2, 123)
-				const res = await metricsGroupMigaration
-					.__setMetricsCountPerProperty(metrics2, 456)
-					.catch((err: Error) => err)
-				const stored = await metricsGroupMigaration.getMetricsCountPerProperty(
-					metrics2
-				)
-				expect(stored.toNumber()).to.be.equal(123)
-				expect(res).to.be.instanceOf(Error)
-			})
 			it('Should fail to call when sent from non-owner account', async () => {
 				const res = await metricsGroupMigaration
 					.__setMetricsCountPerProperty(dummyMetrics, 123, {from: user})
+					.then(gasLogger)
 					.catch((err: Error) => err)
 				const result = await metricsGroupMigaration.getMetricsCountPerProperty(
 					dummyMetrics
