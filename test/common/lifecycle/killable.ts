@@ -13,7 +13,8 @@ contract('KillableTest', ([deployer, user]) => {
 			const result = await killableTest.getValue().catch((err: Error) => err)
 			validateErrorMessage(
 				result,
-				"Returned values aren't valid, did it run Out of Gas?"
+				"Returned values aren't valid, did it run Out of Gas?",
+				false
 			)
 		})
 		it('Only deployed accounts can be killed', async () => {

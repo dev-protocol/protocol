@@ -1,11 +1,10 @@
 {
 	"name": "@devprtcl/protocol",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"description": "Securitize for Internet assets",
 	"main": "cli/index.js",
 	"scripts": {
-		"test": "truffle test test/**/*.ts",
-		"pretest": "yarn build",
+		"test": "truffle test",
 		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
 		"deploy": "truffle migrate --network",
 		"predeploy": "yarn build",

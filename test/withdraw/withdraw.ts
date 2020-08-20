@@ -17,7 +17,6 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
-import {WEB3_URI} from '../test-lib/const'
 
 contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 	const init = async (): Promise<
@@ -53,6 +52,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress),
 		])
+		await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 1)
 		const marketBehavior = await artifacts
 			.require('MarketTest1')
 			.new(dev.addressConfig.address)
@@ -62,9 +62,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		const [market] = await Promise.all([
 			artifacts.require('Market').at(marketAddress),
 		])
-		await market.authenticate(property.address, 'id1', '', '', '', '')
+		market
+			.authenticate(property.address, 'id1', '', '', '', '')
+			.catch(console.error)
 		const metricsAddress = await (async () => {
-			return getEventValue(dev.metricsFactory, WEB3_URI)('Create', '_metrics')
+			return getEventValue(dev.metricsFactory)('Create', '_metrics')
 		})()
 		const [metrics] = await Promise.all([
 			artifacts.require('Metrics').at(metricsAddress as string),
@@ -468,21 +470,19 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 
 			before(async () => {
 				;[dev, , property] = await init()
-
-				const totalSupply = await property.totalSupply().then(toBigNumber)
-				await property.transfer(bob, totalSupply.times(0.2), {
-					from: alice,
-				})
 			})
 
 			it(`event is generated`, async () => {
+				const totalSupply = await property.totalSupply().then(toBigNumber)
+				property
+					.transfer(bob, totalSupply.times(0.2), {
+						from: alice,
+					})
+					.catch(console.error)
 				const [_property, _from, _to] = await Promise.all([
-					getEventValue(dev.withdraw, WEB3_URI)(
-						'PropertyTransfer',
-						'_property'
-					),
-					getEventValue(dev.withdraw, WEB3_URI)('PropertyTransfer', '_from'),
-					getEventValue(dev.withdraw, WEB3_URI)('PropertyTransfer', '_to'),
+					getEventValue(dev.withdraw)('PropertyTransfer', '_property'),
+					getEventValue(dev.withdraw)('PropertyTransfer', '_from'),
+					getEventValue(dev.withdraw)('PropertyTransfer', '_to'),
 				])
 				expect(_property).to.be.equal(property.address)
 				expect(_from).to.be.equal(alice)
@@ -571,6 +571,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 								)
 							),
 					])
+					await dev.metricsGroup.__setMetricsCountPerProperty(
+						property2.address,
+						1
+					)
 					await dev.dev.deposit(
 						property2.address,
 						toBigNumber(10000).times(1e18),
@@ -588,6 +592,49 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					)
 					expect(aliceAmount.toFixed()).to.be.equal('0')
 				})
+			})
+		})
+		describe('scenario; unauthenticated', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+
+			const alice = deployer
+
+			before(async () => {
+				;[dev, , property] = await init()
+			})
+
+			it(`Unauthenticated property has no reward`, async () => {
+				await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 0)
+				const aliceAmount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, alice)
+					.then(toBigNumber)
+				expect(aliceAmount.toFixed()).to.be.equal('0')
+			})
+
+			it(`Property that unauthenticated but already staked before DIP9 has no reward`, async () => {
+				await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 1)
+				await dev.dev.deposit(
+					property.address,
+					toBigNumber(10000).times(1e18),
+					{
+						from: alice,
+					}
+				)
+				await mine(1)
+				await dev.dev.deposit(
+					property.address,
+					toBigNumber(10000).times(1e18),
+					{
+						from: alice,
+					}
+				)
+				await mine(1)
+				await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 0)
+				const aliceAmount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, alice)
+					.then(toBigNumber)
+				expect(aliceAmount.toFixed()).to.be.equal('0')
 			})
 		})
 		describe('scenario; single lockup', () => {
@@ -825,6 +872,18 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 							)
 						),
 				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property3.address,
+					1
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property4.address,
+					1
+				)
 
 				await dev.dev.deposit(property1.address, 10000, {from: alice})
 				lastBlock1 = await getBlock().then(toBigNumber)
@@ -1066,6 +1125,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 							)
 						),
 				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
 
 				calc = createCalculator(dev)
 				await dev.addressConfig.setWithdraw(deployer)
@@ -1171,6 +1234,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 							)
 						),
 				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
+
 				calc = createCalculator(dev)
 				await dev.addressConfig.setWithdraw(deployer)
 				await dev.withdrawStorage.setCumulativePrice(property.address, 10000)
@@ -1284,6 +1352,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 						)
 					),
 			])
+			await dev.metricsGroup.__setMetricsCountPerProperty(property2.address, 1)
+
 			await dev.dev.deposit(property.address, 10000)
 			lastBlock = await getBlock().then(toBigNumber)
 		})
