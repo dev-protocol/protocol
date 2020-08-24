@@ -5,7 +5,6 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
-import {WEB3_URI} from '../test-lib/const'
 
 contract(
 	'MetricsFactoryTest',
@@ -20,7 +19,6 @@ contract(
 	]) => {
 		describe('MetircsFactory; create', () => {
 			const dev = new DevProtocolInstance(deployer)
-			let metricsAddress: string
 			before(async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
@@ -30,23 +28,22 @@ contract(
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				await dev.marketGroup.addGroup(market, {from: marketFactory})
-				const metricsFactoryResult = await dev.metricsFactory.create(
-					property1,
-					{from: market}
-				)
-				metricsAddress = getMetricsAddress(metricsFactoryResult)
 			})
 
 			it('Adds a new metrics contract address to state contract,', async () => {
+				dev.metricsFactory
+					.create(property1, {
+						from: market,
+					})
+					.catch(console.error)
 				const [from, metrics] = await new Promise<string[]>((resolve) => {
-					watch(dev.metricsFactory, WEB3_URI)('Create', (_, values) => {
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						const {_from, _metrics} = values
 						resolve([_from, _metrics])
 					})
 				})
 				expect(market).to.be.equal(from)
-				expect(metricsAddress).to.be.equal(metrics)
-				const result = await dev.metricsGroup.isGroup(metricsAddress, {
+				const result = await dev.metricsGroup.isGroup(metrics, {
 					from: deployer,
 				})
 				expect(result).to.be.equal(true)
@@ -105,19 +102,21 @@ contract(
 					from: deployer,
 				})
 				expect(result).to.be.equal(true)
-				await dev.metricsFactory.destroy(metricsAddress1, {
-					from: market,
+				dev.metricsFactory
+					.destroy(metricsAddress1, {
+						from: market,
+					})
+					.catch(console.error)
+				const [from, metrics] = await new Promise<string[]>((resolve) => {
+					watch(dev.metricsFactory)('Destroy', (_, values) => {
+						const {_from, _metrics} = values
+						resolve([_from, _metrics])
+					})
 				})
 				result = await dev.metricsGroup.isGroup(metricsAddress1, {
 					from: deployer,
 				})
 				expect(result).to.be.equal(false)
-				const [from, metrics] = await new Promise<string[]>((resolve) => {
-					watch(dev.metricsFactory, WEB3_URI)('Destroy', (_, values) => {
-						const {_from, _metrics} = values
-						resolve([_from, _metrics])
-					})
-				})
 				expect(market).to.be.equal(from)
 				expect(metricsAddress1).to.be.equal(metrics)
 			})

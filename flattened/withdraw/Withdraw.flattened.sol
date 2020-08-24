@@ -696,10 +696,16 @@ contract ERC20Mintable is ERC20, MinterRole {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Library for emulating calculations involving decimals.
+ */
 library Decimals {
 	using SafeMath for uint256;
 	uint120 private constant basisValue = 1000000000000000000;
 
+	/**
+	 * Returns the ratio of the first argument to the second argument.
+	 */
 	function outOf(uint256 _a, uint256 _b)
 		internal
 		pure
@@ -715,10 +721,17 @@ library Decimals {
 		return (a.div(_b));
 	}
 
+	/**
+	 * Returns multiplied the number by 10^18.
+	 * This is used when there is a very large difference between the two numbers passed to the `outOf` function.
+	 */
 	function mulBasis(uint256 _a) internal pure returns (uint256) {
 		return _a.mul(basisValue);
 	}
 
+	/**
+	 * Returns by changing the numerical value being emulated to the original number of digits.
+	 */
 	function divBasis(uint256 _a) internal pure returns (uint256) {
 		return _a.div(basisValue);
 	}
@@ -728,13 +741,23 @@ library Decimals {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A module that allows contracts to self-destruct.
+ */
 contract Killable {
 	address payable public _owner;
 
+	/**
+	 * Initialized with the deployer as the owner.
+	 */
 	constructor() internal {
 		_owner = msg.sender;
 	}
 
+	/**
+	 * Self-destruct the contract.
+	 * This function can only be executed by the owner.
+	 */
 	function kill() public {
 		require(msg.sender == _owner, "only owner method");
 		selfdestruct(_owner);
@@ -844,17 +867,29 @@ contract IGroup {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A module that provides common validations patterns.
+ */
 contract AddressValidator {
 	string constant errorMessage = "this is illegal address";
 
+	/**
+	 * Validates passed address is not a zero address.
+	 */
 	function validateIllegalAddress(address _addr) external pure {
 		require(_addr != address(0), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in an address set.
+	 */
 	function validateGroup(address _addr, address _groupAddr) external view {
 		require(IGroup(_groupAddr).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates passed address is included in two address sets.
+	 */
 	function validateGroups(
 		address _addr,
 		address _groupAddr1,
@@ -866,10 +901,16 @@ contract AddressValidator {
 		require(IGroup(_groupAddr2).isGroup(_addr), errorMessage);
 	}
 
+	/**
+	 * Validates that the address of the first argument is equal to the address of the second argument.
+	 */
 	function validateAddress(address _addr, address _target) external pure {
 		require(_addr == _target, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the two addresses.
+	 */
 	function validateAddresses(
 		address _addr,
 		address _target1,
@@ -881,6 +922,9 @@ contract AddressValidator {
 		require(_addr == _target2, errorMessage);
 	}
 
+	/**
+	 * Validates passed address equals to the three addresses.
+	 */
 	function validate3Addresses(
 		address _addr,
 		address _target1,
@@ -903,13 +947,22 @@ pragma solidity ^0.5.0;
 
 // prettier-ignore
 
+/**
+ * Module for contrast handling AddressValidator.
+ */
 contract UsingValidator {
 	AddressValidator private _validator;
 
+	/**
+	 * Create a new AddressValidator contract when initialize.
+	 */
 	constructor() public {
 		_validator = new AddressValidator();
 	}
 
+	/**
+	 * Returns the set AddressValidator address.
+	 */
 	function addressValidator() internal view returns (AddressValidator) {
 		return _validator;
 	}
@@ -919,6 +972,10 @@ contract UsingValidator {
 
 pragma solidity ^0.5.0;
 
+/**
+ * A registry contract to hold the latest contract addresses.
+ * Dev Protocol will be upgradeable by this contract.
+ */
 contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
 	address public allocator;
@@ -942,87 +999,176 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	address public voteCounter;
 	address public voteCounterStorage;
 
+	/**
+	 * Set the latest Allocator contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setAllocator(address _addr) external onlyOwner {
 		allocator = _addr;
 	}
 
+	/**
+	 * Set the latest AllocatorStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the AllocatorStorage contract is not used.
+	 */
 	function setAllocatorStorage(address _addr) external onlyOwner {
 		allocatorStorage = _addr;
 	}
 
+	/**
+	 * Set the latest Withdraw contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setWithdraw(address _addr) external onlyOwner {
 		withdraw = _addr;
 	}
 
+	/**
+	 * Set the latest WithdrawStorage contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setWithdrawStorage(address _addr) external onlyOwner {
 		withdrawStorage = _addr;
 	}
 
+	/**
+	 * Set the latest MarketFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMarketFactory(address _addr) external onlyOwner {
 		marketFactory = _addr;
 	}
 
+	/**
+	 * Set the latest MarketGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMarketGroup(address _addr) external onlyOwner {
 		marketGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PropertyFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPropertyFactory(address _addr) external onlyOwner {
 		propertyFactory = _addr;
 	}
 
+	/**
+	 * Set the latest PropertyGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPropertyGroup(address _addr) external onlyOwner {
 		propertyGroup = _addr;
 	}
 
+	/**
+	 * Set the latest MetricsFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMetricsFactory(address _addr) external onlyOwner {
 		metricsFactory = _addr;
 	}
 
+	/**
+	 * Set the latest MetricsGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setMetricsGroup(address _addr) external onlyOwner {
 		metricsGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PolicyFactory contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicyFactory(address _addr) external onlyOwner {
 		policyFactory = _addr;
 	}
 
+	/**
+	 * Set the latest PolicyGroup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicyGroup(address _addr) external onlyOwner {
 		policyGroup = _addr;
 	}
 
+	/**
+	 * Set the latest PolicySet contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setPolicySet(address _addr) external onlyOwner {
 		policySet = _addr;
 	}
 
+	/**
+	 * Set the latest Policy contract address.
+	 * Only the latest PolicyFactory contract can execute this function.
+	 */
 	function setPolicy(address _addr) external {
 		addressValidator().validateAddress(msg.sender, policyFactory);
 		policy = _addr;
 	}
 
+	/**
+	 * Set the latest Dev contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setToken(address _addr) external onlyOwner {
 		token = _addr;
 	}
 
+	/**
+	 * Set the latest Lockup contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setLockup(address _addr) external onlyOwner {
 		lockup = _addr;
 	}
 
+	/**
+	 * Set the latest LockupStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the LockupStorage contract is not used as a stand-alone because it is inherited from the Lockup contract.
+	 */
 	function setLockupStorage(address _addr) external onlyOwner {
 		lockupStorage = _addr;
 	}
 
+	/**
+	 * Set the latest VoteTimes contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteTimes contract is not used.
+	 */
 	function setVoteTimes(address _addr) external onlyOwner {
 		voteTimes = _addr;
 	}
 
+	/**
+	 * Set the latest VoteTimesStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteTimesStorage contract is not used.
+	 */
 	function setVoteTimesStorage(address _addr) external onlyOwner {
 		voteTimesStorage = _addr;
 	}
 
+	/**
+	 * Set the latest VoteCounter contract address.
+	 * Only the owner can execute this function.
+	 */
 	function setVoteCounter(address _addr) external onlyOwner {
 		voteCounter = _addr;
 	}
 
+	/**
+	 * Set the latest VoteCounterStorage contract address.
+	 * Only the owner can execute this function.
+	 * NOTE: But currently, the VoteCounterStorage contract is not used as a stand-alone because it is inherited from the VoteCounter contract.
+	 */
 	function setVoteCounterStorage(address _addr) external onlyOwner {
 		voteCounterStorage = _addr;
 	}
@@ -1032,17 +1178,29 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for using AddressConfig contracts.
+ */
 contract UsingConfig {
 	AddressConfig private _config;
 
+	/**
+	 * Initialize the argument as AddressConfig address.
+	 */
 	constructor(address _addressConfig) public {
 		_config = AddressConfig(_addressConfig);
 	}
 
+	/**
+	 * Returns the latest AddressConfig instance.
+	 */
 	function config() internal view returns (AddressConfig) {
 		return _config;
 	}
 
+	/**
+	 * Returns the latest AddressConfig address.
+	 */
 	function configAddress() external view returns (address) {
 		return address(_config);
 	}
@@ -1052,6 +1210,10 @@ contract UsingConfig {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for persisting states.
+ * Stores a map for `uint256`, `string`, `address`, `bytes32`, `bool`, and `int256` type with `bytes32` type as a key.
+ */
 contract EternalStorage {
 	address private currentOwner = msg.sender;
 
@@ -1062,46 +1224,81 @@ contract EternalStorage {
 	mapping(bytes32 => bool) private boolStorage;
 	mapping(bytes32 => int256) private intStorage;
 
+	/**
+	 * Modifiers to validate that only the owner can execute.
+	 */
 	modifier onlyCurrentOwner() {
 		require(msg.sender == currentOwner, "not current owner");
 		_;
 	}
 
+	/**
+	 * Transfer the owner.
+	 * Only the owner can execute this function.
+	 */
 	function changeOwner(address _newOwner) external {
 		require(msg.sender == currentOwner, "not current owner");
 		currentOwner = _newOwner;
 	}
 
 	// *** Getter Methods ***
+
+	/**
+	 * Returns the value of the `uint256` type that mapped to the given key.
+	 */
 	function getUint(bytes32 _key) external view returns (uint256) {
 		return uIntStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `string` type that mapped to the given key.
+	 */
 	function getString(bytes32 _key) external view returns (string memory) {
 		return stringStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `address` type that mapped to the given key.
+	 */
 	function getAddress(bytes32 _key) external view returns (address) {
 		return addressStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `bytes32` type that mapped to the given key.
+	 */
 	function getBytes(bytes32 _key) external view returns (bytes32) {
 		return bytesStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `bool` type that mapped to the given key.
+	 */
 	function getBool(bytes32 _key) external view returns (bool) {
 		return boolStorage[_key];
 	}
 
+	/**
+	 * Returns the value of the `int256` type that mapped to the given key.
+	 */
 	function getInt(bytes32 _key) external view returns (int256) {
 		return intStorage[_key];
 	}
 
 	// *** Setter Methods ***
+
+	/**
+	 * Maps a value of `uint256` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setUint(bytes32 _key, uint256 _value) external onlyCurrentOwner {
 		uIntStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `string` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setString(bytes32 _key, string calldata _value)
 		external
 		onlyCurrentOwner
@@ -1109,6 +1306,10 @@ contract EternalStorage {
 		stringStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `address` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setAddress(bytes32 _key, address _value)
 		external
 		onlyCurrentOwner
@@ -1116,39 +1317,76 @@ contract EternalStorage {
 		addressStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `bytes32` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setBytes(bytes32 _key, bytes32 _value) external onlyCurrentOwner {
 		bytesStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `bool` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setBool(bytes32 _key, bool _value) external onlyCurrentOwner {
 		boolStorage[_key] = _value;
 	}
 
+	/**
+	 * Maps a value of `int256` type to a given key.
+	 * Only the owner can execute this function.
+	 */
 	function setInt(bytes32 _key, int256 _value) external onlyCurrentOwner {
 		intStorage[_key] = _value;
 	}
 
 	// *** Delete Methods ***
+
+	/**
+	 * Deletes the value of the `uint256` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteUint(bytes32 _key) external onlyCurrentOwner {
 		delete uIntStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `string` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteString(bytes32 _key) external onlyCurrentOwner {
 		delete stringStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `address` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteAddress(bytes32 _key) external onlyCurrentOwner {
 		delete addressStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `bytes32` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteBytes(bytes32 _key) external onlyCurrentOwner {
 		delete bytesStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `bool` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteBool(bytes32 _key) external onlyCurrentOwner {
 		delete boolStorage[_key];
 	}
 
+	/**
+	 * Deletes the value of the `int256` type that mapped to the given key.
+	 * Only the owner can execute this function.
+	 */
 	function deleteInt(bytes32 _key) external onlyCurrentOwner {
 		delete intStorage[_key];
 	}
@@ -1158,14 +1396,23 @@ contract EternalStorage {
 
 pragma solidity ^0.5.0;
 
+/**
+ * Module for contrast handling EternalStorage.
+ */
 contract UsingStorage is Ownable {
 	address private _storage;
 
+	/**
+	 * Modifier to verify that EternalStorage is set.
+	 */
 	modifier hasStorage() {
-		require(_storage != address(0), "storage is not setted");
+		require(_storage != address(0), "storage is not set");
 		_;
 	}
 
+	/**
+	 * Returns the set EternalStorage instance.
+	 */
 	function eternalStorage()
 		internal
 		view
@@ -1175,20 +1422,36 @@ contract UsingStorage is Ownable {
 		return EternalStorage(_storage);
 	}
 
+	/**
+	 * Returns the set EternalStorage address.
+	 */
 	function getStorageAddress() external view hasStorage returns (address) {
 		return _storage;
 	}
 
+	/**
+	 * Create a new EternalStorage contract.
+	 * This function call will fail if the EternalStorage contract is already set.
+	 * Also, only the owner can execute it.
+	 */
 	function createStorage() external onlyOwner {
-		require(_storage == address(0), "storage is setted");
+		require(_storage == address(0), "storage is set");
 		EternalStorage tmp = new EternalStorage();
 		_storage = address(tmp);
 	}
 
+	/**
+	 * Assigns the EternalStorage contract that has already been created.
+	 * Only the owner can execute this function.
+	 */
 	function setStorage(address _storageAddress) external onlyOwner {
 		_storage = _storageAddress;
 	}
 
+	/**
+	 * Delegates the owner of the current EternalStorage contract.
+	 * Only the owner can execute this function.
+	 */
 	function changeOwner(address newOwner) external onlyOwner {
 		EternalStorage(_storage).changeOwner(newOwner);
 	}
@@ -1514,59 +1777,140 @@ contract ILockup {
 	function withdrawInterest(address _property) external;
 }
 
+// File: contracts/src/metrics/IMetricsGroup.sol
+
+pragma solidity ^0.5.0;
+
+contract IMetricsGroup is IGroup {
+	function removeGroup(address _addr) external;
+
+	function totalIssuedMetrics() external view returns (uint256);
+
+	function getMetricsCountPerProperty(address _property)
+		public
+		view
+		returns (uint256);
+
+	function hasAssets(address _property) public view returns (bool);
+}
+
 // File: contracts/src/withdraw/Withdraw.sol
 
 pragma solidity ^0.5.0;
 
 // prettier-ignore
 
+/**
+ * A contract that manages the withdrawal of holder rewards for Property holders.
+ */
 contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event PropertyTransfer(address _property, address _from, address _to);
 
+	/**
+	 * Initialize the passed address as AddressConfig address.
+	 */
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	/**
+	 * Withdraws rewards.
+	 */
 	function withdraw(address _property) external {
+		/**
+		 * Validates the passed Property address is included the Property address set.
+		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
+		/**
+		 * Gets the withdrawable rewards amount and the latest cumulative sum of the maximum mint amount.
+		 */
 		(uint256 value, uint256 lastPrice) = _calculateWithdrawableAmount(
 			_property,
 			msg.sender
 		);
+
+		/**
+		 * Validates the result is not 0.
+		 */
 		require(value != 0, "withdraw value is 0");
+
+		/**
+		 * Saves the latest cumulative sum of the maximum mint amount.
+		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
+		 */
 		WithdrawStorage withdrawStorage = getStorage();
 		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
 			_property,
 			msg.sender,
 			lastPrice
 		);
+
+		/**
+		 * Sets the number of unwithdrawn rewards to 0.
+		 */
 		withdrawStorage.setPendingWithdrawal(_property, msg.sender, 0);
+
+		/**
+		 * Updates the withdrawal status to avoid double withdrawal for before DIP4.
+		 */
 		__updateLegacyWithdrawableAmount(_property, msg.sender);
+
+		/**
+		 * Mints the holder reward.
+		 */
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		ILockup lockup = ILockup(config().lockup());
 		require(erc20.mint(msg.sender, value), "dev mint failed");
+
+		/**
+		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
+		 */
+		ILockup lockup = ILockup(config().lockup());
 		lockup.update();
+
+		/**
+		 * Adds the reward amount already withdrawn in the passed Property.
+		 */
 		withdrawStorage.setRewardsAmount(
 			_property,
 			withdrawStorage.getRewardsAmount(_property).add(value)
 		);
 	}
 
+	/**
+	 * Updates the change in compensation amount due to the change in the ownership ratio of the passed Property.
+	 * When the ownership ratio of Property changes, the reward that the Property holder can withdraw will change.
+	 * It is necessary to update the status before and after the ownership ratio changes.
+	 */
 	function beforeBalanceChange(
 		address _property,
 		address _from,
 		address _to
 	) external {
+		/**
+		 * Validates the sender is Allocator contract.
+		 */
 		addressValidator().validateAddress(msg.sender, config().allocator());
+
 		WithdrawStorage withdrawStorage = getStorage();
 
+		/**
+		 * Gets the cumulative sum of the transfer source's "before transfer" withdrawable reward amount and the cumulative sum of the maximum mint amount.
+		 */
 		(uint256 amountFrom, uint256 priceFrom) = _calculateAmount(
 			_property,
 			_from
 		);
+
+		/**
+		 * Gets the cumulative sum of the transfer destination's "before receive" withdrawable reward amount and the cumulative sum of the maximum mint amount.
+		 */
 		(uint256 amountTo, uint256 priceTo) = _calculateAmount(_property, _to);
+
+		/**
+		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
+		 */
 		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
 			_property,
 			_from,
@@ -1577,11 +1921,19 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 			_to,
 			priceTo
 		);
+
+		/**
+		 * Gets the unwithdrawn reward amount of the transfer source and destination.
+		 */
 		uint256 pendFrom = withdrawStorage.getPendingWithdrawal(
 			_property,
 			_from
 		);
 		uint256 pendTo = withdrawStorage.getPendingWithdrawal(_property, _to);
+
+		/**
+		 * Adds the undrawn reward amount of the transfer source and destination.
+		 */
 		withdrawStorage.setPendingWithdrawal(
 			_property,
 			_from,
@@ -1592,22 +1944,13 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 			_to,
 			pendTo.add(amountTo)
 		);
-		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
-			_property,
-			_to
-		);
-		(, uint256 total, , , ) = difference(withdrawStorage, _property, _to);
-		if (totalLimit != total) {
-			withdrawStorage.setWithdrawalLimitTotal(_property, _to, total);
-			withdrawStorage.setWithdrawalLimitBalance(
-				_property,
-				_to,
-				ERC20Mintable(_property).balanceOf(_to)
-			);
-		}
+
 		emit PropertyTransfer(_property, _from, _to);
 	}
 
+	/**
+	 * Returns the reward amount already withdrawn in the passed Property.
+	 */
 	function getRewardsAmount(address _property)
 		external
 		view
@@ -1616,6 +1959,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		return getStorage().getRewardsAmount(_property);
 	}
 
+	/**
+	 * Passthrough to `Lockup.difference` function.
+	 */
 	function difference(
 		WithdrawStorage withdrawStorage,
 		address _property,
@@ -1631,6 +1977,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 			uint256 _interestPrice
 		)
 	{
+		/**
+		 * Gets and passes the last recorded cumulative sum of the maximum mint amount.
+		 */
 		uint256 _last = withdrawStorage.getLastCumulativeGlobalHoldersPrice(
 			_property,
 			_user
@@ -1638,48 +1987,81 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		return ILockup(config().lockup()).difference(_property, _last);
 	}
 
+	/**
+	 * Returns the holder reward.
+	 */
 	function _calculateAmount(address _property, address _user)
 		private
 		view
 		returns (uint256 _amount, uint256 _price)
 	{
 		WithdrawStorage withdrawStorage = getStorage();
-		uint256 totalLimit = withdrawStorage.getWithdrawalLimitTotal(
-			_property,
-			_user
-		);
-		uint256 balanceLimit = withdrawStorage.getWithdrawalLimitBalance(
-			_property,
-			_user
-		);
-		(
-			uint256 reward,
-			uint256 _holders,
-			uint256 _holdersPrice,
-			,
 
-		) = difference(withdrawStorage, _property, _user);
+		/**
+		 * Gets the latest cumulative sum of the maximum mint amount,
+		 * and the difference to the previous withdrawal of holder reward unit price.
+		 */
+		(uint256 reward, , uint256 _holdersPrice, , ) = difference(
+			withdrawStorage,
+			_property,
+			_user
+		);
+
+		/**
+		 * Gets the ownership ratio of the passed user and the Property.
+		 */
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
-		if (totalLimit == _holders) {
-			balance = balanceLimit;
-		}
+
+		/**
+		 * Multiplied by the number of tokens to the holder reward unit price.
+		 */
 		uint256 value = _holdersPrice.mul(balance);
+
+		/**
+		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the maximum mint amount.
+		 */
 		return (value.divBasis().divBasis(), reward);
 	}
 
+	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
+	 */
 	function _calculateWithdrawableAmount(address _property, address _user)
 		private
 		view
 		returns (uint256 _amount, uint256 _price)
 	{
+		/**
+		 * Gets the latest withdrawal reward amount.
+		 */
 		(uint256 _value, uint256 price) = _calculateAmount(_property, _user);
+
+		/**
+		 * If the passed Property has not authenticated, returns always 0.
+		 */
+		if (
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+		) {
+			return (0, price);
+		}
+
+		/**
+		 * Gets the reward amount of before DIP4.
+		 */
 		uint256 legacy = __legacyWithdrawableAmount(_property, _user);
+
+		/**
+		 * Gets the reward amount in saved without withdrawal and returns the sum of all values.
+		 */
 		uint256 value = _value
 			.add(getStorage().getPendingWithdrawal(_property, _user))
 			.add(legacy);
 		return (value, price);
 	}
 
+	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
+	 */
 	function calculateWithdrawableAmount(address _property, address _user)
 		external
 		view
@@ -1689,6 +2071,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		return value;
 	}
 
+	/**
+	 * Returns the cumulative sum of the holder rewards of the passed Property.
+	 */
 	function calculateTotalWithdrawableAmount(address _property)
 		external
 		view
@@ -1698,9 +2083,18 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 			_property,
 			0
 		);
+
+		/**
+		 * Adjusts decimals to 10^18 and returns the result.
+		 */
 		return _amount.divBasis().divBasis();
 	}
 
+	/**
+	 * Returns the reward amount of the calculation model before DIP4.
+	 * It can be calculated by subtracting "the last cumulative sum of reward unit price" from
+	 * "the current cumulative sum of reward unit price," and multiplying by the balance of the user.
+	 */
 	function __legacyWithdrawableAmount(address _property, address _user)
 		private
 		view
@@ -1718,6 +2112,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		return value.divBasis();
 	}
 
+	/**
+	 * Updates and treats the reward of before DIP4 as already received.
+	 */
 	function __updateLegacyWithdrawableAmount(address _property, address _user)
 		private
 	{
@@ -1726,6 +2123,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		withdrawStorage.setLastWithdrawalPrice(_property, _user, price);
 	}
 
+	/**
+	 * Returns WithdrawStorage instance.
+	 */
 	function getStorage() private view returns (WithdrawStorage) {
 		return WithdrawStorage(config().withdrawStorage());
 	}

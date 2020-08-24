@@ -7,6 +7,18 @@ export type GraphQLResponse = {
 		}>
 	}
 }
+export type GraphQLPropertyFactoryCreateResponse = {
+	data: {
+		property_factory_create: Array<{
+			property: string
+			authentication_aggregate: {
+				aggregate: {
+					count: number
+				}
+			}
+		}>
+	}
+}
 export type EGSResponse = {
 	fast: number
 	fastest: number

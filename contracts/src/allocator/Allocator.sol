@@ -8,10 +8,21 @@ import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 
+/**
+ * A contract that determines the total number of mint.
+ * Lockup contract and Withdraw contract mint new DEV tokens based on the total number of new mint determined by this contract.
+ */
 contract Allocator is UsingConfig, IAllocator, UsingValidator {
+	/**
+	 * Initialize the argument as AddressConfig address.
+	 */
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
+	/**
+	 * Returns the maximum new mint count per block.
+	 * This function gets the total number of Metrics contracts and total number of lockups and returns the calculation result of `Policy.rewards`.
+	 */
 	function calculateMaxRewardsPerBlock() public view returns (uint256) {
 		uint256 totalAssets = IMetricsGroup(config().metricsGroup())
 			.totalIssuedMetrics();
@@ -19,6 +30,11 @@ contract Allocator is UsingConfig, IAllocator, UsingValidator {
 		return IPolicy(config().policy()).rewards(totalLockedUps, totalAssets);
 	}
 
+	/**
+	 * Passthrough to `Withdraw.beforeBalanceChange` funtion.
+	 * This function just passthrough function.
+	 * Cannot be deleted because there are existing contracts that does not directly execute `Withdraw.beforeBalanceChange` function.
+	 */
 	function beforeBalanceChange(
 		address _property,
 		address _from,

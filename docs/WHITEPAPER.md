@@ -66,7 +66,7 @@ Staking is used in Dev Protocol as a new payment system that enables trading of 
 
 ## Governance
 
-Many incentives are built into Dev Protocol so that all users can receive profit without encroaching on each other’s interests. There is no decisive theory on the interaction of these incentives, and our hope is for the community, including stakeholders, to constantly propose improvements. In Dev Protocol, indices with uncertainty are accepted from external sources as part of the policy. And, the initial policy is [here](<(./POLICY.md)>).
+Many incentives are built into Dev Protocol so that all users can receive profit without encroaching on each other’s interests. There is no decisive theory on the interaction of these incentives, and our hope is for the community, including stakeholders, to constantly propose improvements. In Dev Protocol, indices with uncertainty are accepted from external sources as part of the policy. And, the initial policy is [here](./POLICY.md).
 
 ## Application Layer
 

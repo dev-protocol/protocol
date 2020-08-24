@@ -18,6 +18,15 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: cache deps and built sources
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
       - name: install deps
         run: yarn
 
@@ -27,5 +36,322 @@ jobs:
       - name: lint
         run: yarn lint
 
+  test-allocator:
+    needs: build
+
+    env:
+      DIR: allocator
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
       - name: test
-        run: yarn test
+        run: yarn test test/$DIR/*.ts
+
+  test-common:
+    needs: build
+
+    env:
+      DIR: common/**
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
+      - name: test
+        run: yarn test test/$DIR/*.ts
+
+  test-dev:
+    needs: build
+
+    env:
+      DIR: dev
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
+      - name: test
+        run: yarn test test/$DIR/*.ts
+
+  test-lockup:
+    needs: build
+
+    env:
+      DIR: lockup
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
+      - name: test
+        run: yarn test test/$DIR/*.ts
+
+  test-market:
+    needs: build
+
+    env:
+      DIR: market
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
+      - name: test
+        run: yarn test test/$DIR/*.ts
+
+  test-metrics:
+    needs: build
+
+    env:
+      DIR: metrics
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
+      - name: test
+        run: yarn test test/$DIR/*.ts
+
+  test-policy:
+    needs: build
+
+    env:
+      DIR: policy
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
+      - name: test
+        run: yarn test test/$DIR/*.ts
+
+  test-property:
+    needs: build
+
+    env:
+      DIR: property
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
+      - name: test
+        run: yarn test test/$DIR/*.ts
+
+  test-vote:
+    needs: build
+
+    env:
+      DIR: vote
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
+      - name: test
+        run: yarn test test/$DIR/*.ts
+
+  test-withdraw:
+    needs: build
+
+    env:
+      DIR: withdraw
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: restore cache
+        uses: actions/cache@main
+        with:
+          path: |
+            node_modules
+            build
+            types
+          key: ${{ runner.os }}-${ GITHUB_SHA }
+
+      - name: test
+        run: yarn test test/$DIR/*.ts

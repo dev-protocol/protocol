@@ -16,7 +16,6 @@ import {getWithdrawInterestAmount} from '../test-lib/utils/mint-amount'
 import {getPropertyAddress} from '../test-lib/utils/log'
 import {waitForEvent, getEventValue} from '../test-lib/utils/event'
 import {validateErrorMessage} from '../test-lib/utils/error'
-import {WEB3_URI} from '../test-lib/const'
 
 contract('LockupTest', ([deployer, user1]) => {
 	const init = async (
@@ -55,7 +54,9 @@ contract('LockupTest', ([deployer, user1]) => {
 		])
 
 		await dev.addressConfig.setMetricsFactory(deployer)
-		await dev.metricsGroup.addGroup(deployer)
+		await dev.metricsGroup.addGroup(
+			(await dev.createMetrics(deployer, property.address)).address
+		)
 
 		await dev.dev.addMinter(dev.lockup.address)
 		if (initialUpdate) {
@@ -168,11 +169,20 @@ contract('LockupTest', ([deployer, user1]) => {
 				.catch(err)
 			validateErrorMessage(res, 'ERC20: transfer amount exceeds balance')
 		})
+		it(`should fail to call when the passed property has not any authenticated assets`, async () => {
+			const [dev] = await init()
+			const propertyAddress = getPropertyAddress(
+				await dev.propertyFactory.create('test', 'TEST', deployer)
+			)
+
+			const res = await dev.dev.deposit(propertyAddress, 10000).catch(err)
+			validateErrorMessage(res, 'unable to stake to unauthenticated property')
+		})
 		it('record transferred token as a lockup', async () => {
 			const [dev, property] = await init()
 
 			dev.dev.deposit(property.address, 10000).catch(err)
-			await waitForEvent(dev.lockup, WEB3_URI)('Lockedup')
+			await waitForEvent(dev.lockup)('Lockedup')
 
 			const lockedupAmount = await dev.lockup
 				.getValue(property.address, deployer)
@@ -184,11 +194,11 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('emit an event that notifies token locked-up', async () => {
 			const [dev, property] = await init()
 
-			await dev.dev.deposit(property.address, 10000).catch(err)
+			dev.dev.deposit(property.address, 10000).catch(err)
 			const [_from, _property, _value] = await Promise.all([
-				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_from'),
-				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_property'),
-				getEventValue(dev.lockup, WEB3_URI)('Lockedup', '_value'),
+				getEventValue(dev.lockup)('Lockedup', '_from'),
+				getEventValue(dev.lockup)('Lockedup', '_property'),
+				getEventValue(dev.lockup)('Lockedup', '_value'),
 			])
 
 			expect(_from).to.be.equal(deployer)
@@ -327,6 +337,8 @@ contract('LockupTest', ([deployer, user1]) => {
 						)
 					),
 			])
+			await dev.metricsGroup.__setMetricsCountPerProperty(property2.address, 1)
+			await dev.metricsGroup.__setMetricsCountPerProperty(property3.address, 1)
 		})
 
 		it('getCumulativeLockedUp returns cumulative sum of locking-ups on the Property', async () => {
@@ -560,11 +572,14 @@ contract('LockupTest', ([deployer, user1]) => {
 						)
 					)
 					.integerValue(BigNumber.ROUND_DOWN)
-				const isFirst =
+				const isSingle =
+					lockedUpPerUser.isEqualTo(lastLockupUnitProperty) &&
+					cumulativeLockedUp.isEqualTo(cumulativeLockedUpAll)
+				const isOnly =
 					lastLockupUnitProperty.isEqualTo(lockedUpPerUser) &&
 					lastLockupBlockProperty.isLessThanOrEqualTo(lastLockupBlock)
 				const propertyRewards = rewards
-					.minus(isFirst ? last : 0)
+					.minus(isSingle ? last : 0)
 					.times(shareOfProperty)
 					.integerValue(BigNumber.ROUND_DOWN)
 				// const propertyRewards = rewards.times(shareOfProperty)
@@ -574,19 +589,20 @@ contract('LockupTest', ([deployer, user1]) => {
 					: toBigNumber(0)
 				const share = lockedUpPerUser.isEqualTo(0)
 					? toBigNumber(0)
-					: isFirst
-					? toBigNumber(1e18)
 					: cLockedUser
 							.times(1e18)
 							.div(cumulativeLockedUp.minus(lastCLocked))
 							.integerValue(BigNumber.ROUND_DOWN)
 				// const amount = interestPrice.times(lockedUpPerUser).div(1e36)
-				const amount = isFirst
-					? interest.times(share).div(1e18).div(1e18).div(1e18)
+				const amount = isSingle
+					? interestPrice.times(lockedUpPerUser).div(1e18).div(1e18)
+					: isOnly
+					? interest.minus(lastInterest).div(1e18).div(1e18)
 					: interest.isGreaterThanOrEqualTo(lastInterest)
 					? interest
 							.minus(lastInterest)
 							.times(share)
+							.integerValue(BigNumber.ROUND_DOWN)
 							.div(1e18)
 							.div(1e18)
 							.div(1e18)
@@ -599,15 +615,26 @@ contract('LockupTest', ([deployer, user1]) => {
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map(toBigNumber))
+					console.log(
+						'*',
+						cumulativeLockedUp.toFixed(),
+						lockedUpPerUser.toFixed(),
+						currentBlock.toFixed(),
+						lastLockupBlock.toFixed()
+					)
+					console.log('isSingle', isSingle)
+					console.log('isOnly', isOnly)
 					console.log('deployedBlock', deployedBlock.toFixed())
 					console.log('rewards', rewards.toFixed())
 					console.log('shareOfProperty', shareOfProperty.toFixed())
 					console.log('propertyRewards', propertyRewards.toFixed())
 					console.log('interest', interest.toFixed())
+					console.log('lastInterest', lastInterest.toFixed())
 					console.log('interestPrice', interestPrice.toFixed())
 					console.log('share', share.toFixed())
 					console.log('amount', amount.toFixed())
 					console.log('legacyValue', legacyValue.toFixed())
+					console.log('pending', pending.toFixed())
 					console.log('withdrawable', withdrawable.toFixed())
 					console.log('res', res.toFixed())
 
@@ -649,6 +676,18 @@ contract('LockupTest', ([deployer, user1]) => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, {from: alice})
 					.then(gasLogger)
+				await mine(1)
+				const result = await dev.lockup
+					.calculateWithdrawableInterestAmount(property.address, alice)
+					.then(toBigNumber)
+				const expected = toBigNumber(10).times(1e18)
+				const calculated = await calc(property, alice)
+
+				expect(result.toFixed()).to.be.equal(expected.toFixed())
+				expect(result.toFixed()).to.be.equal(calculated.toFixed())
+			})
+			it('Alice has a 100% of interests after withdrawal', async () => {
+				await dev.lockup.withdrawInterest(property.address, {from: alice})
 				await mine(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
@@ -710,7 +749,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					.times(
 						toBigNumber(1000000000000)
 							.times(6)
-							.div(cLocked.minus(toBigNumber(1000000000000).times(3)))
+							.div(cLocked.minus(toBigNumber(1000000000000).times(5)))
 					)
 				const calculated = await calc(property, bob)
 
@@ -745,6 +784,47 @@ contract('LockupTest', ([deployer, user1]) => {
 
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
 				expect(result.toFixed()).to.be.equal(calculated.toFixed())
+			})
+			it('Alice has a 100% of interests', async () => {
+				await dev.lockup.cancel(property.address, {from: alice})
+				await dev.lockup.cancel(property.address, {from: bob})
+				await dev.lockup.withdraw(property.address, {from: alice})
+				await dev.lockup.withdraw(property.address, {from: bob})
+				await dev.lockup.withdrawInterest(property.address, {from: alice})
+				await dev.lockup.withdrawInterest(property.address, {from: bob})
+				await dev.dev
+					.deposit(property.address, 1000000000000, {from: alice})
+					.then(gasLogger)
+				await mine(1)
+				const result = await dev.lockup
+					.calculateWithdrawableInterestAmount(property.address, alice)
+					.then(toBigNumber)
+				const expected = toBigNumber(10).times(1e18)
+				const calculated = await calc(property, alice)
+
+				expect(result.toFixed()).to.be.equal(expected.toFixed())
+				expect(result.toFixed()).to.be.equal(calculated.toFixed())
+			})
+			it('Property that unauthenticated but already staked before DIP9 has no reward', async () => {
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('test', 'TEST', deployer)
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
+				await dev.dev
+					.deposit(propertyAddress, 1000000000000, {from: alice})
+					.then(gasLogger)
+				await mine(1)
+				await dev.dev
+					.deposit(propertyAddress, 1000000000000, {from: alice})
+					.then(gasLogger)
+				await mine(1)
+				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 0)
+				const result = await dev.lockup
+					.calculateWithdrawableInterestAmount(propertyAddress, alice)
+					.then(toBigNumber)
+				const expected = toBigNumber(0)
+
+				expect(result.toFixed()).to.be.equal(expected.toFixed())
 			})
 		})
 
@@ -1059,6 +1139,18 @@ contract('LockupTest', ([deployer, user1]) => {
 							)
 						),
 				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property3.address,
+					1
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property4.address,
+					1
+				)
 
 				await dev.dev.deposit(property1.address, 10000, {from: alice})
 				await mine(3)
@@ -1368,6 +1460,10 @@ contract('LockupTest', ([deployer, user1]) => {
 							)
 						),
 				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
 
 				calc = createCalculator(dev)
 				await dev.dev.mint(bob, await dev.dev.balanceOf(alice))
@@ -1564,6 +1660,10 @@ contract('LockupTest', ([deployer, user1]) => {
 							)
 						),
 				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
 
 				calc = createCalculator(dev)
 				await dev.dev.mint(bob, await dev.dev.balanceOf(alice))
@@ -1776,9 +1876,15 @@ contract('LockupTest', ([deployer, user1]) => {
 	describe('Lockup; setDIP4GenesisBlock', () => {
 		it('Store passed value to getStorageDIP4GenesisBlock as a block number', async () => {
 			const [dev] = await init()
-			await dev.lockup.setDIP4GenesisBlock(123456)
 			const stored = await dev.lockup.getStorageDIP4GenesisBlock()
-			expect(stored.toNumber()).to.be.equal(123456)
+			expect(stored.toNumber()).to.be.greaterThan(1)
+		})
+		it('Should fail to call when already updated the value', async () => {
+			const [dev] = await init()
+			const res = await dev.lockup.setDIP4GenesisBlock(456789).catch(err)
+			const stored = await dev.lockup.getStorageDIP4GenesisBlock()
+			expect(stored.toNumber()).to.be.greaterThan(1)
+			expect(res).to.be.instanceOf(Error)
 		})
 		it('Should fail to call when sent from non-pauser account', async () => {
 			const [dev] = await init()
@@ -1790,62 +1896,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				.catch(err)
 			const after = await dev.lockup.getStorageDIP4GenesisBlock()
 			expect(after.toNumber()).to.be.equal(before.toNumber())
-			expect(res).to.be.instanceOf(Error)
-		})
-	})
-	describe.only('Lockup; initializeLastCumulativePropertyInterest', () => {
-		it('Store passed value to getStorageLastCumulativePropertyInterest', async () => {
-			const [dev, property] = await init()
-			await dev.lockup.initializeLastCumulativePropertyInterest(
-				property.address,
-				user1,
-				123
-			)
-			const interest = await dev.lockup.getStorageLastCumulativePropertyInterest(
-				property.address,
-				user1
-			)
-			expect(interest.toNumber()).to.be.equal(123)
-		})
-		it('Should not override when already any value ', async () => {
-			const [dev, property] = await init()
-			await dev.lockup.initializeLastCumulativePropertyInterest(
-				property.address,
-				user1,
-				123
-			)
-			await dev.lockup.initializeLastCumulativePropertyInterest(
-				property.address,
-				user1,
-				456
-			)
-			const interest = await dev.lockup.getStorageLastCumulativePropertyInterest(
-				property.address,
-				user1
-			)
-			expect(interest.toNumber()).to.be.equal(123)
-		})
-		it('Should fail to call when sent from non-pauser account', async () => {
-			const [dev, property] = await init()
-			const beforeValue = await dev.lockup.getStorageLastCumulativePropertyInterest(
-				property.address,
-				user1
-			)
-			const res = await dev.lockup
-				.initializeLastCumulativePropertyInterest(
-					property.address,
-					user1,
-					123,
-					{
-						from: user1,
-					}
-				)
-				.catch(err)
-			const afterValue = await dev.lockup.getStorageLastCumulativePropertyInterest(
-				property.address,
-				user1
-			)
-			expect(afterValue.toNumber()).to.be.equal(beforeValue.toNumber())
 			expect(res).to.be.instanceOf(Error)
 		})
 	})

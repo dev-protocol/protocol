@@ -31,7 +31,8 @@
 				"beforeEach": "readonly",
 				"before": "readonly",
 				"afterEach": "readonly",
-				"after": "readonly"
+				"after": "readonly",
+				"web3": "readonly"
 			}
 		},
 		{

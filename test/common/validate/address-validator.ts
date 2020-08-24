@@ -10,7 +10,6 @@ contract(
 		validatedAddress,
 		market,
 		property,
-		metrics,
 		policy,
 		marketFactory,
 		propertyFactory,
@@ -18,11 +17,15 @@ contract(
 		policyFactory,
 	]) => {
 		let addressValidator: AddressValidatorInstance
+		let metrics: string
 		before(async () => {
 			const addressValidatorContract = artifacts.require('AddressValidator')
 			addressValidator = await addressValidatorContract.new({
 				from: deployer,
 			})
+			metrics = (
+				await new DevProtocolInstance(deployer).createMetrics(market, property)
+			).address
 		})
 		describe('AddressValidator; validateIllegal', () => {
 			it('normal address do not cause an error.', async () => {

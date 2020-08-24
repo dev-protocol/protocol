@@ -3,11 +3,14 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
+import {MetricsGroupMigrationInstance} from '../../types/truffle-contracts'
+import {gasLogger} from '../test-lib/utils/common'
 
 contract(
-	'MetricsGroup',
+	'MetricsGroupMigaration',
 	([
 		deployer,
+		user,
 		metricsFactory,
 		dummyMetricsFactory,
 		dummyMetrics,
@@ -15,11 +18,18 @@ contract(
 		dummyProperty,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
+		let metricsGroupMigaration: MetricsGroupMigrationInstance
 		let metrics1: string
 		let metrics2: string
 		before(async () => {
 			await dev.generateAddressConfig()
 			await dev.generateMetricsGroup()
+			metricsGroupMigaration = await artifacts
+				.require('MetricsGroupMigration')
+				.new(dev.addressConfig.address)
+			await dev.addressConfig.setMetricsGroup(metricsGroupMigaration.address)
+			await metricsGroupMigaration.createStorage()
+
 			await dev.addressConfig.setMetricsFactory(metricsFactory, {
 				from: deployer,
 			})
@@ -28,22 +38,22 @@ contract(
 				dev.createMetrics(dummyMarket, dummyProperty).then((x) => x.address),
 			])
 		})
-		describe('MetricsGroup; addGroup, removeGroup, isGroup', () => {
+		describe('MetricsGroupMigaration; addGroup, removeGroup, isGroup', () => {
 			before(async () => {
-				await dev.metricsGroup.addGroup(metrics1, {
+				await metricsGroupMigaration.addGroup(metrics1, {
 					from: metricsFactory,
 				})
 			})
 			it('When the metrics address is Specified.', async () => {
-				const result = await dev.metricsGroup.isGroup(metrics1)
+				const result = await metricsGroupMigaration.isGroup(metrics1)
 				expect(result).to.be.equal(true)
 			})
 			it('When the metrics address is not specified.', async () => {
-				const result = await dev.metricsGroup.isGroup(dummyMetrics)
+				const result = await metricsGroupMigaration.isGroup(dummyMetrics)
 				expect(result).to.be.equal(false)
 			})
 			it('Should fail to call addGroup when sent from other than MetricsFactory', async () => {
-				const result = await dev.metricsGroup
+				const result = await metricsGroupMigaration
 					.addGroup(metrics1, {
 						from: deployer,
 					})
@@ -51,7 +61,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Existing metrics cannot be added.', async () => {
-				const result = await dev.metricsGroup
+				const result = await metricsGroupMigaration
 					.addGroup(metrics1, {
 						from: metricsFactory,
 					})
@@ -59,7 +69,7 @@ contract(
 				validateErrorMessage(result, 'already enabled')
 			})
 			it('Can not execute addGroup without metricsFactory address.', async () => {
-				const result = await dev.metricsGroup
+				const result = await metricsGroupMigaration
 					.addGroup(dummyMetrics, {
 						from: dummyMetricsFactory,
 					})
@@ -67,7 +77,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Should fail to call removeGroup when sent from other than MetricsFactory', async () => {
-				const result = await dev.metricsGroup
+				const result = await metricsGroupMigaration
 					.removeGroup(metrics1, {
 						from: deployer,
 					})
@@ -75,7 +85,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Can not execute removeGroup without metricsFactory address.', async () => {
-				const result = await dev.metricsGroup
+				const result = await metricsGroupMigaration
 					.removeGroup(metrics1, {
 						from: dummyMetricsFactory,
 					})
@@ -83,7 +93,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Not existing metrics cannot be removed.', async () => {
-				const result = await dev.metricsGroup
+				const result = await metricsGroupMigaration
 					.removeGroup(dummyMetrics, {
 						from: metricsFactory,
 					})
@@ -91,65 +101,89 @@ contract(
 				validateErrorMessage(result, 'address is not group')
 			})
 			it('existing metrics can be removed.', async () => {
-				await dev.metricsGroup.removeGroup(metrics1, {from: metricsFactory})
+				await metricsGroupMigaration.removeGroup(metrics1, {
+					from: metricsFactory,
+				})
 			})
 			it('Deleted metrics addresses are treated as if they do not exist in the group.', async () => {
-				const result = await dev.metricsGroup.isGroup(metrics1)
+				const result = await metricsGroupMigaration.isGroup(metrics1)
 				expect(result).to.be.equal(false)
 			})
 		})
-		describe('MetricsGroup; totalIssuedMetrics', () => {
+		describe('MetricsGroupMigaration; totalIssuedMetrics', () => {
 			it('Count increases when metrics are added.', async () => {
-				let result = await dev.metricsGroup.totalIssuedMetrics()
+				let result = await metricsGroupMigaration.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(0)
-				await dev.metricsGroup.addGroup(metrics2, {
+				await metricsGroupMigaration.addGroup(metrics2, {
 					from: metricsFactory,
 				})
-				result = await dev.metricsGroup.totalIssuedMetrics()
+				result = await metricsGroupMigaration.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(1)
-				await dev.metricsGroup.removeGroup(metrics2, {
+				await metricsGroupMigaration.removeGroup(metrics2, {
 					from: metricsFactory,
 				})
-				result = await dev.metricsGroup.totalIssuedMetrics()
+				result = await metricsGroupMigaration.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(0)
 			})
 		})
-		describe('MetricsGroup; getMetricsCountPerProperty', () => {
+		describe('MetricsGroupMigaration; getMetricsCountPerProperty', () => {
 			it('Count increases when metrics are added.', async () => {
-				let result = await dev.metricsGroup.getMetricsCountPerProperty(
+				let result = await metricsGroupMigaration.getMetricsCountPerProperty(
 					dummyProperty
 				)
 				expect(result.toNumber()).to.be.equal(0)
-				await dev.metricsGroup.addGroup(metrics2, {
+				await metricsGroupMigaration.addGroup(metrics2, {
 					from: metricsFactory,
 				})
-				result = await dev.metricsGroup.getMetricsCountPerProperty(
+				result = await metricsGroupMigaration.getMetricsCountPerProperty(
 					dummyProperty
 				)
 				expect(result.toNumber()).to.be.equal(1)
-				await dev.metricsGroup.removeGroup(metrics2, {
+				await metricsGroupMigaration.removeGroup(metrics2, {
 					from: metricsFactory,
 				})
-				result = await dev.metricsGroup.getMetricsCountPerProperty(
+				result = await metricsGroupMigaration.getMetricsCountPerProperty(
 					dummyProperty
 				)
 				expect(result.toNumber()).to.be.equal(0)
 			})
 		})
-		describe('MetricsGroup; hasAssets', () => {
-			it('Returns whether the passed Property has some assets', async () => {
-				let result = await dev.metricsGroup.hasAssets(dummyProperty)
-				expect(result).to.be.equal(false)
-				await dev.metricsGroup.addGroup(metrics2, {
-					from: metricsFactory,
-				})
-				result = await dev.metricsGroup.hasAssets(dummyProperty)
+		describe('MetricsGroupMigaration; hasAssets', () => {
+			it('Returns always true', async () => {
+				let result = await metricsGroupMigaration.hasAssets(dummyProperty)
 				expect(result).to.be.equal(true)
-				await dev.metricsGroup.removeGroup(metrics2, {
+				await metricsGroupMigaration.addGroup(metrics2, {
 					from: metricsFactory,
 				})
-				result = await dev.metricsGroup.hasAssets(dummyProperty)
-				expect(result).to.be.equal(false)
+				result = await metricsGroupMigaration.hasAssets(dummyProperty)
+				expect(result).to.be.equal(true)
+				await metricsGroupMigaration.removeGroup(metrics2, {
+					from: metricsFactory,
+				})
+				result = await metricsGroupMigaration.hasAssets(dummyProperty)
+				expect(result).to.be.equal(true)
+			})
+		})
+		describe('MetricsGroupMigaration; __setMetricsCountPerProperty', () => {
+			it('Store passed value to getMetricsCountPerProperty as an authenticated assets count', async () => {
+				await metricsGroupMigaration
+					.__setMetricsCountPerProperty(metrics1, 123)
+					.then(gasLogger)
+				const stored = await metricsGroupMigaration.getMetricsCountPerProperty(
+					metrics1
+				)
+				expect(stored.toNumber()).to.be.equal(123)
+			})
+			it('Should fail to call when sent from non-owner account', async () => {
+				const res = await metricsGroupMigaration
+					.__setMetricsCountPerProperty(dummyMetrics, 123, {from: user})
+					.then(gasLogger)
+					.catch((err: Error) => err)
+				const result = await metricsGroupMigaration.getMetricsCountPerProperty(
+					dummyMetrics
+				)
+				expect(result.toNumber()).to.be.equal(0)
+				expect(res).to.be.instanceOf(Error)
 			})
 		})
 	}
