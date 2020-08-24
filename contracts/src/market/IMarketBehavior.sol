@@ -8,7 +8,8 @@ interface IMarketBehavior {
 		string calldata _args3,
 		string calldata _args4,
 		string calldata _args5,
-		address market
+		address market,
+		address account
 	)
 		external
 		returns (

@@ -9,6 +9,7 @@ contract MarketTest3 is IMarketBehavior, UsingConfig {
 	string public schema = "[]";
 	mapping(address => string) internal keys;
 	mapping(string => address) private addresses;
+	address public currentAuthinticateAccount;
 
 	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
@@ -21,12 +22,14 @@ contract MarketTest3 is IMarketBehavior, UsingConfig {
 		string memory,
 		string memory,
 		// solium-disable-next-line no-trailing-whitespace
-		address market
+		address market,
+		address account
 	) public returns (bool) {
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
 		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
 		keys[_metrics] = _args1;
 		addresses[_args1] = _metrics;
+		currentAuthinticateAccount = account;
 		return true;
 	}
 

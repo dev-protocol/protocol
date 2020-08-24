@@ -25,7 +25,8 @@ contract MarketTest1 is IMarketBehavior, UsingConfig {
 		string memory,
 		string memory,
 		// solium-disable-next-line no-trailing-whitespace
-		address market
+		address market,
+		address
 	) public returns (bool) {
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
 		address _metrics = Market(market).authenticatedCallback(_prop, idHash);

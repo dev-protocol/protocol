@@ -158,6 +158,27 @@ contract(
 				const key = await behavuorInstance.getId(metrics.address)
 				expect(key).to.be.equal('id-key')
 			})
+			it('The address of the account that executed the authinticate function has been passed to the behavior.', async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketInstance = await marketContract.at(marketAddress1)
+				await marketInstance.authenticate(
+					propertyAddress,
+					'id-key',
+					'',
+					'',
+					'',
+					'',
+					{from: propertyAuther}
+				)
+				const marketTest3 = artifacts.require('MarketTest3')
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const marketTest3Instance = await marketTest3.at(
+					await marketInstance.behavior()
+				)
+				expect(
+					await marketTest3Instance.currentAuthinticateAccount()
+				).to.be.equal(propertyAuther)
+			})
 			it('Market that is not enabled generates an error when performing authentication function.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress2)
