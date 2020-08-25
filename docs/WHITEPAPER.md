@@ -8,61 +8,61 @@ Dev Protocol is a middleware protocol that optimizes various properties for auto
 
 # The World that Dev Protocol Aims for
 
-Economic activities are built on top of many activities. Profit is necessary for these activities to involve investment for future growth. Dev is a technology that fairly evaluates various activities that have not received a proper economic evaluation and realizes their autonomous distribution and sustainability through P2P trading and reward distribution
+Economic activities are built on top of many real world activities. These activities need investments to realize future growth and profit. Dev Protocol is a decentralized technology that fairly evaluates various activities that have not received an economic evaluation and realizes their autonomous distribution and sustainability through P2P trading and reward distribution.
 
 ## Overview
 
-Individuals produce value through activities. Dev Protocol possesses market, staking, and market reward distribution features to capitalize the value produced by these activities and trade it through P2P. When activities are capitalized, the following is achieved.
+Individuals produce value through activities. Dev Protocol offers market, staking, and reward distribution features to capitalize the value produced by these activities and trade it through P2P. When activities are capitalized, the following is achieved.
 
 - Market rewards are obtained based on the value produced by the activities
 - The property undergoes Staking (financial support) by third parties
 - Providing value as an incentive for Staking
 - Sharing properties with joint activity participants and distributing market rewards
 
-Staking is a new form of trading money that uses the inflation mechanism. Through staking, the sustainability of users’ activities is secured, and users receive value at zero real cost. This is a mechanism that provides profit for all properties that had previously been released for free. Dev Protocol aims for a total value staked that surpasses donation activities that have been taking place through legal tender.
+Staking is a new form of trading money that uses the inflation mechanism. Through staking, the sustainability of users’ activities is secured, and users receive value at zero financial cost. This is a mechanism that provides profit for all properties that had previously been released for free or through other indirect monetization mechanisms. Dev Protocol aims for a total value staked that surpasses donation activities that have been taking place through legal tender.
 
-Dev Protocol transfers the formulation of its policy, which serves as the guiding principle for its governance, to the community so that it can be updated depending on the circumstances. Users can freely propose a new policy through the protocol. In order for a policy to take effect, approval must be granted through a vote of property holders. A policy is related to a decision on the inflation rate and more. The current policy is [here](./POLICY.md).
+Dev Protocol transfers the formulation of its policy, which serves as the guiding principle for its governance, to the community so that it can be updated depending on the circumstances. Users can freely propose a new policy through the protocol. In order for a policy to take effect, approval must be granted through a vote of property holders. A policy can be related to a decision on the inflation rate and other aspects of the ecosystem. The current policy is [here](./POLICY.md).
 
 ## Market
 
-The market serves to provide assuring identity by certifying an individual’s activity on the blockchain. A market is created for each authentication target, and the community can propose the opening of a new market.
+The market serves to provide assuring identity by certifying an individual’s activity on the blockchain. A market is created for each authentication target, and the community can propose the opening of new markets.
 
 ## Capitalization
 
-As a premise, ownership of a user’s activities is certified to belong to the user in Dev Protocol. This differs from the model employed in existing web platforms, in which the platform owns the user data, and separates the ownership and utilization of properties. Uses of a property can be produced infinitely through the application layer.
+As a premise, ownership of a user’s activities is certified to belong to the user in Dev Protocol. This differs from the model employed in existing web platforms, in which the platform owns the user data, and separates the ownership and utilization of properties. A property can be used infinitely through the application layer built on top of Dev protocol.
 
 ## Capitalization Method
 
-By authenticating an external account that expresses ownership of the activity on Dev Protocol, users can define their activity as a “property” on the market and certify that they are the owner of the property. When authenticating a property, the user pays a commission in DEV that has been defined by the policy, and the commission that has been paid is automatically burned. Users can authenticate multiple properties and connect them to multiple markets. The maximum number of properties that can be authenticated is defined by the policy.
+By authenticating an external account that expresses ownership of the activity on Dev Protocol, users can define their activity as a “property” on the market and certify that they are the owner of the property. When authenticating a property, the user pays a commission in DEV that has been defined by the policy, and the commission that has been paid is instantly burned. Users can authenticate multiple properties and connect them to multiple markets. The maximum number of properties that can be authenticated is defined by the policy.
 
 ## Profit, Market Reward, Inflation, Deflation
 
 An owner of a property receives a market reward based on the value of the property. If staking is done on a property that a user owns, a market reward will be added based on the total value staked.
 
-The flow of DEV in the protocol can be summarized as a lifecycle as follows. For simplicity, the owner of a property is listed as an “activity participant,” and a third party who uses it is listed as a “user,” although a user can be classified as both.
+The flow of DEV in the protocol can be summarized through the following lifecycle. For simplicity, the owner of a property is listed as an “activity participant,” and a third party who receives some form of utility is listed as a “user,” although a user can be classified as both.
 
 1. DEV is newly issued by an activity participant and undergoes inflation.
 2. A user stakes the DEV for the activity participant.
-3. The more staking that an activity participant receives, the more DEV this activity participant can newly issue.
+3. The more staking that a property receives, the more DEV this activity participant can newly issue.
 4. As consideration for staking, the activity participant provides the user with utility.
-5. When the user cancels staking, the activity participant is able to withdraw the staking amount, as well as a portion of the DEV that the activity participant obtained through the offering.
+5. When the user cancels staking, the user is able to withdraw the staking amount, as well as a portion of the DEV that the activity participant obtained through the offering.
 
-The total amount is decided (dynamically or statically) based on the policy regarding the inflation rate for DEV. The initial policy is [here](./POLICY.md). Through the protocol, DEV is newly issued, burned, staked, and fluctuates based on demand.
+The total amount of rewards is determined (dynamically or statically) based on the policy regarding the inflation rate for DEV. The initial policy is [here](./POLICY.md). Through the protocol, DEV is newly issued, burned, staked, and fluctuates based on demand.
 
 ## Shared Rights with Joint Activity Participants
 
-The owner of a property initially owns 100% of the ownership rights. Owning 100% of the ownership rights is equivalent to the right to receive all of the market rewards. It is possible for multiple people, such as joint activity participants, to own the ownership rights by transferring a portion of the ownership rights. Ownership rights holders can receive a portion of market rewards based on the ownership ratio. This is realized by the fact that the Property Contract that represents ownership rights conforms to ERC20.
+The owner of a property initially owns 100% of the ownership rights. Owning 100% of the ownership rights is equivalent to the right to receive all of the market rewards. It is possible for multiple people, such as joint activity participants, to own the ownership rights by transferring a portion of the ownership rights. Ownership rights holders can receive a portion of market rewards based on the ownership ratio. This is realized by the fact that the Property Contract that represents ownership rights conforms to ERC20 standard.
 
 ## Staking
 
-Staking is used in Dev Protocol as a new payment system that enables trading of various properties. Staking is a mechanism that increases market rewards through the temporary deposit of DEV toward a property. As consideration for staking, the payer receives utility from the activity participant, and the activity participant receives the market rewards that have increased during the staking period. Staking continues while the payer needs this utility, increasing the scarcity value of DEV. By receiving staking, users secure the sustainability of their activity.
+Staking is used in Dev Protocol as a new payment system that enables trading of various properties. Staking is a mechanism that increases market rewards through the temporary deposit of DEV toward a property. As consideration for staking, the payer receives utility from the activity participant, and the activity participant receives the market rewards that have increased during the staking period. Staking continues while the payer needs this utility, increasing the scarcity value of DEV. By receiving staking, activity participant secure the sustainability of their activity.
 
 ### Payment Flow
 
 1. By staking DEV in a property over a specific period of time, the payer receives some sort of consideration.
-2. According to the inventory of DEV staked, the market reward (inflation) amount for the property is added. The longer the staking period by the payer, the more market rewards are promised to the activity participant.
-3. As interest, the payer receives a portion of the DEV that is newly acquired by the activity participant. The amount that can be received at this time is determined by the amount that the payer has staked in comparison with the total amount staked.
-4. When the staking period ends, the DEV staked in the property is released, and the payer can withdraw it.
+2. Based on the amount of DEV staked, a market reward (inflation) amount is added for the property. The longer the staking period by the payer, the more market rewards are promised to the activity participant.
+3. As interest, the user receives a portion of the DEV that is newly acquired by the activity participant. The amount that can be received at this time is determined by the amount that the user has staked in comparison with the total amount staked.
+4. When the staking period ends, the DEV staked in the property is released, and the user can withdraw it.
 
 ## Governance
 
@@ -70,7 +70,7 @@ Many incentives are built into Dev Protocol so that all users can receive profit
 
 ## Application Layer
 
-By staking their DEV toward an activity participant, users receive some sort of consideration from this activity participant. The consideration is paid in the form of rights or labor. (Although it is possible for the staking user to directly contact the activity participant and request consideration in a primitive manner,) The application layer automatically executes a series of trades. The application layer relays the user’s staking to the activity participant and relays the activity participant’s consideration to the user. The motivation to build out an application layer depends on each individual’s intentions, but below are possible motivations.
+By staking their DEV toward an activity participant, users receive some sort of consideration from this activity participant. The consideration is paid in the form of rights or labor. (Although it is possible for the staking user to contact the activity participant and request consideration in a direct manner) The application layer automatically executes a series of trades. The application layer relays the user’s staking to the activity participant and relays the activity participant’s consideration to the user. The motivation to build out an application layer depends on each individual’s intentions, but below are possible motivations.
 
 - Increase the value of DEV owned
 - Receive a portion of the rewards by inheriting a portion of the activity participant’s Property
@@ -113,13 +113,13 @@ The Market Contract represents a specific group of properties. The properties ha
 
 Anybody can freely propose a Market Contract. However, in order for it to take effect, it must be approved through a vote of existing Property Contract owners. The number of votes will be the sum of the count staked in the Property Contract and the `totals`. Generally, votes are expected to be carried out by property owners, but stake executors can use their own count of stakes as the number of votes in order to vote. In this case, the address of the Property Contract subject to staking will be assigned.
 
-The `authenticate` function expresses the property to be authenticated and authenticates whether the executor is the owner of the property. For example, 1 GitHub repository is assigned, and the fact that the executor is the owner of this GitHub repository is authenticated. Therefore, it should not be possible for anybody other than the owner of the Property Contract to execute the `authenticate` function. This function is called directly by a user, and it is expected for `authenticatedCallback` to be called for a successful authentication. When executing the `authenticate` function, a commission defined by the Policy Contract is paid in DEV, and the commission paid is automatically burned.
+The `authenticate` function authenticates the executor of the function as the owner of the property. For example, a GitHub repository is assigned, and the fact that the executor is the owner of this GitHub repository is authenticated. Therefore, it should not be possible for anybody other than the owner of the Property Contract to execute the `authenticate` function. This function is called directly by a user, and it is expected for `authenticatedCallback` to be called for a successful authentication. When executing the `authenticate` function, a commission defined by the Policy Contract is paid in DEV, and the commission paid is automatically burned.
 
 ## Market Factory
 
 The Market Factory Contract generates a new Market Contract.
 
-The generation of a Market Contract is carried out by executing the `create` function. The `create` function receives the address for the contract with the next interface and generates a new Market Contract.
+The generation of a Market Contract is carried out by executing the `create` function. The `create` function receives the address for the Property Contract with the next interface and generates a new Market Contract.
 
 ```solidity
 contract IMarketBehavior {
@@ -165,7 +165,7 @@ The Market Factory Contract creates a new Market Contract that has the proxy met
 
 The Property Contract represents the user’s property group. This is a token that conforms to ERC20 and can be transferred to any email address.
 
-Each Property Contract(Token) holder will receive market rewards based on the balance of the Property Contract(Token) that they own. Calculating the market rewards is the responsibility of the Allocator Contract, receiving the market rewards is the responsibility of the Withdraw Contract, and the Property Contract is a generally pure ERC20.
+Each Property Contract(Token) holder will receive market rewards based on the balance of the Property Contract(Token) that they own. Calculating the market rewards is the responsibility of the Allocator Contract, whereas receiving the market rewards is the responsibility of the Withdraw Contract. The Property Contract is a pure ERC20.
 
 The `transfer` function for the Property Contract requests the Allocator Contract to adjust the amount that can be withdrawn, since the amount of market rewards that can be withdrawn varies based on changes to the balance.
 
@@ -183,7 +183,7 @@ The generation of a Property Contract is carried out by executing the `create` f
 
 The Metrics Contract represents the association between Property Contracts and Market Contracts.
 
-When `authenticatedCallback` for the Market Contract is called, a Metrics Contract that retains the addresses for the Property Contract and Market Contract is generated.
+When `authenticatedCallback` of the Market Contract is called, a Metrics Contract that retains the addresses of the Property Contract and Market Contract is generated.
 `authenticatedCallback` for the Market Contract returns the address for the Metrics Contract. By creating a map that brings the addresses for the Market Contract and Metrics Contract together, it is possible to retain the context for the authentication. The context for the authentication can be used when calculating the market rewards.
 
 ## Lockup
@@ -196,7 +196,7 @@ When a user stakes their own DEV in a Property Contract. This function can only 
 
 By assigning the address of the Property Contract to stake in and the quantity of DEV, the Lockup Contract stakes the DEV. The DEV that has been staked can be withdrawn after a certain amount of time has passed after executing the `cancel` function. Stakes can be added as many times as desired until the `cancel` function is executed.
 
-By staking DEV, users can receive some sort of utility from the owner of the corresponding Property Contract. Staking continues until this utility is needed, increasing the scarcity value of DEV.
+By staking DEV, users can receive some sort of utility from the owner of the corresponding Property Contract. Staking continues until the utility is needed, increasing the scarcity value of DEV.
 
 A cumulative total reward amount at a time of staking (accumulation of the return value of the `calculateMaxRewardsPerBlock` function of the Allocator Contract according to the elapsed block) is recorded and used for the withdrawal reward calculation.
 
@@ -204,7 +204,7 @@ An amount of remuneration is determined by a staking ratio of a Property Contrac
 
 A total reward allocation is determined from a ratio of a cumulative staking amount of a Property and a cumulative total staking amount.
 
-The following variables are used to calculate a reward amount for a staking person.
+The following variables are used to calculate a reward amount for a staking user.
 
 - `r`: Cumulative total reward amount(accumulation of a return value of the `calculateMaxRewardsPerBlock` function of the Allocator Contract according to elapsed block)
 - `p`: Cumulative staking amount(cumulative staking amount according to elapsed block)
