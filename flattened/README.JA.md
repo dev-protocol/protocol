@@ -23,6 +23,7 @@ truffle-flattener contracts/src/common/config/AddressConfig.sol > flattened/comm
 truffle-flattener contracts/src/dev/Dev.sol > flattened/dev/Dev.flattened.sol
 truffle-flattener contracts/src/dev/DevMigration.sol > flattened/dev/DevMigration.flattened.sol
 truffle-flattener contracts/src/lockup/Lockup.sol > flattened/lockup/Lockup.flattened.sol
+truffle-flattener contracts/src/market/Market.sol > flattened/market/Market.flattened.sol
 truffle-flattener contracts/src/market/MarketFactory.sol > flattened/market/MarketFactory.flattened.sol
 truffle-flattener contracts/src/market/MarketGroup.sol > flattened/market/MarketGroup.flattened.sol
 truffle-flattener contracts/src/metrics/MetricsFactory.sol > flattened/metrics/MetricsFactory.flattened.sol
