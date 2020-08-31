@@ -11,7 +11,6 @@ import {
 import builtConfig from '../../build/contracts/AddressConfig.json'
 import builtLockup from '../../build/contracts/Lockup.json'
 import builtMetricsGroup from '../../build/contracts/MetricsGroup.json'
-import builtMetricsGroupMigration from '../../build/contracts/MetricsGroupMigration.json'
 import {AbiItem} from 'web3-utils/types'
 export const createRegistry = (configAddress: string, libWeb3: Web3) =>
 	new libWeb3.eth.Contract(builtConfig.abi as AbiItem[], configAddress)
@@ -39,19 +38,6 @@ export const createMetricsGroup = async (
 	const metricsGroupAddress = await configContract.methods.metricsGroup().call()
 	const contract = new libWeb3.eth.Contract(
 		builtMetricsGroup.abi as AbiItem[],
-		metricsGroupAddress
-	)
-	return contract
-}
-
-export const createMetricsGroupMigration = async (
-	configAddress: string,
-	libWeb3: Web3
-) => {
-	const configContract = createRegistry(configAddress, libWeb3)
-	const metricsGroupAddress = await configContract.methods.metricsGroup().call()
-	const contract = new libWeb3.eth.Contract(
-		builtMetricsGroupMigration.abi as AbiItem[],
 		metricsGroupAddress
 	)
 	return contract
