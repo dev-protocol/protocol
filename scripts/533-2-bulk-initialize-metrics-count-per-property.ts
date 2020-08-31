@@ -5,7 +5,6 @@ import {
 	createQueue,
 	createGraphQLPropertyFactoryCreateFetcher,
 	createGetMetricsCountPerProperty,
-	createMetricsGroupMigration,
 	create__SetMetricsCountPerProperty,
 } from './lib/bulk-initializer'
 import {createFastestGasPriceFetcher} from './lib/ethgas'
@@ -55,12 +54,9 @@ const handler = async (
 		web3
 	)
 
-	const metricsGroupMigration = await createMetricsGroupMigration(CONFIG, web3)
-	const getMetricsCountPerProperty = createGetMetricsCountPerProperty(
-		metricsGroupMigration
-	)
+	const getMetricsCountPerProperty = createGetMetricsCountPerProperty({} as any)
 	const setMetricsCountPerProperty = create__SetMetricsCountPerProperty(
-		metricsGroupMigration
+		{} as any
 	)(from)
 
 	const filteringTacks = all.map(({property, ...x}) => async () => {
