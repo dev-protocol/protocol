@@ -31,6 +31,7 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 
 	/**
 	 * Creates a new Property contract and authenticate.
+	 * There are too many local variables, so when using this method limit the number of arguments that can be used to authenticate to a maximum of 3.
 	 */
 	function createAndAuthenticate(
 		string calldata _name,
