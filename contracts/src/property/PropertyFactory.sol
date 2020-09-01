@@ -4,6 +4,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {IGroup} from "contracts/src/property/PropertyGroup.sol";
 import {IPropertyFactory} from "contracts/src/property/IPropertyFactory.sol";
+import {IMarket} from "contracts/src/market/IMarket.sol";
 
 /**
  * A factory contract that creates a new Property contract.
@@ -25,12 +26,40 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 		string calldata _symbol,
 		address _author
 	) external returns (address) {
-		/**
-		 * Validates the name and the token symbol.
-		 */
-		validatePropertyName(_name);
-		validatePropertySymbol(_symbol);
+		return _create(_name, _symbol, _author);
+	}
 
+	/**
+	 * Creates a new Property contract and authenticate.
+	 */
+	function createAndAuthenticate(
+		string calldata _name,
+		string calldata _symbol,
+		address _market,
+		string calldata _args1,
+		string calldata _args2,
+		string calldata _args3
+	) external returns (bool) {
+		return
+			IMarket(_market).authenticateFromPropertyFactory(
+				_create(_name, _symbol, msg.sender),
+				msg.sender,
+				_args1,
+				_args2,
+				_args3,
+				"",
+				""
+			);
+	}
+
+	/**
+	 * Creates a new Property contract.
+	 */
+	function _create(
+		string memory _name,
+		string memory _symbol,
+		address _author
+	) private returns (address) {
 		/**
 		 * Creates a new Property contract.
 		 */
