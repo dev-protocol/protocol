@@ -81,7 +81,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		})
 
 		it('Create a new Property and authenticate at the same time', async () => {
-			dev.propertyFactory
+			;(dev.propertyFactory as any)
 				.createAndAuthenticate(
 					'example',
 					'EXAMPLE',
