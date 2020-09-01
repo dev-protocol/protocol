@@ -78,34 +78,4 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 		emit Create(msg.sender, address(property));
 		return address(property);
 	}
-
-	/**
-	 * Validates the token name.
-	 */
-	function validatePropertyName(string memory _name) private pure {
-		uint256 len = bytes(_name).length;
-		require(
-			len >= 3,
-			"name must be at least 3 and no more than 10 characters"
-		);
-		require(
-			len <= 10,
-			"name must be at least 3 and no more than 10 characters"
-		);
-	}
-
-	/**
-	 * Validates the token symbol.
-	 */
-	function validatePropertySymbol(string memory _symbol) private pure {
-		uint256 len = bytes(_symbol).length;
-		require(
-			len >= 3,
-			"symbol must be at least 3 and no more than 10 characters"
-		);
-		require(
-			len <= 10,
-			"symbol must be at least 3 and no more than 10 characters"
-		);
-	}
 }
