@@ -158,7 +158,7 @@ contract(
 				const key = await behavuorInstance.getId(metrics.address)
 				expect(key).to.be.equal('id-key')
 			})
-			it('The address of the account that executed the authinticate function has been passed to the behavior.', async () => {
+			it(`The sender's address is passed to Market Behavior.`, async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticate(
@@ -179,7 +179,7 @@ contract(
 					await marketTest3Instance.currentAuthinticateAccount()
 				).to.be.equal(propertyAuther)
 			})
-			it('Market that is not enabled generates an error when performing authentication function.', async () => {
+			it('Should fail to run when not enabled Market.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress2)
 				const result = await marketInstance
@@ -189,7 +189,7 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'market is not enabled')
 			})
-			it('Error occurs if id is not set.', async () => {
+			it('Should fail to run when not passed the ID.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const result = await marketInstance
@@ -199,7 +199,7 @@ contract(
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'id is required')
 			})
-			it('Should fail to run when sent from other than the owner of Property Contract.', async () => {
+			it('Should fail to run when sent from other than Property Factory Contract.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				const result = await marketInstance
@@ -207,7 +207,7 @@ contract(
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
-			it('An error occurs if the same id is specified.', async () => {
+			it('Should fail to run when the passed ID is already authenticated.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				await marketInstance.authenticate(
