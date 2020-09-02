@@ -15,6 +15,21 @@ interface IMarket {
 			bool
 		);
 
+	function authenticateFromPropertyFactory(
+		address _prop,
+		address _author,
+		string calldata _args1,
+		string calldata _args2,
+		string calldata _args3,
+		string calldata _args4,
+		string calldata _args5
+	)
+		external
+		returns (
+			// solium-disable-next-line indentation
+			bool
+		);
+
 	function authenticatedCallback(address _property, bytes32 _idHash)
 		external
 		returns (address);
