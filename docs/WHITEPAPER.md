@@ -137,7 +137,6 @@ contract IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 }
-
 ```
 
 When you implement the `authenticate` function, please verify the caller.Create a function to set the associatedMarket.
