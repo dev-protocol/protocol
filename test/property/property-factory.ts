@@ -78,6 +78,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			})
 			await dev.dev.mint(user, 10000000000)
 			marketAddress = getMarketAddress(result)
+			await (market as any).setAssociatedMarket(marketAddress, {from: user})
 		})
 
 		it('Create a new Property and authenticate at the same time', async () => {
