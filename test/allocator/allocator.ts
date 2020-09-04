@@ -50,6 +50,9 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		const marketAddress = getMarketAddress(createMarketResult)
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const marketInstance = await marketContract.at(marketAddress)
+		await (behavuor as any).setAssociatedMarket(marketAddress, {
+			from: user1,
+		})
 		await marketInstance.authenticate(
 			propertyAddress,
 			'id-key',

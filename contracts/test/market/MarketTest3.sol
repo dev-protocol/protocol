@@ -1,12 +1,15 @@
 pragma solidity ^0.5.0;
 
+import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
-contract MarketTest3 is IMarketBehavior, UsingConfig {
+contract MarketTest3 is Ownable, IMarketBehavior, UsingConfig {
 	string public schema = "[]";
+	bool public asynchronousMode = false;
+	address private associatedMarket;
 	mapping(address => string) internal keys;
 	mapping(string => address) private addresses;
 	address public currentAuthinticateAccount;
@@ -25,6 +28,8 @@ contract MarketTest3 is IMarketBehavior, UsingConfig {
 		address market,
 		address account
 	) public returns (bool) {
+		require(msg.sender == address(0) || msg.sender == associatedMarket, "Invalid sender");
+
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
 		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
 		keys[_metrics] = _args1;
@@ -39,5 +44,9 @@ contract MarketTest3 is IMarketBehavior, UsingConfig {
 
 	function getMetrics(string memory _id) public view returns (address) {
 		return addresses[_id];
+	}
+
+	function setAssociatedMarket(address _associatedMarket) external onlyOwner {
+		associatedMarket = _associatedMarket;
 	}
 }

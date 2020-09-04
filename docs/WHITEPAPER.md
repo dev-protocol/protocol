@@ -139,6 +139,28 @@ contract IMarketBehavior {
 }
 ```
 
+When you implement the `authenticate` function, please verify the caller.Create a function to set the associatedMarket.
+
+```solidity
+	function authenticate(
+		address _prop,
+		string memory _args1,
+		string memory,
+		string memory,
+		string memory,
+		string memory,
+		// solium-disable-next-line no-trailing-whitespace
+		address market,
+		address
+	) public returns (bool) {
+		require(msg.sender == address(0) || msg.sender == associatedMarket, "Invalid sender");
+		・
+		・
+		・
+		・
+	}
+```
+
 The `schema` is an array-type JSON character string that explains the significance of the arguments that the `authenticate` function receives for authentication. The maximum for these arguments is 5, in addition to the address of the Property Contract. An example is presented below.
 
 ```solidity

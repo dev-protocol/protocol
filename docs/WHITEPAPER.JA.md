@@ -145,6 +145,29 @@ contract IMarketBehavior {
 }
 ```
 
+`authenticate` 関数を実装する際は呼び出し元の検証を行ってください。associatedMarketをセットする関数を別途作成してください。
+
+
+```solidity
+	function authenticate(
+		address _prop,
+		string memory _args1,
+		string memory,
+		string memory,
+		string memory,
+		string memory,
+		// solium-disable-next-line no-trailing-whitespace
+		address market,
+		address
+	) public returns (bool) {
+		require(msg.sender == address(0) || msg.sender == associatedMarket, "Invalid sender");
+		・
+		・
+		・
+		・
+	}
+```
+
 `schema` は配列型の JSON 文字列で、 `authenticate` 関数が認証のために受け取る引数の意味を説明する。この引数は Property Contract のアドレスに加えて最大 5 つである。例えば以下のようになる。
 
 ```solidity
