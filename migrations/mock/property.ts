@@ -1,3 +1,4 @@
+import Web3 from 'web3'
 import {PropertyFactoryInstance} from '../../types/truffle-contracts'
 import {AddressInfo, createInstance} from './common'
 
