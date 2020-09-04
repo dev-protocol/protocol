@@ -36,9 +36,10 @@
 			}
 		},
 		{
-			"files": ["migrations/**/*"],
+			"files": ["migrations/**/*", "test/**/*"],
 			"globals": {
-				"artifacts": "readonly"
+				"artifacts": "readonly",
+				"Truffle": "readonly"
 			}
 		}
 	]

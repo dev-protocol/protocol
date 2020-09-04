@@ -102,7 +102,6 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	}
 
 	/**
-	 * Bypass to IMarketBehavior.authenticate.
 	 * Authenticates the new asset and proves that the Property author is the owner of the asset.
 	 */
 	function authenticate(
@@ -113,8 +112,69 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		string memory _args4,
 		string memory _args5
 	) public onlyPropertyAuthor(_prop) returns (bool) {
-		uint256 len = bytes(_args1).length;
-		require(len > 0, "id is required");
+		return
+			_authenticate(
+				_prop,
+				msg.sender,
+				_args1,
+				_args2,
+				_args3,
+				_args4,
+				_args5
+			);
+	}
+
+	/**
+	 * Authenticates the new asset and proves that the Property author is the owner of the asset.
+	 */
+	function authenticateFromPropertyFactory(
+		address _prop,
+		address _author,
+		string calldata _args1,
+		string calldata _args2,
+		string calldata _args3,
+		string calldata _args4,
+		string calldata _args5
+	) external returns (bool) {
+		/**
+		 * Validates the sender is PropertyFactory.
+		 */
+		addressValidator().validateAddress(
+			msg.sender,
+			config().propertyFactory()
+		);
+
+		/**
+		 * Validates this Market is already enabled..
+		 */
+		require(enabled, "market is not enabled");
+
+		return
+			_authenticate(
+				_prop,
+				_author,
+				_args1,
+				_args2,
+				_args3,
+				_args4,
+				_args5
+			);
+	}
+
+	/**
+	 * Bypass to IMarketBehavior.authenticate.
+	 * Authenticates the new asset and proves that the Property author is the owner of the asset.
+	 */
+	function _authenticate(
+		address _prop,
+		address _author,
+		string memory _args1,
+		string memory _args2,
+		string memory _args3,
+		string memory _args4,
+		string memory _args5
+	) private returns (bool) {
+		require(bytes(_args1).length > 0, "id is required");
 
 		return
 			IMarketBehavior(behavior).authenticate(
@@ -125,7 +185,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 				_args4,
 				_args5,
 				address(this),
-				msg.sender
+				_author
 			);
 	}
 
