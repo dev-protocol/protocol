@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`3.1.0`**
+Version: **`3.1.1`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -143,6 +143,7 @@ contract IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 }
+
 ```
 
 `schema` は配列型の JSON 文字列で、 `authenticate` 関数が認証のために受け取る引数の意味を説明する。この引数は Property Contract のアドレスに加えて最大 5 つである。例えば以下のようになる。
