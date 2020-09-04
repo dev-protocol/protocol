@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`3.1.0`**
+Version: **`3.1.1`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -143,6 +143,7 @@ contract IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 }
+
 ```
 
 `authenticate` 関数を実装する際は呼び出し元の検証を行ってください。associatedMarket をセットする関数を別途作成してください。

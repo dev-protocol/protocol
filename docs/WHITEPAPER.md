@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`3.1.0`**
+Version: **`3.1.1`**
 
 _There is a possibility that this white paper will be updated. When there is an update, the version number will increase according to [Semantic Versioning](https://semver.org/)._
 
@@ -137,6 +137,7 @@ contract IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 }
+
 ```
 
 When you implement the `authenticate` function, please verify the caller.Create a function to set the associatedMarket.
