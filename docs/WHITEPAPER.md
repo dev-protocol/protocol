@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`3.1.1`**
+Version: **`3.2.1`**
 
 _There is a possibility that this white paper will be updated. When there is an update, the version number will increase according to [Semantic Versioning](https://semver.org/)._
 
