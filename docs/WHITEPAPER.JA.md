@@ -145,8 +145,7 @@ contract IMarketBehavior {
 }
 ```
 
-`authenticate` 関数を実装する際は呼び出し元の検証を行ってください。associatedMarketをセットする関数を別途作成してください。
-
+`authenticate` 関数を実装する際は呼び出し元の検証を行ってください。associatedMarket をセットする関数を別途作成してください。
 
 ```solidity
 	function authenticate(
