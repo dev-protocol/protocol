@@ -43,12 +43,6 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		policyGroup.addGroup(_newPolicyAddress);
 
 		/**
-		 * Adds the created Policy contract to the Policy address set that is accepting votes.
-		 */
-		IPolicySet policySet = IPolicySet(config().policySet());
-		policySet.addSet(_newPolicyAddress);
-
-		/**
 		 * When the new Policy is the first Policy, the processing ends.
 		 */
 		if (config().policy() == _newPolicyAddress) {
@@ -58,6 +52,7 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		/**
 		 * Resets the voting period because a new Policy has been added.
 		 */
+		IPolicySet policySet = IPolicySet(config().policySet());
 		policySet.setVotingEndBlockNumber(_newPolicyAddress);
 	}
 
@@ -76,22 +71,10 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		config().setPolicy(_currentPolicyAddress);
 
 		/**
-		 * Removes all unapproved Policies from the voting target.
-		 */
-		IPolicySet policySet = IPolicySet(config().policySet());
-		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
-		for (uint256 i = 0; i < policySet.count(); i++) {
-			address policyAddress = policySet.get(i);
-			if (policyAddress == _currentPolicyAddress) {
-				continue;
-			}
-			policyGroup.deleteGroup(policyAddress);
-		}
-
-		/**
 		 * Resets the Policy address set that is accepting votes.
 		 */
-		policySet.reset();
-		policySet.addSet(_currentPolicyAddress);
+		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
+		policyGroup.incrementVotingGroupIndex();
+		policyGroup.addGroup(_currentPolicyAddress);
 	}
 }

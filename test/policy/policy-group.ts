@@ -42,26 +42,5 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
-		describe('PolicyGroup; deleteGroup', () => {
-			it('Existing addresses can be deleted', async () => {
-				await dev.policyGroup.deleteGroup(policy, {from: policyFactory})
-				const result = await dev.policyGroup.isGroup(policy)
-				expect(result).to.be.equal(false)
-			})
-			it('Non-existent addresses cannot be deleted', async () => {
-				const result = await dev.policyGroup
-					.deleteGroup(policy, {from: policyFactory})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not enabled')
-			})
-			it('Can not execute deleteGroup without policyFactory address', async () => {
-				const result = await dev.policyGroup
-					.deleteGroup(policy, {
-						from: dummyPolicyFactory,
-					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
-			})
-		})
 	}
 )

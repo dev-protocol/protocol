@@ -21,20 +21,36 @@ contract PolicyGroup is
 		);
 
 		require(isGroup(_addr) == false, "already enabled");
-		eternalStorage().setBool(getGroupKey(_addr), true);
-	}
-
-	function deleteGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
-
-		require(isGroup(_addr), "not enabled");
-		return eternalStorage().setBool(getGroupKey(_addr), false);
+		eternalStorage().setBool(getPolicyGroupKey(_addr), true);
 	}
 
 	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
+		return eternalStorage().getBool(getPolicyGroupKey(_addr));
+	}
+
+	function getVotingGroupIndex() public view returns (uint256) {
+		bytes32 key = getVotingGroupIndexKey();
+		return eternalStorage().getUint(key);
+	}
+
+	function incrementVotingGroupIndex() external {
+		bytes32 key = getVotingGroupIndexKey();
+		uint256 idx = eternalStorage().getUint(key);
+		idx++;
+		eternalStorage().setUint(key, idx);
+	}
+
+	function getVotingGroupIndexKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_votingGroupIndex"));
+	}
+
+	function getPolicyGroupKey(address _addr) private view returns (bytes32) {
+		uint256 idx = getVotingGroupIndex();
+		return keccak256(abi.encodePacked("_group", idx, _addr));
+	}
+
+	function addGroupOwner(address _addr) external onlyOwner {
+		require(isGroup(_addr) == false, "already enabled");
+		eternalStorage().setBool(getPolicyGroupKey(_addr), true);
 	}
 }
