@@ -3,7 +3,6 @@ pragma solidity ^0.5.0;
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
-import {IPolicySet} from "contracts/src/policy/IPolicySet.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
 /**
@@ -52,8 +51,7 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		/**
 		 * Resets the voting period because a new Policy has been added.
 		 */
-		IPolicySet policySet = IPolicySet(config().policySet());
-		policySet.setVotingEndBlockNumber(_newPolicyAddress);
+		policyGroup.setVotingEndBlockNumber(_newPolicyAddress);
 	}
 
 	/**

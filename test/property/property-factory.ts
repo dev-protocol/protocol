@@ -61,7 +61,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateMetricsGroup(),
 				dev.generatePolicyFactory(),
 				dev.generatePolicyGroup(),
-				dev.generatePolicySet(),
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
 				dev.generateLockup(),

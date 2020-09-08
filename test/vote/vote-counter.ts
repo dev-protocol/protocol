@@ -28,7 +28,6 @@ contract(
 				dev.generateMarketFactory(),
 				dev.generatePolicyGroup(),
 				dev.generatePolicyFactory(),
-				dev.generatePolicySet(),
 				dev.generateLockup(),
 				dev.generateDev(),
 				dev.generatePropertyFactory(),

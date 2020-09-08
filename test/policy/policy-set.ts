@@ -6,7 +6,6 @@ contract('PolicySetTest', ([deployer, policyFactory]) => {
 		const init2 = async (): Promise<DevProtocolInstance> => {
 			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressConfig()
-			await dev.generatePolicySet()
 			await dev.generatePolicyGroup()
 			await dev.generatePolicyFactory()
 			const policy = await dev.getPolicy('PolicyTestForPolicyFactory', deployer)
@@ -22,15 +21,17 @@ contract('PolicySetTest', ([deployer, policyFactory]) => {
 				from: deployer,
 			})
 			const policy = await dev.getPolicy('PolicyTestForPolicyFactory', deployer)
-			await dev.policySet.setVotingEndBlockNumber(policy.address, {
+			await dev.policyGroup.setVotingEndBlockNumber(policy.address, {
 				from: policyFactory,
 			})
-			let voting = await dev.policySet.voting(await dev.addressConfig.policy())
+			let voting = await dev.policyGroup.voting(
+				await dev.addressConfig.policy()
+			)
 			expect(voting).to.be.equal(false)
-			voting = await dev.policySet.voting(policy.address)
+			voting = await dev.policyGroup.voting(policy.address)
 			expect(voting).to.be.equal(true)
 			await mine(11)
-			voting = await dev.policySet.voting(policy.address)
+			voting = await dev.policyGroup.voting(policy.address)
 			expect(voting).to.be.equal(false)
 		})
 	})

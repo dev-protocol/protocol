@@ -4,10 +4,7 @@ import {DevProtocolInstance} from '../test-lib/instance'
 
 import {collectsEth} from '../test-lib/utils/common'
 import {getPropertyAddress} from '../test-lib/utils/log'
-import {
-	validateErrorMessage,
-	validateAddressErrorMessage,
-} from '../test-lib/utils/error'
+import {validateAddressErrorMessage} from '../test-lib/utils/error'
 
 contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 	before(async () => {
@@ -20,7 +17,6 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 			await dev.generateAddressConfig()
 			await Promise.all([
 				dev.generatePolicyGroup(),
-				dev.generatePolicySet(),
 				dev.generatePolicyFactory(),
 				dev.generateMarketFactory(),
 				dev.generateMarketGroup(),
@@ -39,7 +35,7 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 			await dev.policyFactory.create(policy.address, {
 				from: user1,
 			})
-			const voting = await dev.policySet.voting(policy.address)
+			const voting = await dev.policyGroup.voting(policy.address)
 			expect(voting).to.be.equal(false)
 		})
 		it('If other than the first Policy, the Policy is waiting for enable by the voting.', async () => {
@@ -51,7 +47,7 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 			await dev.policyFactory.create(second.address, {
 				from: user1,
 			})
-			const voting = await dev.policySet.voting(second.address)
+			const voting = await dev.policyGroup.voting(second.address)
 			expect(voting).to.be.equal(true)
 		})
 	})
@@ -62,7 +58,6 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 			await dev.generateAddressConfig()
 			await Promise.all([
 				dev.generatePolicyGroup(),
-				dev.generatePolicySet(),
 				dev.generatePolicyFactory(),
 				dev.generateVoteCounter(),
 				dev.generateMarketFactory(),

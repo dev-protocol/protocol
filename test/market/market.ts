@@ -27,7 +27,6 @@ contract(
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
@@ -49,7 +48,6 @@ contract(
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
@@ -74,7 +72,6 @@ contract(
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
@@ -102,7 +99,6 @@ contract(
 					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
@@ -315,7 +311,6 @@ contract(
 					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
