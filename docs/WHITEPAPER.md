@@ -153,7 +153,7 @@ When you implement the `authenticate` function, please verify the caller.Create 
 		address market,
 		address
 	) public returns (bool) {
-		require(msg.sender == address(0) || msg.sender == associatedMarket, "Invalid sender");
+		require(msg.sender == associatedMarket, "Invalid sender");
 		・
 		・
 		・

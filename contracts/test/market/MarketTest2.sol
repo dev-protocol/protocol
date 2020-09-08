@@ -8,7 +8,6 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
 contract MarketTest2 is Ownable, IMarketBehavior, UsingConfig {
 	string public schema = "[]";
-	bool public asynchronousMode = false;
 	address private associatedMarket;
 	mapping(address => string) internal keys;
 	mapping(string => address) private addresses;
@@ -28,7 +27,7 @@ contract MarketTest2 is Ownable, IMarketBehavior, UsingConfig {
 		address
 	) public returns (bool) {
 		require(
-			msg.sender == address(0) || msg.sender == associatedMarket,
+			msg.sender == associatedMarket,
 			"Invalid sender"
 		);
 
