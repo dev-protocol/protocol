@@ -143,6 +143,7 @@ contract IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 }
+
 ```
 
 `authenticate` 関数を実装する際は呼び出し元の検証を行ってください。associatedMarket をセットする関数を別途作成してください。
