@@ -44,3 +44,5 @@ contract(
 		})
 	}
 )
+
+// TODO getVotingGroupIndex ,incrementVotingGroupIndex
