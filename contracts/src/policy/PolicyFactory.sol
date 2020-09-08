@@ -40,18 +40,6 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		 */
 		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		policyGroup.addGroup(_newPolicyAddress);
-
-		/**
-		 * When the new Policy is the first Policy, the processing ends.
-		 */
-		if (config().policy() == _newPolicyAddress) {
-			return;
-		}
-
-		/**
-		 * Resets the voting period because a new Policy has been added.
-		 */
-		policyGroup.setVotingEndBlockNumber(_newPolicyAddress);
 	}
 
 	/**

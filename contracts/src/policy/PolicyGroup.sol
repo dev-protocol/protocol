@@ -24,8 +24,12 @@ contract PolicyGroup is
 			config().policyFactory()
 		);
 
-		require(isGroup(_addr) == false, "already enabled");
+		require(isGroup(_addr) == false, "already group");
 		eternalStorage().setBool(getPolicyGroupKey(_addr), true);
+		/**
+		 * Resets the voting period because a new Policy has been added.
+		 */
+		setVotingEndBlockNumber(_addr);
 	}
 
 	function incrementVotingGroupIndex() external {
@@ -35,19 +39,8 @@ contract PolicyGroup is
 		eternalStorage().setUint(key, idx);
 	}
 
-	function setVotingEndBlockNumber(address _policy) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
-		bytes32 key = getVotingEndBlockNumberKey(_policy);
-		uint256 tmp = IPolicy(config().policy()).policyVotingBlocks();
-		uint256 votingEndBlockNumber = block.number.add(tmp);
-		eternalStorage().setUint(key, votingEndBlockNumber);
-	}
-
 	function addGroupOwner(address _addr) external onlyOwner {
-		require(isGroup(_addr) == false, "already enabled");
+		require(isGroup(_addr) == false, "already group");
 		eternalStorage().setBool(getPolicyGroupKey(_addr), true);
 	}
 
@@ -64,6 +57,17 @@ contract PolicyGroup is
 		bytes32 key = getVotingEndBlockNumberKey(_policy);
 		uint256 limit = eternalStorage().getUint(key);
 		return block.number <= limit;
+	}
+
+	function setVotingEndBlockNumber(address _policy) private {
+		addressValidator().validateAddress(
+			msg.sender,
+			config().policyFactory()
+		);
+		bytes32 key = getVotingEndBlockNumberKey(_policy);
+		uint256 tmp = IPolicy(config().policy()).policyVotingBlocks();
+		uint256 votingEndBlockNumber = block.number.add(tmp);
+		eternalStorage().setUint(key, votingEndBlockNumber);
 	}
 
 	function getVotingGroupIndexKey() private pure returns (bytes32) {
