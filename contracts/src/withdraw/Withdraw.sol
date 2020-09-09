@@ -170,9 +170,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 	 * Passthrough to `Lockup.difference` function.
 	 */
 	function difference(
-		WithdrawStorage withdrawStorage,
-		address _property,
-		address _user
+		address _property
 	)
 		private
 		view
@@ -202,9 +200,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		 * and the difference to the previous withdrawal of holder reward unit price.
 		 */
 		(, , uint256 _holdersPrice, , ) = difference(
-			withdrawStorage,
-			_property,
-			_user
+			_property
 		);
 
 		/**

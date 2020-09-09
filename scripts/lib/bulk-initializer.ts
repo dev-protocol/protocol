@@ -13,7 +13,6 @@ import builtLockup from '../../build/contracts/Lockup.json'
 import builtMetricsGroup from '../../build/contracts/MetricsGroup.json'
 import builtDev from '../../build/contracts/Dev.json'
 import builtWithdrawStorage from '../../build/contracts/WithdrawStorage.json'
-import builtWithdrawMigration from '../../build/contracts/WithdrawMigration.json'
 import {AbiItem} from 'web3-utils/types'
 export const createRegistry = (configAddress: string, libWeb3: Web3) =>
 	new libWeb3.eth.Contract(builtConfig.abi as AbiItem[], configAddress)
@@ -47,7 +46,7 @@ export const createMetricsGroup = async (
 }
 
 export const createWithdrawMigration = (address: string, libWeb3: Web3) =>
-	new libWeb3.eth.Contract(builtWithdrawMigration.abi as AbiItem[], address)
+	new libWeb3.eth.Contract([] as AbiItem[], address)
 
 export const createWithdrawStorage = (address: string, libWeb3: Web3) =>
 	new libWeb3.eth.Contract(builtWithdrawStorage.abi as AbiItem[], address)
