@@ -1,11 +1,11 @@
 pragma solidity ^0.5.0;
 
-import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
+import {LegacyWithdraw} from "contracts/src/withdraw/LegacyWithdraw.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 
-contract WithdrawMigration is Withdraw, Ownable {
-	constructor(address _config) public Withdraw(_config) {}
+contract WithdrawMigration is LegacyWithdraw, Ownable {
+	constructor(address _config) public LegacyWithdraw(_config) {}
 
 	function setLastCumulativeHoldersReward(
 		address _property,
