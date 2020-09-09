@@ -3,17 +3,13 @@ pragma solidity ^0.5.0;
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 
 contract WithdrawStorageTest is WithdrawStorage {
-	function setRewardsAmountTest(
-		address _property,
-		uint256 _value
-	) external {
+	function setRewardsAmountTest(address _property, uint256 _value) external {
 		setRewardsAmount(_property, _value);
 	}
 
-	function setCumulativePriceTest(
-		address _property,
-		uint256 _value
-	) external {
+	function setCumulativePriceTest(address _property, uint256 _value)
+		external
+	{
 		setCumulativePrice(_property, _value);
 	}
 

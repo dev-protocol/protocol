@@ -8,11 +8,7 @@ contract WithdrawStorage is UsingStorage {
 		eternalStorage().setUint(getRewardsAmountKey(_property), _value);
 	}
 
-	function getRewardsAmount(address _property)
-		public
-		view
-		returns (uint256)
-	{
+	function getRewardsAmount(address _property) public view returns (uint256) {
 		return eternalStorage().getUint(getRewardsAmountKey(_property));
 	}
 

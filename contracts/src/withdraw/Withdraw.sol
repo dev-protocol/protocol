@@ -51,11 +51,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		 * Saves the latest cumulative sum of the maximum mint amount.
 		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
 		 */
-		setLastCumulativeGlobalHoldersPrice(
-			_property,
-			msg.sender,
-			lastPrice
-		);
+		setLastCumulativeGlobalHoldersPrice(_property, msg.sender, lastPrice);
 
 		/**
 		 * Sets the number of unwithdrawn rewards to 0.
@@ -82,10 +78,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Adds the reward amount already withdrawn in the passed Property.
 		 */
-		setRewardsAmount(
-			_property,
-			getRewardsAmount(_property).add(value)
-		);
+		setRewardsAmount(_property, getRewardsAmount(_property).add(value));
 	}
 
 	/**
@@ -119,39 +112,20 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
 		 */
-		setLastCumulativeGlobalHoldersPrice(
-			_property,
-			_from,
-			priceFrom
-		);
-		setLastCumulativeGlobalHoldersPrice(
-			_property,
-			_to,
-			priceTo
-		);
+		setLastCumulativeGlobalHoldersPrice(_property, _from, priceFrom);
+		setLastCumulativeGlobalHoldersPrice(_property, _to, priceTo);
 
 		/**
 		 * Gets the unwithdrawn reward amount of the transfer source and destination.
 		 */
-		uint256 pendFrom = getPendingWithdrawal(
-			_property,
-			_from
-		);
+		uint256 pendFrom = getPendingWithdrawal(_property, _from);
 		uint256 pendTo = getPendingWithdrawal(_property, _to);
 
 		/**
 		 * Adds the undrawn reward amount of the transfer source and destination.
 		 */
-		setPendingWithdrawal(
-			_property,
-			_from,
-			pendFrom.add(amountFrom)
-		);
-		setPendingWithdrawal(
-			_property,
-			_to,
-			pendTo.add(amountTo)
-		);
+		setPendingWithdrawal(_property, _from, pendFrom.add(amountFrom));
+		setPendingWithdrawal(_property, _to, pendTo.add(amountTo));
 
 		emit PropertyTransfer(_property, _from, _to);
 	}
@@ -159,10 +133,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	/**
 	 * Passthrough to `Lockup.difference` function.
 	 */
-	function difference(
-		address _property,
-		address _user
-	)
+	function difference(address _property, address _user)
 		private
 		view
 		returns (
@@ -176,10 +147,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets and passes the last recorded cumulative sum of the maximum mint amount.
 		 */
-		uint256 _last = getLastCumulativeGlobalHoldersPrice(
-			_property,
-			_user
-		);
+		uint256 _last = getLastCumulativeGlobalHoldersPrice(_property, _user);
 		return ILockup(config().lockup()).difference(_property, _last);
 	}
 
@@ -246,9 +214,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets the reward amount in saved without withdrawal and returns the sum of all values.
 		 */
-		uint256 value = _value
-			.add(getPendingWithdrawal(_property, _user))
-			.add(legacy);
+		uint256 value = _value.add(getPendingWithdrawal(_property, _user)).add(
+			legacy
+		);
 		return (value, price);
 	}
 
@@ -293,10 +261,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		view
 		returns (uint256)
 	{
-		uint256 _last = getLastWithdrawalPrice(
-			_property,
-			_user
-		);
+		uint256 _last = getLastWithdrawalPrice(_property, _user);
 		uint256 price = getCumulativePrice(_property);
 		uint256 priceGap = price.sub(_last);
 		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
