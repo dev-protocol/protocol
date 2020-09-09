@@ -8,4 +8,6 @@ contract IPolicyGroup is IGroup {
 	function incrementVotingGroupIndex() external;
 
 	function voting(address _policy) external view returns (bool);
+
+	function addGroupWithoutSetVotingEnd(address _addr) public;
 }

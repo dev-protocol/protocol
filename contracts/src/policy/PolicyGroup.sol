@@ -19,6 +19,14 @@ contract PolicyGroup is
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
+		addGroupWithoutSetVotingEnd(_addr);
+		/**
+		 * Resets the voting period because a new Policy has been added.
+		 */
+		setVotingEndBlockNumber(_addr);
+	}
+
+	function addGroupWithoutSetVotingEnd(address _addr) public {
 		addressValidator().validateAddress(
 			msg.sender,
 			config().policyFactory()
@@ -26,10 +34,6 @@ contract PolicyGroup is
 
 		require(isGroup(_addr) == false, "already group");
 		eternalStorage().setBool(getPolicyGroupKey(_addr), true);
-		/**
-		 * Resets the voting period because a new Policy has been added.
-		 */
-		setVotingEndBlockNumber(_addr);
 	}
 
 	function incrementVotingGroupIndex() external {
@@ -60,10 +64,6 @@ contract PolicyGroup is
 	}
 
 	function setVotingEndBlockNumber(address _policy) private {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
 		bytes32 key = getVotingEndBlockNumberKey(_policy);
 		uint256 tmp = IPolicy(config().policy()).policyVotingBlocks();
 		uint256 votingEndBlockNumber = block.number.add(tmp);

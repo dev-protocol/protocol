@@ -36,7 +36,6 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 				from: user1,
 			})
 			const voting = await dev.policyGroup.voting(policy.address)
-			console.log(voting)
 			expect(voting).to.be.equal(false)
 		})
 		it('If other than the first Policy, the Policy is waiting for enable by the voting.', async () => {

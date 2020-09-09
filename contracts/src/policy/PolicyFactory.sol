@@ -31,14 +31,16 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		/**
 		 * In the case of the first Policy, it will be activated immediately.
 		 */
+		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		if (config().policy() == address(0)) {
 			config().setPolicy(_newPolicyAddress);
+			policyGroup.addGroupWithoutSetVotingEnd(_newPolicyAddress);
+			return;
 		}
 
 		/**
 		 * Adds the created Policy contract to the Policy address set.
 		 */
-		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		policyGroup.addGroup(_newPolicyAddress);
 	}
 
