@@ -95,7 +95,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ runner.os }}-${ GITHUB_SHA }
+          key: ${{ runner.os }}-${ GITHUB_SHA }-${ GITHUB_SHA }
 
       - name: test
         run: yarn test test/$DIR/*.ts
@@ -255,7 +255,7 @@ jobs:
             node_modules
             build
             types
-          key: ${{ runner.os }}-${ GITHUB_SHA }
+          key: ${{ runner.os }}-${ GITHUB_SHA }-${ GITHUB_SHA }
 
       - name: test
         run: yarn test test/$DIR/*.ts
