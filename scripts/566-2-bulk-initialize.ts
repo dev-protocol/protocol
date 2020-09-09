@@ -1,0 +1,161 @@
+/* eslint-disable no-undef */
+import Web3 from 'web3'
+import {Contract} from 'web3-eth-contract/types'
+import {
+	prepare,
+	createQueue,
+	createDev,
+	createWithdrawMigration,
+	createWithdrawStorage,
+	createGetLastCumulativeHoldersRewardCaller,
+	createDifferenceCaller,
+	createSetLastCumulativeHoldersReward,
+} from './lib/bulk-initializer'
+import {createFastestGasPriceFetcher} from './lib/ethgas'
+import {ethgas} from './lib/api'
+import {PromiseReturn} from './lib/types'
+const {CONFIG, EGS_TOKEN, WITHDRAW_STORAGE, WITHDRAW_MIGRATION} = process.env
+const {log: ____log} = console
+
+const DEV = '0x5cAf454Ba92e6F2c929DF14667Ee360eD9fD5b26'
+const withdrawContracts = [
+	'0x76fd43840c3944bfaa9da24125d76d7a85cf5269',
+	'0xc86f49bfa6f7c9aebaece655651b915dc124a3d6',
+	'0x2b56e1e9bf814a6658cb55898efdd61170c682d9',
+	'0x2ecefc14a8fc0f52f9345b2fc069fe46defe6e54',
+	'0xa10d4f23d87c75af4489406089615e650431034b',
+	'0x64b0990c8e663b3202589c32dc0e11ac2b1aede7',
+	'0x44a19177a4837cab0178747279bcecbebd6330f2',
+]
+
+const handler = async (
+	callback: (err: Error | null) => void
+): Promise<void> => {
+	if (!CONFIG || !EGS_TOKEN || !WITHDRAW_STORAGE || !WITHDRAW_MIGRATION) {
+		return
+	}
+
+	const [from] = await (web3 as Web3).eth.getAccounts()
+
+	const fetchAllWithdrawEvents = async (devContract: Contract) =>
+		devContract.getPastEvents('Transfer', {
+			filter: {
+				from: '0x0000000000000000000000000000000000000000',
+			},
+			fromBlock: 0,
+			toBlock: 'latest',
+		})
+
+	const dev = createDev(DEV, web3)
+	const lockup = await prepare(CONFIG, web3)
+	const diff = createDifferenceCaller(lockup)
+	const withdrawStorage = createWithdrawStorage(WITHDRAW_STORAGE, web3)
+	const withdrawMigration = createWithdrawMigration(WITHDRAW_MIGRATION, web3)
+	const setLastCumulativeHoldersReward = createSetLastCumulativeHoldersReward(
+		withdrawMigration
+	)(from)
+	const getLastCumulativeHoldersReward = createGetLastCumulativeHoldersRewardCaller(
+		withdrawStorage
+	)
+	const all = await fetchAllWithdrawEvents(dev)
+
+	const fetchFastestGasPrice = createFastestGasPriceFetcher(
+		ethgas(EGS_TOKEN),
+		web3
+	)
+
+	const filter = all.map(({transactionHash, ...x}) => async () => {
+		const {from, to, input} = await (web3 as Web3).eth.getTransaction(
+			transactionHash
+		)
+		const toWithdraw = to ? withdrawContracts.includes(to) : false
+		const propertyAddress = toWithdraw ? `0x${input.slice(-40)}` : undefined
+		const alreadyInitialized = await (toWithdraw && propertyAddress
+			? getLastCumulativeHoldersReward(propertyAddress, from).then(
+					(x) => x !== '0'
+			  )
+			: false)
+		const skip = alreadyInitialized || !toWithdraw
+		____log('Should skip?', skip, propertyAddress, transactionHash)
+		return {skip, from, propertyAddress, ...x}
+	})
+
+	const shouldInitilizeItems = await createQueue(10)
+		.addAll(filter)
+		.catch(console.error)
+
+	____log(
+		'Should skip items',
+		all.length - (shouldInitilizeItems ? shouldInitilizeItems.length : 0)
+	)
+	____log(
+		'Should initilize items',
+		shouldInitilizeItems ? shouldInitilizeItems.length : 0
+	)
+
+	const initializeTasks = shouldInitilizeItems
+		? shouldInitilizeItems.map(
+				({propertyAddress, from, blockNumber}) => async () => {
+					if (!propertyAddress) {
+						____log('Property address is not found')
+						return
+					}
+
+					const res:
+						| Error
+						| PromiseReturn<ReturnType<ReturnType<typeof diff>>> = await diff(
+						blockNumber
+					)(propertyAddress).catch((err) => new Error(err))
+					if (res instanceof Error) {
+						____log(
+							'Failed on fetch `difference`',
+							propertyAddress,
+							from,
+							blockNumber
+						)
+						return
+					}
+
+					const lastPrice = res._holdersPrice
+					const gasPrice = await fetchFastestGasPrice()
+					____log(
+						'Start initilization',
+						propertyAddress,
+						from,
+						lastPrice,
+						gasPrice
+					)
+
+					await new Promise((resolve) => {
+						setLastCumulativeHoldersReward(
+							propertyAddress,
+							from,
+							lastPrice,
+							gasPrice
+						)
+							.on('transactionHash', (hash: string) =>
+								____log('Created the transaction', hash)
+							)
+							.on('confirmation', resolve)
+							.on('error', (err) => {
+								console.error(err)
+								resolve(err)
+							})
+					})
+					____log(
+						'Done initilization',
+						propertyAddress,
+						from,
+						blockNumber,
+						lastPrice
+					)
+				}
+		  )
+		: []
+
+	await createQueue(2).addAll(initializeTasks).catch(console.error)
+
+	callback(null)
+}
+
+export = handler
