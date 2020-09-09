@@ -16,7 +16,7 @@ import {
 	WithdrawStorageInstance,
 	IPolicyInstance,
 	IMarketInstance,
-	WithdrawInstance,
+	NextWithdrawInstance,
 	MetricsInstance,
 } from '../../types/truffle-contracts'
 import {getBlock} from './utils/common'
@@ -40,7 +40,7 @@ export class DevProtocolInstance {
 	private _marketGroup!: MarketGroupInstance
 	private _metricsFactory!: MetricsFactoryInstance
 	private _metricsGroup!: MetricsGroupTestInstance
-	private _withdraw!: WithdrawInstance
+	private _withdraw!: NextWithdrawInstance
 	private _withdrawStorage!: WithdrawStorageInstance
 
 	constructor(deployer: string) {
@@ -107,7 +107,7 @@ export class DevProtocolInstance {
 		return this._metricsGroup
 	}
 
-	public get withdraw(): WithdrawInstance {
+	public get withdraw(): NextWithdrawInstance {
 		return this._withdraw
 	}
 
@@ -267,7 +267,7 @@ export class DevProtocolInstance {
 	}
 
 	public async generateWithdraw(): Promise<void> {
-		this._withdraw = await contract('Withdraw').new(
+		this._withdraw = await contract('NextWithdraw').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)

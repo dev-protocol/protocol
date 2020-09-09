@@ -196,6 +196,44 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 			keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
 	}
 
+	//LastCumulativeGlobalHoldersPrice
+	function setLastCumulativeGlobalHoldersPrice(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		addressValidator().validateAddress(msg.sender, config().withdraw());
+
+		eternalStorage().setUint(
+			getLastCumulativeGlobalHoldersPriceKey(_property, _user),
+			_value
+		);
+	}
+
+	function getLastCumulativeGlobalHoldersPrice(
+		address _property,
+		address _user
+	) external view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getLastCumulativeGlobalHoldersPriceKey(_property, _user)
+			);
+	}
+
+	function getLastCumulativeGlobalHoldersPriceKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativeGlobalHoldersPrice",
+					_property,
+					_user
+				)
+			);
+	}
+
 	//LastCumulativeHoldersReward
 	function setLastCumulativeHoldersReward(
 		address _property,
