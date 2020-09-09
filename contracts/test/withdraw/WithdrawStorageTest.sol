@@ -1,0 +1,61 @@
+pragma solidity ^0.5.0;
+
+import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
+
+contract WithdrawStorageTest is WithdrawStorage {
+	function setRewardsAmountTest(
+		address _property,
+		uint256 _value
+	) external {
+		setRewardsAmount(_property, _value);
+	}
+
+	function setCumulativePriceTest(
+		address _property,
+		uint256 _value
+	) external {
+		setCumulativePrice(_property, _value);
+	}
+
+	function setWithdrawalLimitTotalTest(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		setWithdrawalLimitTotal(_property, _user, _value);
+	}
+
+	function setWithdrawalLimitBalanceTest(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		setWithdrawalLimitBalance(_property, _user, _value);
+	}
+
+	function setLastWithdrawalPriceTest(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		setLastWithdrawalPrice(_property, _user, _value);
+	}
+
+	function setPendingWithdrawalTest(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		setPendingWithdrawal(_property, _user, _value);
+	}
+
+	function setLastCumulativeGlobalHoldersPriceTest(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		setLastCumulativeGlobalHoldersPrice(_property, _user, _value);
+	}
+}
+
+// TODO https://github.com/dev-protocol/protocol/pull/566/files を考慮

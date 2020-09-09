@@ -13,10 +13,10 @@ import {
 	MarketGroupInstance,
 	MetricsFactoryInstance,
 	MetricsGroupTestInstance,
-	WithdrawStorageInstance,
 	IPolicyInstance,
 	IMarketInstance,
 	WithdrawInstance,
+	WithdrawTestInstance,
 	MetricsInstance,
 } from '../../types/truffle-contracts'
 import {getBlock} from './utils/common'
@@ -41,7 +41,7 @@ export class DevProtocolInstance {
 	private _metricsFactory!: MetricsFactoryInstance
 	private _metricsGroup!: MetricsGroupTestInstance
 	private _withdraw!: WithdrawInstance
-	private _withdrawStorage!: WithdrawStorageInstance
+	private _withdrawTest!: WithdrawTestInstance
 
 	constructor(deployer: string) {
 		this._deployer = deployer
@@ -111,8 +111,8 @@ export class DevProtocolInstance {
 		return this._withdraw
 	}
 
-	public get withdrawStorage(): WithdrawStorageInstance {
-		return this._withdrawStorage
+	public get withdrawTest(): WithdrawTestInstance {
+		return this._withdrawTest
 	}
 
 	public async generateAddressConfig(): Promise<void> {
@@ -277,16 +277,15 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generateWithdrawStorage(): Promise<void> {
-		this._withdrawStorage = await contract('WithdrawStorage').new(
+	public async generateWithdrawTest(): Promise<void> {
+		this._withdrawTest = await contract('WithdrawTest').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setWithdrawStorage(
-			this._withdrawStorage.address,
+		await this._addressConfig.setWithdraw(
+			this._withdrawTest.address,
 			this.fromDeployer
 		)
-		await this._withdrawStorage.createStorage(this.fromDeployer)
 	}
 
 	public async getPolicy(

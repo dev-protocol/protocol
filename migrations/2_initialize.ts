@@ -44,7 +44,6 @@ const handler = function (deployer, network) {
 	// Withdraw
 	deployer.link(decimals, artifacts.require('Withdraw'))
 	deployer.deploy(artifacts.require('Withdraw'), address)
-	deployer.deploy(artifacts.require('WithdrawStorage'), address)
 } as Truffle.Migration
 
 export = handler

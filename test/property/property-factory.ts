@@ -67,7 +67,6 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateLockup(),
 				dev.generateDev(),
 				dev.generateWithdraw(),
-				dev.generateWithdrawStorage(),
 				dev.generateAllocator(),
 			])
 			const policy = await dev.getPolicy('PolicyTest1', user)
