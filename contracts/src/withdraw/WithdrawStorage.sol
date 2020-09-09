@@ -267,7 +267,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 		return
 			keccak256(
 				abi.encodePacked(
-					"_LastCumulativeHoldersReward",
+					"_lastCumulativeHoldersReward",
 					_property,
 					_user
 				)
