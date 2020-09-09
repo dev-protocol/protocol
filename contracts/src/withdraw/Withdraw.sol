@@ -52,7 +52,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
 		 */
 		WithdrawStorage withdrawStorage = getStorage();
-		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+		withdrawStorage.setLastCumulativeHoldersReward(
 			_property,
 			msg.sender,
 			lastPrice
@@ -122,16 +122,12 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		/**
 		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
 		 */
-		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+		withdrawStorage.setLastCumulativeHoldersReward(
 			_property,
 			_from,
 			priceFrom
 		);
-		withdrawStorage.setLastCumulativeGlobalHoldersPrice(
-			_property,
-			_to,
-			priceTo
-		);
+		withdrawStorage.setLastCumulativeHoldersReward(_property, _to, priceTo);
 
 		/**
 		 * Gets the unwithdrawn reward amount of the transfer source and destination.
@@ -188,14 +184,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 			uint256 _interestPrice
 		)
 	{
-		/**
-		 * Gets and passes the last recorded cumulative sum of the maximum mint amount.
-		 */
-		uint256 _last = withdrawStorage.getLastCumulativeGlobalHoldersPrice(
-			_property,
-			_user
-		);
-		return ILockup(config().lockup()).difference(_property, _last);
+		return ILockup(config().lockup()).difference(_property, 0);
 	}
 
 	/**
@@ -212,8 +201,16 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		 * Gets the latest cumulative sum of the maximum mint amount,
 		 * and the difference to the previous withdrawal of holder reward unit price.
 		 */
-		(uint256 reward, , uint256 _holdersPrice, , ) = difference(
+		(, , uint256 _holdersPrice, , ) = difference(
 			withdrawStorage,
+			_property,
+			_user
+		);
+
+		/**
+		 * Gets the last recorded holders reward.
+		 */
+		uint256 _last = withdrawStorage.getLastCumulativeHoldersReward(
 			_property,
 			_user
 		);
@@ -226,12 +223,12 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		/**
 		 * Multiplied by the number of tokens to the holder reward unit price.
 		 */
-		uint256 value = _holdersPrice.mul(balance);
+		uint256 value = _holdersPrice.sub(_last).mul(balance);
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the maximum mint amount.
 		 */
-		return (value.divBasis().divBasis(), reward);
+		return (value.divBasis().divBasis(), _holdersPrice);
 	}
 
 	/**
