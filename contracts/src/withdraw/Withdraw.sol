@@ -169,9 +169,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 	/**
 	 * Passthrough to `Lockup.difference` function.
 	 */
-	function difference(
-		address _property
-	)
+	function difference(address _property)
 		private
 		view
 		returns (
@@ -199,9 +197,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator {
 		 * Gets the latest cumulative sum of the maximum mint amount,
 		 * and the difference to the previous withdrawal of holder reward unit price.
 		 */
-		(, , uint256 _holdersPrice, , ) = difference(
-			_property
-		);
+		(, , uint256 _holdersPrice, , ) = difference(_property);
 
 		/**
 		 * Gets the last recorded holders reward.
