@@ -192,9 +192,9 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 		})
-		describe('WithdrawStorageTest; setLastCumulativeGlobalHoldersPrice, getLastCumulativeGlobalHoldersPrice', () => {
+		describe('WithdrawStorageTest; setLastCumulativeHoldersReward, getLastCumulativeHoldersReward', () => {
 			it('Initial value is 0.', async () => {
-				const result = await dev.withdrawStorage.getLastCumulativeGlobalHoldersPrice(
+				const result = await dev.withdrawStorage.getLastCumulativeHoldersReward(
 					property,
 					user,
 					{
@@ -204,7 +204,7 @@ contract(
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('The set value can be taken as it is.', async () => {
-				await dev.withdrawStorage.setLastCumulativeGlobalHoldersPrice(
+				await dev.withdrawStorage.setLastCumulativeHoldersReward(
 					property,
 					user,
 					50000000,
@@ -212,7 +212,7 @@ contract(
 						from: withdraw,
 					}
 				)
-				const result = await dev.withdrawStorage.getLastCumulativeGlobalHoldersPrice(
+				const result = await dev.withdrawStorage.getLastCumulativeHoldersReward(
 					property,
 					user,
 					{
@@ -223,7 +223,7 @@ contract(
 			})
 			it('Cannot rewrite data from other than withdraw.', async () => {
 				const result = await dev.withdrawStorage
-					.setLastCumulativeGlobalHoldersPrice(property, user, 50000000, {
+					.setLastCumulativeHoldersReward(property, user, 50000000, {
 						from: dummyWithdraw,
 					})
 					.catch((err: Error) => err)
