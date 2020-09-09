@@ -59,7 +59,9 @@ contract(
 					dev.propertyGroup.addGroup(property, {from: propertyFactory}),
 					dev.marketGroup.addGroup(market, {from: marketFactory}),
 					dev.metricsGroup.addGroup(metrics, {from: metricsFactory}),
-					dev.policyGroup.addGroup(policy, {from: policyFactory}),
+					dev.policyGroup.addGroupWithoutSetVotingEnd(policy, {
+						from: policyFactory,
+					}),
 				])
 			})
 			it('No error occurs if the address belongs to a market group.', async () => {
