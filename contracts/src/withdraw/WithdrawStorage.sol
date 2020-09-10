@@ -233,4 +233,44 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 				)
 			);
 	}
+
+	//LastCumulativeHoldersReward
+	function setLastCumulativeHoldersReward(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		addressValidator().validateAddress(msg.sender, config().withdraw());
+
+		eternalStorage().setUint(
+			getLastCumulativeHoldersRewardKey(_property, _user),
+			_value
+		);
+	}
+
+	function getLastCumulativeHoldersReward(address _property, address _user)
+		external
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getLastCumulativeHoldersRewardKey(_property, _user)
+			);
+	}
+
+	function getLastCumulativeHoldersRewardKey(address _property, address _user)
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativeHoldersReward",
+					_property,
+					_user
+				)
+			);
+	}
 }

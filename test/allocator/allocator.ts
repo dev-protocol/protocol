@@ -101,7 +101,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			await dev.propertyGroup.addGroup(propertyAddress, {
 				from: propertyFactory,
 			})
-			const beforeValue = await dev.withdrawStorage.getLastCumulativeGlobalHoldersPrice(
+			const beforeValue = await dev.withdrawStorage.getLastCumulativeHoldersReward(
 				property.address,
 				deployer
 			)
@@ -111,7 +111,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 				user1,
 				{from: propertyAddress}
 			)
-			const afterValue = await dev.withdrawStorage.getLastCumulativeGlobalHoldersPrice(
+			const afterValue = await dev.withdrawStorage.getLastCumulativeHoldersReward(
 				property.address,
 				deployer
 			)
