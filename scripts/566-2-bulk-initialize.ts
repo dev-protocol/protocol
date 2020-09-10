@@ -5,11 +5,13 @@ import {
 	prepare,
 	createQueue,
 	createDev,
-	createWithdrawMigration,
+	// Already nonexistent value
+	// createWithdrawMigration,
 	createWithdrawStorage,
 	createGetLastCumulativeHoldersRewardCaller,
 	createDifferenceCaller,
-	createSetLastCumulativeHoldersReward,
+	// Already nonexistent value
+	// createSetLastCumulativeHoldersReward,
 } from './lib/bulk-initializer'
 import {createFastestGasPriceFetcher} from './lib/ethgas'
 import {ethgas} from './lib/api'
@@ -36,7 +38,8 @@ const handler = async (
 		return
 	}
 
-	const [from] = await (web3 as Web3).eth.getAccounts()
+	// Unused value
+	// const [from] = await (web3 as Web3).eth.getAccounts()
 
 	const fetchAllWithdrawEvents = async (devContract: Contract) =>
 		devContract.getPastEvents('Transfer', {
@@ -48,11 +51,10 @@ const handler = async (
 		})
 
 	const dev = createDev(DEV, web3)
-	const lockup = await prepare(CONFIG, web3)
-	const diff = createDifferenceCaller(lockup)
-	const setLastCumulativeHoldersReward = createSetLastCumulativeHoldersReward(
-		createWithdrawMigration(WITHDRAW_MIGRATION, web3)
-	)(from)
+	// Already nonexistent value
+	// const setLastCumulativeHoldersReward = createSetLastCumulativeHoldersReward(
+	// 	createWithdrawMigration(WITHDRAW_MIGRATION, web3)
+	// )(from)
 	const getLastCumulativeHoldersReward = createGetLastCumulativeHoldersRewardCaller(
 		createWithdrawStorage(WITHDRAW_STORAGE, web3)
 	)
@@ -119,6 +121,9 @@ const handler = async (
 						return
 					}
 
+					const lockup = await prepare(CONFIG, web3, blockNumber)
+					const diff = createDifferenceCaller(lockup)
+
 					const res:
 						| Error
 						| PromiseReturn<ReturnType<ReturnType<typeof diff>>> = await diff(
@@ -126,7 +131,7 @@ const handler = async (
 					)(propertyAddress).catch((err) => new Error(err))
 					if (res instanceof Error) {
 						____log(
-							'Failed on fetch `difference`',
+							'Failed on fetch `difference`. Maybe the block is pre-DIP4.',
 							propertyAddress,
 							sender,
 							blockNumber
@@ -135,6 +140,11 @@ const handler = async (
 					}
 
 					const lastPrice = res._holdersPrice
+					if (lastPrice === '0') {
+						____log('Last price is 0.', propertyAddress, sender, blockNumber)
+						return
+					}
+
 					const gasPrice = await fetchFastestGasPrice()
 					____log(
 						'Start initilization',
@@ -144,29 +154,30 @@ const handler = async (
 						gasPrice
 					)
 
-					await new Promise((resolve) => {
-						setLastCumulativeHoldersReward(
-							propertyAddress,
-							sender,
-							lastPrice,
-							gasPrice
-						)
-							.on('transactionHash', (hash: string) =>
-								____log('Created the transaction', hash)
-							)
-							.on('confirmation', resolve)
-							.on('error', (err) => {
-								console.error(err)
-								resolve(err)
-							})
-					})
-					____log(
-						'Done initilization',
-						propertyAddress,
-						sender,
-						blockNumber,
-						lastPrice
-					)
+					// Already nonexistent value
+					// await new Promise((resolve) => {
+					// 	setLastCumulativeHoldersReward(
+					// 		propertyAddress,
+					// 		sender,
+					// 		lastPrice,
+					// 		gasPrice
+					// 	)
+					// 		.on('transactionHash', (hash: string) =>
+					// 			____log('Created the transaction', hash)
+					// 		)
+					// 		.on('confirmation', resolve)
+					// 		.on('error', (err) => {
+					// 			console.error(err)
+					// 			resolve(err)
+					// 		})
+					// })
+					// ____log(
+					// 	'Done initilization',
+					// 	propertyAddress,
+					// 	sender,
+					// 	blockNumber,
+					// 	lastPrice
+					// )
 				}
 		  )
 		: []
