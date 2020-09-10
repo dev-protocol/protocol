@@ -1,12 +1,13 @@
 /* eslint-disable no-undef */
-import Web3 from 'web3'
+// Unused value
+// import Web3 from 'web3'
 import {
 	prepare,
 	createQueue,
 	createGraphQLPropertyFactoryCreateFetcher,
 	createGetMetricsCountPerProperty,
-	createMetricsGroupMigration,
-	create__SetMetricsCountPerProperty,
+	// Already nonexistent value
+	// create__SetMetricsCountPerProperty,
 } from './lib/bulk-initializer'
 import {createFastestGasPriceFetcher} from './lib/ethgas'
 import {graphql, ethgas} from './lib/api'
@@ -21,7 +22,8 @@ const handler = async (
 		return
 	}
 
-	const [from] = await (web3 as Web3).eth.getAccounts()
+	// Unused value
+	// const [from] = await (web3 as Web3).eth.getAccounts()
 
 	const lockup = await prepare(CONFIG, web3)
 	____log('Generated Lockup contract', lockup.options)
@@ -55,13 +57,11 @@ const handler = async (
 		web3
 	)
 
-	const metricsGroupMigration = await createMetricsGroupMigration(CONFIG, web3)
-	const getMetricsCountPerProperty = createGetMetricsCountPerProperty(
-		metricsGroupMigration
-	)
-	const setMetricsCountPerProperty = create__SetMetricsCountPerProperty(
-		metricsGroupMigration
-	)(from)
+	const getMetricsCountPerProperty = createGetMetricsCountPerProperty({} as any)
+	// Already nonexistent value
+	// const setMetricsCountPerProperty = create__SetMetricsCountPerProperty(
+	// 	{} as any
+	// )(from)
 
 	const filteringTacks = all.map(({property, ...x}) => async () => {
 		const asses = await getMetricsCountPerProperty(property)
@@ -82,18 +82,19 @@ const handler = async (
 		const gasPrice = await fetchFastestGasPrice()
 		____log('Start initilization', property, assets, gasPrice)
 
-		await new Promise((resolve) => {
-			setMetricsCountPerProperty(property, assets.toString(), gasPrice)
-				.on('transactionHash', (hash: string) =>
-					____log('Created the transaction', hash)
-				)
-				.on('confirmation', resolve)
-				.on('error', (err) => {
-					console.error(err)
-					resolve(err)
-				})
-		})
-		____log('Done initilization', property, assets)
+		// Already nonexistent value
+		// await new Promise((resolve) => {
+		// 	setMetricsCountPerProperty(property, assets.toString(), gasPrice)
+		// 		.on('transactionHash', (hash: string) =>
+		// 			____log('Created the transaction', hash)
+		// 		)
+		// 		.on('confirmation', resolve)
+		// 		.on('error', (err) => {
+		// 			console.error(err)
+		// 			resolve(err)
+		// 		})
+		// })
+		// ____log('Done initilization', property, assets)
 	})
 
 	await createQueue(2).addAll(initializeTasks).catch(console.error)

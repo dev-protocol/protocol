@@ -1,7 +1,7 @@
 import {DevProtocolInstance} from '../test-lib/instance'
-import {getPropertyAddress} from '../test-lib/utils/log'
-import {validateErrorMessage} from '../test-lib/utils/error'
+import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
 import {toBigNumber} from '../test-lib/utils/common'
+import {getEventValue} from '../test-lib/utils/event'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 	const dev = new DevProtocolInstance(deployer)
@@ -45,99 +45,69 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			expect(author).to.be.equal(user)
 		})
 
-		it('2 characters name cause an error.', async () => {
-			const result = await dev.propertyFactory
-				.create('te', 'TEST', user, {
-					from: user2,
-				})
-				.catch((err: Error) => err)
-			validateErrorMessage(
-				result,
-				'name must be at least 3 and no more than 10 characters'
-			)
-		})
-		it('3 characters name donot cause an error.', async () => {
-			const result = await dev.propertyFactory.create('tes', 'TEST', user, {
-				from: user2,
-			})
-			const propertyAddress = getPropertyAddress(result)
-			// eslint-disable-next-line no-undef
-			const isAddress = web3.utils.isAddress(propertyAddress)
-			expect(isAddress).to.be.equal(true)
-		})
-		it('10 characters name cause an error.', async () => {
-			const result = await dev.propertyFactory.create(
-				'0123456789',
-				'TEST',
-				user,
-				{
-					from: user2,
-				}
-			)
-			const propertyAddress = getPropertyAddress(result)
-			// eslint-disable-next-line no-undef
-			const isAddress = web3.utils.isAddress(propertyAddress)
-			expect(isAddress).to.be.equal(true)
-		})
-		it('11 characters name cause an error.', async () => {
-			const result = await dev.propertyFactory
-				.create('01234567890', 'TEST', user, {
-					from: user2,
-				})
-				.catch((err: Error) => err)
-			validateErrorMessage(
-				result,
-				'name must be at least 3 and no more than 10 characters'
-			)
-		})
-		it('2 characters symbol cause an error.', async () => {
-			const result = await dev.propertyFactory
-				.create('test', 'TE', user, {
-					from: user2,
-				})
-				.catch((err: Error) => err)
-			validateErrorMessage(
-				result,
-				'symbol must be at least 3 and no more than 10 characters'
-			)
-		})
-		it('3 characters symbol donot cause an error.', async () => {
-			const result = await dev.propertyFactory.create('test', 'TES', user, {
-				from: user2,
-			})
-			const propertyAddress = getPropertyAddress(result)
-			// eslint-disable-next-line no-undef
-			const isAddress = web3.utils.isAddress(propertyAddress)
-			expect(isAddress).to.be.equal(true)
-		})
-		it('10 characters symbol cause an error.', async () => {
-			const result = await dev.propertyFactory.create(
-				'test',
-				'0123456789',
-				user,
-				{
-					from: user2,
-				}
-			)
-			const propertyAddress = getPropertyAddress(result)
-			// eslint-disable-next-line no-undef
-			const isAddress = web3.utils.isAddress(propertyAddress)
-			expect(isAddress).to.be.equal(true)
-		})
-		it('11 characters symbol cause an error.', async () => {
-			const result = await dev.propertyFactory
-				.create('test', '01234567890', user, {
-					from: user2,
-				})
-				.catch((err: Error) => err)
-			validateErrorMessage(
-				result,
-				'symbol must be at least 3 and no more than 10 characters'
-			)
-		})
 		it('Adds a new property contract address to state contract', async () => {
 			const isProperty = await dev.propertyGroup.isGroup(propertyAddress)
 			expect(isProperty).to.be.equal(true)
+		})
+	})
+	describe('PropertyFactory; createAndAuthenticate', () => {
+		let marketAddress: string
+		before(async () => {
+			await dev.generateAddressConfig()
+			await Promise.all([
+				dev.generateMarketFactory(),
+				dev.generateMarketGroup(),
+				dev.generateMetricsFactory(),
+				dev.generateMetricsGroup(),
+				dev.generatePolicyFactory(),
+				dev.generatePolicyGroup(),
+				dev.generatePolicySet(),
+				dev.generatePropertyFactory(),
+				dev.generatePropertyGroup(),
+				dev.generateLockup(),
+				dev.generateDev(),
+				dev.generateWithdraw(),
+				dev.generateWithdrawStorage(),
+				dev.generateAllocator(),
+			])
+			const policy = await dev.getPolicy('PolicyTest1', user)
+			await dev.policyFactory.create(policy.address, {from: user})
+			const market = await dev.getMarket('MarketTest1', user)
+			const result = await dev.marketFactory.create(market.address, {
+				from: user,
+			})
+			await dev.dev.mint(user, 10000000000)
+			marketAddress = getMarketAddress(result)
+		})
+
+		it('Create a new Property and authenticate at the same time', async () => {
+			;(dev.propertyFactory as any)
+				.createAndAuthenticate(
+					'example',
+					'EXAMPLE',
+					marketAddress,
+					'test',
+					'',
+					'',
+					{from: user}
+				)
+				.catch(console.error)
+			const [propertyCreator, property, market, metrics] = await Promise.all([
+				getEventValue(dev.propertyFactory)('Create', '_from'),
+				getEventValue(dev.propertyFactory)('Create', '_property'),
+				getEventValue(dev.metricsFactory)('Create', '_from'),
+				getEventValue(dev.metricsFactory)('Create', '_metrics'),
+			])
+			const linkedProperty = await Promise.all([
+				artifacts.require('Metrics').at(metrics as string),
+			]).then(async ([c]) => c.property())
+			const propertyAuthor = await Promise.all([
+				artifacts.require('Property').at(property as string),
+			]).then(async ([c]) => c.author())
+			expect(propertyCreator).to.be.equal(user)
+			expect(propertyAuthor).to.be.equal(user)
+			expect(property).to.be.equal(linkedProperty)
+			expect(market).to.be.equal(marketAddress)
 		})
 	})
 })

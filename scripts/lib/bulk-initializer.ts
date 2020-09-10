@@ -11,7 +11,8 @@ import {
 import builtConfig from '../../build/contracts/AddressConfig.json'
 import builtLockup from '../../build/contracts/Lockup.json'
 import builtMetricsGroup from '../../build/contracts/MetricsGroup.json'
-import builtMetricsGroupMigration from '../../build/contracts/MetricsGroupMigration.json'
+import builtDev from '../../build/contracts/Dev.json'
+import builtWithdrawStorage from '../../build/contracts/WithdrawStorage.json'
 import {AbiItem} from 'web3-utils/types'
 export const createRegistry = (configAddress: string, libWeb3: Web3) =>
 	new libWeb3.eth.Contract(builtConfig.abi as AbiItem[], configAddress)
@@ -44,18 +45,11 @@ export const createMetricsGroup = async (
 	return contract
 }
 
-export const createMetricsGroupMigration = async (
-	configAddress: string,
-	libWeb3: Web3
-) => {
-	const configContract = createRegistry(configAddress, libWeb3)
-	const metricsGroupAddress = await configContract.methods.metricsGroup().call()
-	const contract = new libWeb3.eth.Contract(
-		builtMetricsGroupMigration.abi as AbiItem[],
-		metricsGroupAddress
-	)
-	return contract
-}
+export const createWithdrawStorage = (address: string, libWeb3: Web3) =>
+	new libWeb3.eth.Contract(builtWithdrawStorage.abi as AbiItem[], address)
+
+export const createDev = (address: string, libWeb3: Web3) =>
+	new libWeb3.eth.Contract(builtDev.abi as AbiItem[], address)
 
 export const createGraphQLFetcher = (
 	fetcher: bent.RequestFunction<bent.ValidResponse>
@@ -161,15 +155,9 @@ export const createInitializeLastCumulativePropertyInterest = (
 	lockup.methods
 		.initializeLastCumulativePropertyInterest(property, user, interest)
 		.send({gasPrice, from})
-export const create__SetMetricsCountPerProperty = (
-	metricsGroupMigration: Contract
-) => (from: string) => (
-	property: string,
-	value: string,
-	gasPrice: string
-): SendTx =>
-	metricsGroupMigration.methods
-		.__setMetricsCountPerProperty(property, value)
-		.send({gasPrice, from})
+export const createGetLastCumulativeHoldersRewardCaller = (
+	withdrawStorage: Contract
+) => async (property: string, user: string): Promise<string> =>
+	withdrawStorage.methods.getLastCumulativeHoldersReward(property, user).call()
 
 export const createQueue = (concurrency: number) => new Queue({concurrency})
