@@ -45,13 +45,11 @@ contract WithdrawStorageTest is WithdrawStorage {
 		setPendingWithdrawal(_property, _user, _value);
 	}
 
-	function setLastCumulativeGlobalHoldersPriceTest(
+	function setLastCumulativeHoldersRewardTest(
 		address _property,
 		address _user,
 		uint256 _value
 	) external {
-		setLastCumulativeGlobalHoldersPrice(_property, _user, _value);
+		setLastCumulativeHoldersReward(_property, _user, _value);
 	}
 }
-
-// TODO https://github.com/dev-protocol/protocol/pull/566/files を考慮
