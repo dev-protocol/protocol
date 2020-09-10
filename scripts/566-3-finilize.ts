@@ -30,17 +30,26 @@ const handler = async (
 	const nextWithdraw = await artifacts
 		.require('Withdraw')
 		.new(config.address, {gasPrice: await fastest(), gas})
+		.catch(console.error)
+	if (!nextWithdraw) {
+		return
+	}
+
 	____log('Deployed the new Withdraw', nextWithdraw.address)
 
 	// Add minter
-	await dev.addMinter(nextWithdraw.address, {gasPrice: await fastest(), gas})
+	await dev
+		.addMinter(nextWithdraw.address, {gasPrice: await fastest(), gas})
+		.catch(console.error)
 	____log('Added next Withdraw as a minter')
 
 	// Activation
-	await config.setWithdraw(nextWithdraw.address, {
-		gasPrice: await fastest(),
-		gas,
-	})
+	await config
+		.setWithdraw(nextWithdraw.address, {
+			gasPrice: await fastest(),
+			gas,
+		})
+		.catch(console.error)
 	____log('updated AddressConfig for Withdraw')
 
 	callback(null)
