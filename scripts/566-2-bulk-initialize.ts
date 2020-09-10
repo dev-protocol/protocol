@@ -67,7 +67,7 @@ const handler = async (
 		const {from: sender, to, input} = await (web3 as Web3).eth.getTransaction(
 			transactionHash
 		)
-		const toWithdraw = to ? withdrawContracts.includes(to) : false
+		const toWithdraw = to ? withdrawContracts.includes(to.toLowerCase()) : false
 		const propertyAddress = toWithdraw ? `0x${input.slice(-40)}` : undefined
 		const alreadyInitialized = await (toWithdraw && propertyAddress
 			? getLastCumulativeHoldersReward(propertyAddress, sender).then(
@@ -81,6 +81,7 @@ const handler = async (
 
 	const filteredItems = await createQueue(10)
 		.addAll(filter)
+		.then((data) => data.filter((i) => !i.skip))
 		.catch(console.error)
 
 	if (!filteredItems) {
@@ -107,9 +108,14 @@ const handler = async (
 
 	const initializeTasks = shouldInitilizeItems
 		? shouldInitilizeItems.map(
-				({propertyAddress, sender, blockNumber}) => async () => {
+				({propertyAddress, sender, skip, blockNumber}) => async () => {
 					if (!propertyAddress) {
 						____log('Property address is not found')
+						return
+					}
+
+					if (skip) {
+						____log('This item should skip', propertyAddress, sender)
 						return
 					}
 
