@@ -115,6 +115,14 @@ export class DevProtocolInstance {
 		return this._withdrawTest
 	}
 
+	public get activeWithdraw(): WithdrawInstance | WithdrawTestInstance {
+		if (typeof this._withdraw === 'undefined') {
+			return this._withdrawTest
+		}
+
+		return this._withdraw
+	}
+
 	public async generateAddressConfig(): Promise<void> {
 		const instance = contract('AddressConfig')
 		this._addressConfig = await instance.new(this.fromDeployer)

@@ -43,8 +43,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		])
 		if (generateWithdrawTest) {
 			await dev.generateWithdrawTest()
+			await dev.dev.addMinter(dev.withdrawTest.address)
 		} else {
 			await dev.generateWithdraw()
+			await dev.dev.addMinter(dev.withdraw.address)
 		}
 
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
@@ -77,7 +79,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		const [metrics] = await Promise.all([
 			artifacts.require('Metrics').at(metricsAddress as string),
 		])
-		await dev.dev.addMinter(dev.withdraw.address)
 		await dev.lockup.update()
 
 		return [dev, metrics, property, policy]
@@ -509,11 +510,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		): Promise<BigNumber> =>
 			Promise.all([
 				dev.lockup.difference(prop.address, 0).then((x) => x[2]),
-				dev.withdraw.getLastCumulativeHoldersReward(prop.address, account),
+				dev.activeWithdraw.getLastCumulativeHoldersReward(
+					prop.address,
+					account
+				),
 				prop.balanceOf(account),
-				dev.withdraw.getPendingWithdrawal(prop.address, account),
-				dev.withdraw.getCumulativePrice(prop.address),
-				dev.withdraw.getLastWithdrawalPrice(prop.address, account),
+				dev.activeWithdraw.getPendingWithdrawal(prop.address, account),
+				dev.activeWithdraw.getCumulativePrice(prop.address),
+				dev.activeWithdraw.getLastWithdrawalPrice(prop.address, account),
 			]).then((results) => {
 				const [
 					holdersPrice,
@@ -1287,7 +1291,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 			describe('after withdraw interest', () => {
 				before(async () => {
-					await dev.withdraw.withdraw(property.address, {from: alice})
+					await dev.withdrawTest.withdraw(property.address, {from: alice})
 					lastBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
