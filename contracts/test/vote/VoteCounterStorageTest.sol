@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {VoteCounterStorage} from "contracts/src/vote/VoteCounterStorage.sol";
 

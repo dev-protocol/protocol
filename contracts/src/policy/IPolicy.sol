@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 contract IPolicy {
 	function rewards(uint256 _lockups, uint256 _assets)

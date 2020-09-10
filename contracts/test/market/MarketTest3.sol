@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";

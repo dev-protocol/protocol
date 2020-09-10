@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {AddressConfig} from "contracts/src/common/config/AddressConfig.sol";
 

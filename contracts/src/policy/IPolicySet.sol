@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 contract IPolicySet {
 	function addSet(address _addr) external;

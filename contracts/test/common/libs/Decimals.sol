@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 
