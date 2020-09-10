@@ -51,11 +51,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		 * Saves the latest cumulative sum of the maximum mint amount.
 		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
 		 */
-		setLastCumulativeHoldersReward(
-			_property,
-			msg.sender,
-			lastPrice
-		);
+		setLastCumulativeHoldersReward(_property, msg.sender, lastPrice);
 
 		/**
 		 * Sets the number of unwithdrawn rewards to 0.
@@ -116,11 +112,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
 		 */
-		setLastCumulativeHoldersReward(
-			_property,
-			_from,
-			priceFrom
-		);
+		setLastCumulativeHoldersReward(_property, _from, priceFrom);
 		setLastCumulativeHoldersReward(_property, _to, priceTo);
 
 		/**
@@ -172,10 +164,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets the last recorded holders reward.
 		 */
-		uint256 _last = getLastCumulativeHoldersReward(
-			_property,
-			_user
-		);
+		uint256 _last = getLastCumulativeHoldersReward(_property, _user);
 
 		/**
 		 * Gets the ownership ratio of the passed user and the Property.
