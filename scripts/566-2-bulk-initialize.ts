@@ -26,6 +26,7 @@ const withdrawContracts = [
 	'0xa10d4f23d87c75af4489406089615e650431034b',
 	'0x64b0990c8e663b3202589c32dc0e11ac2b1aede7',
 	'0x44a19177a4837cab0178747279bcecbebd6330f2',
+	'0xfe11597d2b26f1aa63fb8ac33ee86915cb466e5d',
 ]
 
 const handler = async (
@@ -49,13 +50,11 @@ const handler = async (
 	const dev = createDev(DEV, web3)
 	const lockup = await prepare(CONFIG, web3)
 	const diff = createDifferenceCaller(lockup)
-	const withdrawStorage = createWithdrawStorage(WITHDRAW_STORAGE, web3)
-	const withdrawMigration = createWithdrawMigration(WITHDRAW_MIGRATION, web3)
 	const setLastCumulativeHoldersReward = createSetLastCumulativeHoldersReward(
-		withdrawMigration
+		createWithdrawMigration(WITHDRAW_MIGRATION, web3)
 	)(from)
 	const getLastCumulativeHoldersReward = createGetLastCumulativeHoldersRewardCaller(
-		withdrawStorage
+		createWithdrawStorage(WITHDRAW_STORAGE, web3)
 	)
 	const all = await fetchAllWithdrawEvents(dev)
 
@@ -65,39 +64,58 @@ const handler = async (
 	)
 
 	const filter = all.map(({transactionHash, ...x}) => async () => {
-		const {from, to, input} = await (web3 as Web3).eth.getTransaction(
+		const {from: sender, to, input} = await (web3 as Web3).eth.getTransaction(
 			transactionHash
 		)
-		const toWithdraw = to ? withdrawContracts.includes(to) : false
+		const toWithdraw = to ? withdrawContracts.includes(to.toLowerCase()) : false
 		const propertyAddress = toWithdraw ? `0x${input.slice(-40)}` : undefined
 		const alreadyInitialized = await (toWithdraw && propertyAddress
-			? getLastCumulativeHoldersReward(propertyAddress, from).then(
+			? getLastCumulativeHoldersReward(propertyAddress, sender).then(
 					(x) => x !== '0'
 			  )
 			: false)
 		const skip = alreadyInitialized || !toWithdraw
 		____log('Should skip?', skip, propertyAddress, transactionHash)
-		return {skip, from, propertyAddress, ...x}
+		return {skip, sender, propertyAddress, ...x}
 	})
 
-	const shouldInitilizeItems = await createQueue(10)
+	const filteredItems = await createQueue(10)
 		.addAll(filter)
+		.then((data) => data.filter((i) => !i.skip))
 		.catch(console.error)
 
-	____log(
-		'Should skip items',
-		all.length - (shouldInitilizeItems ? shouldInitilizeItems.length : 0)
-	)
-	____log(
-		'Should initilize items',
-		shouldInitilizeItems ? shouldInitilizeItems.length : 0
-	)
+	if (!filteredItems) {
+		____log('Error')
+		return
+	}
+
+	const createKey = (el: typeof filteredItems[0]) =>
+		`${el.propertyAddress ?? ''}${el.sender}`
+	const propertyUserMap = new Map([
+		[createKey(filteredItems[0]), filteredItems[0]],
+	])
+	filteredItems.forEach((item) => {
+		const key = createKey(item)
+		const stored = propertyUserMap.get(key)
+		if (stored === undefined || stored.blockNumber < item.blockNumber) {
+			propertyUserMap.set(key, item)
+		}
+	})
+	const shouldInitilizeItems = Array.from(propertyUserMap.values())
+
+	____log('Should skip items', all.length - shouldInitilizeItems.length)
+	____log('Should initilize items', shouldInitilizeItems.length)
 
 	const initializeTasks = shouldInitilizeItems
 		? shouldInitilizeItems.map(
-				({propertyAddress, from, blockNumber}) => async () => {
+				({propertyAddress, sender, skip, blockNumber}) => async () => {
 					if (!propertyAddress) {
 						____log('Property address is not found')
+						return
+					}
+
+					if (skip) {
+						____log('This item should skip', propertyAddress, sender)
 						return
 					}
 
@@ -110,7 +128,7 @@ const handler = async (
 						____log(
 							'Failed on fetch `difference`',
 							propertyAddress,
-							from,
+							sender,
 							blockNumber
 						)
 						return
@@ -121,7 +139,7 @@ const handler = async (
 					____log(
 						'Start initilization',
 						propertyAddress,
-						from,
+						sender,
 						lastPrice,
 						gasPrice
 					)
@@ -129,7 +147,7 @@ const handler = async (
 					await new Promise((resolve) => {
 						setLastCumulativeHoldersReward(
 							propertyAddress,
-							from,
+							sender,
 							lastPrice,
 							gasPrice
 						)
@@ -145,7 +163,7 @@ const handler = async (
 					____log(
 						'Done initilization',
 						propertyAddress,
-						from,
+						sender,
 						blockNumber,
 						lastPrice
 					)
