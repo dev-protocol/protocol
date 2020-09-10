@@ -26,6 +26,7 @@ const withdrawContracts = [
 	'0xa10d4f23d87c75af4489406089615e650431034b',
 	'0x64b0990c8e663b3202589c32dc0e11ac2b1aede7',
 	'0x44a19177a4837cab0178747279bcecbebd6330f2',
+	'0xfe11597d2b26f1aa63fb8ac33ee86915cb466e5d',
 ]
 
 const handler = async (
