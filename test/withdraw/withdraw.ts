@@ -503,24 +503,28 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			debug = false
 		): Promise<BigNumber> =>
 			Promise.all([
-				dev.withdrawStorage
-					.getLastCumulativeGlobalHoldersPrice(prop.address, account)
-					.then(async (x) =>
-						dev.lockup.difference(prop.address, x).then((x) => x[2])
-					),
+				dev.lockup.difference(prop.address, 0).then((x) => x[2]),
+				dev.withdrawStorage.getLastCumulativeHoldersReward(
+					prop.address,
+					account
+				),
 				prop.balanceOf(account),
 				dev.withdrawStorage.getPendingWithdrawal(prop.address, account),
 				dev.withdrawStorage.getCumulativePrice(prop.address),
 				dev.withdrawStorage.getLastWithdrawalPrice(prop.address, account),
 			]).then((results) => {
 				const [
-					price,
+					holdersPrice,
+					lastPrice,
 					balanceOfUser,
 					pending,
 					legacyPrice,
 					legacyLastPrice,
 				] = results.map(toBigNumber)
-				const value = price.times(balanceOfUser).div(1e36)
+				const value = holdersPrice
+					.minus(lastPrice)
+					.times(balanceOfUser)
+					.div(1e36)
 				const legacy = legacyPrice
 					.minus(legacyLastPrice)
 					.times(balanceOfUser)
