@@ -275,6 +275,7 @@ export class DevProtocolInstance {
 			this._withdraw.address,
 			this.fromDeployer
 		)
+		await this._withdraw.createStorage(this.fromDeployer)
 	}
 
 	public async generateWithdrawTest(): Promise<void> {
@@ -286,6 +287,7 @@ export class DevProtocolInstance {
 			this._withdrawTest.address,
 			this.fromDeployer
 		)
+		await this._withdrawTest.createStorage(this.fromDeployer)
 	}
 
 	public async getPolicy(
