@@ -127,7 +127,7 @@ const handler = async (
 					)(propertyAddress).catch((err) => new Error(err))
 					if (res instanceof Error) {
 						____log(
-							'Failed on fetch `difference`',
+							'Failed on fetch `difference`. Maybe the block is pre-DIP4.',
 							propertyAddress,
 							sender,
 							blockNumber
@@ -136,6 +136,11 @@ const handler = async (
 					}
 
 					const lastPrice = res._holdersPrice
+					if (lastPrice === '0') {
+						____log('Last price is 0.', propertyAddress, sender, blockNumber)
+						return
+					}
+
 					const gasPrice = await fetchFastestGasPrice()
 					____log(
 						'Start initilization',
