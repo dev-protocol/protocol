@@ -48,8 +48,6 @@ const handler = async (
 		})
 
 	const dev = createDev(DEV, web3)
-	const lockup = await prepare(CONFIG, web3)
-	const diff = createDifferenceCaller(lockup)
 	const setLastCumulativeHoldersReward = createSetLastCumulativeHoldersReward(
 		createWithdrawMigration(WITHDRAW_MIGRATION, web3)
 	)(from)
@@ -118,6 +116,9 @@ const handler = async (
 						____log('This item should skip', propertyAddress, sender)
 						return
 					}
+
+					const lockup = await prepare(CONFIG, web3, blockNumber)
+					const diff = createDifferenceCaller(lockup)
 
 					const res:
 						| Error
