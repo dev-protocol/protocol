@@ -20,7 +20,7 @@ const handler = async (
 	____log('Generated AddressConfig contract', config.address)
 
 	const [withdrawStorage, dev] = await Promise.all([
-		artifacts.require('WithdrawStorage').at(await config.lockup()),
+		artifacts.require('WithdrawStorage').at(await config.withdrawStorage()),
 		artifacts.require('Dev').at(await config.token()),
 	])
 	____log('Generated current WithdrawStorage contract', withdrawStorage.address)
