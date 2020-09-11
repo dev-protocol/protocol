@@ -1,4 +1,4 @@
-pragma solidity 0.5.17;
+pragma solidity 0.5.16;
 
 // prettier-ignore
 import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";

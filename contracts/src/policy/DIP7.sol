@@ -1,4 +1,4 @@
-pragma solidity 0.5.17;
+pragma solidity 0.5.16;
 
 import {DIP3} from "contracts/src/policy/DIP3.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
