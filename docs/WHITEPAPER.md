@@ -140,7 +140,7 @@ contract IMarketBehavior {
 
 ```
 
-When you implement the `authenticate` function, please verify the caller.Create a function to set the associatedMarket.
+When you implement the `authenticate` function, strongly recommended verifying the sender is associated Market Contract. To verify, please create a function to set the accotiated Market Contract address.
 
 ```solidity
 	function authenticate(
