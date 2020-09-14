@@ -35,14 +35,19 @@ export class DevCommonInstance {
 		return this._dev
 	}
 
-	public async loadAddressConfig(): Promise<void> {
+	public async prepare(): Promise<void> {
+		await this._loadAddressConfig()
+		await this._loadDev()
+	}
+
+	private async _loadAddressConfig(): Promise<void> {
 		this._addressConfig = await this._artifacts
 			.require('AddressConfig')
 			.at(process.env.CONFIG!)
 		console.log('load AddressConfig contract', this._addressConfig.address)
 	}
 
-	public async loadDev(): Promise<void> {
+	private async _loadDev(): Promise<void> {
 		const address = await this._addressConfig.token()
 		this._dev = await this._artifacts.require('Dev').at(address)
 		console.log('load Dev contract', this._dev.address)

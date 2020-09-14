@@ -6,8 +6,8 @@ import {WithdrawStorage} from './lib/instance/withdraw-storage'
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	const dev = new DevCommonInstance(artifacts, 600000, 5000000000)
-	await dev.loadAddressConfig()
+	const dev = new DevCommonInstance(artifacts, 4000000, 10000000000)
+	await dev.prepare()
 
 	// Withdraw
 	const withdraw = new Withdraw(dev)
