@@ -143,6 +143,7 @@ contract IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 }
+
 ```
 
 `authenticate` 関数を実装する際は呼び出し元が関連付けられた Market Contract であることを検証することを強くお勧めします。その検証のために、関連付けられた Market Contract のアドレスを設定する関数を作成してください。

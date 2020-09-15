@@ -137,6 +137,7 @@ contract IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 }
+
 ```
 
 When you implement the `authenticate` function, strongly recommended verifying the sender is associated Market Contract. To verify, please create a function to set the accotiated Market Contract address.
