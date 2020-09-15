@@ -1,25 +1,14 @@
 pragma solidity 0.5.17;
 
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 
-contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
-	// solium-disable-next-line no-empty-blocks
-	constructor(address _config) public UsingConfig(_config) {}
-
+contract WithdrawStorage is UsingStorage {
 	// RewardsAmount
-	function setRewardsAmount(address _property, uint256 _value) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
+	function setRewardsAmount(address _property, uint256 _value) internal {
 		eternalStorage().setUint(getRewardsAmountKey(_property), _value);
 	}
 
-	function getRewardsAmount(address _property)
-		external
-		view
-		returns (uint256)
-	{
+	function getRewardsAmount(address _property) public view returns (uint256) {
 		return eternalStorage().getUint(getRewardsAmountKey(_property));
 	}
 
@@ -32,16 +21,14 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 
 	// CumulativePrice
-	function setCumulativePrice(address _property, uint256 _value) external {
+	function setCumulativePrice(address _property, uint256 _value) internal {
 		// The previously used function
 		// This function is only used in testing
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
 		eternalStorage().setUint(getCumulativePriceKey(_property), _value);
 	}
 
 	function getCumulativePrice(address _property)
-		external
+		public
 		view
 		returns (uint256)
 	{
@@ -61,9 +48,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
+	) internal {
 		eternalStorage().setUint(
 			getWithdrawalLimitTotalKey(_property, _user),
 			_value
@@ -71,7 +56,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 
 	function getWithdrawalLimitTotal(address _property, address _user)
-		external
+		public
 		view
 		returns (uint256)
 	{
@@ -97,9 +82,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
+	) internal {
 		eternalStorage().setUint(
 			getWithdrawalLimitBalanceKey(_property, _user),
 			_value
@@ -107,7 +90,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 
 	function getWithdrawalLimitBalance(address _property, address _user)
-		external
+		public
 		view
 		returns (uint256)
 	{
@@ -133,9 +116,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
+	) internal {
 		eternalStorage().setUint(
 			getLastWithdrawalPriceKey(_property, _user),
 			_value
@@ -143,7 +124,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 
 	function getLastWithdrawalPrice(address _property, address _user)
-		external
+		public
 		view
 		returns (uint256)
 	{
@@ -169,9 +150,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
+	) internal {
 		eternalStorage().setUint(
 			getPendingWithdrawalKey(_property, _user),
 			_value
@@ -179,7 +158,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 
 	function getPendingWithdrawal(address _property, address _user)
-		external
+		public
 		view
 		returns (uint256)
 	{
@@ -196,52 +175,12 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 			keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
 	}
 
-	//LastCumulativeGlobalHoldersPrice
-	function setLastCumulativeGlobalHoldersPrice(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
-		eternalStorage().setUint(
-			getLastCumulativeGlobalHoldersPriceKey(_property, _user),
-			_value
-		);
-	}
-
-	function getLastCumulativeGlobalHoldersPrice(
-		address _property,
-		address _user
-	) external view returns (uint256) {
-		return
-			eternalStorage().getUint(
-				getLastCumulativeGlobalHoldersPriceKey(_property, _user)
-			);
-	}
-
-	function getLastCumulativeGlobalHoldersPriceKey(
-		address _property,
-		address _user
-	) private pure returns (bytes32) {
-		return
-			keccak256(
-				abi.encodePacked(
-					"_lastCumulativeGlobalHoldersPrice",
-					_property,
-					_user
-				)
-			);
-	}
-
 	//LastCumulativeHoldersReward
 	function setLastCumulativeHoldersReward(
 		address _property,
 		address _user,
 		uint256 _value
-	) external {
-		addressValidator().validateAddress(msg.sender, config().withdraw());
-
+	) internal {
 		eternalStorage().setUint(
 			getLastCumulativeHoldersRewardKey(_property, _user),
 			_value
@@ -249,7 +188,7 @@ contract WithdrawStorage is UsingStorage, UsingConfig, UsingValidator {
 	}
 
 	function getLastCumulativeHoldersReward(address _property, address _user)
-		external
+		public
 		view
 		returns (uint256)
 	{

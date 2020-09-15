@@ -99,14 +99,12 @@ contract(
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
-					dev.generateWithdrawStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 				])
 				const policy = await artifacts.require('PolicyTestForProperty').new()
 				await dev.policyFactory.create(policy.address)
@@ -152,14 +150,12 @@ contract(
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
-					dev.generateWithdrawStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
 					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 				])
 				const policy = await artifacts.require('PolicyTestForProperty').new()
 				await dev.policyFactory.create(policy.address)

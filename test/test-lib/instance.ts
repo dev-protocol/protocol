@@ -7,16 +7,15 @@ import {
 	LockupInstance,
 	PropertyFactoryInstance,
 	PolicyFactoryInstance,
-	PolicySetInstance,
 	PolicyGroupInstance,
 	MarketFactoryInstance,
 	MarketGroupInstance,
 	MetricsFactoryInstance,
 	MetricsGroupTestInstance,
-	WithdrawStorageInstance,
 	IPolicyInstance,
 	IMarketInstance,
 	WithdrawInstance,
+	WithdrawTestInstance,
 	MetricsInstance,
 } from '../../types/truffle-contracts'
 import {getBlock} from './utils/common'
@@ -34,14 +33,13 @@ export class DevProtocolInstance {
 	private _voteCounter!: VoteCounterInstance
 	private _propertyGroup!: PropertyGroupInstance
 	private _policyFactory!: PolicyFactoryInstance
-	private _policySet!: PolicySetInstance
 	private _policyGroup!: PolicyGroupInstance
 	private _marketFactory!: MarketFactoryInstance
 	private _marketGroup!: MarketGroupInstance
 	private _metricsFactory!: MetricsFactoryInstance
 	private _metricsGroup!: MetricsGroupTestInstance
 	private _withdraw!: WithdrawInstance
-	private _withdrawStorage!: WithdrawStorageInstance
+	private _withdrawTest!: WithdrawTestInstance
 
 	constructor(deployer: string) {
 		this._deployer = deployer
@@ -83,10 +81,6 @@ export class DevProtocolInstance {
 		return this._policyFactory
 	}
 
-	public get policySet(): PolicySetInstance {
-		return this._policySet
-	}
-
 	public get policyGroup(): PolicyGroupInstance {
 		return this._policyGroup
 	}
@@ -111,8 +105,16 @@ export class DevProtocolInstance {
 		return this._withdraw
 	}
 
-	public get withdrawStorage(): WithdrawStorageInstance {
-		return this._withdrawStorage
+	public get withdrawTest(): WithdrawTestInstance {
+		return this._withdrawTest
+	}
+
+	public get activeWithdraw(): WithdrawInstance | WithdrawTestInstance {
+		if (typeof this._withdraw === 'undefined') {
+			return this._withdrawTest
+		}
+
+		return this._withdraw
 	}
 
 	public async generateAddressConfig(): Promise<void> {
@@ -196,18 +198,6 @@ export class DevProtocolInstance {
 		)
 	}
 
-	public async generatePolicySet(): Promise<void> {
-		this._policySet = await contract('PolicySet').new(
-			this.addressConfig.address,
-			this.fromDeployer
-		)
-		await this._policySet.createStorage(this.fromDeployer)
-		await this._addressConfig.setPolicySet(
-			this._policySet.address,
-			this.fromDeployer
-		)
-	}
-
 	public async generatePolicyGroup(): Promise<void> {
 		this._policyGroup = await contract('PolicyGroup').new(
 			this.addressConfig.address,
@@ -275,18 +265,19 @@ export class DevProtocolInstance {
 			this._withdraw.address,
 			this.fromDeployer
 		)
+		await this._withdraw.createStorage(this.fromDeployer)
 	}
 
-	public async generateWithdrawStorage(): Promise<void> {
-		this._withdrawStorage = await contract('WithdrawStorage').new(
+	public async generateWithdrawTest(): Promise<void> {
+		this._withdrawTest = await contract('WithdrawTest').new(
 			this.addressConfig.address,
 			this.fromDeployer
 		)
-		await this._addressConfig.setWithdrawStorage(
-			this._withdrawStorage.address,
+		await this._addressConfig.setWithdraw(
+			this._withdrawTest.address,
 			this.fromDeployer
 		)
-		await this._withdrawStorage.createStorage(this.fromDeployer)
+		await this._withdrawTest.createStorage(this.fromDeployer)
 	}
 
 	public async getPolicy(

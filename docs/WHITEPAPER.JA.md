@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`3.1.1`**
+Version: **`3.2.1`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -143,7 +143,28 @@ contract IMarketBehavior {
 
 	function getId(address _metrics) external view returns (string memory);
 }
+```
 
+`authenticate` 関数を実装する際は呼び出し元が関連付けられた Market Contract であることを検証することを強くお勧めします。その検証のために、関連付けられた Market Contract のアドレスを設定する関数を作成してください。
+
+```solidity
+	function authenticate(
+		address _prop,
+		string memory _args1,
+		string memory,
+		string memory,
+		string memory,
+		string memory,
+		// solium-disable-next-line no-trailing-whitespace
+		address market,
+		address
+	) public returns (bool) {
+		require(msg.sender == associatedMarket, "Invalid sender");
+		・
+		・
+		・
+		・
+	}
 ```
 
 `schema` は配列型の JSON 文字列で、 `authenticate` 関数が認証のために受け取る引数の意味を説明する。この引数は Property Contract のアドレスに加えて最大 5 つである。例えば以下のようになる。

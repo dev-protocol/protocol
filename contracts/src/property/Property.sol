@@ -143,6 +143,7 @@ contract Property is
 		 * Transfers the passed amount to the original owner.
 		 */
 		ERC20 devToken = ERC20(config().token());
-		devToken.transfer(_sender, _value);
+		bool result = devToken.transfer(_sender, _value);
+		require(result, "dev transfer failed");
 	}
 }

@@ -28,68 +28,46 @@ const handler = async (
 
 	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
 
-	// Deploy WithdrawMigration as a new Withdraw
+	// Deploy new Withdraw
 	const nextWithdraw = await artifacts
-		.require('WithdrawMigration')
+		.require('Withdraw')
 		.new(config.address, {gasPrice: await fastest(), gas})
-		.catch(console.error)
-	if (!nextWithdraw) {
-		return
-	}
-
 	____log('Deployed the new Withdraw', nextWithdraw.address)
 
-	// Deploy new WithdrawStorage
-	const nextWithdrawStorage = await artifacts
-		.require('WithdrawStorage')
-		.new({gasPrice: await fastest(), gas})
-	____log('Deployed the new WithdrawStorage', nextWithdrawStorage.address)
-
 	// Add minter
-	await dev
-		.addMinter(nextWithdraw.address, {gasPrice: await fastest(), gas})
-		.catch(console.error)
+	await dev.addMinter(nextWithdraw.address, {gasPrice: await fastest(), gas})
 	____log('Added next Withdraw as a minter')
 
 	// Delegate storage for WithdrawStorage
 	const withdrawStorageAddress = await withdrawStorage.getStorageAddress()
 	____log('Got EternalStorage address that uses by WithdrawStorage')
-	await nextWithdrawStorage
-		.setStorage(withdrawStorageAddress, {
-			gasPrice: await fastest(),
-			gas,
-		})
-		.catch(console.error)
-	if (!nextWithdrawStorage) {
-		return
-	}
-
-	____log('Set EternalStorage address to the new WithdrawStorage')
+	await nextWithdraw.setStorage(withdrawStorageAddress, {
+		gasPrice: await fastest(),
+		gas,
+	})
+	____log('Set EternalStorage address to the new Withdraw')
 
 	// Activation
-	await withdrawStorage
-		.changeOwner(nextWithdrawStorage.address, {
-			gasPrice: await fastest(),
-			gas,
-		})
-		.catch(console.error)
-	____log('Delegated EternalStorage owner to the new WithdrawStorage')
+	await withdrawStorage.changeOwner(nextWithdraw.address, {
+		gasPrice: await fastest(),
+		gas,
+	})
+	____log('Delegated EternalStorage owner to the new Withdraw')
 
-	await config
-		.setWithdrawStorage(nextWithdrawStorage.address, {
-			gasPrice: await fastest(),
-			gas,
-		})
-		.catch(console.error)
-	____log('updated AddressConfig for WithdrawStorage')
-
-	await config
-		.setWithdraw(nextWithdraw.address, {
-			gasPrice: await fastest(),
-			gas,
-		})
-		.catch(console.error)
+	await config.setWithdraw(nextWithdraw.address, {
+		gasPrice: await fastest(),
+		gas,
+	})
 	____log('updated AddressConfig for Withdraw')
+
+	await config.setWithdrawStorage(
+		'0x0000000000000000000000000000000000000000',
+		{
+			gasPrice: await fastest(),
+			gas,
+		}
+	)
+	____log('updated AddressConfig for WithdrawStorage')
 
 	callback(null)
 }
