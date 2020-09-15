@@ -59,6 +59,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		const marketAddress = getMarketAddress(
 			await dev.marketFactory.create(marketBehavior.address)
 		)
+		await marketBehavior.setAssociatedMarket(marketAddress)
 		const [market] = await Promise.all([
 			artifacts.require('Market').at(marketAddress),
 		])
