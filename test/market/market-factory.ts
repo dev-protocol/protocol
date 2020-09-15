@@ -13,7 +13,6 @@ contract('MarketFactoryTest', ([deployer, user]) => {
 			await dev.generateAddressConfig()
 			await Promise.all([
 				dev.generatePolicyGroup(),
-				dev.generatePolicySet(),
 				dev.generatePolicyFactory(),
 				dev.generateMarketFactory(),
 				dev.generateMarketGroup(),

@@ -7,7 +7,6 @@ import {
 	LockupInstance,
 	PropertyFactoryInstance,
 	PolicyFactoryInstance,
-	PolicySetInstance,
 	PolicyGroupInstance,
 	MarketFactoryInstance,
 	MarketGroupInstance,
@@ -34,7 +33,6 @@ export class DevProtocolInstance {
 	private _voteCounter!: VoteCounterInstance
 	private _propertyGroup!: PropertyGroupInstance
 	private _policyFactory!: PolicyFactoryInstance
-	private _policySet!: PolicySetInstance
 	private _policyGroup!: PolicyGroupInstance
 	private _marketFactory!: MarketFactoryInstance
 	private _marketGroup!: MarketGroupInstance
@@ -81,10 +79,6 @@ export class DevProtocolInstance {
 
 	public get policyFactory(): PolicyFactoryInstance {
 		return this._policyFactory
-	}
-
-	public get policySet(): PolicySetInstance {
-		return this._policySet
 	}
 
 	public get policyGroup(): PolicyGroupInstance {
@@ -192,18 +186,6 @@ export class DevProtocolInstance {
 		)
 		await this._addressConfig.setPolicyFactory(
 			this._policyFactory.address,
-			this.fromDeployer
-		)
-	}
-
-	public async generatePolicySet(): Promise<void> {
-		this._policySet = await contract('PolicySet').new(
-			this.addressConfig.address,
-			this.fromDeployer
-		)
-		await this._policySet.createStorage(this.fromDeployer)
-		await this._addressConfig.setPolicySet(
-			this._policySet.address,
 			this.fromDeployer
 		)
 	}

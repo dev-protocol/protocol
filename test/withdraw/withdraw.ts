@@ -38,7 +38,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			dev.generateVoteCounter(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
-			dev.generatePolicySet(),
 			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
