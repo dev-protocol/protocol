@@ -241,7 +241,6 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 				dev.generateAllocator(),
 				dev.generateMetricsGroup(),
 				dev.generateWithdraw(),
-				dev.generateWithdrawStorage(),
 				dev.generatePolicyFactory(),
 				dev.generatePolicyGroup(),
 			])

@@ -19,7 +19,9 @@ import {
 } from '../test-lib/utils/error'
 
 contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
-	const init = async (): Promise<
+	const init = async (
+		generateWithdrawTest = false
+	): Promise<
 		[DevProtocolInstance, MetricsInstance, PropertyInstance, IPolicyInstance]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
@@ -31,8 +33,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			dev.generateMetricsFactory(),
 			dev.generateMetricsGroup(),
 			dev.generateLockup(),
-			dev.generateWithdraw(),
-			dev.generateWithdrawStorage(),
 			dev.generatePropertyFactory(),
 			dev.generatePropertyGroup(),
 			dev.generateVoteCounter(),
@@ -40,6 +40,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			dev.generatePolicyGroup(),
 			dev.generateDev(),
 		])
+		if (generateWithdrawTest) {
+			await dev.generateWithdrawTest()
+			await dev.dev.addMinter(dev.withdrawTest.address)
+		} else {
+			await dev.generateWithdraw()
+			await dev.dev.addMinter(dev.withdraw.address)
+		}
+
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
 		const policy = await artifacts.require('PolicyTestForWithdraw').new()
@@ -71,7 +79,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		const [metrics] = await Promise.all([
 			artifacts.require('Metrics').at(metricsAddress as string),
 		])
-		await dev.dev.addMinter(dev.withdraw.address)
 		await dev.lockup.update()
 
 		return [dev, metrics, property, policy]
@@ -503,14 +510,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		): Promise<BigNumber> =>
 			Promise.all([
 				dev.lockup.difference(prop.address, 0).then((x) => x[2]),
-				dev.withdrawStorage.getLastCumulativeHoldersReward(
+				dev.activeWithdraw.getLastCumulativeHoldersReward(
 					prop.address,
 					account
 				),
 				prop.balanceOf(account),
-				dev.withdrawStorage.getPendingWithdrawal(prop.address, account),
-				dev.withdrawStorage.getCumulativePrice(prop.address),
-				dev.withdrawStorage.getLastWithdrawalPrice(prop.address, account),
+				dev.activeWithdraw.getPendingWithdrawal(prop.address, account),
+				dev.activeWithdraw.getCumulativePrice(prop.address),
+				dev.activeWithdraw.getLastWithdrawalPrice(prop.address, account),
 			]).then((results) => {
 				const [
 					holdersPrice,
@@ -1119,7 +1126,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			const alice = deployer
 
 			before(async () => {
-				;[dev, , property] = await init()
+				;[dev, , property] = await init(true)
 				;[property2] = await Promise.all([
 					artifacts
 						.require('Property')
@@ -1135,18 +1142,18 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				)
 
 				calc = createCalculator(dev)
-				await dev.addressConfig.setWithdraw(deployer)
-				await dev.withdrawStorage.setCumulativePrice(property.address, 10000)
-				await dev.withdrawStorage.setLastWithdrawalPrice(
+				// Await dev.addressConfig.setWithdraw(deployer)
+				await dev.withdrawTest.setCumulativePriceTest(property.address, 10000)
+				await dev.withdrawTest.setLastWithdrawalPriceTest(
 					property.address,
 					alice,
 					7000
 				)
-				await dev.addressConfig.setWithdraw(dev.withdraw.address)
+				// Await dev.addressConfig.setWithdraw(dev.withdrawTest.address)
 			})
 			describe('before withdraw interest', () => {
 				it('No staked Property is 0 reward', async () => {
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
 					const expected = await calc(property2, alice)
@@ -1155,7 +1162,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const aliceBalance = await property.balanceOf(alice).then(toBigNumber)
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					const legacy = toBigNumber(10000)
@@ -1169,11 +1176,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 			describe('after withdraw interest', () => {
 				before(async () => {
-					await dev.withdraw.withdraw(property.address, {from: alice})
+					await dev.withdrawTest.withdraw(property.address, {from: alice})
 					await mine(3)
 				})
 				it('No staked Property is 0 reward', async () => {
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
 					const expected = await calc(property2, alice)
@@ -1181,7 +1188,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					expect(expected.toFixed()).to.be.equal('0')
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					const legacy = toBigNumber(0)
@@ -1198,7 +1205,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					await mine(3)
 				})
 				it('No staked Property is 0 reward', async () => {
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
 					const expected = await calc(property2, alice)
@@ -1207,7 +1214,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const block = await getBlock().then(toBigNumber)
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					const latest = toBigNumber(90)
@@ -1228,7 +1235,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			const alice = deployer
 
 			before(async () => {
-				;[dev, , property] = await init()
+				;[dev, , property] = await init(true)
 				;[property2] = await Promise.all([
 					artifacts
 						.require('Property')
@@ -1244,20 +1251,20 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				)
 
 				calc = createCalculator(dev)
-				await dev.addressConfig.setWithdraw(deployer)
-				await dev.withdrawStorage.setCumulativePrice(property.address, 10000)
-				await dev.withdrawStorage.setLastWithdrawalPrice(
+				// Await dev.addressConfig.setWithdraw(deployer)
+				await dev.withdrawTest.setCumulativePriceTest(property.address, 10000)
+				await dev.withdrawTest.setLastWithdrawalPriceTest(
 					property.address,
 					alice,
 					7000
 				)
-				await dev.addressConfig.setWithdraw(dev.withdraw.address)
+				// Await dev.addressConfig.setWithdraw(dev.withdrawTest.address)
 				await dev.dev.deposit(property.address, 10000)
 				lastBlock = await getBlock().then(toBigNumber)
 			})
 			describe('before withdraw interest', () => {
 				it('No staked Property is 0 reward', async () => {
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
 					const expected = await calc(property2, alice)
@@ -1267,7 +1274,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const aliceBalance = await property.balanceOf(alice).then(toBigNumber)
 					const block = await getBlock().then(toBigNumber)
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					const latest = toBigNumber(90)
@@ -1284,12 +1291,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 			describe('after withdraw interest', () => {
 				before(async () => {
-					await dev.withdraw.withdraw(property.address, {from: alice})
+					await dev.withdrawTest.withdraw(property.address, {from: alice})
 					lastBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
 				it('No staked Property is 0 reward', async () => {
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
 					const expected = await calc(property2, alice)
@@ -1298,7 +1305,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const block = await getBlock().then(toBigNumber)
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					const latest = toBigNumber(90)
@@ -1315,7 +1322,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					await mine(3)
 				})
 				it('No staked Property is 0 reward', async () => {
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
 					const expected = await calc(property2, alice)
@@ -1324,7 +1331,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const block = await getBlock().then(toBigNumber)
-					const result = await dev.withdraw
+					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					const latest = toBigNumber(90)

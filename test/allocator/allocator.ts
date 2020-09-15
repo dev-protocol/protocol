@@ -18,7 +18,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			dev.generateMetricsGroup(),
 			dev.generateLockup(),
 			dev.generateWithdraw(),
-			dev.generateWithdrawStorage(),
 			dev.generatePropertyFactory(),
 			dev.generatePropertyGroup(),
 			dev.generateVoteCounter(),
@@ -104,7 +103,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			await dev.propertyGroup.addGroup(propertyAddress, {
 				from: propertyFactory,
 			})
-			const beforeValue = await dev.withdrawStorage.getLastCumulativeHoldersReward(
+			const beforeValue = await dev.withdraw.getLastCumulativeHoldersReward(
 				property.address,
 				deployer
 			)
@@ -114,7 +113,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 				user1,
 				{from: propertyAddress}
 			)
-			const afterValue = await dev.withdrawStorage.getLastCumulativeHoldersReward(
+			const afterValue = await dev.withdraw.getLastCumulativeHoldersReward(
 				property.address,
 				deployer
 			)

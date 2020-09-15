@@ -99,7 +99,6 @@ contract(
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
-					dev.generateWithdrawStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),
@@ -151,7 +150,6 @@ contract(
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
-					dev.generateWithdrawStorage(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateLockup(),

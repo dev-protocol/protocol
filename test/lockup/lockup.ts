@@ -33,7 +33,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			dev.generateMetricsGroup(),
 			dev.generateLockup(),
 			dev.generateWithdraw(),
-			dev.generateWithdrawStorage(),
 			dev.generatePropertyFactory(),
 			dev.generatePropertyGroup(),
 			dev.generateVoteCounter(),

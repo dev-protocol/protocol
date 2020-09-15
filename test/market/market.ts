@@ -104,7 +104,6 @@ contract(
 					dev.generateLockup(),
 					dev.generateDev(),
 					dev.generateWithdraw(),
-					dev.generateWithdrawStorage(),
 					dev.generateAllocator(),
 				])
 				const behavior1 = await dev.getMarket('MarketTest3', user)
@@ -322,7 +321,6 @@ contract(
 					dev.generateLockup(),
 					dev.generateDev(),
 					dev.generateWithdraw(),
-					dev.generateWithdrawStorage(),
 					dev.generateAllocator(),
 				])
 				const behavior1 = await dev.getMarket('MarketTest3', user)

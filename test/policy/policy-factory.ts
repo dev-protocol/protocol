@@ -67,7 +67,6 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 				dev.generateLockup(),
 				dev.generateAllocator(),
 				dev.generateWithdraw(),
-				dev.generateWithdrawStorage(),
 				dev.generateMetricsGroup(),
 				dev.generateDev(),
 			])
