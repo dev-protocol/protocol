@@ -21,7 +21,7 @@ export class WithdrawStorage {
 	public async create(): Promise<WithdrawStorageInstance> {
 		const withdrawStorage = await this._dev.artifacts
 			.require('WithdrawStorage')
-			.new(this._dev.gasInfo)
+			.new(await this._dev.gasInfo)
 		console.log('new WithdrawStorage contract', withdrawStorage.address)
 		return withdrawStorage
 	}
@@ -29,7 +29,7 @@ export class WithdrawStorage {
 	public async set(withdrawStorage: WithdrawStorageInstance): Promise<void> {
 		await this._dev.addressConfig.setWithdrawStorage(
 			withdrawStorage.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set WithdrawStorage contract', withdrawStorage.address)
 	}

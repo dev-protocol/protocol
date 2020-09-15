@@ -20,7 +20,7 @@ export class PropertyGroup {
 	public async create(): Promise<PropertyGroupInstance> {
 		const propertyGroup = await this._dev.artifacts
 			.require('PropertyGroup')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new PropertyGroup contract', propertyGroup.address)
 		return propertyGroup
 	}
@@ -28,7 +28,7 @@ export class PropertyGroup {
 	public async set(propertyGroup: PropertyGroupInstance): Promise<void> {
 		await this._dev.addressConfig.setPropertyGroup(
 			propertyGroup.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set PropertyGroup contract', propertyGroup.address)
 	}

@@ -20,7 +20,7 @@ export class PropertyFactory {
 	public async create(): Promise<PropertyFactoryInstance> {
 		const propertyFactory = await this._dev.artifacts
 			.require('PropertyFactory')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new PropertyFactory contract', propertyFactory.address)
 		return propertyFactory
 	}
@@ -28,7 +28,7 @@ export class PropertyFactory {
 	public async set(propertyFactory: PropertyFactoryInstance): Promise<void> {
 		await this._dev.addressConfig.setPropertyFactory(
 			propertyFactory.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set PropertyFactory contract', propertyFactory.address)
 	}
