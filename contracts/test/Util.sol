@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 contract Util {
 	function blockNumber() public view returns (uint256) {

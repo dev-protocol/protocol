@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";

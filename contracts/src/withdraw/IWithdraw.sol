@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 contract IWithdraw {
 	function withdraw(address _property) external;
