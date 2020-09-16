@@ -20,7 +20,7 @@ export class MetricsFactory {
 	public async create(): Promise<MetricsFactoryInstance> {
 		const metricsFactory = await this._dev.artifacts
 			.require('MetricsFactory')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new MetricsFactory contract', metricsFactory.address)
 		return metricsFactory
 	}
@@ -28,7 +28,7 @@ export class MetricsFactory {
 	public async set(metricsFactory: MetricsFactoryInstance): Promise<void> {
 		await this._dev.addressConfig.setMetricsFactory(
 			metricsFactory.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set MetricsFactory contract', metricsFactory.address)
 	}

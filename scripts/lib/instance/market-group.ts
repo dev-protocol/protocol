@@ -20,7 +20,7 @@ export class MarketGroup {
 	public async create(): Promise<MarketGroupInstance> {
 		const marketGroup = await this._dev.artifacts
 			.require('MarketGroup')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new MarketGroup contract', marketGroup.address)
 		return marketGroup
 	}
@@ -28,7 +28,7 @@ export class MarketGroup {
 	public async set(marketGroup: MarketGroupInstance): Promise<void> {
 		await this._dev.addressConfig.setMarketGroup(
 			marketGroup.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set MarketGroup contract', marketGroup.address)
 	}

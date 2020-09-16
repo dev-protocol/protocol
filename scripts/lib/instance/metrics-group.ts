@@ -20,7 +20,7 @@ export class MetricsGroup {
 	public async create(): Promise<MetricsGroupInstance> {
 		const metricsGroup = await this._dev.artifacts
 			.require('MetricsGroup')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new MetricsGroup contract', metricsGroup.address)
 		return metricsGroup
 	}
@@ -28,7 +28,7 @@ export class MetricsGroup {
 	public async set(metricsGroup: MetricsGroupInstance): Promise<void> {
 		await this._dev.addressConfig.setMetricsGroup(
 			metricsGroup.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set MetricsGroup contract', metricsGroup.address)
 	}
