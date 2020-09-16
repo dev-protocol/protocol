@@ -1,69 +1,51 @@
 /* eslint-disable no-undef */
 import {createFastestGasPriceFetcher} from './lib/ethgas'
 import {ethgas} from './lib/api'
+import {config} from 'dotenv'
+import {DevCommonInstance} from './lib/instance/common'
+import {PolicyGroup} from './lib/instance/policy-group'
+import {PolicyFactory} from './lib/instance/policy-factory'
 
-const {CONFIG, EGS_TOKEN} = process.env
-const {log: ____log} = console
-const gas = 6721975
+config()
+const {CONFIG: configAddress, EGS_TOKEN: egsApiKey} = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!CONFIG || !EGS_TOKEN) {
+	if (!configAddress || !egsApiKey) {
 		return
 	}
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
+	const gasFetcher = async () => 6721975
+	const gasPriceFetcher = createFastestGasPriceFetcher(ethgas(egsApiKey), web3)
+	const dev = new DevCommonInstance(
+		artifacts,
+		configAddress,
+		gasFetcher,
+		gasPriceFetcher
+	)
+	await dev.prepare()
 
-	// Generate current contract
-	const [config] = await Promise.all([
-		artifacts.require('AddressConfig').at(CONFIG),
-	])
-	____log('Generated AddressConfig contract', config.address)
+	const policyGroup = new PolicyGroup(dev)
+	const currentPolicyGroup = await policyGroup.load()
+	const nextPolicyGroup = await policyGroup.create()
+	await policyGroup.changeOwner(currentPolicyGroup, nextPolicyGroup)
+	await policyGroup.set(nextPolicyGroup)
 
-	const [policyGroup] = await Promise.all([
-		artifacts.require('PolicyGroup').at(await config.policyGroup()),
-	])
-	____log('Generated PolicyGroup contract', config.address)
+	const policyFactory = new PolicyFactory(dev)
+	const nextPolicyFactory = await policyFactory.create()
+	await policyFactory.set(nextPolicyFactory)
 
-	// Deploy
-	const nextPolicyFactory = await artifacts
-		.require('PolicyFactory')
-		.new(config.address, {gasPrice: await fastest(), gas})
-	____log('Deployed the new PolicyFactory', nextPolicyFactory.address)
+	await dev.addressConfig.setPolicySet(
+		'0x0000000000000000000000000000000000000000'
+	)
+	console.log('PolicySet address is 0')
 
-	const nextPolicyGroup = await artifacts
-		.require('PolicyGroup')
-		.new(config.address, {gasPrice: await fastest(), gas})
-	____log('Deployed the new PolicyGroup', nextPolicyGroup.address)
+	const currentPolicy = await dev.addressConfig.policy()
+	console.log(`current policy address is ${currentPolicy}`)
 
-	// Delegate authority
-	const policyGroupStorageAddress = await policyGroup.getStorageAddress()
-	____log('Got EternalStorage address that uses by PolicyGroup')
-	await nextPolicyGroup.setStorage(policyGroupStorageAddress)
-	____log('Set EternalStorage address to the new PolicyGroup')
-	await policyGroup.changeOwner(nextPolicyGroup.address)
-	____log('Delegate authority to the new PolicyGroup')
-
-	// Enable new Contract
-	await config.setPolicyFactory(nextPolicyFactory.address, {
-		gasPrice: await fastest(),
-		gas,
-	})
-	____log('Updated PolicyFactory address')
-
-	await config.setPolicyGroup(nextPolicyGroup.address, {
-		gasPrice: await fastest(),
-		gas,
-	})
-	____log('Updated PolicyGroup address')
-
-	// Set Default Address
-	await config.setPolicySet('0x0000000000000000000000000000000000000000')
-
-	// Add policy address
-	const policy = await config.policy()
-	await nextPolicyGroup.addGroupOwner(policy)
+	await nextPolicyGroup.addGroupOwner(currentPolicy)
+	console.log('current policy address was set to PolicyGroup')
 
 	callback(null)
 }
