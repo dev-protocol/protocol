@@ -39,9 +39,13 @@ const handler = async (
 	await dev.addressConfig.setPolicySet(
 		'0x0000000000000000000000000000000000000000'
 	)
+	console.log('PolicySet address is 0')
 
 	const currentPolicy = await dev.addressConfig.policy()
+	console.log(`current policy address is ${currentPolicy}`)
+
 	await nextPolicyGroup.addGroupOwner(currentPolicy)
+	console.log('current policy address was set to PolicyGroup')
 
 	callback(null)
 }
