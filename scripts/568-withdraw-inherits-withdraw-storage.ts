@@ -1,73 +1,57 @@
 /* eslint-disable no-undef */
+import {config} from 'dotenv'
 import {createFastestGasPriceFetcher} from './lib/ethgas'
 import {ethgas} from './lib/api'
+import {DevCommonInstance} from './lib/instance/common'
+import {Withdraw} from './lib/instance/withdraw'
+import {WithdrawStorage} from './lib/instance/withdraw-storage'
 
-const {CONFIG, EGS_TOKEN} = process.env
-const {log: ____log} = console
-const gas = 6721975
+config()
+const {CONFIG: configAddress, EGS_TOKEN: egsApiKey} = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!CONFIG || !EGS_TOKEN) {
+	if (!configAddress || !egsApiKey) {
 		return
 	}
 
-	// Generate current contract
-	const [config] = await Promise.all([
-		artifacts.require('AddressConfig').at(CONFIG),
-	])
-	____log('Generated AddressConfig contract', config.address)
+	const gasFetcher = async () => 6721975
+	const gasPriceFetcher = createFastestGasPriceFetcher(ethgas(egsApiKey), web3)
+	const dev = new DevCommonInstance(
+		artifacts,
+		configAddress,
+		gasFetcher,
+		gasPriceFetcher
+	)
+	await dev.prepare()
 
-	const [withdrawStorage, dev] = await Promise.all([
-		artifacts.require('WithdrawStorage').at(await config.withdrawStorage()),
-		artifacts.require('Dev').at(await config.token()),
-	])
-	____log('Generated current WithdrawStorage contract', withdrawStorage.address)
-	____log('Generated current Dev contract', dev.address)
+	// Withdraw
+	const withdraw = new Withdraw(dev)
+	const nextWithdrawInstance = await withdraw.create()
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
+	// WithdrawStorage
+	const withdrawStorage = new WithdrawStorage(dev)
+	const withdrawStorageInstance = await withdrawStorage.load()
+	const withdrawStorageAddress = await withdrawStorageInstance.getStorageAddress()
+	console.log(`withdraw storage address is ${withdrawStorageAddress}`)
 
-	// Deploy new Withdraw
-	const nextWithdraw = await artifacts
-		.require('Withdraw')
-		.new(config.address, {gasPrice: await fastest(), gas})
-	____log('Deployed the new Withdraw', nextWithdraw.address)
-
-	// Add minter
-	await dev.addMinter(nextWithdraw.address, {gasPrice: await fastest(), gas})
-	____log('Added next Withdraw as a minter')
-
-	// Delegate storage for WithdrawStorage
-	const withdrawStorageAddress = await withdrawStorage.getStorageAddress()
-	____log('Got EternalStorage address that uses by WithdrawStorage')
-	await nextWithdraw.setStorage(withdrawStorageAddress, {
-		gasPrice: await fastest(),
-		gas,
+	await nextWithdrawInstance.setStorage(withdrawStorageAddress, {
+		gasPrice: await gasPriceFetcher(),
+		gas: await gasFetcher(),
 	})
-	____log('Set EternalStorage address to the new Withdraw')
-
-	// Activation
-	await withdrawStorage.changeOwner(nextWithdraw.address, {
-		gasPrice: await fastest(),
-		gas,
+	await withdrawStorageInstance.changeOwner(nextWithdrawInstance.address, {
+		gasPrice: await gasPriceFetcher(),
+		gas: await gasFetcher(),
 	})
-	____log('Delegated EternalStorage owner to the new Withdraw')
-
-	await config.setWithdraw(nextWithdraw.address, {
-		gasPrice: await fastest(),
-		gas,
-	})
-	____log('updated AddressConfig for Withdraw')
-
-	await config.setWithdrawStorage(
+	await withdraw.set(nextWithdrawInstance)
+	await dev.addressConfig.setWithdrawStorage(
 		'0x0000000000000000000000000000000000000000',
 		{
-			gasPrice: await fastest(),
-			gas,
+			gasPrice: await gasPriceFetcher(),
+			gas: await gasFetcher(),
 		}
 	)
-	____log('updated AddressConfig for WithdrawStorage')
 
 	callback(null)
 }
