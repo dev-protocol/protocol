@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {IPolicyInstance} from '../../types/truffle-contracts'
 import {DevProtocolInstance} from '../test-lib/instance'
 

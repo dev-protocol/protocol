@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import {DevCommonInstance} from './lib/instance/common'
 import {Withdraw} from './lib/instance/withdraw'
-import {WithdrawStorage} from './lib/instance/withdraw-storage'
 import {config} from 'dotenv'
 import {createFastestGasPriceFetcher} from './lib/ethgas'
 import {ethgas} from './lib/api'
@@ -29,13 +28,6 @@ const handler = async (
 	const withdraw = new Withdraw(dev)
 	const nextWithdraw = await withdraw.create()
 	await withdraw.set(nextWithdraw)
-
-	// Withdraw storage
-	const withdrawStorage = new WithdrawStorage(dev)
-	const oldWithdrawStorage = await withdrawStorage.load()
-	const nextWithdrawStorage = await withdrawStorage.create()
-	await withdrawStorage.changeOwner(oldWithdrawStorage, nextWithdrawStorage)
-	await withdrawStorage.set(nextWithdrawStorage)
 
 	callback(null)
 }

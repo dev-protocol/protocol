@@ -11,9 +11,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 		})
 	})
 	describe('EternalStorage; getter,setter,deleter', () => {
-		// eslint-disable-next-line no-undef
 		const key = web3.utils.keccak256('key')
-		// eslint-disable-next-line no-undef
 		const unsetKey = web3.utils.keccak256('unsetKey')
 		describe('uint', () => {
 			it('get.', async () => {
@@ -47,7 +45,6 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 		describe('byte32', () => {
 			let value: string
 			before(async () => {
-				// eslint-disable-next-line no-undef
 				value = web3.utils.keccak256('value')
 			})
 			it('get.', async () => {
@@ -195,7 +192,6 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 		})
 	})
 	describe('EternalStorage; upgradeOwner', () => {
-		// eslint-disable-next-line no-undef
 		let key = web3.utils.keccak256('key')
 		before(async () => {
 			await eternalStorage.changeOwner(newOwner, {from: deployer})

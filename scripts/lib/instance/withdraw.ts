@@ -32,11 +32,21 @@ export class Withdraw {
 		console.log('set Withdraw contract', withdraw.address)
 	}
 
+	public async changeOwner(
+		before: WithdrawInstance,
+		after: WithdrawInstance
+	): Promise<void> {
+		const storageAddress = await before.getStorageAddress()
+		console.log(`storage address ${storageAddress}`)
+		await after.setStorage(storageAddress)
+		await before.changeOwner(after.address)
+
+		console.log(`change owner from ${before.address} to ${after.address}`)
+	}
+
 	private async _addMinter(withdraw: WithdrawInstance): Promise<void> {
 		await this._dev.dev.addMinter(withdraw.address, await this._dev.gasInfo)
 
 		console.log(`add minter ${withdraw.address}`)
 	}
-
-	// TODO add change storage method
 }
