@@ -1,38 +1,33 @@
 /* eslint-disable no-undef */
 import {createFastestGasPriceFetcher} from './lib/ethgas'
 import {ethgas} from './lib/api'
+import {config} from 'dotenv'
+import {DevCommonInstance} from './lib/instance/common'
+import {PropertyFactory} from './lib/instance/property-factory'
 
-const {CONFIG, EGS_TOKEN} = process.env
-const {log: ____log} = console
-const gas = 6721975
+config()
+const {CONFIG: configAddress, EGS_TOKEN: egsApiKey} = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!CONFIG || !EGS_TOKEN) {
+	if (!configAddress || !egsApiKey) {
 		return
 	}
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
+	const gasFetcher = async () => 6721975
+	const gasPriceFetcher = createFastestGasPriceFetcher(ethgas(egsApiKey), web3)
+	const dev = new DevCommonInstance(
+		artifacts,
+		configAddress,
+		gasFetcher,
+		gasPriceFetcher
+	)
+	await dev.prepare()
 
-	// Generate current contract
-	const [config] = await Promise.all([
-		artifacts.require('AddressConfig').at(CONFIG),
-	])
-	____log('Generated AddressConfig contract', config.address)
-
-	// Deploy
-	const nextPropertyFactory = await artifacts
-		.require('PropertyFactory')
-		.new(config.address, {gasPrice: await fastest(), gas})
-	____log('Deployed the new PropertyFactory', nextPropertyFactory.address)
-
-	// Enable new Contract
-	await config.setPropertyFactory(nextPropertyFactory.address, {
-		gasPrice: await fastest(),
-		gas,
-	})
-	____log('Updated PropertyFactory address')
+	const propertyFactory = new PropertyFactory(dev)
+	const nextPropertyFactory = await propertyFactory.create()
+	await propertyFactory.set(nextPropertyFactory)
 	callback(null)
 }
 
