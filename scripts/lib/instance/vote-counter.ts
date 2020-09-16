@@ -20,7 +20,7 @@ export class VoteCounter {
 	public async create(): Promise<VoteCounterInstance> {
 		const voteCounter = await this._dev.artifacts
 			.require('VoteCounter')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new VoteCounter contract', voteCounter.address)
 		return voteCounter
 	}
@@ -28,7 +28,7 @@ export class VoteCounter {
 	public async set(voteCounter: VoteCounterInstance): Promise<void> {
 		await this._dev.addressConfig.setVoteCounter(
 			voteCounter.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set VoteCounter contract', voteCounter.address)
 	}

@@ -8,14 +8,24 @@ import {
 export class DevCommonInstance {
 	// eslint-disable-next-line no-undef
 	private readonly _artifacts: Truffle.Artifacts
-	private readonly _gasInfo: {gas: number; gasPrice: number}
+	private readonly _gasFetcher: () => Promise<number | string>
+	private readonly _gasPriceFetcher: () => Promise<number | string>
+	private readonly _configAddress: string
+
 	private _addressConfig!: AddressConfigInstance
 	private _dev!: DevInstance
 
-	// eslint-disable-next-line no-undef
-	constructor(_artifacts: Truffle.Artifacts, _gas: number, _gasPrice: number) {
+	constructor(
+		// eslint-disable-next-line no-undef
+		_artifacts: Truffle.Artifacts,
+		_configAddress: string,
+		_gasFetcher: () => Promise<number | string>,
+		_gasPriceFetcher: () => Promise<number | string>
+	) {
 		this._artifacts = _artifacts
-		this._gasInfo = {gas: _gas, gasPrice: _gasPrice}
+		this._configAddress = _configAddress
+		this._gasFetcher = _gasFetcher
+		this._gasPriceFetcher = _gasPriceFetcher
 	}
 
 	// eslint-disable-next-line no-undef
@@ -23,8 +33,19 @@ export class DevCommonInstance {
 		return this._artifacts
 	}
 
-	public get gasInfo(): {gas: number; gasPrice: number} {
-		return this._gasInfo
+	public get gasInfo(): Promise<{
+		gas: number | string
+		gasPrice: number | string
+	}> {
+		return Promise.all([this._gasFetcher(), this._gasPriceFetcher()])
+			.then(([gas, gasPrice]) => ({gas, gasPrice}))
+			.catch((err: Error) => {
+				console.error(err)
+				return {
+					gas: 0,
+					gasPrice: 0,
+				}
+			})
 	}
 
 	public get addressConfig(): AddressConfigInstance {
@@ -43,7 +64,7 @@ export class DevCommonInstance {
 	private async _loadAddressConfig(): Promise<void> {
 		this._addressConfig = await this._artifacts
 			.require('AddressConfig')
-			.at(process.env.CONFIG!)
+			.at(this._configAddress)
 		console.log('load AddressConfig contract', this._addressConfig.address)
 	}
 

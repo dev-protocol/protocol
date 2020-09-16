@@ -18,14 +18,17 @@ export class Lockup {
 	public async create(): Promise<LockupInstance> {
 		const lockup = await this._dev.artifacts
 			.require('Lockup')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new Lockup contract', lockup.address)
 		await this._addMinter(lockup)
 		return lockup
 	}
 
 	public async set(lockup: LockupInstance): Promise<void> {
-		await this._dev.addressConfig.setLockup(lockup.address, this._dev.gasInfo)
+		await this._dev.addressConfig.setLockup(
+			lockup.address,
+			await this._dev.gasInfo
+		)
 		console.log('set Lockup contract', lockup.address)
 	}
 
@@ -42,7 +45,7 @@ export class Lockup {
 	}
 
 	private async _addMinter(lockup: LockupInstance): Promise<void> {
-		await this._dev.dev.addMinter(lockup.address, this._dev.gasInfo)
+		await this._dev.dev.addMinter(lockup.address, await this._dev.gasInfo)
 
 		console.log(`add minter ${lockup.address}`)
 	}

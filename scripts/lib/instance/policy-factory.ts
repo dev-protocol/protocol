@@ -20,7 +20,7 @@ export class PolicyFactory {
 	public async create(): Promise<PolicyFactoryInstance> {
 		const policyFactory = await this._dev.artifacts
 			.require('PolicyFactory')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new PolicyFactory contract', policyFactory.address)
 		return policyFactory
 	}
@@ -28,7 +28,7 @@ export class PolicyFactory {
 	public async set(policyFactory: PolicyFactoryInstance): Promise<void> {
 		await this._dev.addressConfig.setPolicyFactory(
 			policyFactory.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set PolicyFactory contract', policyFactory.address)
 	}

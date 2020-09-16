@@ -20,7 +20,7 @@ export class MarketFactry {
 	public async create(): Promise<MarketFactoryInstance> {
 		const marketFactory = await this._dev.artifacts
 			.require('MarketFactory')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new MarketFactory contract', marketFactory.address)
 		return marketFactory
 	}
@@ -28,7 +28,7 @@ export class MarketFactry {
 	public async set(marketFactory: MarketFactoryInstance): Promise<void> {
 		await this._dev.addressConfig.setMarketFactory(
 			marketFactory.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set MarketFactory contract', marketFactory.address)
 	}

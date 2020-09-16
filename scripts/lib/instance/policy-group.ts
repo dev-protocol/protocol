@@ -20,7 +20,7 @@ export class PolicyGroup {
 	public async create(): Promise<PolicyGroupInstance> {
 		const policyGroup = await this._dev.artifacts
 			.require('PolicyGroup')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new PolicyGroup contract', policyGroup.address)
 		return policyGroup
 	}
@@ -28,7 +28,7 @@ export class PolicyGroup {
 	public async set(policyGroup: PolicyGroupInstance): Promise<void> {
 		await this._dev.addressConfig.setPolicyGroup(
 			policyGroup.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set PolicyGroup contract', policyGroup.address)
 	}

@@ -18,7 +18,7 @@ export class Withdraw {
 	public async create(): Promise<WithdrawInstance> {
 		const withdraw = await this._dev.artifacts
 			.require('Withdraw')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new Withdraw contract', withdraw.address)
 		await this._addMinter(withdraw)
 		return withdraw
@@ -27,13 +27,13 @@ export class Withdraw {
 	public async set(withdraw: WithdrawInstance): Promise<void> {
 		await this._dev.addressConfig.setWithdraw(
 			withdraw.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set Withdraw contract', withdraw.address)
 	}
 
 	private async _addMinter(withdraw: WithdrawInstance): Promise<void> {
-		await this._dev.dev.addMinter(withdraw.address, this._dev.gasInfo)
+		await this._dev.dev.addMinter(withdraw.address, await this._dev.gasInfo)
 
 		console.log(`add minter ${withdraw.address}`)
 	}

@@ -18,7 +18,7 @@ export class Allocator {
 	public async create(): Promise<AllocatorInstance> {
 		const allocator = await this._dev.artifacts
 			.require('Allocator')
-			.new(this._dev.addressConfig.address, this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
 		console.log('new Allocator contract', allocator.address)
 		return allocator
 	}
@@ -26,7 +26,7 @@ export class Allocator {
 	public async set(allocator: AllocatorInstance): Promise<void> {
 		await this._dev.addressConfig.setAllocator(
 			allocator.address,
-			this._dev.gasInfo
+			await this._dev.gasInfo
 		)
 		console.log('set Allocator contract', allocator.address)
 	}
