@@ -44,6 +44,10 @@ const handler = async (
 		gasPrice: await gasPriceFetcher(),
 		gas: await gasFetcher(),
 	})
+	console.log(
+		`change owner from ${withdrawStorageInstance.address} to ${nextWithdrawInstance.address}`
+	)
+
 	await withdraw.set(nextWithdrawInstance)
 	await dev.addressConfig.setWithdrawStorage(
 		'0x0000000000000000000000000000000000000000',
@@ -52,6 +56,7 @@ const handler = async (
 			gas: await gasFetcher(),
 		}
 	)
+	console.log('WithdrawStorage address is 0')
 
 	callback(null)
 }
