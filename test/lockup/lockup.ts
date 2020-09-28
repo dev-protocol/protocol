@@ -115,11 +115,11 @@ contract('LockupTest', ([deployer, user1]) => {
 				.catch(err)
 			validateErrorMessage(res, 'this is illegal address')
 		})
-		it('should fail to call when passed address is not property contract', async () => {
+		it.only('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
 
-			const res = await dev.lockup.lockup(deployer, user1, 10000).catch(err)
-			validateErrorMessage(res, 'this is illegal address')
+			const res = await dev.dev.deposit(user1, 10000).catch(err)
+			validateErrorMessage(res, 'unable to stake to unauthenticated property')
 		})
 		it('should fail to call when lockup is canceling', async () => {
 			const [dev, property] = await init()
