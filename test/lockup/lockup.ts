@@ -113,7 +113,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 10000)
 				.catch(err)
-			validateErrorMessage(res, 'illegal sender address')
+			validateErrorMessage(res, 'this is illegal address')
 		})
 		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
