@@ -67,7 +67,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		addressValidator().validateAddress(msg.sender, config().token());
 
 		/**
-		 * Validates the target of staking is included Property set.
+		 * Validates _value is not 0.
 		 */
 		require(_value != 0, "illegal lockup value");
 
