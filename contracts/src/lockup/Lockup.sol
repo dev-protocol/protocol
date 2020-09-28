@@ -82,7 +82,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Refuses new staking when after cancel staking and until release it.
 		 */
-		require(getStorageWithdrawalStatus(_property, _from) == 0, "lockup is already canceled");
+		require(
+			getStorageWithdrawalStatus(_property, _from) == 0,
+			"lockup is already canceled"
+		);
 
 		/**
 		 * Since the reward per block that can be withdrawn will change with the addition of staking,
