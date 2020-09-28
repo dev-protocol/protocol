@@ -64,7 +64,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Validates the sender is Dev contract.
 		 */
-		require(msg.sender == config().token(), "illegal sender address");
+		addressValidator().validateAddress(msg.sender, config().token());
 
 		/**
 		 * Validates _value is not 0.
