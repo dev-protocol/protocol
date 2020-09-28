@@ -269,7 +269,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 				50
 			)
 		})
-		it.only('check gas used', async () => {
+		it('check gas used', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
 			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
