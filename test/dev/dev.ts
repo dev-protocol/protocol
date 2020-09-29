@@ -277,7 +277,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const transaction = await dev.dev.deposit(prop, 50, {from: user1})
 			const gasPrice = Number(transaction.receipt.gasUsed)
 			console.log(gasPrice)
-			expect(gasPrice <= 849408).to.be.equal(true)
+			expect(gasPrice <= 849424).to.be.equal(true)
 		})
 		it('should fail to lock up token when 0 amount', async () => {
 			const dev = await generateEnv()
