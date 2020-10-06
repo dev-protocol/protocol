@@ -868,10 +868,10 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-bent@7.3.10:
-  version "7.3.10"
-  resolved "https://registry.yarnpkg.com/bent/-/bent-7.3.10.tgz#3c58a218b51c1efc9e0381a4f230b2f437184cb9"
-  integrity sha512-X2P2nGRWejGn6IjJfL4usOuAVMng1DdyuRhXLGOcUvEblBcLZenrSjlkgS8ob1s3tbq3mo1FDxKhCRNvcf0y0Q==
+bent@7.3.11:
+  version "7.3.11"
+  resolved "https://registry.yarnpkg.com/bent/-/bent-7.3.11.tgz#69043a6f5a875441172119ffbaa84d4b12e12479"
+  integrity sha512-rR4cxkBWlfcMwfj8skEMYVyScRpufIpII9sZwImmZQLPq8v8sVaxYDrdzqIPUgSRVCp32BtY0/sI6HMmj3CB4A==
   dependencies:
     bytesish "^0.4.1"
     caseless "~0.12.0"
