@@ -34,7 +34,7 @@
 		"@types/shelljs": "0.8.8",
 		"@typescript-eslint/eslint-plugin": "4.4.0",
 		"@typescript-eslint/parser": "4.4.0",
-		"bent": "7.3.10",
+		"bent": "7.3.11",
 		"bignumber.js": "9.0.1",
 		"dotenv": "8.2.0",
 		"eslint": "7.10.0",
