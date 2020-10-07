@@ -226,7 +226,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		view
 		returns (uint256)
 	{
-
+		// prettier-ignore
 		uint256 cHoldersReward = getStorageLastCumulativeHoldersRewardPerProperty(_property);
 		uint256 additionalHoldersReward = _reward.mul(
 			getStoragePropertyValue(_property)
