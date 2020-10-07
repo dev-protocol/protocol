@@ -504,36 +504,57 @@ contract LockupStorage is UsingStorage {
 			keccak256(abi.encodePacked("_lastStakesChangedCumulativeReward"));
 	}
 
-	//lastStakesChangedRewardPrice
-	function setStorageLastStakesChangedRewardPrice(
-		uint256 _holders,
-		uint256 _intertest
-	) internal {
-		uint256 record = _holders.mul(basis).add(_intertest);
+	//lastStakesChangedHoldersPrice
+	function setStorageLastStakesChangedHoldersPrice(uint256 _value) internal {
 		eternalStorage().setUint(
-			getStorageLastStakesChangedRewardPriceKey(),
-			record
+			getStorageLastStakesChangedHoldersPriceKey(),
+			_value
 		);
 	}
 
-	function getStorageLastStakesChangedRewardPrice()
+	function getStorageLastStakesChangedHoldersPrice()
 		public
 		view
-		returns (uint256 _holders, uint256 _interest)
+		returns (uint256)
 	{
-		uint256 record = eternalStorage().getUint(
-			getStorageLastStakesChangedRewardPriceKey()
-		);
-		uint256 holders = record.div(basis);
-		uint256 interest = record.sub(holders.mul(basis));
-		return (holders, interest);
+		return
+			eternalStorage().getUint(
+				getStorageLastStakesChangedHoldersPriceKey()
+			);
 	}
 
-	function getStorageLastStakesChangedRewardPriceKey()
+	function getStorageLastStakesChangedHoldersPriceKey()
 		private
 		pure
 		returns (bytes32)
 	{
-		return keccak256(abi.encodePacked("_lastStakesChangedRewardPrice"));
+		return keccak256(abi.encodePacked("_lastStakesChangedHoldersPrice"));
+	}
+
+	//lastStakesChangedInterestPrice
+	function setStorageLastStakesChangedInterestPrice(uint256 _value) internal {
+		eternalStorage().setUint(
+			getStorageLastStakesChangedInterestPriceKey(),
+			_value
+		);
+	}
+
+	function getStorageLastStakesChangedInterestPrice()
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getStorageLastStakesChangedInterestPriceKey()
+			);
+	}
+
+	function getStorageLastStakesChangedInterestPriceKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_lastStakesChangedInterestPrice"));
 	}
 }

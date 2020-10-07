@@ -184,7 +184,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 		setStorageLastStakedInterestPrice(_property, _user, interest);
 		setStorageLastStakesChangedCumulativeReward(reward);
-		setStorageLastStakesChangedRewardPrice(holders, interest);
+		setStorageLastStakesChangedHoldersPrice(holders);
+		setStorageLastStakesChangedInterestPrice(interest);
 	}
 
 	/**
@@ -199,10 +200,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		)
 	{
 		uint256 lastReward = getStorageLastStakesChangedCumulativeReward();
-		(
-			uint256 lastHoldersPrice,
-			uint256 lastInterestPrice
-		) = getStorageLastStakesChangedRewardPrice();
+		uint256 lastHoldersPrice = getStorageLastStakesChangedHoldersPrice();
+		uint256 lastInterestPrice = getStorageLastStakesChangedInterestPrice();
 		uint256 allStakes = getStorageAllValue();
 		(uint256 reward, ) = dry(_includeCurrentBlock);
 		uint256 price = reward.sub(lastReward).mulBasis().div(allStakes);
@@ -210,8 +209,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			price,
 			allStakes
 		);
-		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
-		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
+		uint256 holdersPrice = holdersShare.add(lastHoldersPrice).divBasis();
+		uint256 interestPrice = price
+			.sub(holdersShare)
+			.add(lastInterestPrice)
+			.divBasis();
 		return (reward, holdersPrice, interestPrice);
 	}
 
