@@ -1,3 +1,4 @@
+/* eslint-disable capitalized-comments */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {DevProtocolInstance} from '../test-lib/instance'
 import {
@@ -254,10 +255,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		})
 	})
 
-	describe.only('Withdraw; beforeBalanceChange', () => {
-		describe.only('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
+	describe('Withdraw; beforeBalanceChange', () => {
+		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
+			let blockNumber: number
 			const alice = deployer
 			const bob = user1
 
@@ -272,25 +274,32 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					from: alice,
 				})
 				await dev.dev.deposit(property.address, 10000, {from: user3})
-				await mine(1)
+				blockNumber = await getBlock()
 			})
 
 			describe('Withdraw; Before increment', () => {
 				it(`Alice's withdrawable amount is 70% of reward`, async () => {
+					await mine(1)
+					const currentBlock = await getBlock()
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const totalAmount = toBigNumber(9e19)
+					const totalAmount = toBigNumber(9e19).times(
+						currentBlock - blockNumber
+					)
 					expect(aliceAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.7).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 				})
 
 				it(`Bob's withdrawable amount is 30% of reward`, async () => {
+					const currentBlock = await getBlock()
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, bob)
 						.then(toBigNumber)
-					const totalAmount = toBigNumber(9e19)
+					const totalAmount = toBigNumber(9e19).times(
+						currentBlock - blockNumber
+					)
 					expect(bobAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.3).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -300,10 +309,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			describe('Withdraw; After increment', () => {
 				it(`Alice's withdrawable amount is 70% of rewardd`, async () => {
 					await mine(1)
+					const currentBlock = await getBlock()
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const totalAmount = toBigNumber(9e19).times(2)
+					const totalAmount = toBigNumber(9e19).times(
+						currentBlock - blockNumber
+					)
 					expect(aliceAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.7).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -311,10 +323,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 
 				it(`Bob's withdrawable amount is 30% of reward`, async () => {
 					await mine(1)
+					const currentBlock = await getBlock()
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, bob)
 						.then(toBigNumber)
-					const totalAmount = toBigNumber(9e19).times(3)
+					const totalAmount = toBigNumber(9e19).times(
+						currentBlock - blockNumber
+					)
 					expect(bobAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.3).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -347,6 +362,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 20% tokens to 30% tokens.', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
+			let blockNumber: number
 			const alice = deployer
 			const bob = user1
 
@@ -354,29 +370,39 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				;[dev, , property] = await init()
 
 				const totalSupply = await property.totalSupply().then(toBigNumber)
-				await property.transfer(bob, totalSupply.times(0.2), {
+				await property.transfer(bob, totalSupply.times(0.1), {
+					from: alice,
+				})
+				await property.transfer(bob, totalSupply.times(0.1), {
 					from: alice,
 				})
 				await dev.dev.deposit(property.address, 10000, {from: user3})
-				await mine(1)
+				blockNumber = await getBlock()
 			})
 
 			describe('calculateWithdrawableAmount; Before sent 10% tokens', () => {
 				it(`Alice's withdrawable amount is 80% of reward`, async () => {
+					await mine(1)
+					const currentBlock = await getBlock()
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const totalAmount = toBigNumber(9e19).times(2)
+					const totalAmount = toBigNumber(9e19).times(
+						currentBlock - blockNumber
+					)
 					expect(aliceAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
 				})
 
 				it(`Bob's withdrawable amount is 20% of reward`, async () => {
+					const currentBlock = await getBlock()
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, bob)
 						.then(toBigNumber)
-					const totalAmount = toBigNumber(9e19).times(2)
+					const totalAmount = toBigNumber(9e19).times(
+						currentBlock - blockNumber
+					)
 					expect(bobAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -386,7 +412,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			describe('calculateWithdrawableAmount; After sent 10% tokens', () => {
 				let totalAmountPerBlock: BigNumber
 				before(async () => {
-					totalAmountPerBlock = toBigNumber(9e19).times(2)
+					const currentBlock = await getBlock()
+					totalAmountPerBlock = toBigNumber(9e19).times(
+						currentBlock - blockNumber
+					)
 					const totalSupply = await property.totalSupply().then(toBigNumber)
 					await property.transfer(bob, totalSupply.times(0.1), {
 						from: alice,
@@ -493,25 +522,27 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			debug = false
 		): Promise<BigNumber> =>
 			Promise.all([
-				dev.lockup.getRewardsPrice().then((x) => x[1]),
-				dev.activeWithdraw.getLastCumulativeHoldersReward(
-					prop.address,
-					account
-				),
+				dev.lockup.getHoldersReward(prop.address),
+				dev.withdraw.getStorageLastWithdrawnReward(prop.address, account),
+				prop.totalSupply(),
 				prop.balanceOf(account),
-				dev.activeWithdraw.getPendingWithdrawal(prop.address, account),
-				dev.activeWithdraw.getCumulativePrice(prop.address),
-				dev.activeWithdraw.getLastWithdrawalPrice(prop.address, account),
+				dev.withdraw.getPendingWithdrawal(prop.address, account),
+				dev.withdraw.getCumulativePrice(prop.address),
+				dev.withdraw.getLastWithdrawalPrice(prop.address, account),
 			]).then((results) => {
 				const [
 					holdersPrice,
 					lastPrice,
+					totalSupply,
 					balanceOfUser,
 					pending,
 					legacyPrice,
 					legacyLastPrice,
 				] = results.map(toBigNumber)
-				const value = holdersPrice.minus(lastPrice).times(balanceOfUser)
+				const value = holdersPrice
+					.minus(lastPrice)
+					.div(totalSupply)
+					.times(balanceOfUser)
 				const legacy = legacyPrice
 					.minus(legacyLastPrice)
 					.times(balanceOfUser)
@@ -735,10 +766,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 			})
 		})
-		describe('scenario: multiple lockup', () => {
+		describe.only('scenario: multiple lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
-			let lastBlock: BigNumber
+			let blockNumber: number
 			let calc: Calculator
 
 			const alice = deployer
@@ -752,23 +783,25 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.dev.mint(carol, aliceBalance)
 				await dev.dev.deposit(property.address, 10000, {from: bob})
+				blockNumber = await getBlock()
 				await dev.dev.deposit(property.address, 10000 * 0.25, {from: carol})
 			})
 
 			describe('before withdrawal', () => {
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(3)
+					const currentBlock = await getBlock()
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(90).times(1e18).times(4)
+					const expected = toBigNumber(9e19).times(currentBlock - blockNumber)
+					await calc(property, alice, true)
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
 					await dev.withdraw.withdraw(property.address, {from: alice})
-					lastBlock = await getBlock().then(toBigNumber)
 				})
 
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
