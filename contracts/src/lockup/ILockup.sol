@@ -14,15 +14,13 @@ contract ILockup {
 
 	function withdraw(address _property) external;
 
-	function difference(address _property, uint256 _lastReward)
+	function getRewardsPrice(bool _includeCurrentBlock)
 		public
 		view
 		returns (
 			uint256 _reward,
-			uint256 _holdersAmount,
-			uint256 _holdersPrice,
-			uint256 _interestAmount,
-			uint256 _interestPrice
+			uint256 _holders,
+			uint256 _interest
 		);
 
 	function getPropertyValue(address _property)

@@ -92,12 +92,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		updatePendingInterestWithdrawal(_property, _from);
 
 		/**
-		 * Saves the variables at the time of staking to prepare for reward calculation.
-		 */
-		(, , , uint256 interest, ) = difference(_property, 0);
-		updateStatesAtLockup(_property, _from, interest);
-
-		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
 		updateValues(true, _from, _property, _value);
@@ -183,163 +177,42 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	}
 
 	/**
-	 * Returns the current staking amount, and the block number in which the recorded last.
-	 * These values are used to calculate the cumulative sum of the staking.
 	 */
-	function getCumulativeLockedUpUnitAndBlock(address _property)
-		private
+	function beforeStakesChanged(address _property, address _user) private {
+		(uint256 reward, uint256 holders, uint256 interest) = getRewardsPrice(
+			false
+		);
+		setStorageLastStakedInterestPrice(_property, _user, interest);
+		setStorageLastStakesChangedCumulativeReward(reward);
+		setStorageLastStakesChangedRewardPrice(holders, interest);
+	}
+
+	/**
+	 */
+	function getRewardsPrice(bool _includeCurrentBlock)
+		public
 		view
-		returns (uint256 _unit, uint256 _block)
+		returns (
+			uint256 _reward,
+			uint256 _holders,
+			uint256 _interest
+		)
 	{
-		/**
-		 * Get the current staking amount and the last recorded block number from the `CumulativeLockedUpUnitAndBlock` storage.
-		 * If the last recorded block number is not 0, it is returns as it is.
-		 */
+		uint256 lastReward = getStorageLastStakesChangedCumulativeReward();
 		(
-			uint256 unit,
-			uint256 lastBlock
-		) = getStorageCumulativeLockedUpUnitAndBlock(_property);
-		if (lastBlock > 0) {
-			return (unit, lastBlock);
-		}
-
-		/**
-		 * If the last recorded block number is 0, this function falls back as already staked before the current specs (before DIP4).
-		 * More detail for DIP4: https://github.com/dev-protocol/DIPs/issues/4
-		 *
-		 * When the passed address is 0, the caller wants to know the total staking amount on the protocol,
-		 * so gets the total staking amount from `AllValue` storage.
-		 * When the address is other than 0, the caller wants to know the staking amount of a Property,
-		 * so gets the staking amount from the `PropertyValue` storage.
-		 */
-		unit = _property == address(0)
-			? getStorageAllValue()
-			: getStoragePropertyValue(_property);
-
-		/**
-		 * Staking pre-DIP4 will be treated as staked simultaneously with the DIP4 release.
-		 * Therefore, the last recorded block number is the same as the DIP4 release block.
-		 */
-		lastBlock = getStorageDIP4GenesisBlock();
-		return (unit, lastBlock);
-	}
-
-	/**
-	 * Returns the cumulative sum of the staking on passed address, the current staking amount,
-	 * and the block number in which the recorded last.
-	 * The latest cumulative sum can be calculated using the following formula:
-	 * (current staking amount) * (current block number - last recorded block number) + (last cumulative sum)
-	 */
-	function getCumulativeLockedUp(address _property)
-		public
-		view
-		returns (
-			uint256 _value,
-			uint256 _unit,
-			uint256 _block
-		)
-	{
-		/**
-		 * Gets the current staking amount and the last recorded block number from the `getCumulativeLockedUpUnitAndBlock` function.
-		 */
-		(uint256 unit, uint256 lastBlock) = getCumulativeLockedUpUnitAndBlock(
-			_property
+			uint256 lastHoldersPrice,
+			uint256 lastInterestPrice
+		) = getStorageLastStakesChangedRewardPrice();
+		uint256 allStakes = getStorageAllValue();
+		(uint256 reward, ) = dry(_includeCurrentBlock);
+		uint256 price = reward.sub(lastReward).mulBasis().div(allStakes);
+		uint256 holdersShare = IPolicy(config().policy()).holdersShare(
+			price,
+			allStakes
 		);
-
-		/**
-		 * Gets the last cumulative sum of the staking from `CumulativeLockedUpValue` storage.
-		 */
-		uint256 lastValue = getStorageCumulativeLockedUpValue(_property);
-
-		/**
-		 * Returns the latest cumulative sum, current staking amount as a unit, and last recorded block number.
-		 */
-		return (
-			lastValue.add(unit.mul(block.number.sub(lastBlock))),
-			unit,
-			lastBlock
-		);
-	}
-
-	/**
-	 * Returns the cumulative sum of the staking on the protocol totally, the current staking amount,
-	 * and the block number in which the recorded last.
-	 */
-	function getCumulativeLockedUpAll()
-		public
-		view
-		returns (
-			uint256 _value,
-			uint256 _unit,
-			uint256 _block
-		)
-	{
-		/**
-		 * If the 0 address is passed as a key, it indicates the entire protocol.
-		 */
-		return getCumulativeLockedUp(address(0));
-	}
-
-	/**
-	 * Updates the `CumulativeLockedUpValue` and `CumulativeLockedUpUnitAndBlock` storage.
-	 * This function expected to executes when the amount of staking as a unit changes.
-	 */
-	function updateCumulativeLockedUp(
-		bool _addition,
-		address _property,
-		uint256 _unit
-	) private {
-		address zero = address(0);
-
-		/**
-		 * Gets the cumulative sum of the staking amount, staking amount, and last recorded block number for the passed Property address.
-		 */
-		(uint256 lastValue, uint256 lastUnit, ) = getCumulativeLockedUp(
-			_property
-		);
-
-		/**
-		 * Gets the cumulative sum of the staking amount, staking amount, and last recorded block number for the protocol total.
-		 */
-		(uint256 lastValueAll, uint256 lastUnitAll, ) = getCumulativeLockedUp(
-			zero
-		);
-
-		/**
-		 * Adds or subtracts the staking amount as a new unit to the cumulative sum of the staking for the passed Property address.
-		 */
-		setStorageCumulativeLockedUpValue(
-			_property,
-			_addition ? lastValue.add(_unit) : lastValue.sub(_unit)
-		);
-
-		/**
-		 * Adds or subtracts the staking amount as a new unit to the cumulative sum of the staking for the protocol total.
-		 */
-		setStorageCumulativeLockedUpValue(
-			zero,
-			_addition ? lastValueAll.add(_unit) : lastValueAll.sub(_unit)
-		);
-
-		/**
-		 * Adds or subtracts the staking amount to the staking unit for the passed Property address.
-		 * Also, record the latest block number.
-		 */
-		setStorageCumulativeLockedUpUnitAndBlock(
-			_property,
-			_addition ? lastUnit.add(_unit) : lastUnit.sub(_unit),
-			block.number
-		);
-
-		/**
-		 * Adds or subtracts the staking amount to the staking unit for the protocol total.
-		 * Also, record the latest block number.
-		 */
-		setStorageCumulativeLockedUpUnitAndBlock(
-			zero,
-			_addition ? lastUnitAll.add(_unit) : lastUnitAll.sub(_unit),
-			block.number
-		);
+		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
+		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
+		return (reward, holdersPrice, interestPrice);
 	}
 
 	/**
@@ -352,7 +225,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the cumulative sum of the maximum mint amount and the maximum mint number per block.
 		 */
-		(uint256 _nextRewards, uint256 _amount) = dry();
+		(uint256 _nextRewards, uint256 _amount) = dry(true);
 
 		/**
 		 * Records each value and the latest block number.
@@ -362,65 +235,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	}
 
 	/**
-	 * Updates the cumulative sum of the maximum mint amount when staking, the cumulative sum of staker reward as an interest of the target Property
-	 * and the cumulative staking amount, and the latest block number.
-	 */
-	function updateStatesAtLockup(
-		address _property,
-		address _user,
-		uint256 _interest
-	) private {
-		/**
-		 * Gets the cumulative sum of the maximum mint amount.
-		 */
-		(uint256 _reward, ) = dry();
-
-		/**
-		 * Records each value and the latest block number.
-		 */
-		if (isSingle(_property, _user)) {
-			setStorageLastCumulativeGlobalReward(_property, _user, _reward);
-		}
-		setStorageLastCumulativePropertyInterest(_property, _user, _interest);
-		(uint256 cLocked, , ) = getCumulativeLockedUp(_property);
-		setStorageLastCumulativeLockedUpAndBlock(
-			_property,
-			_user,
-			cLocked,
-			block.number
-		);
-	}
-
-	/**
-	 * Returns the last cumulative staking amount of the passed Property address and the last recorded block number.
-	 */
-	function getLastCumulativeLockedUpAndBlock(address _property, address _user)
-		private
-		view
-		returns (uint256 _cLocked, uint256 _block)
-	{
-		/**
-		 * Gets the values from `LastCumulativeLockedUpAndBlock` storage.
-		 */
-		(
-			uint256 cLocked,
-			uint256 blockNumber
-		) = getStorageLastCumulativeLockedUpAndBlock(_property, _user);
-
-		/**
-		 * When the last recorded block number is 0, the block number at the time of the DIP4 release is returned as being staked at the same time as the DIP4 release.
-		 * More detail for DIP4: https://github.com/dev-protocol/DIPs/issues/4
-		 */
-		if (blockNumber == 0) {
-			blockNumber = getStorageDIP4GenesisBlock();
-		}
-		return (cLocked, blockNumber);
-	}
-
-	/**
 	 * Referring to the values recorded in each storage to returns the latest cumulative sum of the maximum mint amount and the latest maximum mint amount per block.
 	 */
-	function dry()
+	function dry(bool _includeCurrentBlock)
 		private
 		view
 		returns (uint256 _nextRewards, uint256 _amount)
@@ -450,7 +267,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Calculates the difference between the latest block number and the last recorded block number.
 		 */
-		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
+		uint256 blocks = lastBlock > 0
+			? block.number.sub(lastBlock).sub(_includeCurrentBlock ? 0 : 1)
+			: 0;
 
 		/**
 		 * Adds the calculated new cumulative maximum mint amount to the recorded cumulative maximum mint amount.
@@ -467,100 +286,13 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	}
 
 	/**
-	 * Returns the latest theoretical cumulative sum of maximum mint amount, the holder's reward of the passed Property address and its unit price,
-	 * and the staker's reward as interest and its unit price.
-	 * The latest theoretical cumulative sum of maximum mint amount is got from `dry` function.
-	 * The Holder's reward is a staking(delegation) reward received by the holder of the Property contract(token) according to the share.
-	 * The unit price of the holder's reward is the reward obtained per 1 piece of Property contract(token).
-	 * The staker rewards are rewards for staking users.
-	 * The unit price of the staker reward is the reward per DEV token 1 piece that is staking.
-	 */
-	function difference(address _property, uint256 _lastReward)
-		public
-		view
-		returns (
-			uint256 _reward,
-			uint256 _holdersAmount,
-			uint256 _holdersPrice,
-			uint256 _interestAmount,
-			uint256 _interestPrice
-		)
-	{
-		/**
-		 * Gets the cumulative sum of the maximum mint amount.
-		 */
-		(uint256 rewards, ) = dry();
-
-		/**
-		 * Gets the cumulative sum of the staking amount of the passed Property address and
-		 * the cumulative sum of the staking amount of the protocol total.
-		 */
-		(uint256 valuePerProperty, , ) = getCumulativeLockedUp(_property);
-		(uint256 valueAll, , ) = getCumulativeLockedUpAll();
-
-		/**
-		 * Calculates the amount of reward that can be received by the Property from the ratio of the cumulative sum of the staking amount of the Property address
-		 * and the cumulative sum of the staking amount of the protocol total.
-		 * If the past cumulative sum of the maximum mint amount passed as the second argument is 1 or more,
-		 * this result is the difference from that cumulative sum.
-		 */
-		uint256 propertyRewards = rewards.sub(_lastReward).mul(
-			valuePerProperty.mulBasis().outOf(valueAll)
-		);
-
-		/**
-		 * Gets the staking amount and total supply of the Property and calls `Policy.holdersShare` function to calculates
-		 * the holder's reward amount out of the total reward amount.
-		 */
-		uint256 lockedUpPerProperty = getStoragePropertyValue(_property);
-		uint256 totalSupply = ERC20Mintable(_property).totalSupply();
-		uint256 holders = IPolicy(config().policy()).holdersShare(
-			propertyRewards,
-			lockedUpPerProperty
-		);
-
-		/**
-		 * The total rewards amount minus the holder reward amount is the staker rewards as an interest.
-		 */
-		uint256 interest = propertyRewards.sub(holders);
-
-		/**
-		 * Returns each value and a unit price of each reward.
-		 */
-		return (
-			rewards,
-			holders,
-			holders.div(totalSupply),
-			interest,
-			lockedUpPerProperty > 0 ? interest.div(lockedUpPerProperty) : 0
-		);
-	}
-
-	/**
 	 * Returns the staker reward as interest.
 	 */
 	function _calculateInterestAmount(address _property, address _user)
 		private
 		view
-		returns (uint256)
+		returns (uint256 _amount, uint256 _interestPrice)
 	{
-		/**
-		 * Gets the cumulative sum of the staking amount, current staking amount, and last recorded block number of the Property.
-		 */
-		(
-			uint256 cLockProperty,
-			uint256 unit,
-			uint256 lastBlock
-		) = getCumulativeLockedUp(_property);
-
-		/**
-		 * Gets the cumulative sum of staking amount and block number of Property when the user staked.
-		 */
-		(
-			uint256 lastCLocked,
-			uint256 lastBlockUser
-		) = getLastCumulativeLockedUpAndBlock(_property, _user);
-
 		/**
 		 * Get the amount the user is staking for the Property.
 		 */
@@ -569,98 +301,16 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the cumulative sum of the Property's staker reward when the user staked.
 		 */
-		uint256 lastInterest = getStorageLastCumulativePropertyInterest(
+		uint256 lastInterest = getStorageLastStakedInterestPrice(
 			_property,
 			_user
 		);
+		(, , uint256 interest) = getRewardsPrice(true);
 
-		/**
-		 * Calculates the cumulative sum of the staking amount from the time the user staked to the present.
-		 * It can be calculated by multiplying the staking amount by the number of elapsed blocks.
-		 */
-		uint256 cLockUser = lockedUpPerAccount.mul(
-			block.number.sub(lastBlockUser)
-		);
-
-		/**
-		 * Determines if the user is the only staker to the Property.
-		 */
-		bool isOnly = unit == lockedUpPerAccount && lastBlock <= lastBlockUser;
-
-		/**
-		 * If the user is the Property's only staker and the first staker, and the only staker on the protocol:
-		 */
-		if (isSingle(_property, _user)) {
-			/**
-			 * Passing the cumulative sum of the maximum mint amount when staked, to the `difference` function,
-			 * gets the staker reward amount that the user can receive from the time of staking to the present.
-			 * In the case of the staking is single, the ratio of the Property and the user account for 100% of the cumulative sum of the maximum mint amount,
-			 * so the difference cannot be calculated with the value of `LastCumulativePropertyInterest`.
-			 * Therefore, it is necessary to calculate the difference using the cumulative sum of the maximum mint amounts at the time of staked.
-			 */
-			(, , , , uint256 interestPrice) = difference(
-				_property,
-				getStorageLastCumulativeGlobalReward(_property, _user)
-			);
-
-			/**
-			 * Returns the result after adjusted decimals to 10^18.
-			 */
-			uint256 result = interestPrice
-				.mul(lockedUpPerAccount)
-				.divBasis()
-				.divBasis();
-			return result;
-
-			/**
-			 * If not the single but the only staker:
-			 */
-		} else if (isOnly) {
-			/**
-			 * Pass 0 to the `difference` function to gets the Property's cumulative sum of the staker reward.
-			 */
-			(, , , uint256 interest, ) = difference(_property, 0);
-
-			/**
-			 * Calculates the difference in rewards that can be received by subtracting the Property's cumulative sum of staker rewards at the time of staking.
-			 */
-			uint256 result = interest >= lastInterest
-				? interest.sub(lastInterest).divBasis().divBasis()
-				: 0;
-			return result;
-		}
-
-		/**
-		 * If the user is the Property's not the first staker and not the only staker:
-		 */
-
-		/**
-		 * Pass 0 to the `difference` function to gets the Property's cumulative sum of the staker reward.
-		 */
-		(, , , uint256 interest, ) = difference(_property, 0);
-
-		/**
-		 * Calculates the share of rewards that can be received by the user among Property's staker rewards.
-		 * "Cumulative sum of the staking amount of the Property at the time of staking" is subtracted from "cumulative sum of the staking amount of the Property",
-		 * and calculates the cumulative sum of staking amounts from the time of staking to the present.
-		 * The ratio of the "cumulative sum of staking amount from the time the user staked to the present" to that value is the share.
-		 */
-		uint256 share = cLockUser.outOf(cLockProperty.sub(lastCLocked));
-
-		/**
-		 * If the Property's staker reward is greater than the value of the `CumulativePropertyInterest` storage,
-		 * calculates the difference and multiply by the share.
-		 * Otherwise, it returns 0.
-		 */
 		uint256 result = interest >= lastInterest
-			? interest
-				.sub(lastInterest)
-				.mul(share)
-				.divBasis()
-				.divBasis()
-				.divBasis()
+			? interest.sub(lastInterest).mul(lockedUpPerAccount).divBasis()
 			: 0;
-		return result;
+		return (result, interest);
 	}
 
 	/**
@@ -669,14 +319,14 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	function _calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	) private view returns (uint256) {
+	) private view returns (uint256 _amount, uint256 _interestPrice) {
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return 0;
+			return (0, 0);
 		}
 
 		/**
@@ -692,7 +342,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the latest withdrawal reward amount.
 		 */
-		uint256 amount = _calculateInterestAmount(_property, _user);
+		(uint256 amount, uint256 interestPrice) = _calculateInterestAmount(
+			_property,
+			_user
+		);
 
 		/**
 		 * Returns the sum of all values.
@@ -700,7 +353,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 withdrawableAmount = amount
 			.add(pending) // solium-disable-next-line indentation
 			.add(legacy);
-		return withdrawableAmount;
+		return (withdrawableAmount, interestPrice);
 	}
 
 	/**
@@ -710,7 +363,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		address _property,
 		address _user
 	) public view returns (uint256) {
-		uint256 amount = _calculateWithdrawableInterestAmount(_property, _user);
+		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
+			_property,
+			_user
+		);
 		return amount;
 	}
 
@@ -726,15 +382,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the withdrawable amount.
 		 */
-		uint256 value = _calculateWithdrawableInterestAmount(
-			_property,
-			msg.sender
-		);
-
-		/**
-		 * Gets the cumulative sum of staker rewards of the passed Property address.
-		 */
-		(, , , uint256 interest, ) = difference(_property, 0);
+		(
+			uint256 value,
+			uint256 interestPrice
+		) = _calculateWithdrawableInterestAmount(_property, msg.sender);
 
 		/**
 		 * Validates rewards amount there are 1 or more.
@@ -754,7 +405,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Updates the staking status to avoid double rewards.
 		 */
-		updateStatesAtLockup(_property, msg.sender, interest);
+		setStorageLastStakedInterestPrice(_property, msg.sender, interestPrice);
 		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 
 		/**
@@ -777,15 +428,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		address _property,
 		uint256 _value
 	) private {
+		beforeStakesChanged(_property, _account);
 		/**
 		 * If added staking:
 		 */
 		if (_addition) {
-			/**
-			 * Updates the cumulative sum of the staking amount of the passed Property and the cumulative amount of the staking amount of the protocol total.
-			 */
-			updateCumulativeLockedUp(true, _property, _value);
-
 			/**
 			 * Updates the current staking amount of the protocol total.
 			 */
@@ -805,11 +452,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			 * If released staking:
 			 */
 		} else {
-			/**
-			 * Updates the cumulative sum of the staking amount of the passed Property and the cumulative amount of the staking amount of the protocol total.
-			 */
-			updateCumulativeLockedUp(false, _property, _value);
-
 			/**
 			 * Updates the current staking amount of the protocol total.
 			 */
@@ -889,23 +531,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	}
 
 	/**
-	 * Returns whether a single user has all staking share.
-	 * This value is true when only one Property and one user is historically the only staker.
-	 */
-	function isSingle(address _property, address _user)
-		private
-		view
-		returns (bool)
-	{
-		uint256 perAccount = getStorageValue(_property, _user);
-		(uint256 cLockProperty, uint256 unitProperty, ) = getCumulativeLockedUp(
-			_property
-		);
-		(uint256 cLockTotal, , ) = getCumulativeLockedUpAll();
-		return perAccount == unitProperty && cLockProperty == cLockTotal;
-	}
-
-	/**
 	 * Returns the staking amount of the Property.
 	 */
 	function getPropertyValue(address _property)
@@ -943,7 +568,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the latest reward amount.
 		 */
-		uint256 withdrawableAmount = _calculateWithdrawableInterestAmount(
+		(uint256 withdrawableAmount, ) = _calculateWithdrawableInterestAmount(
 			_property,
 			_user
 		);

@@ -19,9 +19,4 @@ contract IWithdraw {
 		external
 		view
 		returns (uint256);
-
-	function calculateTotalWithdrawableAmount(address _property)
-		external
-		view
-		returns (uint256);
 }

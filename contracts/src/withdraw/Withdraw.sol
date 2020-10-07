@@ -131,23 +131,6 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	}
 
 	/**
-	 * Passthrough to `Lockup.difference` function.
-	 */
-	function difference(address _property)
-		private
-		view
-		returns (
-			uint256 _reward,
-			uint256 _holdersAmount,
-			uint256 _holdersPrice,
-			uint256 _interestAmount,
-			uint256 _interestPrice
-		)
-	{
-		return ILockup(config().lockup()).difference(_property, 0);
-	}
-
-	/**
 	 * Returns the holder reward.
 	 */
 	function _calculateAmount(address _property, address _user)
@@ -155,11 +138,14 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		view
 		returns (uint256 _amount, uint256 _price)
 	{
+		ILockup lockup = ILockup(config().lockup());
+		ERC20Mintable property = ERC20Mintable(_property);
 		/**
 		 * Gets the latest cumulative sum of the maximum mint amount,
 		 * and the difference to the previous withdrawal of holder reward unit price.
 		 */
-		(, , uint256 _holdersPrice, , ) = difference(_property);
+		(, uint256 _holdersPrice, ) = lockup.getRewardsPrice(true);
+		uint256 stakes = lockup.getPropertyValue(_property);
 
 		/**
 		 * Gets the last recorded holders reward.
@@ -169,17 +155,20 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets the ownership ratio of the passed user and the Property.
 		 */
-		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+		uint256 balance = property.balanceOf(_user);
+		uint256 totalSupply = property.totalSupply();
 
 		/**
 		 * Multiplied by the number of tokens to the holder reward unit price.
 		 */
-		uint256 value = _holdersPrice.sub(_last).mul(balance);
+		uint256 value = _holdersPrice.sub(_last).mul(stakes).mul(
+			balance.outOf(totalSupply)
+		);
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the maximum mint amount.
 		 */
-		return (value.divBasis().divBasis(), _holdersPrice);
+		return (value.divBasis(), _holdersPrice);
 	}
 
 	/**
@@ -228,25 +217,6 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	{
 		(uint256 value, ) = _calculateWithdrawableAmount(_property, _user);
 		return value;
-	}
-
-	/**
-	 * Returns the cumulative sum of the holder rewards of the passed Property.
-	 */
-	function calculateTotalWithdrawableAmount(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		(, uint256 _amount, , , ) = ILockup(config().lockup()).difference(
-			_property,
-			0
-		);
-
-		/**
-		 * Adjusts decimals to 10^18 and returns the result.
-		 */
-		return _amount.divBasis().divBasis();
 	}
 
 	/**
