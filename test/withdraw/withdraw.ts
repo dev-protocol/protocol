@@ -172,9 +172,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					from: deployer,
 				})
 
-				const oneBlockAmount = await dev.withdraw
-					.calculateTotalWithdrawableAmount(property.address)
-					.then(toBigNumber)
+				const oneBlockAmount = toBigNumber(9e19)
 				await mine(1)
 				const amount1 = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, deployer)
@@ -256,8 +254,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		})
 	})
 
-	describe('Withdraw; beforeBalanceChange', () => {
-		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
+	describe.only('Withdraw; beforeBalanceChange', () => {
+		describe.only('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 10% tokens to 30% tokens.', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			const alice = deployer
@@ -282,9 +280,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const totalAmount = await dev.withdraw
-						.calculateTotalWithdrawableAmount(property.address)
-						.then(toBigNumber)
+					const totalAmount = toBigNumber(9e19)
 					expect(aliceAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.7).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -294,9 +290,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, bob)
 						.then(toBigNumber)
-					const totalAmount = await dev.withdraw
-						.calculateTotalWithdrawableAmount(property.address)
-						.then(toBigNumber)
+					const totalAmount = toBigNumber(9e19)
 					expect(bobAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.3).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -309,9 +303,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const totalAmount = await dev.withdraw
-						.calculateTotalWithdrawableAmount(property.address)
-						.then(toBigNumber)
+					const totalAmount = toBigNumber(9e19).times(2)
 					expect(aliceAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.7).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -322,9 +314,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, bob)
 						.then(toBigNumber)
-					const totalAmount = await dev.withdraw
-						.calculateTotalWithdrawableAmount(property.address)
-						.then(toBigNumber)
+					const totalAmount = toBigNumber(9e19).times(3)
 					expect(bobAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.3).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -376,9 +366,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const totalAmount = await dev.withdraw
-						.calculateTotalWithdrawableAmount(property.address)
-						.then(toBigNumber)
+					const totalAmount = toBigNumber(9e19).times(2)
 					expect(aliceAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.8).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -388,9 +376,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, bob)
 						.then(toBigNumber)
-					const totalAmount = await dev.withdraw
-						.calculateTotalWithdrawableAmount(property.address)
-						.then(toBigNumber)
+					const totalAmount = toBigNumber(9e19).times(2)
 					expect(bobAmount.toFixed()).to.be.equal(
 						totalAmount.times(0.2).integerValue(BigNumber.ROUND_DOWN).toFixed()
 					)
@@ -400,9 +386,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			describe('calculateWithdrawableAmount; After sent 10% tokens', () => {
 				let totalAmountPerBlock: BigNumber
 				before(async () => {
-					totalAmountPerBlock = await dev.withdraw
-						.calculateTotalWithdrawableAmount(property.address)
-						.then(toBigNumber)
+					totalAmountPerBlock = toBigNumber(9e19).times(2)
 					const totalSupply = await property.totalSupply().then(toBigNumber)
 					await property.transfer(bob, totalSupply.times(0.1), {
 						from: alice,
@@ -509,7 +493,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			debug = false
 		): Promise<BigNumber> =>
 			Promise.all([
-				dev.lockup.difference(prop.address, 0).then((x) => x[2]),
+				dev.lockup.getRewardsPrice().then((x) => x[1]),
 				dev.activeWithdraw.getLastCumulativeHoldersReward(
 					prop.address,
 					account
@@ -527,15 +511,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					legacyPrice,
 					legacyLastPrice,
 				] = results.map(toBigNumber)
-				const value = holdersPrice
-					.minus(lastPrice)
-					.times(balanceOfUser)
-					.div(1e36)
+				const value = holdersPrice.minus(lastPrice).times(balanceOfUser)
 				const legacy = legacyPrice
 					.minus(legacyLastPrice)
 					.times(balanceOfUser)
 					.div(1e18)
-				const withdrawable = value.plus(pending).plus(legacy)
+				const withdrawable = value.div(1e18).plus(pending).plus(legacy)
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map((x) => toBigNumber(x).toFixed()))
@@ -1372,9 +1353,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		it('Returns total withdrawable amount of a Property', async () => {
 			await mine(1)
 			const block = await getBlock().then(toBigNumber)
-			const result = await dev.withdraw
-				.calculateTotalWithdrawableAmount(property.address)
-				.then(toBigNumber)
+			const result = toBigNumber(10e19)
 			const expected = toBigNumber(90).times(1e18).times(block.minus(lastBlock))
 			expect(result.toFixed()).to.be.equal(expected.toFixed())
 		})
@@ -1385,9 +1364,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			)
 			await mine(1)
 			const block = await getBlock().then(toBigNumber)
-			const result = await dev.withdraw
-				.calculateTotalWithdrawableAmount(property.address)
-				.then(toBigNumber)
+			const result = toBigNumber(10e19).times(3)
 			const expected = toBigNumber(90).times(1e18).times(block.minus(lastBlock))
 			expect(result.toFixed()).to.be.equal(expected.toFixed())
 		})
@@ -1399,9 +1376,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			lastBlock3 = await getBlock().then(toBigNumber)
 			await mine(3)
 
-			const result = await dev.withdraw
-				.calculateTotalWithdrawableAmount(property.address)
-				.then(toBigNumber)
+			const result = toBigNumber(10e19).times(9)
 			const expected = toBigNumber(90)
 				.times(1e18)
 				.times(lastBlock2.minus(lastBlock))

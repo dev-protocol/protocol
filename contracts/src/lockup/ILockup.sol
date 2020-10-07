@@ -23,6 +23,8 @@ contract ILockup {
 			uint256 _interest
 		);
 
+	function getHoldersReward(address _property) public view returns (uint256);
+
 	function getPropertyValue(address _property)
 		external
 		view

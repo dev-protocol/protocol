@@ -557,4 +557,38 @@ contract LockupStorage is UsingStorage {
 	{
 		return keccak256(abi.encodePacked("_lastStakesChangedInterestPrice"));
 	}
+
+	//LastCumulativeHoldersRewardPerProperty
+	function setStorageLastCumulativeHoldersRewardPerProperty(
+		address _property,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageLastCumulativeHoldersRewardPerPropertyKey(_property),
+			_value
+		);
+	}
+
+	function getStorageLastCumulativeHoldersRewardPerProperty(address _property)
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getStorageLastCumulativeHoldersRewardPerPropertyKey(_property)
+			);
+	}
+
+	function getStorageLastCumulativeHoldersRewardPerPropertyKey(
+		address _property
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"_lastCumulativeHoldersRewardPerProperty",
+					_property
+				)
+			);
+	}
 }

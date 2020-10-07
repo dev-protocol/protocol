@@ -180,10 +180,15 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	 */
 	function beforeStakesChanged(address _property, address _user) private {
 		(uint256 reward, uint256 holders, uint256 interest) = getRewardsPrice();
+		uint256 cHoldersReward = _getHoldersReward(holders, _property);
 		setStorageLastStakedInterestPrice(_property, _user, interest);
 		setStorageLastStakesChangedCumulativeReward(reward);
 		setStorageLastStakesChangedHoldersPrice(holders);
 		setStorageLastStakesChangedInterestPrice(interest);
+		setStorageLastCumulativeHoldersRewardPerProperty(
+			_property,
+			cHoldersReward
+		);
 	}
 
 	/**
@@ -212,6 +217,28 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
 		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
 		return (reward, holdersPrice, interestPrice);
+	}
+
+	/**
+	 */
+	function _getHoldersReward(uint256 _reward, address _property)
+		private
+		view
+		returns (uint256)
+	{
+
+		uint256 cHoldersReward = getStorageLastCumulativeHoldersRewardPerProperty(_property);
+		uint256 additionalHoldersReward = _reward.mul(
+			getStoragePropertyValue(_property)
+		);
+		return cHoldersReward.add(additionalHoldersReward);
+	}
+
+	/**
+	 */
+	function getHoldersReward(address _property) public view returns (uint256) {
+		(, uint256 holders, ) = getRewardsPrice();
+		return _getHoldersReward(holders, _property);
 	}
 
 	/**

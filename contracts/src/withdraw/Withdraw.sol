@@ -30,7 +30,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	 */
 	function withdraw(address _property) external {
 		/**
-		 * Validates the passed Property address is included the Property address set.
+		 * Validate
+		 s the passed Property address is included the Property address set.
 		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
@@ -51,7 +52,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		 * Saves the latest cumulative sum of the maximum mint amount.
 		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
 		 */
-		setLastCumulativeHoldersReward(_property, msg.sender, lastPrice);
+		setStorageLastWithdrawnReward(_property, msg.sender, lastPrice);
 
 		/**
 		 * Sets the number of unwithdrawn rewards to 0.
@@ -112,8 +113,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
 		 */
-		setLastCumulativeHoldersReward(_property, _from, priceFrom);
-		setLastCumulativeHoldersReward(_property, _to, priceTo);
+		setStorageLastWithdrawnReward(_property, _from, priceFrom);
+		setStorageLastWithdrawnReward(_property, _to, priceTo);
 
 		/**
 		 * Gets the unwithdrawn reward amount of the transfer source and destination.
@@ -144,31 +145,29 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		 * Gets the latest cumulative sum of the maximum mint amount,
 		 * and the difference to the previous withdrawal of holder reward unit price.
 		 */
-		(, uint256 _holdersPrice, ) = lockup.getRewardsPrice(true);
-		uint256 stakes = lockup.getPropertyValue(_property);
+		uint256 reward = lockup.getHoldersReward(_property);
 
 		/**
 		 * Gets the last recorded holders reward.
 		 */
-		uint256 _last = getLastCumulativeHoldersReward(_property, _user);
+		uint256 _lastReward = getStorageLastWithdrawnReward(_property, _user);
 
 		/**
 		 * Gets the ownership ratio of the passed user and the Property.
 		 */
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
+		uint256 unitPrice = reward.sub(_lastReward).div(totalSupply);
 
 		/**
 		 * Multiplied by the number of tokens to the holder reward unit price.
 		 */
-		uint256 value = _holdersPrice.sub(_last).mul(stakes).mul(
-			balance.outOf(totalSupply)
-		);
+		uint256 value = unitPrice.mul(balance);
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the maximum mint amount.
 		 */
-		return (value.divBasis(), _holdersPrice);
+		return (value.divBasis(), reward);
 	}
 
 	/**
