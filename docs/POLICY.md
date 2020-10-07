@@ -67,9 +67,14 @@ This policy has been enabled by [DIP1](https://github.com/dev-protocol/DIPs/issu
 Property Contract holders receive a reward share is 51%.
 
 ```solidity
-function holdersShare(uint256 _reward, uint256 _lockups) external view returns (uint256) {
+function holdersShare(uint256 _reward, uint256 _lockups)
+	external
+	view
+	returns (uint256)
+{
 	return _lockups > 0 ? (_reward.mul(51)).div(100) : _reward;
 }
+
 ```
 
 ## assetValue
@@ -79,9 +84,14 @@ The calculation method for an asset value called `assetValue` is determined to m
 This formula indicates that asset scores and lockups have equal influence.
 
 ```solidity
-function assetValue(uint256 _value, uint256 _lockups) external view returns (uint256) {
+function assetValue(uint256 _value, uint256 _lockups)
+	external
+	view
+	returns (uint256)
+{
 	return (_lockups.add(1)).mul(_value);
 }
+
 ```
 
 ## authenticationFee
@@ -89,9 +99,17 @@ function assetValue(uint256 _value, uint256 _lockups) external view returns (uin
 Property Contract author pays `authenticationFee` is multiplies the number of assets by `0.00025` and subtracts 1/1000 of the number of stakes to the Property.
 
 ```solidity
-function authenticationFee(uint256 total_assets, uint256 property_lockups) external view returns (uint256) {
-		return (total_assets.div(10000)).sub((property_lockups.div(100000000000000000000000)));
+function authenticationFee(uint256 total_assets, uint256 property_lockups)
+	external
+	view
+	returns (uint256)
+{
+	return
+		(total_assets.div(10000)).sub(
+			(property_lockups.div(100000000000000000000000))
+		);
 }
+
 ```
 
 ## marketApproval
@@ -99,7 +117,11 @@ function authenticationFee(uint256 total_assets, uint256 property_lockups) exter
 The number of votes required before a new Market is approved is called `marketApproval` is requires 10 or more votes in favor, and more than 10 times more votes than negative votes.
 
 ```solidity
-function marketApproval(uint256 _up_votes, uint256 _negative_votes) external view returns (bool) {
+function marketApproval(uint256 _up_votes, uint256 _negative_votes)
+	external
+	view
+	returns (bool)
+{
 	if (_up_votes < 9999999999999999999) {
 		return false;
 	}
@@ -108,6 +130,7 @@ function marketApproval(uint256 _up_votes, uint256 _negative_votes) external vie
 		: 1000000000000000000;
 	return _up_votes > negative_votes * 10;
 }
+
 ```
 
 ## policyApproval
@@ -115,7 +138,11 @@ function marketApproval(uint256 _up_votes, uint256 _negative_votes) external vie
 The number of votes required before a new Policy is approved is called `policyApproval` is requires 10 or more votes in favor, and more than 10 times more votes than negative votes.
 
 ```solidity
-function policyApproval(uint256 _up_votes, uint256 _negative_votes) external view returns (bool) {
+function policyApproval(uint256 _up_votes, uint256 _negative_votes)
+	external
+	view
+	returns (bool)
+{
 	if (_up_votes < 9999999999999999999) {
 		return false;
 	}
@@ -124,6 +151,7 @@ function policyApproval(uint256 _up_votes, uint256 _negative_votes) external vie
 		: 1000000000000000000;
 	return _up_votes > negative_votes * 10;
 }
+
 ```
 
 ## marketVotingBlocks
@@ -147,13 +175,18 @@ uint public policyVotingBlocks = 525600;
 The abstainers' penalty called `abstentionPenalty` impose an exclusion penalty of 175200 blocks (equals 1 month) on 9 times or more abstainers.
 
 ```solidity
-function abstentionPenalty(uint256 abstentions) external view returns (uint256) {
+function abstentionPenalty(uint256 abstentions)
+	external
+	view
+	returns (uint256)
+{
 	uint256 penalty = 0;
 	if (abstentions > 9) {
 		penalty = 175200;
 	}
 	return penalty;
 }
+
 ```
 
 ## lockUpBlocks
