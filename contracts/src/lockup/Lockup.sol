@@ -179,9 +179,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	/**
 	 */
 	function beforeStakesChanged(address _property, address _user) private {
-		(uint256 reward, uint256 holders, uint256 interest) = getRewardsPrice(
-			false
-		);
+		(uint256 reward, uint256 holders, uint256 interest) = getRewardsPrice();
 		setStorageLastStakedInterestPrice(_property, _user, interest);
 		setStorageLastStakesChangedCumulativeReward(reward);
 		setStorageLastStakesChangedHoldersPrice(holders);
@@ -190,7 +188,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 
 	/**
 	 */
-	function getRewardsPrice(bool _includeCurrentBlock)
+	function getRewardsPrice()
 		public
 		view
 		returns (
@@ -203,17 +201,16 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 lastHoldersPrice = getStorageLastStakesChangedHoldersPrice();
 		uint256 lastInterestPrice = getStorageLastStakesChangedInterestPrice();
 		uint256 allStakes = getStorageAllValue();
-		(uint256 reward, ) = dry(_includeCurrentBlock);
-		uint256 price = reward.sub(lastReward).mulBasis().div(allStakes);
+		(uint256 reward, ) = dry();
+		uint256 price = allStakes > 0
+			? reward.sub(lastReward).mulBasis().div(allStakes)
+			: 0;
 		uint256 holdersShare = IPolicy(config().policy()).holdersShare(
 			price,
 			allStakes
 		);
-		uint256 holdersPrice = holdersShare.add(lastHoldersPrice).divBasis();
-		uint256 interestPrice = price
-			.sub(holdersShare)
-			.add(lastInterestPrice)
-			.divBasis();
+		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
+		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
 		return (reward, holdersPrice, interestPrice);
 	}
 
@@ -227,7 +224,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the cumulative sum of the maximum mint amount and the maximum mint number per block.
 		 */
-		(uint256 _nextRewards, uint256 _amount) = dry(true);
+		(uint256 _nextRewards, uint256 _amount) = dry();
 
 		/**
 		 * Records each value and the latest block number.
@@ -239,7 +236,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	/**
 	 * Referring to the values recorded in each storage to returns the latest cumulative sum of the maximum mint amount and the latest maximum mint amount per block.
 	 */
-	function dry(bool _includeCurrentBlock)
+	function dry()
 		private
 		view
 		returns (uint256 _nextRewards, uint256 _amount)
@@ -269,9 +266,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Calculates the difference between the latest block number and the last recorded block number.
 		 */
-		uint256 blocks = lastBlock > 0
-			? block.number.sub(lastBlock).sub(_includeCurrentBlock ? 0 : 1)
-			: 0;
+		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
 
 		/**
 		 * Adds the calculated new cumulative maximum mint amount to the recorded cumulative maximum mint amount.
@@ -307,7 +302,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			_property,
 			_user
 		);
-		(, , uint256 interest) = getRewardsPrice(true);
+		(, , uint256 interest) = getRewardsPrice();
 
 		uint256 result = interest >= lastInterest
 			? interest.sub(lastInterest).mul(lockedUpPerAccount).divBasis()

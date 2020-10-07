@@ -311,180 +311,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			)
 		})
 	})
-	describe('Lockup; getCumulativeLockedUp, getCumulativeLockedUpAll', () => {
-		let dev: DevProtocolInstance
-		let property: PropertyInstance
-		let property2: PropertyInstance
-		let property3: PropertyInstance
-
-		beforeEach(async () => {
-			;[dev, property] = await init()
-			;[property2, property3] = await Promise.all([
-				artifacts
-					.require('Property')
-					.at(
-						getPropertyAddress(
-							await dev.propertyFactory.create('test2', 'TEST2', deployer)
-						)
-					),
-				artifacts
-					.require('Property')
-					.at(
-						getPropertyAddress(
-							await dev.propertyFactory.create('test3', 'TEST3', deployer)
-						)
-					),
-			])
-			await dev.metricsGroup.__setMetricsCountPerProperty(property2.address, 1)
-			await dev.metricsGroup.__setMetricsCountPerProperty(property3.address, 1)
-		})
-
-		it('getCumulativeLockedUp returns cumulative sum of locking-ups on the Property', async () => {
-			await dev.dev.deposit(property.address, 123456)
-			await mine(3)
-			await dev.dev.deposit(property.address, 67890)
-			await mine(5)
-			await dev.lockup.cancel(property.address)
-			await dev.lockup.withdraw(property.address)
-			await mine(7)
-			const result = await dev.lockup
-				.getCumulativeLockedUp(property.address)
-				.then((x) => toBigNumber(x[0]))
-			const expected =
-				0 + 123456 + 123456 * (3 + 1) + 67890 + (123456 + 67890) * (5 + 1)
-			expect(result.toNumber()).to.be.equal(expected)
-		})
-		it('getCumulativeLockedUp returns cumulative sum of locking-ups on the Property from PropertyValue when the last block is 0', async () => {
-			await dev.dev.transfer(property.address, 6457)
-
-			await dev.lockup.changeOwner(deployer)
-			const storage = await dev.lockup
-				.getStorageAddress()
-				.then((x) => artifacts.require('EternalStorage').at(x))
-			await storage.setUint(keccak256('_allValue'), 6457)
-			await storage.setUint(keccak256('_propertyValue', property.address), 6457)
-			await storage.setUint(
-				keccak256('_value', property.address, deployer),
-				6457
-			)
-			await storage.changeOwner(dev.lockup.address)
-
-			const block = await getBlock().then(toBigNumber)
-			await dev.dev.deposit(property.address, 123456)
-			await mine(3)
-			await dev.dev.deposit(property.address, 67890)
-			await mine(5)
-			await dev.lockup.cancel(property.address)
-			await dev.lockup.withdraw(property.address)
-			await mine(7)
-			const result = await dev.lockup
-				.getCumulativeLockedUp(property.address)
-				.then((x) => toBigNumber(x[0]))
-			const deployedBlock = await dev.lockup
-				.getStorageDIP4GenesisBlock()
-				.then(toBigNumber)
-			const expected =
-				0 +
-				6457 +
-				6457 * (block.toNumber() - deployedBlock.toNumber()) +
-				123456 +
-				(6457 + 123456) * (3 + 1) +
-				67890 +
-				(6457 + 123456 + 67890) * (5 + 1)
-
-			expect(result.toNumber()).to.be.equal(expected)
-		})
-		it('getCumulativeLockedUpAll returns cumulative sum of total locking-ups on the protocol', async () => {
-			await dev.dev.deposit(property.address, 123456)
-			await mine(3)
-			await dev.dev.deposit(property2.address, 67890)
-			await mine(5)
-			await dev.dev.deposit(property3.address, 463578)
-			await mine(7)
-			await dev.lockup.cancel(property.address)
-			await dev.lockup.withdraw(property.address)
-			await mine(2)
-			await dev.lockup.cancel(property2.address)
-			await dev.lockup.withdraw(property2.address)
-			await mine(2)
-			await dev.lockup.cancel(property3.address)
-			await dev.lockup.withdraw(property3.address)
-			await mine(7)
-			const result = await dev.lockup
-				.getCumulativeLockedUpAll()
-				.then((x) => toBigNumber(x[0]))
-			const expected =
-				0 +
-				123456 +
-				123456 * (3 + 1) +
-				67890 +
-				(123456 + 67890) * (5 + 1) +
-				463578 +
-				(123456 + 463578 + 67890) * (7 + 2) -
-				123456 +
-				(463578 + 67890) * (2 + 2) -
-				67890 +
-				463578 * (2 + 2) -
-				463578
-
-			expect(result.toNumber()).to.be.equal(expected)
-		})
-		it('getCumulativeLockedUpAll returns cumulative sum of total locking-ups on the protocol from AllValue when the last block is 0', async () => {
-			await dev.dev.transfer(property.address, 5475)
-
-			await dev.lockup.changeOwner(deployer)
-			const storage = await dev.lockup
-				.getStorageAddress()
-				.then((x) => artifacts.require('EternalStorage').at(x))
-			await storage.setUint(keccak256('_allValue'), 5475)
-			await storage.setUint(keccak256('_propertyValue', property.address), 5475)
-			await storage.setUint(
-				keccak256('_value', property.address, deployer),
-				5475
-			)
-			await storage.changeOwner(dev.lockup.address)
-
-			const block = await getBlock().then(toBigNumber)
-			await dev.dev.deposit(property.address, 123456)
-			await mine(3)
-			await dev.dev.deposit(property2.address, 67890)
-			await mine(5)
-			await dev.dev.deposit(property3.address, 463578)
-			await mine(7)
-			await dev.lockup.cancel(property.address)
-			await dev.lockup.withdraw(property.address)
-			await mine(2)
-			await dev.lockup.cancel(property2.address)
-			await dev.lockup.withdraw(property2.address)
-			await mine(2)
-			await dev.lockup.cancel(property3.address)
-			await dev.lockup.withdraw(property3.address)
-			await mine(7)
-			const result = await dev.lockup
-				.getCumulativeLockedUpAll()
-				.then((x) => toBigNumber(x[0]))
-			const deployedBlock = await dev.lockup
-				.getStorageDIP4GenesisBlock()
-				.then(toBigNumber)
-			const expected =
-				0 +
-				5475 +
-				5475 * (block.toNumber() - deployedBlock.toNumber()) +
-				123456 +
-				(5475 + 123456) * (3 + 1) +
-				67890 +
-				(5475 + 123456 + 67890) * (5 + 1) +
-				463578 +
-				(5475 + 123456 + 67890 + 463578) * (7 + 2) -
-				(5475 + 123456) +
-				(67890 + 463578) * (2 + 2) -
-				67890 +
-				463578 * (2 + 2) -
-				463578
-
-			expect(result.toNumber()).to.be.equal(expected)
-		})
-	})
 	describe('Lockup; calculateWithdrawableInterestAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,
@@ -497,154 +323,50 @@ contract('LockupTest', ([deployer, user1]) => {
 			debug = false
 		): Promise<BigNumber> =>
 			Promise.all([
-				dev.allocator.calculateMaxRewardsPerBlock(),
-				dev.lockup
-					.getStorageLastSameRewardsAmountAndBlock()
-					.then((x: any) => x[0]),
-				dev.lockup
-					.getStorageLastSameRewardsAmountAndBlock()
-					.then((x: any) => x[1]),
-				dev.lockup.getStorageDIP4GenesisBlock(),
-				getBlock(),
-				dev.lockup.getStorageCumulativeGlobalRewards(),
-				dev.lockup.getPropertyValue(prop.address),
+				dev.lockup.getRewardsPrice().then((x) => x[0]),
+				dev.lockup.getRewardsPrice().then((x) => x[1]),
+				dev.lockup.getRewardsPrice().then((x) => x[2]),
+				dev.lockup.getStorageLastStakedInterestPrice(prop.address, account),
 				dev.lockup.getValue(prop.address, account),
-				dev.lockup.getStorageLastCumulativeGlobalReward(prop.address, account),
-				dev.lockup.getStorageLastCumulativePropertyInterest(
-					prop.address,
-					account
-				),
-				dev.lockup.getCumulativeLockedUp(prop.address).then((x) => x[0]),
-				dev.lockup.getCumulativeLockedUpAll().then((x) => x[0]),
 				dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),
 				dev.lockup.getStorageInterestPrice(prop.address),
 				dev.lockup.getStorageLastInterestPrice(prop.address, account),
-				dev.lockup
-					.getStorageLastCumulativeLockedUpAndBlock(prop.address, account)
-					.then((x) => x[0]),
-				dev.lockup
-					.getStorageLastCumulativeLockedUpAndBlock(prop.address, account)
-					.then((x) => x[1]),
-				dev.lockup.getCumulativeLockedUp(prop.address).then((x) => x[1]),
-				dev.lockup.getCumulativeLockedUp(prop.address).then((x) => x[2]),
 			]).then((results) => {
 				const [
 					maxRewards,
-					lastRewardsAmount,
-					lastBlock,
-					deployedBlock,
-					currentBlock,
-					globalRewards,
-					lockedUpPerProperty,
+					holdersPrice,
+					interestPrice,
+					lastInterestPrice,
 					lockedUpPerUser,
-					last,
-					lastInterest,
-					cumulativeLockedUp,
-					cumulativeLockedUpAll,
 					pending,
 					legacyInterestPrice,
 					legacyInterestPricePerUser,
-					lastCLocked,
-					lastLockupBlock,
-					lastLockupUnitProperty,
-					lastLockupBlockProperty,
 				] = results.map(toBigNumber)
-				const rewards = (maxRewards.isEqualTo(lastRewardsAmount)
-					? maxRewards
-					: lastRewardsAmount
-				)
-					.times(
-						currentBlock.minus(
-							lastBlock.isGreaterThan(0) ? lastBlock : currentBlock
-						)
-					)
-					.plus(globalRewards)
-				const shareOfProperty = cumulativeLockedUp
-					.times(1e36)
-					.div(cumulativeLockedUpAll)
-					.integerValue(BigNumber.ROUND_DOWN)
-				const cLockedUser = lockedUpPerUser
-					.times(
-						currentBlock.minus(
-							lastLockupBlock.isEqualTo(0) ? deployedBlock : lastLockupBlock
-						)
-					)
-					.integerValue(BigNumber.ROUND_DOWN)
-				const isSingle =
-					lockedUpPerUser.isEqualTo(lastLockupUnitProperty) &&
-					cumulativeLockedUp.isEqualTo(cumulativeLockedUpAll)
-				const isOnly =
-					lastLockupUnitProperty.isEqualTo(lockedUpPerUser) &&
-					lastLockupBlockProperty.isLessThanOrEqualTo(lastLockupBlock)
-				const propertyRewards = rewards
-					.minus(isSingle ? last : 0)
-					.times(shareOfProperty)
-					.integerValue(BigNumber.ROUND_DOWN)
-				// const propertyRewards = rewards.times(shareOfProperty)
-				const interest = propertyRewards.times(10).div(100)
-				const interestPrice = lockedUpPerProperty.isGreaterThan(0)
-					? interest.div(lockedUpPerProperty)
-					: toBigNumber(0)
-				const share = lockedUpPerUser.isEqualTo(0)
-					? toBigNumber(0)
-					: cLockedUser
-							.times(1e18)
-							.div(cumulativeLockedUp.minus(lastCLocked))
-							.integerValue(BigNumber.ROUND_DOWN)
-				// const amount = interestPrice.times(lockedUpPerUser).div(1e36)
-				const amount = isSingle
-					? interestPrice.times(lockedUpPerUser).div(1e18).div(1e18)
-					: isOnly
-					? interest.minus(lastInterest).div(1e18).div(1e18)
-					: interest.isGreaterThanOrEqualTo(lastInterest)
-					? interest
-							.minus(lastInterest)
-							.times(share)
-							.integerValue(BigNumber.ROUND_DOWN)
-							.div(1e18)
-							.div(1e18)
-							.div(1e18)
-					: toBigNumber(0)
+				const interest = interestPrice
+					.minus(lastInterestPrice)
+					.times(lockedUpPerUser)
 				const legacyValue = legacyInterestPrice
 					.minus(legacyInterestPricePerUser)
 					.times(lockedUpPerUser)
-					.div(1e18)
-				const withdrawable = amount.plus(pending).plus(legacyValue)
+				const withdrawable = interest.div(1e18).plus(pending).plus(legacyValue)
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map(toBigNumber))
-					console.log(
-						'*',
-						cumulativeLockedUp.toFixed(),
-						lockedUpPerUser.toFixed(),
-						currentBlock.toFixed(),
-						lastLockupBlock.toFixed()
-					)
-					console.log('isSingle', isSingle)
-					console.log('isOnly', isOnly)
-					console.log('deployedBlock', deployedBlock.toFixed())
-					console.log('rewards', rewards.toFixed())
-					console.log('shareOfProperty', shareOfProperty.toFixed())
-					console.log('propertyRewards', propertyRewards.toFixed())
-					console.log('interest', interest.toFixed())
-					console.log('lastInterest', lastInterest.toFixed())
+					console.log('maxRewards', maxRewards)
+					console.log('holdersPrice', holdersPrice)
 					console.log('interestPrice', interestPrice.toFixed())
-					console.log('share', share.toFixed())
-					console.log('amount', amount.toFixed())
-					console.log('legacyValue', legacyValue.toFixed())
+					console.log('lastInterestPrice', lastInterestPrice.toFixed())
+					console.log('lockedUpPerUser', lockedUpPerUser.toFixed())
 					console.log('pending', pending.toFixed())
+					console.log('legacyInterestPrice', legacyInterestPrice.toFixed())
+					console.log(
+						'legacyInterestPricePerUser',
+						legacyInterestPricePerUser.toFixed()
+					)
+					console.log('interest', interest.toFixed())
+					console.log('legacyValue', legacyValue.toFixed())
 					console.log('withdrawable', withdrawable.toFixed())
 					console.log('res', res.toFixed())
-
-					console.log(
-						last.toFixed(),
-						lastCLocked.toFixed(),
-						currentBlock.toFixed(),
-						lastLockupBlock.toFixed(),
-						lockedUpPerUser.toFixed(),
-						cumulativeLockedUp.toFixed(),
-						cumulativeLockedUpAll.toFixed()
-					)
 				}
 
 				return res
@@ -737,18 +459,32 @@ contract('LockupTest', ([deployer, user1]) => {
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, bob)
 					.then(toBigNumber)
-				const cLocked = await dev.lockup
-					.getCumulativeLockedUp(property.address)
-					.then((x) => toBigNumber(x[0]))
 				const expected = toBigNumber(10)
 					.times(1e18)
-					.times(10)
-					.minus(toBigNumber(10).times(1e18).times(4))
 					.times(
-						toBigNumber(1000000000000)
-							.times(6)
-							.div(cLocked.minus(toBigNumber(1000000000000).times(5)))
+						toBigNumber(1000000000000).div(toBigNumber(1000000000000).times(2))
 					)
+					.times(3)
+					.plus(
+						toBigNumber(10)
+							.times(1e18)
+							.times(
+								toBigNumber(1000000000000).div(
+									toBigNumber(1000000000000).times(3)
+								)
+							)
+					)
+					.plus(
+						toBigNumber(10)
+							.times(1e18)
+							.times(
+								toBigNumber(1000000000000).div(
+									toBigNumber(1000000000000).times(4)
+								)
+							)
+							.times(2)
+					)
+					.integerValue()
 				const calculated = await calc(property, bob)
 
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
@@ -799,6 +535,76 @@ contract('LockupTest', ([deployer, user1]) => {
 					.then(toBigNumber)
 				const expected = toBigNumber(10).times(1e18)
 				const calculated = await calc(property, alice)
+
+				expect(result.toFixed()).to.be.equal(expected.toFixed())
+				expect(result.toFixed()).to.be.equal(calculated.toFixed())
+			})
+			it('After withdrawn, Alice and Bob has a 0% of interests', async () => {
+				await dev.dev
+					.deposit(property.address, 1000000000000, {from: alice})
+					.then(gasLogger)
+				await dev.dev
+					.deposit(property.address, 1000000000000, {from: bob})
+					.then(gasLogger)
+				await mine(2)
+				await dev.lockup.cancel(property.address, {from: alice})
+				await dev.lockup.cancel(property.address, {from: bob})
+				await dev.lockup.withdraw(property.address, {from: alice})
+				await dev.lockup.withdraw(property.address, {from: bob})
+				await dev.lockup.withdrawInterest(property.address, {from: alice})
+				await dev.lockup.withdrawInterest(property.address, {from: bob})
+				await mine(1)
+				const aliceAmount = await dev.lockup.calculateWithdrawableInterestAmount(
+					property.address,
+					alice
+				)
+				const bobAmount = await dev.lockup.calculateWithdrawableInterestAmount(
+					property.address,
+					bob
+				)
+				const aliceCalculated = await calc(property, alice)
+				const bobCalculated = await calc(property, bob)
+
+				expect(aliceAmount.toString()).to.be.equal('0')
+				expect(bobAmount.toString()).to.be.equal('0')
+				expect(aliceCalculated.toString()).to.be.equal('0')
+				expect(bobCalculated.toString()).to.be.equal('0')
+			})
+			it('Bob has huge staked, Alice has small amount of reward', async () => {
+				const [property2] = await Promise.all([
+					artifacts
+						.require('Property')
+						.at(
+							getPropertyAddress(
+								await dev.propertyFactory.create('test', 'TEST', deployer)
+							)
+						),
+				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
+
+				const bobBalance = toBigNumber(10000000).times(1e18)
+				await dev.dev.mint(bob, bobBalance)
+				await dev.dev
+					.deposit(property.address, bobBalance, {from: bob})
+					.then(gasLogger)
+				await mine(10)
+
+				await dev.dev
+					.deposit(property2.address, 10000000, {from: alice})
+					.then(gasLogger)
+				await mine(1)
+				const result = await dev.lockup
+					.calculateWithdrawableInterestAmount(property2.address, alice)
+					.then(toBigNumber)
+				const expected = toBigNumber(10)
+					.times(1e18)
+					.times(
+						toBigNumber(10000000).div(toBigNumber(10000000).plus(bobBalance))
+					)
+				const calculated = await calc(property2, alice)
 
 				expect(result.toFixed()).to.be.equal(expected.toFixed())
 				expect(result.toFixed()).to.be.equal(calculated.toFixed())
