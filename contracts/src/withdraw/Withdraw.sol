@@ -158,7 +158,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		uint256 totalSupply = property.totalSupply();
 		uint256 unitPrice = reward.sub(_lastReward).mulBasis().div(totalSupply);
 
-		uint256 value = unitPrice.mul(balance).divBasis();
+		uint256 value = unitPrice.mul(balance).divBasis().divBasis();
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the holder reward price.

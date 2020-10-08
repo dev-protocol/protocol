@@ -128,21 +128,33 @@ contract LockupStorageTest is LockupStorage {
 		setStorageLastStakesChangedCumulativeReward(_value);
 	}
 
-	function setStorageLastCumulativePriceStatsTest(uint256 _a, uint256 _b)
+	function setStorageLastCumulativeHoldersRewardPriceTest(uint256 _a)
 		external
 	{
-		setStorageLastCumulativePriceStats(_a, _b);
+		setStorageLastCumulativeHoldersRewardPrice(_a);
 	}
 
-	function setStorageLastCumulativeHoldersStatsPerPropertyTest(
+	function setStorageLastCumulativeInterestPriceTest(uint256 _a) external {
+		setStorageLastCumulativeInterestPrice(_a);
+	}
+
+	function setStorageLastCumulativeHoldersRewardAmountPerPropertyTest(
 		address _property,
-		uint256 _value,
-		uint256 _price
+		uint256 _value
 	) external {
-		setStorageLastCumulativeHoldersStatsPerProperty(
+		setStorageLastCumulativeHoldersRewardAmountPerProperty(
 			_property,
-			_value,
-			_price
+			_value
+		);
+	}
+
+	function setStorageLastCumulativeHoldersRewardPricePerPropertyTest(
+		address _property,
+		uint256 _value
+	) external {
+		setStorageLastCumulativeHoldersRewardPricePerProperty(
+			_property,
+			_value
 		);
 	}
 }

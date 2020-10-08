@@ -202,10 +202,14 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		setStorageLastStakedInterestPrice(_property, _user, interestPrice);
 		setStorageLastStakesChangedCumulativeReward(reward);
-		setStorageLastCumulativePriceStats(holdersPrice, interestPrice);
-		setStorageLastCumulativeHoldersStatsPerProperty(
+		setStorageLastCumulativeHoldersRewardPrice(holdersPrice);
+		setStorageLastCumulativeInterestPrice(interestPrice);
+		setStorageLastCumulativeHoldersRewardAmountPerProperty(
 			_property,
-			cHoldersReward,
+			cHoldersReward
+		);
+		setStorageLastCumulativeHoldersRewardPricePerProperty(
+			_property,
 			holdersPrice
 		);
 	}
@@ -223,23 +227,22 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		)
 	{
 		uint256 lastReward = getStorageLastStakesChangedCumulativeReward();
-		(
-			uint256 lastHoldersPrice,
-			uint256 lastInterestPrice
-		) = getStorageLastCumulativePriceStats();
+		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersRewardPrice();
+		uint256 lastInterestPrice = getStorageLastCumulativeInterestPrice();
 		uint256 allStakes = getStorageAllValue();
 
 		/**
 		 * Gets latest cumulative sum of the reward amount.
 		 */
 		(uint256 reward, ) = dry();
+		uint256 mReward = reward.mulBasis();
 
 		/**
 		 * Calculates reward unit price per staking.
 		 * Later, the last cumulative sum of the reward amount is subtracted because to add the last recorded holder/staking reward.
 		 */
 		uint256 price = allStakes > 0
-			? reward.sub(lastReward).div(allStakes)
+			? mReward.sub(lastReward).div(allStakes)
 			: 0;
 
 		/**
@@ -255,7 +258,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
 		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
-		return (reward, holdersPrice, interestPrice);
+		return (mReward, holdersPrice, interestPrice);
 	}
 
 	/**
@@ -266,10 +269,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 _reward,
 		address _property
 	) private view returns (uint256) {
-		(
-			uint256 cHoldersReward,
-			uint256 lastReward
-		) = getStorageLastCumulativeHoldersStatsPerProperty(_property);
+		(uint256 cHoldersReward, uint256 lastReward) = (
+			getStorageLastCumulativeHoldersRewardAmountPerProperty(_property),
+			getStorageLastCumulativeHoldersRewardPricePerProperty(_property)
+		);
 
 		/**
 		 * `cHoldersReward` contains the calculation of `lastReward`, so subtract it here.
@@ -394,7 +397,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Calculates and returns the latest withdrawable reward amount from the difference.
 		 */
 		uint256 result = interest >= lastInterest
-			? interest.sub(lastInterest).mul(lockedUpPerAccount)
+			? interest.sub(lastInterest).mul(lockedUpPerAccount).divBasis()
 			: 0;
 		return (result, interest);
 	}

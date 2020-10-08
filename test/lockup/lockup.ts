@@ -348,7 +348,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				const legacyValue = legacyInterestPrice
 					.minus(legacyInterestPricePerUser)
 					.times(lockedUpPerUser)
-				const withdrawable = interest.plus(pending).plus(legacyValue)
+				const withdrawable = interest.div(1e18).plus(pending).plus(legacyValue)
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map(toBigNumber))

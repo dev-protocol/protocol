@@ -13,7 +13,7 @@ import {
 	getWithdrawHolderSplitAmount,
 } from '../test-lib/utils/mint-amount'
 import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {getEventValue} from '../test-lib/utils/event'
+import {getEventValue, waitForEvent, watch} from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -550,7 +550,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					.minus(legacyLastPrice)
 					.times(balanceOfUser)
 					.div(1e18)
-				const withdrawable = value.plus(pending).plus(legacy)
+				const withdrawable = value.div(1e18).plus(pending).plus(legacy)
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map((x) => toBigNumber(x).toFixed()))
@@ -701,9 +701,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = await dev.lockup
-						.calculateWithdrawableInterestAmount(property.address, carol)
-						.then((x) => toBigNumber(x).div(0.1).times(0.9))
+					const expected = toBigNumber(9e19).times(9)
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
@@ -757,7 +755,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
-					await dev.withdraw.withdraw(property.address, {from: alice})
+					await dev.withdraw
+						.withdraw(property.address, {from: alice})
+						.catch(console.error)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(3)
