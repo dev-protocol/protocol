@@ -663,7 +663,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				expect(aliceAmount.toFixed()).to.be.equal('0')
 			})
 		})
-		describe.only('scenario; single lockup', () => {
+		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
