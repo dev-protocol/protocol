@@ -177,17 +177,29 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	}
 
 	/**
+	 * Store staking states as a snapshot.
 	 */
 	function beforeStakesChanged(address _property, address _user) private {
+		/**
+		 * Gets latest value of cumulative reward amount, cumulative holders reward per stake, and cumulative stakers reward per stake.
+		 */
 		(
 			uint256 reward,
 			uint256 holdersPrice,
 			uint256 interestPrice
 		) = getRewardsPrice();
+
+		/**
+		 * Gets latest cumulative holders reward for the passed Property.
+		 */
 		uint256 cHoldersReward = _calculateCumulativeHoldersRewardAmount(
 			holdersPrice,
 			_property
 		);
+
+		/**
+		 * Store each value.
+		 */
 		setStorageLastStakedInterestPrice(_property, _user, interestPrice);
 		setStorageLastStakesChangedCumulativeReward(reward);
 		setStorageLastCumulativePriceStats(holdersPrice, interestPrice);
@@ -199,6 +211,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	}
 
 	/**
+	 * Gets latest value of cumulative sum of the reward amount, cumulative sum of the holders reward per stake, and cumulative sum of the stakers reward per stake.
 	 */
 	function getRewardsPrice()
 		public
@@ -215,20 +228,39 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			uint256 lastInterestPrice
 		) = getStorageLastCumulativePriceStats();
 		uint256 allStakes = getStorageAllValue();
+
+		/**
+		 * Gets latest cumulative sum of the reward amount.
+		 */
 		(uint256 reward, ) = dry();
+
+		/**
+		 * Calculates reward unit price per staking.
+		 * Later, the last cumulative sum of the reward amount is subtracted because to add the last recorded holder/staking reward.
+		 */
 		uint256 price = allStakes > 0
 			? reward.sub(lastReward).div(allStakes)
 			: 0;
+
+		/**
+		 * Calculates the holders reward out of the total reward amount.
+		 */
 		uint256 holdersShare = IPolicy(config().policy()).holdersShare(
 			price,
 			allStakes
 		);
+
+		/**
+		 * Calculates and returns each reward.
+		 */
 		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
 		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
 		return (reward, holdersPrice, interestPrice);
 	}
 
 	/**
+	 * Calculates cumulative sum of the holders reward per Property.
+	 * To save computing resources, it receives the latest holder rewards from a caller.
 	 */
 	function _calculateCumulativeHoldersRewardAmount(
 		uint256 _reward,
@@ -238,13 +270,22 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			uint256 cHoldersReward,
 			uint256 lastReward
 		) = getStorageLastCumulativeHoldersStatsPerProperty(_property);
+
+		/**
+		 * `cHoldersReward` contains the calculation of `lastReward`, so subtract it here.
+		 */
 		uint256 additionalHoldersReward = _reward.sub(lastReward).mul(
 			getStoragePropertyValue(_property)
 		);
+
+		/**
+		 * Calculates and returns the cumulative sum of the holder reward by adds the last recorded holder reward and the latest holder reward.
+		 */
 		return cHoldersReward.add(additionalHoldersReward);
 	}
 
 	/**
+	 * Calculates cumulative sum of the holders reward per Property.
 	 */
 	function calculateCumulativeHoldersRewardAmount(address _property)
 		public
@@ -337,14 +378,21 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 lockedUpPerAccount = getStorageValue(_property, _user);
 
 		/**
-		 * Gets the cumulative sum of the Property's staker reward when the user staked.
+		 * Gets the cumulative sum of the interest price recorded the last time you withdrew.
 		 */
 		uint256 lastInterest = getStorageLastStakedInterestPrice(
 			_property,
 			_user
 		);
+
+		/**
+		 * Gets the latest cumulative sum of the interest price.
+		 */
 		(, , uint256 interest) = getRewardsPrice();
 
+		/**
+		 * Calculates and returns the latest withdrawable reward amount from the difference.
+		 */
 		uint256 result = interest >= lastInterest
 			? interest.sub(lastInterest).mul(lockedUpPerAccount)
 			: 0;

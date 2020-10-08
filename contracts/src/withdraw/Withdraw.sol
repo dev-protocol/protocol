@@ -49,7 +49,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		require(value != 0, "withdraw value is 0");
 
 		/**
-		 * Saves the latest cumulative sum of the maximum mint amount.
+		 * Saves the latest cumulative sum of the holder reward price.
 		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
 		 */
 		setStorageLastWithdrawnReward(_property, msg.sender, lastPrice);
@@ -143,32 +143,25 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		ERC20Mintable property = ERC20Mintable(_property);
 
 		/**
-		 * Gets the latest cumulative sum of the maximum mint amount,
-		 * and the difference to the previous withdrawal of holder reward unit price.
+		 * Gets the latest cumulative sum of the holder reward.
 		 */
 		uint256 reward = lockup.calculateCumulativeHoldersRewardAmount(
 			_property
 		);
 
 		/**
-		 * Gets the last recorded holders reward.
+		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
 		uint256 _lastReward = getStorageLastWithdrawnReward(_property, _user);
 
-		/**
-		 * Gets the ownership ratio of the passed user and the Property.
-		 */
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
 		uint256 unitPrice = reward.sub(_lastReward).mulBasis().div(totalSupply);
 
-		/**
-		 * Multiplied by the number of tokens to the holder reward unit price.
-		 */
 		uint256 value = unitPrice.mul(balance).divBasis();
 
 		/**
-		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the maximum mint amount.
+		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the holder reward price.
 		 */
 		return (value, reward);
 	}
