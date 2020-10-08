@@ -323,9 +323,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			debug = false
 		): Promise<BigNumber> =>
 			Promise.all([
-				dev.lockup.getRewardsPrice().then((x) => x[0]),
-				dev.lockup.getRewardsPrice().then((x) => x[1]),
-				dev.lockup.getRewardsPrice().then((x) => x[2]),
+				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[0]),
+				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[1]),
+				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[2]),
 				dev.lockup.getStorageLastStakedInterestPrice(prop.address, account),
 				dev.lockup.getValue(prop.address, account),
 				dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),

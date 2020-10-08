@@ -14,7 +14,7 @@ contract ILockup {
 
 	function withdraw(address _property) external;
 
-	function getRewardsPrice()
+	function calculateCumulativeRewardPrices()
 		public
 		view
 		returns (

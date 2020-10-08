@@ -187,7 +187,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			uint256 reward,
 			uint256 holdersPrice,
 			uint256 interestPrice
-		) = getRewardsPrice();
+		) = calculateCumulativeRewardPrices();
 
 		/**
 		 * Gets latest cumulative holders reward for the passed Property.
@@ -213,7 +213,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	/**
 	 * Gets latest value of cumulative sum of the reward amount, cumulative sum of the holders reward per stake, and cumulative sum of the stakers reward per stake.
 	 */
-	function getRewardsPrice()
+	function calculateCumulativeRewardPrices()
 		public
 		view
 		returns (
@@ -292,7 +292,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		view
 		returns (uint256)
 	{
-		(, uint256 holders, ) = getRewardsPrice();
+		(, uint256 holders, ) = calculateCumulativeRewardPrices();
 		return _calculateCumulativeHoldersRewardAmount(holders, _property);
 	}
 
@@ -388,7 +388,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
-		(, , uint256 interest) = getRewardsPrice();
+		(, , uint256 interest) = calculateCumulativeRewardPrices();
 
 		/**
 		 * Calculates and returns the latest withdrawable reward amount from the difference.
