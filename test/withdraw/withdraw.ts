@@ -522,7 +522,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			debug = false
 		): Promise<BigNumber> =>
 			Promise.all([
-				dev.lockup.getHoldersReward(prop.address),
+				dev.lockup.calculateCumulativeHoldersRewardAmount(prop.address),
 				dev.activeWithdraw.getStorageLastWithdrawnReward(prop.address, account),
 				prop.totalSupply(),
 				prop.balanceOf(account),

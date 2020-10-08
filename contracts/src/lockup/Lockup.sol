@@ -184,7 +184,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			uint256 holdersPrice,
 			uint256 interestPrice
 		) = getRewardsPrice();
-		uint256 cHoldersReward = _calculateHoldersReward(
+		uint256 cHoldersReward = _calculateCumulativeHoldersRewardAmount(
 			holdersPrice,
 			_property
 		);
@@ -230,11 +230,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 
 	/**
 	 */
-	function _calculateHoldersReward(uint256 _reward, address _property)
-		private
-		view
-		returns (uint256)
-	{
+	function _calculateCumulativeHoldersRewardAmount(
+		uint256 _reward,
+		address _property
+	) private view returns (uint256) {
 		(
 			uint256 cHoldersReward,
 			uint256 lastReward
@@ -247,9 +246,13 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 
 	/**
 	 */
-	function getHoldersReward(address _property) public view returns (uint256) {
+	function calculateCumulativeHoldersRewardAmount(address _property)
+		public
+		view
+		returns (uint256)
+	{
 		(, uint256 holders, ) = getRewardsPrice();
-		return _calculateHoldersReward(holders, _property);
+		return _calculateCumulativeHoldersRewardAmount(holders, _property);
 	}
 
 	/**

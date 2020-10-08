@@ -146,7 +146,9 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		 * Gets the latest cumulative sum of the maximum mint amount,
 		 * and the difference to the previous withdrawal of holder reward unit price.
 		 */
-		uint256 reward = lockup.getHoldersReward(_property);
+		uint256 reward = lockup.calculateCumulativeHoldersRewardAmount(
+			_property
+		);
 
 		/**
 		 * Gets the last recorded holders reward.
