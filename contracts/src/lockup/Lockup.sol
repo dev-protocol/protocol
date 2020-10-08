@@ -179,15 +179,22 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	/**
 	 */
 	function beforeStakesChanged(address _property, address _user) private {
-		(uint256 reward, uint256 holders, uint256 interest) = getRewardsPrice();
-		uint256 cHoldersReward = _calculateHoldersReward(holders, _property);
-		setStorageLastStakedInterestPrice(_property, _user, interest);
+		(
+			uint256 reward,
+			uint256 holdersPrice,
+			uint256 interestPrice
+		) = getRewardsPrice();
+		uint256 cHoldersReward = _calculateHoldersReward(
+			holdersPrice,
+			_property
+		);
+		setStorageLastStakedInterestPrice(_property, _user, interestPrice);
 		setStorageLastStakesChangedCumulativeReward(reward);
-		setStorageLastStakesChangedHoldersPrice(holders);
-		setStorageLastStakesChangedInterestPrice(interest);
-		setStorageLastCumulativeHoldersRewardPerProperty(
+		setStorageLastCumulativePriceStats(holdersPrice, interestPrice);
+		setStorageLastCumulativeHoldersStatsPerProperty(
 			_property,
-			cHoldersReward
+			cHoldersReward,
+			holdersPrice
 		);
 	}
 
@@ -203,12 +210,14 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		)
 	{
 		uint256 lastReward = getStorageLastStakesChangedCumulativeReward();
-		uint256 lastHoldersPrice = getStorageLastStakesChangedHoldersPrice();
-		uint256 lastInterestPrice = getStorageLastStakesChangedInterestPrice();
+		(
+			uint256 lastHoldersPrice,
+			uint256 lastInterestPrice
+		) = getStorageLastCumulativePriceStats();
 		uint256 allStakes = getStorageAllValue();
 		(uint256 reward, ) = dry();
 		uint256 price = allStakes > 0
-			? reward.sub(lastReward).mulBasis().div(allStakes)
+			? reward.sub(lastReward).div(allStakes)
 			: 0;
 		uint256 holdersShare = IPolicy(config().policy()).holdersShare(
 			price,
@@ -226,9 +235,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		view
 		returns (uint256)
 	{
-		// prettier-ignore
-		uint256 cHoldersReward = getStorageLastCumulativeHoldersRewardPerProperty(_property);
-		uint256 additionalHoldersReward = _reward.mul(
+		(
+			uint256 cHoldersReward,
+			uint256 lastReward
+		) = getStorageLastCumulativeHoldersStatsPerProperty(_property);
+		uint256 additionalHoldersReward = _reward.sub(lastReward).mul(
 			getStoragePropertyValue(_property)
 		);
 		return cHoldersReward.add(additionalHoldersReward);
@@ -332,7 +343,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		(, , uint256 interest) = getRewardsPrice();
 
 		uint256 result = interest >= lastInterest
-			? interest.sub(lastInterest).mul(lockedUpPerAccount).divBasis()
+			? interest.sub(lastInterest).mul(lockedUpPerAccount)
 			: 0;
 		return (result, interest);
 	}

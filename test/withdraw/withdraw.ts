@@ -523,12 +523,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 		): Promise<BigNumber> =>
 			Promise.all([
 				dev.lockup.getHoldersReward(prop.address),
-				dev.withdraw.getStorageLastWithdrawnReward(prop.address, account),
+				dev.activeWithdraw.getStorageLastWithdrawnReward(prop.address, account),
 				prop.totalSupply(),
 				prop.balanceOf(account),
-				dev.withdraw.getPendingWithdrawal(prop.address, account),
-				dev.withdraw.getCumulativePrice(prop.address),
-				dev.withdraw.getLastWithdrawalPrice(prop.address, account),
+				dev.activeWithdraw.getPendingWithdrawal(prop.address, account),
+				dev.activeWithdraw.getCumulativePrice(prop.address),
+				dev.activeWithdraw.getLastWithdrawalPrice(prop.address, account),
 			]).then((results) => {
 				const [
 					holdersPrice,
@@ -541,20 +541,23 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				] = results.map(toBigNumber)
 				const value = holdersPrice
 					.minus(lastPrice)
+					.times(1e18)
 					.div(totalSupply)
+					.integerValue(BigNumber.ROUND_DOWN)
 					.times(balanceOfUser)
+					.div(1e18)
 				const legacy = legacyPrice
 					.minus(legacyLastPrice)
 					.times(balanceOfUser)
 					.div(1e18)
-				const withdrawable = value.div(1e18).plus(pending).plus(legacy)
+				const withdrawable = value.plus(pending).plus(legacy)
 				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
 				if (debug) {
 					console.log(results.map((x) => toBigNumber(x).toFixed()))
-					console.log('value', value)
-					console.log('legacy', legacy)
-					console.log('withdrawable', withdrawable)
-					console.log('res', res)
+					console.log('value', value.toFixed())
+					console.log('legacy', legacy.toFixed())
+					console.log('withdrawable', withdrawable.toFixed())
+					console.log('res', res.toFixed())
 				}
 
 				return res
@@ -766,7 +769,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 				})
 			})
 		})
-		describe.only('scenario: multiple lockup', () => {
+		describe('scenario: multiple lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let blockNumber: number
@@ -789,13 +792,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 
 			describe('before withdrawal', () => {
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
-					await mine(3)
 					const currentBlock = await getBlock()
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					const expected = toBigNumber(9e19).times(currentBlock - blockNumber)
-					await calc(property, alice, true)
+					await calc(property, alice)
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
@@ -984,6 +986,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
+					console.log(
+						'*',
+						await dev.withdraw
+							.getStorageLastWithdrawnReward(property3.address, carol)
+							.then((x) => x.toString())
+					)
 					await dev.withdraw.withdraw(property1.address, {from: alice})
 					await dev.withdraw.withdraw(property2.address, {from: bob})
 					await dev.withdraw.withdraw(property3.address, {from: carol})
@@ -1049,10 +1057,10 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Carol's withdrawable holders rewards is correct`, async () => {
+					const expected = await calc(property3, carol)
 					const carolAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property3.address, carol)
 						.then(toBigNumber)
-					const expected = await calc(property3, carol)
 					expect(carolAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 			})
@@ -1356,70 +1364,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					expect(latest.toFixed()).to.be.equal(result.toFixed())
 				})
 			})
-		})
-	})
-	describe('Withdraw; calculateTotalWithdrawableAmount', () => {
-		let dev: DevProtocolInstance
-		let property: PropertyInstance
-		let property2: PropertyInstance
-		let lastBlock: BigNumber
-		let lastBlock2: BigNumber
-		let lastBlock3: BigNumber
-
-		before(async () => {
-			;[dev, , property] = await init()
-			;[property2] = await Promise.all([
-				artifacts
-					.require('Property')
-					.at(
-						getPropertyAddress(
-							await dev.propertyFactory.create('test2', 'TEST2', user1)
-						)
-					),
-			])
-			await dev.metricsGroup.__setMetricsCountPerProperty(property2.address, 1)
-
-			await dev.dev.deposit(property.address, 10000)
-			lastBlock = await getBlock().then(toBigNumber)
-		})
-
-		it('Returns total withdrawable amount of a Property', async () => {
-			await mine(1)
-			const block = await getBlock().then(toBigNumber)
-			const result = toBigNumber(10e19)
-			const expected = toBigNumber(90).times(1e18).times(block.minus(lastBlock))
-			expect(result.toFixed()).to.be.equal(expected.toFixed())
-		})
-		it('Returns total withdrawable amount also does not change when after transfer balance', async () => {
-			await property.transfer(
-				user1,
-				await property.balanceOf(deployer).then((x) => toBigNumber(x).div(2))
-			)
-			await mine(1)
-			const block = await getBlock().then(toBigNumber)
-			const result = toBigNumber(10e19).times(3)
-			const expected = toBigNumber(90).times(1e18).times(block.minus(lastBlock))
-			expect(result.toFixed()).to.be.equal(expected.toFixed())
-		})
-		it('After withdrawn staking, stop increasing', async () => {
-			await dev.dev.deposit(property2.address, 10000)
-			lastBlock2 = await getBlock().then(toBigNumber)
-			await dev.lockup.cancel(property.address)
-			await dev.lockup.withdraw(property.address)
-			lastBlock3 = await getBlock().then(toBigNumber)
-			await mine(3)
-
-			const result = toBigNumber(10e19).times(9)
-			const expected = toBigNumber(90)
-				.times(1e18)
-				.times(lastBlock2.minus(lastBlock))
-				.plus(
-					toBigNumber(90)
-						.times(1e18)
-						.times(0.5)
-						.times(lastBlock3.minus(lastBlock2))
-				)
-			expect(result.toFixed()).to.be.equal(expected.toFixed())
 		})
 	})
 })

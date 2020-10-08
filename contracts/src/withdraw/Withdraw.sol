@@ -141,6 +141,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	{
 		ILockup lockup = ILockup(config().lockup());
 		ERC20Mintable property = ERC20Mintable(_property);
+
 		/**
 		 * Gets the latest cumulative sum of the maximum mint amount,
 		 * and the difference to the previous withdrawal of holder reward unit price.
@@ -157,17 +158,17 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		 */
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
-		uint256 unitPrice = reward.sub(_lastReward).div(totalSupply);
+		uint256 unitPrice = reward.sub(_lastReward).mulBasis().div(totalSupply);
 
 		/**
 		 * Multiplied by the number of tokens to the holder reward unit price.
 		 */
-		uint256 value = unitPrice.mul(balance);
+		uint256 value = unitPrice.mul(balance).divBasis();
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the maximum mint amount.
 		 */
-		return (value.divBasis(), reward);
+		return (value, reward);
 	}
 
 	/**

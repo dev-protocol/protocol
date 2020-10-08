@@ -504,83 +504,68 @@ contract LockupStorage is UsingStorage {
 			keccak256(abi.encodePacked("_lastStakesChangedCumulativeReward"));
 	}
 
-	//lastStakesChangedHoldersPrice
-	function setStorageLastStakesChangedHoldersPrice(uint256 _value) internal {
-		eternalStorage().setUint(
-			getStorageLastStakesChangedHoldersPriceKey(),
-			_value
-		);
-	}
-
-	function getStorageLastStakesChangedHoldersPrice()
-		public
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getStorageLastStakesChangedHoldersPriceKey()
-			);
-	}
-
-	function getStorageLastStakesChangedHoldersPriceKey()
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_lastStakesChangedHoldersPrice"));
-	}
-
-	//lastStakesChangedInterestPrice
-	function setStorageLastStakesChangedInterestPrice(uint256 _value) internal {
-		eternalStorage().setUint(
-			getStorageLastStakesChangedInterestPriceKey(),
-			_value
-		);
-	}
-
-	function getStorageLastStakesChangedInterestPrice()
-		public
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getStorageLastStakesChangedInterestPriceKey()
-			);
-	}
-
-	function getStorageLastStakesChangedInterestPriceKey()
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_lastStakesChangedInterestPrice"));
-	}
-
-	//LastCumulativeHoldersRewardPerProperty
-	function setStorageLastCumulativeHoldersRewardPerProperty(
-		address _property,
-		uint256 _value
+	//LastCumulativePriceStats
+	function setStorageLastCumulativePriceStats(
+		uint256 _holders,
+		uint256 _interest
 	) internal {
+		uint256 record = _holders.mul(basis).add(_interest);
 		eternalStorage().setUint(
-			getStorageLastCumulativeHoldersRewardPerPropertyKey(_property),
-			_value
+			getStorageLastCumulativePriceStatsKey(),
+			record
 		);
 	}
 
-	function getStorageLastCumulativeHoldersRewardPerProperty(address _property)
+	function getStorageLastCumulativePriceStats()
 		public
 		view
-		returns (uint256)
+		returns (uint256 _holders, uint256 _interest)
 	{
-		return
-			eternalStorage().getUint(
-				getStorageLastCumulativeHoldersRewardPerPropertyKey(_property)
-			);
+		uint256 record = eternalStorage().getUint(
+			getStorageLastCumulativePriceStatsKey()
+		);
+		uint256 holders = record.div(basis);
+		uint256 interest = record.sub(holders.mul(basis));
+
+		return (holders, interest);
 	}
 
-	function getStorageLastCumulativeHoldersRewardPerPropertyKey(
+	function getStorageLastCumulativePriceStatsKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_lastCumulativePriceStats"));
+	}
+
+	//LastCumulativeHoldersStatsPerProperty
+	function setStorageLastCumulativeHoldersStatsPerProperty(
+		address _property,
+		uint256 _value,
+		uint256 _price
+	) internal {
+		uint256 record = _value.mul(basis).add(_price);
+		eternalStorage().setUint(
+			getStorageLastCumulativeHoldersStatsPerPropertyKey(_property),
+			record
+		);
+	}
+
+	function getStorageLastCumulativeHoldersStatsPerProperty(address _property)
+		public
+		view
+		returns (uint256 _value, uint256 _price)
+	{
+		uint256 record = eternalStorage().getUint(
+			getStorageLastCumulativeHoldersStatsPerPropertyKey(_property)
+		);
+		uint256 value = record.div(basis);
+		uint256 price = record.sub(value.mul(basis));
+
+		return (value, price);
+	}
+
+	function getStorageLastCumulativeHoldersStatsPerPropertyKey(
 		address _property
 	) private pure returns (bytes32) {
 		return
