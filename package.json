@@ -50,7 +50,7 @@
 		"rimraf": "3.0.2",
 		"truffle": "5.1.47",
 		"truffle-typings": "1.0.8",
-		"ts-generator": "0.0.8",
+		"ts-generator": "0.1.0",
 		"ts-node": "9.0.0",
 		"typechain": "2.0.1",
 		"typechain-target-truffle": "1.0.2",
