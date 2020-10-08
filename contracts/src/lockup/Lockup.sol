@@ -44,6 +44,11 @@ import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	struct RewardPrices {
+		uint256 reward;
+		uint256 holders;
+		uint256 interest;
+	}
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	/**
@@ -89,12 +94,15 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Since the reward per block that can be withdrawn will change with the addition of staking,
 		 * saves the undrawn withdrawable reward before addition it.
 		 */
-		updatePendingInterestWithdrawal(_property, _from);
+		RewardPrices memory prices = updatePendingInterestWithdrawal(
+			_property,
+			_from
+		);
 
 		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
-		updateValues(true, _from, _property, _value);
+		updateValues(true, _from, _property, _value, prices);
 		emit Lockedup(_from, _property, _value);
 	}
 
@@ -153,7 +161,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Since the increase of rewards will stop with the release of the staking,
 		 * saves the undrawn withdrawable reward before releasing it.
 		 */
-		updatePendingInterestWithdrawal(_property, msg.sender);
+		RewardPrices memory prices = updatePendingInterestWithdrawal(
+			_property,
+			msg.sender
+		);
 
 		/**
 		 * Transfer the staked amount to the sender.
@@ -163,7 +174,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Saves variables that should change due to the canceling staking..
 		 */
-		updateValues(false, msg.sender, _property, lockedUpValue);
+		updateValues(false, msg.sender, _property, lockedUpValue, prices);
 
 		/**
 		 * Sets the staked amount to 0.
@@ -179,38 +190,33 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	/**
 	 * Store staking states as a snapshot.
 	 */
-	function beforeStakesChanged(address _property, address _user) private {
-		/**
-		 * Gets latest value of cumulative reward amount, cumulative holders reward per stake, and cumulative stakers reward per stake.
-		 */
-		(
-			uint256 reward,
-			uint256 holdersPrice,
-			uint256 interestPrice
-		) = calculateCumulativeRewardPrices();
-
+	function beforeStakesChanged(
+		address _property,
+		address _user,
+		RewardPrices memory _prices
+	) private {
 		/**
 		 * Gets latest cumulative holders reward for the passed Property.
 		 */
 		uint256 cHoldersReward = _calculateCumulativeHoldersRewardAmount(
-			holdersPrice,
+			_prices.holders,
 			_property
 		);
 
 		/**
 		 * Store each value.
 		 */
-		setStorageLastStakedInterestPrice(_property, _user, interestPrice);
-		setStorageLastStakesChangedCumulativeReward(reward);
-		setStorageLastCumulativeHoldersRewardPrice(holdersPrice);
-		setStorageLastCumulativeInterestPrice(interestPrice);
+		setStorageLastStakedInterestPrice(_property, _user, _prices.interest);
+		setStorageLastStakesChangedCumulativeReward(_prices.reward);
+		setStorageLastCumulativeHoldersRewardPrice(_prices.holders);
+		setStorageLastCumulativeInterestPrice(_prices.interest);
 		setStorageLastCumulativeHoldersRewardAmountPerProperty(
 			_property,
 			cHoldersReward
 		);
 		setStorageLastCumulativeHoldersRewardPricePerProperty(
 			_property,
-			holdersPrice
+			_prices.holders
 		);
 	}
 
@@ -373,7 +379,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	function _calculateInterestAmount(address _property, address _user)
 		private
 		view
-		returns (uint256 _amount, uint256 _interestPrice)
+		returns (
+			uint256 _amount,
+			uint256 _interestPrice,
+			RewardPrices memory _prices
+		)
 	{
 		/**
 		 * Get the amount the user is staking for the Property.
@@ -391,7 +401,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
-		(, , uint256 interest) = calculateCumulativeRewardPrices();
+		(
+			uint256 reward,
+			uint256 holders,
+			uint256 interest
+		) = calculateCumulativeRewardPrices();
 
 		/**
 		 * Calculates and returns the latest withdrawable reward amount from the difference.
@@ -399,7 +413,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 result = interest >= lastInterest
 			? interest.sub(lastInterest).mul(lockedUpPerAccount).divBasis()
 			: 0;
-		return (result, interest);
+		return (result, interest, RewardPrices(reward, holders, interest));
 	}
 
 	/**
@@ -408,14 +422,22 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	function _calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	) private view returns (uint256 _amount, uint256 _interestPrice) {
+	)
+		private
+		view
+		returns (
+			uint256 _amount,
+			uint256 _interestPrice,
+			RewardPrices memory _prices
+		)
+	{
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return (0, 0);
+			return (0, 0, RewardPrices(0, 0, 0));
 		}
 
 		/**
@@ -431,10 +453,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the latest withdrawal reward amount.
 		 */
-		(uint256 amount, uint256 interestPrice) = _calculateInterestAmount(
-			_property,
-			_user
-		);
+		(
+			uint256 amount,
+			uint256 interestPrice,
+			RewardPrices memory prices
+		) = _calculateInterestAmount(_property, _user);
 
 		/**
 		 * Returns the sum of all values.
@@ -442,7 +465,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 withdrawableAmount = amount
 			.add(pending) // solium-disable-next-line indentation
 			.add(legacy);
-		return (withdrawableAmount, interestPrice);
+		return (withdrawableAmount, interestPrice, prices);
 	}
 
 	/**
@@ -452,7 +475,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		address _property,
 		address _user
 	) public view returns (uint256) {
-		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
+		(uint256 amount, , ) = _calculateWithdrawableInterestAmount(
 			_property,
 			_user
 		);
@@ -473,7 +496,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		(
 			uint256 value,
-			uint256 interestPrice
+			uint256 interestPrice,
+
 		) = _calculateWithdrawableInterestAmount(_property, msg.sender);
 
 		/**
@@ -515,9 +539,10 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		bool _addition,
 		address _account,
 		address _property,
-		uint256 _value
+		uint256 _value,
+		RewardPrices memory _prices
 	) private {
-		beforeStakesChanged(_property, _account);
+		beforeStakesChanged(_property, _account, _prices);
 		/**
 		 * If added staking:
 		 */
@@ -653,14 +678,16 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	 */
 	function updatePendingInterestWithdrawal(address _property, address _user)
 		private
+		returns (RewardPrices memory _prices)
 	{
 		/**
 		 * Gets the latest reward amount.
 		 */
-		(uint256 withdrawableAmount, ) = _calculateWithdrawableInterestAmount(
-			_property,
-			_user
-		);
+		(
+			uint256 withdrawableAmount,
+			,
+			RewardPrices memory prices
+		) = _calculateWithdrawableInterestAmount(_property, _user);
 
 		/**
 		 * Saves the amount to `PendingInterestWithdrawal` storage.
@@ -675,6 +702,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Updates the reward amount of before DIP4 to prevent further addition it.
 		 */
 		__updateLegacyWithdrawableInterestAmount(_property, _user);
+
+		return prices;
 	}
 
 	/**
