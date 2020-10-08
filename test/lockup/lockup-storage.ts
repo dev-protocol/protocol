@@ -267,42 +267,62 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})
-	describe('LockupStorage; setStorageLastCumulativePriceStats, getStorageLastCumulativePriceStats', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getStorageLastCumulativePriceStats()
-			expect(result[0].toNumber()).to.be.equal(0)
-			expect(result[1].toNumber()).to.be.equal(0)
+	describe('LockupStorage; setStorageLastCumulativeHoldersRewardPrice, getStorageLastCumulativeHoldersRewardPrice', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastCumulativeHoldersRewardPrice()
+			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			const a = toBigNumber('99999999999999.999999999999999999').times(1e18)
-			const b = toBigNumber('88888888888888.888888888888888888').times(1e18)
-			await storage.setStorageLastCumulativePriceStatsTest(a, b)
-			const result = await storage.getStorageLastCumulativePriceStats()
-			expect(toBigNumber(result[0]).toFixed()).to.be.equal(a.toFixed())
-			expect(toBigNumber(result[1]).toFixed()).to.be.equal(b.toFixed())
+			await storage.setStorageLastCumulativeHoldersRewardPriceTest(300000000000)
+			const result = await storage.getStorageLastCumulativeHoldersRewardPrice()
+			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})
-	describe('LockupStorage; setStorageLastCumulativeHoldersStatsPerProperty, getStorageLastCumulativeHoldersStatsPerProperty', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getStorageLastCumulativeHoldersStatsPerProperty(
-				property
-			)
-			expect(result[0].toNumber()).to.be.equal(0)
-			expect(result[1].toNumber()).to.be.equal(0)
+	describe('LockupStorage; setStorageLastCumulativeInterestPrice, getStorageLastCumulativeInterestPrice', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastCumulativeInterestPrice()
+			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			const a = toBigNumber('99999999999999.999999999999999999').times(1e18)
-			const b = toBigNumber('88888888888888.888888888888888888').times(1e18)
-			await storage.setStorageLastCumulativeHoldersStatsPerPropertyTest(
-				property,
-				a,
-				b
-			)
-			const result = await storage.getStorageLastCumulativeHoldersStatsPerProperty(
+			await storage.setStorageLastCumulativeInterestPriceTest(300000000000)
+			const result = await storage.getStorageLastCumulativeInterestPrice()
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
+	describe('LockupStorage; setStorageLastCumulativeHoldersRewardAmountPerProperty, getStorageLastCumulativeHoldersRewardAmountPerProperty', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastCumulativeHoldersRewardAmountPerProperty(
 				property
 			)
-			expect(toBigNumber(result[0]).toFixed()).to.be.equal(a.toFixed())
-			expect(toBigNumber(result[1]).toFixed()).to.be.equal(b.toFixed())
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastCumulativeHoldersRewardAmountPerPropertyTest(
+				property,
+				300000000000
+			)
+			const result = await storage.getStorageLastCumulativeHoldersRewardAmountPerProperty(
+				property
+			)
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
+	describe('LockupStorage; setStorageLastCumulativeHoldersRewardPricePerProperty, getStorageLastCumulativeHoldersRewardPricePerProperty', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastCumulativeHoldersRewardPricePerProperty(
+				property
+			)
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastCumulativeHoldersRewardPricePerPropertyTest(
+				property,
+				300000000000
+			)
+			const result = await storage.getStorageLastCumulativeHoldersRewardPricePerProperty(
+				property
+			)
+			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})
 })
