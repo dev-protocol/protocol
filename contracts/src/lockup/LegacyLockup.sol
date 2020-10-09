@@ -10,7 +10,7 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
-import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {ILegacyLockup} from "contracts/src/lockup/ILegacyLockup.sol";
 import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 
 /**
@@ -41,7 +41,12 @@ import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
  * - After 10 blocks, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
-contract LegacyLockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
+contract LegacyLockup is
+	ILegacyLockup,
+	UsingConfig,
+	UsingValidator,
+	LockupStorage
+{
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event Lockedup(address _from, address _property, uint256 _value);
