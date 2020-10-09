@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {LockupInstance} from '../../../types/truffle-contracts'
+import {
+	LockupInstance,
+	MigrateLockupInstance,
+} from '../../../types/truffle-contracts'
 import {DevCommonInstance} from './common'
+
+type InstanceOfLockup = LockupInstance | MigrateLockupInstance
 
 export class Lockup {
 	private readonly _dev: DevCommonInstance
@@ -24,7 +29,18 @@ export class Lockup {
 		return lockup
 	}
 
-	public async set(lockup: LockupInstance): Promise<void> {
+	public async _remove_later_createMigrateContract(): Promise<
+		MigrateLockupInstance
+	> {
+		const lockup = await this._dev.artifacts
+			.require('MigrateLockup')
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
+		console.log('new Lockup contract', lockup.address)
+		await this._addMinter(lockup)
+		return lockup
+	}
+
+	public async set(lockup: InstanceOfLockup): Promise<void> {
 		await this._dev.addressConfig.setLockup(
 			lockup.address,
 			await this._dev.gasInfo
@@ -33,8 +49,8 @@ export class Lockup {
 	}
 
 	public async changeOwner(
-		before: LockupInstance,
-		after: LockupInstance
+		before: InstanceOfLockup,
+		after: InstanceOfLockup
 	): Promise<void> {
 		const storageAddress = await before.getStorageAddress()
 		console.log(`storage address ${storageAddress}`)
@@ -44,7 +60,16 @@ export class Lockup {
 		console.log(`change owner from ${before.address} to ${after.address}`)
 	}
 
-	private async _addMinter(lockup: LockupInstance): Promise<void> {
+	public async _remove_later_setStorage(
+		before: InstanceOfLockup,
+		after: InstanceOfLockup
+	): Promise<void> {
+		const storageAddress = await before.getStorageAddress()
+		console.log(`storage address ${storageAddress}`)
+		await after.setStorage(storageAddress)
+	}
+
+	private async _addMinter(lockup: InstanceOfLockup): Promise<void> {
 		await this._dev.dev.addMinter(lockup.address, await this._dev.gasInfo)
 
 		console.log(`add minter ${lockup.address}`)

@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {WithdrawInstance} from '../../../types/truffle-contracts'
+import {
+	MigrateWithdrawInstance,
+	WithdrawInstance,
+	WithdrawStorageInstance,
+} from '../../../types/truffle-contracts'
 import {DevCommonInstance} from './common'
+
+type InstanceOfWithdraw = WithdrawInstance | MigrateWithdrawInstance
 
 export class Withdraw {
 	private readonly _dev: DevCommonInstance
@@ -24,7 +30,18 @@ export class Withdraw {
 		return withdraw
 	}
 
-	public async set(withdraw: WithdrawInstance): Promise<void> {
+	public async _remove_later_createMigrateContract(): Promise<
+		MigrateWithdrawInstance
+	> {
+		const withdraw = await this._dev.artifacts
+			.require('MigrateWithdraw')
+			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
+		console.log('new Withdraw contract', withdraw.address)
+		await this._addMinter(withdraw)
+		return withdraw
+	}
+
+	public async set(withdraw: InstanceOfWithdraw): Promise<void> {
 		await this._dev.addressConfig.setWithdraw(
 			withdraw.address,
 			await this._dev.gasInfo
@@ -33,8 +50,8 @@ export class Withdraw {
 	}
 
 	public async changeOwner(
-		before: WithdrawInstance,
-		after: WithdrawInstance
+		before: WithdrawStorageInstance | InstanceOfWithdraw,
+		after: InstanceOfWithdraw
 	): Promise<void> {
 		const storageAddress = await before.getStorageAddress()
 		console.log(`storage address ${storageAddress}`)
@@ -44,7 +61,16 @@ export class Withdraw {
 		console.log(`change owner from ${before.address} to ${after.address}`)
 	}
 
-	private async _addMinter(withdraw: WithdrawInstance): Promise<void> {
+	public async _remove_later_setStorage(
+		before: WithdrawStorageInstance,
+		after: InstanceOfWithdraw
+	): Promise<void> {
+		const storageAddress = await before.getStorageAddress()
+		console.log(`storage address ${storageAddress}`)
+		await after.setStorage(storageAddress)
+	}
+
+	private async _addMinter(withdraw: InstanceOfWithdraw): Promise<void> {
 		await this._dev.dev.addMinter(withdraw.address, await this._dev.gasInfo)
 
 		console.log(`add minter ${withdraw.address}`)
