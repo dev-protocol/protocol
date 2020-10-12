@@ -336,10 +336,10 @@
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-"@types/bent@7.3.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@types/bent/-/bent-7.3.0.tgz#c3a99e790eceba77e0b87423eef35f0b034678a5"
-  integrity sha512-EitzswEqzdUc1Yqnyuqd90aLQCgHeTCwd7GMoL56saxpNt5Mi6v8Sr4BrlKd0NYRwdwcayQqb2QuKjGYM7GegQ==
+"@types/bent@7.3.1":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@types/bent/-/bent-7.3.1.tgz#e59e9144058da1843c00b8fcc3c5b3ed7bfab9e6"
+  integrity sha512-76ieb6NdaxXAURJwTXaFYovU7lXB2cO03vMMCDlfTb12Uw7jgEBdAABBMvsm/SIB6LavDofvFXYDhiU/qAySDg==
   dependencies:
     "@types/node" "*"
 
@@ -5707,22 +5707,7 @@ ts-essentials@^6.0.3:
   resolved "https://registry.yarnpkg.com/ts-essentials/-/ts-essentials-6.0.7.tgz#5f4880911b7581a873783740ce8b94da163d18a6"
   integrity sha512-2E4HIIj4tQJlIHuATRHayv0EfMGK3ris/GRk1E3CFnsZzeNV+hUmelbaTZHLtXaZppM5oLhHRtO04gINC4Jusw==
 
-ts-generator@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/ts-generator/-/ts-generator-0.1.1.tgz#af46f2fb88a6db1f9785977e9590e7bcd79220ab"
-  integrity sha512-N+ahhZxTLYu1HNTQetwWcx3so8hcYbkKBHTr4b4/YgObFTIKkOSSsaa+nal12w8mfrJAyzJfETXawbNjSfP2gQ==
-  dependencies:
-    "@types/mkdirp" "^0.5.2"
-    "@types/prettier" "^2.1.1"
-    "@types/resolve" "^0.0.8"
-    chalk "^2.4.1"
-    glob "^7.1.2"
-    mkdirp "^0.5.1"
-    prettier "^2.1.2"
-    resolve "^1.8.1"
-    ts-essentials "^1.0.0"
-
-ts-generator@^0.1.1:
+ts-generator@0.1.1, ts-generator@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/ts-generator/-/ts-generator-0.1.1.tgz#af46f2fb88a6db1f9785977e9590e7bcd79220ab"
   integrity sha512-N+ahhZxTLYu1HNTQetwWcx3so8hcYbkKBHTr4b4/YgObFTIKkOSSsaa+nal12w8mfrJAyzJfETXawbNjSfP2gQ==
