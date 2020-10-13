@@ -32,18 +32,14 @@ const handler = async (
 	)
 	await dev.prepare()
 
-	// Deploy new Lockup
+	// Set new Lockup
 	const l = new Lockup(dev)
-	const lInstance = await l.load()
 	const nLInstance = await artifacts.require('Lockup').at(NEXT_LOCKUP)
-	await l.changeOwner(lInstance, nLInstance)
 	await l.set(nLInstance)
 
-	// Deploy new Withdraw
+	// Set new Withdraw
 	const w = new Withdraw(dev)
-	const wInstance = await w.load()
 	const nWInstance = await artifacts.require('Withdraw').at(NEXT_WITHDRAW)
-	await w.changeOwner(wInstance, nWInstance)
 	await w.set(nWInstance)
 
 	callback(null)
