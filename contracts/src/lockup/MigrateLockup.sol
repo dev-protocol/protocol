@@ -8,7 +8,6 @@ contract MigrateLockup is LegacyLockup {
 	function __initStakeOnProperty(
 		address _property,
 		address _user,
-		uint256 _cReward,
 		uint256 _cInterestPrice
 	) public onlyOwner {
 		setStorageLastStakedInterestPrice(_property, _user, _cInterestPrice);
