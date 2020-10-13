@@ -27,9 +27,9 @@ contract MigrateLockup is LegacyLockup {
 			getStorageLastCumulativeHoldersRewardAmountPerProperty(_property) !=
 				_cHoldersAmountPerProperty ||
 				getStorageLastCumulativeHoldersRewardPricePerProperty(
-					_property,
-					_cHoldersPrice
-				),
+					_property
+				) !=
+				_cHoldersPrice,
 			"ALREADY EXISTS"
 		);
 		setStorageLastCumulativeHoldersRewardAmountPerProperty(
