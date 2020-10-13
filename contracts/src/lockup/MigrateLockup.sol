@@ -10,6 +10,11 @@ contract MigrateLockup is LegacyLockup {
 		address _user,
 		uint256 _cInterestPrice
 	) public onlyOwner {
+		require(
+			getStorageLastStakedInterestPrice(_property, _user) !=
+				_cInterestPrice,
+			"ALREADY EXISTS"
+		);
 		setStorageLastStakedInterestPrice(_property, _user, _cInterestPrice);
 	}
 
@@ -18,6 +23,15 @@ contract MigrateLockup is LegacyLockup {
 		uint256 _cHoldersAmountPerProperty,
 		uint256 _cHoldersPrice
 	) public onlyOwner {
+		require(
+			getStorageLastCumulativeHoldersRewardAmountPerProperty(_property) !=
+				_cHoldersAmountPerProperty ||
+				getStorageLastCumulativeHoldersRewardPricePerProperty(
+					_property,
+					_cHoldersPrice
+				),
+			"ALREADY EXISTS"
+		);
 		setStorageLastCumulativeHoldersRewardAmountPerProperty(
 			_property,
 			_cHoldersAmountPerProperty
@@ -33,6 +47,13 @@ contract MigrateLockup is LegacyLockup {
 		uint256 _cInterestPrice,
 		uint256 _cHoldersPrice
 	) public onlyOwner {
+		require(
+			getStorageLastStakesChangedCumulativeReward() != _cReward ||
+				getStorageLastCumulativeHoldersRewardPrice() !=
+				_cHoldersPrice ||
+				getStorageLastCumulativeInterestPrice() != _cInterestPrice,
+			"ALREADY EXISTS"
+		);
 		setStorageLastStakesChangedCumulativeReward(_cReward);
 		setStorageLastCumulativeHoldersRewardPrice(_cHoldersPrice);
 		setStorageLastCumulativeInterestPrice(_cInterestPrice);

@@ -10,6 +10,10 @@ contract MigrateWithdraw is LegacyWithdraw {
 		address _user,
 		uint256 _cHoldersPrice
 	) public onlyOwner {
+		require(
+			getStorageLastWithdrawnReward(_property, _user) != _cHoldersPrice,
+			"ALREADY EXISTS"
+		);
 		setStorageLastWithdrawnReward(_property, _user, _cHoldersPrice);
 	}
 
@@ -18,6 +22,10 @@ contract MigrateWithdraw is LegacyWithdraw {
 		address _to,
 		uint256 _cHoldersPrice
 	) public onlyOwner {
+		require(
+			getStorageLastWithdrawnReward(_property, _to) != _cHoldersPrice,
+			"ALREADY EXISTS"
+		);
 		setStorageLastWithdrawnReward(_property, _to, _cHoldersPrice);
 	}
 }
