@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable no-undef */
 import {config} from 'dotenv'
 import {createFastestGasPriceFetcher} from './lib/ethgas'
@@ -40,13 +41,12 @@ const handler = async (
 
 	// Deploy new Withdraw
 	const w = new Withdraw(dev)
-	const wInstance = await w.load()
+	const wSInstance = await new WithdrawStorage(dev).load()
 	const nWInstance = await w.create()
-	await w._remove_later_setStorage(wInstance, nWInstance) // DON'T CHANGE THE OWNER TO THIS INSTANCE until completed the migration process
+	await w._remove_later_setStorage(wSInstance, nWInstance) // DON'T CHANGE THE OWNER TO THIS INSTANCE until completed the migration process
 
 	// Deploy MigrateLockup
 	const mWInstance = await w._remove_later_createMigrateContract()
-	const wSInstance = await new WithdrawStorage(dev).load()
 	await w.changeOwner(wSInstance, mWInstance)
 	await w.set(mWInstance)
 
