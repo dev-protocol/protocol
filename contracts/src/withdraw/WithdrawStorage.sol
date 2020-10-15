@@ -212,4 +212,38 @@ contract WithdrawStorage is UsingStorage {
 				)
 			);
 	}
+
+	//lastWithdrawnReward
+	function setStorageLastWithdrawnReward(
+		address _property,
+		address _user,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageLastWithdrawnRewardKey(_property, _user),
+			_value
+		);
+	}
+
+	function getStorageLastWithdrawnReward(address _property, address _user)
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getStorageLastWithdrawnRewardKey(_property, _user)
+			);
+	}
+
+	function getStorageLastWithdrawnRewardKey(address _property, address _user)
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(
+				abi.encodePacked("_lastWithdrawnReward", _property, _user)
+			);
+	}
 }

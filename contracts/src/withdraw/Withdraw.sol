@@ -30,7 +30,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	 */
 	function withdraw(address _property) external {
 		/**
-		 * Validates the passed Property address is included the Property address set.
+		 * Validate
+		 s the passed Property address is included the Property address set.
 		 */
 		addressValidator().validateGroup(_property, config().propertyGroup());
 
@@ -48,10 +49,10 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		require(value != 0, "withdraw value is 0");
 
 		/**
-		 * Saves the latest cumulative sum of the maximum mint amount.
+		 * Saves the latest cumulative sum of the holder reward price.
 		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
 		 */
-		setLastCumulativeHoldersReward(_property, msg.sender, lastPrice);
+		setStorageLastWithdrawnReward(_property, msg.sender, lastPrice);
 
 		/**
 		 * Sets the number of unwithdrawn rewards to 0.
@@ -112,8 +113,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
 		 */
-		setLastCumulativeHoldersReward(_property, _from, priceFrom);
-		setLastCumulativeHoldersReward(_property, _to, priceTo);
+		setStorageLastWithdrawnReward(_property, _from, priceFrom);
+		setStorageLastWithdrawnReward(_property, _to, priceTo);
 
 		/**
 		 * Gets the unwithdrawn reward amount of the transfer source and destination.
@@ -131,23 +132,6 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	}
 
 	/**
-	 * Passthrough to `Lockup.difference` function.
-	 */
-	function difference(address _property)
-		private
-		view
-		returns (
-			uint256 _reward,
-			uint256 _holdersAmount,
-			uint256 _holdersPrice,
-			uint256 _interestAmount,
-			uint256 _interestPrice
-		)
-	{
-		return ILockup(config().lockup()).difference(_property, 0);
-	}
-
-	/**
 	 * Returns the holder reward.
 	 */
 	function _calculateAmount(address _property, address _user)
@@ -155,31 +139,31 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		view
 		returns (uint256 _amount, uint256 _price)
 	{
-		/**
-		 * Gets the latest cumulative sum of the maximum mint amount,
-		 * and the difference to the previous withdrawal of holder reward unit price.
-		 */
-		(, , uint256 _holdersPrice, , ) = difference(_property);
+		ILockup lockup = ILockup(config().lockup());
+		ERC20Mintable property = ERC20Mintable(_property);
 
 		/**
-		 * Gets the last recorded holders reward.
+		 * Gets the latest cumulative sum of the holder reward.
 		 */
-		uint256 _last = getLastCumulativeHoldersReward(_property, _user);
+		uint256 reward = lockup.calculateCumulativeHoldersRewardAmount(
+			_property
+		);
 
 		/**
-		 * Gets the ownership ratio of the passed user and the Property.
+		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
-		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+		uint256 _lastReward = getStorageLastWithdrawnReward(_property, _user);
+
+		uint256 balance = property.balanceOf(_user);
+		uint256 totalSupply = property.totalSupply();
+		uint256 unitPrice = reward.sub(_lastReward).mulBasis().div(totalSupply);
+
+		uint256 value = unitPrice.mul(balance).divBasis().divBasis();
 
 		/**
-		 * Multiplied by the number of tokens to the holder reward unit price.
+		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the holder reward price.
 		 */
-		uint256 value = _holdersPrice.sub(_last).mul(balance);
-
-		/**
-		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the maximum mint amount.
-		 */
-		return (value.divBasis().divBasis(), _holdersPrice);
+		return (value, reward);
 	}
 
 	/**
@@ -228,25 +212,6 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	{
 		(uint256 value, ) = _calculateWithdrawableAmount(_property, _user);
 		return value;
-	}
-
-	/**
-	 * Returns the cumulative sum of the holder rewards of the passed Property.
-	 */
-	function calculateTotalWithdrawableAmount(address _property)
-		external
-		view
-		returns (uint256)
-	{
-		(, uint256 _amount, , , ) = ILockup(config().lockup()).difference(
-			_property,
-			0
-		);
-
-		/**
-		 * Adjusts decimals to 10^18 and returns the result.
-		 */
-		return _amount.divBasis().divBasis();
 	}
 
 	/**

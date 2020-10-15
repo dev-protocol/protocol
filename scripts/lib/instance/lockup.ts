@@ -2,6 +2,8 @@
 import {LockupInstance} from '../../../types/truffle-contracts'
 import {DevCommonInstance} from './common'
 
+type InstanceOfLockup = LockupInstance
+
 export class Lockup {
 	private readonly _dev: DevCommonInstance
 	constructor(dev: DevCommonInstance) {
@@ -24,7 +26,7 @@ export class Lockup {
 		return lockup
 	}
 
-	public async set(lockup: LockupInstance): Promise<void> {
+	public async set(lockup: InstanceOfLockup): Promise<void> {
 		await this._dev.addressConfig.setLockup(
 			lockup.address,
 			await this._dev.gasInfo
@@ -33,18 +35,18 @@ export class Lockup {
 	}
 
 	public async changeOwner(
-		before: LockupInstance,
-		after: LockupInstance
+		before: InstanceOfLockup,
+		after: InstanceOfLockup
 	): Promise<void> {
 		const storageAddress = await before.getStorageAddress()
 		console.log(`storage address ${storageAddress}`)
-		await after.setStorage(storageAddress)
-		await before.changeOwner(after.address)
+		await after.setStorage(storageAddress, await this._dev.gasInfo)
+		await before.changeOwner(after.address, await this._dev.gasInfo)
 
 		console.log(`change owner from ${before.address} to ${after.address}`)
 	}
 
-	private async _addMinter(lockup: LockupInstance): Promise<void> {
+	private async _addMinter(lockup: InstanceOfLockup): Promise<void> {
 		await this._dev.dev.addMinter(lockup.address, await this._dev.gasInfo)
 
 		console.log(`add minter ${lockup.address}`)
