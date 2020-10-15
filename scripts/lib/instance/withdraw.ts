@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/await-thenable */
 import {
-	MigrateWithdrawInstance,
 	WithdrawInstance,
 	WithdrawStorageInstance,
 } from '../../../types/truffle-contracts'
 import {DevCommonInstance} from './common'
 
-type InstanceOfWithdraw = WithdrawInstance | MigrateWithdrawInstance
+type InstanceOfWithdraw = WithdrawInstance
 
 export class Withdraw {
 	private readonly _dev: DevCommonInstance

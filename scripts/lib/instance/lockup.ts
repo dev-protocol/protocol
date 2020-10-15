@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {
-	LockupInstance,
-	MigrateLockupInstance,
-} from '../../../types/truffle-contracts'
+import {LockupInstance} from '../../../types/truffle-contracts'
 import {DevCommonInstance} from './common'
 
-type InstanceOfLockup = LockupInstance | MigrateLockupInstance
+type InstanceOfLockup = LockupInstance
 
 export class Lockup {
 	private readonly _dev: DevCommonInstance
