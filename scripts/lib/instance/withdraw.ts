@@ -30,17 +30,6 @@ export class Withdraw {
 		return withdraw
 	}
 
-	public async _remove_later_createMigrateContract(): Promise<
-		MigrateWithdrawInstance
-	> {
-		const withdraw = await this._dev.artifacts
-			.require('MigrateWithdraw')
-			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
-		console.log('new Withdraw contract', withdraw.address)
-		await this._addMinter(withdraw)
-		return withdraw
-	}
-
 	public async set(withdraw: InstanceOfWithdraw): Promise<void> {
 		await this._dev.addressConfig.setWithdraw(
 			withdraw.address,
@@ -59,15 +48,6 @@ export class Withdraw {
 		await before.changeOwner(after.address, await this._dev.gasInfo)
 
 		console.log(`change owner from ${before.address} to ${after.address}`)
-	}
-
-	public async _remove_later_setStorage(
-		before: WithdrawStorageInstance,
-		after: InstanceOfWithdraw
-	): Promise<void> {
-		const storageAddress = await before.getStorageAddress()
-		console.log(`storage address ${storageAddress}`)
-		await after.setStorage(storageAddress, await this._dev.gasInfo)
 	}
 
 	private async _addMinter(withdraw: InstanceOfWithdraw): Promise<void> {

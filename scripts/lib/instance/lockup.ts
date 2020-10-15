@@ -29,17 +29,6 @@ export class Lockup {
 		return lockup
 	}
 
-	public async _remove_later_createMigrateContract(): Promise<
-		MigrateLockupInstance
-	> {
-		const lockup = await this._dev.artifacts
-			.require('MigrateLockup')
-			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
-		console.log('new Lockup contract', lockup.address)
-		await this._addMinter(lockup)
-		return lockup
-	}
-
 	public async set(lockup: InstanceOfLockup): Promise<void> {
 		await this._dev.addressConfig.setLockup(
 			lockup.address,
@@ -58,15 +47,6 @@ export class Lockup {
 		await before.changeOwner(after.address, await this._dev.gasInfo)
 
 		console.log(`change owner from ${before.address} to ${after.address}`)
-	}
-
-	public async _remove_later_setStorage(
-		before: InstanceOfLockup,
-		after: InstanceOfLockup
-	): Promise<void> {
-		const storageAddress = await before.getStorageAddress()
-		console.log(`storage address ${storageAddress}`)
-		await after.setStorage(storageAddress, await this._dev.gasInfo)
 	}
 
 	private async _addMinter(lockup: InstanceOfLockup): Promise<void> {
