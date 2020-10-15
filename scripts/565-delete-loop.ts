@@ -5,6 +5,7 @@ import {config} from 'dotenv'
 import {DevCommonInstance} from './lib/instance/common'
 import {PolicyGroup} from './lib/instance/policy-group'
 import {PolicyFactory} from './lib/instance/policy-factory'
+import {VoteCounter} from './lib/instance/vote-counter'
 
 config()
 const {CONFIG: configAddress, EGS_TOKEN: egsApiKey} = process.env
@@ -35,6 +36,12 @@ const handler = async (
 	const policyFactory = new PolicyFactory(dev)
 	const nextPolicyFactory = await policyFactory.create()
 	await policyFactory.set(nextPolicyFactory)
+
+	const voteCounter = new VoteCounter(dev)
+	const currentVoteCounter = await voteCounter.load()
+	const nextVoteCounter = await voteCounter.create()
+	await voteCounter.changeOwner(currentVoteCounter, nextVoteCounter)
+	await voteCounter.set(nextVoteCounter)
 
 	await dev.addressConfig.setPolicySet(
 		'0x0000000000000000000000000000000000000000'
