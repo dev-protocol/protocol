@@ -145,9 +145,7 @@ contract(
 				await dev.generatePolicyGroup()
 				await dev.addressConfig.setPolicyFactory(policyFactory)
 
-				let index = await dev.policyGroup.getVotingGroupIndex({
-					from: policyFactory,
-				})
+				let index = await dev.policyGroup.getVotingGroupIndex()
 				expect(index.toNumber()).to.be.equal(0)
 				await dev.policyGroup.incrementVotingGroupIndex({from: policyFactory})
 				index = await dev.policyGroup.getVotingGroupIndex()
