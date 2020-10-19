@@ -1880,10 +1880,10 @@ escape-string-regexp@4.0.0, escape-string-regexp@^4.0.0:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz#14ba83a5d373e3d311e5afca29cf5bfad965bf34"
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
-eslint-config-prettier@6.12.0:
-  version "6.12.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-6.12.0.tgz#9eb2bccff727db1c52104f0b49e87ea46605a0d2"
-  integrity sha512-9jWPlFlgNwRUYVoujvWTQ1aMO8o6648r+K7qU7K5Jmkbyqav1fuEZC0COYpGBxyiAJb65Ra9hrmFx19xRGwXWw==
+eslint-config-prettier@6.13.0:
+  version "6.13.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-6.13.0.tgz#207d88796b5624e5bb815bbbdfc5891ceb9ebffa"
+  integrity sha512-LcT0i0LSmnzqK2t764pyIt7kKH2AuuqKRTtJTdddWxOiUja9HdG5GXBVF2gmCTvVYWVsTu8J2MhJLVGRh+pj8w==
   dependencies:
     get-stdin "^6.0.0"
 
@@ -1892,10 +1892,10 @@ eslint-config-xo-typescript@0.33.0:
   resolved "https://registry.yarnpkg.com/eslint-config-xo-typescript/-/eslint-config-xo-typescript-0.33.0.tgz#6d8a277eef85870cb854cd9a3bcc6b3c1813bffe"
   integrity sha512-MCAP26EX+o+hoNPPmi/GHUznQHBUaN5taKUQznMy7RjqjPPJMlOzsiZLGNEQeDfuoYZE0O4x0vZWRduggyVQMg==
 
-eslint-config-xo@0.32.1:
-  version "0.32.1"
-  resolved "https://registry.yarnpkg.com/eslint-config-xo/-/eslint-config-xo-0.32.1.tgz#51f6d7fd5591e66a2330feb24f2f205c4bfa64fc"
-  integrity sha512-achnYLilUTtljR1CGRikVj9HRAf5GplJeGgeyQMvph7mKo+AqTkNuig4EO/IrNOChcjoazgw9YT4cW/3+69i3Q==
+eslint-config-xo@0.33.1:
+  version "0.33.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-xo/-/eslint-config-xo-0.33.1.tgz#05031d970c3ad5c3b592fc94dc8c8d5459cf44a9"
+  integrity sha512-ZdnT4Q/m3CLCX0o3nKKW3Q8CfNiRy/ojkeffLtz8f0EQJMHP/9fJyncIvI0mik1wE61EI6PHrXdLeAbeb62cZw==
   dependencies:
     confusing-browser-globals "1.0.9"
 
@@ -5688,10 +5688,10 @@ truffle-typings@1.0.8:
     "@types/mocha" "^5.2.5"
     "@types/web3" "^1.0.18"
 
-truffle@5.1.48:
-  version "5.1.48"
-  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.1.48.tgz#43c78cb1fa8f51496a66de7bddfd6726ad132676"
-  integrity sha512-Z8485qH5Db8P05dVy7SHQHcaa+hXAekvPcVkkv8zONsVBqOmS3q48eajukdeKNbLlfPWb3m7TYdPzrGFBDcFiQ==
+truffle@5.1.49:
+  version "5.1.49"
+  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.1.49.tgz#c9edc95192047ff4d170fcad235d26d0c4545de5"
+  integrity sha512-SkCfYRPhruowxH+qpJBAvM0u5+j/LK51U85ErXeiuRhyCNEWMNjUtISHTlEZ0KLr0Kki68iXk+o2UekN4Nlp5g==
   dependencies:
     app-module-path "^2.2.0"
     mocha "8.1.2"

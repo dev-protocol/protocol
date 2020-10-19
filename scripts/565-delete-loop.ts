@@ -44,14 +44,15 @@ const handler = async (
 	await voteCounter.set(nextVoteCounter)
 
 	await dev.addressConfig.setPolicySet(
-		'0x0000000000000000000000000000000000000000'
+		'0x0000000000000000000000000000000000000000',
+		await dev.gasInfo
 	)
 	console.log('PolicySet address is 0')
 
 	const currentPolicy = await dev.addressConfig.policy()
 	console.log(`current policy address is ${currentPolicy}`)
 
-	await nextPolicyGroup.addGroupOwner(currentPolicy)
+	await nextPolicyGroup.addGroupOwner(currentPolicy, await dev.gasInfo)
 	console.log('current policy address was set to PolicyGroup')
 
 	callback(null)

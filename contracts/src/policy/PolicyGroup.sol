@@ -37,6 +37,11 @@ contract PolicyGroup is
 	}
 
 	function incrementVotingGroupIndex() external {
+		addressValidator().validateAddress(
+			msg.sender,
+			config().policyFactory()
+		);
+
 		bytes32 key = getVotingGroupIndexKey();
 		uint256 idx = eternalStorage().getUint(key);
 		idx++;
