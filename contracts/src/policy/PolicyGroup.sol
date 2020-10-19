@@ -43,11 +43,6 @@ contract PolicyGroup is
 		eternalStorage().setUint(key, idx);
 	}
 
-	function addGroupOwner(address _addr) external onlyOwner {
-		require(isGroup(_addr) == false, "already group");
-		eternalStorage().setBool(getPolicyGroupKey(_addr), true);
-	}
-
 	function isGroup(address _addr) public view returns (bool) {
 		return eternalStorage().getBool(getPolicyGroupKey(_addr));
 	}
