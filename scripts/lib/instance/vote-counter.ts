@@ -39,8 +39,8 @@ export class VoteCounter {
 	): Promise<void> {
 		const storageAddress = await before.getStorageAddress()
 		console.log(`storage address ${storageAddress}`)
-		await after.setStorage(storageAddress)
-		await before.changeOwner(after.address)
+		await after.setStorage(storageAddress, await this._dev.gasInfo)
+		await before.changeOwner(after.address, await this._dev.gasInfo)
 
 		console.log(`change owner from ${before.address} to ${after.address}`)
 	}
