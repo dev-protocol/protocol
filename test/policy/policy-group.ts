@@ -143,14 +143,25 @@ contract(
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
 				await dev.generatePolicyGroup()
+				await dev.addressConfig.setPolicyFactory(policyFactory)
+
 				let index = await dev.policyGroup.getVotingGroupIndex()
 				expect(index.toNumber()).to.be.equal(0)
-				await dev.policyGroup.incrementVotingGroupIndex()
+				await dev.policyGroup.incrementVotingGroupIndex({from: policyFactory})
 				index = await dev.policyGroup.getVotingGroupIndex()
 				expect(index.toNumber()).to.be.equal(1)
-				await dev.policyGroup.incrementVotingGroupIndex()
+				await dev.policyGroup.incrementVotingGroupIndex({from: policyFactory})
 				index = await dev.policyGroup.getVotingGroupIndex()
 				expect(index.toNumber()).to.be.equal(2)
+			})
+			it('Should fail to call when caller is not PolicyFactory', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressConfig()
+				await dev.generatePolicyGroup()
+				const result = await dev.policyGroup
+					.incrementVotingGroupIndex()
+					.catch((err: Error) => err)
+				validateAddressErrorMessage(result)
 			})
 		})
 	}
