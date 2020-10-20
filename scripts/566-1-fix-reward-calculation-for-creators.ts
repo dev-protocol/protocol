@@ -20,7 +20,7 @@ const handler = async (
 	____log('Generated AddressConfig contract', config.address)
 
 	const [withdrawStorage, dev] = await Promise.all([
-		artifacts.require('WithdrawStorage').at(await config.lockup()),
+		artifacts.require('WithdrawStorage').at(await config.withdrawStorage()),
 		artifacts.require('Dev').at(await config.token()),
 	])
 	____log('Generated current WithdrawStorage contract', withdrawStorage.address)
@@ -42,12 +42,7 @@ const handler = async (
 	// Deploy new WithdrawStorage
 	const nextWithdrawStorage = await artifacts
 		.require('WithdrawStorage')
-		.new(config.address, {gasPrice: await fastest(), gas})
-		.catch(console.error)
-	if (!nextWithdrawStorage) {
-		return
-	}
-
+		.new({gasPrice: await fastest(), gas})
 	____log('Deployed the new WithdrawStorage', nextWithdrawStorage.address)
 
 	// Add minter

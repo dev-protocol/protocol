@@ -27,7 +27,6 @@ contract(
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
@@ -49,7 +48,6 @@ contract(
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
@@ -74,7 +72,6 @@ contract(
 				await Promise.all([
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
@@ -102,25 +99,29 @@ contract(
 					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateDev(),
 					dev.generateWithdraw(),
-					dev.generateWithdrawStorage(),
 					dev.generateAllocator(),
 				])
-				const behavuor1 = await dev.getMarket('MarketTest3', user)
-				const behavuor2 = await dev.getMarket('MarketTest3', user)
+				const behavior1 = await dev.getMarket('MarketTest3', user)
+				const behavior2 = await dev.getMarket('MarketTest3', user)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
 				let createMarketResult = await dev.marketFactory.create(
-					behavuor1.address
+					behavior1.address
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
-				createMarketResult = await dev.marketFactory.create(behavuor2.address)
+				await (behavior1 as any).setAssociatedMarket(marketAddress1, {
+					from: user,
+				})
+				createMarketResult = await dev.marketFactory.create(behavior2.address)
 				marketAddress2 = getMarketAddress(createMarketResult)
+				await (behavior2 as any).setAssociatedMarket(marketAddress2, {
+					from: user,
+				})
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',
@@ -315,25 +316,29 @@ contract(
 					dev.generateMetricsGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
-					dev.generatePolicySet(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
 					dev.generateDev(),
 					dev.generateWithdraw(),
-					dev.generateWithdrawStorage(),
 					dev.generateAllocator(),
 				])
-				const behavuor1 = await dev.getMarket('MarketTest3', user)
-				const behavuor2 = await dev.getMarket('MarketTest3', user)
+				const behavior1 = await dev.getMarket('MarketTest3', user)
+				const behavior2 = await dev.getMarket('MarketTest3', user)
 				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
 				await dev.policyFactory.create(iPolicyInstance.address)
 				let createMarketResult = await dev.marketFactory.create(
-					behavuor1.address
+					behavior1.address
 				)
 				marketAddress1 = getMarketAddress(createMarketResult)
-				createMarketResult = await dev.marketFactory.create(behavuor2.address)
+				await (behavior1 as any).setAssociatedMarket(marketAddress1, {
+					from: user,
+				})
+				createMarketResult = await dev.marketFactory.create(behavior2.address)
 				marketAddress2 = getMarketAddress(createMarketResult)
+				await (behavior2 as any).setAssociatedMarket(marketAddress2, {
+					from: user,
+				})
 				const createPropertyResult = await dev.propertyFactory.create(
 					'test',
 					'TEST',

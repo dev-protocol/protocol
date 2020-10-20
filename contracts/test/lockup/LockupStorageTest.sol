@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 
@@ -112,5 +112,49 @@ contract LockupStorageTest is LockupStorage {
 		uint256 _value
 	) external {
 		setStorageLastCumulativePropertyInterest(_property, _user, _value);
+	}
+
+	function setStorageLastStakedInterestPriceTest(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		setStorageLastStakedInterestPrice(_property, _user, _value);
+	}
+
+	function setStorageLastStakesChangedCumulativeRewardTest(uint256 _value)
+		external
+	{
+		setStorageLastStakesChangedCumulativeReward(_value);
+	}
+
+	function setStorageLastCumulativeHoldersRewardPriceTest(uint256 _a)
+		external
+	{
+		setStorageLastCumulativeHoldersRewardPrice(_a);
+	}
+
+	function setStorageLastCumulativeInterestPriceTest(uint256 _a) external {
+		setStorageLastCumulativeInterestPrice(_a);
+	}
+
+	function setStorageLastCumulativeHoldersRewardAmountPerPropertyTest(
+		address _property,
+		uint256 _value
+	) external {
+		setStorageLastCumulativeHoldersRewardAmountPerProperty(
+			_property,
+			_value
+		);
+	}
+
+	function setStorageLastCumulativeHoldersRewardPricePerPropertyTest(
+		address _property,
+		uint256 _value
+	) external {
+		setStorageLastCumulativeHoldersRewardPricePerProperty(
+			_property,
+			_value
+		);
 	}
 }

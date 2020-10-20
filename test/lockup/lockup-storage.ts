@@ -233,4 +233,96 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})
+	describe('LockupStorage; setStorageLastStakedInterestPrice, getStorageLastStakedInterestPrice', () => {
+		it('Initial value is 0.', async () => {
+			const result = await storage.getStorageLastStakedInterestPrice(
+				property,
+				user
+			)
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastStakedInterestPriceTest(
+				property,
+				user,
+				300000000000
+			)
+			const result = await storage.getStorageLastStakedInterestPrice(
+				property,
+				user
+			)
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
+	describe('LockupStorage; setStorageLastStakesChangedCumulativeReward, getStorageLastStakesChangedCumulativeReward', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastStakesChangedCumulativeReward()
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastStakesChangedCumulativeRewardTest(
+				300000000000
+			)
+			const result = await storage.getStorageLastStakesChangedCumulativeReward()
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
+	describe('LockupStorage; setStorageLastCumulativeHoldersRewardPrice, getStorageLastCumulativeHoldersRewardPrice', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastCumulativeHoldersRewardPrice()
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastCumulativeHoldersRewardPriceTest(300000000000)
+			const result = await storage.getStorageLastCumulativeHoldersRewardPrice()
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
+	describe('LockupStorage; setStorageLastCumulativeInterestPrice, getStorageLastCumulativeInterestPrice', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastCumulativeInterestPrice()
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastCumulativeInterestPriceTest(300000000000)
+			const result = await storage.getStorageLastCumulativeInterestPrice()
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
+	describe('LockupStorage; setStorageLastCumulativeHoldersRewardAmountPerProperty, getStorageLastCumulativeHoldersRewardAmountPerProperty', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastCumulativeHoldersRewardAmountPerProperty(
+				property
+			)
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastCumulativeHoldersRewardAmountPerPropertyTest(
+				property,
+				300000000000
+			)
+			const result = await storage.getStorageLastCumulativeHoldersRewardAmountPerProperty(
+				property
+			)
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
+	describe('LockupStorage; setStorageLastCumulativeHoldersRewardPricePerProperty, getStorageLastCumulativeHoldersRewardPricePerProperty', () => {
+		it('Initial value is 0 and 0.', async () => {
+			const result = await storage.getStorageLastCumulativeHoldersRewardPricePerProperty(
+				property
+			)
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastCumulativeHoldersRewardPricePerPropertyTest(
+				property,
+				300000000000
+			)
+			const result = await storage.getStorageLastCumulativeHoldersRewardPricePerProperty(
+				property
+			)
+			expect(result.toNumber()).to.be.equal(300000000000)
+		})
+	})
 })

@@ -1,9 +1,8 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
-import {IPolicySet} from "contracts/src/policy/IPolicySet.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
 /**
@@ -32,33 +31,17 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		/**
 		 * In the case of the first Policy, it will be activated immediately.
 		 */
+		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		if (config().policy() == address(0)) {
 			config().setPolicy(_newPolicyAddress);
+			policyGroup.addGroupWithoutSetVotingEnd(_newPolicyAddress);
+			return;
 		}
 
 		/**
 		 * Adds the created Policy contract to the Policy address set.
 		 */
-		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		policyGroup.addGroup(_newPolicyAddress);
-
-		/**
-		 * Adds the created Policy contract to the Policy address set that is accepting votes.
-		 */
-		IPolicySet policySet = IPolicySet(config().policySet());
-		policySet.addSet(_newPolicyAddress);
-
-		/**
-		 * When the new Policy is the first Policy, the processing ends.
-		 */
-		if (config().policy() == _newPolicyAddress) {
-			return;
-		}
-
-		/**
-		 * Resets the voting period because a new Policy has been added.
-		 */
-		policySet.setVotingEndBlockNumber(_newPolicyAddress);
 	}
 
 	/**
@@ -76,22 +59,10 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		config().setPolicy(_currentPolicyAddress);
 
 		/**
-		 * Removes all unapproved Policies from the voting target.
-		 */
-		IPolicySet policySet = IPolicySet(config().policySet());
-		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
-		for (uint256 i = 0; i < policySet.count(); i++) {
-			address policyAddress = policySet.get(i);
-			if (policyAddress == _currentPolicyAddress) {
-				continue;
-			}
-			policyGroup.deleteGroup(policyAddress);
-		}
-
-		/**
 		 * Resets the Policy address set that is accepting votes.
 		 */
-		policySet.reset();
-		policySet.addSet(_currentPolicyAddress);
+		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
+		policyGroup.incrementVotingGroupIndex();
+		policyGroup.addGroup(_currentPolicyAddress);
 	}
 }

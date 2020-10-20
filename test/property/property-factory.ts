@@ -61,13 +61,11 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateMetricsGroup(),
 				dev.generatePolicyFactory(),
 				dev.generatePolicyGroup(),
-				dev.generatePolicySet(),
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
 				dev.generateLockup(),
 				dev.generateDev(),
 				dev.generateWithdraw(),
-				dev.generateWithdrawStorage(),
 				dev.generateAllocator(),
 			])
 			const policy = await dev.getPolicy('PolicyTest1', user)
@@ -78,6 +76,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			})
 			await dev.dev.mint(user, 10000000000)
 			marketAddress = getMarketAddress(result)
+			await (market as any).setAssociatedMarket(marketAddress, {from: user})
 		})
 
 		it('Create a new Property and authenticate at the same time', async () => {

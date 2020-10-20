@@ -241,10 +241,8 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 				dev.generateAllocator(),
 				dev.generateMetricsGroup(),
 				dev.generateWithdraw(),
-				dev.generateWithdrawStorage(),
 				dev.generatePolicyFactory(),
 				dev.generatePolicyGroup(),
-				dev.generatePolicySet(),
 			])
 			const iPolicyInstance = await dev.getPolicy('PolicyTest1', user1)
 			await dev.policyFactory.create(iPolicyInstance.address)
@@ -270,6 +268,16 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(
 				50
 			)
+		})
+		it('check gas used', async () => {
+			const dev = await generateEnv()
+			const prop = await createProperty(dev)
+			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
+			await dev.dev.mint(user1, 100)
+			const transaction = await dev.dev.deposit(prop, 50, {from: user1})
+			const gasPrice = Number(transaction.receipt.gasUsed)
+			console.log(gasPrice)
+			expect(gasPrice <= 849424).to.be.equal(true)
 		})
 		it('should fail to lock up token when 0 amount', async () => {
 			const dev = await generateEnv()

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -143,6 +143,7 @@ contract Property is
 		 * Transfers the passed amount to the original owner.
 		 */
 		ERC20 devToken = ERC20(config().token());
-		devToken.transfer(_sender, _value);
+		bool result = devToken.transfer(_sender, _value);
+		require(result, "dev transfer failed");
 	}
 }

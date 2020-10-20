@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 contract IWithdraw {
 	function withdraw(address _property) external;
@@ -16,11 +16,6 @@ contract IWithdraw {
 	) external;
 
 	function calculateWithdrawableAmount(address _property, address _user)
-		external
-		view
-		returns (uint256);
-
-	function calculateTotalWithdrawableAmount(address _property)
 		external
 		view
 		returns (uint256);

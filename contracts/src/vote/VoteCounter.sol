@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
@@ -8,7 +8,7 @@ import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
 import {IMarket} from "contracts/src/market/IMarket.sol";
 import {IVoteCounter} from "contracts/src/vote/IVoteCounter.sol";
-import {IPolicySet} from "contracts/src/policy/IPolicySet.sol";
+import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
 /**
@@ -141,14 +141,14 @@ contract VoteCounter is
 		/**
 		 * Validates the voting deadline has not passed.
 		 */
-		IPolicySet policySet = IPolicySet(config().policySet());
-		require(policySet.voting(_policy), "voting deadline is over");
+		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
+		require(policyGroup.voting(_policy), "voting deadline is over");
 
 		/**
 		 * Validates it does not become a double vote.
 		 * In a Policy vote, the Property used to vote for one of the Policies with the same voting period cannot be reused.
 		 */
-		uint256 votingGroupIndex = policySet.getVotingGroupIndex();
+		uint256 votingGroupIndex = policyGroup.getVotingGroupIndex();
 		bool alreadyVote = getStorageAlreadyUseProperty(
 			msg.sender,
 			_property,
@@ -233,8 +233,8 @@ contract VoteCounter is
 		/**
 		 * Validates the passed Policy has already been voted using the passed Property.
 		 */
-		IPolicySet policySet = IPolicySet(config().policySet());
-		uint256 votingGroupIndex = policySet.getVotingGroupIndex();
+		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
+		uint256 votingGroupIndex = policyGroup.getVotingGroupIndex();
 		bool alreadyVote = getStorageAlreadyUseProperty(
 			msg.sender,
 			_property,
