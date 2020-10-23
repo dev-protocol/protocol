@@ -73,7 +73,6 @@ contract Property is
 		author = _nextAuthor;
 	}
 
-
 	/**
 	 * Hook on `transfer` and call `Withdraw.beforeBalanceChange` function.
 	 */

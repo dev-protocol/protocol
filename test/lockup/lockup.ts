@@ -1,4 +1,3 @@
-/* eslint-disable capitalized-comments */
 import {DevProtocolInstance} from '../test-lib/instance'
 import {
 	PropertyInstance,
