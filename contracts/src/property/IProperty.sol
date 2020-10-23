@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-contract IProperty {
+interface IProperty {
 	function author() external view returns (address);
 
 	function changeAuthor(address _nextAuthor) external;
