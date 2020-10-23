@@ -59,6 +59,22 @@ contract Property is
 	}
 
 	/**
+	 * Changing the author
+	 */
+	function changeAuthor(address _nextAuthor) external {
+		/**
+		 * Only the author can execute.
+		 */
+		require(msg.sender == author, "not the author.");
+
+		/**
+		 * Changing the author
+		 */
+		author = _nextAuthor;
+	}
+
+
+	/**
 	 * Hook on `transfer` and call `Withdraw.beforeBalanceChange` function.
 	 */
 	function transfer(address _to, uint256 _value) public returns (bool) {

@@ -9,7 +9,7 @@ import {toBigNumber} from '../test-lib/utils/common'
 
 contract(
 	'PropertyTest',
-	([deployer, author, user, propertyFactory, lockup, transfer]) => {
+	([deployer, author, user, propertyFactory, lockup, transfer, nextAuthor]) => {
 		const propertyContract = artifacts.require('Property')
 		describe('Property; constructor', () => {
 			const dev = new DevProtocolInstance(deployer)
@@ -44,6 +44,45 @@ contract(
 				expect(
 					(await propertyInstance.totalSupply().then(toBigNumber)).toFixed()
 				).to.be.equal(tenMillion.toFixed())
+			})
+		})
+		describe('Property; changeAuthor', () => {
+			const dev = new DevProtocolInstance(deployer)
+			before(async () => {
+				await dev.generateAddressConfig()
+			})
+			it('Executing a changeAuthor function with a non-Author.', async () => {
+				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				const propertyInstance = await propertyContract.new(
+					dev.addressConfig.address,
+					author,
+					'sample',
+					'SAMPLE',
+					{
+						from: propertyFactory,
+					}
+				)
+				const result = await propertyInstance
+					.changeAuthor(nextAuthor)
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'not the author.')
+			})
+			it('Author is changed.', async () => {
+				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				const propertyInstance = await propertyContract.new(
+					dev.addressConfig.address,
+					author,
+					'sample',
+					'SAMPLE',
+					{
+						from: propertyFactory,
+					}
+				)
+				expect(await propertyInstance.author()).to.be.equal(author)
+				await propertyInstance.changeAuthor(nextAuthor, {
+					from: author,
+				})
+				expect(await propertyInstance.author()).to.be.equal(nextAuthor)
 			})
 		})
 		describe('Property; withdraw', () => {
