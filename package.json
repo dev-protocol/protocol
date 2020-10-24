@@ -37,7 +37,7 @@
 		"bent": "7.3.12",
 		"bignumber.js": "9.0.1",
 		"dotenv": "8.2.0",
-		"eslint": "7.11.0",
+		"eslint": "7.12.0",
 		"eslint-config-prettier": "6.14.0",
 		"eslint-config-xo": "0.33.1",
 		"eslint-config-xo-typescript": "0.33.0",
