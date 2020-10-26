@@ -53,5 +53,8 @@ contract ILockup {
 
 	function withdrawInterest(address _property) external;
 
-	function getStorageLastCumulativeInterestPriceLink() external view returns (uint256);
+	function getStorageLastCumulativeInterestPriceLink()
+		external
+		view
+		returns (uint256);
 }

@@ -17,7 +17,11 @@ contract Link is UsingConfig, ILink {
 	/**
 	 * Call the lockup contract's getStorageLastCumulativeInterestPriceLink function.
 	 */
-	function getStorageLastCumulativeInterestPrice() external view returns (uint256){
+	function getStorageLastCumulativeInterestPrice()
+		external
+		view
+		returns (uint256)
+	{
 		ILockup lockup = ILockup(config().lockup());
 		return lockup.getStorageLastCumulativeInterestPriceLink();
 	}

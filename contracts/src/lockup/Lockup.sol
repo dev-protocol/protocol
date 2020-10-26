@@ -190,7 +190,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	/**
 	 * External linkage
 	 */
-	function getStorageLastCumulativeInterestPriceLink() external view returns (uint256) {
+	function getStorageLastCumulativeInterestPriceLink()
+		external
+		view
+		returns (uint256)
+	{
 		return getStorageLastCumulativeInterestPrice();
 	}
 
