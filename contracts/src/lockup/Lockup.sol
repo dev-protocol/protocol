@@ -188,6 +188,13 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	}
 
 	/**
+	 * External linkage
+	 */
+	function getStorageLastCumulativeInterestPriceLink() external view returns (uint256) {
+		return getStorageLastCumulativeInterestPrice();
+	}
+
+	/**
 	 * Store staking states as a snapshot.
 	 */
 	function beforeStakesChanged(
