@@ -8,7 +8,11 @@ interface ILink {
 		view
 		returns (uint256);
 
-	function depositFrom(address _from, address _to, uint256 _amount) external returns (bool);
+	function depositFrom(
+		address _from,
+		address _to,
+		uint256 _amount
+	) external returns (bool);
 
 	function cancel(address _property) external;
 

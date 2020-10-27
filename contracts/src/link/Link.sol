@@ -47,7 +47,11 @@ contract Link is UsingConfig, ILink {
 		return config().token();
 	}
 
-	function depositFrom(address _from, address _to, uint256 _amount) external returns (bool) {
+	function depositFrom(
+		address _from,
+		address _to,
+		uint256 _amount
+	) external returns (bool) {
 		return Dev(config().token()).depositFrom(_from, _to, _amount);
 	}
 }
