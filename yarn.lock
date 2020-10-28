@@ -336,10 +336,10 @@
     xhr "^2.2.0"
     xtend "^4.0.1"
 
-"@types/bent@7.3.1":
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/@types/bent/-/bent-7.3.1.tgz#e59e9144058da1843c00b8fcc3c5b3ed7bfab9e6"
-  integrity sha512-76ieb6NdaxXAURJwTXaFYovU7lXB2cO03vMMCDlfTb12Uw7jgEBdAABBMvsm/SIB6LavDofvFXYDhiU/qAySDg==
+"@types/bent@7.3.2":
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/@types/bent/-/bent-7.3.2.tgz#07b4f7bcec577be27cdb9e9034eb0de0242481a7"
+  integrity sha512-wtE/+NIk55jVUHJFt//kxmq8cQ7ef4J2U9HO7lZqKW4lvvPYTd7KfAEKZLsFmDgmzzMvfd4cPSdv3blqVWmqSQ==
   dependencies:
     "@types/node" "*"
 
