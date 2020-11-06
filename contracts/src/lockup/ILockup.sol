@@ -10,8 +10,6 @@ contract ILockup {
 
 	function update() public;
 
-	function cancel(address _property) external;
-
 	function withdraw(address _property) external;
 
 	function calculateCumulativeRewardPrices()
