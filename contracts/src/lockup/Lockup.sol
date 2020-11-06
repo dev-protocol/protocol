@@ -378,22 +378,14 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	function _calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	)
-		private
-		view
-		returns (
-			uint256 _amount,
-			uint256 _interestPrice,
-			RewardPrices memory _prices
-		)
-	{
+	) private view returns (uint256 _amount, RewardPrices memory _prices) {
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return (0, 0, RewardPrices(0, 0, 0));
+			return (0, RewardPrices(0, 0, 0));
 		}
 
 		/**
@@ -421,7 +413,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 withdrawableAmount = amount
 			.add(pending) // solium-disable-next-line indentation
 			.add(legacy);
-		return (withdrawableAmount, interestPrice, prices);
+		return (withdrawableAmount, prices);
 	}
 
 	/**
@@ -431,7 +423,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		address _property,
 		address _user
 	) public view returns (uint256) {
-		(uint256 amount, , ) = _calculateWithdrawableInterestAmount(
+		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
 			_property,
 			_user
 		);
@@ -450,7 +442,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		(
 			uint256 value,
-			uint256 interestPrice,
 			RewardPrices memory prices
 		) = _calculateWithdrawableInterestAmount(_property, msg.sender);
 
@@ -467,7 +458,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Updates the staking status to avoid double rewards.
 		 */
-		setStorageLastStakedInterestPrice(_property, msg.sender, interestPrice);
+		setStorageLastStakedInterestPrice(
+			_property,
+			msg.sender,
+			prices.interest
+		);
 		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 
 		/**
@@ -654,7 +649,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		(
 			uint256 withdrawableAmount,
-			,
 			RewardPrices memory prices
 		) = _calculateWithdrawableInterestAmount(_property, _user);
 
