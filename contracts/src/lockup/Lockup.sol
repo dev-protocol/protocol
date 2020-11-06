@@ -89,8 +89,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		setStorageWithdrawalStatus(
 			_property,
-			msg.sender,
-			block.number.add(IPolicy(config().policy()).lockUpBlocks())
+			_from,
+			IPolicy(config().policy()).lockUpBlocks().add(block.number)
 		);
 
 		/**
@@ -402,8 +402,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Gets the latest withdrawal reward amount.
 		 */
 		(
-			uint256 amount,
-			uint256 interestPrice,
+			uint256 amount,,
 			RewardPrices memory prices
 		) = _calculateInterestAmount(_property, _user);
 
