@@ -402,7 +402,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Gets the latest withdrawal reward amount.
 		 */
 		(
-			uint256 amount,,
+			uint256 amount,
+			,
 			RewardPrices memory prices
 		) = _calculateInterestAmount(_property, _user);
 
