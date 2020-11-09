@@ -197,7 +197,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			)
 		})
 	})
-	describe.only('Lockup; calculateWithdrawableInterestAmount', () => {
+	describe('Lockup; calculateWithdrawableInterestAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,
 			account: string,
