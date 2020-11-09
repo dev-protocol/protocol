@@ -145,12 +145,6 @@ contract('LockupTest', ([deployer, user1]) => {
 		})
 	})
 	describe('Lockup; withdraw', () => {
-		it('should fail to call when tokens are not locked', async () => {
-			const [dev, property] = await init()
-
-			const res = await dev.lockup.withdraw(property.address, 1000).catch(err)
-			validateErrorMessage(res, 'tokens are not staked or insufficient staked')
-		})
 		it('should fail to call when tokens are insufficient', async () => {
 			const [dev, property] = await init()
 			const amount = 1000000
@@ -159,7 +153,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const res = await dev.lockup
 				.withdraw(property.address, amount + 1)
 				.catch(err)
-			validateErrorMessage(res, 'tokens are not staked or insufficient staked')
+			validateErrorMessage(res, 'insufficient tokens staked')
 		})
 		it('should fail to call when waiting for released', async () => {
 			const [dev, property, policy] = await init()
@@ -194,6 +188,70 @@ contract('LockupTest', ([deployer, user1]) => {
 			)
 			expect(afterTotalSupply.toFixed()).to.be.equal(
 				beforeTotalSupply.plus(reward).toFixed()
+			)
+		})
+		it(`withdraw 0 amount when passed amount is 0 and non-staked user`, async () => {
+			const [dev, property] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			await dev.lockup.withdraw(property.address, 0)
+
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.toFixed()
+			)
+		})
+		it(`withdraw just reward when passed amount is 0`, async () => {
+			const [dev, property] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			await dev.dev.deposit(property.address, 10000)
+			let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+
+			await dev.lockup.withdraw(property.address, 0)
+			lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+			expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+			const reward = toBigNumber(10).times(1e18)
+
+			expect(afterBalance.toFixed()).to.be.equal(
+				beforeBalance.minus(10000).plus(reward).toFixed()
+			)
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.plus(reward).toFixed()
+			)
+		})
+		it(`withdraw just reward when passed amount is 0 and user withdrawn by the legacy contract`, async () => {
+			const [dev, property] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			const storage = await dev.lockup
+				.getStorageAddress()
+				.then((x) => artifacts.require('EternalStorage').at(x))
+			await dev.lockup.changeOwner(deployer)
+			await storage.setUint(
+				keccak256('_pendingInterestWithdrawal', property.address, deployer),
+				100000
+			)
+			await storage.changeOwner(dev.lockup.address)
+
+			await dev.lockup.withdraw(property.address, 0)
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			expect(afterBalance.toFixed()).to.be.equal(
+				beforeBalance.plus(100000).toFixed()
+			)
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.plus(100000).toFixed()
 			)
 		})
 	})

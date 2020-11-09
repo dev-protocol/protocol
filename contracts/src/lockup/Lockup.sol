@@ -119,7 +119,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		require(
 			hasValue(_property, msg.sender, _amount),
-			"tokens are not staked or insufficient staked"
+			"insufficient tokens staked"
 		);
 
 		/**
@@ -605,7 +605,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 _amount
 	) private view returns (bool) {
 		uint256 value = getStorageValue(_property, _sender);
-		return value > 0 && value >= _amount;
+		return value >= _amount;
 	}
 
 	/**
