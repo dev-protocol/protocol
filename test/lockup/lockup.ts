@@ -197,7 +197,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			)
 		})
 	})
-	describe('Lockup; calculateWithdrawableInterestAmount', () => {
+	describe.only('Lockup; calculateWithdrawableInterestAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,
 			account: string,
@@ -605,10 +605,14 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 			})
 			describe('after withdrawal', () => {
+				let aliceBalance: BigNumber
+				let aliceLocked: BigNumber
 				before(async () => {
+					aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+					aliceLocked = await dev.lockup.getValue(property.address, alice).then(toBigNumber)
 					await dev.lockup.withdraw(
 						property.address,
-						await dev.lockup.getValue(property.address, alice),
+						aliceLocked,
 						{
 							from: alice,
 						}
@@ -622,11 +626,13 @@ contract('LockupTest', ([deployer, user1]) => {
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+					const afterAliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+					const reward = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
 						.times(1e18)
 						.times(block.minus(lastBlock))
+					expect(aliceAmount.toFixed()).to.be.equal('0')
 					expect(aliceLockup.toFixed()).to.be.equal('0')
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					expect(afterAliceBalance.toFixed()).to.be.equal(aliceBalance.plus(aliceLocked).plus(reward).toFixed())
 				})
 			})
 		})
