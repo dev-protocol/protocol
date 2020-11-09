@@ -1,10 +1,7 @@
 contract('Policy', () => {
-	const decimalsLibrary = artifacts.require('Decimals')
 	const policyContract = artifacts.require('PolicyTest1')
 	let policy: any
 	beforeEach(async () => {
-		const decimals = await decimalsLibrary.new()
-		await policyContract.link('Decimals', decimals.address)
 		policy = await policyContract.new()
 	})
 	describe('PolicyTest1; rewards', () => {
