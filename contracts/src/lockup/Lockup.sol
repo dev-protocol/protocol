@@ -678,14 +678,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		returns (bool)
 	{
 		uint256 blockNumber = getStorageWithdrawalStatus(_property, _from);
-		if (blockNumber <= block.number) {
-			return true;
-		} else {
-			if (IPolicy(config().policy()).lockUpBlocks() == 1) {
-				return true;
-			}
-		}
-		return false;
+		return blockNumber <= block.number;
 	}
 
 	/**

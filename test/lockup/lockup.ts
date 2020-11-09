@@ -144,7 +144,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			expect(_value).to.be.equal('10000')
 		})
 	})
-	describe('Lockup; withdraw', () => {
+	describe.only('Lockup; withdraw', () => {
 		it('should fail to call when tokens are not locked', async () => {
 			const [dev, property] = await init()
 
@@ -153,28 +153,20 @@ contract('LockupTest', ([deployer, user1]) => {
 		})
 		it('should fail to call when tokens are insufficient', async () => {
 			const [dev, property] = await init()
-			await dev.dev.deposit(property.address, 10000)
+			const amount = 1000000
+			await dev.dev.deposit(property.address, amount)
 
-			const res = await dev.lockup.withdraw(property.address, 10001).catch(err)
+			const res = await dev.lockup.withdraw(property.address, amount + 1).catch(err)
 			validateErrorMessage(res, 'tokens are not staked or insufficient staked')
 		})
 		it('should fail to call when waiting for released', async () => {
 			const [dev, property, policy] = await init()
-			await dev.dev.deposit(property.address, 10000)
-
-			// Disable DIP3
-			await policy.setLockUpBlocks(10)
 
 			const block = await getBlock()
-			await dev.lockup.changeOwner(deployer)
-			const storage = await dev.lockup
-				.getStorageAddress()
-				.then((x) => artifacts.require('EternalStorage').at(x))
-			await storage.setUint(
-				keccak256('_withdrawalStatus', property.address, deployer),
-				block + 9999
-			)
-			await storage.changeOwner(dev.lockup.address)
+			await policy.setLockUpBlocks(block + 9999)
+
+			await dev.dev.deposit(property.address, 10000)
+			await mine(5)
 
 			const res = await dev.lockup.withdraw(property.address, 0).catch(err)
 			validateErrorMessage(res, 'waiting for release')
@@ -197,57 +189,6 @@ contract('LockupTest', ([deployer, user1]) => {
 
 			expect(afterBalance.toFixed()).to.be.equal(
 				beforeBalance.minus(9000).plus(reward).toFixed()
-			)
-			expect(afterTotalSupply.toFixed()).to.be.equal(
-				beforeTotalSupply.plus(reward).toFixed()
-			)
-		})
-		// Patch for DIP3
-		it('should fail to withdraw when not enable DIP3 and block is small', async () => {
-			const [dev, property, policy] = await init()
-			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			// Disable DIP3
-			await policy.setLockUpBlocks(10)
-
-			await dev.dev.deposit(property.address, 10000, {from: deployer})
-			const res = await dev.lockup
-				.withdraw(property.address, 10000, {from: deployer})
-				.catch(err)
-
-			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			expect(afterBalance.toFixed()).to.be.equal(
-				beforeBalance.minus(10000).toFixed()
-			)
-			expect(afterTotalSupply.toFixed()).to.be.equal(
-				beforeTotalSupply.toFixed()
-			)
-			validateErrorMessage(res, 'waiting for release')
-		})
-		it('can withdraw when enabling DIP3', async () => {
-			const [dev, property, policy] = await init()
-			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-			// Disable DIP3
-			await policy.setLockUpBlocks(10)
-
-			await dev.dev.deposit(property.address, 10000)
-
-			// Enable DIP3
-			await policy.setLockUpBlocks(1)
-
-			await dev.lockup.withdraw(property.address, 10000)
-
-			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-			const reward = toBigNumber(10).times(1e18).times(2)
-
-			expect(afterBalance.toFixed()).to.be.equal(
-				beforeBalance.plus(reward).toFixed()
 			)
 			expect(afterTotalSupply.toFixed()).to.be.equal(
 				beforeTotalSupply.plus(reward).toFixed()
