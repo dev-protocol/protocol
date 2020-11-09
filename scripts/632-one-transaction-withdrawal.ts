@@ -4,6 +4,7 @@ import {ethgas} from './lib/api'
 import {config} from 'dotenv'
 import {DevCommonInstance} from './lib/instance/common'
 import {Lockup} from './lib/instance/lockup'
+import {PolicyFactory} from './lib/instance/policy-factory'
 
 config()
 const {CONFIG: configAddress, EGS_TOKEN: egsApiKey} = process.env
@@ -30,6 +31,10 @@ const handler = async (
 	const lNext = await l.create()
 	await l.changeOwner(lCurrent, lNext)
 	await l.set(lNext)
+
+	const pf = new PolicyFactory(dev)
+	const pfNext = await pf.create()
+	await pf.set(pfNext)
 
 	callback(null)
 }
