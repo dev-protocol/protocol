@@ -49,6 +49,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 			await dev.dev.addMinter(dev.withdraw.address)
 		}
 
+		await dev.dev.addMinter(dev.lockup.address)
+
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
 		const policy = await artifacts.require('PolicyTestForWithdraw').new()
