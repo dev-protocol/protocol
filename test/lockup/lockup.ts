@@ -144,7 +144,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			expect(_value).to.be.equal('10000')
 		})
 	})
-	describe.only('Lockup; withdraw', () => {
+	describe('Lockup; withdraw', () => {
 		it('should fail to call when tokens are insufficient', async () => {
 			const [dev, property] = await init()
 			const amount = 1000000
