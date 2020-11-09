@@ -83,9 +83,7 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('should fail to call when a passed value is 0', async () => {
 			const [dev, property] = await init()
 
-			const res = await dev.lockup
-				.lockup(deployer, property.address, 0)
-				.catch(err)
+			const res = await dev.dev.deposit(property.address, 0).catch(err)
 			validateErrorMessage(res, 'illegal lockup value')
 		})
 		it(`should fail to call when token's transfer was failed`, async () => {
