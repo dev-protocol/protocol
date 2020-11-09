@@ -144,7 +144,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			expect(_value).to.be.equal('10000')
 		})
 	})
-	describe.only('Lockup; withdraw', () => {
+	describe('Lockup; withdraw', () => {
 		it('should fail to call when tokens are not locked', async () => {
 			const [dev, property] = await init()
 
@@ -156,7 +156,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			const amount = 1000000
 			await dev.dev.deposit(property.address, amount)
 
-			const res = await dev.lockup.withdraw(property.address, amount + 1).catch(err)
+			const res = await dev.lockup
+				.withdraw(property.address, amount + 1)
+				.catch(err)
 			validateErrorMessage(res, 'tokens are not staked or insufficient staked')
 		})
 		it('should fail to call when waiting for released', async () => {
