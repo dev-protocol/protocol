@@ -83,17 +83,6 @@ contract('LockupTest', ([deployer, user1]) => {
 		it('should fail to call when a passed value is 0', async () => {
 			const [dev, property] = await init()
 
-			await dev.lockup.changeOwner(deployer)
-			const storage = await dev.lockup
-				.getStorageAddress()
-				.then((x) => artifacts.require('EternalStorage').at(x))
-			await storage.setUint(
-				keccak256('_withdrawalStatus', property.address, deployer),
-				1
-			)
-			await storage.changeOwner(dev.lockup.address)
-			await dev.addressConfig.setToken(deployer)
-
 			const res = await dev.lockup
 				.lockup(deployer, property.address, 0)
 				.catch(err)
@@ -154,18 +143,6 @@ contract('LockupTest', ([deployer, user1]) => {
 				.withdraw(property.address, amount + 1)
 				.catch(err)
 			validateErrorMessage(res, 'insufficient tokens staked')
-		})
-		it('should fail to call when waiting for released', async () => {
-			const [dev, property, policy] = await init()
-
-			const block = await getBlock()
-			await policy.setLockUpBlocks(block + 9999)
-
-			await dev.dev.deposit(property.address, 10000)
-			await mine(5)
-
-			const res = await dev.lockup.withdraw(property.address, 0).catch(err)
-			validateErrorMessage(res, 'waiting for release')
 		})
 		it(`withdraw the amount passed`, async () => {
 			const [dev, property] = await init()

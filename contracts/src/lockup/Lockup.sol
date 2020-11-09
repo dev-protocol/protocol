@@ -85,15 +85,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 
 		/**
-		 * Updates minimum staking duration.
-		 */
-		setStorageWithdrawalStatus(
-			_property,
-			_from,
-			IPolicy(config().policy()).lockUpBlocks().add(block.number)
-		);
-
-		/**
 		 * Since the reward per block that can be withdrawn will change with the addition of staking,
 		 * saves the undrawn withdrawable reward before addition it.
 		 */
@@ -121,11 +112,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			hasValue(_property, msg.sender, _amount),
 			"insufficient tokens staked"
 		);
-
-		/**
-		 * Validates the block number reaches the block number where staking can be released.
-		 */
-		require(possible(_property, msg.sender), "waiting for release");
 
 		/**
 		 * Withdraws the staking reward
@@ -667,18 +653,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		__updateLegacyWithdrawableInterestAmount(_property, _user);
 
 		return prices;
-	}
-
-	/**
-	 * Returns whether the staking can be released.
-	 */
-	function possible(address _property, address _from)
-		private
-		view
-		returns (bool)
-	{
-		uint256 blockNumber = getStorageWithdrawalStatus(_property, _from);
-		return blockNumber <= block.number;
 	}
 
 	/**
