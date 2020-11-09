@@ -144,7 +144,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			expect(_value).to.be.equal('10000')
 		})
 	})
-	describe('Lockup; withdraw', () => {
+	describe.only('Lockup; withdraw', () => {
 		it('should fail to call when tokens are insufficient', async () => {
 			const [dev, property] = await init()
 			const amount = 1000000
@@ -203,6 +203,39 @@ contract('LockupTest', ([deployer, user1]) => {
 			expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
 			expect(afterTotalSupply.toFixed()).to.be.equal(
 				beforeTotalSupply.toFixed()
+			)
+		})
+		it(`withdraw 0 amount when passed amount is 0 and past staked user`, async () => {
+			const [dev, property] = await init()
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+			await dev.dev.deposit(property.address, 10000)
+			const lastBlock = await getBlock()
+			await mine(3)
+			await dev.lockup.withdraw(property.address, 10000)
+			const block = await getBlock()
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+			const reward = toBigNumber(10)
+				.times(1e18)
+				.times(block - lastBlock)
+
+			expect(afterBalance.toFixed()).to.be.equal(
+				beforeBalance.plus(reward).toFixed()
+			)
+			expect(afterTotalSupply.toFixed()).to.be.equal(
+				beforeTotalSupply.plus(reward).toFixed()
+			)
+
+			await mine(3)
+			await dev.lockup.withdraw(property.address, 0)
+			const afterBalance2 = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			const afterTotalSupply2 = await dev.dev.totalSupply().then(toBigNumber)
+
+			expect(afterBalance2.toFixed()).to.be.equal(afterBalance.toFixed())
+			expect(afterTotalSupply2.toFixed()).to.be.equal(
+				afterTotalSupply.toFixed()
 			)
 		})
 		it(`withdraw just reward when passed amount is 0`, async () => {
