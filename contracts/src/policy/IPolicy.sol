@@ -36,6 +36,4 @@ contract IPolicy {
 	function policyVotingBlocks() external view returns (uint256);
 
 	function abstentionPenalty(uint256 _count) external view returns (uint256);
-
-	function lockUpBlocks() external view returns (uint256);
 }
