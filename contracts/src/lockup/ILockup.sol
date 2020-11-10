@@ -10,9 +10,7 @@ contract ILockup {
 
 	function update() public;
 
-	function cancel(address _property) external;
-
-	function withdraw(address _property) external;
+	function withdraw(address _property, uint256 _amount) external;
 
 	function calculateCumulativeRewardPrices()
 		public
@@ -50,6 +48,4 @@ contract ILockup {
 			// solium-disable-next-line indentation
 			uint256
 		);
-
-	function withdrawInterest(address _property) external;
 }
