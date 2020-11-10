@@ -345,26 +345,6 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
 			expect(res).to.be.an.instanceOf(Error)
 		})
-		it('should fail to lockup token when the sender is waiting for withdrawing', async () => {
-			const dev = await generateEnv()
-			const prop = await createProperty(dev)
-			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
-			await dev.dev.mint(user1, 100)
-			await dev.dev.deposit(prop, 50, {from: user1})
-
-			await dev.lockup.cancel(prop, {from: user1})
-
-			const res = await dev.dev
-				.deposit(prop, 1, {from: user1})
-				.catch((err: Error) => err)
-			const balance = await dev.dev.balanceOf(user1)
-
-			expect(balance.toNumber()).to.be.equal(50)
-			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(
-				50
-			)
-			expect(res).to.be.an.instanceOf(Error)
-		})
 		it('lockup token by running the depositFrom from another account after approved', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)

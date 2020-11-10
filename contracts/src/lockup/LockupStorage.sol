@@ -75,36 +75,6 @@ contract LockupStorage is UsingStorage {
 		return keccak256(abi.encodePacked("_propertyValue", _property));
 	}
 
-	//WithdrawalStatus
-	function setStorageWithdrawalStatus(
-		address _property,
-		address _from,
-		uint256 _value
-	) internal {
-		bytes32 key = getStorageWithdrawalStatusKey(_property, _from);
-		eternalStorage().setUint(key, _value);
-	}
-
-	function getStorageWithdrawalStatus(address _property, address _from)
-		public
-		view
-		returns (uint256)
-	{
-		bytes32 key = getStorageWithdrawalStatusKey(_property, _from);
-		return eternalStorage().getUint(key);
-	}
-
-	function getStorageWithdrawalStatusKey(address _property, address _sender)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_withdrawalStatus", _property, _sender)
-			);
-	}
-
 	//InterestPrice
 	function setStorageInterestPrice(address _property, uint256 _value)
 		internal

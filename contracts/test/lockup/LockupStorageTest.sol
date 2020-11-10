@@ -15,14 +15,6 @@ contract LockupStorageTest is LockupStorage {
 		setStorageValue(_property, _sender, _value);
 	}
 
-	function setStorageWithdrawalStatusTest(
-		address _property,
-		address _from,
-		uint256 _value
-	) external {
-		setStorageWithdrawalStatus(_property, _from, _value);
-	}
-
 	function setStorageInterestPriceTest(address _property, uint256 _value)
 		external
 	{
