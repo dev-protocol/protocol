@@ -121,7 +121,9 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Transfer the staked amount to the sender.
 		 */
-		IProperty(_property).withdraw(msg.sender, _amount);
+		if (_amount != 0) {
+			IProperty(_property).withdraw(msg.sender, _amount);
+		}
 
 		/**
 		 * Saves variables that should change due to the canceling staking..
