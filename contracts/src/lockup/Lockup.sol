@@ -121,7 +121,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Transfer the staked amount to the sender.
 		 */
-		if(_amount != 0) {
+		if (_amount != 0) {
 			IProperty(_property).withdraw(msg.sender, _amount);
 		}
 
