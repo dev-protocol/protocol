@@ -48,7 +48,7 @@
 		"prettier": "2.1.2",
 		"prettier-plugin-solidity": "1.0.0-alpha.60",
 		"rimraf": "3.0.2",
-		"truffle": "5.1.52",
+		"truffle": "5.1.53",
 		"truffle-typings": "1.0.8",
 		"ts-generator": "0.1.1",
 		"ts-node": "9.0.0",
