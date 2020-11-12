@@ -63,12 +63,12 @@ contract Property is
 	 */
 	function changeAuthor(address _nextAuthor) external {
 		/**
-		 * Only the author can execute.
+		 * Validates the sender is current author.
 		 */
-		require(msg.sender == author, "not the author.");
+		require(msg.sender == author, "illegal sender");
 
 		/**
-		 * Changing the author
+		 * Changes the author.
 		 */
 		author = _nextAuthor;
 	}
