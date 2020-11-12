@@ -85,12 +85,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		);
 
 		/**
-		 * Refuses new staking when after cancel staking and until release it.
-		 */
-		bool isWaiting = getStorageWithdrawalStatus(_property, _from) != 0;
-		require(isWaiting == false, "lockup is already canceled");
-
-		/**
 		 * Since the reward per block that can be withdrawn will change with the addition of staking,
 		 * saves the undrawn withdrawable reward before addition it.
 		 */
@@ -107,84 +101,34 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	}
 
 	/**
-	 * Cancel staking.
-	 * The staking amount can be withdrawn after the blocks specified by `Policy.lockUpBlocks` have passed.
-	 */
-	function cancel(address _property) external {
-		/**
-		 * Validates the target of staked is included Property set.
-		 */
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
-		/**
-		 * Validates the sender is staking to the target Property.
-		 */
-		require(hasValue(_property, msg.sender), "dev token is not locked");
-
-		/**
-		 * Validates not already been canceled.
-		 */
-		bool isWaiting = getStorageWithdrawalStatus(_property, msg.sender) != 0;
-		require(isWaiting == false, "lockup is already canceled");
-
-		/**
-		 * Get `Policy.lockUpBlocks`, add it to the current block number, and saves that block number in `WithdrawalStatus`.
-		 * Staking is cannot release until the block number saved in `WithdrawalStatus` is reached.
-		 */
-		uint256 blockNumber = IPolicy(config().policy()).lockUpBlocks();
-		blockNumber = blockNumber.add(block.number);
-		setStorageWithdrawalStatus(_property, msg.sender, blockNumber);
-	}
-
-	/**
 	 * Withdraw staking.
-	 * Releases canceled staking and transfer the staked amount to the sender.
+	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
 	 */
-	function withdraw(address _property) external {
-		/**
-		 * Validates the target of staked is included Property set.
-		 */
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
-		/**
-		 * Validates the block number reaches the block number where staking can be released.
-		 */
-		require(possible(_property, msg.sender), "waiting for release");
-
+	function withdraw(address _property, uint256 _amount) external {
 		/**
 		 * Validates the sender is staking to the target Property.
 		 */
-		uint256 lockedUpValue = getStorageValue(_property, msg.sender);
-		require(lockedUpValue != 0, "dev token is not locked");
+		require(
+			hasValue(_property, msg.sender, _amount),
+			"insufficient tokens staked"
+		);
 
 		/**
-		 * Since the increase of rewards will stop with the release of the staking,
-		 * saves the undrawn withdrawable reward before releasing it.
+		 * Withdraws the staking reward
 		 */
-		RewardPrices memory prices = updatePendingInterestWithdrawal(
-			_property,
-			msg.sender
-		);
+		RewardPrices memory prices = _withdrawInterest(_property);
 
 		/**
 		 * Transfer the staked amount to the sender.
 		 */
-		IProperty(_property).withdraw(msg.sender, lockedUpValue);
+		if (_amount != 0) {
+			IProperty(_property).withdraw(msg.sender, _amount);
+		}
 
 		/**
 		 * Saves variables that should change due to the canceling staking..
 		 */
-		updateValues(false, msg.sender, _property, lockedUpValue, prices);
-
-		/**
-		 * Sets the staked amount to 0.
-		 */
-		setStorageValue(_property, msg.sender, 0);
-
-		/**
-		 * Sets the cancellation status to not have.
-		 */
-		setStorageWithdrawalStatus(_property, msg.sender, 0);
+		updateValues(false, msg.sender, _property, _amount, prices);
 	}
 
 	/**
@@ -422,22 +366,14 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	function _calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	)
-		private
-		view
-		returns (
-			uint256 _amount,
-			uint256 _interestPrice,
-			RewardPrices memory _prices
-		)
-	{
+	) private view returns (uint256 _amount, RewardPrices memory _prices) {
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return (0, 0, RewardPrices(0, 0, 0));
+			return (0, RewardPrices(0, 0, 0));
 		}
 
 		/**
@@ -455,7 +391,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		(
 			uint256 amount,
-			uint256 interestPrice,
+			,
 			RewardPrices memory prices
 		) = _calculateInterestAmount(_property, _user);
 
@@ -465,7 +401,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 withdrawableAmount = amount
 			.add(pending) // solium-disable-next-line indentation
 			.add(legacy);
-		return (withdrawableAmount, interestPrice, prices);
+		return (withdrawableAmount, prices);
 	}
 
 	/**
@@ -475,7 +411,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		address _property,
 		address _user
 	) public view returns (uint256) {
-		(uint256 amount, , ) = _calculateWithdrawableInterestAmount(
+		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
 			_property,
 			_user
 		);
@@ -485,25 +421,17 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	/**
 	 * Withdraws staking reward as an interest.
 	 */
-	function withdrawInterest(address _property) external {
-		/**
-		 * Validates the target of staking is included Property set.
-		 */
-		addressValidator().validateGroup(_property, config().propertyGroup());
-
+	function _withdrawInterest(address _property)
+		private
+		returns (RewardPrices memory _prices)
+	{
 		/**
 		 * Gets the withdrawable amount.
 		 */
 		(
 			uint256 value,
-			uint256 interestPrice,
-
+			RewardPrices memory prices
 		) = _calculateWithdrawableInterestAmount(_property, msg.sender);
-
-		/**
-		 * Validates rewards amount there are 1 or more.
-		 */
-		require(value > 0, "your interest amount is 0");
 
 		/**
 		 * Sets the unwithdrawn reward amount to 0.
@@ -518,7 +446,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Updates the staking status to avoid double rewards.
 		 */
-		setStorageLastStakedInterestPrice(_property, msg.sender, interestPrice);
+		setStorageLastStakedInterestPrice(
+			_property,
+			msg.sender,
+			prices.interest
+		);
 		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 
 		/**
@@ -530,6 +462,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
 		 */
 		update();
+
+		return prices;
 	}
 
 	/**
@@ -575,6 +509,11 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 			 * Updates the current staking amount of the Property.
 			 */
 			subPropertyValue(_property, _value);
+
+			/**
+			 * Updates the current staking amount of the Property.
+			 */
+			subValue(_property, _account, _value);
 		}
 
 		/**
@@ -633,15 +572,28 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	}
 
 	/**
+	 * Subtracts the user's staking amount in the Property.
+	 */
+	function subValue(
+		address _property,
+		address _sender,
+		uint256 _value
+	) private {
+		uint256 value = getStorageValue(_property, _sender);
+		value = value.sub(_value);
+		setStorageValue(_property, _sender, value);
+	}
+
+	/**
 	 * Returns whether the user is staking in the Property.
 	 */
-	function hasValue(address _property, address _sender)
-		private
-		view
-		returns (bool)
-	{
+	function hasValue(
+		address _property,
+		address _sender,
+		uint256 _amount
+	) private view returns (bool) {
 		uint256 value = getStorageValue(_property, _sender);
-		return value != 0;
+		return value >= _amount;
 	}
 
 	/**
@@ -685,7 +637,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 */
 		(
 			uint256 withdrawableAmount,
-			,
 			RewardPrices memory prices
 		) = _calculateWithdrawableInterestAmount(_property, _user);
 
@@ -704,28 +655,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		__updateLegacyWithdrawableInterestAmount(_property, _user);
 
 		return prices;
-	}
-
-	/**
-	 * Returns whether the staking can be released.
-	 */
-	function possible(address _property, address _from)
-		private
-		view
-		returns (bool)
-	{
-		uint256 blockNumber = getStorageWithdrawalStatus(_property, _from);
-		if (blockNumber == 0) {
-			return false;
-		}
-		if (blockNumber <= block.number) {
-			return true;
-		} else {
-			if (IPolicy(config().policy()).lockUpBlocks() == 1) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
