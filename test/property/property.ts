@@ -65,7 +65,7 @@ contract(
 				const result = await propertyInstance
 					.changeAuthor(nextAuthor)
 					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not the author.')
+				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Author is changed.', async () => {
 				await dev.addressConfig.setPropertyFactory(propertyFactory)
