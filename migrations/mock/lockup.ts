@@ -1,5 +1,5 @@
-import {LockupInstance, DevInstance} from '../../types/truffle-contracts'
-import {AddressInfo, createInstance} from './common'
+import { LockupInstance, DevInstance } from '../../types/truffle-contracts'
+import { AddressInfo, createInstance } from './common'
 import BigNumber from 'bignumber.js'
 
 export async function lockup(
@@ -12,7 +12,7 @@ export async function lockup(
 		value: number
 	): Promise<void> {
 		const bigValue = new BigNumber(value * decimals)
-		await dev.deposit(propertyAddress, bigValue, {from: account})
+		await dev.deposit(propertyAddress, bigValue, { from: account })
 		const resultValue = await lockup.getValue(propertyAddress, account)
 		const lockupValue = new BigNumber(resultValue).dividedBy(
 			new BigNumber(decimals)

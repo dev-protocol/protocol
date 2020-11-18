@@ -5,7 +5,7 @@ import {
 	MarketTest2Instance,
 	MarketTest3Instance,
 } from '../../types/truffle-contracts'
-import {createInstance, AddressInfo, createInstanceByAddress} from './common'
+import { createInstance, AddressInfo, createInstanceByAddress } from './common'
 
 export async function createMarket(
 	artifacts: Truffle.Artifacts,
@@ -20,7 +20,7 @@ async function create(artifacts: Truffle.Artifacts): Promise<string[]> {
 	async function getMarketAddress(marketAddr: string): Promise<string> {
 		const result = await marketFactory.create(marketAddr)
 		const marketAddress = await result.logs.filter(
-			(e: {event: string}) => e.event === 'Create'
+			(e: { event: string }) => e.event === 'Create'
 		)[0].args._market
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 		console.log(`market${index}:${marketAddress} is created`)

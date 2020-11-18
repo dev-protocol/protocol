@@ -2,7 +2,7 @@ import {
 	AddressConfigInstance,
 	PolicyFactoryInstance,
 } from '../../types/truffle-contracts'
-import {createInstance} from './common'
+import { createInstance } from './common'
 
 export async function createPolicy(
 	artifacts: Truffle.Artifacts

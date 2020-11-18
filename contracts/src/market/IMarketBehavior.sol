@@ -13,7 +13,6 @@ interface IMarketBehavior {
 	)
 		external
 		returns (
-			// solium-disable-next-line indentation
 			bool
 		);
 

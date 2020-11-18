@@ -150,7 +150,6 @@ When you implement the `authenticate` function, strongly recommended verifying t
 		string memory,
 		string memory,
 		string memory,
-		// solium-disable-next-line no-trailing-whitespace
 		address market,
 		address
 	) public returns (bool) {

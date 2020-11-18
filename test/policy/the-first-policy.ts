@@ -1,6 +1,6 @@
-import {TheFirstPolicyInstance} from '../../types/truffle-contracts'
-import {DevProtocolInstance} from '../test-lib/instance'
-import {toBigNumber} from '../test-lib/utils/common'
+import { TheFirstPolicyInstance } from '../../types/truffle-contracts'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { toBigNumber } from '../test-lib/utils/common'
 import BigNumber from 'bignumber.js'
 
 contract('TheFirstPolicy', ([deployer]) => {

@@ -16,7 +16,6 @@ contract Allocator is UsingConfig, IAllocator, UsingValidator {
 	/**
 	 * Initialize the argument as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**

@@ -1,12 +1,12 @@
 /* eslint-disable no-undef */
-import {config} from 'dotenv'
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {ethgas} from './lib/api'
-import {DevCommonInstance} from './lib/instance/common'
-import {Lockup} from './lib/instance/lockup'
+import { config } from 'dotenv'
+import { createFastestGasPriceFetcher } from './lib/ethgas'
+import { ethgas } from './lib/api'
+import { DevCommonInstance } from './lib/instance/common'
+import { Lockup } from './lib/instance/lockup'
 
 config()
-const {CONFIG: configAddress, EGS_TOKEN: egsApiKey} = process.env
+const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void

@@ -1,4 +1,4 @@
-import {validateErrorMessage} from '../../test-lib/utils/error'
+import { validateErrorMessage } from '../../test-lib/utils/error'
 
 contract('KillableTest', ([deployer, user]) => {
 	const killableTestContract = artifacts.require('KillableTest')
@@ -9,7 +9,7 @@ contract('KillableTest', ([deployer, user]) => {
 			})
 			const value = await killableTest.getValue()
 			expect(value.toNumber()).to.be.equal(1)
-			await killableTest.kill({from: deployer})
+			await killableTest.kill({ from: deployer })
 			const result = await killableTest.getValue().catch((err: Error) => err)
 			validateErrorMessage(
 				result,
@@ -22,7 +22,7 @@ contract('KillableTest', ([deployer, user]) => {
 				from: deployer,
 			})
 			const result = await killableTest
-				.kill({from: user})
+				.kill({ from: user })
 				.catch((err: Error) => err)
 			validateErrorMessage(result, 'only owner method')
 		})

@@ -1,4 +1,4 @@
-import {WithdrawStorageTestInstance} from '../../types/truffle-contracts'
+import { WithdrawStorageTestInstance } from '../../types/truffle-contracts'
 
 contract('WithdrawStorageTest', ([withdraw, property, user]) => {
 	let storage: WithdrawStorageTestInstance

@@ -1,3 +1,4 @@
+/* solhint-disable const-name-snakecase */
 pragma solidity 0.5.17;
 
 import {DIP3} from "contracts/src/policy/DIP3.sol";

@@ -15,7 +15,6 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**

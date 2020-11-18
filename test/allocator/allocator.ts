@@ -1,9 +1,9 @@
-import {DevProtocolInstance} from '../test-lib/instance'
+import { DevProtocolInstance } from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
-import {toBigNumber} from '../test-lib/utils/common'
-import {PropertyInstance} from '../../types/truffle-contracts'
-import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {validateAddressErrorMessage} from '../test-lib/utils/error'
+import { toBigNumber } from '../test-lib/utils/common'
+import { PropertyInstance } from '../../types/truffle-contracts'
+import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
+import { validateAddressErrorMessage } from '../test-lib/utils/error'
 
 contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	const marketContract = artifacts.require('Market')
@@ -58,7 +58,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			'',
 			'',
 			'',
-			{from: deployer}
+			{ from: deployer }
 		)
 	}
 
@@ -111,7 +111,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 				property.address,
 				deployer,
 				user1,
-				{from: propertyAddress}
+				{ from: propertyAddress }
 			)
 			const afterValue = await dev.withdraw.getStorageLastWithdrawnReward(
 				property.address,

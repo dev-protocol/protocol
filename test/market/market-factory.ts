@@ -1,7 +1,7 @@
-import {DevProtocolInstance} from '../test-lib/instance'
-import {getMarketAddress} from '../test-lib/utils/log'
-import {validateAddressErrorMessage} from '../test-lib/utils/error'
-import {DEFAULT_ADDRESS} from '../test-lib/const'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { getMarketAddress } from '../test-lib/utils/log'
+import { validateAddressErrorMessage } from '../test-lib/utils/error'
+import { DEFAULT_ADDRESS } from '../test-lib/const'
 
 contract('MarketFactoryTest', ([deployer, user]) => {
 	const dev = new DevProtocolInstance(deployer)
@@ -18,7 +18,7 @@ contract('MarketFactoryTest', ([deployer, user]) => {
 				dev.generateMarketGroup(),
 			])
 			const policy = await dev.getPolicy('PolicyTest1', user)
-			await dev.policyFactory.create(policy.address, {from: user})
+			await dev.policyFactory.create(policy.address, { from: user })
 			const market = await dev.getMarket('MarketTest1', user)
 			marketBehaviorAddress = market.address
 			const result = await dev.marketFactory.create(market.address, {
@@ -30,7 +30,7 @@ contract('MarketFactoryTest', ([deployer, user]) => {
 		it('Create a new market contract and emit create event telling created market address,', async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(marketAddress)
-			const behaviorAddress = await deployedMarket.behavior({from: deployer})
+			const behaviorAddress = await deployedMarket.behavior({ from: deployer })
 			expect(behaviorAddress).to.be.equal(marketBehaviorAddress)
 		})
 

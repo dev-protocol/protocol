@@ -5,7 +5,6 @@ contract IVoteCounter {
 		address _market,
 		address _property,
 		bool _agree
-		// solium-disable-next-line indentation
 	) external;
 
 	function isAlreadyVoteMarket(address _target, address _property)
@@ -17,7 +16,6 @@ contract IVoteCounter {
 		address _policy,
 		address _property,
 		bool _agree
-		// solium-disable-next-line indentation
 	) external;
 
 	function cancelVotePolicy(address _policy, address _property) external;

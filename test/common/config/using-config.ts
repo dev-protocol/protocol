@@ -1,4 +1,4 @@
-import {DevProtocolInstance} from '../../test-lib/instance'
+import { DevProtocolInstance } from '../../test-lib/instance'
 
 contract('UsingConfigTest', ([deployer]) => {
 	const usingConfigContract = artifacts.require('UsingConfigTest')
@@ -10,7 +10,7 @@ contract('UsingConfigTest', ([deployer]) => {
 		it('You can get the address of config by setting it in the constructor.', async () => {
 			const usingConfigTest = await usingConfigContract.new(
 				dev.addressConfig.address,
-				{from: deployer}
+				{ from: deployer }
 			)
 			const config = await usingConfigTest.getConfig()
 
@@ -21,7 +21,7 @@ contract('UsingConfigTest', ([deployer]) => {
 		it('You can get the address of config .', async () => {
 			const usingConfigTest = await usingConfigContract.new(
 				dev.addressConfig.address,
-				{from: deployer}
+				{ from: deployer }
 			)
 			const configAddress = await usingConfigTest.configAddress()
 

@@ -1,7 +1,7 @@
-import {Dip7Instance, Dip1Instance} from '../../types/truffle-contracts'
-import {DevProtocolInstance} from '../test-lib/instance'
+import { Dip7Instance, Dip1Instance } from '../../types/truffle-contracts'
+import { DevProtocolInstance } from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
-import {toBigNumber} from '../test-lib/utils/common'
+import { toBigNumber } from '../test-lib/utils/common'
 
 const random = (): BigNumber =>
 	((f) => new BigNumber(f()).times(f().slice(0, 1)))((): string =>

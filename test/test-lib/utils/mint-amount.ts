@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
-import {DevProtocolInstance} from '../instance'
-import {toBigNumber} from './common'
-import {PropertyInstance} from '../../../types/truffle-contracts'
+import { DevProtocolInstance } from '../instance'
+import { toBigNumber } from './common'
+import { PropertyInstance } from '../../../types/truffle-contracts'
 
 async function getWithdrawAmount(
 	dev: DevProtocolInstance,

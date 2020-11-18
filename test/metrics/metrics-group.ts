@@ -1,4 +1,4 @@
-import {DevProtocolInstance} from '../test-lib/instance'
+import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -91,7 +91,7 @@ contract(
 				validateErrorMessage(result, 'address is not group')
 			})
 			it('existing metrics can be removed.', async () => {
-				await dev.metricsGroup.removeGroup(metrics1, {from: metricsFactory})
+				await dev.metricsGroup.removeGroup(metrics1, { from: metricsFactory })
 			})
 			it('Deleted metrics addresses are treated as if they do not exist in the group.', async () => {
 				const result = await dev.metricsGroup.isGroup(metrics1)

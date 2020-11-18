@@ -1,9 +1,9 @@
-import {DevProtocolInstance} from '../test-lib/instance'
+import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
-import {mine} from '../test-lib/utils/common'
+import { mine } from '../test-lib/utils/common'
 
 contract(
 	'PolicyGroupTest',
@@ -147,10 +147,10 @@ contract(
 
 				let index = await dev.policyGroup.getVotingGroupIndex()
 				expect(index.toNumber()).to.be.equal(0)
-				await dev.policyGroup.incrementVotingGroupIndex({from: policyFactory})
+				await dev.policyGroup.incrementVotingGroupIndex({ from: policyFactory })
 				index = await dev.policyGroup.getVotingGroupIndex()
 				expect(index.toNumber()).to.be.equal(1)
-				await dev.policyGroup.incrementVotingGroupIndex({from: policyFactory})
+				await dev.policyGroup.incrementVotingGroupIndex({ from: policyFactory })
 				index = await dev.policyGroup.getVotingGroupIndex()
 				expect(index.toNumber()).to.be.equal(2)
 			})

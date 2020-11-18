@@ -1,7 +1,7 @@
-import {DevProtocolInstance} from '../test-lib/instance'
-import {MarketInstance} from '../../types/truffle-contracts'
-import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {watch} from '../test-lib/utils/event'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { MarketInstance } from '../../types/truffle-contracts'
+import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
+import { watch } from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -19,7 +19,7 @@ contract(
 			it('Cannot be created from other than market factory', async () => {
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				const result = await marketContract
-					.new(dev.addressConfig.address, behavuor, {from: deployer})
+					.new(dev.addressConfig.address, behavuor, { from: deployer })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -34,7 +34,7 @@ contract(
 				const market = await marketContract.new(
 					dev.addressConfig.address,
 					behavuor,
-					{from: marketFactory}
+					{ from: marketFactory }
 				)
 				expect(await market.behavior()).to.be.equal(behavuor)
 				expect(await market.enabled()).to.be.equal(false)
@@ -61,7 +61,7 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Can be enabled from the market factory', async () => {
-				await market.toEnable({from: marketFactory})
+				await market.toEnable({ from: marketFactory })
 				expect(await market.enabled()).to.be.equal(true)
 			})
 		})
@@ -80,7 +80,7 @@ contract(
 				const market = await marketContract.new(
 					dev.addressConfig.address,
 					behavuor.address,
-					{from: marketFactory}
+					{ from: marketFactory }
 				)
 				expect(await market.schema()).to.be.equal('[]')
 			})
@@ -129,10 +129,10 @@ contract(
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
 				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
-				await dev.dev.mint(propertyAuther, 10000000000, {from: deployer})
+				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
-				await dev.dev.deposit(propertyAddress, 100000, {from: propertyAuther})
+				await dev.dev.deposit(propertyAddress, 100000, { from: propertyAuther })
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				marketInstance
@@ -169,7 +169,7 @@ contract(
 					'',
 					'',
 					'',
-					{from: propertyAuther}
+					{ from: propertyAuther }
 				)
 				const marketTest3 = artifacts.require('MarketTest3')
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -218,7 +218,7 @@ contract(
 					'',
 					'',
 					'',
-					{from: propertyAuther}
+					{ from: propertyAuther }
 				)
 				const result = await marketInstance
 					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
@@ -242,7 +242,7 @@ contract(
 					)
 				})
 				const result = await marketInstance
-					.deauthenticate(metricsAddress, {from: user})
+					.deauthenticate(metricsAddress, { from: user })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'this is illegal address')
 			})
@@ -268,7 +268,7 @@ contract(
 					.catch(console.error)
 				const [_from, _metrics] = await new Promise<string[]>((resolve) => {
 					watch(dev.metricsFactory)('Destroy', (_, values) => {
-						const {_from, _metrics} = values
+						const { _from, _metrics } = values
 						resolve([_from, _metrics])
 					})
 				})
@@ -346,11 +346,11 @@ contract(
 				)
 				propertyAddress = getPropertyAddress(createPropertyResult)
 				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
-				await dev.dev.mint(propertyAuther, 10000000000, {from: deployer})
+				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 				await dev.addressConfig.setPropertyFactory(propertyFactory)
 			})
 			it('Proxy to mapped Behavior Contract.', async () => {
-				await dev.dev.deposit(propertyAddress, 100000, {from: propertyAuther})
+				await dev.dev.deposit(propertyAddress, 100000, { from: propertyAuther })
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
 				void marketInstance.authenticateFromPropertyFactory(
@@ -395,7 +395,7 @@ contract(
 					'',
 					'',
 					'',
-					{from: propertyFactory}
+					{ from: propertyFactory }
 				)
 				const marketTest3 = artifacts.require('MarketTest3')
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -470,7 +470,7 @@ contract(
 					'',
 					'',
 					'',
-					{from: propertyAuther}
+					{ from: propertyAuther }
 				)
 				const result = await marketInstance
 					.authenticateFromPropertyFactory(

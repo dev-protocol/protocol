@@ -1,3 +1,5 @@
+/* solhint-disable const-name-snakecase */
+/* solhint-disable var-name-mixedcase */
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";

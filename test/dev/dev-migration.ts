@@ -1,5 +1,5 @@
-import {DevProtocolInstance} from '../test-lib/instance'
-import {DevInstance} from '../../types/truffle-contracts'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { DevInstance } from '../../types/truffle-contracts'
 
 contract('DevMigration', ([deployer, user1, user2]) => {
 	const devMigrationContract = artifacts.require('DevMigration')
@@ -27,10 +27,10 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 			await legacy.approve(
 				migration.address,
 				(await legacy.balanceOf(user1)).toNumber(),
-				{from: user1}
+				{ from: user1 }
 			)
 			await next.addMinter(migration.address)
-			await migration.migrate({from: user1})
+			await migration.migrate({ from: user1 })
 
 			expect((await legacy.totalSupply()).toNumber()).to.equal(0)
 			expect((await legacy.balanceOf(user1)).toNumber()).to.equal(0)
@@ -52,7 +52,7 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 			)
 			await next.addMinter(migration.address)
 			const res = await migration
-				.migrate({from: user1})
+				.migrate({ from: user1 })
 				.catch((err: Error) => err)
 
 			expect((await legacy.totalSupply()).toNumber()).to.equal(100)
@@ -77,10 +77,10 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 			await legacy.approve(
 				migration.address,
 				(await legacy.balanceOf(user1)).toNumber(),
-				{from: user1}
+				{ from: user1 }
 			)
 			const res = await migration
-				.migrate({from: user1})
+				.migrate({ from: user1 })
 				.catch((err: Error) => err)
 
 			expect((await legacy.totalSupply()).toNumber()).to.equal(100)
@@ -105,10 +105,10 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 			await legacy.approve(
 				migration.address,
 				(await legacy.balanceOf(user1)).toNumber(),
-				{from: user1}
+				{ from: user1 }
 			)
 			await next.addMinter(migration.address)
-			await migration.migrate({from: user1})
+			await migration.migrate({ from: user1 })
 
 			expect((await legacy.totalSupply()).toNumber()).to.equal(100)
 			expect((await legacy.balanceOf(user1)).toNumber()).to.equal(0)

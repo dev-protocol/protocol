@@ -8,7 +8,6 @@ contract IPropertyFactory {
 	)
 		external
 		returns (
-			// solium-disable-next-line indentation
 			address
 		);
 
@@ -22,7 +21,6 @@ contract IPropertyFactory {
 	)
 		external
 		returns (
-			// solium-disable-next-line indentation
 			bool
 		);
 }

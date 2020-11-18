@@ -54,7 +54,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**
@@ -399,7 +398,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Returns the sum of all values.
 		 */
 		uint256 withdrawableAmount = amount
-			.add(pending) // solium-disable-next-line indentation
+			.add(pending)
 			.add(legacy);
 		return (withdrawableAmount, prices);
 	}
