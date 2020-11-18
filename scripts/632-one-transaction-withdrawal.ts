@@ -1,13 +1,13 @@
 /* eslint-disable no-undef */
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {ethgas} from './lib/api'
-import {config} from 'dotenv'
-import {DevCommonInstance} from './lib/instance/common'
-import {Lockup} from './lib/instance/lockup'
-import {PolicyFactory} from './lib/instance/policy-factory'
+import { createFastestGasPriceFetcher } from './lib/ethgas'
+import { ethgas } from './lib/api'
+import { config } from 'dotenv'
+import { DevCommonInstance } from './lib/instance/common'
+import { Lockup } from './lib/instance/lockup'
+import { PolicyFactory } from './lib/instance/policy-factory'
 
 config()
-const {CONFIG: configAddress, EGS_TOKEN: egsApiKey} = process.env
+const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void

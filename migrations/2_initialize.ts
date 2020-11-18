@@ -3,7 +3,7 @@ const handler = function (deployer, network) {
 		return
 	}
 
-	const {address} = artifacts.require('AddressConfig')
+	const { address } = artifacts.require('AddressConfig')
 	const decimals = artifacts.require('Decimals')
 
 	// Library

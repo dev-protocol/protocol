@@ -1,6 +1,6 @@
-import {Dip1Instance} from '../../types/truffle-contracts'
-import {TheFirstPolicyInstance} from '../../types/truffle-contracts'
-import {DevProtocolInstance} from '../test-lib/instance'
+import { Dip1Instance } from '../../types/truffle-contracts'
+import { TheFirstPolicyInstance } from '../../types/truffle-contracts'
+import { DevProtocolInstance } from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
 
 const random = (): BigNumber =>

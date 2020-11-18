@@ -22,8 +22,8 @@ contract Property is
 	IProperty
 {
 	using SafeMath for uint256;
-	uint8 private constant _property_decimals = 18;
-	uint256 private constant _supply = 10000000000000000000000000;
+	uint8 private constant PROPERTY_DECIMALS = 18;
+	uint256 private constant SUPPLY = 10000000000000000000000000;
 	address public author;
 
 	/**
@@ -37,7 +37,7 @@ contract Property is
 	)
 		public
 		UsingConfig(_config)
-		ERC20Detailed(_name, _symbol, _property_decimals)
+		ERC20Detailed(_name, _symbol, PROPERTY_DECIMALS)
 	{
 		/**
 		 * Validates the sender is PropertyFactory contract.
@@ -55,7 +55,7 @@ contract Property is
 		/**
 		 * Mints to the author 100% of the total supply.
 		 */
-		_mint(author, _supply);
+		_mint(author, SUPPLY);
 	}
 
 	/**

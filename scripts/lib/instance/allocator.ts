@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {AllocatorInstance} from '../../../types/truffle-contracts'
-import {DevCommonInstance} from './common'
+import { AllocatorInstance } from '../../../types/truffle-contracts'
+import { DevCommonInstance } from './common'
 
 export class Allocator {
 	private readonly _dev: DevCommonInstance

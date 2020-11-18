@@ -38,7 +38,7 @@ export class DevCommonInstance {
 		gasPrice: number | string
 	}> {
 		return Promise.all([this._gasFetcher(), this._gasPriceFetcher()])
-			.then(([gas, gasPrice]) => ({gas, gasPrice}))
+			.then(([gas, gasPrice]) => ({ gas, gasPrice }))
 			.catch((err: Error) => {
 				console.error(err)
 				return {

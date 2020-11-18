@@ -16,7 +16,6 @@ contract Allocator is UsingConfig, IAllocator, UsingValidator {
 	/**
 	 * Initialize the argument as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**
@@ -24,8 +23,8 @@ contract Allocator is UsingConfig, IAllocator, UsingValidator {
 	 * This function gets the total number of Metrics contracts and total number of lockups and returns the calculation result of `Policy.rewards`.
 	 */
 	function calculateMaxRewardsPerBlock() public view returns (uint256) {
-		uint256 totalAssets = IMetricsGroup(config().metricsGroup())
-			.totalIssuedMetrics();
+		uint256 totalAssets =
+			IMetricsGroup(config().metricsGroup()).totalIssuedMetrics();
 		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
 		return IPolicy(config().policy()).rewards(totalLockedUps, totalAssets);
 	}

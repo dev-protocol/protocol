@@ -7,6 +7,5 @@ contract IAllocator {
 		address _property,
 		address _from,
 		address _to
-		// solium-disable-next-line indentation
 	) external;
 }

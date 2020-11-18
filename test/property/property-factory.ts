@@ -1,7 +1,7 @@
-import {DevProtocolInstance} from '../test-lib/instance'
-import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
-import {toBigNumber} from '../test-lib/utils/common'
-import {getEventValue} from '../test-lib/utils/event'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
+import { toBigNumber } from '../test-lib/utils/common'
+import { getEventValue } from '../test-lib/utils/event'
 
 contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 	const dev = new DevProtocolInstance(deployer)
@@ -29,13 +29,13 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 		it('Create a new property contract and emit create event telling created property address', async () => {
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedProperty = await propertyContract.at(propertyAddress)
-			const name = await deployedProperty.name({from: user2})
-			const symbol = await deployedProperty.symbol({from: user2})
-			const decimals = await deployedProperty.decimals({from: user2})
+			const name = await deployedProperty.name({ from: user2 })
+			const symbol = await deployedProperty.symbol({ from: user2 })
+			const decimals = await deployedProperty.decimals({ from: user2 })
 			const totalSupply = await deployedProperty
-				.totalSupply({from: user2})
+				.totalSupply({ from: user2 })
 				.then(toBigNumber)
-			const author = await deployedProperty.author({from: user2})
+			const author = await deployedProperty.author({ from: user2 })
 			expect(name).to.be.equal('sample')
 			expect(symbol).to.be.equal('SAMPLE')
 			expect(decimals.toNumber()).to.be.equal(18)
@@ -69,14 +69,14 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateAllocator(),
 			])
 			const policy = await dev.getPolicy('PolicyTest1', user)
-			await dev.policyFactory.create(policy.address, {from: user})
+			await dev.policyFactory.create(policy.address, { from: user })
 			const market = await dev.getMarket('MarketTest1', user)
 			const result = await dev.marketFactory.create(market.address, {
 				from: user,
 			})
 			await dev.dev.mint(user, 10000000000)
 			marketAddress = getMarketAddress(result)
-			await (market as any).setAssociatedMarket(marketAddress, {from: user})
+			await (market as any).setAssociatedMarket(marketAddress, { from: user })
 		})
 
 		it('Create a new Property and authenticate at the same time', async () => {
@@ -88,7 +88,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 					'test',
 					'',
 					'',
-					{from: user}
+					{ from: user }
 				)
 				.catch(console.error)
 			const [propertyCreator, property, market, metrics] = await Promise.all([

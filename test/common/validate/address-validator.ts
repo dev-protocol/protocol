@@ -1,7 +1,7 @@
-import {validateAddressErrorMessage} from '../../test-lib/utils/error'
-import {DEFAULT_ADDRESS} from '../../test-lib/const'
-import {AddressValidatorInstance} from '../../../types/truffle-contracts'
-import {DevProtocolInstance} from '../../test-lib/instance'
+import { validateAddressErrorMessage } from '../../test-lib/utils/error'
+import { DEFAULT_ADDRESS } from '../../test-lib/const'
+import { AddressValidatorInstance } from '../../../types/truffle-contracts'
+import { DevProtocolInstance } from '../../test-lib/instance'
 
 contract(
 	'AddressValidatorTest',
@@ -56,9 +56,9 @@ contract(
 					dev.addressConfig.setPolicyFactory(policyFactory),
 				])
 				await Promise.all([
-					dev.propertyGroup.addGroup(property, {from: propertyFactory}),
-					dev.marketGroup.addGroup(market, {from: marketFactory}),
-					dev.metricsGroup.addGroup(metrics, {from: metricsFactory}),
+					dev.propertyGroup.addGroup(property, { from: propertyFactory }),
+					dev.marketGroup.addGroup(market, { from: marketFactory }),
+					dev.metricsGroup.addGroup(metrics, { from: metricsFactory }),
 					dev.policyGroup.addGroupWithoutSetVotingEnd(policy, {
 						from: policyFactory,
 					}),

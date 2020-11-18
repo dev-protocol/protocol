@@ -9,13 +9,12 @@ import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 contract MarketTest1 is Ownable, IMarketBehavior, UsingConfig {
 	string public schema = "[]";
 	address private associatedMarket;
-	address metrics;
-	uint256 lastBlock;
-	uint256 currentBlock;
+	address private metrics;
+	uint256 private lastBlock;
+	uint256 private currentBlock;
 	mapping(address => string) private keys;
 	mapping(string => address) private addresses;
 
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function authenticate(
@@ -25,7 +24,6 @@ contract MarketTest1 is Ownable, IMarketBehavior, UsingConfig {
 		string memory,
 		string memory,
 		string memory,
-		// solium-disable-next-line no-trailing-whitespace
 		address market,
 		address
 	) public returns (bool) {

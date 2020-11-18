@@ -13,7 +13,6 @@ contract MarketTest3 is Ownable, IMarketBehavior, UsingConfig {
 	mapping(string => address) private addresses;
 	address public currentAuthinticateAccount;
 
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function authenticate(
@@ -23,7 +22,6 @@ contract MarketTest3 is Ownable, IMarketBehavior, UsingConfig {
 		string memory,
 		string memory,
 		string memory,
-		// solium-disable-next-line no-trailing-whitespace
 		address market,
 		address account
 	) public returns (bool) {

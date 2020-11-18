@@ -14,7 +14,6 @@ contract MarketGroup is
 {
 	using SafeMath for uint256;
 
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	function addGroup(address _addr) external {

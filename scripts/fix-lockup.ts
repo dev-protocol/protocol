@@ -1,9 +1,9 @@
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {ethgas} from './lib/api'
+import { createFastestGasPriceFetcher } from './lib/ethgas'
+import { ethgas } from './lib/api'
 
 /* eslint-disable no-undef */
-const {CONFIG, EGS_TOKEN} = process.env
-const {log: ____log} = console
+const { CONFIG, EGS_TOKEN } = process.env
+const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
@@ -31,11 +31,11 @@ const handler = async (
 	// Deploy new Lockup
 	const nextLockup = await artifacts
 		.require('Lockup')
-		.new(config.address, {gasPrice: await fastest(), gas})
+		.new(config.address, { gasPrice: await fastest(), gas })
 	____log('Deployed the new Lockup', nextLockup.address)
 
 	// Add minter
-	await dev.addMinter(nextLockup.address, {gasPrice: await fastest(), gas})
+	await dev.addMinter(nextLockup.address, { gasPrice: await fastest(), gas })
 	____log('Added next Lockup as a minter')
 
 	const lockupStorageAddress = await lockup.getStorageAddress()
