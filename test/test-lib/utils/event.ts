@@ -2,7 +2,7 @@ import Web3 from 'web3'
 
 export const watch = (deployedContract: any) => (
 	name: string,
-	handler: (err: Error, values: { [key: string]: string }) => void
+	handler: (err: Error, values: Record<string, string>) => void
 ): void => {
 	const { contract: deployed } = deployedContract
 	const web3WithWebsockets = new Web3(
