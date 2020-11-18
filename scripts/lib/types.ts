@@ -45,16 +45,12 @@ export type Event = {
 		readonly data: string
 		readonly topics: string
 	}
-	readonly returnValues: {
-		readonly [key: string]: string | number
-	}
+	readonly returnValues: Record<string, string | number>
 	readonly signature: string
 	readonly transactionHash: string
 	readonly transactionIndex: number
 }
-export type ReceiptEvent = {
-	readonly [key: string]: Event
-}
+export type ReceiptEvent = Record<string, Event>
 export type TxReceipt = {
 	readonly blockHash: string
 	readonly blockNumber: number
