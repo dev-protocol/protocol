@@ -5,11 +5,7 @@ contract IPropertyFactory {
 		string calldata _name,
 		string calldata _symbol,
 		address _author
-	)
-		external
-		returns (
-			address
-		);
+	) external returns (address);
 
 	function createAndAuthenticate(
 		string calldata _name,
@@ -18,9 +14,5 @@ contract IPropertyFactory {
 		string calldata _args1,
 		string calldata _args2,
 		string calldata _args3
-	)
-		external
-		returns (
-			bool
-		);
+	) external returns (bool);
 }

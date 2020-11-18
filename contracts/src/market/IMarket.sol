@@ -8,11 +8,7 @@ interface IMarket {
 		string calldata _args3,
 		string calldata _args4,
 		string calldata _args5
-	)
-		external
-		returns (
-			bool
-		);
+	) external returns (bool);
 
 	function authenticateFromPropertyFactory(
 		address _prop,
@@ -22,11 +18,7 @@ interface IMarket {
 		string calldata _args3,
 		string calldata _args4,
 		string calldata _args5
-	)
-		external
-		returns (
-			bool
-		);
+	) external returns (bool);
 
 	function authenticatedCallback(address _property, bytes32 _idHash)
 		external

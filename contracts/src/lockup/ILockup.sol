@@ -40,10 +40,5 @@ contract ILockup {
 	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	)
-		public
-		view
-		returns (
-			uint256
-		);
+	) public view returns (uint256);
 }
