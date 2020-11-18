@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {LockupInstance} from '../../../types/truffle-contracts'
-import {DevCommonInstance} from './common'
+import { LockupInstance } from '../../../types/truffle-contracts'
+import { DevCommonInstance } from './common'
 
 type InstanceOfLockup = LockupInstance
 

@@ -12,7 +12,6 @@ contract IWithdraw {
 		address _property,
 		address _from,
 		address _to
-		// solium-disable-next-line indentation
 	) external;
 
 	function calculateWithdrawableAmount(address _property, address _user)

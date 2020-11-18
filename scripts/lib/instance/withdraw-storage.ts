@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {WithdrawStorageInstance} from '../../../types/truffle-contracts'
-import {DevCommonInstance} from './common'
+import { WithdrawStorageInstance } from '../../../types/truffle-contracts'
+import { DevCommonInstance } from './common'
 
 export class WithdrawStorage {
 	private readonly _dev: DevCommonInstance

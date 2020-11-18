@@ -1,4 +1,4 @@
-import {DevProtocolInstance} from '../test-lib/instance'
+import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -21,7 +21,7 @@ contract(
 				await dev.addressConfig.setPropertyFactory(propertyFactory, {
 					from: deployer,
 				})
-				await dev.propertyGroup.addGroup(property, {from: propertyFactory})
+				await dev.propertyGroup.addGroup(property, { from: propertyFactory })
 			})
 
 			it('Create a new Property Contract and emit Create Event telling created property address', async () => {

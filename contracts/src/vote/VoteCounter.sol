@@ -30,7 +30,6 @@ contract VoteCounter is
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**
@@ -64,20 +63,15 @@ contract VoteCounter is
 		 * Gets the staking amount for the passed Property as a voting right.
 		 * If the voting right is 0, it cannot vote.
 		 */
-		uint256 count = ILockup(config().lockup()).getValue(
-			_property,
-			msg.sender
-		);
+		uint256 count =
+			ILockup(config().lockup()).getValue(_property, msg.sender);
 		require(count != 0, "vote count is 0");
 
 		/**
 		 * Validates it does not become a double vote.
 		 */
-		bool alreadyVote = getStorageAlreadyVoteMarket(
-			msg.sender,
-			_market,
-			_property
-		);
+		bool alreadyVote =
+			getStorageAlreadyVoteMarket(msg.sender, _market, _property);
 		require(alreadyVote == false, "already vote");
 
 		/**
@@ -94,10 +88,11 @@ contract VoteCounter is
 		 * Gets the votes for and against and gets whether or not the threshold
 		 * for enabling the Market is exceeded.
 		 */
-		bool result = IPolicy(config().policy()).marketApproval(
-			getStorageAgreeCount(_market),
-			getStorageOppositeCount(_market)
-		);
+		bool result =
+			IPolicy(config().policy()).marketApproval(
+				getStorageAgreeCount(_market),
+				getStorageOppositeCount(_market)
+			);
 
 		/**
 		 * If the result is false, the process ends.
@@ -149,11 +144,12 @@ contract VoteCounter is
 		 * In a Policy vote, the Property used to vote for one of the Policies with the same voting period cannot be reused.
 		 */
 		uint256 votingGroupIndex = policyGroup.getVotingGroupIndex();
-		bool alreadyVote = getStorageAlreadyUseProperty(
-			msg.sender,
-			_property,
-			votingGroupIndex
-		);
+		bool alreadyVote =
+			getStorageAlreadyUseProperty(
+				msg.sender,
+				_property,
+				votingGroupIndex
+			);
 		require(alreadyVote == false, "already use property");
 
 		/**
@@ -170,10 +166,8 @@ contract VoteCounter is
 		 * Gets the staking amount for the passed Property as a voting right.
 		 * If the voting right is 0, it cannot vote.
 		 */
-		uint256 count = ILockup(config().lockup()).getValue(
-			_property,
-			msg.sender
-		);
+		uint256 count =
+			ILockup(config().lockup()).getValue(_property, msg.sender);
 		require(count != 0, "vote count is 0");
 
 		/**
@@ -207,10 +201,11 @@ contract VoteCounter is
 		 * Gets the votes for and against and gets whether or not the threshold
 		 * for enabling the Policy is exceeded.
 		 */
-		bool result = IPolicy(config().policy()).policyApproval(
-			getStorageAgreeCount(_policy),
-			getStorageOppositeCount(_policy)
-		);
+		bool result =
+			IPolicy(config().policy()).policyApproval(
+				getStorageAgreeCount(_policy),
+				getStorageOppositeCount(_policy)
+			);
 
 		/**
 		 * If the result is false, the process ends.
@@ -235,11 +230,12 @@ contract VoteCounter is
 		 */
 		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		uint256 votingGroupIndex = policyGroup.getVotingGroupIndex();
-		bool alreadyVote = getStorageAlreadyUseProperty(
-			msg.sender,
-			_property,
-			votingGroupIndex
-		);
+		bool alreadyVote =
+			getStorageAlreadyUseProperty(
+				msg.sender,
+				_property,
+				votingGroupIndex
+			);
 		require(alreadyVote, "not use property");
 
 		/**

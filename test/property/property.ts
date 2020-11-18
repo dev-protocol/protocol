@@ -1,11 +1,11 @@
-import {DevProtocolInstance} from '../test-lib/instance'
-import {getPropertyAddress, getTransferToAddress} from '../test-lib/utils/log'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { getPropertyAddress, getTransferToAddress } from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
-import {DEFAULT_ADDRESS} from '../test-lib/const'
-import {toBigNumber} from '../test-lib/utils/common'
+import { DEFAULT_ADDRESS } from '../test-lib/const'
+import { toBigNumber } from '../test-lib/utils/common'
 
 contract(
 	'PropertyTest',
@@ -70,7 +70,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.withdraw(user, 10, {from: deployer})
+					.withdraw(user, 10, { from: deployer })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -79,7 +79,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.withdraw(user, 10, {from: lockup})
+					.withdraw(user, 10, { from: lockup })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'ERC20: transfer amount exceeds balance')
 			})
@@ -88,7 +88,7 @@ contract(
 				await dev.dev.mint(propertyAddress, 10)
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
-				await property.withdraw(user, 10, {from: lockup})
+				await property.withdraw(user, 10, { from: lockup })
 			})
 		})
 		describe('Property; transfer', () => {
@@ -122,7 +122,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transfer(DEFAULT_ADDRESS, 10, {from: user})
+					.transfer(DEFAULT_ADDRESS, 10, { from: user })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -130,14 +130,14 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transfer(transfer, 0, {from: user})
+					.transfer(transfer, 0, { from: user })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'illegal transfer value')
 			})
 			it('transfer success', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property.transfer(transfer, 10, {from: author})
+				const result = await property.transfer(transfer, 10, { from: author })
 				const toAddress = getTransferToAddress(result)
 				expect(toAddress).to.be.equal(transfer)
 			})
@@ -173,7 +173,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transferFrom(DEFAULT_ADDRESS, transfer, 10, {from: user})
+					.transferFrom(DEFAULT_ADDRESS, transfer, 10, { from: user })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -181,7 +181,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transferFrom(transfer, DEFAULT_ADDRESS, 10, {from: user})
+					.transferFrom(transfer, DEFAULT_ADDRESS, 10, { from: user })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -189,7 +189,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transferFrom(author, transfer, 0, {from: user})
+					.transferFrom(author, transfer, 0, { from: user })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'illegal transfer value')
 			})

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {exec} from 'shelljs'
+import { exec } from 'shelljs'
 import * as program from 'commander'
 
 program
@@ -11,8 +11,8 @@ program
 			ETHEREUM_MOCK_HOST: host,
 			ETHEREUM_MOCK_PORT: port,
 		}
-		exec('npx truffle compile', {env})
-		exec('npx truffle migrate --reset --network mock', {env})
+		exec('npx truffle compile', { env })
+		exec('npx truffle migrate --reset --network mock', { env })
 	})
 
 program.parse(process.argv)

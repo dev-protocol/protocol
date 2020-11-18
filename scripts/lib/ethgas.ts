@@ -1,6 +1,6 @@
 import bent from 'bent'
 import Web3 from 'web3'
-import {EGSResponse} from './types'
+import { EGSResponse } from './types'
 
 export const createEGSFetcher = (
 	fetcher: bent.RequestFunction<bent.ValidResponse>

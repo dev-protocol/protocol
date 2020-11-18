@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {PropertyGroupInstance} from '../../../types/truffle-contracts'
-import {DevCommonInstance} from './common'
+import { PropertyGroupInstance } from '../../../types/truffle-contracts'
+import { DevCommonInstance } from './common'
 
 export class PropertyGroup {
 	private readonly _dev: DevCommonInstance

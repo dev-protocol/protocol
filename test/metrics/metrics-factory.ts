@@ -1,6 +1,6 @@
-import {DevProtocolInstance} from '../test-lib/instance'
-import {getMetricsAddress} from '../test-lib/utils/log'
-import {watch} from '../test-lib/utils/event'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { getMetricsAddress } from '../test-lib/utils/log'
+import { watch } from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -27,7 +27,7 @@ contract(
 					dev.generateMetricsGroup(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				await dev.marketGroup.addGroup(market, {from: marketFactory})
+				await dev.marketGroup.addGroup(market, { from: marketFactory })
 			})
 
 			it('Adds a new metrics contract address to state contract,', async () => {
@@ -38,7 +38,7 @@ contract(
 					.catch(console.error)
 				const [from, metrics] = await new Promise<string[]>((resolve) => {
 					watch(dev.metricsFactory)('Create', (_, values) => {
-						const {_from, _metrics} = values
+						const { _from, _metrics } = values
 						resolve([_from, _metrics])
 					})
 				})
@@ -69,14 +69,14 @@ contract(
 					dev.generateMetricsGroup(),
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				await dev.marketGroup.addGroup(market, {from: marketFactory})
+				await dev.marketGroup.addGroup(market, { from: marketFactory })
 				const metricsFactoryResult1 = await dev.metricsFactory.create(
 					property1,
-					{from: market}
+					{ from: market }
 				)
 				const metricsFactoryResult2 = await dev.metricsFactory.create(
 					property1,
-					{from: market}
+					{ from: market }
 				)
 				metricsAddress1 = getMetricsAddress(metricsFactoryResult1)
 				metricsAddress2 = getMetricsAddress(metricsFactoryResult2)
@@ -109,7 +109,7 @@ contract(
 					.catch(console.error)
 				const [from, metrics] = await new Promise<string[]>((resolve) => {
 					watch(dev.metricsFactory)('Destroy', (_, values) => {
-						const {_from, _metrics} = values
+						const { _from, _metrics } = values
 						resolve([_from, _metrics])
 					})
 				})

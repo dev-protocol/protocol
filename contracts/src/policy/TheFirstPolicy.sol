@@ -1,3 +1,5 @@
+/* solhint-disable const-name-snakecase */
+/* solhint-disable var-name-mixedcase */
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
@@ -29,10 +31,13 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		uint256 t = ERC20(config().token()).totalSupply();
 		uint256 s = (_lockups.mul(basis)).div(t);
 		uint256 _d = basis.sub(s);
-		uint256 _p = (
-			(power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))
-		)
-			.div(2);
+		uint256 _p =
+			(
+				(power_basis.mul(12)).sub(
+					s.div((basis.div((power_basis.mul(10)))))
+				)
+			)
+				.div(2);
 		uint256 p = _p.div(power_basis);
 		uint256 rp = p.add(1);
 		uint256 f = _p.sub(p.mul(power_basis));
@@ -88,9 +93,8 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		if (_up_votes < 9999999999999999999) {
 			return false;
 		}
-		uint256 negative_votes = _negative_votes > 0
-			? _negative_votes
-			: 1000000000000000000;
+		uint256 negative_votes =
+			_negative_votes > 0 ? _negative_votes : 1000000000000000000;
 		return _up_votes > negative_votes.mul(10);
 	}
 
@@ -102,9 +106,8 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		if (_up_votes < 9999999999999999999) {
 			return false;
 		}
-		uint256 negative_votes = _negative_votes > 0
-			? _negative_votes
-			: 1000000000000000000;
+		uint256 negative_votes =
+			_negative_votes > 0 ? _negative_votes : 1000000000000000000;
 		return _up_votes > negative_votes.mul(10);
 	}
 

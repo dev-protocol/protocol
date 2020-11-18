@@ -6,7 +6,7 @@ import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 contract LockupStorage is UsingStorage {
 	using SafeMath for uint256;
 
-	uint256 public constant basis = 100000000000000000000000000000000;
+	uint256 private constant BASIS = 100000000000000000000000000000000;
 
 	//AllValue
 	function setStorageAllValue(uint256 _value) internal {
@@ -139,7 +139,7 @@ contract LockupStorage is UsingStorage {
 		uint256 _amount,
 		uint256 _block
 	) internal {
-		uint256 record = _amount.mul(basis).add(_block);
+		uint256 record = _amount.mul(BASIS).add(_block);
 		eternalStorage().setUint(
 			getStorageLastSameRewardsAmountAndBlockKey(),
 			record
@@ -151,11 +151,12 @@ contract LockupStorage is UsingStorage {
 		view
 		returns (uint256 _amount, uint256 _block)
 	{
-		uint256 record = eternalStorage().getUint(
-			getStorageLastSameRewardsAmountAndBlockKey()
-		);
-		uint256 amount = record.div(basis);
-		uint256 blockNumber = record.sub(amount.mul(basis));
+		uint256 record =
+			eternalStorage().getUint(
+				getStorageLastSameRewardsAmountAndBlockKey()
+			);
+		uint256 amount = record.div(BASIS);
+		uint256 blockNumber = record.sub(amount.mul(BASIS));
 		return (amount, blockNumber);
 	}
 
@@ -265,7 +266,7 @@ contract LockupStorage is UsingStorage {
 		uint256 _unit,
 		uint256 _block
 	) internal {
-		uint256 record = _unit.mul(basis).add(_block);
+		uint256 record = _unit.mul(BASIS).add(_block);
 		eternalStorage().setUint(
 			getStorageCumulativeLockedUpUnitAndBlockKey(_addr),
 			record
@@ -277,11 +278,12 @@ contract LockupStorage is UsingStorage {
 		view
 		returns (uint256 _unit, uint256 _block)
 	{
-		uint256 record = eternalStorage().getUint(
-			getStorageCumulativeLockedUpUnitAndBlockKey(_addr)
-		);
-		uint256 unit = record.div(basis);
-		uint256 blockNumber = record.sub(unit.mul(basis));
+		uint256 record =
+			eternalStorage().getUint(
+				getStorageCumulativeLockedUpUnitAndBlockKey(_addr)
+			);
+		uint256 unit = record.div(BASIS);
+		uint256 blockNumber = record.sub(unit.mul(BASIS));
 		return (unit, blockNumber);
 	}
 
@@ -377,7 +379,7 @@ contract LockupStorage is UsingStorage {
 		uint256 _cLocked,
 		uint256 _block
 	) internal {
-		uint256 record = _cLocked.mul(basis).add(_block);
+		uint256 record = _cLocked.mul(BASIS).add(_block);
 		eternalStorage().setUint(
 			getStorageLastCumulativeLockedUpAndBlockKey(_property, _user),
 			record
@@ -388,11 +390,12 @@ contract LockupStorage is UsingStorage {
 		address _property,
 		address _user
 	) public view returns (uint256 _cLocked, uint256 _block) {
-		uint256 record = eternalStorage().getUint(
-			getStorageLastCumulativeLockedUpAndBlockKey(_property, _user)
-		);
-		uint256 cLocked = record.div(basis);
-		uint256 blockNumber = record.sub(cLocked.mul(basis));
+		uint256 record =
+			eternalStorage().getUint(
+				getStorageLastCumulativeLockedUpAndBlockKey(_property, _user)
+			);
+		uint256 cLocked = record.div(BASIS);
+		uint256 blockNumber = record.sub(cLocked.mul(BASIS));
 
 		return (cLocked, blockNumber);
 	}

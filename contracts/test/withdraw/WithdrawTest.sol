@@ -1,9 +1,8 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
 
 contract WithdrawTest is Withdraw {
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public Withdraw(_config) {}
 
 	function setCumulativePriceTest(address _property, uint256 _value)

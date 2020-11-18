@@ -156,7 +156,6 @@ contract IMarketBehavior {
 		string memory,
 		string memory,
 		string memory,
-		// solium-disable-next-line no-trailing-whitespace
 		address market,
 		address
 	) public returns (bool) {

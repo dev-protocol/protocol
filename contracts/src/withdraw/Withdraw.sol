@@ -22,7 +22,6 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**
@@ -38,10 +37,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets the withdrawable rewards amount and the latest cumulative sum of the maximum mint amount.
 		 */
-		(uint256 value, uint256 lastPrice) = _calculateWithdrawableAmount(
-			_property,
-			msg.sender
-		);
+		(uint256 value, uint256 lastPrice) =
+			_calculateWithdrawableAmount(_property, msg.sender);
 
 		/**
 		 * Validates the result is not 0.
@@ -100,10 +97,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets the cumulative sum of the transfer source's "before transfer" withdrawable reward amount and the cumulative sum of the maximum mint amount.
 		 */
-		(uint256 amountFrom, uint256 priceFrom) = _calculateAmount(
-			_property,
-			_from
-		);
+		(uint256 amountFrom, uint256 priceFrom) =
+			_calculateAmount(_property, _from);
 
 		/**
 		 * Gets the cumulative sum of the transfer destination's "before receive" withdrawable reward amount and the cumulative sum of the maximum mint amount.
@@ -145,9 +140,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets the latest cumulative sum of the holder reward.
 		 */
-		uint256 reward = lockup.calculateCumulativeHoldersRewardAmount(
-			_property
-		);
+		uint256 reward =
+			lockup.calculateCumulativeHoldersRewardAmount(_property);
 
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
@@ -196,9 +190,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets the reward amount in saved without withdrawal and returns the sum of all values.
 		 */
-		uint256 value = _value.add(getPendingWithdrawal(_property, _user)).add(
-			legacy
-		);
+		uint256 value =
+			_value.add(getPendingWithdrawal(_property, _user)).add(legacy);
 		return (value, price);
 	}
 

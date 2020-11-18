@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {MarketFactoryInstance} from '../../../types/truffle-contracts'
-import {DevCommonInstance} from './common'
+import { MarketFactoryInstance } from '../../../types/truffle-contracts'
+import { DevCommonInstance } from './common'
 
 export class MarketFactry {
 	private readonly _dev: DevCommonInstance

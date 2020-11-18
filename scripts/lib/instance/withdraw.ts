@@ -3,7 +3,7 @@ import {
 	WithdrawInstance,
 	WithdrawStorageInstance,
 } from '../../../types/truffle-contracts'
-import {DevCommonInstance} from './common'
+import { DevCommonInstance } from './common'
 
 type InstanceOfWithdraw = WithdrawInstance
 
