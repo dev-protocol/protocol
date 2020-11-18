@@ -40,38 +40,6 @@ contract LockupStorageTest is LockupStorage {
 		setStorageCumulativeGlobalRewards(_value);
 	}
 
-	function setStorageLastCumulativeGlobalRewardTest(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		eternalStorage().setUint(
-			keccak256(
-				abi.encodePacked(
-					"_LastCumulativeGlobalReward",
-					_property,
-					_user
-				)
-			),
-			_value
-		);
-	}
-
-	function setStorageCumulativeLockedUpUnitAndBlockTest(
-		address _addr,
-		uint256 _unit,
-		uint256 _block
-	) external {
-		setStorageCumulativeLockedUpUnitAndBlock(_addr, _unit, _block);
-	}
-
-	function setStorageCumulativeLockedUpValueTest(
-		address _addr,
-		uint256 _value
-	) external {
-		setStorageCumulativeLockedUpValue(_addr, _value);
-	}
-
 	function setStoragePendingInterestWithdrawalTest(
 		address _property,
 		address _user,
@@ -82,28 +50,6 @@ contract LockupStorageTest is LockupStorage {
 
 	function setStorageDIP4GenesisBlockTest(uint256 _block) external {
 		setStorageDIP4GenesisBlock(_block);
-	}
-
-	function setStorageLastCumulativeLockedUpAndBlockTest(
-		address _property,
-		address _user,
-		uint256 _cLocked,
-		uint256 _block
-	) external {
-		setStorageLastCumulativeLockedUpAndBlock(
-			_property,
-			_user,
-			_cLocked,
-			_block
-		);
-	}
-
-	function setStorageLastCumulativePropertyInterestTest(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		setStorageLastCumulativePropertyInterest(_property, _user, _value);
 	}
 
 	function setStorageLastStakedInterestPriceTest(

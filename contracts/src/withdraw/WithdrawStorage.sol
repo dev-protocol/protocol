@@ -43,74 +43,6 @@ contract WithdrawStorage is UsingStorage {
 		return keccak256(abi.encodePacked("_cumulativePrice", _property));
 	}
 
-	// WithdrawalLimitTotal
-	function setWithdrawalLimitTotal(
-		address _property,
-		address _user,
-		uint256 _value
-	) internal {
-		eternalStorage().setUint(
-			getWithdrawalLimitTotalKey(_property, _user),
-			_value
-		);
-	}
-
-	function getWithdrawalLimitTotal(address _property, address _user)
-		public
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getWithdrawalLimitTotalKey(_property, _user)
-			);
-	}
-
-	function getWithdrawalLimitTotalKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_withdrawalLimitTotal", _property, _user)
-			);
-	}
-
-	// WithdrawalLimitBalance
-	function setWithdrawalLimitBalance(
-		address _property,
-		address _user,
-		uint256 _value
-	) internal {
-		eternalStorage().setUint(
-			getWithdrawalLimitBalanceKey(_property, _user),
-			_value
-		);
-	}
-
-	function getWithdrawalLimitBalance(address _property, address _user)
-		public
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getWithdrawalLimitBalanceKey(_property, _user)
-			);
-	}
-
-	function getWithdrawalLimitBalanceKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_withdrawalLimitBalance", _property, _user)
-			);
-	}
-
 	//LastWithdrawalPrice
 	function setLastWithdrawalPrice(
 		address _property,
@@ -173,44 +105,6 @@ contract WithdrawStorage is UsingStorage {
 	{
 		return
 			keccak256(abi.encodePacked("_pendingWithdrawal", _property, _user));
-	}
-
-	//LastCumulativeHoldersReward
-	function setLastCumulativeHoldersReward(
-		address _property,
-		address _user,
-		uint256 _value
-	) internal {
-		eternalStorage().setUint(
-			getLastCumulativeHoldersRewardKey(_property, _user),
-			_value
-		);
-	}
-
-	function getLastCumulativeHoldersReward(address _property, address _user)
-		public
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getLastCumulativeHoldersRewardKey(_property, _user)
-			);
-	}
-
-	function getLastCumulativeHoldersRewardKey(address _property, address _user)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked(
-					"_lastCumulativeHoldersReward",
-					_property,
-					_user
-				)
-			);
 	}
 
 	//lastWithdrawnReward
