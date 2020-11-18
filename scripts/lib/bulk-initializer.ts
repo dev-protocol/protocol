@@ -2,7 +2,7 @@
 import bent from 'bent'
 import Queue from 'p-queue'
 import Web3 from 'web3'
-import {Contract} from 'web3-eth/node_modules/web3-eth-contract/types'
+import { Contract } from 'web3-eth/node_modules/web3-eth-contract/types'
 import {
 	GraphQLResponse,
 	SendTx,
@@ -13,7 +13,7 @@ import builtLockup from '../../build/contracts/Lockup.json'
 import builtMetricsGroup from '../../build/contracts/MetricsGroup.json'
 import builtDev from '../../build/contracts/Dev.json'
 import builtWithdrawStorage from '../../build/contracts/WithdrawStorage.json'
-import {AbiItem} from 'web3-utils/types'
+import { AbiItem } from 'web3-utils/types'
 export const createRegistry = (configAddress: string, libWeb3: Web3) =>
 	new libWeb3.eth.Contract(builtConfig.abi as AbiItem[], configAddress)
 export const prepare = async (
@@ -97,7 +97,7 @@ export const createGetStorageLastCumulativeLockedUpAndBlock = (
 ) => (blockNumber?: number) => async (
 	property: string,
 	user: string
-): Promise<{_cLocked: string; _block: string}> =>
+): Promise<{ _cLocked: string; _block: string }> =>
 	lockup.methods
 		.getStorageLastCumulativeLockedUpAndBlock(property, user)
 		.call(undefined, blockNumber)
@@ -128,7 +128,7 @@ export const createDifferenceCaller = (lockup: Contract) => (
 }> => lockup.methods.difference(property, 0).call(undefined, blockNumber)
 export const createGetCumulativeLockedUpCaller = (lockup: Contract) => (
 	blockNumber?: number
-) => async (property: string): Promise<{_value: string}> =>
+) => async (property: string): Promise<{ _value: string }> =>
 	lockup.methods.getCumulativeLockedUp(property).call(undefined, blockNumber)
 export const createInitializeStatesAtLockup = (lockup: Contract) => (
 	from: string
@@ -143,7 +143,7 @@ export const createInitializeStatesAtLockup = (lockup: Contract) => (
 ): SendTx =>
 	lockup.methods
 		.initializeStatesAtLockup(property, user, reward, cLocked, block)
-		.send({gasPrice, from})
+		.send({ gasPrice, from })
 export const createInitializeLastCumulativePropertyInterest = (
 	lockup: Contract
 ) => (from: string) => (
@@ -154,10 +154,10 @@ export const createInitializeLastCumulativePropertyInterest = (
 ): SendTx =>
 	lockup.methods
 		.initializeLastCumulativePropertyInterest(property, user, interest)
-		.send({gasPrice, from})
+		.send({ gasPrice, from })
 export const createGetLastCumulativeHoldersRewardCaller = (
 	withdrawStorage: Contract
 ) => async (property: string, user: string): Promise<string> =>
 	withdrawStorage.methods.getLastCumulativeHoldersReward(property, user).call()
 
-export const createQueue = (concurrency: number) => new Queue({concurrency})
+export const createQueue = (concurrency: number) => new Queue({ concurrency })

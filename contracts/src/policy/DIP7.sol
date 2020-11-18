@@ -1,3 +1,4 @@
+/* solhint-disable const-name-snakecase */
 pragma solidity 0.5.17;
 
 import {DIP3} from "contracts/src/policy/DIP3.sol";
@@ -23,10 +24,13 @@ contract DIP7 is DIP3 {
 		uint256 assets = _assets.mul(basis.sub(s));
 		uint256 max = assets.mul(mint_per_block_and_aseet);
 		uint256 _d = basis.sub(s);
-		uint256 _p = (
-			(power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))
-		)
-			.div(2);
+		uint256 _p =
+			(
+				(power_basis.mul(12)).sub(
+					s.div((basis.div((power_basis.mul(10)))))
+				)
+			)
+				.div(2);
 		uint256 p = _p.div(power_basis);
 		uint256 rp = p.add(1);
 		uint256 f = _p.sub(p.mul(power_basis));

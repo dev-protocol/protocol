@@ -1,4 +1,4 @@
-import {DevProtocolInstance} from '../test-lib/instance'
+import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	PropertyInstance,
 	PolicyTestForLockupInstance,
@@ -11,9 +11,9 @@ import {
 	gasLogger,
 	keccak256,
 } from '../test-lib/utils/common'
-import {getPropertyAddress} from '../test-lib/utils/log'
-import {waitForEvent, getEventValue} from '../test-lib/utils/event'
-import {validateErrorMessage} from '../test-lib/utils/error'
+import { getPropertyAddress } from '../test-lib/utils/log'
+import { waitForEvent, getEventValue } from '../test-lib/utils/event'
+import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('LockupTest', ([deployer, user1]) => {
 	const init = async (
@@ -89,7 +89,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			const [dev, property] = await init()
 
 			const res = await dev.dev
-				.deposit(property.address, 10000, {from: user1})
+				.deposit(property.address, 10000, { from: user1 })
 				.catch(err)
 			validateErrorMessage(res, 'ERC20: transfer amount exceeds balance')
 		})
@@ -346,7 +346,7 @@ contract('LockupTest', ([deployer, user1]) => {
 
 			it('Alice has a 100% of interests', async () => {
 				await dev.dev
-					.deposit(property.address, 1000000000000, {from: alice})
+					.deposit(property.address, 1000000000000, { from: alice })
 					.then(gasLogger)
 				await mine(1)
 				const result = await dev.lockup
@@ -359,7 +359,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				expect(result.toFixed()).to.be.equal(calculated.toFixed())
 			})
 			it('Alice has a 100% of interests after withdrawal', async () => {
-				await dev.lockup.withdraw(property.address, 0, {from: alice})
+				await dev.lockup.withdraw(property.address, 0, { from: alice })
 				await mine(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
@@ -372,9 +372,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			it('Alice has a 50% of interests', async () => {
 				await dev.dev
-					.deposit(property.address, 1000000000000, {from: bob})
+					.deposit(property.address, 1000000000000, { from: bob })
 					.then(gasLogger)
-				await dev.lockup.withdraw(property.address, 0, {from: alice})
+				await dev.lockup.withdraw(property.address, 0, { from: alice })
 				await mine(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
@@ -389,12 +389,12 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			it('Alice has a 75% of interests', async () => {
 				await dev.dev
-					.deposit(property.address, 1000000000000, {from: alice})
+					.deposit(property.address, 1000000000000, { from: alice })
 					.then(gasLogger)
 				await dev.dev
-					.deposit(property.address, 1000000000000, {from: alice})
+					.deposit(property.address, 1000000000000, { from: alice })
 					.then(gasLogger)
-				await dev.lockup.withdraw(property.address, 0, {from: alice})
+				await dev.lockup.withdraw(property.address, 0, { from: alice })
 				await mine(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
@@ -443,7 +443,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				expect(result.toFixed()).to.be.equal(calculated.toFixed())
 			})
 			it('Bob has a 25% of interests', async () => {
-				await dev.lockup.withdraw(property.address, 0, {from: bob})
+				await dev.lockup.withdraw(property.address, 0, { from: bob })
 				await mine(1)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, bob)
@@ -457,7 +457,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				expect(result.toFixed()).to.be.equal(calculated.toFixed())
 			})
 			it('Alice can withdraw 5 blocks', async () => {
-				await dev.lockup.withdraw(property.address, 0, {from: alice})
+				await dev.lockup.withdraw(property.address, 0, { from: alice })
 				await mine(5)
 				const result = await dev.lockup
 					.calculateWithdrawableInterestAmount(property.address, alice)
@@ -475,15 +475,15 @@ contract('LockupTest', ([deployer, user1]) => {
 				await dev.lockup.withdraw(
 					property.address,
 					await dev.lockup.getValue(property.address, alice),
-					{from: alice}
+					{ from: alice }
 				)
 				await dev.lockup.withdraw(
 					property.address,
 					await dev.lockup.getValue(property.address, bob),
-					{from: bob}
+					{ from: bob }
 				)
 				await dev.dev
-					.deposit(property.address, 1000000000000, {from: alice})
+					.deposit(property.address, 1000000000000, { from: alice })
 					.then(gasLogger)
 				await mine(1)
 				const result = await dev.lockup
@@ -497,21 +497,21 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			it('After withdrawn, Alice and Bob has a 0% of interests', async () => {
 				await dev.dev
-					.deposit(property.address, 1000000000000, {from: alice})
+					.deposit(property.address, 1000000000000, { from: alice })
 					.then(gasLogger)
 				await dev.dev
-					.deposit(property.address, 1000000000000, {from: bob})
+					.deposit(property.address, 1000000000000, { from: bob })
 					.then(gasLogger)
 				await mine(2)
 				await dev.lockup.withdraw(
 					property.address,
 					await dev.lockup.getValue(property.address, alice),
-					{from: alice}
+					{ from: alice }
 				)
 				await dev.lockup.withdraw(
 					property.address,
 					await dev.lockup.getValue(property.address, bob),
-					{from: bob}
+					{ from: bob }
 				)
 				await mine(1)
 				const aliceAmount = await dev.lockup.calculateWithdrawableInterestAmount(
@@ -548,12 +548,12 @@ contract('LockupTest', ([deployer, user1]) => {
 				const bobBalance = toBigNumber(10000000).times(1e18)
 				await dev.dev.mint(bob, bobBalance)
 				await dev.dev
-					.deposit(property.address, bobBalance, {from: bob})
+					.deposit(property.address, bobBalance, { from: bob })
 					.then(gasLogger)
 				await mine(10)
 
 				await dev.dev
-					.deposit(property2.address, 10000000, {from: alice})
+					.deposit(property2.address, 10000000, { from: alice })
 					.then(gasLogger)
 				await mine(1)
 				const result = await dev.lockup
@@ -575,11 +575,11 @@ contract('LockupTest', ([deployer, user1]) => {
 				)
 				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 				await dev.dev
-					.deposit(propertyAddress, 1000000000000, {from: alice})
+					.deposit(propertyAddress, 1000000000000, { from: alice })
 					.then(gasLogger)
 				await mine(1)
 				await dev.dev
-					.deposit(propertyAddress, 1000000000000, {from: alice})
+					.deposit(propertyAddress, 1000000000000, { from: alice })
 					.then(gasLogger)
 				await mine(1)
 				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 0)
@@ -605,7 +605,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.dev
-					.deposit(property.address, 10000, {from: alice})
+					.deposit(property.address, 10000, { from: alice })
 					.then(gasLogger)
 				lastBlock = await getBlock().then(toBigNumber)
 			})
@@ -639,7 +639,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			describe('after second run', () => {
 				before(async () => {
-					await dev.lockup.withdraw(property.address, 0, {from: alice})
+					await dev.lockup.withdraw(property.address, 0, { from: alice })
 					lastBlock = await getBlock().then(toBigNumber)
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
@@ -655,7 +655,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			describe('after additional staking', () => {
 				before(async () => {
-					await dev.dev.deposit(property.address, 10000, {from: alice})
+					await dev.dev.deposit(property.address, 10000, { from: alice })
 				})
 				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
 					const block = await getBlock().then(toBigNumber)
@@ -716,7 +716,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				calc = createCalculator(dev)
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
-				await dev.dev.deposit(property.address, 10000, {from: alice})
+				await dev.dev.deposit(property.address, 10000, { from: alice })
 			})
 
 			describe('before second run', () => {
@@ -730,7 +730,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
 				})
 				it(`Bob does staking 25% of the Property's total lockups, Alice's share become 80%`, async () => {
-					await dev.dev.deposit(property.address, 10000 * 0.25, {from: bob})
+					await dev.dev.deposit(property.address, 10000 * 0.25, { from: bob })
 					const total = await dev.lockup
 						.getPropertyValue(property.address)
 						.then(toBigNumber)
@@ -767,8 +767,8 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			describe('after second withdrawal', () => {
 				before(async () => {
-					await dev.lockup.withdraw(property.address, 0, {from: alice})
-					await dev.lockup.withdraw(property.address, 0, {from: bob})
+					await dev.lockup.withdraw(property.address, 0, { from: alice })
+					await dev.lockup.withdraw(property.address, 0, { from: bob })
 					await mine(3)
 				})
 				it(`Alice's withdrawable interest is 80% of current interest`, async () => {
@@ -790,7 +790,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			describe('additional staking', () => {
 				before(async () => {
-					await dev.dev.deposit(property.address, 12500 * 0.3, {from: bob})
+					await dev.dev.deposit(property.address, 12500 * 0.3, { from: bob })
 					await mine(3)
 				})
 				it(`Bob does staking 30% of the Property's total lockups, Bob's share become ${
@@ -927,7 +927,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					1
 				)
 
-				await dev.dev.deposit(property1.address, 10000, {from: alice})
+				await dev.dev.deposit(property1.address, 10000, { from: alice })
 				await mine(3)
 			})
 
@@ -950,7 +950,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					expect(aliceBalance.toFixed()).to.be.equal(total.toFixed())
 				})
 				it(`Bob does staking 100% of the Property2 total lockups, Property2 is 20% of the total rewards`, async () => {
-					await dev.dev.deposit(property2.address, 2500, {from: bob})
+					await dev.dev.deposit(property2.address, 2500, { from: bob })
 					const total = await dev.lockup.getAllValue().then(toBigNumber)
 					const p1 = await dev.lockup
 						.getPropertyValue(property1.address)
@@ -980,8 +980,8 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
-					await dev.lockup.withdraw(property1.address, 0, {from: alice})
-					await dev.lockup.withdraw(property2.address, 0, {from: bob})
+					await dev.lockup.withdraw(property1.address, 0, { from: alice })
+					await dev.lockup.withdraw(property2.address, 0, { from: bob })
 					await mine(3)
 				})
 				it('No staked Property is 0 interest', async () => {
@@ -1011,7 +1011,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			describe('additional staking', () => {
 				before(async () => {
-					await dev.dev.deposit(property2.address, 12500 * 0.3, {from: bob})
+					await dev.dev.deposit(property2.address, 12500 * 0.3, { from: bob })
 					await mine(3)
 				})
 				it('No staked Property is 0 interest', async () => {
@@ -1082,7 +1082,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 			describe('additional staking', () => {
 				before(async () => {
-					await dev.dev.deposit(property3.address, 16250 * 0.6, {from: alice})
+					await dev.dev.deposit(property3.address, 16250 * 0.6, { from: alice })
 					await mine(3)
 				})
 				it('No staked Property is 0 interest', async () => {
@@ -1259,8 +1259,8 @@ contract('LockupTest', ([deployer, user1]) => {
 				legacyPrice = legacyAmount.times(1e18).div(totalLocked)
 				legacyLastPriceAlice = legacyPrice.div(4)
 				legacyLastPriceBob = legacyPrice.div(2)
-				await dev.dev.transfer(property.address, lockedAlice, {from: alice})
-				await dev.dev.transfer(property.address, lockedBob, {from: bob})
+				await dev.dev.transfer(property.address, lockedAlice, { from: alice })
+				await dev.dev.transfer(property.address, lockedBob, { from: bob })
 
 				await dev.lockup.changeOwner(deployer)
 				const storage = await dev.lockup
@@ -1346,10 +1346,10 @@ contract('LockupTest', ([deployer, user1]) => {
 				let lastBlockAlice: BigNumber
 				let lastBlockBob: BigNumber
 				before(async () => {
-					await dev.lockup.withdraw(property.address, 0, {from: alice})
+					await dev.lockup.withdraw(property.address, 0, { from: alice })
 					lastBlockAlice = await getBlock().then(toBigNumber)
 					blockAlice = lastBlockAlice
-					await dev.lockup.withdraw(property.address, 0, {from: bob})
+					await dev.lockup.withdraw(property.address, 0, { from: bob })
 					lastBlockBob = await getBlock().then(toBigNumber)
 					blockBob = lastBlockBob
 					await mine(3)
@@ -1406,7 +1406,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					bobLocked = await dev.lockup
 						.getValue(property.address, bob)
 						.then(toBigNumber)
-					await dev.lockup.withdraw(property.address, bobLocked, {from: bob})
+					await dev.lockup.withdraw(property.address, bobLocked, { from: bob })
 					lastBlockBob = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
@@ -1490,8 +1490,8 @@ contract('LockupTest', ([deployer, user1]) => {
 				legacyPrice = legacyAmount.times(1e18).div(totalLocked)
 				legacyLastPriceAlice = legacyPrice.div(4)
 				legacyLastPriceBob = legacyPrice.div(2)
-				await dev.dev.transfer(property.address, lockedAlice, {from: alice})
-				await dev.dev.transfer(property.address, lockedBob, {from: bob})
+				await dev.dev.transfer(property.address, lockedAlice, { from: alice })
+				await dev.dev.transfer(property.address, lockedBob, { from: bob })
 				await dev.lockup.changeOwner(deployer)
 				const storage = await dev.lockup
 					.getStorageAddress()
@@ -1524,9 +1524,9 @@ contract('LockupTest', ([deployer, user1]) => {
 				)
 				await storage.changeOwner(dev.lockup.address)
 
-				await dev.dev.deposit(property.address, 200000000, {from: alice})
+				await dev.dev.deposit(property.address, 200000000, { from: alice })
 				blockAlice = await getBlock().then(toBigNumber)
-				await dev.dev.deposit(property.address, 100000000, {from: bob})
+				await dev.dev.deposit(property.address, 100000000, { from: bob })
 				await mine(10)
 			})
 			describe('before withdraw interest', () => {
@@ -1557,10 +1557,10 @@ contract('LockupTest', ([deployer, user1]) => {
 				let lastBlockAlice: BigNumber
 				let lastBlockBob: BigNumber
 				before(async () => {
-					await dev.lockup.withdraw(property.address, 0, {from: alice})
+					await dev.lockup.withdraw(property.address, 0, { from: alice })
 					lastBlockAlice = await getBlock().then(toBigNumber)
 					blockAlice = lastBlockAlice
-					await dev.lockup.withdraw(property.address, 0, {from: bob})
+					await dev.lockup.withdraw(property.address, 0, { from: bob })
 					lastBlockBob = await getBlock().then(toBigNumber)
 					blockBob = lastBlockBob
 					await mine(3)
@@ -1617,7 +1617,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					bobLocked = await dev.lockup
 						.getValue(property.address, bob)
 						.then(toBigNumber)
-					await dev.lockup.withdraw(property.address, bobLocked, {from: bob})
+					await dev.lockup.withdraw(property.address, bobLocked, { from: bob })
 					lastBlockBob = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
@@ -1682,7 +1682,7 @@ contract('LockupTest', ([deployer, user1]) => {
 				.getStorageDIP4GenesisBlock()
 				.then(toBigNumber)
 			const res = await dev.lockup
-				.setDIP4GenesisBlock(before.plus(123456), {from: user1})
+				.setDIP4GenesisBlock(before.plus(123456), { from: user1 })
 				.catch(err)
 			const after = await dev.lockup.getStorageDIP4GenesisBlock()
 			expect(after.toNumber()).to.be.equal(before.toNumber())

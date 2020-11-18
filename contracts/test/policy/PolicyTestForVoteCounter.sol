@@ -3,8 +3,9 @@ pragma solidity 0.5.17;
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
 contract PolicyTestForVoteCounter is IPolicy {
-	uint256 _lockUpBlocks = 1;
+	uint256 private _lockUpBlocks = 1;
 
+	// solhint-disable-next-line no-unused-vars
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view

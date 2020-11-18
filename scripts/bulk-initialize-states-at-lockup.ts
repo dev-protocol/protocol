@@ -10,11 +10,11 @@ import {
 	createInitializeStatesAtLockup,
 	createQueue,
 } from './lib/bulk-initializer'
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {graphql, ethgas} from './lib/api'
-import {GraphQLResponse, PromiseReturn} from './lib/types'
-const {CONFIG, EGS_TOKEN} = process.env
-const {log: ____log} = console
+import { createFastestGasPriceFetcher } from './lib/ethgas'
+import { graphql, ethgas } from './lib/api'
+import { GraphQLResponse, PromiseReturn } from './lib/types'
+const { CONFIG, EGS_TOKEN } = process.env
+const { log: ____log } = console
 
 const handler = async (
 	callback: (err: Error | null) => void
@@ -35,8 +35,8 @@ const handler = async (
 				i = 0,
 				prev: GraphQLResponse['data']['account_lockup'] = []
 			): Promise<void> => {
-				const {data} = await fetchGraphQL(i)
-				const {account_lockup: items} = data
+				const { data } = await fetchGraphQL(i)
+				const { account_lockup: items } = data
 				const next = [...prev, ...items]
 				if (items.length > 0) {
 					f(i + items.length, next).catch(console.error)
@@ -65,8 +65,8 @@ const handler = async (
 	____log('all targets', all.length)
 
 	const filteringTacks = all.map(
-		({property_address, account_address, ...x}) => async () => {
-			const [cReward, {_cLocked, _block}] = await Promise.all([
+		({ property_address, account_address, ...x }) => async () => {
+			const [cReward, { _cLocked, _block }] = await Promise.all([
 				lastCumulativeGlobalReward()(property_address, account_address),
 				lastCumulativeLockedUpAndBlock()(property_address, account_address),
 			])
@@ -80,7 +80,7 @@ const handler = async (
 				_cLocked,
 				_block
 			)
-			return {property_address, account_address, skip, ...x}
+			return { property_address, account_address, skip, ...x }
 		}
 	)
 	const shouldInitilizeItems = await createQueue(10)
@@ -90,7 +90,7 @@ const handler = async (
 	____log('Should initilize items', shouldInitilizeItems.length)
 
 	const initializeTasks = shouldInitilizeItems.map(
-		({property_address, account_address, block_number}) => async () => {
+		({ property_address, account_address, block_number }) => async () => {
 			const lockupAtThisTime = await prepare(CONFIG, web3, block_number)
 			const difference = createDifferenceCaller(lockupAtThisTime)
 			const getCumulativeLockedUp = createGetCumulativeLockedUpCaller(

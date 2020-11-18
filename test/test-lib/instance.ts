@@ -18,7 +18,7 @@ import {
 	WithdrawTestInstance,
 	MetricsInstance,
 } from '../../types/truffle-contracts'
-import {getBlock} from './utils/common'
+import { getBlock } from './utils/common'
 
 const contract = artifacts.require
 
@@ -45,8 +45,8 @@ export class DevProtocolInstance {
 		this._deployer = deployer
 	}
 
-	public get fromDeployer(): {from: string} {
-		return {from: this._deployer}
+	public get fromDeployer(): { from: string } {
+		return { from: this._deployer }
 	}
 
 	public get addressConfig(): AddressConfigInstance {
@@ -180,7 +180,7 @@ export class DevProtocolInstance {
 			this.addressConfig.address,
 			this.fromDeployer
 		)
-		await this._propertyGroup.createStorage({from: this._deployer})
+		await this._propertyGroup.createStorage({ from: this._deployer })
 		await this._addressConfig.setPropertyGroup(
 			this._propertyGroup.address,
 			this.fromDeployer
@@ -203,7 +203,7 @@ export class DevProtocolInstance {
 			this.addressConfig.address,
 			this.fromDeployer
 		)
-		await this._policyGroup.createStorage({from: this._deployer})
+		await this._policyGroup.createStorage({ from: this._deployer })
 		await this._addressConfig.setPolicyGroup(
 			this._policyGroup.address,
 			this.fromDeployer
@@ -284,7 +284,7 @@ export class DevProtocolInstance {
 		contractName: string,
 		user: string
 	): Promise<IPolicyInstance> {
-		const tmp = await contract(contractName).new({from: user})
+		const tmp = await contract(contractName).new({ from: user })
 		return tmp
 	}
 

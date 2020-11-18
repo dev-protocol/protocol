@@ -15,7 +15,6 @@ contract MetricsGroup is
 {
 	using SafeMath for uint256;
 
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {

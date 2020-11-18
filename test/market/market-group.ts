@@ -1,4 +1,4 @@
-import {DevProtocolInstance} from '../test-lib/instance'
+import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -22,7 +22,7 @@ contract(
 				await dev.addressConfig.setMarketFactory(marketFactory, {
 					from: deployer,
 				})
-				await dev.marketGroup.addGroup(market1, {from: marketFactory})
+				await dev.marketGroup.addGroup(market1, { from: marketFactory })
 			})
 			it('When a market address is specified', async () => {
 				const result = await dev.marketGroup.isGroup(market1)
@@ -31,7 +31,7 @@ contract(
 			it('The number increases as you add addresses', async () => {
 				let result = await dev.marketGroup.getCount()
 				expect(result.toNumber()).to.be.equal(1)
-				await dev.marketGroup.addGroup(market2, {from: marketFactory})
+				await dev.marketGroup.addGroup(market2, { from: marketFactory })
 				result = await dev.marketGroup.getCount()
 				expect(result.toNumber()).to.be.equal(2)
 			})

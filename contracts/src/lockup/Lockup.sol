@@ -54,7 +54,6 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**
@@ -88,10 +87,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Since the reward per block that can be withdrawn will change with the addition of staking,
 		 * saves the undrawn withdrawable reward before addition it.
 		 */
-		RewardPrices memory prices = updatePendingInterestWithdrawal(
-			_property,
-			_from
-		);
+		RewardPrices memory prices =
+			updatePendingInterestWithdrawal(_property, _from);
 
 		/**
 		 * Saves variables that should change due to the addition of staking.
@@ -142,10 +139,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets latest cumulative holders reward for the passed Property.
 		 */
-		uint256 cHoldersReward = _calculateCumulativeHoldersRewardAmount(
-			_prices.holders,
-			_property
-		);
+		uint256 cHoldersReward =
+			_calculateCumulativeHoldersRewardAmount(_prices.holders, _property);
 
 		/**
 		 * Store each value.
@@ -191,17 +186,14 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Calculates reward unit price per staking.
 		 * Later, the last cumulative sum of the reward amount is subtracted because to add the last recorded holder/staking reward.
 		 */
-		uint256 price = allStakes > 0
-			? mReward.sub(lastReward).div(allStakes)
-			: 0;
+		uint256 price =
+			allStakes > 0 ? mReward.sub(lastReward).div(allStakes) : 0;
 
 		/**
 		 * Calculates the holders reward out of the total reward amount.
 		 */
-		uint256 holdersShare = IPolicy(config().policy()).holdersShare(
-			price,
-			allStakes
-		);
+		uint256 holdersShare =
+			IPolicy(config().policy()).holdersShare(price, allStakes);
 
 		/**
 		 * Calculates and returns each reward.
@@ -219,17 +211,19 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		uint256 _reward,
 		address _property
 	) private view returns (uint256) {
-		(uint256 cHoldersReward, uint256 lastReward) = (
-			getStorageLastCumulativeHoldersRewardAmountPerProperty(_property),
-			getStorageLastCumulativeHoldersRewardPricePerProperty(_property)
-		);
+		(uint256 cHoldersReward, uint256 lastReward) =
+			(
+				getStorageLastCumulativeHoldersRewardAmountPerProperty(
+					_property
+				),
+				getStorageLastCumulativeHoldersRewardPricePerProperty(_property)
+			);
 
 		/**
 		 * `cHoldersReward` contains the calculation of `lastReward`, so subtract it here.
 		 */
-		uint256 additionalHoldersReward = _reward.sub(lastReward).mul(
-			getStoragePropertyValue(_property)
-		);
+		uint256 additionalHoldersReward =
+			_reward.sub(lastReward).mul(getStoragePropertyValue(_property));
 
 		/**
 		 * Calculates and returns the cumulative sum of the holder reward by adds the last recorded holder reward and the latest holder reward.
@@ -279,24 +273,21 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the latest mint amount per block from Allocator contract.
 		 */
-		uint256 rewardsAmount = IAllocator(config().allocator())
-			.calculateMaxRewardsPerBlock();
+		uint256 rewardsAmount =
+			IAllocator(config().allocator()).calculateMaxRewardsPerBlock();
 
 		/**
 		 * Gets the maximum mint amount per block, and the last recorded block number from `LastSameRewardsAmountAndBlock` storage.
 		 */
-		(
-			uint256 lastAmount,
-			uint256 lastBlock
-		) = getStorageLastSameRewardsAmountAndBlock();
+		(uint256 lastAmount, uint256 lastBlock) =
+			getStorageLastSameRewardsAmountAndBlock();
 
 		/**
 		 * If the recorded maximum mint amount per block and the result of the Allocator contract are different,
 		 * the result of the Allocator contract takes precedence as a maximum mint amount per block.
 		 */
-		uint256 lastMaxRewards = lastAmount == rewardsAmount
-			? rewardsAmount
-			: lastAmount;
+		uint256 lastMaxRewards =
+			lastAmount == rewardsAmount ? rewardsAmount : lastAmount;
 
 		/**
 		 * Calculates the difference between the latest block number and the last recorded block number.
@@ -307,9 +298,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		 * Adds the calculated new cumulative maximum mint amount to the recorded cumulative maximum mint amount.
 		 */
 		uint256 additionalRewards = lastMaxRewards.mul(blocks);
-		uint256 nextRewards = getStorageCumulativeGlobalRewards().add(
-			additionalRewards
-		);
+		uint256 nextRewards =
+			getStorageCumulativeGlobalRewards().add(additionalRewards);
 
 		/**
 		 * Returns the latest theoretical cumulative sum of maximum mint amount and maximum mint amount per block.
@@ -337,26 +327,22 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the cumulative sum of the interest price recorded the last time you withdrew.
 		 */
-		uint256 lastInterest = getStorageLastStakedInterestPrice(
-			_property,
-			_user
-		);
+		uint256 lastInterest =
+			getStorageLastStakedInterestPrice(_property, _user);
 
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
-		(
-			uint256 reward,
-			uint256 holders,
-			uint256 interest
-		) = calculateCumulativeRewardPrices();
+		(uint256 reward, uint256 holders, uint256 interest) =
+			calculateCumulativeRewardPrices();
 
 		/**
 		 * Calculates and returns the latest withdrawable reward amount from the difference.
 		 */
-		uint256 result = interest >= lastInterest
-			? interest.sub(lastInterest).mul(lockedUpPerAccount).divBasis()
-			: 0;
+		uint256 result =
+			interest >= lastInterest
+				? interest.sub(lastInterest).mul(lockedUpPerAccount).divBasis()
+				: 0;
 		return (result, interest, RewardPrices(reward, holders, interest));
 	}
 
@@ -389,18 +375,13 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the latest withdrawal reward amount.
 		 */
-		(
-			uint256 amount,
-			,
-			RewardPrices memory prices
-		) = _calculateInterestAmount(_property, _user);
+		(uint256 amount, , RewardPrices memory prices) =
+			_calculateInterestAmount(_property, _user);
 
 		/**
 		 * Returns the sum of all values.
 		 */
-		uint256 withdrawableAmount = amount
-			.add(pending) // solium-disable-next-line indentation
-			.add(legacy);
+		uint256 withdrawableAmount = amount.add(pending).add(legacy);
 		return (withdrawableAmount, prices);
 	}
 
@@ -411,10 +392,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		address _property,
 		address _user
 	) public view returns (uint256) {
-		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
-			_property,
-			_user
-		);
+		(uint256 amount, ) =
+			_calculateWithdrawableInterestAmount(_property, _user);
 		return amount;
 	}
 
@@ -428,10 +407,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the withdrawable amount.
 		 */
-		(
-			uint256 value,
-			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(_property, msg.sender);
+		(uint256 value, RewardPrices memory prices) =
+			_calculateWithdrawableInterestAmount(_property, msg.sender);
 
 		/**
 		 * Sets the unwithdrawn reward amount to 0.
@@ -635,10 +612,8 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Gets the latest reward amount.
 		 */
-		(
-			uint256 withdrawableAmount,
-			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(_property, _user);
+		(uint256 withdrawableAmount, RewardPrices memory prices) =
+			_calculateWithdrawableInterestAmount(_property, _user);
 
 		/**
 		 * Saves the amount to `PendingInterestWithdrawal` storage.

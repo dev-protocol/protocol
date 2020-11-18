@@ -1,9 +1,9 @@
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {ethgas} from './lib/api'
+import { createFastestGasPriceFetcher } from './lib/ethgas'
+import { ethgas } from './lib/api'
 
 /* eslint-disable no-undef */
-const {CONFIG, EGS_TOKEN} = process.env
-const {log: ____log} = console
+const { CONFIG, EGS_TOKEN } = process.env
+const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
@@ -29,7 +29,7 @@ const handler = async (
 	// Deploy new MetricsGroup
 	const nextMetricsGroup = await artifacts
 		.require('MetricsGroup')
-		.new(config.address, {gasPrice: await fastest(), gas})
+		.new(config.address, { gasPrice: await fastest(), gas })
 	____log('Deployed the new MetricsGroup', nextMetricsGroup.address)
 
 	// Delegate storage for MetricsGroup

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {PolicyFactoryInstance} from '../../../types/truffle-contracts'
-import {DevCommonInstance} from './common'
+import { PolicyFactoryInstance } from '../../../types/truffle-contracts'
+import { DevCommonInstance } from './common'
 
 export class PolicyFactory {
 	private readonly _dev: DevCommonInstance

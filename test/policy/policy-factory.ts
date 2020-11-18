@@ -1,9 +1,9 @@
-import {IPolicyInstance} from '../../types/truffle-contracts'
-import {DevProtocolInstance} from '../test-lib/instance'
+import { IPolicyInstance } from '../../types/truffle-contracts'
+import { DevProtocolInstance } from '../test-lib/instance'
 
-import {collectsEth} from '../test-lib/utils/common'
-import {getPropertyAddress} from '../test-lib/utils/log'
-import {validateAddressErrorMessage} from '../test-lib/utils/error'
+import { collectsEth } from '../test-lib/utils/common'
+import { getPropertyAddress } from '../test-lib/utils/log'
+import { validateAddressErrorMessage } from '../test-lib/utils/error'
 
 contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 	before(async () => {
@@ -69,12 +69,14 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 				dev.generateMetricsGroup(),
 				dev.generateDev(),
 			])
-			await dev.dev.mint(user1, 10000, {from: deployer})
+			await dev.dev.mint(user1, 10000, { from: deployer })
 			firstPolicyInstance = await dev.getPolicy(
 				'PolicyTestForPolicyFactory',
 				user1
 			)
-			await dev.policyFactory.create(firstPolicyInstance.address, {from: user1})
+			await dev.policyFactory.create(firstPolicyInstance.address, {
+				from: user1,
+			})
 			const propertyCreateResult = await dev.propertyFactory.create(
 				'test',
 				'TST',
@@ -99,12 +101,12 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 			expect(isGroup).to.be.equal(true)
 			isGroup = await dev.policyGroup.isGroup(second.address)
 			expect(isGroup).to.be.equal(true)
-			await dev.dev.deposit(createdPropertyAddress, 10000, {from: user1})
+			await dev.dev.deposit(createdPropertyAddress, 10000, { from: user1 })
 			await dev.voteCounter.votePolicy(
 				second.address,
 				createdPropertyAddress,
 				true,
-				{from: user1}
+				{ from: user1 }
 			)
 			const nextPolicyAddress = await dev.addressConfig.policy()
 			expect(nextPolicyAddress).to.be.equal(second.address)
@@ -117,7 +119,7 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 		})
 		it('Should fail when a call from other than Policy.', async () => {
 			const result = await dev.policyFactory
-				.convergePolicy(policy.address, {from: deployer})
+				.convergePolicy(policy.address, { from: deployer })
 				.catch((err: Error) => err)
 			validateAddressErrorMessage(result)
 		})

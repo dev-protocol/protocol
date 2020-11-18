@@ -5,7 +5,7 @@ const handler = function (deployer, network) {
 		return
 	}
 
-	const {address: next} = artifacts.require('Dev')
+	const { address: next } = artifacts.require('Dev')
 
 	deployer.deploy(artifacts.require('DevMigration'), legacy, next)
 } as Truffle.Migration

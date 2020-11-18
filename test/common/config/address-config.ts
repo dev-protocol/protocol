@@ -1,4 +1,4 @@
-import {DevProtocolInstance} from '../../test-lib/instance'
+import { DevProtocolInstance } from '../../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -11,7 +11,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			await dev.generateAddressConfig()
 		})
 		it('Value set by owner(allocator)', async () => {
-			await dev.addressConfig.setAllocator(setAddress1, {from: deployer})
+			await dev.addressConfig.setAllocator(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.allocator()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -24,7 +24,9 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(allocatorStorage)', async () => {
-			await dev.addressConfig.setAllocatorStorage(setAddress1, {from: deployer})
+			await dev.addressConfig.setAllocatorStorage(setAddress1, {
+				from: deployer,
+			})
 			const addresss = await dev.addressConfig.allocatorStorage()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -37,7 +39,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(withdraw)', async () => {
-			await dev.addressConfig.setWithdraw(setAddress1, {from: deployer})
+			await dev.addressConfig.setWithdraw(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.withdraw()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -50,7 +52,9 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(withdrawStorage)', async () => {
-			await dev.addressConfig.setWithdrawStorage(setAddress1, {from: deployer})
+			await dev.addressConfig.setWithdrawStorage(setAddress1, {
+				from: deployer,
+			})
 			const addresss = await dev.addressConfig.withdrawStorage()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -63,7 +67,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(marketFactory)', async () => {
-			await dev.addressConfig.setMarketFactory(setAddress1, {from: deployer})
+			await dev.addressConfig.setMarketFactory(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.marketFactory()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -76,7 +80,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(marketGroup)', async () => {
-			await dev.addressConfig.setMarketGroup(setAddress1, {from: deployer})
+			await dev.addressConfig.setMarketGroup(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.marketGroup()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -89,7 +93,9 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(propertyFactory)', async () => {
-			await dev.addressConfig.setPropertyFactory(setAddress1, {from: deployer})
+			await dev.addressConfig.setPropertyFactory(setAddress1, {
+				from: deployer,
+			})
 			const addresss = await dev.addressConfig.propertyFactory()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -102,7 +108,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(propertyGroup)', async () => {
-			await dev.addressConfig.setPropertyGroup(setAddress1, {from: deployer})
+			await dev.addressConfig.setPropertyGroup(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.propertyGroup()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -115,7 +121,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(metricsFactory)', async () => {
-			await dev.addressConfig.setMetricsFactory(setAddress1, {from: deployer})
+			await dev.addressConfig.setMetricsFactory(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.metricsFactory()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -128,7 +134,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(metricsGroup)', async () => {
-			await dev.addressConfig.setMetricsGroup(setAddress1, {from: deployer})
+			await dev.addressConfig.setMetricsGroup(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.metricsGroup()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -141,7 +147,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(policyFactory)', async () => {
-			await dev.addressConfig.setPolicyFactory(setAddress1, {from: deployer})
+			await dev.addressConfig.setPolicyFactory(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.policyFactory()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -154,7 +160,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(policyGroup)', async () => {
-			await dev.addressConfig.setPolicyGroup(setAddress1, {from: deployer})
+			await dev.addressConfig.setPolicyGroup(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.policyGroup()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -167,7 +173,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(policySet)', async () => {
-			await dev.addressConfig.setPolicySet(setAddress1, {from: deployer})
+			await dev.addressConfig.setPolicySet(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.policySet()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -180,7 +186,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(token)', async () => {
-			await dev.addressConfig.setToken(setAddress1, {from: deployer})
+			await dev.addressConfig.setToken(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.token()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -193,7 +199,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(lockup)', async () => {
-			await dev.addressConfig.setLockup(setAddress1, {from: deployer})
+			await dev.addressConfig.setLockup(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.lockup()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -206,7 +212,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(lockupStorage)', async () => {
-			await dev.addressConfig.setLockupStorage(setAddress1, {from: deployer})
+			await dev.addressConfig.setLockupStorage(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.lockupStorage()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -234,7 +240,9 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(voteTimesStorage)', async () => {
-			await dev.addressConfig.setVoteTimesStorage(setAddress1, {from: deployer})
+			await dev.addressConfig.setVoteTimesStorage(setAddress1, {
+				from: deployer,
+			})
 			const addresss = await dev.addressConfig.voteTimesStorage()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -247,7 +255,7 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			validateErrorMessage(result, 'Ownable: caller is not the owner')
 		})
 		it('Value set by owner(voteCounter)', async () => {
-			await dev.addressConfig.setVoteCounter(setAddress1, {from: deployer})
+			await dev.addressConfig.setVoteCounter(setAddress1, { from: deployer })
 			const addresss = await dev.addressConfig.voteCounter()
 			expect(addresss).to.be.equal(setAddress1)
 		})
@@ -280,22 +288,22 @@ contract('AddressConfigTest', ([deployer, other, setAddress1, setAddress2]) => {
 			await dev.generateAddressConfig()
 		})
 		it('Value set by PolicyFactory', async () => {
-			await dev.addressConfig.setPolicyFactory(setAddress1, {from: deployer})
-			await dev.addressConfig.setPolicy(setAddress2, {from: setAddress1})
+			await dev.addressConfig.setPolicyFactory(setAddress1, { from: deployer })
+			await dev.addressConfig.setPolicy(setAddress2, { from: setAddress1 })
 			const addresss = await dev.addressConfig.policy()
 			expect(addresss).to.be.equal(setAddress2)
 		})
 		it('Value set by owner', async () => {
-			await dev.addressConfig.setPolicyFactory(setAddress1, {from: deployer})
+			await dev.addressConfig.setPolicyFactory(setAddress1, { from: deployer })
 			const result = await dev.addressConfig
-				.setPolicy(setAddress2, {from: deployer})
+				.setPolicy(setAddress2, { from: deployer })
 				.catch((err: Error) => err)
 			validateAddressErrorMessage(result)
 		})
 		it('Value set by non-owner', async () => {
-			await dev.addressConfig.setPolicyFactory(setAddress1, {from: deployer})
+			await dev.addressConfig.setPolicyFactory(setAddress1, { from: deployer })
 			const result = await dev.addressConfig
-				.setPolicy(setAddress2, {from: other})
+				.setPolicy(setAddress2, { from: other })
 				.catch((err: Error) => err)
 			validateAddressErrorMessage(result)
 		})

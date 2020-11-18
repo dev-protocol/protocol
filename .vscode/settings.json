@@ -1,5 +1,5 @@
 {
-	"solidity.linter": "solium",
+	"solidity.linter": "solhint",
 	"solidity.packageDefaultDependenciesContractsDirectory": "",
 	"solidity.packageDefaultDependenciesDirectory": "node_modules",
 	"eslint.autoFixOnSave": true,

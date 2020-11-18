@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import Web3 from 'web3'
-import {Contract} from 'web3-eth/node_modules/web3-eth-contract/types'
+import { Contract } from 'web3-eth/node_modules/web3-eth-contract/types'
 import {
 	prepare,
 	createQueue,
@@ -13,11 +14,11 @@ import {
 	// Already nonexistent value
 	// createSetLastCumulativeHoldersReward,
 } from './lib/bulk-initializer'
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {ethgas} from './lib/api'
-import {PromiseReturn} from './lib/types'
-const {CONFIG, EGS_TOKEN, WITHDRAW_STORAGE, WITHDRAW_MIGRATION} = process.env
-const {log: ____log} = console
+import { createFastestGasPriceFetcher } from './lib/ethgas'
+import { ethgas } from './lib/api'
+import { PromiseReturn } from './lib/types'
+const { CONFIG, EGS_TOKEN, WITHDRAW_STORAGE, WITHDRAW_MIGRATION } = process.env
+const { log: ____log } = console
 
 const DEV = '0x5cAf454Ba92e6F2c929DF14667Ee360eD9fD5b26'
 const withdrawContracts = [
@@ -65,8 +66,8 @@ const handler = async (
 		web3
 	)
 
-	const filter = all.map(({transactionHash, ...x}) => async () => {
-		const {from: sender, to, input} = await (web3 as Web3).eth.getTransaction(
+	const filter = all.map(({ transactionHash, ...x }) => async () => {
+		const { from: sender, to, input } = await (web3 as Web3).eth.getTransaction(
 			transactionHash
 		)
 		const toWithdraw = to ? withdrawContracts.includes(to.toLowerCase()) : false
@@ -78,7 +79,7 @@ const handler = async (
 			: false)
 		const skip = alreadyInitialized || !toWithdraw
 		____log('Should skip?', skip, propertyAddress, transactionHash)
-		return {skip, sender, propertyAddress, ...x}
+		return { skip, sender, propertyAddress, ...x }
 	})
 
 	const filteredItems = await createQueue(10)
@@ -91,8 +92,7 @@ const handler = async (
 		return
 	}
 
-	const createKey = (el: typeof filteredItems[0]) =>
-		`${el.propertyAddress ?? ''}${el.sender}`
+	const createKey = (el: any) => `${el.propertyAddress ?? ''}${el.sender}`
 	const propertyUserMap = new Map([
 		[createKey(filteredItems[0]), filteredItems[0]],
 	])
@@ -110,7 +110,7 @@ const handler = async (
 
 	const initializeTasks = shouldInitilizeItems
 		? shouldInitilizeItems.map(
-				({propertyAddress, sender, skip, blockNumber}) => async () => {
+				({ propertyAddress, sender, skip, blockNumber }) => async () => {
 					if (!propertyAddress) {
 						____log('Property address is not found')
 						return

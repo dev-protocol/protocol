@@ -1,5 +1,5 @@
-import {DevInstance} from '../../types/truffle-contracts'
-import {AddressInfo, createInstance} from './common'
+import { DevInstance } from '../../types/truffle-contracts'
+import { AddressInfo, createInstance } from './common'
 import BigNumber from 'bignumber.js'
 
 export async function changeBalance(
