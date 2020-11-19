@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const CONFIG = '0x1D415aa39D647834786EB9B5a333A50e9935b796'
 const DEPLOYED_BLOCK = '10358615'
 const { log: ____log } = console
