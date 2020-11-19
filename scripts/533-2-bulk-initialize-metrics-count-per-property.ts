@@ -9,8 +9,8 @@ import {
 	// Already nonexistent value
 	// create__SetMetricsCountPerProperty,
 } from './lib/bulk-initializer'
-import { createFastestGasPriceFetcher } from './lib/ethgas'
-import { graphql, ethgas } from './lib/api'
+import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
+import { graphql } from './lib/api'
 import { GraphQLPropertyFactoryCreateResponse } from './lib/types'
 const { CONFIG, EGS_TOKEN } = process.env
 const { log: ____log } = console
@@ -52,10 +52,7 @@ const handler = async (
 	____log('GraphQL fetched', all)
 	____log('all targets', all.length)
 
-	const fetchFastestGasPrice = createFastestGasPriceFetcher(
-		ethgas(EGS_TOKEN),
-		web3
-	)
+	const fetchFastestGasPrice = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
 
 	const getMetricsCountPerProperty = createGetMetricsCountPerProperty({} as any)
 	// Already nonexistent value

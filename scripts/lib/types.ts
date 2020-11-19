@@ -19,19 +19,6 @@ export type GraphQLPropertyFactoryCreateResponse = {
 		}>
 	}
 }
-export type EGSResponse = {
-	fast: number
-	fastest: number
-	safeLow: number
-	average: number
-	block_time: number
-	blockNum: number
-	speed: number
-	safeLowWait: number
-	avgWait: number
-	fastWait: number
-	fastestWait: number
-}
 export type PromiseReturn<T extends Promise<any>> = T extends Promise<infer P>
 	? P
 	: never

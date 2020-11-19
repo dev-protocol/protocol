@@ -1,7 +1,5 @@
-import { createFastestGasPriceFetcher } from './lib/ethgas'
-import { ethgas } from './lib/api'
+import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
 
-/* eslint-disable no-undef */
 const { CONFIG, EGS_TOKEN } = process.env
 const { log: ____log } = console
 const gas = 6721975
@@ -23,7 +21,7 @@ const handler = async (
 		artifacts.require('Dev').at(await config.token()),
 	])
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
+	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
 
 	// Deploy new Lockup and new Withdraw
 	const nextWithdraw = await artifacts
