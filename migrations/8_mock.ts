@@ -14,7 +14,6 @@ const handler = async function (deployer, network) {
 	await createPolicy(artifacts)
 	console.log('---finish---')
 	console.log('[create property]')
-	// eslint-disable-next-line no-undef
 	const addressInfo = await createProperty(artifacts, web3)
 	console.log('---finish---')
 	console.log('[balance adjustment]')
