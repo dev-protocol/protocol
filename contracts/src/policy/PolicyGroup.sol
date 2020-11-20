@@ -3,42 +3,30 @@ pragma solidity 0.5.17;
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
+import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 
-contract PolicyGroup is
-	UsingConfig,
-	UsingStorage,
-	UsingValidator,
-	IPolicyGroup
-{
+contract PolicyGroup is UsingConfig, UsingStorage, IPolicyGroup {
 	using SafeMath for uint256;
 
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		addGroupWithoutSetVotingEnd(_addr);
+		innerAddGroupWithoutSetVotingEnd(_addr);
 		/**
 		 * Resets the voting period because a new Policy has been added.
 		 */
 		setVotingEndBlockNumber(_addr);
 	}
 
-	function addGroupWithoutSetVotingEnd(address _addr) public {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
-		);
-
-		require(isGroup(_addr) == false, "already group");
-		eternalStorage().setBool(getPolicyGroupKey(_addr), true);
+	function addGroupWithoutSetVotingEnd(address _addr) external {
+		innerAddGroupWithoutSetVotingEnd(_addr);
 	}
 
 	function incrementVotingGroupIndex() external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().policyFactory()
+		require(
+			msg.sender == config().policyFactory(),
+			"this is illegal address"
 		);
 
 		bytes32 key = getVotingGroupIndexKey();
@@ -47,19 +35,31 @@ contract PolicyGroup is
 		eternalStorage().setUint(key, idx);
 	}
 
-	function isGroup(address _addr) public view returns (bool) {
+	function isGroup(address _addr) external view returns (bool) {
 		return eternalStorage().getBool(getPolicyGroupKey(_addr));
 	}
 
-	function getVotingGroupIndex() public view returns (uint256) {
-		bytes32 key = getVotingGroupIndexKey();
-		return eternalStorage().getUint(key);
+	function getVotingGroupIndex() external view returns (uint256) {
+		return eternalStorage().getUint(getVotingGroupIndexKey());
 	}
 
 	function voting(address _policy) external view returns (bool) {
 		bytes32 key = getVotingEndBlockNumberKey(_policy);
 		uint256 limit = eternalStorage().getUint(key);
 		return block.number <= limit;
+	}
+
+	function innerAddGroupWithoutSetVotingEnd(address _addr) private {
+		require(
+			msg.sender == config().policyFactory(),
+			"this is illegal address"
+		);
+
+		require(
+			eternalStorage().getBool(getPolicyGroupKey(_addr)) == false,
+			"already group"
+		);
+		eternalStorage().setBool(getPolicyGroupKey(_addr), true);
 	}
 
 	function setVotingEndBlockNumber(address _policy) private {
@@ -69,13 +69,13 @@ contract PolicyGroup is
 		eternalStorage().setUint(key, votingEndBlockNumber);
 	}
 
-	function getVotingGroupIndexKey() private pure returns (bytes32) {
-		return keccak256(abi.encodePacked("_votingGroupIndex"));
+	function getPolicyGroupKey(address _addr) private view returns (bytes32) {
+		uint256 idx = eternalStorage().getUint(getVotingGroupIndexKey());
+		return keccak256(abi.encodePacked("_group", idx, _addr));
 	}
 
-	function getPolicyGroupKey(address _addr) private view returns (bytes32) {
-		uint256 idx = getVotingGroupIndex();
-		return keccak256(abi.encodePacked("_group", idx, _addr));
+	function getVotingGroupIndexKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_votingGroupIndex"));
 	}
 
 	function getVotingEndBlockNumberKey(address _policy)
@@ -84,5 +84,9 @@ contract PolicyGroup is
 		returns (bytes32)
 	{
 		return keccak256(abi.encodePacked("_votingEndBlockNumber", _policy));
+	}
+
+	function getGroupKey(address _addr) private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }

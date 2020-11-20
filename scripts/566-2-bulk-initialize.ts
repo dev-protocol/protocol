@@ -1,7 +1,6 @@
-/* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import Web3 from 'web3'
-import { Contract } from 'web3-eth/node_modules/web3-eth-contract/types'
+import { Contract } from 'web3-eth-contract'
 import {
 	prepare,
 	createQueue,

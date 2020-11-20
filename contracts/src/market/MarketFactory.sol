@@ -1,15 +1,14 @@
 pragma solidity 0.5.17;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IMarketFactory} from "contracts/src/market/IMarketFactory.sol";
 import {Market} from "contracts/src/market/Market.sol";
-import {IMarketGroup} from "contracts/src/market/IMarketGroup.sol";
+import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 
 /**
  * A factory contract that creates a new Market contract.
  */
-contract MarketFactory is IMarketFactory, UsingConfig, UsingValidator {
+contract MarketFactory is IMarketFactory, UsingConfig {
 	event Create(address indexed _from, address _market);
 
 	/**
@@ -24,7 +23,7 @@ contract MarketFactory is IMarketFactory, UsingConfig, UsingValidator {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
-		addressValidator().validateIllegalAddress(_addr);
+		require(_addr != address(0), "this is illegal address");
 
 		/**
 		 * Creates a new Market contract with the passed address as the IMarketBehavior.

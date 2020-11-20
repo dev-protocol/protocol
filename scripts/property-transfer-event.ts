@@ -1,7 +1,6 @@
 import { createFastestGasPriceFetcher } from './lib/ethgas'
 import { ethgas } from './lib/api'
 
-/* eslint-disable no-undef */
 const { CONFIG, EGS_TOKEN } = process.env
 const { log: ____log } = console
 const gas = 6721975

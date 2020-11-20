@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 // Unused value
 // import Web3 from 'web3'
 import {

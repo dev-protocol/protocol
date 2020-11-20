@@ -1,16 +1,14 @@
 pragma solidity 0.5.17;
 
-import {Killable} from "contracts/src/common/lifecycle/Killable.sol";
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 
 /**
  * A registry contract to hold the latest contract addresses.
  * Dev Protocol will be upgradeable by this contract.
  */
 /* solhint-disable max-states-count */
-contract AddressConfig is Ownable, UsingValidator, Killable {
-	address public token = 0x98626E2C9231f03504273d55f397409deFD4a093;
+contract AddressConfig is Ownable {
+	address public token = 0x5cAf454Ba92e6F2c929DF14667Ee360eD9fD5b26;
 	address public allocator;
 	address public allocatorStorage;
 	address public withdraw;
@@ -142,7 +140,7 @@ contract AddressConfig is Ownable, UsingValidator, Killable {
 	 * Only the latest PolicyFactory contract can execute this function.
 	 */
 	function setPolicy(address _addr) external {
-		addressValidator().validateAddress(msg.sender, policyFactory);
+		require(msg.sender == policyFactory, "this is illegal address");
 		policy = _addr;
 	}
 

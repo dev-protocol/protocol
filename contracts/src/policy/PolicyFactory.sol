@@ -1,14 +1,13 @@
 pragma solidity 0.5.17;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
+import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
 import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
 
 /**
  * A factory contract that creates a new Policy contract.
  */
-contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
+contract PolicyFactory is UsingConfig, IPolicyFactory {
 	event Create(address indexed _from, address _policy);
 
 	/**
@@ -23,7 +22,7 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
-		addressValidator().validateIllegalAddress(_newPolicyAddress);
+		require(_newPolicyAddress != address(0), "this is illegal address");
 
 		emit Create(msg.sender, _newPolicyAddress);
 
@@ -50,7 +49,10 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		/**
 		 * Verify sender is VoteCounter contract
 		 */
-		addressValidator().validateAddress(msg.sender, config().voteCounter());
+		require(
+			msg.sender == config().voteCounter(),
+			"this is illegal address"
+		);
 
 		/**
 		 * Sets the passed Policy to current Policy.

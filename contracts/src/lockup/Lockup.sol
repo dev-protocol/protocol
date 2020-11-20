@@ -4,14 +4,13 @@ pragma solidity 0.5.17;
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {IProperty} from "contracts/src/property/IProperty.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
-import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
+import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
-import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
+import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 
 /**
  * A contract that manages the staking of DEV tokens and calculates rewards.
@@ -41,7 +40,7 @@ import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
  * - After 10 blocks, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
-contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
+contract Lockup is ILockup, UsingConfig, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	struct RewardPrices {
@@ -68,7 +67,7 @@ contract Lockup is ILockup, UsingConfig, UsingValidator, LockupStorage {
 		/**
 		 * Validates the sender is Dev contract.
 		 */
-		addressValidator().validateAddress(msg.sender, config().token());
+		require(msg.sender == config().token(), "this is illegal address");
 
 		/**
 		 * Validates _value is not 0.

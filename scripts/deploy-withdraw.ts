@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { DevCommonInstance } from './lib/instance/common'
 import { Withdraw } from './lib/instance/withdraw'
 import { config } from 'dotenv'

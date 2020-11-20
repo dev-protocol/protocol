@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { createFastestGasPriceFetcher } from './lib/ethgas'
 import { ethgas } from './lib/api'
 import { config } from 'dotenv'

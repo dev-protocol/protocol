@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import Web3 from 'web3'
 import {
 	prepare,

@@ -1,18 +1,18 @@
 pragma solidity 0.5.17;
 
-import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
+import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {IPolicy} from "contracts/src/policy/IPolicy.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
+import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 
 /**
  * A contract that determines the total number of mint.
  * Lockup contract and Withdraw contract mint new DEV tokens based on the total number of new mint determined by this contract.
  */
-contract Allocator is UsingConfig, IAllocator, UsingValidator {
+contract Allocator is UsingConfig, IAllocator {
 	/**
 	 * Initialize the argument as AddressConfig address.
 	 */
@@ -22,7 +22,7 @@ contract Allocator is UsingConfig, IAllocator, UsingValidator {
 	 * Returns the maximum new mint count per block.
 	 * This function gets the total number of Metrics contracts and total number of lockups and returns the calculation result of `Policy.rewards`.
 	 */
-	function calculateMaxRewardsPerBlock() public view returns (uint256) {
+	function calculateMaxRewardsPerBlock() external view returns (uint256) {
 		uint256 totalAssets =
 			IMetricsGroup(config().metricsGroup()).totalIssuedMetrics();
 		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
@@ -39,7 +39,10 @@ contract Allocator is UsingConfig, IAllocator, UsingValidator {
 		address _from,
 		address _to
 	) external {
-		addressValidator().validateGroup(msg.sender, config().propertyGroup());
+		require(
+			IPropertyGroup(config().propertyGroup()).isGroup(msg.sender),
+			"this is illegal address"
+		);
 
 		IWithdraw(config().withdraw()).beforeBalanceChange(
 			_property,

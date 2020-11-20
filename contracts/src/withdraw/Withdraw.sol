@@ -5,16 +5,16 @@ import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.s
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
 import {ILockup} from "contracts/src/lockup/ILockup.sol";
-import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
+import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
+import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
-contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
+contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event PropertyTransfer(address _property, address _from, address _to);
@@ -30,9 +30,12 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	function withdraw(address _property) external {
 		/**
 		 * Validate
-		 s the passed Property address is included the Property address set.
+		 * the passed Property address is included the Property address set.
 		 */
-		addressValidator().validateGroup(_property, config().propertyGroup());
+		require(
+			IPropertyGroup(config().propertyGroup()).isGroup(_property),
+			"this is illegal address"
+		);
 
 		/**
 		 * Gets the withdrawable rewards amount and the latest cumulative sum of the maximum mint amount.
@@ -92,7 +95,7 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Validates the sender is Allocator contract.
 		 */
-		addressValidator().validateAddress(msg.sender, config().allocator());
+		require(msg.sender == config().allocator(), "this is illegal address");
 
 		/**
 		 * Gets the cumulative sum of the transfer source's "before transfer" withdrawable reward amount and the cumulative sum of the maximum mint amount.

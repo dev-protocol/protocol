@@ -6,9 +6,10 @@ import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.s
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 // prettier-ignore
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {Lockup} from "contracts/src/lockup/Lockup.sol";
+import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {IDev} from "contracts/interface/IDev.sol";
+import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 
 /**
  * The contract used as the DEV token.
@@ -17,13 +18,7 @@ import {Lockup} from "contracts/src/lockup/Lockup.sol";
  * Also, mint will be performed based on the Allocator contract.
  * When authenticated a new asset by the Market contracts, DEV token is burned as fees.
  */
-contract Dev is
-	ERC20Detailed,
-	ERC20Mintable,
-	ERC20Burnable,
-	UsingConfig,
-	UsingValidator
-{
+contract Dev is ERC20Detailed, ERC20Mintable, ERC20Burnable, UsingConfig, IDev {
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 * The token name is `Dev`, the token symbol is `DEV`, and the decimals is 18.
@@ -65,7 +60,10 @@ contract Dev is
 	 * Only Market contracts can execute this function.
 	 */
 	function fee(address _from, uint256 _amount) external returns (bool) {
-		addressValidator().validateGroup(msg.sender, config().marketGroup());
+		require(
+			IMarketGroup(config().marketGroup()).isGroup(msg.sender),
+			"this is illegal address"
+		);
 		_burn(_from, _amount);
 		return true;
 	}
@@ -78,6 +76,6 @@ contract Dev is
 		address _to,
 		uint256 _amount
 	) private {
-		Lockup(config().lockup()).lockup(_from, _to, _amount);
+		ILockup(config().lockup()).lockup(_from, _to, _amount);
 	}
 }

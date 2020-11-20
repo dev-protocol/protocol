@@ -20,9 +20,7 @@
 		"dev-protocol": "cli/index.js"
 	},
 	"files": [
-		"contracts",
-		"migrations",
-		"truffle-config.js"
+		"contracts/interfaces"
 	],
 	"author": "aggre",
 	"license": "MPL-2.0",
