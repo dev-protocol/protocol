@@ -73,7 +73,7 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 	}
 
 	function setMetricsCountPerProperty(address _property, uint256 _value)
-		private
+		internal
 	{
 		eternalStorage().setUint(
 			getMetricsCountPerPropertyKey(_property),
