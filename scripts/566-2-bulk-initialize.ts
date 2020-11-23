@@ -13,8 +13,7 @@ import {
 	// Already nonexistent value
 	// createSetLastCumulativeHoldersReward,
 } from './lib/bulk-initializer'
-import { createFastestGasPriceFetcher } from './lib/ethgas'
-import { ethgas } from './lib/api'
+import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
 import { PromiseReturn } from './lib/types'
 const { CONFIG, EGS_TOKEN, WITHDRAW_STORAGE, WITHDRAW_MIGRATION } = process.env
 const { log: ____log } = console
@@ -60,10 +59,7 @@ const handler = async (
 	)
 	const all = await fetchAllWithdrawEvents(dev)
 
-	const fetchFastestGasPrice = createFastestGasPriceFetcher(
-		ethgas(EGS_TOKEN),
-		web3
-	)
+	const fetchFastestGasPrice = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
 
 	const filter = all.map(({ transactionHash, ...x }) => async () => {
 		const { from: sender, to, input } = await (web3 as Web3).eth.getTransaction(

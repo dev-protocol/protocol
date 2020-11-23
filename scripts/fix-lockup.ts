@@ -1,5 +1,4 @@
-import { createFastestGasPriceFetcher } from './lib/ethgas'
-import { ethgas } from './lib/api'
+import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
 
 const { CONFIG, EGS_TOKEN } = process.env
 const { log: ____log } = console
@@ -25,7 +24,7 @@ const handler = async (
 	____log('Generated current Lockup contract', lockup.address)
 	____log('Generated current Dev contract', dev.address)
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
+	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
 
 	// Deploy new Lockup
 	const nextLockup = await artifacts

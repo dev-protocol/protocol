@@ -9,8 +9,8 @@ import {
 	createInitializeStatesAtLockup,
 	createQueue,
 } from './lib/bulk-initializer'
-import { createFastestGasPriceFetcher } from './lib/ethgas'
-import { graphql, ethgas } from './lib/api'
+import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
+import { graphql } from './lib/api'
 import { GraphQLResponse, PromiseReturn } from './lib/types'
 const { CONFIG, EGS_TOKEN } = process.env
 const { log: ____log } = console
@@ -48,10 +48,7 @@ const handler = async (
 		}))()
 	____log('GraphQL fetched', all)
 
-	const fetchFastestGasPrice = createFastestGasPriceFetcher(
-		ethgas(EGS_TOKEN),
-		web3
-	)
+	const fetchFastestGasPrice = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
 
 	const lastCumulativeGlobalReward = createGetStorageLastCumulativeGlobalReward(
 		lockup
