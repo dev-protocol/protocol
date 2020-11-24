@@ -11,5 +11,8 @@ interface IMetricsGroup {
 
 	function hasAssets(address _property) external view returns (bool);
 
-	function getMetricsCountPerProperty(address _property) external view returns (uint256);
+	function getMetricsCountPerProperty(address _property)
+		external
+		view
+		returns (uint256);
 }
