@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {IPolicy} from "contracts/src/policy/IPolicy.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 
 contract PolicyTest1 is IPolicy {

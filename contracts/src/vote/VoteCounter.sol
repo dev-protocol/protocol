@@ -3,13 +3,13 @@ pragma solidity 0.5.17;
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {VoteCounterStorage} from "contracts/src/vote/VoteCounterStorage.sol";
-import {IPolicy} from "contracts/src/policy/IPolicy.sol";
-import {ILockup} from "contracts/src/lockup/ILockup.sol";
-import {IMarket} from "contracts/src/market/IMarket.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
+import {ILockup} from "contracts/interface/ILockup.sol";
+import {IMarket} from "contracts/interface/IMarket.sol";
 import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 import {IVoteCounter} from "contracts/src/vote/IVoteCounter.sol";
 import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
-import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
+import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
 
 /**
  * A contract that manages the activation votes for new markets and new policies.

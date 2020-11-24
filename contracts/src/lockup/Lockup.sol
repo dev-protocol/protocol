@@ -4,12 +4,12 @@ pragma solidity 0.5.17;
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {IProperty} from "contracts/src/property/IProperty.sol";
+import {IProperty} from "contracts/interface/IProperty.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
-import {IPolicy} from "contracts/src/policy/IPolicy.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
-import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {ILockup} from "contracts/interface/ILockup.sol";
 import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 
 /**

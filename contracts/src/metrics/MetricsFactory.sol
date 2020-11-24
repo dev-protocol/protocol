@@ -2,9 +2,10 @@ pragma solidity 0.5.17;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
+import {IMetrics} from "contracts/interface/IMetrics.sol";
 import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
-import {IMetricsFactory} from "contracts/src/metrics/IMetricsFactory.sol";
+import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
 
 /**
  * A factory contract for creating new Metrics contracts and logical deletion of Metrics contracts.
@@ -67,7 +68,7 @@ contract MetricsFactory is UsingConfig, IMetricsFactory {
 		/**
 		 *  Validates the sender is the Market contract associated with the passed Metrics.
 		 */
-		Metrics metrics = Metrics(_metrics);
+		IMetrics metrics = IMetrics(_metrics);
 		require(msg.sender == metrics.market(), "this is illegal address");
 
 		/**

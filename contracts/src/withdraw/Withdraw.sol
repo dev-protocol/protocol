@@ -7,7 +7,7 @@ import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
-import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {ILockup} from "contracts/interface/ILockup.sol";
 import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 

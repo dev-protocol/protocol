@@ -2,7 +2,7 @@ pragma solidity 0.5.17;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
-import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
+import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
 
 /**
  * A factory contract that creates a new Policy contract.

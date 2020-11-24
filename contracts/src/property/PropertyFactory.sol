@@ -3,8 +3,8 @@ pragma solidity 0.5.17;
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Property} from "contracts/src/property/Property.sol";
 import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
-import {IPropertyFactory} from "contracts/src/property/IPropertyFactory.sol";
-import {IMarket} from "contracts/src/market/IMarket.sol";
+import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
+import {IMarket} from "contracts/interface/IMarket.sol";
 
 /**
  * A factory contract that creates a new Property contract.

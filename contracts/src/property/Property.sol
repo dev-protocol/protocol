@@ -6,7 +6,7 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
-import {IProperty} from "contracts/src/property/IProperty.sol";
+import {IProperty} from "contracts/interface/IProperty.sol";
 
 /**
  * A contract that represents the assets of the user and collects staking from the stakers.

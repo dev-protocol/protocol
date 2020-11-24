@@ -1,7 +1,7 @@
 pragma solidity 0.5.17;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IMarketFactory} from "contracts/src/market/IMarketFactory.sol";
+import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 

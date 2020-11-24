@@ -2,14 +2,14 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IProperty} from "contracts/src/property/IProperty.sol";
-import {IMarket} from "contracts/src/market/IMarket.sol";
-import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
-import {IPolicy} from "contracts/src/policy/IPolicy.sol";
-import {Metrics} from "contracts/src/metrics/Metrics.sol";
-import {IMetricsFactory} from "contracts/src/metrics/IMetricsFactory.sol";
+import {IProperty} from "contracts/interface/IProperty.sol";
+import {IMarket} from "contracts/interface/IMarket.sol";
+import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
+import {IMetrics} from "contracts/interface/IMetrics.sol";
+import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
 import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
-import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";
 
 /**
@@ -82,7 +82,7 @@ contract Market is UsingConfig, IMarket {
 	 * Modifier for validates the sender is the author of the Property associated with the passed Metrics contract.
 	 */
 	modifier onlyLinkedPropertyAuthor(address _metrics) {
-		address _prop = Metrics(_metrics).property();
+		address _prop = IMetrics(_metrics).property();
 		propertyValidation(_prop);
 		_;
 	}

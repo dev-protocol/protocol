@@ -7,7 +7,7 @@ import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.s
 // prettier-ignore
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {ILockup} from "contracts/src/lockup/ILockup.sol";
+import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";
 import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 

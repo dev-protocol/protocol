@@ -4,7 +4,7 @@ import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
-import {IMetrics} from "contracts/src/metrics/IMetrics.sol";
+import {IMetrics} from "contracts/interface/IMetrics.sol";
 
 contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 	using SafeMath for uint256;
@@ -64,7 +64,7 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 	}
 
 	function getMetricsCountPerProperty(address _property)
-		private
+		public
 		view
 		returns (uint256)
 	{
