@@ -43,4 +43,46 @@ interface IAddressConfig {
 	function voteCounter() external view returns (address);
 
 	function voteCounterStorage() external view returns (address);
+
+	function setAllocator(address _addr) external;
+
+	function setAllocatorStorage(address _addr) external;
+
+	function setWithdraw(address _addr) external;
+
+	function setWithdrawStorage(address _addr) external;
+
+	function setMarketFactory(address _addr) external;
+
+	function setMarketGroup(address _addr) external;
+
+	function setPropertyFactory(address _addr) external;
+
+	function setPropertyGroup(address _addr) external;
+
+	function setMetricsFactory(address _addr) external;
+
+	function setMetricsGroup(address _addr) external;
+
+	function setPolicyFactory(address _addr) external;
+
+	function setPolicyGroup(address _addr) external;
+
+	function setPolicySet(address _addr) external;
+
+	function setPolicy(address _addr) external;
+
+	function setToken(address _addr) external;
+
+	function setLockup(address _addr) external;
+
+	function setLockupStorage(address _addr) external;
+
+	function setVoteTimes(address _addr) external;
+
+	function setVoteTimesStorage(address _addr) external;
+
+	function setVoteCounter(address _addr) external;
+
+	function setVoteCounterStorage(address _addr) external;
 }
