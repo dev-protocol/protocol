@@ -3,8 +3,8 @@ pragma solidity 0.5.17;
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 import {IMetrics} from "contracts/interface/IMetrics.sol";
+import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 
 contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 	using SafeMath for uint256;

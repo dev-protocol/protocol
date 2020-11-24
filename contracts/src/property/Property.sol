@@ -2,7 +2,6 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-// prettier-ignore
 import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";

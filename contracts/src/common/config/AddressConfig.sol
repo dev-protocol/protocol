@@ -8,7 +8,7 @@ import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
  * Dev Protocol will be upgradeable by this contract.
  */
 /* solhint-disable max-states-count */
-contract AddressConfig is Ownable {
+contract AddressConfig is Ownable, IAddressConfig {
 	address public token = 0x5cAf454Ba92e6F2c929DF14667Ee360eD9fD5b26;
 	address public allocator;
 	address public allocatorStorage;
