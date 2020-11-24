@@ -20,7 +20,7 @@
 		"dev-protocol": "cli/index.js"
 	},
 	"files": [
-		"contracts/interfaces"
+		"contracts/interface"
 	],
 	"author": "aggre",
 	"license": "MPL-2.0",
