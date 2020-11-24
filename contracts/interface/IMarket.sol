@@ -1,4 +1,5 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity >=0.5.17;
 
 interface IMarket {
 	function authenticate(
@@ -29,6 +30,8 @@ interface IMarket {
 	function schema() external view returns (string memory);
 
 	function behavior() external view returns (address);
+
+	function issuedMetrics() external view returns (uint256);
 
 	function enabled() external view returns (bool);
 

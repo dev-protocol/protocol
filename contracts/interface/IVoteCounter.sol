@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity >=0.5.17;
 
-contract IVoteCounter {
+interface IVoteCounter {
 	function voteMarket(
 		address _market,
 		address _property,

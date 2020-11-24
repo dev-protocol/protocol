@@ -2,9 +2,9 @@ pragma solidity 0.5.17;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Property} from "contracts/src/property/Property.sol";
-import {IGroup} from "contracts/src/property/PropertyGroup.sol";
-import {IPropertyFactory} from "contracts/src/property/IPropertyFactory.sol";
-import {IMarket} from "contracts/src/market/IMarket.sol";
+import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
+import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
+import {IMarket} from "contracts/interface/IMarket.sol";
 
 /**
  * A factory contract that creates a new Property contract.
@@ -69,7 +69,7 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 		/**
 		 * Adds the new Property contract to the Property address set.
 		 */
-		IGroup(config().propertyGroup()).addGroup(address(property));
+		IPropertyGroup(config().propertyGroup()).addGroup(address(property));
 
 		emit Create(msg.sender, address(property));
 		return address(property);

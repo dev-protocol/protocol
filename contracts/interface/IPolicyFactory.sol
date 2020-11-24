@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity >=0.5.17;
 
-contract IPolicyFactory {
+interface IPolicyFactory {
 	function create(address _newPolicyAddress) external;
 
 	function convergePolicy(address _currentPolicyAddress) external;

@@ -5,6 +5,7 @@ contract('UsingConfigTest', ([deployer]) => {
 	const dev = new DevProtocolInstance(deployer)
 	before(async () => {
 		await dev.generateAddressConfig()
+		await dev.generateDev()
 	})
 	describe('UsingConfig; config', () => {
 		it('You can get the address of config by setting it in the constructor.', async () => {
@@ -12,9 +13,9 @@ contract('UsingConfigTest', ([deployer]) => {
 				dev.addressConfig.address,
 				{ from: deployer }
 			)
-			const config = await usingConfigTest.getConfig()
+			const tokenAddress = await usingConfigTest.getToken()
 
-			expect(config).to.be.equal(dev.addressConfig.address)
+			expect(tokenAddress).to.be.equal(await dev.addressConfig.token())
 		})
 	})
 	describe('UsingConfig; configAddress', () => {

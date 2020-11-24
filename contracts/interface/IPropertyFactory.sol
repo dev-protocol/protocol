@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity >=0.5.17;
 
-contract IPropertyFactory {
+interface IPropertyFactory {
 	function create(
 		string calldata _name,
 		string calldata _symbol,

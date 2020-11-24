@@ -3,27 +3,24 @@ pragma solidity 0.5.17;
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
-import {IMetrics} from "contracts/src/metrics/IMetrics.sol";
+import {IMetrics} from "contracts/interface/IMetrics.sol";
+import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 
-contract MetricsGroup is
-	UsingConfig,
-	UsingStorage,
-	UsingValidator,
-	IMetricsGroup
-{
+contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 	using SafeMath for uint256;
 
 	constructor(address _config) public UsingConfig(_config) {}
 
 	function addGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().metricsFactory()
+		require(
+			msg.sender == config().metricsFactory(),
+			"this is illegal address"
 		);
 
-		require(isGroup(_addr) == false, "already enabled");
+		require(
+			eternalStorage().getBool(getGroupKey(_addr)) == false,
+			"already enabled"
+		);
 		eternalStorage().setBool(getGroupKey(_addr), true);
 		address property = IMetrics(_addr).property();
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
@@ -35,12 +32,15 @@ contract MetricsGroup is
 	}
 
 	function removeGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().metricsFactory()
+		require(
+			msg.sender == config().metricsFactory(),
+			"this is illegal address"
 		);
 
-		require(isGroup(_addr), "address is not group");
+		require(
+			eternalStorage().getBool(getGroupKey(_addr)),
+			"address is not group"
+		);
 		eternalStorage().setBool(getGroupKey(_addr), false);
 		address property = IMetrics(_addr).property();
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
@@ -51,14 +51,16 @@ contract MetricsGroup is
 		setMetricsCountPerProperty(property, metricsCountPerProperty);
 	}
 
-	function setMetricsCountPerProperty(address _property, uint256 _value)
-		internal
-	{
-		return
-			eternalStorage().setUint(
-				getMetricsCountPerPropertyKey(_property),
-				_value
-			);
+	function isGroup(address _addr) external view returns (bool) {
+		return eternalStorage().getBool(getGroupKey(_addr));
+	}
+
+	function totalIssuedMetrics() external view returns (uint256) {
+		return eternalStorage().getUint(getTotalCountKey());
+	}
+
+	function hasAssets(address _property) external view returns (bool) {
+		return getMetricsCountPerProperty(_property) > 0;
 	}
 
 	function getMetricsCountPerProperty(address _property)
@@ -70,20 +72,17 @@ contract MetricsGroup is
 			eternalStorage().getUint(getMetricsCountPerPropertyKey(_property));
 	}
 
-	function hasAssets(address _property) public view returns (bool) {
-		return getMetricsCountPerProperty(_property) > 0;
+	function setMetricsCountPerProperty(address _property, uint256 _value)
+		internal
+	{
+		eternalStorage().setUint(
+			getMetricsCountPerPropertyKey(_property),
+			_value
+		);
 	}
 
-	function setTotalIssuedMetrics(uint256 _value) internal {
+	function setTotalIssuedMetrics(uint256 _value) private {
 		eternalStorage().setUint(getTotalCountKey(), _value);
-	}
-
-	function isGroup(address _addr) public view returns (bool) {
-		return eternalStorage().getBool(getGroupKey(_addr));
-	}
-
-	function totalIssuedMetrics() external view returns (uint256) {
-		return eternalStorage().getUint(getTotalCountKey());
 	}
 
 	function getTotalCountKey() private pure returns (bytes32) {
@@ -97,5 +96,9 @@ contract MetricsGroup is
 	{
 		return
 			keccak256(abi.encodePacked("_metricsCountPerProperty", _property));
+	}
+
+	function getGroupKey(address _addr) private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }

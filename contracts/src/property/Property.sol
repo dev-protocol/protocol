@@ -2,25 +2,19 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-// prettier-ignore
-import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
+import {
+	ERC20Detailed
+} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IAllocator} from "contracts/src/allocator/IAllocator.sol";
-import {IProperty} from "contracts/src/property/IProperty.sol";
+import {IAllocator} from "contracts/interface/IAllocator.sol";
+import {IProperty} from "contracts/interface/IProperty.sol";
 
 /**
  * A contract that represents the assets of the user and collects staking from the stakers.
  * Property contract inherits ERC20.
  * Holders of Property contracts(tokens) receive holder rewards according to their share.
  */
-contract Property is
-	ERC20,
-	ERC20Detailed,
-	UsingConfig,
-	UsingValidator,
-	IProperty
-{
+contract Property is ERC20, ERC20Detailed, UsingConfig, IProperty {
 	using SafeMath for uint256;
 	uint8 private constant PROPERTY_DECIMALS = 18;
 	uint256 private constant SUPPLY = 10000000000000000000000000;
@@ -42,9 +36,9 @@ contract Property is
 		/**
 		 * Validates the sender is PropertyFactory contract.
 		 */
-		addressValidator().validateAddress(
-			msg.sender,
-			config().propertyFactory()
+		require(
+			msg.sender == config().propertyFactory(),
+			"this is illegal address"
 		);
 
 		/**
@@ -80,7 +74,7 @@ contract Property is
 		/**
 		 * Validates the destination is not 0 address.
 		 */
-		addressValidator().validateIllegalAddress(_to);
+		require(_to != address(0), "this is illegal address");
 		require(_value != 0, "illegal transfer value");
 
 		/**
@@ -111,8 +105,8 @@ contract Property is
 		/**
 		 * Validates the source and destination is not 0 address.
 		 */
-		addressValidator().validateIllegalAddress(_from);
-		addressValidator().validateIllegalAddress(_to);
+		require(_from != address(0), "this is illegal address");
+		require(_to != address(0), "this is illegal address");
 		require(_value != 0, "illegal transfer value");
 
 		/**
@@ -152,7 +146,7 @@ contract Property is
 		/**
 		 * Validates the sender is Lockup contract.
 		 */
-		addressValidator().validateAddress(msg.sender, config().lockup());
+		require(msg.sender == config().lockup(), "this is illegal address");
 
 		/**
 		 * Transfers the passed amount to the original owner.

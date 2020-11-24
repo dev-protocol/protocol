@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	MetricsInstance,

@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {IPolicy} from "contracts/src/policy/IPolicy.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 contract PolicyTestForTimeVote is IPolicy {
 	uint256 private _lockUpBlocks = 1;

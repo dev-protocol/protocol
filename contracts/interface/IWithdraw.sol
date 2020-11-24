@@ -1,6 +1,7 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity >=0.5.17;
 
-contract IWithdraw {
+interface IWithdraw {
 	function withdraw(address _property) external;
 
 	function getRewardsAmount(address _property)

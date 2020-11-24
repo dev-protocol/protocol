@@ -1,7 +1,5 @@
-/* eslint-disable no-undef */
 import { config } from 'dotenv'
-import { createFastestGasPriceFetcher } from './lib/ethgas'
-import { ethgas } from './lib/api'
+import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
 import { DevCommonInstance } from './lib/instance/common'
 import { Withdraw } from './lib/instance/withdraw'
 import { WithdrawStorage } from './lib/instance/withdraw-storage'
@@ -17,7 +15,7 @@ const handler = async (
 	}
 
 	const gasFetcher = async () => 6721975
-	const gasPriceFetcher = createFastestGasPriceFetcher(ethgas(egsApiKey), web3)
+	const gasPriceFetcher = createFastestGasPriceFetcher(ethgas(egsApiKey))
 	const dev = new DevCommonInstance(
 		artifacts,
 		configAddress,

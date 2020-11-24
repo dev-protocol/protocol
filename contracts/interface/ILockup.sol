@@ -1,18 +1,19 @@
-pragma solidity 0.5.17;
+// SPDX-License-Identifier: MPL-2.0
+pragma solidity >=0.5.17;
 
-contract ILockup {
+interface ILockup {
 	function lockup(
 		address _from,
 		address _property,
 		uint256 _value
 	) external;
 
-	function update() public;
+	function update() external;
 
 	function withdraw(address _property, uint256 _amount) external;
 
 	function calculateCumulativeRewardPrices()
-		public
+		external
 		view
 		returns (
 			uint256 _reward,
@@ -21,7 +22,7 @@ contract ILockup {
 		);
 
 	function calculateCumulativeHoldersRewardAmount(address _property)
-		public
+		external
 		view
 		returns (uint256);
 
@@ -40,5 +41,5 @@ contract ILockup {
 	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	) public view returns (uint256);
+	) external view returns (uint256);
 }
