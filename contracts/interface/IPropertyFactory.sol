@@ -1,6 +1,6 @@
-pragma solidity 0.5.17;
+pragma solidity >=0.5.17;
 
-contract IPropertyFactory {
+interface IPropertyFactory {
 	function create(
 		string calldata _name,
 		string calldata _symbol,

@@ -1,10 +1,9 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
-import {Allocator} from "contracts/src/allocator/Allocator.sol";
-import {Market} from "contracts/src/market/Market.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
+import {IMarket} from "contracts/interface/IMarket.sol";
 
 contract MarketTest1 is Ownable, IMarketBehavior, UsingConfig {
 	string public schema = "[]";
@@ -30,7 +29,7 @@ contract MarketTest1 is Ownable, IMarketBehavior, UsingConfig {
 		require(msg.sender == associatedMarket, "Invalid sender");
 
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
-		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
+		address _metrics = IMarket(market).authenticatedCallback(_prop, idHash);
 		keys[_metrics] = _args1;
 		addresses[_args1] = _metrics;
 		return true;

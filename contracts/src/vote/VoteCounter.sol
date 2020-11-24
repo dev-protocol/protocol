@@ -2,14 +2,14 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {VoteCounterStorage} from "contracts/src/vote/VoteCounterStorage.sol";
-import {IPolicy} from "contracts/src/policy/IPolicy.sol";
-import {ILockup} from "contracts/src/lockup/ILockup.sol";
-import {IMarket} from "contracts/src/market/IMarket.sol";
-import {IVoteCounter} from "contracts/src/vote/IVoteCounter.sol";
-import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
-import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
+import {ILockup} from "contracts/interface/ILockup.sol";
+import {IMarket} from "contracts/interface/IMarket.sol";
+import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
+import {IVoteCounter} from "contracts/interface/IVoteCounter.sol";
+import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
+import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
 
 /**
  * A contract that manages the activation votes for new markets and new policies.
@@ -19,12 +19,7 @@ import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
  * Policy voting is an election to select one that seems to be the best with Quadratic Voting.
  * Quadratic Voting is realized by exercising multiple voting rights in Policy voting.
  */
-contract VoteCounter is
-	IVoteCounter,
-	UsingConfig,
-	UsingValidator,
-	VoteCounterStorage
-{
+contract VoteCounter is IVoteCounter, UsingConfig, VoteCounterStorage {
 	using SafeMath for uint256;
 
 	/**
@@ -43,7 +38,10 @@ contract VoteCounter is
 		/**
 		 * Validates the passed Market address is included the Market address set
 		 */
-		addressValidator().validateGroup(_market, config().marketGroup());
+		require(
+			IMarketGroup(config().marketGroup()).isGroup(_market),
+			"this is illegal address"
+		);
 
 		/**
 		 * Validates the passed Market is still not enabled
@@ -126,7 +124,10 @@ contract VoteCounter is
 		/**
 		 * Validates the passed Policy address is included the Policy address set
 		 */
-		addressValidator().validateGroup(_policy, config().policyGroup());
+		require(
+			IPolicyGroup(config().policyGroup()).isGroup(_policy),
+			"this is illegal address"
+		);
 
 		/**
 		 * Validates the passed Policy is not the current Policy.

@@ -1,8 +1,8 @@
 /* solhint-disable const-name-snakecase */
 pragma solidity 0.5.17;
 
-import {DIP3} from "contracts/src/policy/DIP3.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {DIP3} from "contracts/src/policy/DIP3.sol";
 
 /**
  * DIP7 is a contract that changes the `rewards` of DIP3.

@@ -1,6 +1,6 @@
-pragma solidity 0.5.17;
+pragma solidity >=0.5.17;
 
-contract IWithdraw {
+interface IWithdraw {
 	function withdraw(address _property) external;
 
 	function getRewardsAmount(address _property)

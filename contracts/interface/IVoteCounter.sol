@@ -1,6 +1,6 @@
-pragma solidity 0.5.17;
+pragma solidity >=0.5.17;
 
-contract IVoteCounter {
+interface IVoteCounter {
 	function voteMarket(
 		address _market,
 		address _property,
