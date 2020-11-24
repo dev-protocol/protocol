@@ -1,7 +1,9 @@
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+import {
+	ERC20Mintable
+} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";

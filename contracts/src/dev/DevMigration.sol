@@ -1,7 +1,11 @@
 pragma solidity 0.5.17;
 
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
-import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+import {
+	ERC20Mintable
+} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+import {
+	ERC20Burnable
+} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 
 /**
  * A contract to migrate two ERC20 tokens.
