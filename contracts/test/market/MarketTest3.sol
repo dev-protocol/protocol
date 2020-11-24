@@ -27,7 +27,7 @@ contract MarketTest3 is Ownable, IMarketBehavior, UsingConfig {
 		require(msg.sender == associatedMarket, "Invalid sender");
 
 		bytes32 idHash = keccak256(abi.encodePacked(_args1));
-		address _metrics = Market(market).authenticatedCallback(_prop, idHash);
+		address _metrics = IMarket(market).authenticatedCallback(_prop, idHash);
 		keys[_metrics] = _args1;
 		addresses[_args1] = _metrics;
 		currentAuthinticateAccount = account;
