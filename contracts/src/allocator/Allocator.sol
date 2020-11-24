@@ -1,8 +1,8 @@
 pragma solidity 0.5.17;
 
-import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
+import {IAllocator} from "contracts/interface/IAllocator.sol";
+import {IWithdraw} from "contracts/interface/IWithdraw.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";

@@ -7,7 +7,7 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IMarket} from "contracts/interface/IMarket.sol";
 import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
-import {IVoteCounter} from "contracts/src/vote/IVoteCounter.sol";
+import {IVoteCounter} from "contracts/interface/IVoteCounter.sol";
 import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
 import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
 

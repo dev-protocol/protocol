@@ -1,6 +1,5 @@
 pragma solidity >=0.5.17;
 
-/* solhint-disable max-states-count */
 interface IAddressConfig {
 	function token() external view returns (address);
 
