@@ -15,7 +15,7 @@ import builtDev from '../../build/contracts/Dev.json'
 import builtWithdrawStorage from '../../build/contracts/WithdrawStorage.json'
 import { AbiItem } from 'web3-utils/types'
 export const createRegistry = (configAddress: string, libWeb3: Web3) =>
-	new libWeb3.eth.Contract(builtConfig.abi as AbiItem[], configAddress)
+	new Contract(builtConfig.abi as AbiItem[], configAddress)
 export const prepare = async (
 	configAddress: string,
 	libWeb3: Web3,
@@ -25,10 +25,7 @@ export const prepare = async (
 	const lockupAddress = await configContract.methods
 		.lockup()
 		.call(undefined, blockNumber)
-	const contract = new libWeb3.eth.Contract(
-		builtLockup.abi as AbiItem[],
-		lockupAddress
-	)
+	const contract = new Contract(builtLockup.abi as AbiItem[], lockupAddress)
 	return contract
 }
 
@@ -38,7 +35,7 @@ export const createMetricsGroup = async (
 ) => {
 	const configContract = createRegistry(configAddress, libWeb3)
 	const metricsGroupAddress = await configContract.methods.metricsGroup().call()
-	const contract = new libWeb3.eth.Contract(
+	const contract = new Contract(
 		builtMetricsGroup.abi as AbiItem[],
 		metricsGroupAddress
 	)
@@ -46,10 +43,10 @@ export const createMetricsGroup = async (
 }
 
 export const createWithdrawStorage = (address: string, libWeb3: Web3) =>
-	new libWeb3.eth.Contract(builtWithdrawStorage.abi as AbiItem[], address)
+	new Contract(builtWithdrawStorage.abi as AbiItem[], address)
 
 export const createDev = (address: string, libWeb3: Web3) =>
-	new libWeb3.eth.Contract(builtDev.abi as AbiItem[], address)
+	new Contract(builtDev.abi as AbiItem[], address)
 
 export const createGraphQLFetcher = (
 	fetcher: bent.RequestFunction<bent.ValidResponse>

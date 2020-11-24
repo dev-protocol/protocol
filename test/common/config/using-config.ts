@@ -12,9 +12,9 @@ contract('UsingConfigTest', ([deployer]) => {
 				dev.addressConfig.address,
 				{ from: deployer }
 			)
-			const config = await usingConfigTest.getConfig()
+			const tokenAddress = await usingConfigTest.getToken()
 
-			expect(config).to.be.equal(dev.addressConfig.address)
+			expect(tokenAddress).to.be.equal(dev.addressConfig.address)
 		})
 	})
 	describe('UsingConfig; configAddress', () => {
