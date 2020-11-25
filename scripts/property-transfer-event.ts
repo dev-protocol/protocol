@@ -1,4 +1,4 @@
-import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
+import { ethGasStationFetcher } from '@devprtcl/util-ts'
 
 const { CONFIG, EGS_TOKEN } = process.env
 const { log: ____log } = console
@@ -21,7 +21,7 @@ const handler = async (
 		artifacts.require('Dev').at(await config.token()),
 	])
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
+	const fastest = ethGasStationFetcher(EGS_TOKEN)
 
 	// Deploy new Lockup and new Withdraw
 	const nextWithdraw = await artifacts

@@ -1,4 +1,4 @@
-import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
+import { ethGasStationFetcher } from '@devprtcl/util-ts'
 
 const { CONFIG, EGS_TOKEN } = process.env
 const { log: ____log } = console
@@ -11,7 +11,7 @@ const handler = async (
 		return
 	}
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
+	const fastest = ethGasStationFetcher(EGS_TOKEN)
 
 	// Generate current contract
 	const [config] = await Promise.all([
