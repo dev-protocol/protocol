@@ -1,4 +1,4 @@
-import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
+import { ethGasStationFetcher } from '@devprtcl/util-ts'
 
 const { CONFIG, EGS_TOKEN } = process.env
 const { log: ____log } = console
@@ -22,7 +22,7 @@ const handler = async (
 	])
 	____log('Generated current MetricsGroup contract', metricsGroup.address)
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN))
+	const fastest = ethGasStationFetcher(EGS_TOKEN)
 
 	// Deploy new MetricsGroup
 	const nextMetricsGroup = await artifacts

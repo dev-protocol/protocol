@@ -1,4 +1,4 @@
-import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
+import { ethGasStationFetcher } from '@devprtcl/util-ts'
 import { config } from 'dotenv'
 import { DevCommonInstance } from './lib/instance/common'
 import { PolicyGroup } from './lib/instance/policy-group'
@@ -16,7 +16,7 @@ const handler = async (
 	}
 
 	const gasFetcher = async () => 6721975
-	const gasPriceFetcher = createFastestGasPriceFetcher(ethgas(egsApiKey))
+	const gasPriceFetcher = ethGasStationFetcher(egsApiKey)
 	const dev = new DevCommonInstance(
 		artifacts,
 		configAddress,

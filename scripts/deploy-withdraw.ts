@@ -1,7 +1,7 @@
 import { DevCommonInstance } from './lib/instance/common'
 import { Withdraw } from './lib/instance/withdraw'
 import { config } from 'dotenv'
-import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
+import { ethGasStationFetcher } from '@devprtcl/util-ts'
 config()
 const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
 
@@ -13,7 +13,7 @@ const handler = async (
 	}
 
 	const gasFetcher = async () => 6721975
-	const gasPriceFetcher = createFastestGasPriceFetcher(ethgas(egsApiKey))
+	const gasPriceFetcher = ethGasStationFetcher(egsApiKey)
 	const dev = new DevCommonInstance(
 		artifacts,
 		configAddress,

@@ -1,5 +1,5 @@
 import { config } from 'dotenv'
-import { ethgas, createFastestGasPriceFetcher } from '@devprtcl/utils'
+import { ethGasStationFetcher } from '@devprtcl/util-ts'
 import { DevCommonInstance } from './lib/instance/common'
 import { Lockup } from './lib/instance/lockup'
 
@@ -14,7 +14,7 @@ const handler = async (
 	}
 
 	const gasFetcher = async () => 6721975
-	const gasPriceFetcher = createFastestGasPriceFetcher(ethgas(egsApiKey))
+	const gasPriceFetcher = ethGasStationFetcher(egsApiKey)
 	const dev = new DevCommonInstance(
 		artifacts,
 		configAddress,
