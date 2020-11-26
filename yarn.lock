@@ -61,10 +61,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@devprtcl/util-ts@1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@devprtcl/util-ts/-/util-ts-1.3.1.tgz#4933f1d62ec20b3986e655a1bbe824668c97a282"
-  integrity sha512-3DX4BdYgvQXxdAqmg3tozEjpsh3glZI+4mbD6K14a6r6bI94RmeT3FlZ7zapl9pmSP2pAEf+8LaYOuZ27xhr5A==
+"@devprtcl/util-ts@1.4.0":
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/@devprtcl/util-ts/-/util-ts-1.4.0.tgz#9d70c9cf453f35c1bfb5308c5af4b1b93b82e7da"
+  integrity sha512-Pq6wHJpZaHol9DUKcvaFZ3pfapw284+pLemMeXa6lkyBe0h985acDRX5ts/yWRNWH1D1s7nWOfV5sWZr29xjtw==
   dependencies:
     bent "7.3.12"
     ethereum-waffle "3.2.1"
