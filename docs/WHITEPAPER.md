@@ -334,13 +334,6 @@ The share of market rewards received by the Property Contract(Token) holder. It 
 
 The share received by the stake executor is the excess portion of the Holders Share.
 
-### assetValue
-
-The property value. It is called when calculating the market rewards in the Allocator Contract, and the property value is calculated using the following variables.
-
-- Total Stakes in the Property
-- Property Evaluation Based on the Market Contract
-
 ### authenticationFee
 
 The commission for authenticating a property. It is called within `authenticatedCallback` for the Market Contract, and the commission for authenticating a property is decided based on the following variables.
@@ -369,16 +362,6 @@ The number of blocks between the proposal of a new Market Contract and the end o
 ### policyVotingBlocks
 
 The number of blocks between the proposal of a new Policy Contract and the end of voting. Once voting ends, the Policy Contract will be rejected.
-
-### abstentionPenalty
-
-The penalty that is applied when the owner of a Property Contract abstains from voting for a Market Contract or Policy Contract. The penalty is levied by instituting a period (block count) that is excluded from the calculation of market rewards. It is called within `allocate` for the Allocator Contract, and the penalty is decided using the following variable.
-
-- Abstention Count
-
-The period that is excluded from the calculation is calculated and returned. The starting block for the exclusion period is the block from the previous execution of `allocate`. During the period that is excluded from the calculation, execution of `allocate` will fail, and property value during the period will not be considered even after the end of the period.
-
-In order to calculate the abstention count, the Property Contracts for which voting did not take place for the Market Contract and Policy Contract vote acceptance periods are recorded.
 
 ### lockUpBlocks
 

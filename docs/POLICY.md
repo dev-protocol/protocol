@@ -77,23 +77,6 @@ function holdersShare(uint256 _reward, uint256 _lockups)
 
 ```
 
-## assetValue
-
-The calculation method for an asset value called `assetValue` is determined to multiply the number of lockups on the target Property by the measured value of the target asset.
-
-This formula indicates that asset scores and lockups have equal influence.
-
-```solidity
-function assetValue(uint256 _value, uint256 _lockups)
-	external
-	view
-	returns (uint256)
-{
-	return (_lockups.add(1)).mul(_value);
-}
-
-```
-
 ## authenticationFee
 
 Property Contract author pays `authenticationFee` is multiplies the number of assets by `0.00025` and subtracts 1/1000 of the number of stakes to the Property.
@@ -166,25 +149,6 @@ The voting period for a new Policy called `policyVotingBlocks` is 525600 blocks 
 
 ```solidity
 uint public policyVotingBlocks = 525600;
-```
-
-## abstentionPenalty
-
-The abstainers' penalty called `abstentionPenalty` impose an exclusion penalty of 175200 blocks (equals 1 month) on 9 times or more abstainers.
-
-```solidity
-function abstentionPenalty(uint256 abstentions)
-	external
-	view
-	returns (uint256)
-{
-	uint256 penalty = 0;
-	if (abstentions > 9) {
-		penalty = 175200;
-	}
-	return penalty;
-}
-
 ```
 
 ## lockUpBlocks

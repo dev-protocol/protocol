@@ -64,14 +64,6 @@ contract DIP1 is IPolicy, UsingConfig {
 		return _lockups > 0 ? (_reward.mul(51)).div(100) : _reward;
 	}
 
-	function assetValue(uint256 _value, uint256 _lockups)
-		external
-		view
-		returns (uint256)
-	{
-		return (_lockups.add(1)).mul(_value);
-	}
-
 	function authenticationFee(uint256 total_assets, uint256 property_lockups)
 		external
 		view
@@ -109,17 +101,5 @@ contract DIP1 is IPolicy, UsingConfig {
 		uint256 negative_votes =
 			_negative_votes > 0 ? _negative_votes : 1000000000000000000;
 		return _up_votes > negative_votes.mul(10);
-	}
-
-	function abstentionPenalty(uint256 abstentions)
-		external
-		view
-		returns (uint256)
-	{
-		uint256 penalty = 0;
-		if (abstentions > 10) {
-			penalty = 175200;
-		}
-		return penalty;
 	}
 }

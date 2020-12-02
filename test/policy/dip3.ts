@@ -88,33 +88,6 @@ contract('DIP3', ([deployer]) => {
 			)
 		})
 	})
-	describe('DIP3; assetValue', () => {
-		it('assetValue equals DIP1', async () => {
-			const method = 'assetValue'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip3[method](a, b)).toString()).to.be.equal(
-				(await dip1[method](a, b)).toString()
-			)
-			expect((await dip3[method](c, d)).toString()).to.be.equal(
-				(await dip1[method](c, d)).toString()
-			)
-			expect((await dip3[method](e, f)).toString()).to.be.equal(
-				(await dip1[method](e, f)).toString()
-			)
-			expect((await dip3[method](a, 0)).toString()).to.be.equal(
-				(await dip1[method](a, 0)).toString()
-			)
-			expect((await dip3[method](a, 1)).toString()).to.be.equal(
-				(await dip1[method](a, 1)).toString()
-			)
-			expect((await dip3[method](0, a)).toString()).to.be.equal(
-				(await dip1[method](0, a)).toString()
-			)
-			expect((await dip3[method](1, a)).toString()).to.be.equal(
-				(await dip1[method](1, a)).toString()
-			)
-		})
-	})
 	describe('DIP3; authenticationFee', () => {
 		it('authenticationFee equals DIP1', async () => {
 			const method = 'authenticationFee'
@@ -209,27 +182,6 @@ contract('DIP3', ([deployer]) => {
 			const method = 'policyVotingBlocks'
 			expect((await dip3[method]()).toString()).to.be.equal(
 				(await dip1[method]()).toString()
-			)
-		})
-	})
-	describe('DIP3; abstentionPenalty', () => {
-		it('abstentionPenalty equals DIP1', async () => {
-			const method = 'abstentionPenalty'
-			const [a, b, c] = batchRandom()
-			expect((await dip3[method](a)).toString()).to.be.equal(
-				(await dip1[method](a)).toString()
-			)
-			expect((await dip3[method](b)).toString()).to.be.equal(
-				(await dip1[method](b)).toString()
-			)
-			expect((await dip3[method](c)).toString()).to.be.equal(
-				(await dip1[method](c)).toString()
-			)
-			expect((await dip3[method](0)).toString()).to.be.equal(
-				(await dip1[method](0)).toString()
-			)
-			expect((await dip3[method](1)).toString()).to.be.equal(
-				(await dip1[method](1)).toString()
 			)
 		})
 	})
