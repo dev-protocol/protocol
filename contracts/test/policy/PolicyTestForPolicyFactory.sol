@@ -3,7 +3,6 @@ pragma solidity 0.5.17;
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 contract PolicyTestForPolicyFactory is IPolicy {
-
 	// solhint-disable-next-line no-unused-vars
 	function rewards(uint256 _lockups, uint256 _assets)
 		external

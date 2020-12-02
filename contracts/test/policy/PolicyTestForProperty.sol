@@ -3,7 +3,6 @@ pragma solidity 0.5.17;
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 contract PolicyTestForProperty is IPolicy {
-
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view
