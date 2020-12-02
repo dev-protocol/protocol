@@ -61,8 +61,4 @@ contract PolicyTest1 is IPolicy {
 	function policyVotingBlocks() external view returns (uint256) {
 		return 20;
 	}
-
-	function lockUpBlocks() external view returns (uint256) {
-		return 1;
-	}
 }

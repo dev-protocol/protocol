@@ -363,10 +363,6 @@ The number of blocks between the proposal of a new Market Contract and the end o
 
 The number of blocks between the proposal of a new Policy Contract and the end of voting. Once voting ends, the Policy Contract will be rejected.
 
-### lockUpBlocks
-
-The number of continuous blocks after the request to cancel Staking. Users can cancel the DEV that they have staked in a Property Contract, but staking will continue for a specified number of blocks after the cancellation is requested.
-
 ## Policy Factory
 
 The Policy Factory Contract generates a new Policy Contract.

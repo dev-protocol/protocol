@@ -371,11 +371,6 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 
 新しい Policy Contract が提案されてから投票を終了するまでのブロック数。投票を終了すると、Policy Contract は否決される。
 
-### lockUpBlocks
-
-ステーキングの解除申請後の継続ブロック数。
-ユーザーは Property Contract に対してステーキングしている DEV を解除することができるが、解除が要請されてから指定されたブロック数だけステーキングが継続する。
-
 ## Policy Factory
 
 Policy Factory Contract は新しい Policy Contract を生成する。
