@@ -30,28 +30,6 @@ contract PolicyTestForLockup is IPolicy {
 		return _assets + _propertyLockups + 1;
 	}
 
-	function marketApproval(uint256 _agree, uint256 _opposite)
-		external
-		view
-		returns (bool)
-	{
-		if (_agree + _opposite < 10000) {
-			return false;
-		}
-		return _agree > _opposite;
-	}
-
-	function policyApproval(uint256 _agree, uint256 _opposite)
-		external
-		view
-		returns (bool)
-	{
-		if (_agree + _opposite < 10000) {
-			return false;
-		}
-		return _agree > _opposite;
-	}
-
 	function marketVotingBlocks() external view returns (uint256) {
 		return 10;
 	}

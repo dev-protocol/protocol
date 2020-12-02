@@ -1,5 +1,6 @@
 pragma solidity 0.5.17;
 
+import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
 import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
@@ -7,7 +8,7 @@ import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
 /**
  * A factory contract that creates a new Policy contract.
  */
-contract PolicyFactory is UsingConfig, IPolicyFactory {
+contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 	event Create(address indexed _from, address _policy);
 
 	/**
@@ -54,16 +55,32 @@ contract PolicyFactory is UsingConfig, IPolicyFactory {
 			"this is illegal address"
 		);
 
+		setPolicy(_currentPolicyAddress);
+	}
+
+	function forceAttach(address _policy) external onlyOwner {
+		/**
+		 * Validates the passed Policy address is included the Policy address set
+		 */
+		require(
+			IPolicyGroup(config().policyGroup()).isGroup(_policy),
+			"this is illegal address"
+		);
+
+		setPolicy(_policy);
+	}
+
+	function setPolicy(address _policy) private {
 		/**
 		 * Sets the passed Policy to current Policy.
 		 */
-		config().setPolicy(_currentPolicyAddress);
+		config().setPolicy(_policy);
 
 		/**
 		 * Resets the Policy address set that is accepting votes.
 		 */
 		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		policyGroup.incrementVotingGroupIndex();
-		policyGroup.addGroup(_currentPolicyAddress);
+		policyGroup.addGroup(_policy);
 	}
 }
