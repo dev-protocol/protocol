@@ -2,17 +2,17 @@
 pragma solidity 0.5.17;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {DIP3} from "contracts/src/policy/DIP3.sol";
+import {DIP1} from "contracts/src/policy/DIP1.sol";
 
 /**
- * DIP7 is a contract that changes the `rewards` of DIP3.
+ * DIP7 is a contract that changes the `rewards` of DIP1.
  */
-contract DIP7 is DIP3 {
+contract DIP7 is DIP1 {
 	uint256 private constant basis = 10000000000000000000000000;
 	uint256 private constant power_basis = 10000000000;
 	uint256 private constant mint_per_block_and_aseet = 120000000000000;
 
-	constructor(address _config) public DIP3(_config) {}
+	constructor(address _config) public DIP1(_config) {}
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		external

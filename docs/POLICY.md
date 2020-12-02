@@ -150,13 +150,3 @@ The voting period for a new Policy called `policyVotingBlocks` is 525600 blocks 
 ```solidity
 uint public policyVotingBlocks = 525600;
 ```
-
-## lockUpBlocks
-
-This policy has been enabled by [DIP3](https://github.com/dev-protocol/DIPs/issues/3).
-
-The lock-up period from the request for cancellation of staking until the withdrawal becomes possible is one block. In other words, there is practically no lock-up. See [DIP3](https://github.com/dev-protocol/DIPs/issues/3) for details.
-
-```solidity
-uint public lockUpBlocks = 1;
-```

@@ -46,10 +46,4 @@ contract('Policy', () => {
 			expect(result.toNumber()).to.be.equal(20)
 		})
 	})
-	describe('PolicyTest1; lockUpBlocks', () => {
-		it('Returns the minimum number of lockup blocks.', async () => {
-			const result = await policy.lockUpBlocks()
-			expect(result.toNumber()).to.be.equal(1)
-		})
-	})
 })

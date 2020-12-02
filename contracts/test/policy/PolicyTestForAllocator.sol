@@ -3,8 +3,6 @@ pragma solidity 0.5.17;
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 contract PolicyTestForAllocator is IPolicy {
-	uint256 private _lockUpBlocks = 1;
-
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
 		view
@@ -57,13 +55,5 @@ contract PolicyTestForAllocator is IPolicy {
 
 	function policyVotingBlocks() external view returns (uint256) {
 		return 20;
-	}
-
-	function lockUpBlocks() external view returns (uint256) {
-		return _lockUpBlocks;
-	}
-
-	function setLockUpBlocks(uint256 _blocks) public {
-		_lockUpBlocks = _blocks;
 	}
 }
