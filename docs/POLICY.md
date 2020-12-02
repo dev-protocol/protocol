@@ -77,23 +77,6 @@ function holdersShare(uint256 _reward, uint256 _lockups)
 
 ```
 
-## assetValue
-
-The calculation method for an asset value called `assetValue` is determined to multiply the number of lockups on the target Property by the measured value of the target asset.
-
-This formula indicates that asset scores and lockups have equal influence.
-
-```solidity
-function assetValue(uint256 _value, uint256 _lockups)
-	external
-	view
-	returns (uint256)
-{
-	return (_lockups.add(1)).mul(_value);
-}
-
-```
-
 ## authenticationFee
 
 Property Contract author pays `authenticationFee` is multiplies the number of assets by `0.00025` and subtracts 1/1000 of the number of stakes to the Property.

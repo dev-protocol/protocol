@@ -16,12 +16,6 @@ contract('Policy', () => {
 			expect(result.toNumber()).to.be.equal(9346)
 		})
 	})
-	describe('PolicyTest1; assetValue', () => {
-		it('Returns the asset value when the value of index calculated by Market and the number of lockups is passed', async () => {
-			const result = await policy.assetValue(858, 2345)
-			expect(result.toNumber()).to.be.equal(2012010)
-		})
-	})
 	describe('PolicyTest1; authenticationFee', () => {
 		it('Returns the authentication fee when the total number of assets and the number of lockups is passed', async () => {
 			const result = await policy.authenticationFee(1000, 100)

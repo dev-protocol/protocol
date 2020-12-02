@@ -334,13 +334,6 @@ The share of market rewards received by the Property Contract(Token) holder. It 
 
 The share received by the stake executor is the excess portion of the Holders Share.
 
-### assetValue
-
-The property value. It is called when calculating the market rewards in the Allocator Contract, and the property value is calculated using the following variables.
-
-- Total Stakes in the Property
-- Property Evaluation Based on the Market Contract
-
 ### authenticationFee
 
 The commission for authenticating a property. It is called within `authenticatedCallback` for the Market Contract, and the commission for authenticating a property is decided based on the following variables.

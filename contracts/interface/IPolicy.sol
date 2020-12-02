@@ -12,11 +12,6 @@ interface IPolicy {
 		view
 		returns (uint256);
 
-	function assetValue(uint256 _value, uint256 _lockups)
-		external
-		view
-		returns (uint256);
-
 	function authenticationFee(uint256 _assets, uint256 _propertyAssets)
 		external
 		view

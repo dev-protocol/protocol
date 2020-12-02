@@ -342,13 +342,6 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 
 ステーキング実行者の受け取るシェアは Holders Share の余剰分となる。
 
-### assetValue
-
-資産価値。Allocator Contract でマーケット報酬の計算過程で呼び出され、以下の変数から資産価値を計算する。
-
-- Property に紐づく総ステーキング数
-- Market Contract による資産評価
-
 ### authenticationFee
 
 資産認証の手数料。Market Contract の `authenticatedCallback` の中で呼び出され、以下の変数から資産認証の手数料を計算する。

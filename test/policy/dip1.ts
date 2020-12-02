@@ -86,33 +86,6 @@ contract('DIP1', ([deployer]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('DIP1; assetValue', () => {
-		it('assetValue equals TheFirstPolicy', async () => {
-			const method = 'assetValue'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip1[method](a, b)).toString()).to.be.equal(
-				(await theFirstPolicy[method](a, b)).toString()
-			)
-			expect((await dip1[method](c, d)).toString()).to.be.equal(
-				(await theFirstPolicy[method](c, d)).toString()
-			)
-			expect((await dip1[method](e, f)).toString()).to.be.equal(
-				(await theFirstPolicy[method](e, f)).toString()
-			)
-			expect((await dip1[method](a, 0)).toString()).to.be.equal(
-				(await theFirstPolicy[method](a, 0)).toString()
-			)
-			expect((await dip1[method](a, 1)).toString()).to.be.equal(
-				(await theFirstPolicy[method](a, 1)).toString()
-			)
-			expect((await dip1[method](0, a)).toString()).to.be.equal(
-				(await theFirstPolicy[method](0, a)).toString()
-			)
-			expect((await dip1[method](1, a)).toString()).to.be.equal(
-				(await theFirstPolicy[method](1, a)).toString()
-			)
-		})
-	})
 	describe('DIP1; authenticationFee', () => {
 		it('authenticationFee equals TheFirstPolicy', async () => {
 			const method = 'authenticationFee'
