@@ -183,12 +183,4 @@ contract('DIP1', ([deployer]) => {
 			)
 		})
 	})
-	describe('DIP1; lockUpBlocks', () => {
-		it('lockUpBlocks equals TheFirstPolicy', async () => {
-			const method = 'lockUpBlocks'
-			expect((await dip1[method]()).toString()).to.be.equal(
-				(await theFirstPolicy[method]()).toString()
-			)
-		})
-	})
 })

@@ -208,11 +208,4 @@ contract('TheFirstPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('525600')
 		})
 	})
-	describe('TheFirstPolicy; lockUpBlocks', () => {
-		it('Returns the minimum number of lockup blocks.', async () => {
-			const policy = await create()
-			const result = await policy.lockUpBlocks()
-			expect(result.toString()).to.be.equal('175200')
-		})
-	})
 })

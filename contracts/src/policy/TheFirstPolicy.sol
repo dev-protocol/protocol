@@ -14,7 +14,6 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	using SafeMath for uint256;
 	uint256 public marketVotingBlocks = 525600;
 	uint256 public policyVotingBlocks = 525600;
-	uint256 public lockUpBlocks = 175200;
 
 	uint256 private constant basis = 10000000000000000000000000;
 	uint256 private constant power_basis = 10000000000;
