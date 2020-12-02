@@ -69,8 +69,4 @@ contract PolicyTestForLockup is IPolicy {
 	function policyVotingBlocks() external view returns (uint256) {
 		return 20;
 	}
-
-	function abstentionPenalty(uint256 _count) external view returns (uint256) {
-		return _count > 1 ? 5 : 0;
-	}
 }

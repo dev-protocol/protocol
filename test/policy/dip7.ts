@@ -279,27 +279,6 @@ contract('DIP7', ([deployer]) => {
 			)
 		})
 	})
-	describe('DIP7; abstentionPenalty', () => {
-		it('abstentionPenalty equals DIP3', async () => {
-			const method = 'abstentionPenalty'
-			const [a, b, c] = batchRandom()
-			expect((await dip7[method](a)).toString()).to.be.equal(
-				(await dip3[method](a)).toString()
-			)
-			expect((await dip7[method](b)).toString()).to.be.equal(
-				(await dip3[method](b)).toString()
-			)
-			expect((await dip7[method](c)).toString()).to.be.equal(
-				(await dip3[method](c)).toString()
-			)
-			expect((await dip7[method](0)).toString()).to.be.equal(
-				(await dip3[method](0)).toString()
-			)
-			expect((await dip7[method](1)).toString()).to.be.equal(
-				(await dip3[method](1)).toString()
-			)
-		})
-	})
 	describe('DIP7; lockUpBlocks', () => {
 		it('lockUpBlocks equals DIP3', async () => {
 			const method = 'lockUpBlocks'

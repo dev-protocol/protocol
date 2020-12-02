@@ -232,18 +232,6 @@ contract('TheFirstPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('525600')
 		})
 	})
-	describe('TheFirstPolicy; abstentionPenalty', () => {
-		it('Returns the number of penalty blocks when the number of abstentions is passed', async () => {
-			const policy = await create()
-			const result = await policy.abstentionPenalty(11)
-			expect(result.toString()).to.be.equal('175200')
-		})
-		it('Returns 0 if the number of abstentions is less than 10', async () => {
-			const policy = await create()
-			const result = await policy.abstentionPenalty(10)
-			expect(result.toString()).to.be.equal('0')
-		})
-	})
 	describe('TheFirstPolicy; lockUpBlocks', () => {
 		it('Returns the minimum number of lockup blocks.', async () => {
 			const policy = await create()

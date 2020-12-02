@@ -110,16 +110,4 @@ contract DIP1 is IPolicy, UsingConfig {
 			_negative_votes > 0 ? _negative_votes : 1000000000000000000;
 		return _up_votes > negative_votes.mul(10);
 	}
-
-	function abstentionPenalty(uint256 abstentions)
-		external
-		view
-		returns (uint256)
-	{
-		uint256 penalty = 0;
-		if (abstentions > 10) {
-			penalty = 175200;
-		}
-		return penalty;
-	}
 }

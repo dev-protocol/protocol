@@ -168,25 +168,6 @@ The voting period for a new Policy called `policyVotingBlocks` is 525600 blocks 
 uint public policyVotingBlocks = 525600;
 ```
 
-## abstentionPenalty
-
-The abstainers' penalty called `abstentionPenalty` impose an exclusion penalty of 175200 blocks (equals 1 month) on 9 times or more abstainers.
-
-```solidity
-function abstentionPenalty(uint256 abstentions)
-	external
-	view
-	returns (uint256)
-{
-	uint256 penalty = 0;
-	if (abstentions > 9) {
-		penalty = 175200;
-	}
-	return penalty;
-}
-
-```
-
 ## lockUpBlocks
 
 This policy has been enabled by [DIP3](https://github.com/dev-protocol/DIPs/issues/3).

@@ -70,10 +70,6 @@ contract PolicyTestForPolicyFactory is IPolicy {
 		return 10;
 	}
 
-	function abstentionPenalty(uint256 _count) external view returns (uint256) {
-		return _count > 1 ? 5 : 0;
-	}
-
 	function lockUpBlocks() external view returns (uint256) {
 		return _lockUpBlocks;
 	}
