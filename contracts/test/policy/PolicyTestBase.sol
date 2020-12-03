@@ -64,4 +64,8 @@ contract PolicyTestBase is IPolicy {
 	function shareOfTreasury(uint256 _supply) external view returns (uint256) {
 		return _supply.div(100).mul(5);
 	}
+
+	function treasury() external view returns (address) {
+		return address(0);
+	}
 }

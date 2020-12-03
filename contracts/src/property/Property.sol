@@ -8,6 +8,7 @@ import {
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 /**
  * A contract that represents the assets of the user and collects staking from the stakers.
@@ -40,7 +41,6 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, IProperty {
 			msg.sender == config().propertyFactory(),
 			"this is illegal address"
 		);
-
 		/**
 		 * Sets the author.
 		 */
@@ -49,7 +49,11 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, IProperty {
 		/**
 		 * Mints to the author 100% of the total supply.
 		 */
-		_mint(author, SUPPLY);
+		IPolicy policy = IPolicy(consig().policy());
+		uint256 toTreasury = policy.shareOfTreasury(SUPPLY);
+		uint256 toAuthor = SUPPLY.sub(toTreasury);
+		_mint(author, toAuthor);
+		_mint(policy.treasury(), toTreasury);
 	}
 
 	/**
