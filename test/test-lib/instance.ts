@@ -17,7 +17,6 @@ import {
 	WithdrawInstance,
 	WithdrawTestInstance,
 	MetricsInstance,
-	TreasuryTestInstance,
 } from '../../types/truffle-contracts'
 import { getBlock } from './utils/common'
 
