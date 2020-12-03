@@ -49,7 +49,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, IProperty {
 		/**
 		 * Mints to the author 100% of the total supply.
 		 */
-		IPolicy policy = IPolicy(consig().policy());
+		IPolicy policy = IPolicy(config().policy());
 		uint256 toTreasury = policy.shareOfTreasury(SUPPLY);
 		uint256 toAuthor = SUPPLY.sub(toTreasury);
 		_mint(author, toAuthor);
