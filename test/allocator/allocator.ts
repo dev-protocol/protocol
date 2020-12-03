@@ -26,9 +26,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		const policy = await artifacts.require('PolicyTestForAllocator').new()
-
-		await dev.policyFactory.create(policy.address)
+		await dev.generatePolicy('PolicyTestForAllocator')
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', deployer)
 		)

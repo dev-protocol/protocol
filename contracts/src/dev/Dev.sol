@@ -1,14 +1,11 @@
 pragma solidity 0.5.17;
 
-import {
-	ERC20Detailed
-} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
-import {
-	ERC20Mintable
-} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
-import {
-	ERC20Burnable
-} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+// prettier-ignore
+import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
+// prettier-ignore
+import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+// prettier-ignore
+import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IDev} from "contracts/interface/IDev.sol";

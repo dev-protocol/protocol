@@ -5,6 +5,7 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 contract PolicyTestBase is IPolicy {
 	using SafeMath for uint256;
+	address public treasury;
 
 	// solhint-disable-next-line no-unused-vars
 	function rewards(uint256 _lockups, uint256 _assets)
@@ -65,7 +66,7 @@ contract PolicyTestBase is IPolicy {
 		return _supply.div(100).mul(5);
 	}
 
-	function treasury() external view returns (address) {
-		return address(0);
+	function setTreasury(address _treasury) external {
+		treasury = _treasury;
 	}
 }
