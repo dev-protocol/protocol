@@ -13,7 +13,10 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 			await Promise.all([
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
+				dev.generatePolicyFactory(),
+				dev.generatePolicyGroup(),
 			])
+			await dev.generatePolicy()
 			await dev.addressConfig.setMarketFactory(marketFactory)
 			const result = await dev.propertyFactory.create(
 				'sample',
@@ -68,8 +71,7 @@ contract('PropertyFactoryTest', ([deployer, user, user2, marketFactory]) => {
 				dev.generateWithdraw(),
 				dev.generateAllocator(),
 			])
-			const policy = await dev.getPolicy('PolicyTest1', user)
-			await dev.policyFactory.create(policy.address, { from: user })
+			await dev.generatePolicy('PolicyTest1')
 			const market = await dev.getMarket('MarketTest1', user)
 			const result = await dev.marketFactory.create(market.address, {
 				from: user,
