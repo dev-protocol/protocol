@@ -70,13 +70,13 @@ contract('PolicyFactory', ([deployer, user1, propertyAuther, ...accounts]) => {
 				dev.generateDev(),
 			])
 			await dev.dev.mint(user1, 10000, { from: deployer })
-			firstPolicyInstance = await dev.getPolicy(
-				'PolicyTestForPolicyFactory',
-				user1
+			const policyAddress = await dev.generatePolicy(
+				'PolicyTestForPolicyFactory'
 			)
-			await dev.policyFactory.create(firstPolicyInstance.address, {
-				from: user1,
-			})
+			// eslint-disable-next-line @typescript-eslint/await-thenable
+			firstPolicyInstance = await artifacts
+				.require('PolicyTestForPolicyFactory')
+				.at(policyAddress)
 			const propertyCreateResult = await dev.propertyFactory.create(
 				'test',
 				'TST',

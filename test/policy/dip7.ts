@@ -31,8 +31,11 @@ contract('DIP7', ([deployer]) => {
 		await dev.generateAddressConfig()
 		await dev.generateDev()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
+		console.log(1)
 		dip7 = await artifacts.require('DIP7').new(dev.addressConfig.address)
+		console.log(2)
 		dip1 = await artifacts.require('DIP1').new(dev.addressConfig.address)
+		console.log(3)
 	})
 
 	describe('DIP7; rewards', () => {

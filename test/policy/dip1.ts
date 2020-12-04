@@ -29,14 +29,21 @@ contract('DIP1', ([deployer]) => {
 	let theFirstPolicy: TheFirstPolicyInstance
 
 	before(async () => {
+		console.log(1)
 		const dev = new DevProtocolInstance(deployer)
+		console.log(2)
 		await dev.generateAddressConfig()
+		console.log(3)
 		await dev.generateDev()
+		console.log(4)
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
+		console.log(5)
 		dip1 = await artifacts.require('DIP1').new(dev.addressConfig.address)
+		console.log(6)
 		theFirstPolicy = await artifacts
 			.require('TheFirstPolicy')
 			.new(dev.addressConfig.address)
+		console.log(7)
 	})
 
 	describe('DIP1; rewards', () => {
