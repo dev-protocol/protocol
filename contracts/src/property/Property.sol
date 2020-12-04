@@ -51,6 +51,7 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, IProperty {
 		IPolicy policy = IPolicy(config().policy());
 		uint256 toTreasury = policy.shareOfTreasury(SUPPLY);
 		uint256 toAuthor = SUPPLY.sub(toTreasury);
+		require(toAuthor != 0, "share of author is 0");
 		_mint(author, toAuthor);
 		_mint(policy.treasury(), toTreasury);
 	}

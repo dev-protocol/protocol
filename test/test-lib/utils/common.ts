@@ -1,5 +1,6 @@
 import Web3 from 'web3'
 import BigNumber from 'bignumber.js'
+import { SHARE_OF_TREASURY } from './../const'
 
 export async function mine(count: number): Promise<void> {
 	for (let i = 0; i < count; i++) {
@@ -61,7 +62,7 @@ export function keccak256(...values: string[]): string {
 
 export function splitValue(
 	_value: BigNumber,
-	percentage = 5
+	percentage = SHARE_OF_TREASURY
 ): [BigNumber, BigNumber] {
 	const tmp = _value.div(new BigNumber(100)).times(new BigNumber(percentage))
 	const tmp2 = _value.minus(tmp)
