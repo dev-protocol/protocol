@@ -39,9 +39,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		const policy = await artifacts.require('PolicyTestBase').new()
-
-		await dev.policyFactory.create(policy.address)
+		const policyAddress = await dev.generatePolicy('PolicyTestBase')
+		// eslint-disable-next-line @typescript-eslint/await-thenable
+		const policy = await artifacts.require('PolicyTestBase').at(policyAddress)
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', deployer)
 		)
