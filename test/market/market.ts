@@ -108,8 +108,7 @@ contract(
 				])
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
-				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
-				await dev.policyFactory.create(iPolicyInstance.address)
+				await dev.generatePolicy('PolicyTest1')
 				let createMarketResult = await dev.marketFactory.create(
 					behavior1.address
 				)
@@ -325,8 +324,7 @@ contract(
 				])
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
-				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
-				await dev.policyFactory.create(iPolicyInstance.address)
+				await dev.generatePolicy('PolicyTest1')
 				let createMarketResult = await dev.marketFactory.create(
 					behavior1.address
 				)
