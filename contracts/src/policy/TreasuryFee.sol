@@ -16,10 +16,6 @@ contract TreasuryFee is DIP7, Ownable {
 		return false;
 	}
 
-	function shareOfTreasury(uint256 _supply) external view returns (uint256) {
-		return _supply.div(100).mul(5);
-	}
-
 	function treasury() external view returns (address) {
 		return treasuryAddress;
 	}
