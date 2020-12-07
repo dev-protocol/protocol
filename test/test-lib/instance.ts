@@ -292,7 +292,9 @@ export class DevProtocolInstance {
 		policyContractName = 'PolicyTestBase'
 	): Promise<string> {
 		const policy = await contract(policyContractName).new()
-		this._treasury = await contract('TreasuryTest').new()
+		this._treasury = await contract('TreasuryTest').new(
+			this.addressConfig.address
+		)
 		await policy.setTreasury(this._treasury.address)
 		await this._policyFactory.create(policy.address)
 		return policy.address

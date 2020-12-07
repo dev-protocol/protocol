@@ -23,7 +23,7 @@ import {
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 
-contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
+contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 	const init = async (
 		generateWithdrawTest = false
 	): Promise<
@@ -1444,6 +1444,59 @@ contract('WithdrawTest', ([deployer, user1, user2, user3]) => {
 					expect(tmp.toFixed()).to.be.equal(result.toFixed())
 				})
 			})
+		})
+	})
+	describe('Withdraw; tresuary', () => {
+		let dev: DevProtocolInstance
+		let property: PropertyInstance
+		let blockNumber: number
+		const alice = deployer
+		const bob = user1
+		const FIRST_TRANSFER_PERCENTAGE = 20
+		const SECOUND_TRANSFER_PERCENTAGE = 10
+
+		before(async () => {
+			;[dev, , property] = await init()
+
+			const totalSupply = await property.totalSupply().then(toBigNumber)
+			await property.transfer(
+				bob,
+				totalSupply.div(100).times(FIRST_TRANSFER_PERCENTAGE),
+				{
+					from: alice,
+				}
+			)
+			await property.transfer(
+				bob,
+				totalSupply.div(100).times(SECOUND_TRANSFER_PERCENTAGE),
+				{
+					from: alice,
+				}
+			)
+			await dev.dev.deposit(property.address, 10000, { from: user3 })
+			blockNumber = await getBlock()
+		})
+
+		it(`can get your share of tresuary`, async () => {
+			await mine(1)
+			const currentBlock = await getBlock()
+			const treasuryAmount = await dev.withdraw
+				.calculateWithdrawableAmount(property.address, dev.treasury.address)
+				.then(toBigNumber)
+			const [, tresuryShareAmount] = splitValue(
+				toBigNumber(9e19).times(currentBlock - blockNumber),
+				SHARE_OF_TREASURY
+			)
+			expect(treasuryAmount.toFixed()).to.be.equal(
+				tresuryShareAmount.integerValue(BigNumber.ROUND_DOWN).toFixed()
+			)
+			const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			await dev.treasury.withdraw(property.address)
+			await dev.treasury.transfer()
+			const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+			expect(treasuryAmount.times(2).toFixed()).to.be.equal(
+				afterBalance.minus(beforeBalance).toFixed()
+			)
 		})
 	})
 })
