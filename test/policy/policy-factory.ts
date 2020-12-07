@@ -126,7 +126,7 @@ contract(
 			})
 			it('Should fail when a call from other than Policy.', async () => {
 				const result = await dev.policyFactory
-					.convergePolicy(policy.address, { from: deployer })
+					.convergePolicy(dummyPolicy, { from: deployer })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})

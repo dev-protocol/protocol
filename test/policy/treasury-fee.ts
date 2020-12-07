@@ -6,8 +6,8 @@ import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { DevProtocolInstance } from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
 import { batchRandom } from './utils'
-import { validateAddressErrorMessage } from '../test-lib/utils/error'
-contract('DIP7', ([deployer, treasury, uesr]) => {
+import { validateNotOwnerErrorMessage } from '../test-lib/utils/error'
+contract('TreasuryFee', ([deployer, treasury, uesr]) => {
 	let dip7: Dip7Instance
 	let treasuryFee: TreasuryFeeInstance
 	let dev: DevProtocolInstance
@@ -198,7 +198,7 @@ contract('DIP7', ([deployer, treasury, uesr]) => {
 					from: uesr,
 				})
 				.catch((err: Error) => err)
-			validateAddressErrorMessage(result)
+			validateNotOwnerErrorMessage(result)
 		})
 	})
 })
