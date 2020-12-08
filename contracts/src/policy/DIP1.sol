@@ -102,8 +102,8 @@ contract DIP1 is IPolicy, UsingConfig {
 		return _up_votes > negative_votes.mul(10);
 	}
 
-	function shareOfTreasury(uint256 _supply) external view returns (uint256) {
-		return _supply.div(100).mul(5);
+	function shareOfTreasury(uint256 ) external view returns (uint256) {
+		return 0;
 	}
 
 	function treasury() external view returns (address) {

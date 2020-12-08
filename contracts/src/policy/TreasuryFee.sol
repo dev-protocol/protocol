@@ -12,6 +12,10 @@ contract TreasuryFee is DIP7, Ownable {
 
 	constructor(address _config) public DIP7(_config) {}
 
+	function shareOfTreasury(uint256 _supply) external view returns (uint256) {
+		return _supply.div(100).mul(5);
+	}
+
 	function policyApproval(uint256, uint256) external view returns (bool) {
 		return false;
 	}

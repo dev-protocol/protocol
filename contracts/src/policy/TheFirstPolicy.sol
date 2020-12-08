@@ -103,7 +103,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	}
 
 	function shareOfTreasury(uint256 _supply) external view returns (uint256) {
-		return _supply.div(100).mul(5);
+		return 0;
 	}
 
 	function treasury() external view returns (address) {

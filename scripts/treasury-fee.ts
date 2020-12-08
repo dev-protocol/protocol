@@ -3,8 +3,16 @@ import { PolicyFactory } from './lib/instance/policy-factory'
 import { PropertyFactory } from './lib/instance/property-factory'
 import { config } from 'dotenv'
 import { ethGasStationFetcher } from '@devprtcl/util-ts'
+
+// Caution!!!!!!!!!!!!!!!!!!
+// Please set TRESUARY_ADDRESS to env file before exexute this script.
+
 config()
-const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
+const {
+	CONFIG: configAddress,
+	EGS_TOKEN: egsApiKey,
+	TRESUARY_ADDRESS: tresauryAddress,
+} = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void
@@ -29,7 +37,7 @@ const handler = async (
 		.new(dev.addressConfig.address, await dev.gasInfo)
 	console.log('new policy was created:', newPolicy.address)
 	// Tresuary
-	await newPolicy.setTreasury('tresuary address')
+	await newPolicy.setTreasury(tresauryAddress!)
 	console.log('tresuary address was settted:', await newPolicy.treasury())
 
 	// PolicyFactory
