@@ -58,6 +58,9 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 		setPolicy(_currentPolicyAddress);
 	}
 
+	/**
+	 * Set the policy to force a policy without a vote.
+	 */
 	function forceAttach(address _policy) external onlyOwner {
 		/**
 		 * Validates the passed Policy address is included the Policy address set
@@ -69,7 +72,9 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 
 		setPolicy(_policy);
 	}
-
+	/**
+	 * Sets the Policy
+	 */
 	function setPolicy(address _policy) private {
 		/**
 		 * Sets the passed Policy to current Policy.
