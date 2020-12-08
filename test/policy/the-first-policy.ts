@@ -213,7 +213,7 @@ contract('TheFirstPolicy', ([deployer]) => {
 		it('Returns the share value of treasury', async () => {
 			const policy = await create()
 			const result = await policy.shareOfTreasury(100)
-			expect(result.toString()).to.be.equal('5')
+			expect(result.toString()).to.be.equal('0')
 		})
 	})
 	describe('TheFirstPolicy; treasury', () => {
