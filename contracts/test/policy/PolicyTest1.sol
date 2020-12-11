@@ -24,14 +24,6 @@ contract PolicyTest1 is IPolicy {
 		return _amount - (_amount * share).divBasis();
 	}
 
-	function assetValue(uint256 _value, uint256 _lockups)
-		external
-		view
-		returns (uint256)
-	{
-		return _value * _lockups;
-	}
-
 	function authenticationFee(uint256 _assets, uint256 _propertyLockups)
 		external
 		view
@@ -68,13 +60,5 @@ contract PolicyTest1 is IPolicy {
 
 	function policyVotingBlocks() external view returns (uint256) {
 		return 20;
-	}
-
-	function abstentionPenalty(uint256 _count) external view returns (uint256) {
-		return _count * 5760;
-	}
-
-	function lockUpBlocks() external view returns (uint256) {
-		return 1;
 	}
 }

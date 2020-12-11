@@ -342,13 +342,6 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 
 ステーキング実行者の受け取るシェアは Holders Share の余剰分となる。
 
-### assetValue
-
-資産価値。Allocator Contract でマーケット報酬の計算過程で呼び出され、以下の変数から資産価値を計算する。
-
-- Property に紐づく総ステーキング数
-- Market Contract による資産評価
-
 ### authenticationFee
 
 資産認証の手数料。Market Contract の `authenticatedCallback` の中で呼び出され、以下の変数から資産認証の手数料を計算する。
@@ -377,21 +370,6 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 ### policyVotingBlocks
 
 新しい Policy Contract が提案されてから投票を終了するまでのブロック数。投票を終了すると、Policy Contract は否決される。
-
-### abstentionPenalty
-
-Property Contract オーナーが Market Contract 及び Policy Contract への投票を棄権した場合のペナルティ。ペナルティはマーケット報酬の計算対象外期間( ブロック数 )を設けることで罰則とする。Allocator Contract の `allocate` の中で呼び出され、以下の変数からペナルティを決定する。
-
-- 棄権回数
-
-計算対象外期間を算出し返却する。対象外期間の開始ブロックは `allocate` の前回実行ブロックとする。計算対象外期間中は `allocate` の実行が失敗し、期間経過後も期間中の資産価値は考慮されない。
-
-棄権回数の算出のために、Market Contract 及び Policy Contract の投票受付期間中に投票しなかった Property Contract を記録している。
-
-### lockUpBlocks
-
-ステーキングの解除申請後の継続ブロック数。
-ユーザーは Property Contract に対してステーキングしている DEV を解除することができるが、解除が要請されてから指定されたブロック数だけステーキングが継続する。
 
 ## Policy Factory
 
