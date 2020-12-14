@@ -61,7 +61,7 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@devprotocol/util-ts@^1.4.0":
+"@devprotocol/util-ts@1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@devprotocol/util-ts/-/util-ts-1.4.0.tgz#583148639c3be0a902d314daf66c321745d1e5ae"
   integrity sha512-HcRSIA5hvo1JkjMs27NWJI6wjVmM4pepyrP1OKaHxwKYzINLV2Slc+2ME+vD4lS9PgVWqKY2DLy+INv18KeXDQ==
