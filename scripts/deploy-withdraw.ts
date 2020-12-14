@@ -1,7 +1,7 @@
 import { DevCommonInstance } from './lib/instance/common'
 import { Withdraw } from './lib/instance/withdraw'
 import { config } from 'dotenv'
-import { ethGasStationFetcher } from '@devprtcl/util-ts'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
 config()
 const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
 

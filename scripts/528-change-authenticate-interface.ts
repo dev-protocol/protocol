@@ -1,4 +1,4 @@
-import { ethGasStationFetcher } from '@devprtcl/util-ts'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
 const { CONFIG, EGS_TOKEN } = process.env
 const { log: ____log } = console
