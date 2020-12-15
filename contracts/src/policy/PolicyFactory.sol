@@ -72,6 +72,7 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 
 		setPolicy(_policy);
 	}
+
 	/**
 	 * Sets the Policy
 	 */
