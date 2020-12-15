@@ -207,11 +207,11 @@ Property Factory Contract は新しい Property Contract を生成する。
 
 Property Contract の生成は `create` 関数を実行することで行われる。引数として `name` と `symbol` を指定する。Property Contract の比較容易性のために `totalSupply` は `10000000`(Solidity では `10000000000000000000000000`) に、 `decimals` は `18` に固定する。
 
-Property Factory Contract が新しい Property Contract を生成すると、総供給量の一部が Treasury Contract に割り当てられます。
+Property Factory Contract が新しい Property Contract を生成すると、総供給量の一部が Treasury Contract に割り当てられる。
 
-Treasury Contract に割り当てられたトークンは、より柔軟なユースケース開発のために Dev Protocol 開発者チームによって使用されるか、Property Contract の作成者に返還されます。
+Treasury Contract に割り当てられたトークンは、より柔軟なユースケース開発のために Dev Protocol 開発者チームによって使用されるか、Property Contract の作成者に返還される。
 
-Treasury Contract への割り当てシェアは、Policy Contract の `shareOfTreasury` 関数によって決定されます。 また、Treasury Contract のアドレスは、Policy Contract の `treasury` 関数によって決定されます。
+Treasury Contract への割り当てシェアは、Policy Contract の `shareOfTreasury` 関数によって決定される。 また、Treasury Contract のアドレスは、Policy Contract の `treasury` 関数によって決定される。
 
 ## Metrics
 
