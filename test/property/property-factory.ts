@@ -81,8 +81,8 @@ contract(
 				)
 				const event = result.logs[0].args
 				expect(event._property).to.be.equal(dummyProperty)
-				expect(event._before).to.be.equal(beforeAuthor)
-				expect(event._after).to.be.equal(afterAuthor)
+				expect(event._beforeAuthor).to.be.equal(beforeAuthor)
+				expect(event._afterAuthor).to.be.equal(afterAuthor)
 			})
 
 			it('cannot be executed from outside of a property.', async () => {
