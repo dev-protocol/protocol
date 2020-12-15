@@ -6,6 +6,7 @@ import {
 } from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { toBigNumber } from '../test-lib/utils/common'
+import { getEventValue, waitForEvent } from '../test-lib/utils/event'
 
 contract(
 	'PropertyTest',
@@ -68,16 +69,16 @@ contract(
 				validateErrorMessage(result, 'illegal sender')
 			})
 			it('Author is changed.', async () => {
-				await dev.addressConfig.setPropertyFactory(propertyFactory)
-				const propertyInstance = await propertyContract.new(
-					dev.addressConfig.address,
-					author,
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
-					{
-						from: propertyFactory,
-					}
+					author
 				)
+				const propertyAddress = getPropertyAddress(transaction)
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const propertyInstance = await propertyContract.at(propertyAddress)
 				expect(await propertyInstance.author()).to.be.equal(author)
 				await propertyInstance.changeAuthor(nextAuthor, {
 					from: author,

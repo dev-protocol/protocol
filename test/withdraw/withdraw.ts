@@ -11,7 +11,7 @@ import {
 	getWithdrawHolderSplitAmount,
 } from '../test-lib/utils/mint-amount'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
-import { getEventValue, waitForEvent, watch } from '../test-lib/utils/event'
+import { getEventValue } from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,

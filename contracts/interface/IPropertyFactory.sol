@@ -16,4 +16,6 @@ interface IPropertyFactory {
 		string calldata _args2,
 		string calldata _args3
 	) external returns (bool);
+
+	function createChangeAuthorEvent(address _before, address _after) external;
 }
