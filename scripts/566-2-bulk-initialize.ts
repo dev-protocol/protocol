@@ -13,7 +13,7 @@ import {
 	// Already nonexistent value
 	// createSetLastCumulativeHoldersReward,
 } from './lib/bulk-initializer'
-import { ethGasStationFetcher } from '@devprtcl/util-ts'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { PromiseReturn } from './lib/types'
 const { CONFIG, EGS_TOKEN, WITHDRAW_STORAGE, WITHDRAW_MIGRATION } = process.env
 const { log: ____log } = console

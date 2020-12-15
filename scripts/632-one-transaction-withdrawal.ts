@@ -1,4 +1,4 @@
-import { ethGasStationFetcher } from '@devprtcl/util-ts'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { config } from 'dotenv'
 import { DevCommonInstance } from './lib/instance/common'
 import { Lockup } from './lib/instance/lockup'
