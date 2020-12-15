@@ -9,7 +9,7 @@ import {
 	createInitializeStatesAtLockup,
 	createQueue,
 } from './lib/bulk-initializer'
-import { ethGasStationFetcher } from '@devprtcl/util-ts'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { graphql } from './lib/api'
 import { GraphQLResponse, PromiseReturn } from './lib/types'
 const { CONFIG, EGS_TOKEN } = process.env
