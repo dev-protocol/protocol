@@ -2,7 +2,7 @@ import { DevCommonInstance } from './lib/instance/common'
 import { PolicyFactory } from './lib/instance/policy-factory'
 import { PropertyFactory } from './lib/instance/property-factory'
 import { config } from 'dotenv'
-import { ethGasStationFetcher } from '@devprtcl/util-ts'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
 // Caution!!!!!!!!!!!!!!!!!!
 // Please set TRESUARY_ADDRESS to env file before exexute this script.

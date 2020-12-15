@@ -25,10 +25,13 @@ export const waitForEvent = (deployedContract: any) => async (
 	timeout = 10000
 ): Promise<Error | void> =>
 	new Promise((resolve, reject) => {
-		setTimeout(() => reject(new Error()), timeout)
+		setTimeout(() => {
+			reject(new Error())
+		}, timeout)
 		watch(deployedContract)(name, (err) => {
 			if (err) {
-				return reject(err)
+				reject(err)
+				return
 			}
 
 			resolve()
@@ -41,10 +44,13 @@ export const getEventValue = (deployedContract: any) => async (
 	timeout = 10000
 ): Promise<Error | string> =>
 	new Promise((resolve, reject) => {
-		setTimeout(() => reject(new Error()), timeout)
+		setTimeout(() => {
+			reject(new Error())
+		}, timeout)
 		watch(deployedContract)(name, (err, values) => {
 			if (err) {
-				return reject(err)
+				reject(err)
+				return
 			}
 
 			resolve(values[arg])

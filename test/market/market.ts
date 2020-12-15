@@ -140,9 +140,9 @@ contract(
 					})
 					.catch(console.error)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const metrics = await artifacts.require('Metrics').at(metricsAddress)
@@ -236,9 +236,9 @@ contract(
 					})
 					.catch(console.error)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				const result = await marketInstance
 					.deauthenticate(metricsAddress, { from: user })
@@ -254,9 +254,9 @@ contract(
 					})
 					.catch(console.error)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				let count = await marketInstance.issuedMetrics()
 				expect(count.toNumber()).to.be.equal(1)
@@ -285,9 +285,9 @@ contract(
 					})
 					.catch(console.error)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				await marketInstance.deauthenticate(metricsAddress, {
 					from: propertyAuther,
@@ -364,9 +364,9 @@ contract(
 					}
 				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const metrics = await artifacts.require('Metrics').at(metricsAddress)
