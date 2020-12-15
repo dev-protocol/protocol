@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`3.2.1`**
+Version: **`3.3.0`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -207,6 +207,12 @@ Property Factory Contract は新しい Property Contract を生成する。
 
 Property Contract の生成は `create` 関数を実行することで行われる。引数として `name` と `symbol` を指定する。Property Contract の比較容易性のために `totalSupply` は `10000000`(Solidity では `10000000000000000000000000`) に、 `decimals` は `18` に固定する。
 
+Property Factory Contract が新しい Property Contract を生成すると、総供給量の一部が Treasury Contract に割り当てられます。
+
+Treasury Contract に割り当てられたトークンは、より柔軟なユースケース開発のために Dev Protocol 開発者チームによって使用されるか、Property Contract の作成者に返還されます。
+
+Treasury Contract への割り当てシェアは、Policy Contract の `shareOfTreasury` 関数によって決定されます。 また、Treasury Contract のアドレスは、Policy Contract の `treasury` 関数によって決定されます。
+
 ## Metrics
 
 Metrics Contract は Property Contract と Market Contract の関連を表す。
@@ -370,6 +376,16 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 ### policyVotingBlocks
 
 新しい Policy Contract が提案されてから投票を終了するまでのブロック数。投票を終了すると、Policy Contract は否決される。
+
+### shareOfTreasury
+
+Treasury Contract が受け取る、新たに発行された Property Contract のシェア。Property Contract の `constructor` の中で現行の Policy Contract の `shareOfTreasury` が呼び出され、以下の変数から Treasury Contract への割り当てシェアを決定する。
+
+- Property Contract の総供給量
+
+### treasury
+
+現行の Treasury Contract のアドレス。
 
 ## Policy Factory
 

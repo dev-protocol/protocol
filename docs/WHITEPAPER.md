@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`3.2.1`**
+Version: **`3.3.0`**
 
 _There is a possibility that this white paper will be updated. When there is an update, the version number will increase according to [Semantic Versioning](https://semver.org/)._
 
@@ -201,6 +201,12 @@ The Property Factory Contract generates a new Property Contract.
 
 The generation of a Property Contract is carried out by executing the `create` function. The `name` and `symbol` are specified as an argument. For ease of comparison of Property Contracts, `totalSupply` is fixed as `10000000`(in Solidity, it's `10000000000000000000000000`), and `decimals` is fixed as `18`.
 
+When the Property Factory Contract generates a new Property Contract, a portion of the total supply will be allocated to the Treasury Contract.
+
+Tokens assigned to the Treasury Contract will be used by the Dev Protocol developers team for more flexible use case development or returned to the Property Contract creator.
+
+The allocation share to the Treasury Contract is determined by the Policy Contract's `shareOfTreasury` function. Besides, the Treasury Contract's address is determined by the `treasury` function of the Policy Contract.
+
 ## Metrics
 
 The Metrics Contract represents the association between Property Contracts and Market Contracts.
@@ -362,6 +368,16 @@ The number of blocks between the proposal of a new Market Contract and the end o
 ### policyVotingBlocks
 
 The number of blocks between the proposal of a new Policy Contract and the end of voting. Once voting ends, the Policy Contract will be rejected.
+
+### shareOfTreasury
+
+The share of total supply of newly issued Property Contracts received by the Treasury Contract. Within `constructor` for the Property Contract, `shareOfTreasury` for the current Policy Contract is called, and the share sent to the Treasury Contract takes effect is decided based on the following variables.
+
+- Total supply of the Property Contract
+
+### treasury
+
+The contract address of the current Treasury Contract.
 
 ## Policy Factory
 
