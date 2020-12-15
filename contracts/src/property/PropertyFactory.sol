@@ -80,7 +80,10 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 		return address(property);
 	}
 
-	function createChangeAuthorEvent(address _beforeAuthor, address _afterAuthor) external {
+	function createChangeAuthorEvent(
+		address _beforeAuthor,
+		address _afterAuthor
+	) external {
 		require(
 			IPropertyGroup(config().propertyGroup()).isGroup(msg.sender),
 			"this is illegal address"
