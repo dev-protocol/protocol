@@ -11,7 +11,11 @@ import {IMarket} from "contracts/interface/IMarket.sol";
  */
 contract PropertyFactory is UsingConfig, IPropertyFactory {
 	event Create(address indexed _from, address _property);
-	event ChangeAuthor(address indexed _property, address _before, address _after);
+	event ChangeAuthor(
+		address indexed _property,
+		address _before,
+		address _after
+	);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.

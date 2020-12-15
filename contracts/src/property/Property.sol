@@ -64,13 +64,15 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, IProperty {
 		/**
 		 * save author information
 		 */
-		IPropertyFactory(config().propertyFactory()).createChangeAuthorEvent(author, _nextAuthor);
+		IPropertyFactory(config().propertyFactory()).createChangeAuthorEvent(
+			author,
+			_nextAuthor
+		);
 
 		/**
 		 * Changes the author.
 		 */
 		author = _nextAuthor;
-
 	}
 
 	/**
