@@ -37,7 +37,7 @@ const handler = async (
 		.new(dev.addressConfig.address, await dev.gasInfo)
 	console.log('new policy was created:', newPolicy.address)
 	// Tresuary
-	await newPolicy.setTreasury(tresauryAddress!)
+	await newPolicy.setTreasury(tresauryAddress!, await dev.gasInfo)
 	console.log('tresuary address was settted:', await newPolicy.treasury())
 
 	// PolicyFactory
