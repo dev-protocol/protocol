@@ -4,25 +4,7 @@ import {
 } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
-
-const random = (): BigNumber =>
-	((f) => new BigNumber(f()).times(f().slice(0, 1)))((): string =>
-		Math.random().toString().replace('0.', '')
-	)
-const batchRandom = (): BigNumber[] => [
-	random(),
-	random(),
-	random(),
-	random(),
-	random(),
-	random(),
-	random(),
-	random(),
-	random(),
-	random(),
-	random(),
-	random(),
-]
+import { batchRandom } from './utils'
 
 contract('DIP1', ([deployer]) => {
 	let dip1: Dip1Instance
@@ -178,6 +160,22 @@ contract('DIP1', ([deployer]) => {
 	describe('DIP1; policyVotingBlocks', () => {
 		it('policyVotingBlocks equals TheFirstPolicy', async () => {
 			const method = 'policyVotingBlocks'
+			expect((await dip1[method]()).toString()).to.be.equal(
+				(await theFirstPolicy[method]()).toString()
+			)
+		})
+	})
+	describe('DIP1; shareOfTreasury', () => {
+		it('shareOfTreasury equals TheFirstPolicy', async () => {
+			const method = 'shareOfTreasury'
+			expect((await dip1[method](100)).toString()).to.be.equal(
+				(await theFirstPolicy[method](100)).toString()
+			)
+		})
+	})
+	describe('DIP1; treasury', () => {
+		it('treasury equals TheFirstPolicy', async () => {
+			const method = 'treasury'
 			expect((await dip1[method]()).toString()).to.be.equal(
 				(await theFirstPolicy[method]()).toString()
 			)

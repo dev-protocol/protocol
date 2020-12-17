@@ -1,6 +1,7 @@
 import { TheFirstPolicyInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { toBigNumber } from '../test-lib/utils/common'
+import { DEFAULT_ADDRESS } from '../test-lib/const'
 import BigNumber from 'bignumber.js'
 
 contract('TheFirstPolicy', ([deployer]) => {
@@ -206,6 +207,20 @@ contract('TheFirstPolicy', ([deployer]) => {
 			const policy = await create()
 			const result = await policy.policyVotingBlocks()
 			expect(result.toString()).to.be.equal('525600')
+		})
+	})
+	describe('TheFirstPolicy; shareOfTreasury', () => {
+		it('Returns the share value of treasury', async () => {
+			const policy = await create()
+			const result = await policy.shareOfTreasury(100)
+			expect(result.toString()).to.be.equal('0')
+		})
+	})
+	describe('TheFirstPolicy; treasury', () => {
+		it('Returns the treasury address', async () => {
+			const policy = await create()
+			const result = await policy.treasury()
+			expect(result.toString()).to.be.equal(DEFAULT_ADDRESS)
 		})
 	})
 })

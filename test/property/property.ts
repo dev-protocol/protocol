@@ -5,7 +5,7 @@ import {
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
-import { toBigNumber } from '../test-lib/utils/common'
+import { toBigNumber, splitValue } from '../test-lib/utils/common'
 
 contract(
 	'PropertyTest',
@@ -15,6 +15,9 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generatePolicyFactory()
+				await dev.generatePolicyGroup()
+				await dev.generatePolicy()
 			})
 			it('Cannot be created from other than factory', async () => {
 				const result = await propertyContract
@@ -38,9 +41,21 @@ contract(
 				const tenMillion = toBigNumber(1000).times(10000).times(1e18)
 				expect(await propertyInstance.author()).to.be.equal(author)
 				expect((await propertyInstance.decimals()).toNumber()).to.be.equal(18)
-				expect(
-					(await propertyInstance.balanceOf(author).then(toBigNumber)).toFixed()
-				).to.be.equal(tenMillion.toFixed())
+				const authorBalance = await propertyInstance
+					.balanceOf(author)
+					.then(toBigNumber)
+				const treasuryBalance = await propertyInstance
+					.balanceOf(dev.treasury.address)
+					.then(toBigNumber)
+				const [predictedAutherBalance, predictedTreasuryBalance] = splitValue(
+					tenMillion
+				)
+				expect(authorBalance.toFixed()).to.be.equal(
+					predictedAutherBalance.toFixed()
+				)
+				expect(treasuryBalance.toFixed()).to.be.equal(
+					predictedTreasuryBalance.toFixed()
+				)
 				expect(
 					(await propertyInstance.totalSupply().then(toBigNumber)).toFixed()
 				).to.be.equal(tenMillion.toFixed())
@@ -55,7 +70,10 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateDev(),
+					dev.generatePolicyFactory(),
+					dev.generatePolicyGroup(),
 				])
+				await dev.generatePolicy()
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -106,8 +124,7 @@ contract(
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 				])
-				const policy = await artifacts.require('PolicyTestForProperty').new()
-				await dev.policyFactory.create(policy.address)
+				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -157,8 +174,7 @@ contract(
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 				])
-				const policy = await artifacts.require('PolicyTestForProperty').new()
-				await dev.policyFactory.create(policy.address)
+				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',

@@ -22,12 +22,11 @@ async function getWithdrawAmount(
 
 export async function getWithdrawHolderAmount(
 	dev: DevProtocolInstance,
-	calculateWithdrawableAmount: BigNumber,
 	propertyAddress: string,
 	transitionalBlock = 1
 ): Promise<BigNumber> {
 	const [, share] = await getWithdrawAmount(dev, propertyAddress)
-	return calculateWithdrawableAmount.plus(share.times(transitionalBlock))
+	return share.times(transitionalBlock)
 }
 
 export async function getWithdrawInterestAmount(

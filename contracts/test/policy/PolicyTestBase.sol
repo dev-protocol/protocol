@@ -1,8 +1,12 @@
 pragma solidity 0.5.17;
 
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 
-contract PolicyTestForLockup is IPolicy {
+contract PolicyTestBase is IPolicy {
+	using SafeMath for uint256;
+	address public treasury;
+
 	// solhint-disable-next-line no-unused-vars
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
@@ -56,5 +60,13 @@ contract PolicyTestForLockup is IPolicy {
 
 	function policyVotingBlocks() external view returns (uint256) {
 		return 20;
+	}
+
+	function shareOfTreasury(uint256 _supply) external view returns (uint256) {
+		return _supply.div(100).mul(5);
+	}
+
+	function setTreasury(address _treasury) external {
+		treasury = _treasury;
 	}
 }

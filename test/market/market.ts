@@ -108,8 +108,7 @@ contract(
 				])
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
-				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
-				await dev.policyFactory.create(iPolicyInstance.address)
+				await dev.generatePolicy('PolicyTest1')
 				let createMarketResult = await dev.marketFactory.create(
 					behavior1.address
 				)
@@ -141,9 +140,9 @@ contract(
 					})
 					.catch(console.error)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const metrics = await artifacts.require('Metrics').at(metricsAddress)
@@ -237,9 +236,9 @@ contract(
 					})
 					.catch(console.error)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				const result = await marketInstance
 					.deauthenticate(metricsAddress, { from: user })
@@ -255,9 +254,9 @@ contract(
 					})
 					.catch(console.error)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				let count = await marketInstance.issuedMetrics()
 				expect(count.toNumber()).to.be.equal(1)
@@ -286,9 +285,9 @@ contract(
 					})
 					.catch(console.error)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				await marketInstance.deauthenticate(metricsAddress, {
 					from: propertyAuther,
@@ -325,8 +324,7 @@ contract(
 				])
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
-				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
-				await dev.policyFactory.create(iPolicyInstance.address)
+				await dev.generatePolicy('PolicyTest1')
 				let createMarketResult = await dev.marketFactory.create(
 					behavior1.address
 				)
@@ -366,9 +364,9 @@ contract(
 					}
 				)
 				const metricsAddress = await new Promise<string>((resolve) => {
-					watch(dev.metricsFactory)('Create', (_, values) =>
+					watch(dev.metricsFactory)('Create', (_, values) => {
 						resolve(values._metrics)
-					)
+					})
 				})
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const metrics = await artifacts.require('Metrics').at(metricsAddress)

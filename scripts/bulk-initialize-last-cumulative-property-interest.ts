@@ -119,9 +119,9 @@ const handler = async (
 					interest,
 					gasPrice
 				)
-					.on('transactionHash', (hash: string) =>
+					.on('transactionHash', (hash: string) => {
 						____log('Created the transaction', hash)
-					)
+					})
 					.on('confirmation', resolve)
 					.on('error', reject)
 			})

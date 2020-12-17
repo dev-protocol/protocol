@@ -1,7 +1,7 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	PropertyInstance,
-	PolicyTestForLockupInstance,
+	PolicyTestBaseInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {
@@ -19,7 +19,7 @@ contract('LockupTest', ([deployer, user1]) => {
 	const init = async (
 		initialUpdate = true
 	): Promise<
-		[DevProtocolInstance, PropertyInstance, PolicyTestForLockupInstance]
+		[DevProtocolInstance, PropertyInstance, PolicyTestBaseInstance]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
@@ -39,9 +39,9 @@ contract('LockupTest', ([deployer, user1]) => {
 			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-		const policy = await artifacts.require('PolicyTestForLockup').new()
-
-		await dev.policyFactory.create(policy.address)
+		const policyAddress = await dev.generatePolicy('PolicyTestBase')
+		// eslint-disable-next-line @typescript-eslint/await-thenable
+		const policy = await artifacts.require('PolicyTestBase').at(policyAddress)
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', deployer)
 		)
@@ -340,7 +340,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 
 			/*
-			 * PolicyTestForLockup returns 100 as rewards
+			 * PolicyTestBase returns 100 as rewards
 			 * And stakers share is 10%
 			 */
 
@@ -611,7 +611,7 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 
 			/*
-			 * PolicyTestForLockup returns 100 as rewards
+			 * PolicyTestBase returns 100 as rewards
 			 * And stakers share is 10%
 			 */
 
@@ -631,7 +631,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
 						.times(1e18)
 						.times(block.minus(lastBlock))
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
@@ -647,7 +647,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
 						.times(1e18)
 						.times(3)
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
@@ -662,7 +662,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					const aliceAmount = await dev.lockup
 						.calculateWithdrawableInterestAmount(property.address, alice)
 						.then(toBigNumber)
-					const expected = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
 						.times(1e18)
 						.times(block.minus(lastBlock))
 
@@ -692,7 +692,7 @@ contract('LockupTest', ([deployer, user1]) => {
 					const afterAliceBalance = await dev.dev
 						.balanceOf(alice)
 						.then(toBigNumber)
-					const reward = toBigNumber(10) // In PolicyTestForLockup, the max staker reward per block is 10.
+					const reward = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
 						.times(1e18)
 						.times(block.minus(lastBlock))
 					expect(aliceAmount.toFixed()).to.be.equal('0')

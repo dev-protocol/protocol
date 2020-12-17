@@ -2,12 +2,12 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {
-	ERC20Detailed
-} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
+// prettier-ignore
+import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 /**
  * A contract that represents the assets of the user and collects staking from the stakers.
@@ -40,16 +40,20 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, IProperty {
 			msg.sender == config().propertyFactory(),
 			"this is illegal address"
 		);
-
 		/**
 		 * Sets the author.
 		 */
 		author = _own;
 
 		/**
-		 * Mints to the author 100% of the total supply.
+		 * Mints to the author and  treasury contract.
 		 */
-		_mint(author, SUPPLY);
+		IPolicy policy = IPolicy(config().policy());
+		uint256 toTreasury = policy.shareOfTreasury(SUPPLY);
+		uint256 toAuthor = SUPPLY.sub(toTreasury);
+		require(toAuthor != 0, "share of author is 0");
+		_mint(author, toAuthor);
+		_mint(policy.treasury(), toTreasury);
 	}
 
 	/**
