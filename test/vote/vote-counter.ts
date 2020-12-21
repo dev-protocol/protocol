@@ -80,9 +80,12 @@ contract(
 		const createPolicy = async (
 			dev: DevProtocolInstance
 		): Promise<IPolicyInstance> => {
-			const policy = await artifacts.require('PolicyTestForVoteCounter').new()
-			await dev.policyFactory.create(policy.address)
-			return policy
+			const policyAddress = await dev.generatePolicy('PolicyTestForVoteCounter')
+			// eslint-disable-next-line @typescript-eslint/await-thenable
+			const policyInstance = await artifacts
+				.require('PolicyTestForVoteCounter')
+				.at(policyAddress)
+			return policyInstance
 		}
 
 		describe('VoteCounter; voteMarket', () => {

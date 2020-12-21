@@ -17,6 +17,8 @@ import {
 	WithdrawInstance,
 	WithdrawTestInstance,
 	MetricsInstance,
+	TreasuryTestInstance,
+	IPolicyContract,
 } from '../../types/truffle-contracts'
 import { getBlock } from './utils/common'
 
@@ -40,6 +42,8 @@ export class DevProtocolInstance {
 	private _metricsGroup!: MetricsGroupTestInstance
 	private _withdraw!: WithdrawInstance
 	private _withdrawTest!: WithdrawTestInstance
+	private _treasury!: TreasuryTestInstance
+	private readonly _policy!: IPolicyContract
 
 	constructor(deployer: string) {
 		this._deployer = deployer
@@ -107,6 +111,10 @@ export class DevProtocolInstance {
 
 	public get withdrawTest(): WithdrawTestInstance {
 		return this._withdrawTest
+	}
+
+	public get treasury(): TreasuryTestInstance {
+		return this._treasury
 	}
 
 	public get activeWithdraw(): WithdrawInstance | WithdrawTestInstance {
@@ -278,6 +286,18 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this._withdrawTest.createStorage(this.fromDeployer)
+	}
+
+	public async generatePolicy(
+		policyContractName = 'PolicyTestBase'
+	): Promise<string> {
+		const policy = await contract(policyContractName).new()
+		this._treasury = await contract('TreasuryTest').new(
+			this.addressConfig.address
+		)
+		await policy.setTreasury(this._treasury.address)
+		await this._policyFactory.create(policy.address)
+		return policy.address
 	}
 
 	public async getPolicy(

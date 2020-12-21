@@ -101,4 +101,12 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 			_negative_votes > 0 ? _negative_votes : 1000000000000000000;
 		return _up_votes > negative_votes.mul(10);
 	}
+
+	function shareOfTreasury(uint256) external view returns (uint256) {
+		return 0;
+	}
+
+	function treasury() external view returns (address) {
+		return address(0);
+	}
 }
