@@ -61,7 +61,7 @@ contract(
 				).to.be.equal(tenMillion.toFixed())
 			})
 		})
-		describe.only('Property; changeAuthor', () => {
+		describe('Property; changeAuthor', () => {
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
