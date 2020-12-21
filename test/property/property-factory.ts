@@ -1,3 +1,4 @@
+/* eslint-disable max-nested-callbacks */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { toBigNumber } from '../test-lib/utils/common'
@@ -99,6 +100,7 @@ contract(
 			})
 		})
 		describe('PropertyFactory; createAndAuthenticate', () => {
+			const dev = new DevProtocolInstance(deployer)
 			let marketAddress: string
 			before(async () => {
 				await dev.generateAddressConfig()
@@ -118,13 +120,12 @@ contract(
 				])
 				await dev.generatePolicy('PolicyTest1')
 				const market = await dev.getMarket('MarketTest1', user)
-				const result = await dev.marketFactory.create(market.address, {
+				await dev.marketFactory.create(market.address, {
 					from: user,
 				})
 			})
 			describe('PropertyFactory; createAndAuthenticate', () => {
 				const dev = new DevProtocolInstance(deployer)
-				const propertyContract = artifacts.require('Property')
 				let marketAddress: string
 				before(async () => {
 					await dev.generateAddressConfig()
