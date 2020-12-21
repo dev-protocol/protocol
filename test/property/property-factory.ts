@@ -143,8 +143,7 @@ contract(
 						dev.generateWithdraw(),
 						dev.generateAllocator(),
 					])
-					const policy = await dev.getPolicy('PolicyTest1', user)
-					await dev.policyFactory.create(policy.address, { from: user })
+					await dev.generatePolicy('PolicyTest1')
 					const market = await dev.getMarket('MarketTest1', user)
 					const result = await dev.marketFactory.create(market.address, {
 						from: user,
