@@ -4,5 +4,7 @@ pragma solidity >=0.5.17;
 interface IProperty {
 	function author() external view returns (address);
 
+	function changeAuthor(address _nextAuthor) external;
+
 	function withdraw(address _sender, uint256 _value) external;
 }

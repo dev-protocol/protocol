@@ -7,6 +7,7 @@ import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.s
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
+import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 /**
@@ -54,6 +55,29 @@ contract Property is ERC20, ERC20Detailed, UsingConfig, IProperty {
 		require(toAuthor != 0, "share of author is 0");
 		_mint(author, toAuthor);
 		_mint(policy.treasury(), toTreasury);
+	}
+
+	/**
+	 * Changing the author
+	 */
+	function changeAuthor(address _nextAuthor) external {
+		/**
+		 * Validates the sender is current author.
+		 */
+		require(msg.sender == author, "illegal sender");
+
+		/**
+		 * save author information
+		 */
+		IPropertyFactory(config().propertyFactory()).createChangeAuthorEvent(
+			author,
+			_nextAuthor
+		);
+
+		/**
+		 * Changes the author.
+		 */
+		author = _nextAuthor;
 	}
 
 	/**

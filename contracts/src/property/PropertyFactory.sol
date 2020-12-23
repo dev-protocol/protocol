@@ -11,6 +11,11 @@ import {IMarket} from "contracts/interface/IMarket.sol";
  */
 contract PropertyFactory is UsingConfig, IPropertyFactory {
 	event Create(address indexed _from, address _property);
+	event ChangeAuthor(
+		address indexed _property,
+		address _beforeAuthor,
+		address _afterAuthor
+	);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.
@@ -73,5 +78,17 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 
 		emit Create(msg.sender, address(property));
 		return address(property);
+	}
+
+	function createChangeAuthorEvent(
+		address _beforeAuthor,
+		address _afterAuthor
+	) external {
+		require(
+			IPropertyGroup(config().propertyGroup()).isGroup(msg.sender),
+			"this is illegal address"
+		);
+
+		emit ChangeAuthor(msg.sender, _beforeAuthor, _afterAuthor);
 	}
 }
