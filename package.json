@@ -38,7 +38,7 @@
 		"dotenv": "8.2.0",
 		"eslint": "7.17.0",
 		"eslint-config-prettier": "6.15.0",
-		"eslint-config-xo": "0.33.1",
+		"eslint-config-xo": "0.34.0",
 		"eslint-config-xo-typescript": "0.37.0",
 		"eslint-plugin-prettier": "3.3.0",
 		"husky": "4.3.6",
