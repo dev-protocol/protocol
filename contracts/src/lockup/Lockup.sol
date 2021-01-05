@@ -464,16 +464,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		_mintInterestValue(msg.sender, value);
 
 		/**
-		 * Creates a Dev token instance.
-		 */
-		ERC20Mintable erc20 = ERC20Mintable(config().token());
-
-		/**
-		 * Mints the reward.
-		 */
-		require(erc20.mint(msg.sender, value), "dev mint failed");
-
-		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
 		 */
 		update();
