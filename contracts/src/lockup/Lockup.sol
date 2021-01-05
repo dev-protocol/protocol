@@ -137,18 +137,21 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 
 		uint256 mintValue;
 		RewardPrices memory lastPrices;
-		for (uint256 i = 0; i<_properties.length; i++ ){
+		for (uint256 i = 0; i < _properties.length; i++) {
 			/**
-			* Prepare withdraws staking reward as an interest.
-			*/
+			 * Prepare withdraws staking reward as an interest.
+			 */
 			(uint256 value, RewardPrices memory prices) =
 				_prepareWithdrawInterest(_properties[i], msg.sender);
 			mintValue = mintValue.add(value);
 			/**
-			* Gets latest cumulative holders reward for the passed Property.
-			*/
+			 * Gets latest cumulative holders reward for the passed Property.
+			 */
 			uint256 cHoldersReward =
-				_calculateCumulativeHoldersRewardAmount(prices.holders, _properties[i]);
+				_calculateCumulativeHoldersRewardAmount(
+					prices.holders,
+					_properties[i]
+				);
 			setStorageLastCumulativeHoldersRewardAmountPerProperty(
 				_properties[i],
 				cHoldersReward
@@ -163,12 +166,12 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		setStorageLastCumulativeHoldersRewardPrice(lastPrices.holders);
 		setStorageLastCumulativeInterestPrice(lastPrices.interest);
 		/**
-		* Mints the reward.
-		*/
+		 * Mints the reward.
+		 */
 		_mintInterestValue(msg.sender, mintValue);
 		/**
-		* Since the total supply of tokens has changed, updates the latest maximum mint amount.
-		*/
+		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
+		 */
 		update();
 	}
 
@@ -512,11 +515,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Updates the staking status to avoid double rewards.
 		 */
-		setStorageLastStakedInterestPrice(
-			_property,
-			sender,
-			prices.interest
-		);
+		setStorageLastStakedInterestPrice(_property, sender, prices.interest);
 		__updateLegacyWithdrawableInterestAmount(_property, sender);
 
 		return (value, prices);
