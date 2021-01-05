@@ -128,6 +128,51 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 
 	/**
+	 * withdraw up to 9 properties rewards
+	 * and transfer the staked and withdraw rewards amount to the sender.
+	 */
+	function bulkWithdraw(address[] _properties) external {
+		require(_properties.length == 0, "length is 0");
+		require(_properties.length <= 9, "length is too long");
+
+		uint256 mintValue;
+		RewardPrices memory lastPrices;
+		for (uint256 i = 0; i<_properties.length; i++ ){
+			/**
+			* Prepare withdraws staking reward as an interest.
+			*/
+			(uint256 value, RewardPrices memory prices) =
+				_prepareWithdrawInterest(_properties[i], msg.sender);
+			mintValue = mintValue.add(value);
+			/**
+			* Gets latest cumulative holders reward for the passed Property.
+			*/
+			uint256 cHoldersReward =
+				_calculateCumulativeHoldersRewardAmount(prices.holders, _properties[i]);
+			setStorageLastCumulativeHoldersRewardAmountPerProperty(
+				_properties[i],
+				cHoldersReward
+			);
+			setStorageLastCumulativeHoldersRewardPricePerProperty(
+				_properties[i],
+				prices.holders
+			);
+			lastPrices = prices;
+		}
+		setStorageLastStakesChangedCumulativeReward(lastPrices.reward);
+		setStorageLastCumulativeHoldersRewardPrice(lastPrices.holders);
+		setStorageLastCumulativeInterestPrice(lastPrices.interest);
+		/**
+		* Mints the reward.
+		*/
+		_mintInterestValue(msg.sender, mintValue);
+		/**
+		* Since the total supply of tokens has changed, updates the latest maximum mint amount.
+		*/
+		update();
+	}
+
+	/**
 	 * Store staking states as a snapshot.
 	 */
 	function beforeStakesChanged(
@@ -404,30 +449,20 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		returns (RewardPrices memory _prices)
 	{
 		/**
-		 * Gets the withdrawable amount.
+		 * Prepare withdraws staking reward as an interest.
 		 */
 		(uint256 value, RewardPrices memory prices) =
-			_calculateWithdrawableInterestAmount(_property, msg.sender);
+			_prepareWithdrawInterest(_property, msg.sender);
 
 		/**
-		 * Sets the unwithdrawn reward amount to 0.
+		 * Mints the reward.
 		 */
-		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
+		_mintInterestValue(msg.sender, value);
 
 		/**
 		 * Creates a Dev token instance.
 		 */
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
-
-		/**
-		 * Updates the staking status to avoid double rewards.
-		 */
-		setStorageLastStakedInterestPrice(
-			_property,
-			msg.sender,
-			prices.interest
-		);
-		__updateLegacyWithdrawableInterestAmount(_property, msg.sender);
 
 		/**
 		 * Mints the reward.
@@ -440,6 +475,51 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		update();
 
 		return prices;
+	}
+
+	/**
+	 * Mints the reward.
+	 */
+	function _mintInterestValue(address _account, uint256 _value) private {
+		/**
+		 * Creates a Dev token instance.
+		 */
+		ERC20Mintable erc20 = ERC20Mintable(config().token());
+
+		/**
+		 * Mints the reward.
+		 */
+		require(erc20.mint(_account, _value), "dev mint failed");
+	}
+
+	/**
+	 * Prepare withdraws staking reward as an interest.
+	 */
+	function _prepareWithdrawInterest(address _property, address sender)
+		private
+		returns (uint256 _value, RewardPrices memory _prices)
+	{
+		/**
+		 * Gets the withdrawable amount.
+		 */
+		(uint256 value, RewardPrices memory prices) =
+			_calculateWithdrawableInterestAmount(_property, sender);
+
+		/**
+		 * Sets the unwithdrawn reward amount to 0.
+		 */
+		setStoragePendingInterestWithdrawal(_property, sender, 0);
+		/**
+		 * Updates the staking status to avoid double rewards.
+		 */
+		setStorageLastStakedInterestPrice(
+			_property,
+			sender,
+			prices.interest
+		);
+		__updateLegacyWithdrawableInterestAmount(_property, sender);
+
+		return (value, prices);
 	}
 
 	/**
