@@ -45,5 +45,5 @@ interface ILockup {
 
 	function bulkWithdraw(address[] calldata _properties)
 		external
-		returns (bool);
+		returns (uint256);
 }

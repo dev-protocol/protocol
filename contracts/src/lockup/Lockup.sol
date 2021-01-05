@@ -134,7 +134,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 */
 	function bulkWithdraw(address[] calldata _properties)
 		external
-		returns (bool)
+		returns (uint256)
 	{
 		require(_properties.length != 0, "length is 0");
 		require(_properties.length <= 9, "length is too long");
@@ -177,13 +177,14 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Mints the reward.
 		 */
-		require(mintValue != 0, "reword is 0");
-		_mintInterestValue(msg.sender, mintValue);
+		if(mintValue != 0) {
+			_mintInterestValue(msg.sender, mintValue);
+		}
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
 		 */
 		update();
-		return true;
+		return mintValue;
 	}
 
 	/**

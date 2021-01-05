@@ -346,46 +346,52 @@ contract('LockupTest', ([deployer, user1]) => {
 				})
 			})
 		})
+		describe('success', () => {
+			it(`withdraw the amount passed`, async () => {
+				const [dev, property] = await init()
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
+				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-		// It(`withdraw the amount passed`, async () => {
-		// 	const [dev, property] = await init()
-		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				await dev.dev.deposit(property.address, 10000)
+				let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+				expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
 
-		// 	await dev.dev.deposit(property.address, 10000)
-		// 	let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
-		// 	expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+				await dev.lockup.bulkWithdraw([property.address])
+				lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+				expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				const reward = toBigNumber(10).times(1e18)
 
-		// 	await dev.lockup.withdraw(property.address, 1000)
-		// 	lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
-		// 	expect(lockedupAllAmount.toFixed()).to.be.equal('9000')
-		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-		// 	const reward = toBigNumber(10).times(1e18)
+				expect(afterBalance.toFixed()).to.be.equal(
+					beforeBalance.minus(10000).plus(reward).toFixed()
+				)
+				expect(afterTotalSupply.toFixed()).to.be.equal(
+					beforeTotalSupply.plus(reward).toFixed()
+				)
+			})
+			it(`withdraw 0 amount when passed amount is 0 and non-staked user`, async () => {
+				const [dev, property] = await init()
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
+				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-		// 	expect(afterBalance.toFixed()).to.be.equal(
-		// 		beforeBalance.minus(9000).plus(reward).toFixed()
-		// 	)
-		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
-		// 		beforeTotalSupply.plus(reward).toFixed()
-		// 	)
-		// })
-		// It(`withdraw 0 amount when passed amount is 0 and non-staked user`, async () => {
-		// 	const [dev, property] = await init()
-		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				await dev.lockup.bulkWithdraw([property.address])
 
-		// 	await dev.lockup.withdraw(property.address, 0)
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 
-		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
+				expect(afterTotalSupply.toFixed()).to.be.equal(
+					beforeTotalSupply.toFixed()
+				)
+			})
+		})
 
-		// 	expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
-		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
-		// 		beforeTotalSupply.toFixed()
-		// 	)
-		// })
-		// it(`withdraw 0 amount when passed amount is 0 and past staked user`, async () => {
+		// It(`withdraw 0 amount when passed amount is 0 and past staked user`, async () => {
 		// 	const [dev, property] = await init()
 		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
