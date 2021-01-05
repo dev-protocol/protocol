@@ -132,14 +132,17 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * withdraw up to 9 properties rewards
 	 * and transfer withdraw rewards amount to the sender.
 	 */
-	function bulkWithdraw(address[] calldata _properties) external returns (bool) {
+	function bulkWithdraw(address[] calldata _properties)
+		external
+		returns (bool)
+	{
 		require(_properties.length != 0, "length is 0");
 		require(_properties.length <= 9, "length is too long");
 
 		uint256 mintValue;
 		RewardPrices memory lastPrices;
 		for (uint256 i = 0; i < _properties.length; i++) {
-			for (uint256 k = i+1; k < _properties.length; k++) {
+			for (uint256 k = i + 1; k < _properties.length; k++) {
 				require(_properties[i] != _properties[k], "duplicate address");
 			}
 		}
