@@ -43,6 +43,7 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 contract Lockup is ILockup, UsingConfig, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+
 	struct RewardPrices {
 		uint256 reward;
 		uint256 holders;
@@ -131,12 +132,17 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * withdraw up to 9 properties rewards
 	 * and transfer withdraw rewards amount to the sender.
 	 */
-	function bulkWithdraw(address[] calldata _properties) external {
-		require(_properties.length == 0, "length is 0");
+	function bulkWithdraw(address[] calldata _properties) external returns (bool) {
+		require(_properties.length != 0, "length is 0");
 		require(_properties.length <= 9, "length is too long");
 
 		uint256 mintValue;
 		RewardPrices memory lastPrices;
+		for (uint256 i = 0; i < _properties.length; i++) {
+			for (uint256 k = i+1; k < _properties.length; k++) {
+				require(_properties[i] != _properties[k], "duplicate address");
+			}
+		}
 		for (uint256 i = 0; i < _properties.length; i++) {
 			/**
 			 * Prepare withdraws staking reward as an interest.
@@ -174,6 +180,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
 		 */
 		update();
+		return true;
 	}
 
 	/**

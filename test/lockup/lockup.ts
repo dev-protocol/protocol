@@ -262,6 +262,213 @@ contract('LockupTest', ([deployer, user1]) => {
 			)
 		})
 	})
+
+	describe('Lockup; bulkWithdraw', () => {
+		describe('fail', () => {
+			const generatePropertyAddress = async (
+				dev: DevProtocolInstance,
+				count = 10
+			): Promise<string[]> => {
+				const result: string[] = []
+				while (true) {
+					if (result.length === count) {
+						return result
+					}
+
+					const propertyAddress = getPropertyAddress(
+						// eslint-disable-next-line no-await-in-loop
+						await dev.propertyFactory.create('test', 'TEST', deployer)
+					)
+					result.push(propertyAddress)
+				}
+			}
+
+			describe('length', () => {
+				it('target property address is 0.', async () => {
+					const [dev] = await init()
+
+					const res = await dev.lockup.bulkWithdraw([]).catch(err)
+					validateErrorMessage(res, 'length is 0')
+				})
+				it('target property address is 10.', async () => {
+					const [dev] = await init()
+					const addresses = await generatePropertyAddress(dev)
+
+					const res = await dev.lockup.bulkWithdraw(addresses).catch(err)
+					validateErrorMessage(res, 'length is too long')
+				})
+			})
+			describe('duplicate', () => {
+				it('The first and second property addresses of the target property are duplicated.', async () => {
+					const [dev, property] = await init()
+					const res = await dev.lockup
+						.bulkWithdraw([property.address, property.address])
+						.catch(err)
+					validateErrorMessage(res, 'duplicate address')
+				})
+				it('The fifth and ninth property addresses of the target property address are duplicated.', async () => {
+					const [dev] = await init()
+					const addresses = await generatePropertyAddress(dev)
+
+					const res = await dev.lockup
+						.bulkWithdraw([
+							addresses[0],
+							addresses[1],
+							addresses[2],
+							addresses[3],
+							addresses[4],
+							addresses[5],
+							addresses[6],
+							addresses[7],
+							addresses[4],
+						])
+						.catch(err)
+					validateErrorMessage(res, 'duplicate address')
+				})
+				it('The eighth and ninth property addresses of the target property address are duplicated.', async () => {
+					const [dev] = await init()
+					const addresses = await generatePropertyAddress(dev)
+
+					const res = await dev.lockup
+						.bulkWithdraw([
+							addresses[0],
+							addresses[1],
+							addresses[2],
+							addresses[3],
+							addresses[4],
+							addresses[5],
+							addresses[6],
+							addresses[7],
+							addresses[7],
+						])
+						.catch(err)
+					validateErrorMessage(res, 'duplicate address')
+				})
+			})
+		})
+
+		// It(`withdraw the amount passed`, async () => {
+		// 	const [dev, property] = await init()
+		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+		// 	await dev.dev.deposit(property.address, 10000)
+		// 	let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+		// 	expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+
+		// 	await dev.lockup.withdraw(property.address, 1000)
+		// 	lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+		// 	expect(lockedupAllAmount.toFixed()).to.be.equal('9000')
+		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+		// 	const reward = toBigNumber(10).times(1e18)
+
+		// 	expect(afterBalance.toFixed()).to.be.equal(
+		// 		beforeBalance.minus(9000).plus(reward).toFixed()
+		// 	)
+		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
+		// 		beforeTotalSupply.plus(reward).toFixed()
+		// 	)
+		// })
+		// It(`withdraw 0 amount when passed amount is 0 and non-staked user`, async () => {
+		// 	const [dev, property] = await init()
+		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+		// 	await dev.lockup.withdraw(property.address, 0)
+
+		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+		// 	expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
+		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
+		// 		beforeTotalSupply.toFixed()
+		// 	)
+		// })
+		// it(`withdraw 0 amount when passed amount is 0 and past staked user`, async () => {
+		// 	const [dev, property] = await init()
+		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+		// 	await dev.dev.deposit(property.address, 10000)
+		// 	const lastBlock = await getBlock()
+		// 	await mine(3)
+		// 	await dev.lockup.withdraw(property.address, 10000)
+		// 	const block = await getBlock()
+		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+		// 	const reward = toBigNumber(10)
+		// 		.times(1e18)
+		// 		.times(block - lastBlock)
+
+		// 	expect(afterBalance.toFixed()).to.be.equal(
+		// 		beforeBalance.plus(reward).toFixed()
+		// 	)
+		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
+		// 		beforeTotalSupply.plus(reward).toFixed()
+		// 	)
+
+		// 	await mine(3)
+		// 	await dev.lockup.withdraw(property.address, 0)
+		// 	const afterBalance2 = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const afterTotalSupply2 = await dev.dev.totalSupply().then(toBigNumber)
+
+		// 	expect(afterBalance2.toFixed()).to.be.equal(afterBalance.toFixed())
+		// 	expect(afterTotalSupply2.toFixed()).to.be.equal(
+		// 		afterTotalSupply.toFixed()
+		// 	)
+		// })
+		// it(`withdraw just reward when passed amount is 0`, async () => {
+		// 	const [dev, property] = await init()
+		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+		// 	await dev.dev.deposit(property.address, 10000)
+		// 	let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+		// 	expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+
+		// 	await dev.lockup.withdraw(property.address, 0)
+		// 	lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+		// 	expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+		// 	const reward = toBigNumber(10).times(1e18)
+
+		// 	expect(afterBalance.toFixed()).to.be.equal(
+		// 		beforeBalance.minus(10000).plus(reward).toFixed()
+		// 	)
+		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
+		// 		beforeTotalSupply.plus(reward).toFixed()
+		// 	)
+		// })
+		// it(`withdraw just reward when passed amount is 0 and user withdrawn by the legacy contract`, async () => {
+		// 	const [dev, property] = await init()
+		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+		// 	const storage = await dev.lockup
+		// 		.getStorageAddress()
+		// 		.then((x) => artifacts.require('EternalStorage').at(x))
+		// 	await dev.lockup.changeOwner(deployer)
+		// 	await storage.setUint(
+		// 		keccak256('_pendingInterestWithdrawal', property.address, deployer),
+		// 		100000
+		// 	)
+		// 	await storage.changeOwner(dev.lockup.address)
+
+		// 	await dev.lockup.withdraw(property.address, 0)
+		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+		// 	expect(afterBalance.toFixed()).to.be.equal(
+		// 		beforeBalance.plus(100000).toFixed()
+		// 	)
+		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
+		// 		beforeTotalSupply.plus(100000).toFixed()
+		// 	)
+		// })
+	})
+
 	describe('Lockup; calculateWithdrawableInterestAmount', () => {
 		type Calculator = (
 			prop: PropertyInstance,
