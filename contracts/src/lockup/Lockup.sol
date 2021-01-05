@@ -168,6 +168,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Mints the reward.
 		 */
+		require(mintValue != 0, "reword is 0");
 		_mintInterestValue(msg.sender, mintValue);
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
