@@ -131,7 +131,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * withdraw up to 9 properties rewards
 	 * and transfer the staked and withdraw rewards amount to the sender.
 	 */
-	function bulkWithdraw(address[] _properties) external {
+	function bulkWithdraw(address[] calldata _properties) external {
 		require(_properties.length == 0, "length is 0");
 		require(_properties.length <= 9, "length is too long");
 
