@@ -264,25 +264,25 @@ contract('LockupTest', ([deployer, user1]) => {
 	})
 
 	describe('Lockup; bulkWithdraw', () => {
-		describe('fail', () => {
-			const generatePropertyAddress = async (
-				dev: DevProtocolInstance,
-				count = 10
-			): Promise<string[]> => {
-				const result: string[] = []
-				while (true) {
-					if (result.length === count) {
-						return result
-					}
-
-					const propertyAddress = getPropertyAddress(
-						// eslint-disable-next-line no-await-in-loop
-						await dev.propertyFactory.create('test', 'TEST', deployer)
-					)
-					result.push(propertyAddress)
+		const generatePropertyAddress = async (
+			dev: DevProtocolInstance,
+			count = 10
+		): Promise<string[]> => {
+			const result: string[] = []
+			while (true) {
+				if (result.length === count) {
+					return result
 				}
-			}
 
+				const propertyAddress = getPropertyAddress(
+					// eslint-disable-next-line no-await-in-loop
+					await dev.propertyFactory.create('test', 'TEST', deployer)
+				)
+				result.push(propertyAddress)
+			}
+		}
+
+		describe('fail', () => {
 			describe('length', () => {
 				it('target property address is 0.', async () => {
 					const [dev] = await init()
@@ -347,6 +347,36 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 		})
 		describe('success', () => {
+			it(`withdraw the amount passed(multiple property addresses)`, async () => {
+				const [dev, property] = await init()
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
+				const properties = await generatePropertyAddress(dev, 1)
+				await dev.metricsGroup.addGroup(
+					(await dev.createMetrics(deployer, properties[0])).address
+				)
+				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+				await dev.dev.deposit(property.address, 10000)
+				await dev.dev.deposit(properties[0], 10000)
+				let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+				expect(lockedupAllAmount.toFixed()).to.be.equal('20000')
+
+				await dev.lockup.bulkWithdraw([property.address, properties[0]])
+				lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+				expect(lockedupAllAmount.toFixed()).to.be.equal('20000')
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				const reward = toBigNumber(10).times(1e18)
+
+				expect(afterBalance.toFixed()).to.be.equal(
+					beforeBalance.minus(20000).plus(reward).plus(reward).toFixed()
+				)
+				expect(afterTotalSupply.toFixed()).to.be.equal(
+					beforeTotalSupply.plus(reward).plus(reward).toFixed()
+				)
+			})
 			it(`withdraw the amount passed`, async () => {
 				const [dev, property] = await init()
 				const beforeBalance = await dev.dev
@@ -389,90 +419,97 @@ contract('LockupTest', ([deployer, user1]) => {
 					beforeTotalSupply.toFixed()
 				)
 			})
+			it(`If you don't remove the staking, the reward will continue to increase`, async () => {
+				const [dev, property] = await init()
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
+				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+				await dev.dev.deposit(property.address, 10000)
+				const lastBlock = await getBlock()
+				await mine(3)
+				await dev.lockup.bulkWithdraw([property.address])
+				const block = await getBlock()
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				const reward = toBigNumber(10)
+					.times(1e18)
+					.times(block - lastBlock)
+				expect(afterBalance.toFixed()).to.be.equal(
+					beforeBalance.plus(reward).minus(10000).toFixed()
+				)
+				expect(afterTotalSupply.toFixed()).to.be.equal(
+					beforeTotalSupply.plus(reward).toFixed()
+				)
+
+				await mine(3)
+				await dev.lockup.bulkWithdraw([property.address])
+				const afterBalance2 = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
+				const afterTotalSupply2 = await dev.dev.totalSupply().then(toBigNumber)
+				expect(afterBalance2.toFixed()).to.be.equal(
+					afterBalance.plus(reward).toFixed()
+				)
+				expect(afterTotalSupply2.toFixed()).to.be.equal(
+					afterTotalSupply.plus(reward).toFixed()
+				)
+			})
+			it(`withdraw just reward`, async () => {
+				const [dev, property] = await init()
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
+				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+				await dev.dev.deposit(property.address, 10000)
+				let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+				expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+
+				await dev.lockup.bulkWithdraw([property.address])
+				lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
+				expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+				const reward = toBigNumber(10).times(1e18)
+
+				expect(afterBalance.toFixed()).to.be.equal(
+					beforeBalance.minus(10000).plus(reward).toFixed()
+				)
+				expect(afterTotalSupply.toFixed()).to.be.equal(
+					beforeTotalSupply.plus(reward).toFixed()
+				)
+			})
+			it(`withdraw just reward when passed amount is 0 and user withdrawn by the legacy contract`, async () => {
+				const [dev, property] = await init()
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
+				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+				const storage = await dev.lockup
+					.getStorageAddress()
+					.then((x) => artifacts.require('EternalStorage').at(x))
+				await dev.lockup.changeOwner(deployer)
+				await storage.setUint(
+					keccak256('_pendingInterestWithdrawal', property.address, deployer),
+					100000
+				)
+				await storage.changeOwner(dev.lockup.address)
+
+				await dev.lockup.bulkWithdraw([property.address])
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
+
+				expect(afterBalance.toFixed()).to.be.equal(
+					beforeBalance.plus(100000).toFixed()
+				)
+				expect(afterTotalSupply.toFixed()).to.be.equal(
+					beforeTotalSupply.plus(100000).toFixed()
+				)
+			})
 		})
-
-		// It(`withdraw 0 amount when passed amount is 0 and past staked user`, async () => {
-		// 	const [dev, property] = await init()
-		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-		// 	await dev.dev.deposit(property.address, 10000)
-		// 	const lastBlock = await getBlock()
-		// 	await mine(3)
-		// 	await dev.lockup.withdraw(property.address, 10000)
-		// 	const block = await getBlock()
-		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-		// 	const reward = toBigNumber(10)
-		// 		.times(1e18)
-		// 		.times(block - lastBlock)
-
-		// 	expect(afterBalance.toFixed()).to.be.equal(
-		// 		beforeBalance.plus(reward).toFixed()
-		// 	)
-		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
-		// 		beforeTotalSupply.plus(reward).toFixed()
-		// 	)
-
-		// 	await mine(3)
-		// 	await dev.lockup.withdraw(property.address, 0)
-		// 	const afterBalance2 = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const afterTotalSupply2 = await dev.dev.totalSupply().then(toBigNumber)
-
-		// 	expect(afterBalance2.toFixed()).to.be.equal(afterBalance.toFixed())
-		// 	expect(afterTotalSupply2.toFixed()).to.be.equal(
-		// 		afterTotalSupply.toFixed()
-		// 	)
-		// })
-		// it(`withdraw just reward when passed amount is 0`, async () => {
-		// 	const [dev, property] = await init()
-		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-		// 	await dev.dev.deposit(property.address, 10000)
-		// 	let lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
-		// 	expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
-
-		// 	await dev.lockup.withdraw(property.address, 0)
-		// 	lockedupAllAmount = await dev.lockup.getAllValue().then(toBigNumber)
-		// 	expect(lockedupAllAmount.toFixed()).to.be.equal('10000')
-		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-		// 	const reward = toBigNumber(10).times(1e18)
-
-		// 	expect(afterBalance.toFixed()).to.be.equal(
-		// 		beforeBalance.minus(10000).plus(reward).toFixed()
-		// 	)
-		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
-		// 		beforeTotalSupply.plus(reward).toFixed()
-		// 	)
-		// })
-		// it(`withdraw just reward when passed amount is 0 and user withdrawn by the legacy contract`, async () => {
-		// 	const [dev, property] = await init()
-		// 	const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-		// 	const storage = await dev.lockup
-		// 		.getStorageAddress()
-		// 		.then((x) => artifacts.require('EternalStorage').at(x))
-		// 	await dev.lockup.changeOwner(deployer)
-		// 	await storage.setUint(
-		// 		keccak256('_pendingInterestWithdrawal', property.address, deployer),
-		// 		100000
-		// 	)
-		// 	await storage.changeOwner(dev.lockup.address)
-
-		// 	await dev.lockup.withdraw(property.address, 0)
-		// 	const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
-		// 	const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-
-		// 	expect(afterBalance.toFixed()).to.be.equal(
-		// 		beforeBalance.plus(100000).toFixed()
-		// 	)
-		// 	expect(afterTotalSupply.toFixed()).to.be.equal(
-		// 		beforeTotalSupply.plus(100000).toFixed()
-		// 	)
-		// })
 	})
 
 	describe('Lockup; calculateWithdrawableInterestAmount', () => {

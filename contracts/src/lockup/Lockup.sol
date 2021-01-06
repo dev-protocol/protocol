@@ -177,7 +177,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Mints the reward.
 		 */
-		if(mintValue != 0) {
+		if (mintValue != 0) {
 			_mintInterestValue(msg.sender, mintValue);
 		}
 		/**
