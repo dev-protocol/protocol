@@ -99,7 +99,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 	/**
 	 * Withdraws rewards.
 	 */
-	function bulkWithdraw(address[] calldata _properties) external {
+	function bulkWithdraw(address[] calldata _properties) external returns (uint256) {
 		validateProperties(_properties);
 		uint256 mintValue;
 		for (uint256 i = 0; i < _properties.length; i++) {
@@ -121,12 +121,15 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		 * Mints the holder reward.
 		 */
 		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		require(erc20.mint(msg.sender, mintValue), "dev mint failed");
+		if (mintValue != 0){
+			require(erc20.mint(msg.sender, mintValue), "dev mint failed");
+		}
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
 		 */
 		ILockup lockup = ILockup(config().lockup());
 		lockup.update();
+		return mintValue;
 	}
 
 	/**
