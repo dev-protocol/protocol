@@ -1,4 +1,4 @@
-![Dev Protocol](https://raw.githubusercontent.com/dev-protocol/repository-token/main/public/asset/logo.png)
+![Dev Protocol](https://raw.githubusercontent.com/dev-protocol/protocol/main/public/asset/logo.png)
 
 [![CI Status](https://github.com/dev-protocol/protocol/workflows/Node/badge.svg)](https://github.com/dev-protocol/protocol/actions)
 [![code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
