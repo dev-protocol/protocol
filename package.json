@@ -2,7 +2,6 @@
 	"name": "@devprotocol/protocol",
 	"version": "3.0.5",
 	"description": "Securitize for Internet assets",
-	"main": "cli/index.js",
 	"scripts": {
 		"test": "truffle test",
 		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
@@ -15,9 +14,6 @@
 		"prepack": "yarn build",
 		"build": "tsc -p tsconfig.build.json",
 		"prebuild": "rimraf ['migrations/**/*.js', 'scripts/**/*.js'] && yarn generate"
-	},
-	"bin": {
-		"dev-protocol": "cli/index.js"
 	},
 	"files": [
 		"contracts/interface"
@@ -57,9 +53,7 @@
 		"web3": "1.3.1"
 	},
 	"dependencies": {
-		"@openzeppelin/contracts": "^2.5.0",
-		"commander": "^6.0.0",
-		"shelljs": "^0.8.3"
+		"@openzeppelin/contracts": "^2.5.0"
 	},
 	"bundleddependencies": [
 		"truffle",

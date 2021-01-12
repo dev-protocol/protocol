@@ -11,24 +11,6 @@ This repository is the place to develop smart contracts for Dev Protocol.
 - Whitepaper: https://github.com/dev-protocol/protocol/blob/main/docs/WHITEPAPER.md
 - ホワイトペーパー(日本語): https://github.com/dev-protocol/protocol/blob/main/docs/WHITEPAPER.JA.md
 
-## How to use
-
-### Deploy a mock to your local network
-
-First, install this repository as an npm package.
-
-```bash
-> npm i -D @dev-protocol/protocol
-```
-
-Prepare a local network using [Ganache](https://www.trufflesuite.com/ganache), etc.
-
-Finally, run the following command to deploy a mock.
-
-```bash
-> dev-protocol mock --host 127.0.0.1 --port 7545
-```
-
 ## How to contribute:
 
 Read the [contributing guide](https://github.com/dev-protocol/protocol/blob/main/.github/CONTRIBUTING.md), and create PR when you have time. 🧚✨
