@@ -29,12 +29,13 @@ const handler = async (
 
 	const metricsGroup = new MetricsGroup(dev)
 	const currentMetoricsGroup = await metricsGroup.load()
-	const nextmetricsGroup = await metricsGroup.create()
-	await metricsGroup.set(nextmetricsGroup)
-	await metricsGroup.changeOwner(currentMetoricsGroup, nextmetricsGroup)
-	await nextmetricsGroup.setTotalAuthenticatedPropertiesAdmin(
+	const nextMetricsGroup = await metricsGroup.create()
+	await metricsGroup.set(nextMetricsGroup)
+	await metricsGroup.changeOwner(currentMetoricsGroup, nextMetricsGroup)
+	await nextMetricsGroup.setTotalAuthenticatedPropertiesAdmin(
 		totalAuthenticatedProperties
 	)
+	callback(null)
 }
 
 export = handler
