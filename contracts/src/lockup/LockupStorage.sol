@@ -421,4 +421,83 @@ contract LockupStorage is UsingStorage {
 				)
 			);
 	}
+
+	//GeometricMeanLockedUp
+	function setStorageGeometricMeanLockedUp(uint256 _geometricMean) internal {
+		eternalStorage().setUint(
+			getStorageGeometricMeanLockedUpKey(),
+			_geometricMean
+		);
+	}
+
+	function getStorageGeometricMeanLockedUp() public view returns (uint256) {
+		return eternalStorage().getUint(getStorageGeometricMeanLockedUpKey());
+	}
+
+	function getStorageGeometricMeanLockedUpKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_geometricMeanLockedUp"));
+	}
+
+	//DisabledLockedups
+	function setStorageDisabledLockedups(address _property, uint256 _value)
+		internal
+	{
+		eternalStorage().setUint(
+			getStorageDisabledLockedupsKey(_property),
+			_value
+		);
+	}
+
+	function getStorageDisabledLockedups(address _property)
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(getStorageDisabledLockedupsKey(_property));
+	}
+
+	function getStorageDisabledLockedupsKey(address _property)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_disabledLockedups", _property));
+	}
+
+	//DisabledLockedupsPerUser
+	function setStorageDisabledLockedupsPerUser(
+		address _property,
+		address _user,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageDisabledLockedupsPerUserKey(_property, _user),
+			_value
+		);
+	}
+
+	function getStorageDisabledLockedupsPerUser(
+		address _property,
+		address _user
+	) public view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getStorageDisabledLockedupsPerUserKey(_property, _user)
+			);
+	}
+
+	function getStorageDisabledLockedupsPerUserKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked("_disabledLockedupsPerUser", _property, _user)
+			);
+	}
 }

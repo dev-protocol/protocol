@@ -181,4 +181,12 @@ contract('DIP1', ([deployer]) => {
 			)
 		})
 	})
+	describe('DIP1; treasury', () => {
+		it('geometricMeanSetter equals TheFirstPolicy', async () => {
+			const method = 'geometricMeanSetter'
+			expect((await dip1[method]()).toString()).to.be.equal(
+				(await theFirstPolicy[method]()).toString()
+			)
+		})
+	})
 })

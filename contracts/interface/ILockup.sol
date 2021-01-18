@@ -42,4 +42,10 @@ interface ILockup {
 		address _property,
 		address _user
 	) external view returns (uint256);
+
+	function geometricMeanLockedUp() external view returns (uint256);
+
+	function setGeometricMean(uint256 _geometricMean)
+		external
+		returns (uint256);
 }

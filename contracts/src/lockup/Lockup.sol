@@ -2,6 +2,7 @@ pragma solidity 0.5.17;
 
 // prettier-ignore
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
@@ -93,7 +94,29 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Saves variables that should change due to the addition of staking.
 		 */
 		updateValues(true, _from, _property, _value, prices);
+
+		/**
+		 * Saves disabled lockedups value
+		 */
+		addDisabledLockedups(_from, _property, _value);
+
 		emit Lockedup(_from, _property, _value);
+	}
+
+	function addDisabledLockedups(
+		address _from,
+		address _property,
+		uint256 _amount
+	) private {
+		IERC20 property = IERC20(_property);
+		uint256 balance = property.balanceOf(_from);
+		if (balance == 0) {
+			return;
+		}
+		uint256 tmp = getStorageDisabledLockedups(_property);
+		setStorageDisabledLockedups(_property, tmp.add(_amount));
+		tmp = getStorageDisabledLockedupsPerUser(_property, _from);
+		setStorageDisabledLockedupsPerUser(_property, _from, tmp.add(_amount));
 	}
 
 	/**
@@ -125,6 +148,47 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Saves variables that should change due to the canceling staking..
 		 */
 		updateValues(false, msg.sender, _property, _amount, prices);
+
+		/**
+		 * Saves disabled lockedups value
+		 */
+		subDisabledLockedups(msg.sender, _property, _amount);
+	}
+
+	function subDisabledLockedups(
+		address _from,
+		address _property,
+		uint256 _amount
+	) private {
+		uint256 tmp = getStorageDisabledLockedupsPerUser(_property, _from);
+		if (tmp == 0) {
+			return;
+		}
+		tmp = tmp < _amount ? 0 : tmp.sub(_amount);
+		setStorageDisabledLockedupsPerUser(_property, _from, tmp);
+
+		tmp = getStorageDisabledLockedups(_property);
+		tmp = tmp < _amount ? 0 : tmp.sub(_amount);
+		setStorageDisabledLockedups(_property, tmp);
+	}
+
+	/**
+	 * get geometric average
+	 */
+	function geometricMeanLockedUp() external view returns (uint256) {
+		return getStorageGeometricMeanLockedUp();
+	}
+
+	/**
+	 * set geometric average
+	 */
+	function setGeometricMean(uint256 _geometricMean)
+		external
+		returns (uint256)
+	{
+		address setter = IPolicy(config().policy()).geometricMeanSetter();
+		require(setter == msg.sender, "illegal access");
+		setStorageGeometricMeanLockedUp(_geometricMean);
 	}
 
 	/**
