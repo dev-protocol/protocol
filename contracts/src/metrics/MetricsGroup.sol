@@ -26,7 +26,8 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		uint256 metricsCountPerProperty = getMetricsCountPerProperty(property);
 		if (metricsCountPerProperty == 0) {
-			uint256 tmp = eternalStorage().getUint(getTotalAuthenticatedPropertiesKey());
+			uint256 tmp =
+				eternalStorage().getUint(getTotalAuthenticatedPropertiesKey());
 			setTotalAuthenticatedProperties(tmp.add(1));
 		}
 		totalCount = totalCount.add(1);
@@ -50,7 +51,8 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		uint256 metricsCountPerProperty = getMetricsCountPerProperty(property);
 		if (metricsCountPerProperty == 1) {
-			uint256 tmp = eternalStorage().getUint(getTotalAuthenticatedPropertiesKey());
+			uint256 tmp =
+				eternalStorage().getUint(getTotalAuthenticatedPropertiesKey());
 			setTotalAuthenticatedProperties(tmp.sub(1));
 		}
 		totalCount = totalCount.sub(1);
@@ -67,7 +69,11 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		return eternalStorage().getUint(getTotalCountKey());
 	}
 
-	function totalTotalAuthenticatedProperties() external view returns (uint256) {
+	function totalTotalAuthenticatedProperties()
+		external
+		view
+		returns (uint256)
+	{
 		return eternalStorage().getUint(getTotalAuthenticatedPropertiesKey());
 	}
 
@@ -101,7 +107,10 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		eternalStorage().setUint(getTotalAuthenticatedPropertiesKey(), _value);
 	}
 
-	function setTotalAuthenticatedPropertiesAdmin(uint256 _value) external onlyOwner {
+	function setTotalAuthenticatedPropertiesAdmin(uint256 _value)
+		external
+		onlyOwner
+	{
 		eternalStorage().setUint(getTotalAuthenticatedPropertiesKey(), _value);
 	}
 
@@ -122,7 +131,11 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		return keccak256(abi.encodePacked("_group", _addr));
 	}
 
-	function getTotalAuthenticatedPropertiesKey() private pure returns (bytes32) {
+	function getTotalAuthenticatedPropertiesKey()
+		private
+		pure
+		returns (bytes32)
+	{
 		return keccak256(abi.encodePacked("_totalAuthenticatedProperties"));
 	}
 }
