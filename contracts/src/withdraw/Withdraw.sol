@@ -141,10 +141,10 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		ERC20Mintable property = ERC20Mintable(_property);
 
 		/**
-		 * Gets the latest cumulative sum of the holder reward.
+		 * Gets the latest reward.
 		 */
-		uint256 reward =
-			lockup.calculateCumulativeHoldersRewardAmount(_property);
+		(uint256 reward, uint256 geometric) =
+			lockup.calculateRewardAmount(_property);
 
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
@@ -155,7 +155,9 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		uint256 totalSupply = property.totalSupply();
 		uint256 unitPrice = reward.sub(_lastReward).mulBasis().div(totalSupply);
 
-		uint256 value = unitPrice.mul(balance).divBasis().divBasis();
+		uint256 tmp = unitPrice.mul(balance).divBasis().divBasis();
+		uint256 cap = geometric.mul(balance).div(totalSupply);
+		uint256 value = tmp <= cap ? tmp : cap;
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the holder reward price.

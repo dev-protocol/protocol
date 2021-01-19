@@ -186,10 +186,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * set geometric average
 	 */
-	function setGeometricMean(uint256 _geometricMean)
-		external
-		returns (uint256)
-	{
+	function setGeometricMean(uint256 _geometricMean) external {
 		address setter = IPolicy(config().policy()).geometricMeanSetter();
 		require(setter == msg.sender, "illegal access");
 		setStorageGeometricMeanLockedUp(_geometricMean);
@@ -322,6 +319,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 
 	/**
 	 * Calculates cumulative sum of the holders reward per Property.
+	 * caution!!!this function is deprecated!!!
+	 * use calculateRewardAmount
 	 */
 	function calculateCumulativeHoldersRewardAmount(address _property)
 		external
@@ -340,22 +339,21 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 
 	/**
-	 * Calculates geometric mean per Property.
+	 * Calculates holders reward and geometric mean per Property.
 	 */
-	function calculateEffectiveHoldersRewardAmount(address _property)
+	function calculateRewardAmount(address _property)
 		external
 		view
-		returns (uint256)
+		returns (uint256, uint256)
 	{
 		(, uint256 holders, , uint256 geometric) =
 			calculateCumulativeRewardPrices();
-		(, uint256 geometricMean) =
+		return
 			_calculateCumulativeHoldersRewardAmount(
 				holders,
 				geometric,
 				_property
 			);
-		return geometricMean;
 	}
 
 	/**

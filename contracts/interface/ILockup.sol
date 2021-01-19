@@ -22,6 +22,15 @@ interface ILockup {
 			uint256 _geometric
 		);
 
+	function calculateRewardAmount(address _property)
+		external
+		view
+		returns (uint256, uint256);
+
+	/**
+	 * caution!!!this function is deprecated!!!
+	 * use calculateRewardAmount
+	 */
 	function calculateCumulativeHoldersRewardAmount(address _property)
 		external
 		view
@@ -46,7 +55,5 @@ interface ILockup {
 
 	function geometricMeanLockedUp() external view returns (uint256);
 
-	function setGeometricMean(uint256 _geometricMean)
-		external
-		returns (uint256);
+	function setGeometricMean(uint256 _geometricMean) external;
 }
