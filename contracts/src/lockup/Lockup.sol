@@ -271,7 +271,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
 		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
 		uint256 geometricMeanHoldersPrice =
-			geometricMean.mul(holdersPrice).div(allStakes);
+			allStakes == 0 ? 0 : geometricMean.mul(holdersPrice).div(allStakes);
 		return (
 			mReward,
 			holdersPrice,
