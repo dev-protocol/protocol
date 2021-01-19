@@ -468,36 +468,4 @@ contract LockupStorage is UsingStorage {
 	{
 		return keccak256(abi.encodePacked("_disabledLockedups", _property));
 	}
-
-	//DisabledLockedupsPerUser
-	function setStorageDisabledLockedupsPerUser(
-		address _property,
-		address _user,
-		uint256 _value
-	) internal {
-		eternalStorage().setUint(
-			getStorageDisabledLockedupsPerUserKey(_property, _user),
-			_value
-		);
-	}
-
-	function getStorageDisabledLockedupsPerUser(
-		address _property,
-		address _user
-	) public view returns (uint256) {
-		return
-			eternalStorage().getUint(
-				getStorageDisabledLockedupsPerUserKey(_property, _user)
-			);
-	}
-
-	function getStorageDisabledLockedupsPerUserKey(
-		address _property,
-		address _user
-	) private pure returns (bytes32) {
-		return
-			keccak256(
-				abi.encodePacked("_disabledLockedupsPerUser", _property, _user)
-			);
-	}
 }

@@ -48,6 +48,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 reward;
 		uint256 holders;
 		uint256 interest;
+		uint256 geometric;
 	}
 	event Lockedup(address _from, address _property, uint256 _value);
 
@@ -103,6 +104,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		emit Lockedup(_from, _property, _value);
 	}
 
+	/**
+	 * Disable staking if property token is held.
+	 */
 	function addDisabledLockedups(
 		address _from,
 		address _property,
@@ -115,8 +119,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		}
 		uint256 tmp = getStorageDisabledLockedups(_property);
 		setStorageDisabledLockedups(_property, tmp.add(_amount));
-		tmp = getStorageDisabledLockedupsPerUser(_property, _from);
-		setStorageDisabledLockedupsPerUser(_property, _from, tmp.add(_amount));
 	}
 
 	/**
@@ -152,23 +154,25 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Saves disabled lockedups value
 		 */
-		subDisabledLockedups(msg.sender, _property, _amount);
+		subDisabledLockedups(_property, _amount);
 	}
 
-	function subDisabledLockedups(
-		address _from,
-		address _property,
-		uint256 _amount
-	) private {
-		uint256 tmp = getStorageDisabledLockedupsPerUser(_property, _from);
-		if (tmp == 0) {
+	/**
+	 * Remove disabled staking.
+	 */
+	function subDisabledLockedups(address _property, uint256 _amount) private {
+		uint256 disabledLockedups = getStorageDisabledLockedups(_property);
+		if (disabledLockedups < _amount) {
 			return;
 		}
-		tmp = tmp < _amount ? 0 : tmp.sub(_amount);
-		setStorageDisabledLockedupsPerUser(_property, _from, tmp);
-
-		tmp = getStorageDisabledLockedups(_property);
-		tmp = tmp < _amount ? 0 : tmp.sub(_amount);
+		uint256 stakingAmount = getStoragePropertyValue(_property);
+		uint256 tmp =
+			disabledLockedups.sub(_amount) <= stakingAmount.sub(_amount)
+				? disabledLockedups
+				: disabledLockedups - _amount;
+		if (disabledLockedups == tmp) {
+			return;
+		}
 		setStorageDisabledLockedups(_property, tmp);
 	}
 
@@ -202,8 +206,12 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Gets latest cumulative holders reward for the passed Property.
 		 */
-		uint256 cHoldersReward =
-			_calculateCumulativeHoldersRewardAmount(_prices.holders, _property);
+		(uint256 cHoldersReward, ) =
+			_calculateCumulativeHoldersRewardAmount(
+				_prices.holders,
+				_prices.geometric,
+				_property
+			);
 
 		/**
 		 * Store each value.
@@ -231,13 +239,15 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		returns (
 			uint256 _reward,
 			uint256 _holders,
-			uint256 _interest
+			uint256 _interest,
+			uint256 _geometric
 		)
 	{
 		uint256 lastReward = getStorageLastStakesChangedCumulativeReward();
 		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersRewardPrice();
 		uint256 lastInterestPrice = getStorageLastCumulativeInterestPrice();
 		uint256 allStakes = getStorageAllValue();
+		uint256 geometricMean = getStorageGeometricMeanLockedUp();
 
 		/**
 		 * Gets latest cumulative sum of the reward amount.
@@ -263,7 +273,14 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
 		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
-		return (mReward, holdersPrice, interestPrice);
+		uint256 geometricMeanHoldersPrice =
+			geometricMean.mul(holdersPrice).div(allStakes);
+		return (
+			mReward,
+			holdersPrice,
+			interestPrice,
+			geometricMeanHoldersPrice
+		);
 	}
 
 	/**
@@ -272,8 +289,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 */
 	function _calculateCumulativeHoldersRewardAmount(
 		uint256 _reward,
+		uint256 _geometric,
 		address _property
-	) private view returns (uint256) {
+	) private view returns (uint256, uint256) {
 		(uint256 cHoldersReward, uint256 lastReward) =
 			(
 				getStorageLastCumulativeHoldersRewardAmountPerProperty(
@@ -285,25 +303,59 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * `cHoldersReward` contains the calculation of `lastReward`, so subtract it here.
 		 */
+		uint256 stakingValue = getStoragePropertyValue(_property);
 		uint256 additionalHoldersReward =
-			_reward.sub(lastReward).mul(getStoragePropertyValue(_property));
+			_reward.sub(lastReward).mul(stakingValue);
+
+		/**
+		 * culculate geometric mean cap
+		 */
+		uint256 enabledStakingValue =
+			stakingValue.sub(getStorageDisabledLockedups(_property));
+		uint256 geometricMeanCap = _geometric.mul(enabledStakingValue);
 
 		/**
 		 * Calculates and returns the cumulative sum of the holder reward by adds the last recorded holder reward and the latest holder reward.
 		 */
-		return cHoldersReward.add(additionalHoldersReward);
+		return (cHoldersReward.add(additionalHoldersReward), geometricMeanCap);
 	}
 
 	/**
 	 * Calculates cumulative sum of the holders reward per Property.
 	 */
 	function calculateCumulativeHoldersRewardAmount(address _property)
-		public
+		external
 		view
 		returns (uint256)
 	{
-		(, uint256 holders, ) = calculateCumulativeRewardPrices();
-		return _calculateCumulativeHoldersRewardAmount(holders, _property);
+		(, uint256 holders, , uint256 geometric) =
+			calculateCumulativeRewardPrices();
+		(uint256 reward, ) =
+			_calculateCumulativeHoldersRewardAmount(
+				holders,
+				geometric,
+				_property
+			);
+		return reward;
+	}
+
+	/**
+	 * Calculates geometric mean per Property.
+	 */
+	function calculateEffectiveHoldersRewardAmount(address _property)
+		external
+		view
+		returns (uint256)
+	{
+		(, uint256 holders, , uint256 geometric) =
+			calculateCumulativeRewardPrices();
+		(, uint256 geometricMean) =
+			_calculateCumulativeHoldersRewardAmount(
+				holders,
+				geometric,
+				_property
+			);
+		return geometricMean;
 	}
 
 	/**
@@ -396,7 +448,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
-		(uint256 reward, uint256 holders, uint256 interest) =
+		(uint256 reward, uint256 holders, uint256 interest, uint256 geometric) =
 			calculateCumulativeRewardPrices();
 
 		/**
@@ -406,7 +458,11 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			interest >= lastInterest
 				? interest.sub(lastInterest).mul(lockedUpPerAccount).divBasis()
 				: 0;
-		return (result, interest, RewardPrices(reward, holders, interest));
+		return (
+			result,
+			interest,
+			RewardPrices(reward, holders, interest, geometric)
+		);
 	}
 
 	/**
@@ -422,7 +478,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return (0, RewardPrices(0, 0, 0));
+			return (0, RewardPrices(0, 0, 0, 0));
 		}
 
 		/**

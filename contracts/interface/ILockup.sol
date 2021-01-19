@@ -18,7 +18,8 @@ interface ILockup {
 		returns (
 			uint256 _reward,
 			uint256 _holders,
-			uint256 _interest
+			uint256 _interest,
+			uint256 _geometric
 		);
 
 	function calculateCumulativeHoldersRewardAmount(address _property)
