@@ -12,6 +12,7 @@ const {
 	EGS_TOKEN: egsApiKey,
 	TOTAL_AUTHENTICATE_PROPERTIES: totalAuthenticatedProperties,
 	GEOMETRIC_MEAN_SETTER: geometricMearSetter,
+	TRESUARY_ADDRESS: tresauryAddress,
 } = process.env
 
 const handler = async (
@@ -21,7 +22,8 @@ const handler = async (
 		!configAddress ||
 		!egsApiKey ||
 		!totalAuthenticatedProperties ||
-		!geometricMearSetter
+		!geometricMearSetter ||
+		!tresauryAddress
 	) {
 		return
 	}
@@ -40,6 +42,7 @@ const handler = async (
 		.require('GeometricMean')
 		.new(dev.addressConfig.address)
 	await nextPolicy.setGeometricMeanSetter(geometricMearSetter)
+	await nextPolicy.setTreasury(tresauryAddress)
 
 	const policyFactory = new PolicyFactory(dev)
 	const currentPolicyFactory = await policyFactory.load()
