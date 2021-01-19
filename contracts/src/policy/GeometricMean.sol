@@ -5,7 +5,7 @@ import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {TreasuryFee} from "contracts/src/policy/TreasuryFee.sol";
 
 /**
- * TreasuryFee is a contract that changes the `rewards` of DIP7.
+ * GeometricMean is a contract that changes the `rewards` of DIP7.
  */
 contract GeometricMean is TreasuryFee {
 	address private geometricMeanSetter;
