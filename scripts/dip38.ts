@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/await-thenable */
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { config } from 'dotenv'
 import { DevCommonInstance } from './lib/instance/common'
