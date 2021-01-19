@@ -1,4 +1,4 @@
-contract('Policy', () => {
+contract('Policy', ([account1, account2]) => {
 	const policyContract = artifacts.require('PolicyTest1')
 	let policy: any
 	beforeEach(async () => {
@@ -44,6 +44,26 @@ contract('Policy', () => {
 		it('Returns the number of the blocks of the voting period for the new Policy', async () => {
 			const result = await policy.policyVotingBlocks()
 			expect(result.toNumber()).to.be.equal(20)
+		})
+	})
+	describe('PolicyTest1; shareOfTreasury', () => {
+		it('Returns the number of the share treasury', async () => {
+			const result = await policy.shareOfTreasury(100)
+			expect(result.toNumber()).to.be.equal(5)
+		})
+	})
+	describe('PolicyTest1; setTreasury', () => {
+		it('get the set treasury address', async () => {
+			await policy.setTreasury(account1)
+			const tmp: string = await policy.treasury()
+			await policy.expect(tmp).to.be.equal(account1)
+		})
+	})
+	describe('PolicyTest1; setGeometricMeanSetter', () => {
+		it('get the set geometric mean setter address', async () => {
+			await policy.setGeometricMeanSetter(account2)
+			const tmp: string = await policy.geometricMeanSetter()
+			await policy.expect(tmp).to.be.equal(account2)
 		})
 	})
 })

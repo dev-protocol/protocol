@@ -158,6 +158,9 @@ export class DevProtocolInstance {
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 		await this._lockup.createStorage()
 		await this._lockup.setDIP4GenesisBlock(block)
+		await this._lockup.setGeometricMean(
+			'115792089237316000000000000000000000000000000000000000000000000000000000000000'
+		)
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
@@ -297,6 +300,7 @@ export class DevProtocolInstance {
 		)
 		await policy.setTreasury(this._treasury.address)
 		await this._policyFactory.create(policy.address)
+		await policy.setGeometricMeanSetter(this._deployer)
 		return policy.address
 	}
 

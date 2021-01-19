@@ -227,7 +227,7 @@ contract('DIP7', ([deployer]) => {
 		})
 	})
 	describe('DIP7; policyVotingBlocks', () => {
-		it('policyVotingBlocks equals DIP3', async () => {
+		it('policyVotingBlocks equals DIP1', async () => {
 			const method = 'policyVotingBlocks'
 			expect((await dip7[method]()).toString()).to.be.equal(
 				(await dip1[method]()).toString()
@@ -235,7 +235,7 @@ contract('DIP7', ([deployer]) => {
 		})
 	})
 	describe('DIP1; shareOfTreasury', () => {
-		it('shareOfTreasury equals DIP3', async () => {
+		it('shareOfTreasury equals DIP1', async () => {
 			const method = 'shareOfTreasury'
 			expect((await dip7[method](100)).toString()).to.be.equal(
 				(await dip1[method](100)).toString()
@@ -243,8 +243,16 @@ contract('DIP7', ([deployer]) => {
 		})
 	})
 	describe('DIP1; treasury', () => {
-		it('treasury equals DIP3', async () => {
+		it('treasury equals DIP1', async () => {
 			const method = 'treasury'
+			expect((await dip7[method]()).toString()).to.be.equal(
+				(await dip1[method]()).toString()
+			)
+		})
+	})
+	describe('DIP1; geometricMeanSetter', () => {
+		it('treasury equals DIP1', async () => {
+			const method = 'geometricMeanSetter'
 			expect((await dip7[method]()).toString()).to.be.equal(
 				(await dip1[method]()).toString()
 			)

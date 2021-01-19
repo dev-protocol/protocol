@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { config } from 'dotenv'
 import { DevCommonInstance } from './lib/instance/common'
@@ -5,6 +6,7 @@ import { MetricsGroup } from './lib/instance/metrics-group'
 import { Lockup } from './lib/instance/lockup'
 import { Withdraw } from './lib/instance/withdraw'
 import { PolicyFactory } from './lib/instance/policy-factory'
+import { Policy } from './lib/instance/policy'
 
 config()
 const {
@@ -12,7 +14,6 @@ const {
 	EGS_TOKEN: egsApiKey,
 	TOTAL_AUTHENTICATE_PROPERTIES: totalAuthenticatedProperties,
 	GEOMETRIC_MEAN_SETTER: geometricMearSetter,
-	TRESUARY_ADDRESS: tresauryAddress,
 } = process.env
 
 const handler = async (
@@ -22,8 +23,7 @@ const handler = async (
 		!configAddress ||
 		!egsApiKey ||
 		!totalAuthenticatedProperties ||
-		!geometricMearSetter ||
-		!tresauryAddress
+		!geometricMearSetter
 	) {
 		return
 	}
@@ -38,11 +38,14 @@ const handler = async (
 	)
 	await dev.prepare()
 
+	const policy = new Policy(dev)
+	const currentPolicy = await policy.load()
+	const treasuryAddress = await currentPolicy.treasury()
 	const nextPolicy = await artifacts
 		.require('GeometricMean')
 		.new(dev.addressConfig.address)
 	await nextPolicy.setGeometricMeanSetter(geometricMearSetter)
-	await nextPolicy.setTreasury(tresauryAddress)
+	await nextPolicy.setTreasury(treasuryAddress)
 
 	const policyFactory = new PolicyFactory(dev)
 	const currentPolicyFactory = await policyFactory.load()
