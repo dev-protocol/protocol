@@ -4,18 +4,25 @@ import { DevCommonInstance } from './lib/instance/common'
 import { MetricsGroup } from './lib/instance/metrics-group'
 import { Lockup } from './lib/instance/lockup'
 import { Withdraw } from './lib/instance/withdraw'
+import { PolicyFactory } from './lib/instance/policy-factory'
 
 config()
 const {
 	CONFIG: configAddress,
 	EGS_TOKEN: egsApiKey,
 	TOTAL_AUTHENTICATE_PROPERTIES: totalAuthenticatedProperties,
+	GEOMETRIC_MEAN_SETTER: geometricMearSetter,
 } = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!configAddress || !egsApiKey || !totalAuthenticatedProperties) {
+	if (
+		!configAddress ||
+		!egsApiKey ||
+		!totalAuthenticatedProperties ||
+		!geometricMearSetter
+	) {
 		return
 	}
 
@@ -28,6 +35,15 @@ const handler = async (
 		gasPriceFetcher
 	)
 	await dev.prepare()
+
+	const nextPolicy = await artifacts
+		.require('GeometricMean')
+		.new(dev.addressConfig.address)
+	await nextPolicy.setGeometricMeanSetter(geometricMearSetter)
+
+	const policyFactory = new PolicyFactory(dev)
+	const currentPolicyFactory = await policyFactory.load()
+	await currentPolicyFactory.create(nextPolicy.address)
 
 	const metricsGroup = new MetricsGroup(dev)
 	const currentMetoricsGroup = await metricsGroup.load()
