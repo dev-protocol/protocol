@@ -107,6 +107,7 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		eternalStorage().setUint(getTotalAuthenticatedPropertiesKey(), _value);
 	}
 
+	// deplicated!!!!!!!
 	function setTotalAuthenticatedPropertiesAdmin(uint256 _value)
 		external
 		onlyOwner

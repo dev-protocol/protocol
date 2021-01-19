@@ -22,5 +22,6 @@ interface IMetricsGroup {
 		view
 		returns (uint256);
 
+	// deplicated!!!!!!!
 	function setTotalAuthenticatedPropertiesAdmin(uint256 _value) external;
 }
