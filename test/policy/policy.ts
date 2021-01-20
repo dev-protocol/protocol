@@ -56,14 +56,14 @@ contract('Policy', ([account1, account2]) => {
 		it('get the set treasury address', async () => {
 			await policy.setTreasury(account1)
 			const tmp: string = await policy.treasury()
-			await policy.expect(tmp).to.be.equal(account1)
+			expect(tmp).to.be.equal(account1)
 		})
 	})
 	describe('PolicyTest1; setGeometricMeanSetter', () => {
 		it('get the set geometric mean setter address', async () => {
 			await policy.setGeometricMeanSetter(account2)
 			const tmp: string = await policy.geometricMeanSetter()
-			await policy.expect(tmp).to.be.equal(account2)
+			expect(tmp).to.be.equal(account2)
 		})
 	})
 })
