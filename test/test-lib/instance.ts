@@ -327,9 +327,9 @@ export class DevProtocolInstance {
 		return contract('Metrics').new(market, property)
 	}
 
-	private async setDefaultGeometricMean(): Promise<void> {
-		await this._lockup.setGeometricMean(
-			'115792089237316000000000000000000000000000'
-		)
+	public async setDefaultGeometricMean(
+		value = '115792089237316000000000000000000000'
+	): Promise<void> {
+		await this._lockup.setGeometricMean(value)
 	}
 }
