@@ -28,6 +28,7 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
+					dev.generateLockup(),
 				])
 				await dev.generatePolicy()
 				await dev.addressConfig.setMarketFactory(marketFactory)
@@ -101,7 +102,6 @@ contract(
 		})
 		describe('PropertyFactory; createAndAuthenticate', () => {
 			const dev = new DevProtocolInstance(deployer)
-			let marketAddress: string
 			before(async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([

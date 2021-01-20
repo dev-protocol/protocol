@@ -17,6 +17,6 @@ contract GeometricMean is TreasuryFee {
 	}
 
 	function geometricMeanSetter() external view returns (address) {
-		return geometricMeanSetter;
+		return geometricMeanSetterAddress;
 	}
 }

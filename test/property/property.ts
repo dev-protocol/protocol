@@ -17,6 +17,7 @@ contract(
 				await dev.generateAddressConfig()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
+				await dev.generateLockup()
 				await dev.generatePolicy()
 			})
 			it('Cannot be created from other than factory', async () => {
@@ -67,6 +68,7 @@ contract(
 				await dev.generateAddressConfig()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
+				await dev.generateLockup()
 				await dev.generatePolicy()
 			})
 			it('Executing a changeAuthor function with a non-Author.', async () => {
@@ -114,6 +116,7 @@ contract(
 					dev.generateDev(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
+					dev.generateLockup(),
 				])
 				await dev.generatePolicy()
 				const result = await dev.propertyFactory.create(
