@@ -57,16 +57,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
-		await dev.dev.mint(user4, new BigNumber(1e18).times(10000000))
 		const policyAddress = await dev.generatePolicy('PolicyTestForWithdraw')
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const policy = await artifacts
 			.require('PolicyTestForWithdraw')
 			.at(policyAddress)
 		const propertyAddress = getPropertyAddress(
-			await dev.propertyFactory.create('test', 'TEST', user4, {
-				from: user4,
-			})
+			await dev.propertyFactory.create('test', 'TEST', deployer)
 		)
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress),
@@ -82,14 +79,17 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		const [market] = await Promise.all([
 			artifacts.require('Market').at(marketAddress),
 		])
-		await market.authenticate(property.address, 'id1', '', '', '', '', {
-			from: user4,
-		})
-		const metricsAddress = await marketBehavior.getMetrics('id1')
+		market
+			.authenticate(property.address, 'id1', '', '', '', '')
+			.catch(console.error)
+		const metricsAddress = await (async () => {
+			return getEventValue(dev.metricsFactory)('Create', '_metrics')
+		})()
 		const [metrics] = await Promise.all([
-			artifacts.require('Metrics').at(metricsAddress),
+			artifacts.require('Metrics').at(metricsAddress as string),
 		])
 		await dev.lockup.update()
+
 		return [dev, metrics, property, policy]
 	}
 
@@ -113,28 +113,35 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 
+			const alis = user1
+			const bob = deployer
+
 			before(async () => {
 				;[dev, , property] = await init()
-				await dev.dev.deposit(property.address, '10000000000000000000000')
+				await dev.dev.mint(alis, new BigNumber(1e18).times(10000000))
+				await dev.dev.deposit(property.address, '10000000000000000000000', {
+					from: alis,
+				})
 			})
 
 			it(`withdrawing sender's withdrawable interest full amount`, async () => {
-				const beforeBalance = await dev.dev.balanceOf(user4).then(toBigNumber)
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
 				const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 				await mine(10)
 				const amount = await dev.withdraw
-					.calculateWithdrawableAmount(property.address, user4)
+					.calculateWithdrawableAmount(property.address, bob)
 					.then(toBigNumber)
-				await dev.withdraw.withdraw(property.address, {
-					from: user4,
-				})
+				await dev.withdraw.withdraw(property.address, { from: bob })
 				const holderAmount = await getWithdrawHolderAmount(
 					dev,
 					property.address
 				)
 				const [oneBlockReword] = splitValue(holderAmount)
 				const realAmount = amount.plus(oneBlockReword)
-				const afterBalance = await dev.dev.balanceOf(user4).then(toBigNumber)
+
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
 				expect(afterBalance.toFixed()).to.be.equal(
 					beforeBalance.plus(realAmount).toFixed()
@@ -145,26 +152,29 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			it('withdrawable interest amount becomes 0 when after withdrawing interest', async () => {
 				const amount = await dev.withdraw
-					.calculateWithdrawableAmount(property.address, user4)
+					.calculateWithdrawableAmount(property.address, bob)
 					.then(toBigNumber)
 				expect(amount.toFixed()).to.be.equal('0')
 			})
 		})
 		describe('Withdraw; Withdraw is mint', () => {
+			const alis = user1
+			const bob = deployer
 			it('Withdraw mints an ERC20 token specified in the Address Config Contract', async () => {
 				const [dev, , property] = await init()
-				await dev.dev.deposit(property.address, '10000000000000000000000')
-				const prev = await dev.dev.totalSupply().then(toBigNumber)
-				const balance = await dev.dev.balanceOf(user4).then(toBigNumber)
-
-				await dev.withdraw.withdraw(property.address, {
-					from: user4,
+				await dev.dev.mint(alis, new BigNumber(1e18).times(10000000))
+				await dev.dev.deposit(property.address, '10000000000000000000000', {
+					from: alis,
 				})
+				const prev = await dev.dev.totalSupply().then(toBigNumber)
+				const balance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+
+				await dev.withdraw.withdraw(property.address, { from: bob })
 
 				const next = await dev.dev.totalSupply().then(toBigNumber)
-				const afterBalance = await dev.dev.balanceOf(user4).then(toBigNumber)
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const gap = next.minus(prev)
-				expect(gap.toString()).to.be.not.equal('0')
+
 				expect(prev.toString()).to.be.not.equal(next.toString())
 				expect(balance.plus(gap).toString()).to.be.equal(
 					afterBalance.toString()
@@ -187,11 +197,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					SHARE_OF_TREASURY + user1Share
 				)
 				await property.transfer(user1, totalSupply.div(100).times(user1Share), {
-					from: user4,
+					from: deployer,
 				})
 				await mine(1)
 				const amount1 = await dev.withdraw
-					.calculateWithdrawableAmount(property.address, user4)
+					.calculateWithdrawableAmount(property.address, deployer)
 					.then(toBigNumber)
 				const amount2 = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, user1)
@@ -216,25 +226,25 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					from: user3,
 				})
 				const totalSupply = await property.totalSupply().then(toBigNumber)
-				const prevBalance1 = await dev.dev.balanceOf(user4).then(toBigNumber)
+				const prevBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const prevBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
 
 				const rate = 0.2
 				await property.transfer(user1, totalSupply.times(rate), {
-					from: user4,
+					from: deployer,
 				})
 
 				const amount1 = await dev.withdraw
-					.calculateWithdrawableAmount(property.address, user4)
+					.calculateWithdrawableAmount(property.address, deployer)
 					.then(toBigNumber)
 				await dev.withdraw.withdraw(property.address, {
-					from: user4,
+					from: deployer,
 				})
 				const realAmount1 = await getWithdrawHolderSplitAmount(
 					dev,
 					amount1,
 					property,
-					user4
+					deployer
 				)
 				const amount2 = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, user1)
@@ -246,7 +256,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					property,
 					user1
 				)
-				const nextBalance1 = await dev.dev.balanceOf(user4).then(toBigNumber)
+				const nextBalance1 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const nextBalance2 = await dev.dev.balanceOf(user1).then(toBigNumber)
 				expect(prevBalance1.plus(realAmount1).toFixed()).to.be.equal(
 					nextBalance1.toFixed()
@@ -279,7 +289,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let blockNumber: number
-			const alice = user4
+			const alice = deployer
 			const bob = user1
 			const FIRST_TRANSFER_PERCENTAGE = 20
 			const SECOUND_TRANSFER_PERCENTAGE = 10
@@ -400,7 +410,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let blockNumber: number
-			const alice = user4
+			const alice = deployer
 			const bob = user1
 			const TRANSFERD_PROPERTY_TOKEN_PERCENT = 10
 
@@ -552,7 +562,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		describe('Transferring the property creates an event.', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
-			const alice = user4
+			const alice = deployer
 			const bob = user1
 
 			before(async () => {
@@ -634,7 +644,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 
-			const alice = user4
+			const alice = deployer
 			const bob = user1
 
 			before(async () => {
@@ -660,7 +670,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 							.require('Property')
 							.at(
 								getPropertyAddress(
-									await dev.propertyFactory.create('test2', 'TEST2', alice)
+									await dev.propertyFactory.create('test2', 'TEST2', deployer)
 								)
 							),
 					])
@@ -691,7 +701,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 
-			const alice = user4
+			const alice = deployer
 
 			before(async () => {
 				;[dev, , property] = await init()
@@ -730,18 +740,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				expect(aliceAmount.toFixed()).to.be.equal('0')
 			})
 		})
-		// TODO あとでやる
 		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let calc: Calculator
 
-			const alice = user4
+			const alice = deployer
 			const carol = user2
 
 			before(async () => {
 				;[dev, , property] = await init()
-				await dev.setDefaultGeometricMean('1157920892373160000000000000')
 				calc = createCalculator(dev)
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(carol, aliceBalance)
@@ -764,7 +772,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						.getPropertyValue(property.address)
 						.then(toBigNumber)
 					expect(property1.toFixed()).to.be.equal(total.toFixed())
-					expect(total.toFixed()).to.be.not.equal('0')
 				})
 				it(`Alice's withdrawable reward is 900% of Carol's withdrawable interest`, async () => {
 					await mine(9)
@@ -774,7 +781,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const expected = toBigNumber(9e19).times(9)
 					const [reword] = splitValue(expected)
 					expect(aliceAmount.toFixed()).to.be.equal(reword.toFixed())
-					expect(aliceAmount.toFixed()).to.be.not.equal('0')
 				})
 			})
 			describe('after withdrawal', () => {
@@ -788,7 +794,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						.then(toBigNumber)
 					const expected = await calc(property, alice)
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
-					expect(aliceAmount.toFixed()).to.be.not.equal('0')
 				})
 			})
 			describe('after additional staking', () => {
@@ -845,14 +850,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 			})
 		})
-		// TODO あとでやる
 		describe('scenario: multiple lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let blockNumber: number
 			let calc: Calculator
 
-			const alice = user4
+			const alice = deployer
 			const bob = user1
 			const carol = user2
 
@@ -940,7 +944,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 			})
 		})
-		// TODO あとでやる
 		describe('scenario: multiple properties', () => {
 			let dev: DevProtocolInstance
 			let property1: PropertyInstance
@@ -951,7 +954,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let lastBlock2: BigNumber
 			let calc: Calculator
 
-			const alice = user4
+			const alice = deployer
 			const bob = user1
 			const carol = user2
 
@@ -1234,13 +1237,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 			})
 		})
-		// TODO あとでやる
 		describe('scenario: fallback legacy rewards', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let property2: PropertyInstance
 			let calc: Calculator
-			const alice = user4
+			const alice = deployer
 
 			before(async () => {
 				;[dev, , property] = await init(true)
@@ -1344,14 +1346,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 			})
 		})
-		// TODO あとでやる
 		describe('scenario: fallback legacy rewards and latest rewards', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
 			let property2: PropertyInstance
 			let lastBlock: BigNumber
 			let calc: Calculator
-			const alice = user4
+			const alice = deployer
 
 			before(async () => {
 				;[dev, , property] = await init(true)
@@ -1464,12 +1465,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 		})
 	})
-	// あとでやる
 	describe('Withdraw; tresuary', () => {
 		let dev: DevProtocolInstance
 		let property: PropertyInstance
 		let blockNumber: number
-		const alice = user4
+		const alice = deployer
 		const bob = user1
 		const FIRST_TRANSFER_PERCENTAGE = 20
 		const SECOUND_TRANSFER_PERCENTAGE = 10
