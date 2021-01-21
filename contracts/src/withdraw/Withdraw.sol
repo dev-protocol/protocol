@@ -157,7 +157,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 
 		uint256 tmp = unitPrice.mul(balance).divBasis().divBasis();
 		uint256 cap = geometric.mul(balance).div(totalSupply);
-		uint256 value = tmp <= cap ? tmp : cap;
+		uint256 value = cap == 0 ? tmp : tmp <= cap ? tmp : cap;
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the holder reward price.

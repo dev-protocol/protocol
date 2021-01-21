@@ -309,6 +309,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		uint256 enabledStakingValue =
 			stakingValue.sub(getStorageDisabledLockedups(_property));
+
 		uint256 geometricMeanCap = _geometric.mul(enabledStakingValue);
 
 		/**

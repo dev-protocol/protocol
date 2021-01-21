@@ -670,7 +670,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 							.require('Property')
 							.at(
 								getPropertyAddress(
-									await dev.propertyFactory.create('test2', 'TEST2', deployer)
+									await dev.propertyFactory.create('test2', 'TEST2', alice)
 								)
 							),
 					])
@@ -702,9 +702,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let property: PropertyInstance
 
 			const alice = deployer
+			const bob = user1
 
 			before(async () => {
 				;[dev, , property] = await init()
+				await dev.dev.mint(bob, new BigNumber(1e18).times(10000000))
 			})
 
 			it(`Unauthenticated property has no reward`, async () => {
@@ -721,7 +723,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					property.address,
 					toBigNumber(10000).times(1e18),
 					{
-						from: alice,
+						from: bob,
 					}
 				)
 				await mine(1)
@@ -729,7 +731,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					property.address,
 					toBigNumber(10000).times(1e18),
 					{
-						from: alice,
+						from: bob,
 					}
 				)
 				await mine(1)
@@ -788,6 +790,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					await dev.withdraw.withdraw(property.address, { from: alice })
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
+					await dev.setDefaultGeometricMean('1157920892373160000000000000000')
 					await mine(3)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
@@ -805,6 +808,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
+					await dev.setDefaultGeometricMean('1157920892373160000000000000000')
 					await mine(3)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
@@ -814,7 +818,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 			})
 			describe('after staking withdrawal', () => {
-				let block: BigNumber
 				before(async () => {
 					await dev.lockup.withdraw(
 						property.address,
@@ -823,7 +826,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 							from: carol,
 						}
 					)
-					block = await getBlock().then(toBigNumber)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(6)
@@ -836,9 +838,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
-					await dev.withdraw
-						.withdraw(property.address, { from: alice })
-						.catch(console.error)
+					await dev.withdraw.withdraw(property.address, { from: alice })
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await mine(3)
@@ -866,9 +866,17 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
 				await dev.dev.mint(carol, aliceBalance)
-				await dev.dev.deposit(property.address, 10000, { from: bob })
+				await dev.dev.deposit(property.address, '10000000000000000000000', {
+					from: bob,
+				})
 				blockNumber = await getBlock()
-				await dev.dev.deposit(property.address, 10000 * 0.25, { from: carol })
+				await dev.dev.deposit(
+					property.address,
+					toBigNumber('10000000000000000000000').times('0.25'),
+					{
+						from: carol,
+					}
+				)
 			})
 
 			describe('before withdrawal', () => {
@@ -944,7 +952,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				})
 			})
 		})
-		describe('scenario: multiple properties', () => {
+		describe.only('scenario: multiple properties', () => {
 			let dev: DevProtocolInstance
 			let property1: PropertyInstance
 			let property2: PropertyInstance
@@ -957,6 +965,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			const alice = deployer
 			const bob = user1
 			const carol = user2
+			const dave = user4
 
 			before(async () => {
 				;[dev, , property1] = await init()
@@ -1000,7 +1009,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					1
 				)
 
-				await dev.dev.deposit(property1.address, 10000, { from: alice })
+				await dev.dev.deposit(property1.address, '10000000000000000000000', {
+					from: alice,
+				})
 				lastBlock1 = await getBlock().then(toBigNumber)
 				await mine(3)
 			})
@@ -1030,7 +1041,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
 				})
 				it(`Alice does staking 2500 to Property2, Property2 is 20% of the total rewards`, async () => {
-					await dev.dev.deposit(property2.address, 2500, { from: alice })
+					await dev.dev.deposit(property2.address, '2500000000000000000000', {
+						from: alice,
+					})
 					lastBlock2 = await getBlock().then(toBigNumber)
 					const total = await dev.lockup.getAllValue().then(toBigNumber)
 					const p1 = await dev.lockup
@@ -1047,7 +1060,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				}% of the total rewards, Property2 is ${
 					250000 / 16250
 				}% of the total rewards`, async () => {
-					await dev.dev.deposit(property3.address, 3750, { from: alice })
+					await dev.dev.deposit(property3.address, '3750000000000000000000', {
+						from: alice,
+					})
 					lastBlock2 = await getBlock().then(toBigNumber)
 					const total = await dev.lockup.getAllValue().then(toBigNumber)
 					const p1 = await dev.lockup
@@ -1117,9 +1132,15 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			describe('after additional staking', () => {
 				before(async () => {
-					await dev.dev.deposit(property1.address, 10000, { from: alice })
-					await dev.dev.deposit(property2.address, 10000, { from: alice })
-					await dev.dev.deposit(property3.address, 10000, { from: alice })
+					await dev.dev.deposit(property1.address, '10000000000000000000000', {
+						from: alice,
+					})
+					await dev.dev.deposit(property2.address, '10000000000000000000000', {
+						from: alice,
+					})
+					await dev.dev.deposit(property3.address, '10000000000000000000000', {
+						from: alice,
+					})
 					await mine(3)
 				})
 				it('No staked Property is 0 reward', async () => {
@@ -1492,7 +1513,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					from: alice,
 				}
 			)
-			await dev.dev.deposit(property.address, 10000, { from: user3 })
+			await dev.dev.deposit(property.address, '10000000000000000000000', {
+				from: user3,
+			})
 			blockNumber = await getBlock()
 		})
 
