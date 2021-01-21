@@ -15,7 +15,7 @@ import { getPropertyAddress } from '../test-lib/utils/log'
 import { waitForEvent, getEventValue } from '../test-lib/utils/event'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
-contract('LockupTest', ([deployer, user1]) => {
+contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	const init = async (
 		initialUpdate = true
 	): Promise<
@@ -43,7 +43,9 @@ contract('LockupTest', ([deployer, user1]) => {
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const policy = await artifacts.require('PolicyTestBase').at(policyAddress)
 		const propertyAddress = getPropertyAddress(
-			await dev.propertyFactory.create('test', 'TEST', deployer)
+			await dev.propertyFactory.create('test', 'TEST', user2, {
+				from: user2,
+			})
 		)
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress),
@@ -194,19 +196,16 @@ contract('LockupTest', ([deployer, user1]) => {
 			const reward = toBigNumber(10)
 				.times(1e18)
 				.times(block - lastBlock)
-
 			expect(afterBalance.toFixed()).to.be.equal(
 				beforeBalance.plus(reward).toFixed()
 			)
 			expect(afterTotalSupply.toFixed()).to.be.equal(
 				beforeTotalSupply.plus(reward).toFixed()
 			)
-
 			await mine(3)
 			await dev.lockup.withdraw(property.address, 0)
 			const afterBalance2 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 			const afterTotalSupply2 = await dev.dev.totalSupply().then(toBigNumber)
-
 			expect(afterBalance2.toFixed()).to.be.equal(afterBalance.toFixed())
 			expect(afterTotalSupply2.toFixed()).to.be.equal(
 				afterTotalSupply.toFixed()
@@ -343,7 +342,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			 * PolicyTestBase returns 100 as rewards
 			 * And stakers share is 10%
 			 */
-
 			it('Alice has a 100% of interests', async () => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, { from: alice })
@@ -883,11 +881,12 @@ contract('LockupTest', ([deployer, user1]) => {
 			let property4: PropertyInstance
 			let calc: Calculator
 
-			const alice = deployer
+			const alice = user2
 			const bob = user1
 
 			before(async () => {
 				;[dev, property1] = await init()
+				await dev.dev.mint(alice, new BigNumber(1e18).times(10000000))
 				calc = createCalculator(dev)
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
@@ -896,21 +895,21 @@ contract('LockupTest', ([deployer, user1]) => {
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test2', 'TEST2', deployer)
+								await dev.propertyFactory.create('test2', 'TEST2', user3)
 							)
 						),
 					artifacts
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test3', 'TEST3', deployer)
+								await dev.propertyFactory.create('test3', 'TEST3', user3)
 							)
 						),
 					artifacts
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test4', 'TEST4', deployer)
+								await dev.propertyFactory.create('test4', 'TEST4', user3)
 							)
 						),
 				])

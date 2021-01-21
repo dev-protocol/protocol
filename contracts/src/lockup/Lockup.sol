@@ -147,14 +147,14 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		}
 
 		/**
-		 * Saves variables that should change due to the canceling staking..
-		 */
-		updateValues(false, msg.sender, _property, _amount, prices);
-
-		/**
 		 * Saves disabled lockedups value
 		 */
 		subDisabledLockedups(_property, _amount);
+
+		/**
+		 * Saves variables that should change due to the canceling staking..
+		 */
+		updateValues(false, msg.sender, _property, _amount, prices);
 	}
 
 	/**
