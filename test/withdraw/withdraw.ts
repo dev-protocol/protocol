@@ -1265,9 +1265,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let property2: PropertyInstance
 			let calc: Calculator
 			const alice = deployer
+			const bob = user2
 
 			before(async () => {
 				;[dev, , property] = await init(true)
+				await dev.dev.mint(bob, new BigNumber(1e18).times(10000000))
 				;[property2] = await Promise.all([
 					artifacts
 						.require('Property')
@@ -1341,7 +1343,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			describe('after staking', () => {
 				let lastBlock: BigNumber
 				before(async () => {
-					await dev.dev.deposit(property.address, 10000)
+					await dev.dev.deposit(property.address, '10000000000000000000000', {
+						from: bob,
+					})
 					lastBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
