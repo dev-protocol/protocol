@@ -168,6 +168,40 @@ contract LockupStorage is UsingStorage {
 		return keccak256(abi.encodePacked("_LastSameRewardsAmountAndBlock"));
 	}
 
+	//LastSameGMRewardsAmountAndBlock
+	function setStorageLastSameGMRewardsAmountAndBlock(
+		uint256 _amount,
+		uint256 _block
+	) internal {
+		uint256 record = _amount.mul(BASIS).add(_block);
+		eternalStorage().setUint(
+			getStorageLastSameGMRewardsAmountAndBlockKey(),
+			record
+		);
+	}
+
+	function getStorageLastSameGMRewardsAmountAndBlock()
+		public
+		view
+		returns (uint256 _amount, uint256 _block)
+	{
+		uint256 record =
+			eternalStorage().getUint(
+				getStorageLastSameGMRewardsAmountAndBlockKey()
+			);
+		uint256 amount = record.div(BASIS);
+		uint256 blockNumber = record.sub(amount.mul(BASIS));
+		return (amount, blockNumber);
+	}
+
+	function getStorageLastSameGMRewardsAmountAndBlockKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_LastSameGMRewardsAmountAndBlock"));
+	}
+
 	//CumulativeGlobalRewards
 	function setStorageCumulativeGlobalRewards(uint256 _value) internal {
 		eternalStorage().setUint(
@@ -186,6 +220,31 @@ contract LockupStorage is UsingStorage {
 		returns (bytes32)
 	{
 		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
+	}
+
+	//CumulativeGlobalGMRewards
+	function setStorageCumulativeGlobalGMRewards(uint256 _value) internal {
+		eternalStorage().setUint(
+			getStorageCumulativeGlobalGMRewardsKey(),
+			_value
+		);
+	}
+
+	function getStorageCumulativeGlobalGMRewards()
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(getStorageCumulativeGlobalGMRewardsKey());
+	}
+
+	function getStorageCumulativeGlobalGMRewardsKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_cumulativeGlobalGMRewards"));
 	}
 
 	//PendingWithdrawal
@@ -467,5 +526,137 @@ contract LockupStorage is UsingStorage {
 		returns (bytes32)
 	{
 		return keccak256(abi.encodePacked("_disabledLockedups", _property));
+	}
+
+	//lastStakesChangedCumulativeGMReward
+	function setStorageLastStakesChangedCumulativeGMReward(uint256 _value)
+		internal
+	{
+		eternalStorage().setUint(
+			getStorageLastStakesChangedCumulativeGMRewardKey(),
+			_value
+		);
+	}
+
+	function getStorageLastStakesChangedCumulativeGMReward()
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getStorageLastStakesChangedCumulativeGMRewardKey()
+			);
+	}
+
+	function getStorageLastStakesChangedCumulativeGMRewardKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(abi.encodePacked("1lastStakesChangedCumulativeGMReward"));
+	}
+
+	//LastCumulativeHoldersGMRewardAmountPerProperty
+	function setStorageLastCumulativeHoldersGMRewardAmountPerProperty(
+		address _property,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageLastCumulativeHoldersGMRewardAmountPerPropertyKey(
+				_property
+			),
+			_value
+		);
+	}
+
+	function getStorageLastCumulativeHoldersGMRewardAmountPerProperty(
+		address _property
+	) public view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getStorageLastCumulativeHoldersGMRewardAmountPerPropertyKey(
+					_property
+				)
+			);
+	}
+
+	function getStorageLastCumulativeHoldersGMRewardAmountPerPropertyKey(
+		address _property
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"1LastCumulativeHoldersGMRewardAmountPerProperty",
+					_property
+				)
+			);
+	}
+
+	//LastCumulativeHoldersGMRewardPricePerProperty
+	function setStorageLastCumulativeHoldersGMRewardPricePerProperty(
+		address _property,
+		uint256 _price
+	) internal {
+		eternalStorage().setUint(
+			getStorageLastCumulativeHoldersGMRewardPricePerPropertyKey(
+				_property
+			),
+			_price
+		);
+	}
+
+	function getStorageLastCumulativeHoldersGMRewardPricePerProperty(
+		address _property
+	) public view returns (uint256) {
+		return
+			eternalStorage().getUint(
+				getStorageLastCumulativeHoldersGMRewardPricePerPropertyKey(
+					_property
+				)
+			);
+	}
+
+	function getStorageLastCumulativeHoldersGMRewardPricePerPropertyKey(
+		address _property
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked(
+					"1LastCumulativeHoldersGMRewardPricePerProperty",
+					_property
+				)
+			);
+	}
+
+	//LastCumulativeHoldersGMRewardPrice
+	function setStorageLastCumulativeHoldersGMRewardPrice(uint256 _holders)
+		internal
+	{
+		eternalStorage().setUint(
+			getStorageLastCumulativeHoldersGMRewardPriceKey(),
+			_holders
+		);
+	}
+
+	function getStorageLastCumulativeHoldersGMRewardPrice()
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getStorageLastCumulativeHoldersGMRewardPriceKey()
+			);
+	}
+
+	function getStorageLastCumulativeHoldersGMRewardPriceKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(abi.encodePacked("1lastCumulativeHoldersGMRewardPrice"));
 	}
 }

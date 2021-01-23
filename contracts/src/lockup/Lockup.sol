@@ -48,7 +48,14 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 reward;
 		uint256 holders;
 		uint256 interest;
-		uint256 geometric;
+		uint256 gMReward;
+		uint256 gMHolders;
+	}
+	struct Rewards {
+		uint256 nextReward;
+		uint256 rewardAmount;
+		uint256 nextGMReward;
+		uint256 gMRewardAmount;
 	}
 	event Lockedup(address _from, address _property, uint256 _value);
 
@@ -203,10 +210,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Gets latest cumulative holders reward for the passed Property.
 		 */
-		(uint256 cHoldersReward, ) =
+		(uint256 cHoldersReward, uint256 cHoldersGMReward) =
 			_calculateCumulativeHoldersRewardAmount(
 				_prices.holders,
-				_prices.geometric,
+				_prices.gMHolders,
 				_property
 			);
 
@@ -215,7 +222,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		setStorageLastStakedInterestPrice(_property, _user, _prices.interest);
 		setStorageLastStakesChangedCumulativeReward(_prices.reward);
+		setStorageLastStakesChangedCumulativeGMReward(_prices.gMReward);
 		setStorageLastCumulativeHoldersRewardPrice(_prices.holders);
+		setStorageLastCumulativeHoldersGMRewardPrice(_prices.gMHolders);
 		setStorageLastCumulativeInterestPrice(_prices.interest);
 		setStorageLastCumulativeHoldersRewardAmountPerProperty(
 			_property,
@@ -225,32 +234,37 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_property,
 			_prices.holders
 		);
+		setStorageLastCumulativeHoldersGMRewardAmountPerProperty(
+			_property,
+			cHoldersGMReward
+		);
+		setStorageLastCumulativeHoldersGMRewardPricePerProperty(
+			_property,
+			_prices.gMHolders
+		);
 	}
 
 	/**
 	 * Gets latest value of cumulative sum of the reward amount, cumulative sum of the holders reward per stake, and cumulative sum of the stakers reward per stake.
 	 */
-	function calculateCumulativeRewardPrices()
-		public
+	function calculateCumulativeRewardPrices(Rewards memory _rewards)
+		private
 		view
 		returns (
 			uint256 _reward,
 			uint256 _holders,
-			uint256 _interest,
-			uint256 _geometric
+			uint256 _interest
 		)
 	{
 		uint256 lastReward = getStorageLastStakesChangedCumulativeReward();
 		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersRewardPrice();
 		uint256 lastInterestPrice = getStorageLastCumulativeInterestPrice();
 		uint256 allStakes = getStorageAllValue();
-		uint256 geometricMean = getStorageGeometricMeanLockedUp();
 
 		/**
 		 * Gets latest cumulative sum of the reward amount.
 		 */
-		(uint256 reward, ) = dry();
-		uint256 mReward = reward.mulBasis();
+		uint256 mReward = _rewards.nextReward.mulBasis();
 
 		/**
 		 * Calculates reward unit price per staking.
@@ -270,14 +284,46 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
 		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
+		return (mReward, holdersPrice, interestPrice);
+	}
+
+	/**
+	 * Gets latest value of cumulative sum of the reward amount for geometric mean, cumulative sum of the holders reward per stake, and cumulative sum of the stakers reward per stake.
+	 */
+	function calculateCumulativeGMRewardPrices(Rewards memory _rewards)
+		private
+		view
+		returns (uint256 _gMReward, uint256 _gMHolders)
+	{
+		uint256 lastGMReward = getStorageLastStakesChangedCumulativeGMReward();
+		uint256 lastHoldersGMPrice =
+			getStorageLastCumulativeHoldersGMRewardPrice();
+		uint256 allStakes = getStorageAllValue();
+
+		/**
+		 * Gets latest cumulative sum of the reward amount.
+		 */
+		uint256 mGMReward = _rewards.nextGMReward.mulBasis();
+
+		/**
+		 * Calculates reward unit price per staking.
+		 * Later, the last cumulative sum of the reward amount is subtracted because to add the last recorded holder/staking reward.
+		 */
+		uint256 gMPrice =
+			allStakes > 0 ? mGMReward.sub(lastGMReward).div(allStakes) : 0;
+
+		/**
+		 * Calculates the holders reward out of the total reward amount.
+		 */
+		uint256 gMHoldersShare =
+			IPolicy(config().policy()).holdersShare(gMPrice, allStakes);
+
+		/**
+		 * Calculates and returns each reward.
+		 */
 		uint256 geometricMeanHoldersPrice =
-			allStakes == 0 ? 0 : geometricMean.mul(holdersPrice).div(allStakes);
-		return (
-			mReward,
-			holdersPrice,
-			interestPrice,
-			geometricMeanHoldersPrice
-		);
+			gMHoldersShare.add(lastHoldersGMPrice);
+		return (mGMReward, geometricMeanHoldersPrice);
 	}
 
 	/**
@@ -289,33 +335,49 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 _geometric,
 		address _property
 	) private view returns (uint256, uint256) {
-		(uint256 cHoldersReward, uint256 lastReward) =
+		(uint256 cHoldersReward, uint256 lastRewardPrice) =
 			(
 				getStorageLastCumulativeHoldersRewardAmountPerProperty(
 					_property
 				),
 				getStorageLastCumulativeHoldersRewardPricePerProperty(_property)
 			);
+		(uint256 cHoldersGMReward, uint256 lastGMRewardPrice) =
+			(
+				getStorageLastCumulativeHoldersGMRewardAmountPerProperty(
+					_property
+				),
+				getStorageLastCumulativeHoldersGMRewardPricePerProperty(
+					_property
+				)
+			);
 
 		/**
-		 * `cHoldersReward` contains the calculation of `lastReward`, so subtract it here.
+		 * culculate enabled staking value
 		 */
 		uint256 stakingValue = getStoragePropertyValue(_property);
-		uint256 additionalHoldersReward =
-			_reward.sub(lastReward).mul(stakingValue);
-
-		/**
-		 * culculate geometric mean cap
-		 */
 		uint256 enabledStakingValue =
 			stakingValue.sub(getStorageDisabledLockedups(_property));
 
-		uint256 geometricMeanCap = _geometric.mul(enabledStakingValue);
+		/**
+		 * `_reward` contains the calculation of `lastRewardPrice`, so subtract it here.
+		 */
+		uint256 additionalHoldersReward =
+			_reward.sub(lastRewardPrice).mul(enabledStakingValue);
+
+		/**
+		 * `_geometric` contains the calculation of `lastGMRewardPrice`, so subtract it here.
+		 */
+		uint256 additionalGMHoldersReward =
+			_geometric.sub(lastGMRewardPrice).mul(enabledStakingValue);
 
 		/**
 		 * Calculates and returns the cumulative sum of the holder reward by adds the last recorded holder reward and the latest holder reward.
 		 */
-		return (cHoldersReward.add(additionalHoldersReward), geometricMeanCap);
+		return (
+			cHoldersReward.add(additionalHoldersReward),
+			cHoldersGMReward.add(additionalGMHoldersReward)
+		);
 	}
 
 	/**
@@ -328,12 +390,13 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		view
 		returns (uint256)
 	{
-		(, uint256 holders, , uint256 geometric) =
-			calculateCumulativeRewardPrices();
+		Rewards memory rewards = dry();
+		(, uint256 holders, ) = calculateCumulativeRewardPrices(rewards);
+		(, uint256 gMHolders) = calculateCumulativeGMRewardPrices(rewards);
 		(uint256 reward, ) =
 			_calculateCumulativeHoldersRewardAmount(
 				holders,
-				geometric,
+				gMHolders,
 				_property
 			);
 		return reward;
@@ -347,12 +410,13 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		view
 		returns (uint256, uint256)
 	{
-		(, uint256 holders, , uint256 geometric) =
-			calculateCumulativeRewardPrices();
+		Rewards memory rewards = dry();
+		(, uint256 holders, ) = calculateCumulativeRewardPrices(rewards);
+		(, uint256 gMHolders) = calculateCumulativeGMRewardPrices(rewards);
 		return
 			_calculateCumulativeHoldersRewardAmount(
 				holders,
-				geometric,
+				gMHolders,
 				_property
 			);
 	}
@@ -367,28 +431,41 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Gets the cumulative sum of the maximum mint amount and the maximum mint number per block.
 		 */
-		(uint256 _nextRewards, uint256 _amount) = dry();
+		Rewards memory rewards = dry();
 
 		/**
 		 * Records each value and the latest block number.
 		 */
-		setStorageCumulativeGlobalRewards(_nextRewards);
-		setStorageLastSameRewardsAmountAndBlock(_amount, block.number);
+		setStorageCumulativeGlobalRewards(rewards.nextReward);
+		setStorageLastSameRewardsAmountAndBlock(
+			rewards.rewardAmount,
+			block.number
+		);
+		setStorageCumulativeGlobalGMRewards(rewards.nextGMReward);
+		setStorageLastSameGMRewardsAmountAndBlock(
+			rewards.gMRewardAmount,
+			block.number
+		);
 	}
 
 	/**
 	 * Referring to the values recorded in each storage to returns the latest cumulative sum of the maximum mint amount and the latest maximum mint amount per block.
 	 */
-	function dry()
-		private
-		view
-		returns (uint256 _nextRewards, uint256 _amount)
-	{
+	function dry() private view returns (Rewards memory _rewards) {
+		uint256 gM = getStorageGeometricMeanLockedUp();
+
 		/**
 		 * Gets the latest mint amount per block from Allocator contract.
 		 */
 		uint256 rewardsAmount =
 			IAllocator(config().allocator()).calculateMaxRewardsPerBlock();
+
+		/**
+		 * Gets the latest mint amount when geometric mean per block from Allocator contract.
+		 */
+		uint256 gMRewardsAmount =
+			IAllocator(config().allocator())
+				.calculateMaxRewardsPerBlockWhenLockedIs(gM);
 
 		/**
 		 * Gets the maximum mint amount per block, and the last recorded block number from `LastSameRewardsAmountAndBlock` storage.
@@ -397,28 +474,41 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			getStorageLastSameRewardsAmountAndBlock();
 
 		/**
+		 * Gets the maximum mint amount per block for geometric mean, and the last recorded block number from `LastSameGMRewardsAmountAndBlock` storage.
+		 */
+		(uint256 lastGMAmount, uint256 lastGMBlock) =
+			getStorageLastSameGMRewardsAmountAndBlock();
+
+		/**
 		 * If the recorded maximum mint amount per block and the result of the Allocator contract are different,
 		 * the result of the Allocator contract takes precedence as a maximum mint amount per block.
 		 */
 		uint256 lastMaxRewards =
 			lastAmount == rewardsAmount ? rewardsAmount : lastAmount;
+		uint256 lastMaxGMRewards =
+			lastGMAmount == gMRewardsAmount ? gMRewardsAmount : lastGMAmount;
 
 		/**
 		 * Calculates the difference between the latest block number and the last recorded block number.
 		 */
 		uint256 blocks = lastBlock > 0 ? block.number.sub(lastBlock) : 0;
+		uint256 gMBlocks = lastGMBlock > 0 ? block.number.sub(lastGMBlock) : 0;
 
 		/**
 		 * Adds the calculated new cumulative maximum mint amount to the recorded cumulative maximum mint amount.
 		 */
 		uint256 additionalRewards = lastMaxRewards.mul(blocks);
+		uint256 additionalGMRewards = lastMaxGMRewards.mul(gMBlocks);
 		uint256 nextRewards =
 			getStorageCumulativeGlobalRewards().add(additionalRewards);
+		uint256 nextGMRewards =
+			getStorageCumulativeGlobalGMRewards().add(additionalGMRewards);
 
 		/**
 		 * Returns the latest theoretical cumulative sum of maximum mint amount and maximum mint amount per block.
 		 */
-		return (nextRewards, rewardsAmount);
+		return
+			Rewards(nextRewards, rewardsAmount, nextGMRewards, gMRewardsAmount);
 	}
 
 	/**
@@ -447,8 +537,11 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
-		(uint256 reward, uint256 holders, uint256 interest, uint256 geometric) =
-			calculateCumulativeRewardPrices();
+		Rewards memory rewards = dry();
+		(uint256 reward, uint256 holders, uint256 interest) =
+			calculateCumulativeRewardPrices(rewards);
+		(uint256 gMReward, uint256 gMHolders) =
+			calculateCumulativeGMRewardPrices(rewards);
 
 		/**
 		 * Calculates and returns the latest withdrawable reward amount from the difference.
@@ -460,7 +553,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		return (
 			result,
 			interest,
-			RewardPrices(reward, holders, interest, geometric)
+			RewardPrices(reward, holders, interest, gMReward, gMHolders)
 		);
 	}
 
@@ -477,7 +570,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return (0, RewardPrices(0, 0, 0, 0));
+			return (0, RewardPrices(0, 0, 0, 0, 0));
 		}
 
 		/**

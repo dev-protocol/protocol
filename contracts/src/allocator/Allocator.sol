@@ -26,7 +26,32 @@ contract Allocator is UsingConfig, IAllocator {
 		uint256 totalAssets =
 			IMetricsGroup(config().metricsGroup()).totalIssuedMetrics();
 		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
-		return IPolicy(config().policy()).rewards(totalLockedUps, totalAssets);
+		return _calculateMaxRewardsPerBlock(totalLockedUps, totalAssets);
+	}
+
+	/**
+	 * Returns the maximum new mint count per block.
+	 * This function gets the total number of Metrics contracts and calculate result of `Policy.rewards` using the passed value as a lockups.
+	 */
+	function calculateMaxRewardsPerBlockWhenLockedIs(uint256 _lockedups)
+		external
+		view
+		returns (uint256)
+	{
+		uint256 totalAssets =
+			IMetricsGroup(config().metricsGroup()).totalIssuedMetrics();
+		return _calculateMaxRewardsPerBlock(_lockedups, totalAssets);
+	}
+
+	/**
+	 * Returns the maximum new mint count per block.
+	 */
+	function _calculateMaxRewardsPerBlock(uint256 _lockedups, uint256 _assets)
+		private
+		view
+		returns (uint256)
+	{
+		return IPolicy(config().policy()).rewards(_lockedups, _assets);
 	}
 
 	/**

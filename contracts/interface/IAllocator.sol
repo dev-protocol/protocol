@@ -9,4 +9,9 @@ interface IAllocator {
 	) external;
 
 	function calculateMaxRewardsPerBlock() external view returns (uint256);
+
+	function calculateMaxRewardsPerBlockWhenLockedIs(uint256 _lockedups)
+		external
+		view
+		returns (uint256);
 }
