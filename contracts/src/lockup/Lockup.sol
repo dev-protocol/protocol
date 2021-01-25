@@ -205,14 +205,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 cap = cCap.add(additionalCap);
 		setStorageCumulativeHoldersRewardCap(cap);
 		setStorageLastCumulativeHoldersPriceCap(holdersPrice);
-
-		/**
-		 * Sets the default value on the first update.
-		 * This value is used for Properties that already have collected one or more stakings when DIP38 is applied.
-		 */
-		if (getStorageDefaultHoldersRewardCap() == 0) {
-			setStorageDefaultHoldersRewardCap(cap);
-		}
 	}
 
 	/**
@@ -247,17 +239,11 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 
 		/**
 		 * Sets `InitialCumulativeHoldersRewardCap`.
-		 * If the Property is not staking, sets the latest `holdersCap`.
-		 * If the Property is already staked but the `InitialCumulativeHoldersRewardCap` is 0,
-		 * the Property has collected the staking before DIP38 and so sets the value of `getStorageDefaultHoldersRewardCap`.
 		 */
 		if (getStorageInitialCumulativeHoldersRewardCap(_property) == 0) {
-			bool hasStaked = getStoragePropertyValue(_property) > 0;
 			setStorageInitialCumulativeHoldersRewardCap(
 				_property,
-				hasStaked
-					? getStorageDefaultHoldersRewardCap()
-					: _prices.holdersCap
+				_prices.holdersCap
 			);
 		}
 	}
@@ -369,15 +355,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 
 		/**
 		 * Calculates the cap
-		 * If `initialCap` exists, subtract its value from `holdersCap`.
-		 * If `initialCap` does not exists, fallback and subtract the value of `getStorageDefaultHoldersRewardCap()`.
 		 */
-		uint256 cap =
-			holdersCap.sub(
-				initialCap > 0
-					? initialCap
-					: getStorageDefaultHoldersRewardCap()
-			);
+		uint256 cap = holdersCap.sub(initialCap);
 		return (
 			_calculateCumulativeHoldersRewardAmount(holders, _property),
 			cap

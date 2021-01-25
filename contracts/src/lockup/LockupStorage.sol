@@ -556,24 +556,4 @@ contract LockupStorage is UsingStorage {
 				)
 			);
 	}
-
-	//DefaultHoldersRewardCap
-	function setStorageDefaultHoldersRewardCap(uint256 _value) internal {
-		eternalStorage().setUint(
-			getStorageDefaultHoldersRewardCapKey(),
-			_value
-		);
-	}
-
-	function getStorageDefaultHoldersRewardCap() public view returns (uint256) {
-		return eternalStorage().getUint(getStorageDefaultHoldersRewardCapKey());
-	}
-
-	function getStorageDefaultHoldersRewardCapKey()
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_defaultHoldersRewardCap"));
-	}
 }
