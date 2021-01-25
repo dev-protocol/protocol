@@ -185,11 +185,34 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 
 	/**
 	 * set geometric average
+	 * TODO: Rename this function
 	 */
 	function setGeometricMean(uint256 _geometricMean) external {
 		address setter = IPolicy(config().policy()).geometricMeanSetter();
 		require(setter == msg.sender, "illegal access");
 		setStorageGeometricMeanLockedUp(_geometricMean);
+
+		/**
+		 * Updates cumulative amount of the holders reward cap
+		 */
+		(, uint256 holdersPrice, , uint256 cCap) =
+			calculateCumulativeRewardPrices();
+
+		// TODO: When this function is improved to be called on-chain, the source of `getStorageLastCumulativeHoldersPriceCap` can be rewritten to` getStorageLastCumulativeHoldersRewardPrice`.
+		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersPriceCap();
+		uint256 additionalCap =
+			holdersPrice.sub(lastHoldersPrice).mul(_geometricMean);
+		uint256 cap = cCap.add(additionalCap);
+		setStorageCumulativeHoldersRewardCap(cap);
+		setStorageLastCumulativeHoldersPriceCap(holdersPrice);
+
+		/**
+		 * Sets the default value on the first update.
+		 * This value is used for Properties that already have collected one or more stakings when DIP38 is applied.
+		 */
+		if (getStorageDefaultHoldersRewardCap() == 0) {
+			setStorageDefaultHoldersRewardCap(cap);
+		}
 	}
 
 	/**
@@ -221,6 +244,12 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_property,
 			_prices.holders
 		);
+		if (getStorageInitialCumulativeHoldersRewardCap(_property) == 0) {
+			setStorageInitialCumulativeHoldersRewardCap(
+				_property,
+				_prices.holdersCap
+			);
+		}
 	}
 
 	/**
@@ -240,7 +269,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersRewardPrice();
 		uint256 lastInterestPrice = getStorageLastCumulativeInterestPrice();
 		uint256 allStakes = getStorageAllValue();
-		uint256 geometricMean = getStorageGeometricMeanLockedUp();
+		uint256 cCap = getStorageCumulativeHoldersRewardCap();
 
 		/**
 		 * Gets latest cumulative sum of the reward amount.
@@ -266,8 +295,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
 		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
-		uint256 holdersCap = geometricMean.mul(holdersPrice);
-		return (mReward, holdersPrice, interestPrice, holdersCap);
+		return (mReward, holdersPrice, interestPrice, cCap);
 	}
 
 	/**
@@ -326,9 +354,23 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	{
 		(, uint256 holders, , uint256 holdersCap) =
 			calculateCumulativeRewardPrices();
+		uint256 initialCap =
+			getStorageInitialCumulativeHoldersRewardCap(_property);
+
+		/**
+		 * Calculates the cap
+		 * If `initialCap` exists, subtract its value from `holdersCap`.
+		 * If `initialCap` does not exists, fallback and subtract the value of `getStorageDefaultHoldersRewardCap()`.
+		 */
+		uint256 cap =
+			holdersCap.sub(
+				initialCap > 0
+					? initialCap
+					: getStorageDefaultHoldersRewardCap()
+			);
 		return (
 			_calculateCumulativeHoldersRewardAmount(holders, _property),
-			holdersCap
+			cap
 		);
 	}
 
