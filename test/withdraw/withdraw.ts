@@ -790,7 +790,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					await dev.withdraw.withdraw(property.address, { from: alice })
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
-					await dev.setDefaultGeometricMean('1157920892373160000000000000000')
 					await mine(3)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
@@ -808,7 +807,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
-					await dev.setDefaultGeometricMean('1157920892373160000000000000000')
 					await mine(3)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
@@ -1265,9 +1263,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let property2: PropertyInstance
 			let calc: Calculator
 			const alice = deployer
+			const bob = user2
 
 			before(async () => {
 				;[dev, , property] = await init(true)
+				await dev.dev.mint(bob, new BigNumber(1e18).times(10000000))
 				;[property2] = await Promise.all([
 					artifacts
 						.require('Property')
@@ -1341,7 +1341,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			describe('after staking', () => {
 				let lastBlock: BigNumber
 				before(async () => {
-					await dev.dev.deposit(property.address, 10000)
+					await dev.dev.deposit(property.address, '10000000000000000000000', {
+						from: bob,
+					})
 					lastBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
@@ -1375,9 +1377,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let lastBlock: BigNumber
 			let calc: Calculator
 			const alice = deployer
+			const bob = user4
 
 			before(async () => {
 				;[dev, , property] = await init(true)
+				await dev.dev.mint(bob, new BigNumber(1e18).times(10000000))
 				;[property2] = await Promise.all([
 					artifacts
 						.require('Property')
@@ -1400,7 +1404,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					7000
 				)
 				// Await dev.addressConfig.setWithdraw(dev.withdrawTest.address)
-				await dev.dev.deposit(property.address, 10000)
+				await dev.dev.deposit(property.address, '10000000000000000000000', {
+					from: bob,
+				})
 				lastBlock = await getBlock().then(toBigNumber)
 			})
 			describe('before withdraw interest', () => {
@@ -1460,7 +1466,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 			describe('after additional staking', () => {
 				before(async () => {
-					await dev.dev.deposit(property.address, 10000)
+					await dev.dev.deposit(property.address, '10000000000000000000000', {
+						from: bob,
+					})
 					await mine(3)
 				})
 				it('No staked Property is 0 reward', async () => {

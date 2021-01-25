@@ -40,7 +40,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		/**
 		 * Gets the withdrawable rewards amount and the latest cumulative sum of the maximum mint amount.
 		 */
-		(uint256 value, uint256 lastPrice) =
+		(uint256 value, uint256 lastPrice, uint256 lastPriceCap) =
 			_calculateWithdrawableAmount(_property, msg.sender);
 
 		/**
@@ -53,6 +53,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		 * By subtracting this value when calculating the next rewards, always withdrawal the difference from the previous time.
 		 */
 		setStorageLastWithdrawnReward(_property, msg.sender, lastPrice);
+		setStorageLastWithdrawnRewardCap(_property, msg.sender, lastPriceCap);
 
 		/**
 		 * Sets the number of unwithdrawn rewards to 0.
@@ -100,19 +101,22 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		/**
 		 * Gets the cumulative sum of the transfer source's "before transfer" withdrawable reward amount and the cumulative sum of the maximum mint amount.
 		 */
-		(uint256 amountFrom, uint256 priceFrom) =
+		(uint256 amountFrom, uint256 priceFrom, uint256 priceCapFrom) =
 			_calculateAmount(_property, _from);
 
 		/**
 		 * Gets the cumulative sum of the transfer destination's "before receive" withdrawable reward amount and the cumulative sum of the maximum mint amount.
 		 */
-		(uint256 amountTo, uint256 priceTo) = _calculateAmount(_property, _to);
+		(uint256 amountTo, uint256 priceTo, uint256 priceCapTo) =
+			_calculateAmount(_property, _to);
 
 		/**
 		 * Updates the last cumulative sum of the maximum mint amount of the transfer source and destination.
 		 */
 		setStorageLastWithdrawnReward(_property, _from, priceFrom);
 		setStorageLastWithdrawnReward(_property, _to, priceTo);
+		setStorageLastWithdrawnRewardCap(_property, _from, priceCapFrom);
+		setStorageLastWithdrawnRewardCap(_property, _to, priceCapTo);
 
 		/**
 		 * Gets the unwithdrawn reward amount of the transfer source and destination.
@@ -135,7 +139,11 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 	function _calculateAmount(address _property, address _user)
 		private
 		view
-		returns (uint256 _amount, uint256 _price)
+		returns (
+			uint256 _amount,
+			uint256 _price,
+			uint256 _cap
+		)
 	{
 		ILockup lockup = ILockup(config().lockup());
 		ERC20Mintable property = ERC20Mintable(_property);
@@ -143,26 +151,29 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		/**
 		 * Gets the latest reward.
 		 */
-		(uint256 reward, uint256 geometric) =
-			lockup.calculateRewardAmount(_property);
+		(uint256 reward, uint256 cap) = lockup.calculateRewardAmount(_property);
 
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
 		uint256 _lastReward = getStorageLastWithdrawnReward(_property, _user);
+		uint256 _lastRewardCap =
+			getStorageLastWithdrawnRewardCap(_property, _user);
 
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
 		uint256 unitPrice = reward.sub(_lastReward).mulBasis().div(totalSupply);
+		uint256 unitPriceCap =
+			cap.sub(_lastRewardCap).mulBasis().div(totalSupply);
 
 		uint256 tmp = unitPrice.mul(balance).divBasis().divBasis();
-		uint256 cap = geometric.mul(balance).div(totalSupply);
-		uint256 value = cap == 0 ? tmp : tmp <= cap ? tmp : cap;
+		uint256 capped = unitPriceCap.mul(balance).divBasis().divBasis();
+		uint256 value = capped == 0 ? tmp : tmp <= capped ? tmp : capped;
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the holder reward price.
 		 */
-		return (value, reward);
+		return (value, reward, cap);
 	}
 
 	/**
@@ -171,12 +182,17 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 	function _calculateWithdrawableAmount(address _property, address _user)
 		private
 		view
-		returns (uint256 _amount, uint256 _price)
+		returns (
+			uint256 _amount,
+			uint256 _price,
+			uint256 _cap
+		)
 	{
 		/**
 		 * Gets the latest withdrawal reward amount.
 		 */
-		(uint256 _value, uint256 price) = _calculateAmount(_property, _user);
+		(uint256 _value, uint256 price, uint256 cap) =
+			_calculateAmount(_property, _user);
 
 		/**
 		 * If the passed Property has not authenticated, returns always 0.
@@ -184,7 +200,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return (0, price);
+			return (0, price, cap);
 		}
 
 		/**
@@ -197,7 +213,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		 */
 		uint256 value =
 			_value.add(getPendingWithdrawal(_property, _user)).add(legacy);
-		return (value, price);
+		return (value, price, cap);
 	}
 
 	/**
@@ -208,7 +224,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		view
 		returns (uint256)
 	{
-		(uint256 value, ) = _calculateWithdrawableAmount(_property, _user);
+		(uint256 value, , ) = _calculateWithdrawableAmount(_property, _user);
 		return value;
 	}
 
