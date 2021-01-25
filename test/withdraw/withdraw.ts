@@ -1339,7 +1339,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			describe('after staking', () => {
 				let lastBlock: BigNumber
 				before(async () => {
-					await dev.dev.deposit(property.address, 10000)
+					await dev.dev.deposit(property.address, '10000000000000000000000')
 					lastBlock = await getBlock().then(toBigNumber)
 					await mine(3)
 				})
@@ -1398,7 +1398,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					7000
 				)
 				// Await dev.addressConfig.setWithdraw(dev.withdrawTest.address)
-				await dev.dev.deposit(property.address, 10000)
+				await dev.dev.deposit(property.address, '10000000000000000000000')
 				lastBlock = await getBlock().then(toBigNumber)
 			})
 			describe('before withdraw interest', () => {
