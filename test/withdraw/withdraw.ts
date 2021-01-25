@@ -790,7 +790,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					await dev.withdraw.withdraw(property.address, { from: alice })
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
-					await dev.setDefaultGeometricMean('1157920892373160000000000000000')
 					await mine(3)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
@@ -808,7 +807,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
-					await dev.setDefaultGeometricMean('1157920892373160000000000000000')
 					await mine(3)
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
