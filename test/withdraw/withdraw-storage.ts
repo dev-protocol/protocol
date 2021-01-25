@@ -74,4 +74,34 @@ contract('WithdrawStorageTest', ([withdraw, property, user]) => {
 			expect(result.toNumber()).to.be.equal(500000)
 		})
 	})
+	describe('WithdrawStorageTest; setStorageLastWithdrawnRewardCap, getStorageLastWithdrawnRewardCap', () => {
+		it('Initial value is 0.', async () => {
+			const result = await storage.setStorageLastWithdrawnRewardCapTest(
+				property,
+				user,
+				{
+					from: withdraw,
+				}
+			)
+			expect(result.toNumber()).to.be.equal(0)
+		})
+		it('The set value can be taken as it is.', async () => {
+			await storage.setStorageLastWithdrawnRewardCapTest(
+				property,
+				user,
+				5000000,
+				{
+					from: withdraw,
+				}
+			)
+			const result = await storage.getStorageLastWithdrawnRewardCap(
+				property,
+				user,
+				{
+					from: withdraw,
+				}
+			)
+			expect(result.toNumber()).to.be.equal(5000000)
+		})
+	})
 })
