@@ -24,11 +24,13 @@ contract(
 			before(async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
+					dev.generateAllocator(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 					dev.generateLockup(),
+					dev.generateMetricsGroup(),
 				])
 				await dev.generatePolicy()
 				await dev.addressConfig.setMarketFactory(marketFactory)
