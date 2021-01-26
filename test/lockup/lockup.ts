@@ -1665,6 +1665,23 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 		})
 	})
+	describe('Lockup; calculateRewardAmount', () => {
+		it('test.', async () => {
+			const [dev, property] = await init()
+			await dev.dev.deposit(property.address, '10000000000000000000000')
+			await dev.updateCap()
+			const tmp = await dev.lockup.calculateCumulativeRewardPrices()
+			const holderCap = toBigNumber(tmp[3])
+			const initialCap = await dev.lockup
+				.getStorageInitialCumulativeHoldersRewardCap(property.address)
+				.then(toBigNumber)
+			const result = await dev.lockup.calculateRewardAmount(property.address)
+			// TODO result[0] check
+			expect(toBigNumber(result[1]).toFixed()).to.be.equal(
+				holderCap.minus(initialCap).toFixed()
+			)
+		})
+	})
 	describe('Lockup; cap, updateCap', () => {
 		const calculateCap = async (
 			dev: DevProtocolInstance,
