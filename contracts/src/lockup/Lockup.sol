@@ -187,7 +187,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * set cap
 	 */
 	function updateCap(uint256 _cap) external {
-		address setter = IPolicy(config().policy()).geometricMeanSetter();
+		address setter = IPolicy(config().policy()).capSetter();
 		require(setter == msg.sender, "illegal access");
 		setStorageGeometricMeanLockedUp(_cap);
 
