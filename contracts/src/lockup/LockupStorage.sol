@@ -468,4 +468,92 @@ contract LockupStorage is UsingStorage {
 	{
 		return keccak256(abi.encodePacked("_disabledLockedups", _property));
 	}
+
+	//CumulativeHoldersRewardCap
+	function setStorageCumulativeHoldersRewardCap(uint256 _value) internal {
+		eternalStorage().setUint(
+			getStorageCumulativeHoldersRewardCapKey(),
+			_value
+		);
+	}
+
+	function getStorageCumulativeHoldersRewardCap()
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(getStorageCumulativeHoldersRewardCapKey());
+	}
+
+	function getStorageCumulativeHoldersRewardCapKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_cumulativeHoldersRewardCap"));
+	}
+
+	//LastCumulativeHoldersPriceCap
+	function setStorageLastCumulativeHoldersPriceCap(uint256 _value) internal {
+		eternalStorage().setUint(
+			getStorageLastCumulativeHoldersPriceCapKey(),
+			_value
+		);
+	}
+
+	function getStorageLastCumulativeHoldersPriceCap()
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getStorageLastCumulativeHoldersPriceCapKey()
+			);
+	}
+
+	function getStorageLastCumulativeHoldersPriceCapKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_lastCumulativeHoldersPriceCap"));
+	}
+
+	//InitialCumulativeHoldersRewardCap
+	function setStorageInitialCumulativeHoldersRewardCap(
+		address _property,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageInitialCumulativeHoldersRewardCapKey(_property),
+			_value
+		);
+	}
+
+	function getStorageInitialCumulativeHoldersRewardCap(address _property)
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getStorageInitialCumulativeHoldersRewardCapKey(_property)
+			);
+	}
+
+	function getStorageInitialCumulativeHoldersRewardCapKey(address _property)
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(
+				abi.encodePacked(
+					"_initialCumulativeHoldersRewardCap",
+					_property
+				)
+			);
+	}
 }

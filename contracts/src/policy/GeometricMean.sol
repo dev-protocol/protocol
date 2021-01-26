@@ -8,15 +8,15 @@ import {TreasuryFee} from "contracts/src/policy/TreasuryFee.sol";
  * GeometricMean is a contract that changes the `rewards` of DIP7.
  */
 contract GeometricMean is TreasuryFee {
-	address private geometricMeanSetterAddress;
+	address private capSetterAddress;
 
 	constructor(address _config) public TreasuryFee(_config) {}
 
-	function setGeometricMeanSetter(address _setter) external onlyOwner {
-		geometricMeanSetterAddress = _setter;
+	function setCapSetter(address _setter) external onlyOwner {
+		capSetterAddress = _setter;
 	}
 
-	function geometricMeanSetter() external view returns (address) {
-		return geometricMeanSetterAddress;
+	function capSetter() external view returns (address) {
+		return capSetterAddress;
 	}
 }

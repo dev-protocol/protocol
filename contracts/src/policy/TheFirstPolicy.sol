@@ -110,7 +110,7 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		return address(0);
 	}
 
-	function geometricMeanSetter() external view returns (address) {
+	function capSetter() external view returns (address) {
 		return address(0);
 	}
 }

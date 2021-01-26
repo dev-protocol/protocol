@@ -250,9 +250,9 @@ contract('DIP7', ([deployer]) => {
 			)
 		})
 	})
-	describe('DIP1; geometricMeanSetter', () => {
+	describe('DIP1; capSetter', () => {
 		it('treasury equals DIP1', async () => {
-			const method = 'geometricMeanSetter'
+			const method = 'capSetter'
 			expect((await dip7[method]()).toString()).to.be.equal(
 				(await dip1[method]()).toString()
 			)

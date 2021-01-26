@@ -15,6 +15,8 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
 				await dev.generateLockup()
@@ -66,6 +68,8 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
 				await dev.generateLockup()
@@ -111,6 +115,8 @@ contract(
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
+					dev.generateAllocator(),
+					dev.generateMetricsGroup(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateDev(),

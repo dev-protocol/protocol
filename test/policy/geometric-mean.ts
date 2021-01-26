@@ -7,7 +7,7 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
 import { batchRandom } from './utils'
 import { validateNotOwnerErrorMessage } from '../test-lib/utils/error'
-contract('GeometricMean', ([deployer, treasury, geometricMeanSetter, uesr]) => {
+contract('GeometricMean', ([deployer, treasury, capSetter, uesr]) => {
 	let treasuryFee: TreasuryFeeInstance
 	let geometricMean: GeometricMeanInstance
 	let dev: DevProtocolInstance
@@ -218,22 +218,22 @@ contract('GeometricMean', ([deployer, treasury, geometricMeanSetter, uesr]) => {
 			validateNotOwnerErrorMessage(result)
 		})
 	})
-	describe('GeometricMean; geometricMeanSetter', () => {
+	describe('GeometricMean; capSetter', () => {
 		it('returns the setter address.', async () => {
-			await geometricMean.setGeometricMeanSetter(geometricMeanSetter)
-			const result = await geometricMean.geometricMeanSetter()
-			expect(result).to.be.equal(geometricMeanSetter)
+			await geometricMean.setCapSetter(capSetter)
+			const result = await geometricMean.capSetter()
+			expect(result).to.be.equal(capSetter)
 		})
 		it('the default value is 0 address.', async () => {
 			const treasuryFeeTmp = await artifacts
 				.require('TreasuryFee')
 				.new(dev.addressConfig.address)
-			const result = await treasuryFeeTmp.geometricMeanSetter()
+			const result = await treasuryFeeTmp.capSetter()
 			expect(result).to.be.equal(DEFAULT_ADDRESS)
 		})
 		it('No one but the owner can set the address.', async () => {
 			const result = await geometricMean
-				.setGeometricMeanSetter(geometricMeanSetter, {
+				.setCapSetter(capSetter, {
 					from: uesr,
 				})
 				.catch((err: Error) => err)
