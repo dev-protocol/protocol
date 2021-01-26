@@ -35,5 +35,5 @@ interface IPolicy {
 
 	function treasury() external view returns (address);
 
-	function geometricMeanSetter() external view returns (address);
+	function capSetter() external view returns (address);
 }
