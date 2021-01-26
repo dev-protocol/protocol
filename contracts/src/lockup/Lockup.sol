@@ -252,7 +252,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * the Property has collected the staking before DIP38 and so sets the value of `getStorageDefaultHoldersRewardCap`.
 		 */
 		if (getStorageInitialCumulativeHoldersRewardCap(_property) == 0) {
-			uint256 hasStaked = getStoragePropertyValue(_property) > 0;
+			bool hasStaked = getStoragePropertyValue(_property) > 0;
 			setStorageInitialCumulativeHoldersRewardCap(
 				_property,
 				hasStaked
