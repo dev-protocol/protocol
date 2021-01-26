@@ -184,13 +184,12 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 
 	/**
-	 * set geometric average
-	 * TODO: Rename this function
+	 * set cap
 	 */
-	function setGeometricMean(uint256 _geometricMean) external {
+	function updateCap(uint256 _cap) external {
 		address setter = IPolicy(config().policy()).geometricMeanSetter();
 		require(setter == msg.sender, "illegal access");
-		setStorageGeometricMeanLockedUp(_geometricMean);
+		setStorageGeometricMeanLockedUp(_cap);
 
 		/**
 		 * Updates cumulative amount of the holders reward cap
@@ -201,7 +200,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		// TODO: When this function is improved to be called on-chain, the source of `getStorageLastCumulativeHoldersPriceCap` can be rewritten to` getStorageLastCumulativeHoldersRewardPrice`.
 		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersPriceCap();
 		uint256 additionalCap =
-			holdersPrice.sub(lastHoldersPrice).mul(_geometricMean);
+			holdersPrice.sub(lastHoldersPrice).mul(_cap);
 		uint256 cap = cCap.add(additionalCap);
 		setStorageCumulativeHoldersRewardCap(cap);
 		setStorageLastCumulativeHoldersPriceCap(holdersPrice);

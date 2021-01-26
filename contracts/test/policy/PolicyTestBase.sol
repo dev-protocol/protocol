@@ -6,7 +6,7 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
 contract PolicyTestBase is IPolicy {
 	using SafeMath for uint256;
 	address public treasury;
-	address public geometricMeanSetter;
+	address public capSetter;
 
 	// solhint-disable-next-line no-unused-vars
 	function rewards(uint256 _lockups, uint256 _assets)
@@ -71,7 +71,7 @@ contract PolicyTestBase is IPolicy {
 		treasury = _treasury;
 	}
 
-	function setGeometricMeanSetter(address _geometricMeanSetter) external {
-		geometricMeanSetter = _geometricMeanSetter;
+	function setCapSetter(address _capSetter) external {
+		capSetter = _capSetter;
 	}
 }

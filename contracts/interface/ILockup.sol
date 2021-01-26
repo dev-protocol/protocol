@@ -55,5 +55,5 @@ interface ILockup {
 
 	function geometricMeanLockedUp() external view returns (uint256);
 
-	function setGeometricMean(uint256 _geometricMean) external;
+	function updateCap(uint256 _geometricMean) external;
 }

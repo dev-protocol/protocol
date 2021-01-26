@@ -297,8 +297,8 @@ export class DevProtocolInstance {
 		)
 		await policy.setTreasury(this._treasury.address)
 		await this._policyFactory.create(policy.address)
-		await policy.setGeometricMeanSetter(this._deployer)
-		await this.setDefaultGeometricMean()
+		await policy.setCapSetter(this._deployer)
+		await this.updateCap()
 		return policy.address
 	}
 
@@ -327,9 +327,9 @@ export class DevProtocolInstance {
 		return contract('Metrics').new(market, property)
 	}
 
-	public async setDefaultGeometricMean(
+	private async updateCap(
 		value = '115792089237316000000000000000000000'
 	): Promise<void> {
-		await this._lockup.setGeometricMean(value)
+		await this._lockup.updateCap(value)
 	}
 }

@@ -59,10 +59,10 @@ contract('Policy', ([account1, account2]) => {
 			expect(tmp).to.be.equal(account1)
 		})
 	})
-	describe('PolicyTest1; setGeometricMeanSetter', () => {
+	describe('PolicyTest1; setCapSetter', () => {
 		it('get the set geometric mean setter address', async () => {
-			await policy.setGeometricMeanSetter(account2)
-			const tmp: string = await policy.geometricMeanSetter()
+			await policy.setCapSetter(account2)
+			const tmp: string = await policy.capSetter()
 			expect(tmp).to.be.equal(account2)
 		})
 	})

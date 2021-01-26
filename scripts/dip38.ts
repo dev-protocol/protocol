@@ -43,7 +43,7 @@ const handler = async (
 	const nextPolicy = await artifacts
 		.require('GeometricMean')
 		.new(dev.addressConfig.address)
-	await nextPolicy.setGeometricMeanSetter(geometricMearSetter)
+	await nextPolicy.setCapSetter(geometricMearSetter)
 	await nextPolicy.setTreasury(treasuryAddress)
 
 	const policyFactory = new PolicyFactory(dev)
