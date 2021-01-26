@@ -106,9 +106,7 @@ contract LockupStorageTest is LockupStorage {
 		setStorageDisabledLockedups(_property, _value);
 	}
 
-	function setStorageCumulativeHoldersRewardCapTest(uint256 _value)
-		external
-	{
+	function setStorageCumulativeHoldersRewardCapTest(uint256 _value) external {
 		setStorageCumulativeHoldersRewardCap(_value);
 	}
 
@@ -118,9 +116,10 @@ contract LockupStorageTest is LockupStorage {
 		setStorageLastCumulativeHoldersPriceCap(_value);
 	}
 
-	function setStorageInitialCumulativeHoldersRewardCapTest(address _property, uint256 _value)
-		external
-	{
+	function setStorageInitialCumulativeHoldersRewardCapTest(
+		address _property,
+		uint256 _value
+	) external {
 		setStorageInitialCumulativeHoldersRewardCap(_property, _value);
 	}
 }
