@@ -276,6 +276,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[0]),
 				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[1]),
 				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[2]),
+				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[3]),
 				dev.lockup.getStorageLastStakedInterestPrice(prop.address, account),
 				dev.lockup.getValue(prop.address, account),
 				dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),
@@ -286,6 +287,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					maxRewards,
 					holdersPrice,
 					interestPrice,
+					cCap,
 					lastInterestPrice,
 					lockedUpPerUser,
 					pending,
@@ -306,6 +308,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					console.log('maxRewards', maxRewards)
 					console.log('holdersPrice', holdersPrice)
 					console.log('interestPrice', interestPrice.toFixed())
+					console.log('cCap', cCap.toFixed())
 					console.log('lastInterestPrice', lastInterestPrice.toFixed())
 					console.log('lockedUpPerUser', lockedUpPerUser.toFixed())
 					console.log('pending', pending.toFixed())
@@ -1659,6 +1662,50 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						bobBalance.plus(bobLocked).plus(reward).toFixed()
 					)
 				})
+			})
+		})
+	})
+	describe('Lockup; cap, updateCap', () => {
+		const calculateCap = async (
+			dev: DevProtocolInstance,
+			cap: BigNumber
+		): Promise<[BigNumber, BigNumber]> => {
+			const tmp = await dev.lockup.calculateCumulativeRewardPrices()
+			const holderPrice = toBigNumber(tmp[1])
+			const cCap = toBigNumber(tmp[3])
+			const lastHoldersPrice = await dev.lockup
+				.getStorageLastCumulativeHoldersPriceCap()
+				.then(toBigNumber)
+			const additionalCap = holderPrice.minus(lastHoldersPrice).times(cap)
+			const capValue = cCap.plus(additionalCap)
+			return [capValue, holderPrice]
+		}
+
+		describe('success', () => {
+			it('Can set cap.', async () => {
+				const [dev] = await init()
+				await dev.lockup.updateCap(100)
+				const cap = await dev.lockup.cap()
+				expect(cap.toNumber()).to.be.equal(100)
+				const [capValue, holdersPrice] = await calculateCap(
+					dev,
+					toBigNumber(100)
+				)
+				const holderRewardCap = await dev.lockup
+					.getStorageCumulativeHoldersRewardCap()
+					.then(toBigNumber)
+				expect(holderRewardCap.toString()).to.be.equal(capValue.toString())
+				const holdersPriceCap = await dev.lockup
+					.getStorageLastCumulativeHoldersPriceCap()
+					.then(toBigNumber)
+				expect(holdersPriceCap.toString()).to.be.equal(holdersPrice.toString())
+			})
+		})
+		describe('fail', () => {
+			it('Do not accept access from addresses other than the specified one.', async () => {
+				const [dev] = await init()
+				const res = await dev.lockup.updateCap(100, { from: user1 }).catch(err)
+				validateErrorMessage(res, 'illegal access')
 			})
 		})
 	})
