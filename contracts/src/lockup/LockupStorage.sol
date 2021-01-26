@@ -422,24 +422,17 @@ contract LockupStorage is UsingStorage {
 			);
 	}
 
-	//GeometricMeanLockedUp
-	function setStorageGeometricMeanLockedUp(uint256 _geometricMean) internal {
-		eternalStorage().setUint(
-			getStorageGeometricMeanLockedUpKey(),
-			_geometricMean
-		);
+	//cap
+	function setStorageCap(uint256 _cap) internal {
+		eternalStorage().setUint(getStorageCapKey(), _cap);
 	}
 
-	function getStorageGeometricMeanLockedUp() public view returns (uint256) {
-		return eternalStorage().getUint(getStorageGeometricMeanLockedUpKey());
+	function getStorageCap() public view returns (uint256) {
+		return eternalStorage().getUint(getStorageCapKey());
 	}
 
-	function getStorageGeometricMeanLockedUpKey()
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_geometricMeanLockedUp"));
+	function getStorageCapKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_cap"));
 	}
 
 	//DisabledLockedups

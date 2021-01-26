@@ -177,10 +177,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 
 	/**
-	 * get geometric average
+	 * get cap
 	 */
-	function geometricMeanLockedUp() external view returns (uint256) {
-		return getStorageGeometricMeanLockedUp();
+	function cap() external view returns (uint256) {
+		return getStorageCap();
 	}
 
 	/**
@@ -189,7 +189,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	function updateCap(uint256 _cap) external {
 		address setter = IPolicy(config().policy()).capSetter();
 		require(setter == msg.sender, "illegal access");
-		setStorageGeometricMeanLockedUp(_cap);
+		setStorageCap(_cap);
 
 		/**
 		 * Updates cumulative amount of the holders reward cap
@@ -200,8 +200,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		// TODO: When this function is improved to be called on-chain, the source of `getStorageLastCumulativeHoldersPriceCap` can be rewritten to` getStorageLastCumulativeHoldersRewardPrice`.
 		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersPriceCap();
 		uint256 additionalCap = holdersPrice.sub(lastHoldersPrice).mul(_cap);
-		uint256 cap = cCap.add(additionalCap);
-		setStorageCumulativeHoldersRewardCap(cap);
+		uint256 capValue = cCap.add(additionalCap);
+		setStorageCumulativeHoldersRewardCap(capValue);
 		setStorageLastCumulativeHoldersPriceCap(holdersPrice);
 	}
 
@@ -354,10 +354,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Calculates the cap
 		 */
-		uint256 cap = holdersCap.sub(initialCap);
+		uint256 capValue = holdersCap.sub(initialCap);
 		return (
 			_calculateCumulativeHoldersRewardAmount(holders, _property),
-			cap
+			capValue
 		);
 	}
 

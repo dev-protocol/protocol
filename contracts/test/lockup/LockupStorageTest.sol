@@ -96,8 +96,8 @@ contract LockupStorageTest is LockupStorage {
 		);
 	}
 
-	function setStorageGeometricMeanLockedUpTest(uint256 _value) external {
-		setStorageGeometricMeanLockedUp(_value);
+	function setStorageCapTest(uint256 _value) external {
+		setStorageCap(_value);
 	}
 
 	function setStorageDisabledLockedupsTest(address _property, uint256 _value)

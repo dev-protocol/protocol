@@ -204,14 +204,14 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})
-	describe('LockupStorage; setStorageGeometricMeanLockedUp, getStorageGeometricMeanLockedUp', () => {
+	describe('LockupStorage; setStorageCap, getStorageCap', () => {
 		it('Initial value is 0 and 0.', async () => {
-			const result = await storage.getStorageGeometricMeanLockedUp()
+			const result = await storage.getStorageCap()
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageGeometricMeanLockedUpTest(600000000000)
-			const result = await storage.getStorageGeometricMeanLockedUp()
+			await storage.setStorageCap(600000000000)
+			const result = await storage.getStorageCap()
 			expect(result.toNumber()).to.be.equal(600000000000)
 		})
 	})

@@ -53,7 +53,7 @@ interface ILockup {
 		address _user
 	) external view returns (uint256);
 
-	function geometricMeanLockedUp() external view returns (uint256);
+	function cap() external view returns (uint256);
 
 	function updateCap(uint256 _geometricMean) external;
 }
