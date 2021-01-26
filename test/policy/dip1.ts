@@ -181,8 +181,8 @@ contract('DIP1', ([deployer]) => {
 			)
 		})
 	})
-	describe('DIP1; geometricMeanSetter', () => {
-		it('geometricMeanSetter equals TheFirstPolicy', async () => {
+	describe('DIP1; capSetter', () => {
+		it('capSetter equals TheFirstPolicy', async () => {
 			const method = 'capSetter'
 			expect((await dip1[method]()).toString()).to.be.equal(
 				(await theFirstPolicy[method]()).toString()

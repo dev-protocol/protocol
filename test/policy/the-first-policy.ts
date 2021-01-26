@@ -223,10 +223,10 @@ contract('TheFirstPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal(DEFAULT_ADDRESS)
 		})
 	})
-	describe('TheFirstPolicy; geometricMeanSetter', () => {
-		it('Returns the geometricMeanSetter address', async () => {
+	describe('TheFirstPolicy; capSetter', () => {
+		it('Returns the capSetter address', async () => {
 			const policy = await create()
-			const result = await policy.geometricMeanSetter()
+			const result = await policy.capSetter()
 			expect(result.toString()).to.be.equal(DEFAULT_ADDRESS)
 		})
 	})
