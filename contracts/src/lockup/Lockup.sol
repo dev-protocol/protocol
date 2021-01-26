@@ -199,8 +199,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 
 		// TODO: When this function is improved to be called on-chain, the source of `getStorageLastCumulativeHoldersPriceCap` can be rewritten to` getStorageLastCumulativeHoldersRewardPrice`.
 		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersPriceCap();
-		uint256 additionalCap =
-			holdersPrice.sub(lastHoldersPrice).mul(_cap);
+		uint256 additionalCap = holdersPrice.sub(lastHoldersPrice).mul(_cap);
 		uint256 cap = cCap.add(additionalCap);
 		setStorageCumulativeHoldersRewardCap(cap);
 		setStorageLastCumulativeHoldersPriceCap(holdersPrice);
