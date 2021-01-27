@@ -1690,13 +1690,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			const lastReward = await dev.lockup
 				.getStorageLastCumulativeHoldersRewardPricePerProperty(property.address)
 				.then(toBigNumber)
-			const value = await dev.lockup
+			const enabledStakingValue = await dev.lockup
 				.getStoragePropertyValue(property.address)
 				.then(toBigNumber)
-			const disabledValue = await dev.lockup
-				.getStorageDisabledLockedups(property.address)
-				.then(toBigNumber)
-			const enabledStakingValue = value.minus(disabledValue)
 			const additionalHoldersReward = holders
 				.minus(lastReward)
 				.times(enabledStakingValue)
