@@ -1767,6 +1767,127 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 		})
 	})
+	describe.only('Lockup; self staking', () => {
+		const isSelfStaking = async (
+			dev: DevProtocolInstance,
+			property: PropertyInstance
+		): Promise<boolean> => {
+			const result = await dev.lockup
+				.getStorageDisabledLockedups(property.address)
+				.then(toBigNumber)
+			console.log(result.toString())
+			return result.toString() !== '0'
+		}
+
+		it('Release more staking than self-staking.', async () => {
+			const [dev, property] = await init()
+			await dev.dev.mint(user2, new BigNumber(1e18).times(10000000))
+			await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
+			await dev.dev.deposit(property.address, '1000', {
+				from: user2,
+			})
+			await dev.dev.deposit(property.address, '10000', {
+				from: user3,
+			})
+			await dev.lockup.withdraw(property.address, '10000', {
+				from: user3,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(true)
+		})
+
+		it('Release the same amount of staking as self-staking.', async () => {
+			const [dev, property] = await init()
+			await dev.dev.mint(user2, new BigNumber(1e18).times(10000000))
+			await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
+			await dev.dev.deposit(property.address, '10000', {
+				from: user2,
+			})
+			await dev.dev.deposit(property.address, '10000', {
+				from: user3,
+			})
+			await dev.lockup.withdraw(property.address, '10000', {
+				from: user3,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(true)
+		})
+		it('Release less staking than self-staking.', async () => {
+			const [dev, property] = await init()
+			await dev.dev.mint(user2, new BigNumber(1e18).times(10000000))
+			await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
+			await dev.dev.deposit(property.address, '100000', {
+				from: user2,
+			})
+			await dev.dev.deposit(property.address, '10000', {
+				from: user3,
+			})
+			await dev.lockup.withdraw(property.address, '10000', {
+				from: user3,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(true)
+		})
+		it.only('Remove some self-staking(ver1).', async () => {
+			const [dev, property] = await init()
+			await dev.dev.mint(user2, new BigNumber(1e18).times(10000000))
+			await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
+			await dev.dev.deposit(property.address, '10000', {
+				from: user2,
+			})
+			await dev.dev.deposit(property.address, '2000', {
+				from: user3,
+			})
+			await dev.lockup.withdraw(property.address, '1000', {
+				from: user2,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(true)
+			await dev.lockup.withdraw(property.address, '3000', {
+				from: user2,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(true)
+			await dev.lockup.withdraw(property.address, '6000', {
+				from: user2,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(false)
+		})
+		it.only('Remove some self-staking(ver2).', async () => {
+			const [dev, property] = await init()
+			await dev.dev.mint(user2, new BigNumber(1e18).times(10000000))
+			await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
+			await dev.dev.deposit(property.address, '10000', {
+				from: user2,
+			})
+			await dev.dev.deposit(property.address, '10000', {
+				from: user3,
+			})
+			await dev.lockup.withdraw(property.address, '3000', {
+				from: user2,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(true)
+			await dev.lockup.withdraw(property.address, '3000', {
+				from: user2,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(true)
+			await dev.lockup.withdraw(property.address, '4000', {
+				from: user2,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(false)
+		})
+		it.only('Release all self-staking.', async () => {
+			const [dev, property] = await init()
+			await dev.dev.mint(user2, new BigNumber(1e18).times(10000000))
+			await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
+			await dev.dev.deposit(property.address, '10000', {
+				from: user2,
+			})
+			await dev.dev.deposit(property.address, '10000', {
+				from: user3,
+			})
+			await dev.lockup.withdraw(property.address, '10000', {
+				from: user2,
+			})
+			expect(await isSelfStaking(dev, property)).to.be.equal(false)
+		})
+	})
+
 	describe('Lockup; setDIP4GenesisBlock', () => {
 		it('Store passed value to getStorageDIP4GenesisBlock as a block number', async () => {
 			const [dev] = await init()
