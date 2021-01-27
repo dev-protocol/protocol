@@ -210,7 +210,7 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageCap(600000000000)
+			await storage.setStorageCapTest(600000000000)
 			const result = await storage.getStorageCap()
 			expect(result.toNumber()).to.be.equal(600000000000)
 		})
