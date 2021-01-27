@@ -1666,20 +1666,61 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		})
 	})
 	describe('Lockup; calculateRewardAmount', () => {
-		it('test.', async () => {
-			const [dev, property] = await init()
-			await dev.dev.deposit(property.address, '10000000000000000000000')
-			await dev.updateCap()
-			const tmp = await dev.lockup.calculateCumulativeRewardPrices()
-			const holderCap = toBigNumber(tmp[3])
+		const calculateCap = async (
+			dev: DevProtocolInstance,
+			property: PropertyInstance,
+			holderCap: BigNumber
+		): Promise<BigNumber> => {
 			const initialCap = await dev.lockup
 				.getStorageInitialCumulativeHoldersRewardCap(property.address)
 				.then(toBigNumber)
+			return holderCap.minus(initialCap)
+		}
+
+		const calculateReword = async (
+			dev: DevProtocolInstance,
+			property: PropertyInstance,
+			holders: BigNumber
+		): Promise<BigNumber> => {
+			const cHoldersReward = await dev.lockup
+				.getStorageLastCumulativeHoldersRewardAmountPerProperty(
+					property.address
+				)
+				.then(toBigNumber)
+			const lastReward = await dev.lockup
+				.getStorageLastCumulativeHoldersRewardPricePerProperty(property.address)
+				.then(toBigNumber)
+			const value = await dev.lockup
+				.getStoragePropertyValue(property.address)
+				.then(toBigNumber)
+			const disabledValue = await dev.lockup
+				.getStorageDisabledLockedups(property.address)
+				.then(toBigNumber)
+			const enabledStakingValue = value.minus(disabledValue)
+			const additionalHoldersReward = holders
+				.minus(lastReward)
+				.times(enabledStakingValue)
+			return cHoldersReward.plus(additionalHoldersReward)
+		}
+
+		const calculate = async (
+			dev: DevProtocolInstance,
+			property: PropertyInstance
+		): Promise<[BigNumber, BigNumber]> => {
+			const tmp = await dev.lockup.calculateCumulativeRewardPrices()
+			const reward = await calculateReword(dev, property, toBigNumber(tmp[1]))
+			const cap = await calculateCap(dev, property, toBigNumber(tmp[3]))
+			return [reward, cap]
+		}
+
+		it('The reward is calculated and comes back to you.', async () => {
+			const [dev, property] = await init()
+			await dev.dev.deposit(property.address, '10000000000000000000000')
+			await dev.updateCap()
+			const [reword, cap] = await calculate(dev, property)
 			const result = await dev.lockup.calculateRewardAmount(property.address)
-			// TODO result[0] check
-			expect(toBigNumber(result[1]).toFixed()).to.be.equal(
-				holderCap.minus(initialCap).toFixed()
-			)
+			expect(toBigNumber(result[0]).toFixed()).to.be.equal(reword.toFixed())
+			expect(toBigNumber(result[1]).toFixed()).to.be.equal(cap.toFixed())
 		})
 	})
 	describe('Lockup; cap, updateCap', () => {
