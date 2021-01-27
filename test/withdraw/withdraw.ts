@@ -93,55 +93,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		return [dev, metrics, property, policy]
 	}
 
-	describe('Withdraw; withdraw:self staking', () => {
-		const alis = deployer
-		const bob = user2
-		const test = async (
-			dev: DevProtocolInstance,
-			property: PropertyInstance,
-			targetUser = alis
-		): Promise<void> => {
-			await dev.dev.deposit(property.address, '10000000000000000000000', {
-				from: targetUser,
-			})
-
-			const beforeBalance = await dev.dev
-				.balanceOf(targetUser)
-				.then(toBigNumber)
-			const beforeTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-			await mine(10)
-			const amount = await dev.withdraw
-				.calculateWithdrawableAmount(property.address, targetUser)
-				.then(toBigNumber)
-			expect(amount.toFixed()).to.be.equal('0')
-			const res = await dev.withdraw
-				.withdraw(property.address, { from: targetUser })
-				.catch((err: Error) => err)
-			validateErrorMessage(res, 'withdraw value is 0')
-			const afterBalance = await dev.dev.balanceOf(targetUser).then(toBigNumber)
-			const afterTotalSupply = await dev.dev.totalSupply().then(toBigNumber)
-			expect(afterBalance.toFixed()).to.be.equal(beforeBalance.toFixed())
-			expect(afterTotalSupply.toFixed()).to.be.equal(
-				beforeTotalSupply.toFixed()
-			)
-		}
-
-		it('With self-staking, the creator reward is zero.', async () => {
-			const [dev, , property] = await init()
-			await test(dev, property)
-		})
-		it('If hold even one token, it is considered self-staking.', async () => {
-			const [dev, , property] = await init()
-			await dev.dev.mint(bob, new BigNumber(1e18).times(10000000))
-			const beforeBalance = await property.balanceOf(alis).then(toBigNumber)
-			await property.transfer(bob, beforeBalance.minus(1), { from: alis })
-			const afterBalance = await property.balanceOf(alis).then(toBigNumber)
-			expect(afterBalance.toFixed()).to.be.equal('1')
-			await test(dev, property)
-			await test(dev, property, bob)
-		})
-	})
-
 	describe('Withdraw; withdraw', () => {
 		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
