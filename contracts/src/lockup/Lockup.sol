@@ -2,7 +2,6 @@ pragma solidity 0.5.17;
 
 // prettier-ignore
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
@@ -96,29 +95,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		updateValues(true, _from, _property, _value, prices);
 
-		/**
-		 * Saves disabled lockedups value
-		 */
-		addDisabledLockedups(_from, _property, _value);
-
 		emit Lockedup(_from, _property, _value);
-	}
-
-	/**
-	 * Disable staking if property token is held.
-	 */
-	function addDisabledLockedups(
-		address _from,
-		address _property,
-		uint256 _amount
-	) private {
-		IERC20 property = IERC20(_property);
-		uint256 balance = property.balanceOf(_from);
-		if (balance == 0) {
-			return;
-		}
-		uint256 tmp = getStorageDisabledLockedups(_property);
-		setStorageDisabledLockedups(_property, tmp.add(_amount));
 	}
 
 	/**
@@ -147,33 +124,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		}
 
 		/**
-		 * Saves disabled lockedups value
-		 */
-		subDisabledLockedups(_property, _amount);
-
-		/**
 		 * Saves variables that should change due to the canceling staking..
 		 */
 		updateValues(false, msg.sender, _property, _amount, prices);
-	}
-
-	/**
-	 * Remove disabled staking.
-	 */
-	function subDisabledLockedups(address _property, uint256 _amount) private {
-		uint256 disabledLockedups = getStorageDisabledLockedups(_property);
-		if (disabledLockedups < _amount) {
-			return;
-		}
-		uint256 stakingAmount = getStoragePropertyValue(_property);
-		uint256 tmp =
-			disabledLockedups.sub(_amount) <= stakingAmount.sub(_amount)
-				? disabledLockedups
-				: disabledLockedups - _amount;
-		if (disabledLockedups == tmp) {
-			return;
-		}
-		setStorageDisabledLockedups(_property, tmp);
 	}
 
 	/**
@@ -311,10 +264,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * `cHoldersReward` contains the calculation of `lastReward`, so subtract it here.
 		 */
-		uint256 enabledStakingValue =
-			getStoragePropertyValue(_property).sub(
-				getStorageDisabledLockedups(_property)
-			);
+		uint256 enabledStakingValue = getStoragePropertyValue(_property);
 		uint256 additionalHoldersReward =
 			_holdersPrice.sub(lastReward).mul(enabledStakingValue);
 

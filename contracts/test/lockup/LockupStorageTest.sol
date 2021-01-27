@@ -100,12 +100,6 @@ contract LockupStorageTest is LockupStorage {
 		setStorageCap(_value);
 	}
 
-	function setStorageDisabledLockedupsTest(address _property, uint256 _value)
-		external
-	{
-		setStorageDisabledLockedups(_property, _value);
-	}
-
 	function setStorageCumulativeHoldersRewardCapTest(uint256 _value) external {
 		setStorageCumulativeHoldersRewardCap(_value);
 	}
