@@ -1,8 +1,10 @@
+import { pow, bignumber, floor } from 'mathjs'
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	MetricsInstance,
 	PropertyInstance,
 	IPolicyInstance,
+	MarketInstance,
 } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
 import {
@@ -27,7 +29,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 	const init = async (
 		generateWithdrawTest = false
 	): Promise<
-		[DevProtocolInstance, MetricsInstance, PropertyInstance, IPolicyInstance]
+		[
+			DevProtocolInstance,
+			MetricsInstance,
+			PropertyInstance,
+			IPolicyInstance,
+			MarketInstance
+		]
 	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
@@ -90,7 +98,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		])
 		await dev.lockup.update()
 
-		return [dev, metrics, property, policy]
+		return [dev, metrics, property, policy, market]
 	}
 
 	describe('Withdraw; withdraw', () => {
@@ -1495,6 +1503,67 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 		})
 	})
+
+	describe('Withdraw; cap', () => {
+		const propertyAuthor = deployer
+		const alis = user1
+		const prepare = async (): Promise<
+			[
+				DevProtocolInstance,
+				[PropertyInstance, PropertyInstance, PropertyInstance]
+			]
+		> => {
+			const [dev, metrics, property, Policy, market] = await init()
+			await dev.dev.mint(alis, new BigNumber(1e18).times(10000000))
+			const propertyAddress2 = getPropertyAddress(
+				await dev.propertyFactory.create('test2', 'TEST2', propertyAuthor)
+			)
+			const [property2] = await Promise.all([
+				artifacts.require('Property').at(propertyAddress2),
+			])
+			const propertyAddress3 = getPropertyAddress(
+				await dev.propertyFactory.create('test2', 'TEST2', propertyAuthor)
+			)
+			const [property3] = await Promise.all([
+				artifacts.require('Property').at(propertyAddress3),
+			])
+			await market.authenticate(property2.address, 'id2', '', '', '', '')
+			await market.authenticate(property3.address, 'id3', '', '', '', '')
+
+			return [dev, [property, property2, property3]]
+		}
+
+		const calculateGeometricMean = (args: BigNumber[]): BigNumber => {
+			const result = args.reduce((a, b) => {
+				return a.times(b)
+			})
+			const tmp = toBigNumber(1).div(args.length)
+			const t = pow(bignumber(result.toString()), bignumber(tmp.toString()))
+			const r = floor(bignumber(t.toString()))
+			return toBigNumber(r.toString())
+		}
+
+		it(`cap`, async () => {
+			const [dev, [property1, property2, property3]] = await prepare()
+			await dev.dev.deposit(property1.address, toBigNumber(10000), {
+				from: alis,
+			})
+			await dev.dev.deposit(property2.address, toBigNumber(20000), {
+				from: alis,
+			})
+			await dev.dev.deposit(property3.address, toBigNumber(20000), {
+				from: alis,
+			})
+			const tmp = calculateGeometricMean([
+				toBigNumber(10000),
+				toBigNumber(20000),
+				toBigNumber(30000),
+			])
+			await dev.updateCap(tmp.toFixed())
+			console.log(tmp.toFixed())
+		})
+	})
+
 	describe('Withdraw; tresuary', () => {
 		let dev: DevProtocolInstance
 		let property: PropertyInstance

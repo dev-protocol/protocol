@@ -264,9 +264,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * `cHoldersReward` contains the calculation of `lastReward`, so subtract it here.
 		 */
-		uint256 enabledStakingValue = getStoragePropertyValue(_property);
 		uint256 additionalHoldersReward =
-			_holdersPrice.sub(lastReward).mul(enabledStakingValue);
+			_holdersPrice.sub(lastReward).mul(
+				getStoragePropertyValue(_property)
+			);
 
 		/**
 		 * Calculates and returns the cumulative sum of the holder reward by adds the last recorded holder reward and the latest holder reward.
