@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import { pow, bignumber, floor } from 'mathjs'
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
@@ -65,6 +66,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
+
 		const policyAddress = await dev.generatePolicy('PolicyTestForWithdraw')
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const policy = await artifacts
@@ -1513,7 +1515,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				[PropertyInstance, PropertyInstance, PropertyInstance]
 			]
 		> => {
-			const [dev, metrics, property, Policy, market] = await init()
+			const [dev, , property, , market] = await init()
 			await dev.dev.mint(alis, new BigNumber(1e18).times(10000000))
 			const propertyAddress2 = getPropertyAddress(
 				await dev.propertyFactory.create('test2', 'TEST2', propertyAuthor)
@@ -1543,6 +1545,69 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			return toBigNumber(r.toString())
 		}
 
+		const calculateRewardAndCap = async (
+			dev: DevProtocolInstance,
+			property: PropertyInstance,
+			user: string
+		): Promise<[BigNumber, BigNumber]> => {
+			const result = await dev.lockup.calculateRewardAmount(property.address)
+			const reward = toBigNumber(result[0])
+			const cap = toBigNumber(result[1])
+			const lastReward = await dev.withdraw
+				.getStorageLastWithdrawnRewardCap(property.address, user)
+				.then(toBigNumber)
+			const lastRewardCap = await dev.withdraw
+				.getStorageLastWithdrawnRewardCap(property.address, user)
+				.then(toBigNumber)
+			const balance = await property.balanceOf(user).then(toBigNumber)
+			const totalSupply = await property.totalSupply().then(toBigNumber)
+			const unitPrice = reward
+				.minus(lastReward)
+				.times(toBigNumber(1e18))
+				.idiv(totalSupply)
+			const unitPriceCap = cap
+				.minus(lastRewardCap)
+				.times(toBigNumber(1e18))
+				.idiv(totalSupply)
+			const tmp = unitPrice
+				.times(balance)
+				.idiv(toBigNumber(1e18))
+				.idiv(toBigNumber(1e18))
+			const capped = unitPriceCap
+				.times(balance)
+				.idiv(toBigNumber(1e18))
+				.idiv(toBigNumber(1e18))
+			const value =
+				capped.toString() === '0' ? tmp : tmp <= capped ? tmp : capped
+			return [value, capped]
+		}
+
+		const checkAmount = async (
+			dev: DevProtocolInstance,
+			property: PropertyInstance,
+			user: string
+		): Promise<void> => {
+			let beforeAmount = toBigNumber(0)
+			let count = 0
+			while (true) {
+				await mine(1)
+				const amount = await dev.withdraw
+					.calculateWithdrawableAmount(property.address, user)
+					.then(toBigNumber)
+				const [value, capped] = await calculateRewardAndCap(dev, property, user)
+				expect(amount.toFixed()).to.be.equal(value.toFixed())
+				if (amount.eq(beforeAmount)) {
+					expect(capped.toFixed()).to.be.equal(value.toFixed())
+					count++
+					if (count === 3) {
+						break
+					}
+				}
+
+				beforeAmount = amount
+			}
+		}
+
 		it(`cap`, async () => {
 			const [dev, [property1, property2, property3]] = await prepare()
 			await dev.dev.deposit(property1.address, toBigNumber(10000), {
@@ -1551,16 +1616,34 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			await dev.dev.deposit(property2.address, toBigNumber(20000), {
 				from: alis,
 			})
-			await dev.dev.deposit(property3.address, toBigNumber(20000), {
+			await dev.dev.deposit(property3.address, toBigNumber(30000), {
 				from: alis,
 			})
-			const tmp = calculateGeometricMean([
+
+			const geometricMean = calculateGeometricMean([
 				toBigNumber(10000),
 				toBigNumber(20000),
 				toBigNumber(30000),
 			])
-			await dev.updateCap(tmp.toFixed())
-			console.log(tmp.toFixed())
+			await dev.updateCap(geometricMean.toFixed())
+			await checkAmount(dev, property1, propertyAuthor)
+			await dev.dev.deposit(property1.address, toBigNumber(10000), {
+				from: alis,
+			})
+			await dev.dev.deposit(property2.address, toBigNumber(20000), {
+				from: alis,
+			})
+			await dev.dev.deposit(property3.address, toBigNumber(30000), {
+				from: alis,
+			})
+
+			const geometricMean2 = calculateGeometricMean([
+				toBigNumber(20000),
+				toBigNumber(40000),
+				toBigNumber(60000),
+			])
+			await dev.updateCap(geometricMean2.toFixed())
+			await checkAmount(dev, property1, propertyAuthor)
 		})
 	})
 

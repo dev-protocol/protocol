@@ -299,6 +299,7 @@ export class DevProtocolInstance {
 		await this._policyFactory.create(policy.address)
 		await policy.setCapSetter(this._deployer)
 		await this.updateCap()
+
 		return policy.address
 	}
 
