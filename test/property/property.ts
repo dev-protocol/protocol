@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getPropertyAddress, getTransferToAddress } from '../test-lib/utils/log'
 import {
@@ -6,6 +7,7 @@ import {
 } from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { toBigNumber, splitValue } from '../test-lib/utils/common'
+import { getEventValue, waitForEvent } from '../test-lib/utils/event'
 
 contract(
 	'PropertyTest',
@@ -94,13 +96,157 @@ contract(
 					author
 				)
 				const propertyAddress = getPropertyAddress(transaction)
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const propertyInstance = await propertyContract.at(propertyAddress)
 				expect(await propertyInstance.author()).to.be.equal(author)
 				await propertyInstance.changeAuthor(nextAuthor, {
 					from: author,
 				})
 				expect(await propertyInstance.author()).to.be.equal(nextAuthor)
+			})
+			it('Should emit ChangeAuthor event from PropertyFactory', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				void propertyInstance.changeAuthor(nextAuthor, {
+					from: author,
+				})
+				const watcher = getEventValue(dev.propertyFactory)
+				const event = await Promise.all([
+					watcher('ChangeAuthor', '_property'),
+					watcher('ChangeAuthor', '_beforeAuthor'),
+					watcher('ChangeAuthor', '_afterAuthor'),
+				])
+				expect(event).to.deep.equal([propertyAddress, author, nextAuthor])
+			})
+		})
+		describe('Property; changeName', () => {
+			const dev = new DevProtocolInstance(deployer)
+			before(async () => {
+				await dev.generateAddressConfig()
+				await dev.generatePolicyFactory()
+				await dev.generatePolicyGroup()
+				await dev.generatePolicy()
+			})
+			it('Should fail to call when the sender is not author', async () => {
+				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				const propertyInstance = await propertyContract.new(
+					dev.addressConfig.address,
+					author,
+					'sample',
+					'SAMPLE',
+					{
+						from: propertyFactory,
+					}
+				)
+				const result = await propertyInstance
+					.changeName('next-name')
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal sender')
+			})
+			it('Change the name', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				expect(await propertyInstance.name()).to.be.equal('sample')
+				await propertyInstance.changeName('next-name', {
+					from: author,
+				})
+				expect(await propertyInstance.name()).to.be.equal('next-name')
+			})
+			it('Should emit ChangeName event from PropertyFactory', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				void propertyInstance.changeName('next-name', {
+					from: author,
+				})
+				const watcher = getEventValue(dev.propertyFactory)
+				const event = await Promise.all([
+					watcher('ChangeName', '_property'),
+					watcher('ChangeName', '_old'),
+					watcher('ChangeName', '_new'),
+				])
+				expect(event).to.deep.equal([propertyAddress, 'sample', 'next-name'])
+			})
+		})
+		describe('Property; changeSymbol', () => {
+			const dev = new DevProtocolInstance(deployer)
+			before(async () => {
+				await dev.generateAddressConfig()
+				await dev.generatePolicyFactory()
+				await dev.generatePolicyGroup()
+				await dev.generatePolicy()
+			})
+			it('Should fail to call when the sender is not author', async () => {
+				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				const propertyInstance = await propertyContract.new(
+					dev.addressConfig.address,
+					author,
+					'sample',
+					'SAMPLE',
+					{
+						from: propertyFactory,
+					}
+				)
+				const result = await propertyInstance
+					.changeSymbol('NEXTSYMBOL')
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal sender')
+			})
+			it('Change the symbol', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				expect(await propertyInstance.symbol()).to.be.equal('SAMPLE')
+				await propertyInstance.changeSymbol('NEXTSYMBOL', {
+					from: author,
+				})
+				expect(await propertyInstance.symbol()).to.be.equal('NEXTSYMBOL')
+			})
+			it('Should emit ChangeSymbol event from PropertyFactory', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				void propertyInstance.changeSymbol('NEXTSYMBOL', {
+					from: author,
+				})
+				const watcher = getEventValue(dev.propertyFactory)
+				const event = await Promise.all([
+					watcher('ChangeSymbol', '_property'),
+					watcher('ChangeSymbol', '_old'),
+					watcher('ChangeSymbol', '_new'),
+				])
+				expect(event).to.deep.equal([propertyAddress, 'SAMPLE', 'NEXTSYMBOL'])
 			})
 		})
 		describe('Property; withdraw', () => {
