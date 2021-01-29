@@ -16,6 +16,8 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 		address _beforeAuthor,
 		address _afterAuthor
 	);
+	event ChangeName(address indexed _property, string _old, string _new);
+	event ChangeSymbol(address indexed _property, string _old, string _new);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.
@@ -80,15 +82,34 @@ contract PropertyFactory is UsingConfig, IPropertyFactory {
 		return address(property);
 	}
 
-	function createChangeAuthorEvent(
-		address _beforeAuthor,
-		address _afterAuthor
-	) external {
+	function createChangeAuthorEvent(address _old, address _new) external {
 		require(
 			IPropertyGroup(config().propertyGroup()).isGroup(msg.sender),
 			"this is illegal address"
 		);
 
-		emit ChangeAuthor(msg.sender, _beforeAuthor, _afterAuthor);
+		emit ChangeAuthor(msg.sender, _old, _new);
+	}
+
+	function createChangeNameEvent(string calldata _old, string calldata _new)
+		external
+	{
+		require(
+			IPropertyGroup(config().propertyGroup()).isGroup(msg.sender),
+			"this is illegal address"
+		);
+
+		emit ChangeName(msg.sender, _old, _new);
+	}
+
+	function createChangeSymbolEvent(string calldata _old, string calldata _new)
+		external
+	{
+		require(
+			IPropertyGroup(config().propertyGroup()).isGroup(msg.sender),
+			"this is illegal address"
+		);
+
+		emit ChangeSymbol(msg.sender, _old, _new);
 	}
 }
