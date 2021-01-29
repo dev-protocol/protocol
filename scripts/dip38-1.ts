@@ -3,27 +3,18 @@ import { config } from 'dotenv'
 import { DevCommonInstance } from './lib/instance/common'
 import { MetricsGroup } from './lib/instance/metrics-group'
 import { Lockup } from './lib/instance/lockup'
+import { LockupMigration } from './lib/instance/lockup-migration'
 import { Withdraw } from './lib/instance/withdraw'
 import { PolicyFactory } from './lib/instance/policy-factory'
 import { Policy } from './lib/instance/policy'
 
 config()
-const {
-	CONFIG: configAddress,
-	EGS_TOKEN: egsApiKey,
-	TOTAL_AUTHENTICATE_PROPERTIES: totalAuthenticatedProperties,
-	GEOMETRIC_MEAN_SETTER: geometricMearSetter,
-} = process.env
+const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (
-		!configAddress ||
-		!egsApiKey ||
-		!totalAuthenticatedProperties ||
-		!geometricMearSetter
-	) {
+	if (!configAddress || !egsApiKey) {
 		return
 	}
 
@@ -43,7 +34,6 @@ const handler = async (
 	const nextPolicy = await artifacts
 		.require('GeometricMean')
 		.new(dev.addressConfig.address)
-	await nextPolicy.setCapSetter(geometricMearSetter)
 	await nextPolicy.setTreasury(treasuryAddress)
 
 	const policyFactory = new PolicyFactory(dev)
@@ -55,14 +45,16 @@ const handler = async (
 	const nextMetricsGroup = await metricsGroup.create()
 	await metricsGroup.set(nextMetricsGroup)
 	await metricsGroup.changeOwner(currentMetoricsGroup, nextMetricsGroup)
-	await nextMetricsGroup.setTotalAuthenticatedPropertiesAdmin(
-		totalAuthenticatedProperties
-	)
+
 	const lockup = new Lockup(dev)
 	const currentLockup = await lockup.load()
-	const nextLockupp = await lockup.create()
-	await lockup.set(nextLockupp)
-	await lockup.changeOwner(currentLockup, nextLockupp)
+	const lockupMigration = new LockupMigration(dev)
+	const nextLockup = await lockupMigration.create()
+	await lockup.set(nextLockup)
+	await lockupMigration.changeOwnerToMigrationContract(
+		currentLockup,
+		nextLockup
+	)
 
 	const withdraw = new Withdraw(dev)
 	const currentWithdraw = await withdraw.load()

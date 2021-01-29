@@ -7,6 +7,7 @@ import {
 	GraphQLResponse,
 	SendTx,
 	GraphQLPropertyFactoryCreateResponse,
+	GraphQLPropertyFactoryCreatePropertyResponse,
 } from './types'
 import builtConfig from '../../build/contracts/AddressConfig.json'
 import builtLockup from '../../build/contracts/Lockup.json'
@@ -80,6 +81,20 @@ export const createGraphQLPropertyFactoryCreateFetcher = (
 				}
 			}`,
 	}).then((r) => (r as unknown) as GraphQLPropertyFactoryCreateResponse)
+export const createGraphQLPropertyFactoryCreatePropertyFetcher = (
+	fetcher: bent.RequestFunction<bent.ValidResponse>
+) => async (
+	offset = 0
+): Promise<GraphQLPropertyFactoryCreatePropertyResponse> =>
+	fetcher('/', {
+		query: `{
+				property_factory_create(
+				) {
+					property
+				}
+			}`,
+	}).then((r) => (r as unknown) as GraphQLPropertyFactoryCreatePropertyResponse)
+
 export const createGetStorageLastCumulativeGlobalReward = (
 	lockup: Contract
 ) => (blockNumber?: number) => async (
@@ -112,6 +127,10 @@ export const createGetMetricsCountPerProperty = (
 ) => async (property: string): Promise<string> =>
 	metricsGroup.methods.getMetricsCountPerProperty(property).call()
 
+export const createHasAssetsPerProperty = (metricsGroup: Contract) => async (
+	property: string
+): Promise<boolean> => metricsGroup.methods.hasAssets(property).call()
+
 export const createDifferenceCaller = (lockup: Contract) => (
 	blockNumber?: number
 ) => async (
@@ -140,6 +159,12 @@ export const createInitializeStatesAtLockup = (lockup: Contract) => (
 ): SendTx =>
 	lockup.methods
 		.initializeStatesAtLockup(property, user, reward, cLocked, block)
+		.send({ gasPrice, from })
+export const setInitialCumulativeHoldersRewardCap = (lockup: Contract) => (
+	from: string
+) => (property: string, gasPrice: string): SendTx =>
+	lockup.methods
+		.setInitialCumulativeHoldersRewardCap(property)
 		.send({ gasPrice, from })
 export const createInitializeLastCumulativePropertyInterest = (
 	lockup: Contract
