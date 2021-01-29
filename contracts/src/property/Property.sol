@@ -23,7 +23,11 @@ contract Property is ERC20, UsingConfig, IProperty {
 	uint8 private __decimals;
 
 	/**
-	 * Initializes the passed value as AddressConfig address, author address, token name, and token symbol.
+	 * @dev Initializes the passed value as AddressConfig address, author address, token name, and token symbol.
+	 * @param _config AddressConfig address.
+	 * @param _own The author address.
+	 * @param _name The name of the new Property.
+	 * @param _symbol The symbol of the new Property.
 	 */
 	constructor(
 		address _config,
