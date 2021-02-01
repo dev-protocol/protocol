@@ -1,29 +1,21 @@
-/* eslint-disable @typescript-eslint/await-thenable */
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { config } from 'dotenv'
 import { DevCommonInstance } from './lib/instance/common'
 import { MetricsGroup } from './lib/instance/metrics-group'
 import { Lockup } from './lib/instance/lockup'
 import { LockupMigration } from './lib/instance/lockup-migration'
-import { Policy } from './lib/instance/policy'
 
 config()
 const {
 	CONFIG: configAddress,
 	EGS_TOKEN: egsApiKey,
 	TOTAL_AUTHENTICATE_PROPERTIES: totalAuthenticatedProperties,
-	GEOMETRIC_MEAN_SETTER: geometricMearSetter,
 } = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (
-		!configAddress ||
-		!egsApiKey ||
-		!totalAuthenticatedProperties ||
-		!geometricMearSetter
-	) {
+	if (!configAddress || !egsApiKey || !totalAuthenticatedProperties) {
 		return
 	}
 
@@ -36,13 +28,6 @@ const handler = async (
 		gasPriceFetcher
 	)
 	await dev.prepare()
-
-	const policy = new Policy(dev)
-	const currentPolicy = await policy.load()
-	const geometricMeanPolicy = await artifacts
-		.require('GeometricMean')
-		.at(currentPolicy.address)
-	await geometricMeanPolicy.setCapSetter(geometricMearSetter)
 
 	const metricsGroup = new MetricsGroup(dev)
 	const currentMetoricsGroup = await metricsGroup.load()

@@ -9,12 +9,16 @@ import { PolicyFactory } from './lib/instance/policy-factory'
 import { Policy } from './lib/instance/policy'
 
 config()
-const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
+const {
+	CONFIG: configAddress,
+	EGS_TOKEN: egsApiKey,
+	CAP_SETTER: capSetter,
+} = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!configAddress || !egsApiKey) {
+	if (!configAddress || !egsApiKey || !capSetter) {
 		return
 	}
 
@@ -28,39 +32,59 @@ const handler = async (
 	)
 	await dev.prepare()
 
+	// Create the new Policy
 	const policy = new Policy(dev)
-	const currentPolicy = await policy.load()
-	const treasuryAddress = await currentPolicy.treasury()
-	const nextPolicy = await artifacts
+	const policy_current = await policy.load()
+	const treasury = await policy_current.treasury()
+	const policy_next = await artifacts
 		.require('GeometricMean')
 		.new(dev.addressConfig.address)
-	await nextPolicy.setTreasury(treasuryAddress)
+	await Promise.all([
+		policy_next.setTreasury(treasury),
+		policy_next.setCapSetter(capSetter),
+	])
 
-	const policyFactory = new PolicyFactory(dev)
-	const currentPolicyFactory = await policyFactory.load()
-	await currentPolicyFactory.create(nextPolicy.address)
+	// Create the new PolicyFactory
+	const policy_factory = new PolicyFactory(dev)
+	const policy_factory_current = await policy_factory.load()
+	const policy_factory_next = await policy_factory.create()
 
-	const metricsGroup = new MetricsGroup(dev)
-	const currentMetoricsGroup = await metricsGroup.load()
-	const nextMetricsGroup = await metricsGroup.create()
-	await metricsGroup.set(nextMetricsGroup)
-	await metricsGroup.changeOwner(currentMetoricsGroup, nextMetricsGroup)
-
-	const lockup = new Lockup(dev)
-	const currentLockup = await lockup.load()
-	const lockupMigration = new LockupMigration(dev)
-	const nextLockup = await lockupMigration.create()
-	await lockup.set(nextLockup)
-	await lockupMigration.changeOwnerToMigrationContract(
-		currentLockup,
-		nextLockup
+	// Force attach the new Policy
+	await policy_factory_current.create(policy_next.address)
+	await policy_factory_current.forceAttach(
+		policy_next.address,
+		await dev.gasInfo
 	)
 
+	// Create the new MetricsGroup
+	const metrics_group = new MetricsGroup(dev)
+	const metrics_group_current = await metrics_group.load()
+	const metrics_group_next = await metrics_group.create()
+	await metrics_group.changeOwner(metrics_group_current, metrics_group_next)
+
+	// Create the LockupMigration
+	const lockup = new Lockup(dev)
+	const lockup_current = await lockup.load()
+	const lockup_migration = new LockupMigration(dev)
+	const lockup_next = await lockup_migration.create()
+	await lockup_migration.changeOwnerToMigrationContract(
+		lockup_current,
+		lockup_next
+	)
+
+	// Create the new Withdraw
 	const withdraw = new Withdraw(dev)
-	const currentWithdraw = await withdraw.load()
-	const nextWithdraw = await withdraw.create()
-	await withdraw.set(nextWithdraw)
-	await withdraw.changeOwner(currentWithdraw, nextWithdraw)
+	const withdraw_current = await withdraw.load()
+	const withdraw_next = await withdraw.create()
+	await withdraw.changeOwner(withdraw_current, withdraw_next)
+
+	// Set all new contracts
+	await Promise.all([
+		policy_factory.set(policy_factory_next),
+		metrics_group.set(metrics_group_next),
+		lockup.set(lockup_next),
+		withdraw.set(withdraw_next),
+	])
 
 	callback(null)
 }

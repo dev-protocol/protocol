@@ -8,12 +8,14 @@ import {
 	SendTx,
 	GraphQLPropertyFactoryCreateResponse,
 	GraphQLPropertyFactoryCreatePropertyResponse,
+	GraphQLAggregateAuthenticatedPropertiesResponse,
 } from './types'
 import builtConfig from '../../build/contracts/AddressConfig.json'
 import builtLockup from '../../build/contracts/Lockup.json'
 import builtMetricsGroup from '../../build/contracts/MetricsGroup.json'
 import builtDev from '../../build/contracts/Dev.json'
 import builtWithdrawStorage from '../../build/contracts/WithdrawStorage.json'
+import builtProperty from '../../build/contracts/Property.json'
 import { AbiItem } from 'web3-utils/types'
 export const createRegistry = (configAddress: string, libWeb3: Web3) =>
 	new Contract(builtConfig.abi as AbiItem[], configAddress)
@@ -40,6 +42,11 @@ export const createMetricsGroup = async (
 		builtMetricsGroup.abi as AbiItem[],
 		metricsGroupAddress
 	)
+	return contract
+}
+
+export const createProperty = (libWeb3: Web3) => (property: string) => {
+	const contract = new Contract(builtProperty.abi as AbiItem[], property)
 	return contract
 }
 
@@ -94,6 +101,22 @@ export const createGraphQLPropertyFactoryCreatePropertyFetcher = (
 				}
 			}`,
 	}).then((r) => (r as unknown) as GraphQLPropertyFactoryCreatePropertyResponse)
+export const createGraphQLAggregateAuthenticatedPropertiesFetcher = (
+	fetcher: bent.RequestFunction<bent.ValidResponse>
+) => async (
+	offset = 0
+): Promise<GraphQLAggregateAuthenticatedPropertiesResponse> =>
+	fetcher('/', {
+		query: `{
+			property_authentication_aggregate {
+				aggregate {
+					count
+				}
+			}
+		}`,
+	}).then(
+		(r) => (r as unknown) as GraphQLAggregateAuthenticatedPropertiesResponse
+	)
 
 export const createGetStorageLastCumulativeGlobalReward = (
 	lockup: Contract
@@ -127,9 +150,19 @@ export const createGetMetricsCountPerProperty = (
 ) => async (property: string): Promise<string> =>
 	metricsGroup.methods.getMetricsCountPerProperty(property).call()
 
-export const createHasAssetsPerProperty = (metricsGroup: Contract) => async (
-	property: string
-): Promise<boolean> => metricsGroup.methods.hasAssets(property).call()
+export const createWithdrawableRewardPerProperty = (
+	withdrawContract: Contract,
+	libWeb3: Web3
+) => {
+	const propertyCreator = createProperty(libWeb3)
+	return async (property: string): Promise<string> =>
+		withdrawContract.methods
+			.calculateWithdrawableAmount(
+				property,
+				await propertyCreator(property).methods.author().call()
+			)
+			.call()
+}
 
 export const createDifferenceCaller = (lockup: Contract) => (
 	blockNumber?: number
