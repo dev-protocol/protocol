@@ -176,6 +176,15 @@ export const createInitializeStatesAtLockup = (lockup: Contract) => (
 	lockup.methods
 		.initializeStatesAtLockup(property, user, reward, cLocked, block)
 		.send({ gasPrice, from })
+export const estimateGasInitialCumulativeHoldersRewardCap = (
+	lockup: Contract
+) => (from: string) => async (
+	property: string,
+	gasPrice: string
+): Promise<number> =>
+	lockup.methods
+		.setInitialCumulativeHoldersRewardCap(property)
+		.estimateGas({ gasPrice, from })
 export const setInitialCumulativeHoldersRewardCap = (lockup: Contract) => (
 	from: string
 ) => (property: string, gasPrice: string): SendTx =>

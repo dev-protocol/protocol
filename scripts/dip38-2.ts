@@ -7,6 +7,7 @@ import {
 	setInitialCumulativeHoldersRewardCap,
 	createGraphQLPropertyFactoryCreatePropertyFetcher,
 	createWithdrawableRewardPerProperty,
+	estimateGasInitialCumulativeHoldersRewardCap,
 } from './lib/bulk-initializer'
 import { graphql } from './lib/api'
 import { GraphQLPropertyFactoryCreatePropertyResponse } from './lib/types'
@@ -38,6 +39,9 @@ const handler = async (
 		web3
 	)
 	const setLockupCap = setInitialCumulativeHoldersRewardCap(lockup)(from)
+	const estimateSetLockupCap = estimateGasInitialCumulativeHoldersRewardCap(
+		lockup
+	)(from)
 	const fetchGraphQL = createGraphQLPropertyFactoryCreatePropertyFetcher(
 		graphql()
 	)
@@ -97,17 +101,26 @@ const handler = async (
 		const gasPrice = await fetchFastestGasPrice()
 		____log('Start set', property, gasPrice)
 
-		await new Promise((resolve) => {
-			setLockupCap(property, gasPrice)
-				.on('transactionHash', (hash: string) => {
-					____log('Created the transaction', hash)
-				})
-				.on('confirmation', resolve)
-				.on('error', (err) => {
-					console.error(err)
-					resolve(err)
-				})
-		})
+		const callable = await estimateSetLockupCap(property, gasPrice)
+			.then(() => true)
+			.catch((err) => {
+				console.error(err)
+				return false
+			})
+		if (callable) {
+			await new Promise((resolve) => {
+				setLockupCap(property, gasPrice)
+					.on('transactionHash', (hash: string) => {
+						____log('Created the transaction', hash)
+					})
+					.on('confirmation', resolve)
+					.on('error', (err) => {
+						console.error(err)
+						resolve(err)
+					})
+			})
+		}
+
 		____log('Done initilization', property)
 	})
 
