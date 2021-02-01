@@ -60,23 +60,27 @@ const handler = async (
 	const metrics_group = new MetricsGroup(dev)
 	const metrics_group_current = await metrics_group.load()
 	const metrics_group_next = await metrics_group.create()
-	await metrics_group.changeOwner(metrics_group_current, metrics_group_next)
 
 	// Create the LockupMigration
 	const lockup = new Lockup(dev)
 	const lockup_current = await lockup.load()
 	const lockup_migration = new LockupMigration(dev)
 	const lockup_next = await lockup_migration.create()
-	await lockup_migration.changeOwnerToMigrationContract(
-		lockup_current,
-		lockup_next
-	)
 
 	// Create the new Withdraw
 	const withdraw = new Withdraw(dev)
 	const withdraw_current = await withdraw.load()
 	const withdraw_next = await withdraw.create()
-	await withdraw.changeOwner(withdraw_current, withdraw_next)
+
+	// Delegate to all new contracts
+	await Promise.all([
+		metrics_group.changeOwner(metrics_group_current, metrics_group_next),
+		lockup_migration.changeOwnerToMigrationContract(
+			lockup_current,
+			lockup_next
+		),
+		withdraw.changeOwner(withdraw_current, withdraw_next),
+	])
 
 	// Set all new contracts
 	await Promise.all([
