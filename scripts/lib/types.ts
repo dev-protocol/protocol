@@ -28,16 +28,6 @@ export type GraphQLPropertyFactoryCreatePropertyResponse = {
 	}
 }
 
-export type GraphQLAggregateAuthenticatedPropertiesResponse = {
-	data: {
-		property_authentication_aggregate: {
-			aggregate: {
-				count: number
-			}
-		}
-	}
-}
-
 export type PromiseReturn<T extends Promise<any>> = T extends Promise<infer P>
 	? P
 	: never

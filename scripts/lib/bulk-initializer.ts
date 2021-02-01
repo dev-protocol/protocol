@@ -8,7 +8,6 @@ import {
 	SendTx,
 	GraphQLPropertyFactoryCreateResponse,
 	GraphQLPropertyFactoryCreatePropertyResponse,
-	GraphQLAggregateAuthenticatedPropertiesResponse,
 } from './types'
 import builtConfig from '../../build/contracts/AddressConfig.json'
 import builtLockup from '../../build/contracts/Lockup.json'
@@ -101,22 +100,6 @@ export const createGraphQLPropertyFactoryCreatePropertyFetcher = (
 				}
 			}`,
 	}).then((r) => (r as unknown) as GraphQLPropertyFactoryCreatePropertyResponse)
-export const createGraphQLAggregateAuthenticatedPropertiesFetcher = (
-	fetcher: bent.RequestFunction<bent.ValidResponse>
-) => async (
-	offset = 0
-): Promise<GraphQLAggregateAuthenticatedPropertiesResponse> =>
-	fetcher('/', {
-		query: `{
-			property_authentication_aggregate {
-				aggregate {
-					count
-				}
-			}
-		}`,
-	}).then(
-		(r) => (r as unknown) as GraphQLAggregateAuthenticatedPropertiesResponse
-	)
 
 export const createGetStorageLastCumulativeGlobalReward = (
 	lockup: Contract
