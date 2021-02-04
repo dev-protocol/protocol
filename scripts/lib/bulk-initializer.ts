@@ -81,19 +81,22 @@ export const createGraphQLPropertyFactoryCreateFetcher = (
 				}
 			}`,
 	}).then((r) => (r as unknown) as GraphQLPropertyFactoryCreateResponse)
-export const createGraphQLPropertyFactoryCreatePropertyFetcher = (
+export const createGraphQLPropertyAuthenticationPropertyFetcher = (
 	fetcher: bent.RequestFunction<bent.ValidResponse>
 ) => async (
 	offset = 0
-): Promise<GraphQLPropertyFactoryCreatePropertyResponse> =>
+): Promise<GraphQLPropertyAuthenticationPropertyResponse> =>
 	fetcher('/', {
 		query: `{
-				property_factory_create(
+			property_authentication(
+					offset: ${offset}
 				) {
 					property
 				}
 			}`,
-	}).then((r) => (r as unknown) as GraphQLPropertyFactoryCreatePropertyResponse)
+	}).then(
+		(r) => (r as unknown) as GraphQLPropertyAuthenticationPropertyResponse
+	)
 
 export const createGetStorageLastCumulativeGlobalReward = (
 	lockup: Contract

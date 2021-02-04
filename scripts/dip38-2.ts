@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { config } from 'dotenv'
 import {
@@ -5,11 +6,11 @@ import {
 	createMetricsGroup,
 	createQueue,
 	setInitialCumulativeHoldersRewardCap,
-	createGraphQLPropertyFactoryCreatePropertyFetcher,
+	createGraphQLPropertyAuthenticationPropertyFetcher,
 	createHasAssetsPerProperty,
 } from './lib/bulk-initializer'
 import { graphql } from './lib/api'
-import { GraphQLPropertyFactoryCreatePropertyResponse } from './lib/types'
+import { GraphQLPropertyAuthenticationPropertyResponse } from './lib/types'
 const { log: ____log } = console
 
 config()
@@ -28,44 +29,38 @@ const handler = async (
 	const metricsGroup = await createMetricsGroup(configAddress, web3)
 	____log('load metricsGroup contract', metricsGroup.options)
 
-	const fetchGraphQL = createGraphQLPropertyFactoryCreatePropertyFetcher(
+	const fetchGraphQL = createGraphQLPropertyAuthenticationPropertyFetcher(
 		graphql()
 	)
-	const all = await (async () =>
-		new Promise<
-			GraphQLPropertyFactoryCreatePropertyResponse['data']['property_factory_create']
-		>((resolve) => {
-			const f = async (
-				i = 0,
-				prev: GraphQLPropertyFactoryCreatePropertyResponse['data']['property_factory_create'] = []
-			): Promise<void> => {
-				const { data } = await fetchGraphQL(i)
-				const { property_factory_create: items } = data
-				const next = [...prev, ...items]
-				if (items.length > 0) {
-					f(i + items.length, next).catch(console.error)
-				} else {
-					resolve(next)
-				}
-			}
+	type R = GraphQLPropertyAuthenticationPropertyResponse['data']['property_authentication']
+	const authinticatedPropertoes = await (async () => {
+		const f = async (i = 0, prev: R = []): Promise<R> => {
+			const { data } = await fetchGraphQL(i)
+			const { property_authentication: items } = data
+			const next = [...prev, ...items]
+			return items.length > 0 ? f(i + items.length, next) : next
+		}
 
-			f().catch(console.error)
-		}))()
-	____log('GraphQL fetched', all)
-	____log('all targets', all.length)
+		return f()
+	})()
+	const properties = authinticatedPropertoes.map((data) => {
+		return data.property
+	})
+	____log('GraphQL fetched', properties)
+	____log('all targets', properties.length)
 	const fetchFastestGasPrice = ethGasStationFetcher(egsApiKey)
 	const hasAssetsPerProperty = createHasAssetsPerProperty(metricsGroup)
 
 	const setLockupCap = setInitialCumulativeHoldersRewardCap(lockup)(from)
-	const filteringTacks = all.map(({ property, ...x }) => async () => {
+	const filteringTacks = properties.map((property) => async () => {
 		const hasAssets = await hasAssetsPerProperty(property)
 		____log('Should skip item?', !hasAssets, property)
-		return { property, hasAssets, ...x }
+		return { property, hasAssets }
 	})
 	const shouldInitilizeItems = await createQueue(10)
 		.addAll(filteringTacks)
 		.then((done) => done.filter(({ hasAssets }) => hasAssets))
-	____log('Should skip items', all.length - shouldInitilizeItems.length)
+	____log('Should skip items', properties.length - shouldInitilizeItems.length)
 	____log('Should set items', shouldInitilizeItems.length)
 
 	const initializeTasks = shouldInitilizeItems.map((data) => async () => {

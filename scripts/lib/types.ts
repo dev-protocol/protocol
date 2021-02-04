@@ -20,9 +20,9 @@ export type GraphQLPropertyFactoryCreateResponse = {
 	}
 }
 
-export type GraphQLPropertyFactoryCreatePropertyResponse = {
+export type GraphQLPropertyAuthenticationPropertyResponse = {
 	data: {
-		property_factory_create: Array<{
+		property_authentication: Array<{
 			property: string
 		}>
 	}
