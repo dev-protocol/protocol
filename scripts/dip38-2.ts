@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { config } from 'dotenv'
 import {
@@ -7,7 +6,8 @@ import {
 	createQueue,
 	setInitialCumulativeHoldersRewardCap,
 	createGraphQLPropertyAuthenticationPropertyFetcher,
-	createHasAssetsPerProperty,
+	createWithdrawableRewardPerProperty,
+	estimateGasInitialCumulativeHoldersRewardCap,
 } from './lib/bulk-initializer'
 import { graphql } from './lib/api'
 import { GraphQLPropertyAuthenticationPropertyResponse } from './lib/types'
@@ -23,15 +23,34 @@ const handler = async (
 		return
 	}
 
+	/**
+	 * ==========================
+	 * Prepare required functions
+	 * ==========================
+	 */
 	const [from] = await web3.eth.getAccounts()
 	const lockup = await prepare(configAddress, web3)
 	____log('load Lockup contract', lockup.options)
 	const metricsGroup = await createMetricsGroup(configAddress, web3)
 	____log('load metricsGroup contract', metricsGroup.options)
-
+	const fetchFastestGasPrice = ethGasStationFetcher(egsApiKey)
+	const withdrawableRewardPerProperty = createWithdrawableRewardPerProperty(
+		metricsGroup,
+		web3
+	)
+	const setLockupCap = setInitialCumulativeHoldersRewardCap(lockup)(from)
+	const estimateSetLockupCap = estimateGasInitialCumulativeHoldersRewardCap(
+		lockup
+	)(from)
 	const fetchGraphQL = createGraphQLPropertyAuthenticationPropertyFetcher(
 		graphql()
 	)
+
+	/**
+	 * ====================
+	 * Fetch all Properties
+	 * ====================
+	 */
 	type R = GraphQLPropertyAuthenticationPropertyResponse['data']['property_authentication']
 	const authinticatedPropertoes = await (async () => {
 		const f = async (i = 0, prev: R = []): Promise<R> => {
@@ -48,37 +67,54 @@ const handler = async (
 	})
 	____log('GraphQL fetched', properties)
 	____log('all targets', properties.length)
-	const fetchFastestGasPrice = ethGasStationFetcher(egsApiKey)
-	const hasAssetsPerProperty = createHasAssetsPerProperty(metricsGroup)
 
-	const setLockupCap = setInitialCumulativeHoldersRewardCap(lockup)(from)
-	const filteringTacks = properties.map((property) => async () => {
-		const hasAssets = await hasAssetsPerProperty(property)
-		____log('Should skip item?', !hasAssets, property)
-		return { property, hasAssets }
+	/**
+	 * ====================================================
+	 * Filter to only Properties that has withdrable reward
+	 * ====================================================
+	 */
+	const filteringTasks = properties.map((property) => async () => {
+		const unwithdrawn = await withdrawableRewardPerProperty(property)
+		const hasUnwithdrawn = unwithdrawn !== '0'
+		____log('Should skip item?', !hasUnwithdrawn, property)
+		return { property, hasUnwithdrawn }
 	})
 	const shouldInitilizeItems = await createQueue(10)
-		.addAll(filteringTacks)
-		.then((done) => done.filter(({ hasAssets }) => hasAssets))
+		.addAll(filteringTasks)
+		.then((done) => done.filter(({ hasUnwithdrawn }) => hasUnwithdrawn))
 	____log('Should skip items', properties.length - shouldInitilizeItems.length)
 	____log('Should set items', shouldInitilizeItems.length)
 
+	/**
+	 * ==================
+	 * Run initialization
+	 * ==================
+	 */
 	const initializeTasks = shouldInitilizeItems.map((data) => async () => {
 		const { property } = data
 		const gasPrice = await fetchFastestGasPrice()
 		____log('Start set', property, gasPrice)
 
-		await new Promise((resolve) => {
-			setLockupCap(property, gasPrice)
-				.on('transactionHash', (hash: string) => {
-					____log('Created the transaction', hash)
-				})
-				.on('confirmation', resolve)
-				.on('error', (err) => {
-					console.error(err)
-					resolve(err)
-				})
-		})
+		const callable = await estimateSetLockupCap(property, gasPrice)
+			.then(() => true)
+			.catch((err) => {
+				console.error(err)
+				return false
+			})
+		if (callable) {
+			await new Promise((resolve) => {
+				setLockupCap(property, gasPrice)
+					.on('transactionHash', (hash: string) => {
+						____log('Created the transaction', hash)
+					})
+					.on('confirmation', resolve)
+					.on('error', (err) => {
+						console.error(err)
+						resolve(err)
+					})
+			})
+		}
+
 		____log('Done initilization', property)
 	})
 
