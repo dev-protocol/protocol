@@ -69,7 +69,7 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		return eternalStorage().getUint(getTotalCountKey());
 	}
 
-	function totalTotalAuthenticatedProperties()
+	function totalAuthenticatedProperties()
 		external
 		view
 		returns (uint256)
