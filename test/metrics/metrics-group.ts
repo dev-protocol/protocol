@@ -41,37 +41,37 @@ contract(
 		describe('MetricsGroup; addGroup, removeGroup, isGroup', () => {
 			it('You can get the number of properties being authenticated.', async () => {
 				const [dev, metrics1, metrics2, metrics3] = await init()
-				const before: BigNumber = await dev.metricsGroup.totalTotalAuthenticatedProperties()
+				const before: BigNumber = await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(before.toString()).to.be.equal('0')
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
-				let after: BigNumber = await dev.metricsGroup.totalTotalAuthenticatedProperties()
+				let after: BigNumber = await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(after.toString()).to.be.equal('1')
 				await dev.metricsGroup.addGroup(metrics2, {
 					from: metricsFactory,
 				})
-				after = await dev.metricsGroup.totalTotalAuthenticatedProperties()
+				after = await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(after.toString()).to.be.equal('1')
 				await dev.metricsGroup.addGroup(metrics3, {
 					from: metricsFactory,
 				})
-				after = await dev.metricsGroup.totalTotalAuthenticatedProperties()
+				after = await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(after.toString()).to.be.equal('2')
 				await dev.metricsGroup.removeGroup(metrics2, {
 					from: metricsFactory,
 				})
-				after = await dev.metricsGroup.totalTotalAuthenticatedProperties()
+				after = await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(after.toString()).to.be.equal('2')
 				await dev.metricsGroup.removeGroup(metrics1, {
 					from: metricsFactory,
 				})
-				after = await dev.metricsGroup.totalTotalAuthenticatedProperties()
+				after = await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(after.toString()).to.be.equal('1')
 				await dev.metricsGroup.removeGroup(metrics3, {
 					from: metricsFactory,
 				})
-				after = await dev.metricsGroup.totalTotalAuthenticatedProperties()
+				after = await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(after.toString()).to.be.equal('0')
 			})
 
@@ -236,9 +236,9 @@ contract(
 			})
 			it('You can get the set value.', async () => {
 				const [dev] = await init()
-				const before = await dev.metricsGroup.totalTotalAuthenticatedProperties()
+				const before = await dev.metricsGroup.totalAuthenticatedProperties()
 				await dev.metricsGroup.setTotalAuthenticatedPropertiesAdmin(17354)
-				const result = await dev.metricsGroup.totalTotalAuthenticatedProperties()
+				const result = await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(result.toString()).to.be.equal('17354')
 				await dev.metricsGroup.setTotalAuthenticatedPropertiesAdmin(
 					before.toString()
