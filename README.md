@@ -13,20 +13,41 @@ This repository is the place to develop smart contracts for Dev Protocol.
 
 ## How to use
 
-### Deploy a mock to your local network
+### install
 
 First, install this repository as an npm package.
 
 ```bash
-> npm i -D @dev-protocol/protocol
+> npm i -D @devprotocol/protocol
 ```
 
-Prepare a local network using [Ganache](https://www.trufflesuite.com/ganache), etc.
+### import
 
-Finally, run the following command to deploy a mock.
+You can use the Dev Protocol interface by importing it from a Solidity file.
 
-```bash
-> dev-protocol mock --host 127.0.0.1 --port 7545
+```
+import {IAddressConfig} from "@devprotocol/protocol/contracts/interface/IAddressConfig.sol";
+import {IPropertyGroup} from "@devprotocol/protocol/contracts/interface/IPropertyGroup.sol";
+
+contract TestContract {
+	function validatePropertyAddress(address _property) external view {
+		IAddressConfig addressConfig = IAddressConfig(0x1D415aa39D647834786EB9B5a333A50e9935b796);
+		IPropertyGroup propertyGroup = IPropertyGroup(addressConfig.propertyGroup());
+		require(propertyGroup.isGroup(_property), "not property address");
+	}
+}
+```
+
+This is an example of logic that uses the PropertyGroup contract feature of the Dev Protocol to validate if it is a Property address.
+
+The available interfaces can be found in "node_modules/@devprotocol/protocol/contracts/interface/".
+
+AddressConfig holds the addresses of the contracts used in the Dev Protocol.
+
+```
+AddressConfig address
+mainnet：0x1D415aa39D647834786EB9B5a333A50e9935b796
+Ropsten：0xD6D07f1c048bDF2B3d5d9B6c25eD1FC5348D0A70
 ```
 
 ## How to contribute:
@@ -50,38 +71,10 @@ run the following command to test each contract.
 yarn test
 ```
 
-create a `.env` file like following, and run the command to deploy a mock. ( Beforehand, please prepare a local network using [Ganache](https://www.trufflesuite.com/ganache), etc. )
-
-```
-# .env
-ETHEREUM_MOCK_HOST=127.0.0.1
-ETHEREUM_MOCK_PORT=7545
-```
-
-```
-yarn deploy mock
-```
-
 If you use Visual Studio Code, we recommend that you install the following plug-ins:
 
 ```
 EditorConfig
 vscode-eslint
 solidity
-```
-
-## How to publish the first policy
-
-First, deploy this protocol:
-
-```bash
-yarn deploy <network>
-```
-
-Then, calling `PolicyFactory.create` using Truffle console:
-
-```bash
-npx truffle console --network <network>
-# Truffle console is launched
-> Promise.all([PolicyFactory.deployed(), TheFirstPolicy.deployed()]).then(([factory, policy]) => factory.create(policy.address))
 ```
