@@ -150,3 +150,14 @@ The voting period for a new Policy called `policyVotingBlocks` is 525600 blocks 
 ```solidity
 uint public policyVotingBlocks = 525600;
 ```
+
+# shareOfTreasury
+
+The share of Property Contracts send to Treasury Contract is called `shareOfTreasury` is 5%.
+
+```solidity
+function shareOfTreasury(uint256 _supply) external view returns (uint256) {
+	return _supply.div(100).mul(5);
+}
+
+```
