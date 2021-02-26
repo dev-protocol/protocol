@@ -1,6 +1,7 @@
-import {TheFirstPolicyInstance} from '../../types/truffle-contracts'
-import {DevProtocolInstance} from '../test-lib/instance'
-import {toBigNumber} from '../test-lib/utils/common'
+import { TheFirstPolicyInstance } from '../../types/truffle-contracts'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { toBigNumber } from '../test-lib/utils/common'
+import { DEFAULT_ADDRESS } from '../test-lib/const'
 import BigNumber from 'bignumber.js'
 
 contract('TheFirstPolicy', ([deployer]) => {
@@ -109,30 +110,6 @@ contract('TheFirstPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('TheFirstPolicy; assetValue', () => {
-		it('Returns the asset value when the value of index calculated by Market and the number of lockups is passed', async () => {
-			const policy = await create()
-			const result = await policy.assetValue(543666, 6788)
-			expect(result.toString()).to.be.equal('3690948474')
-		})
-		it('Returns value multiplied by calculated value and locked-ups + 1', async () => {
-			const policy = await create()
-			const result = await policy.assetValue(645734, 4634)
-			expect(result.toString()).to.be.equal(
-				new BigNumber(645734).times(4634 + 1).toString()
-			)
-		})
-		it('The lockup is 1 by default', async () => {
-			const policy = await create()
-			const result = await policy.assetValue(543666, 0)
-			expect(result.toString()).to.be.equal('543666')
-		})
-		it('Returns 0 when a passed calculated value is 0', async () => {
-			const policy = await create()
-			const result = await policy.assetValue(0, 99999999)
-			expect(result.toString()).to.be.equal('0')
-		})
-	})
 	describe('TheFirstPolicy; authenticationFee', () => {
 		it('Returns the authentication fee when the total number of assets and the number of lockups is passed', async () => {
 			const policy = await create()
@@ -232,23 +209,18 @@ contract('TheFirstPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('525600')
 		})
 	})
-	describe('TheFirstPolicy; abstentionPenalty', () => {
-		it('Returns the number of penalty blocks when the number of abstentions is passed', async () => {
+	describe('TheFirstPolicy; shareOfTreasury', () => {
+		it('Returns the share value of treasury', async () => {
 			const policy = await create()
-			const result = await policy.abstentionPenalty(11)
-			expect(result.toString()).to.be.equal('175200')
-		})
-		it('Returns 0 if the number of abstentions is less than 10', async () => {
-			const policy = await create()
-			const result = await policy.abstentionPenalty(10)
+			const result = await policy.shareOfTreasury(100)
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('TheFirstPolicy; lockUpBlocks', () => {
-		it('Returns the minimum number of lockup blocks.', async () => {
+	describe('TheFirstPolicy; treasury', () => {
+		it('Returns the treasury address', async () => {
 			const policy = await create()
-			const result = await policy.lockUpBlocks()
-			expect(result.toString()).to.be.equal('175200')
+			const result = await policy.treasury()
+			expect(result.toString()).to.be.equal(DEFAULT_ADDRESS)
 		})
 	})
 })

@@ -11,3 +11,7 @@ export function validateErrorMessage(
 export function validateAddressErrorMessage(result: any, reason = true): void {
 	validateErrorMessage(result, 'this is illegal address', reason)
 }
+
+export function validateNotOwnerErrorMessage(result: any, reason = true): void {
+	validateErrorMessage(result, 'Ownable: caller is not the owner.', reason)
+}

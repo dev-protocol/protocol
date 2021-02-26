@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
-import {toBigNumber} from '../../test-lib/utils/common'
-import {validateErrorMessage} from '../../test-lib/utils/error'
+import { toBigNumber } from '../../test-lib/utils/common'
+import { validateErrorMessage } from '../../test-lib/utils/error'
 contract('DecimalsTest', ([deployer]) => {
 	const decimalsTestContract = artifacts.require('DecimalsTest')
 	describe('Decimals; outOf', () => {

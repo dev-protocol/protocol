@@ -1,5 +1,5 @@
-import {MarketInstance, DevInstance} from '../../types/truffle-contracts'
-import {createInstance, AddressInfo, createInstanceByAddress} from './common'
+import { MarketInstance, DevInstance } from '../../types/truffle-contracts'
+import { createInstance, AddressInfo, createInstanceByAddress } from './common'
 
 export async function createMetrics(
 	artifacts: Truffle.Artifacts,
@@ -28,7 +28,7 @@ export async function createMetrics(
 			'arg3',
 			'arg4',
 			'arg5',
-			{from: addressInfo[accountIndex].account}
+			{ from: addressInfo[accountIndex].account }
 		)
 		idIndex++
 		console.log(

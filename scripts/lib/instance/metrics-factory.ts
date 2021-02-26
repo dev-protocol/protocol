@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import {MetricsFactoryInstance} from '../../../types/truffle-contracts'
-import {DevCommonInstance} from './common'
+import { MetricsFactoryInstance } from '../../../types/truffle-contracts'
+import { DevCommonInstance } from './common'
 
 export class MetricsFactory {
 	private readonly _dev: DevCommonInstance

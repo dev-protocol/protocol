@@ -1,13 +1,11 @@
-/* eslint-disable no-undef */
-import {config} from 'dotenv'
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {ethgas} from './lib/api'
-import {DevCommonInstance} from './lib/instance/common'
-import {Withdraw} from './lib/instance/withdraw'
-import {WithdrawStorage} from './lib/instance/withdraw-storage'
+import { config } from 'dotenv'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
+import { DevCommonInstance } from './lib/instance/common'
+import { Withdraw } from './lib/instance/withdraw'
+import { WithdrawStorage } from './lib/instance/withdraw-storage'
 
 config()
-const {CONFIG: configAddress, EGS_TOKEN: egsApiKey} = process.env
+const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
 
 const handler = async (
 	callback: (err: Error | null) => void
@@ -17,12 +15,12 @@ const handler = async (
 	}
 
 	const gasFetcher = async () => 6721975
-	const gasPriceFetcher = createFastestGasPriceFetcher(ethgas(egsApiKey), web3)
+	const fastest = ethGasStationFetcher(egsApiKey)
 	const dev = new DevCommonInstance(
 		artifacts,
 		configAddress,
 		gasFetcher,
-		gasPriceFetcher
+		fastest
 	)
 	await dev.prepare()
 
@@ -37,11 +35,11 @@ const handler = async (
 	console.log(`withdraw storage address is ${withdrawStorageAddress}`)
 
 	await nextWithdrawInstance.setStorage(withdrawStorageAddress, {
-		gasPrice: await gasPriceFetcher(),
+		gasPrice: await fastest(),
 		gas: await gasFetcher(),
 	})
 	await withdrawStorageInstance.changeOwner(nextWithdrawInstance.address, {
-		gasPrice: await gasPriceFetcher(),
+		gasPrice: await fastest(),
 		gas: await gasFetcher(),
 	})
 	console.log(
@@ -52,7 +50,7 @@ const handler = async (
 	await dev.addressConfig.setWithdrawStorage(
 		'0x0000000000000000000000000000000000000000',
 		{
-			gasPrice: await gasPriceFetcher(),
+			gasPrice: await fastest(),
 			gas: await gasFetcher(),
 		}
 	)

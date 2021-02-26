@@ -1,20 +1,25 @@
-import {DevProtocolInstance} from '../test-lib/instance'
-import {getPropertyAddress, getTransferToAddress} from '../test-lib/utils/log'
+/* eslint-disable @typescript-eslint/await-thenable */
+import { DevProtocolInstance } from '../test-lib/instance'
+import { getPropertyAddress, getTransferToAddress } from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
-import {DEFAULT_ADDRESS} from '../test-lib/const'
-import {toBigNumber} from '../test-lib/utils/common'
+import { DEFAULT_ADDRESS } from '../test-lib/const'
+import { toBigNumber, splitValue } from '../test-lib/utils/common'
+import { getEventValue, waitForEvent } from '../test-lib/utils/event'
 
 contract(
 	'PropertyTest',
-	([deployer, author, user, propertyFactory, lockup, transfer]) => {
+	([deployer, author, user, propertyFactory, lockup, transfer, nextAuthor]) => {
 		const propertyContract = artifacts.require('Property')
 		describe('Property; constructor', () => {
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generatePolicyFactory()
+				await dev.generatePolicyGroup()
+				await dev.generatePolicy()
 			})
 			it('Cannot be created from other than factory', async () => {
 				const result = await propertyContract
@@ -38,12 +43,210 @@ contract(
 				const tenMillion = toBigNumber(1000).times(10000).times(1e18)
 				expect(await propertyInstance.author()).to.be.equal(author)
 				expect((await propertyInstance.decimals()).toNumber()).to.be.equal(18)
-				expect(
-					(await propertyInstance.balanceOf(author).then(toBigNumber)).toFixed()
-				).to.be.equal(tenMillion.toFixed())
+				const authorBalance = await propertyInstance
+					.balanceOf(author)
+					.then(toBigNumber)
+				const treasuryBalance = await propertyInstance
+					.balanceOf(dev.treasury.address)
+					.then(toBigNumber)
+				const [predictedAutherBalance, predictedTreasuryBalance] = splitValue(
+					tenMillion
+				)
+				expect(authorBalance.toFixed()).to.be.equal(
+					predictedAutherBalance.toFixed()
+				)
+				expect(treasuryBalance.toFixed()).to.be.equal(
+					predictedTreasuryBalance.toFixed()
+				)
 				expect(
 					(await propertyInstance.totalSupply().then(toBigNumber)).toFixed()
 				).to.be.equal(tenMillion.toFixed())
+			})
+		})
+		describe('Property; changeAuthor', () => {
+			const dev = new DevProtocolInstance(deployer)
+			before(async () => {
+				await dev.generateAddressConfig()
+				await dev.generatePolicyFactory()
+				await dev.generatePolicyGroup()
+				await dev.generatePolicy()
+			})
+			it('Executing a changeAuthor function with a non-Author.', async () => {
+				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				const propertyInstance = await propertyContract.new(
+					dev.addressConfig.address,
+					author,
+					'sample',
+					'SAMPLE',
+					{
+						from: propertyFactory,
+					}
+				)
+				const result = await propertyInstance
+					.changeAuthor(nextAuthor)
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal sender')
+			})
+			it('Author is changed.', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				expect(await propertyInstance.author()).to.be.equal(author)
+				await propertyInstance.changeAuthor(nextAuthor, {
+					from: author,
+				})
+				expect(await propertyInstance.author()).to.be.equal(nextAuthor)
+			})
+			it('Should emit ChangeAuthor event from PropertyFactory', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				void propertyInstance.changeAuthor(nextAuthor, {
+					from: author,
+				})
+				const watcher = getEventValue(dev.propertyFactory)
+				const event = await Promise.all([
+					watcher('ChangeAuthor', '_property'),
+					watcher('ChangeAuthor', '_beforeAuthor'),
+					watcher('ChangeAuthor', '_afterAuthor'),
+				])
+				expect(event).to.deep.equal([propertyAddress, author, nextAuthor])
+			})
+		})
+		describe('Property; changeName', () => {
+			const dev = new DevProtocolInstance(deployer)
+			before(async () => {
+				await dev.generateAddressConfig()
+				await dev.generatePolicyFactory()
+				await dev.generatePolicyGroup()
+				await dev.generatePolicy()
+			})
+			it('Should fail to call when the sender is not author', async () => {
+				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				const propertyInstance = await propertyContract.new(
+					dev.addressConfig.address,
+					author,
+					'sample',
+					'SAMPLE',
+					{
+						from: propertyFactory,
+					}
+				)
+				const result = await propertyInstance
+					.changeName('next-name')
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal sender')
+			})
+			it('Change the name', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				expect(await propertyInstance.name()).to.be.equal('sample')
+				await propertyInstance.changeName('next-name', {
+					from: author,
+				})
+				expect(await propertyInstance.name()).to.be.equal('next-name')
+			})
+			it('Should emit ChangeName event from PropertyFactory', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				void propertyInstance.changeName('next-name', {
+					from: author,
+				})
+				const watcher = getEventValue(dev.propertyFactory)
+				const event = await Promise.all([
+					watcher('ChangeName', '_property'),
+					watcher('ChangeName', '_old'),
+					watcher('ChangeName', '_new'),
+				])
+				expect(event).to.deep.equal([propertyAddress, 'sample', 'next-name'])
+			})
+		})
+		describe('Property; changeSymbol', () => {
+			const dev = new DevProtocolInstance(deployer)
+			before(async () => {
+				await dev.generateAddressConfig()
+				await dev.generatePolicyFactory()
+				await dev.generatePolicyGroup()
+				await dev.generatePolicy()
+			})
+			it('Should fail to call when the sender is not author', async () => {
+				await dev.addressConfig.setPropertyFactory(propertyFactory)
+				const propertyInstance = await propertyContract.new(
+					dev.addressConfig.address,
+					author,
+					'sample',
+					'SAMPLE',
+					{
+						from: propertyFactory,
+					}
+				)
+				const result = await propertyInstance
+					.changeSymbol('NEXTSYMBOL')
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal sender')
+			})
+			it('Change the symbol', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				expect(await propertyInstance.symbol()).to.be.equal('SAMPLE')
+				await propertyInstance.changeSymbol('NEXTSYMBOL', {
+					from: author,
+				})
+				expect(await propertyInstance.symbol()).to.be.equal('NEXTSYMBOL')
+			})
+			it('Should emit ChangeSymbol event from PropertyFactory', async () => {
+				await dev.generatePropertyFactory()
+				await dev.generatePropertyGroup()
+				const transaction = await dev.propertyFactory.create(
+					'sample',
+					'SAMPLE',
+					author
+				)
+				const propertyAddress = getPropertyAddress(transaction)
+				const propertyInstance = await propertyContract.at(propertyAddress)
+				void propertyInstance.changeSymbol('NEXTSYMBOL', {
+					from: author,
+				})
+				const watcher = getEventValue(dev.propertyFactory)
+				const event = await Promise.all([
+					watcher('ChangeSymbol', '_property'),
+					watcher('ChangeSymbol', '_old'),
+					watcher('ChangeSymbol', '_new'),
+				])
+				expect(event).to.deep.equal([propertyAddress, 'SAMPLE', 'NEXTSYMBOL'])
 			})
 		})
 		describe('Property; withdraw', () => {
@@ -55,7 +258,10 @@ contract(
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generateDev(),
+					dev.generatePolicyFactory(),
+					dev.generatePolicyGroup(),
 				])
+				await dev.generatePolicy()
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -70,7 +276,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.withdraw(user, 10, {from: deployer})
+					.withdraw(user, 10, { from: deployer })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -79,7 +285,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.withdraw(user, 10, {from: lockup})
+					.withdraw(user, 10, { from: lockup })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'ERC20: transfer amount exceeds balance')
 			})
@@ -88,7 +294,7 @@ contract(
 				await dev.dev.mint(propertyAddress, 10)
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
-				await property.withdraw(user, 10, {from: lockup})
+				await property.withdraw(user, 10, { from: lockup })
 			})
 		})
 		describe('Property; transfer', () => {
@@ -106,8 +312,7 @@ contract(
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 				])
-				const policy = await artifacts.require('PolicyTestForProperty').new()
-				await dev.policyFactory.create(policy.address)
+				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -122,7 +327,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transfer(DEFAULT_ADDRESS, 10, {from: user})
+					.transfer(DEFAULT_ADDRESS, 10, { from: user })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -130,14 +335,14 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transfer(transfer, 0, {from: user})
+					.transfer(transfer, 0, { from: user })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'illegal transfer value')
 			})
 			it('transfer success', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property.transfer(transfer, 10, {from: author})
+				const result = await property.transfer(transfer, 10, { from: author })
 				const toAddress = getTransferToAddress(result)
 				expect(toAddress).to.be.equal(transfer)
 			})
@@ -157,8 +362,7 @@ contract(
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
 				])
-				const policy = await artifacts.require('PolicyTestForProperty').new()
-				await dev.policyFactory.create(policy.address)
+				await dev.generatePolicy('PolicyTestForProperty')
 				const result = await dev.propertyFactory.create(
 					'sample',
 					'SAMPLE',
@@ -173,7 +377,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transferFrom(DEFAULT_ADDRESS, transfer, 10, {from: user})
+					.transferFrom(DEFAULT_ADDRESS, transfer, 10, { from: user })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -181,7 +385,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transferFrom(transfer, DEFAULT_ADDRESS, 10, {from: user})
+					.transferFrom(transfer, DEFAULT_ADDRESS, 10, { from: user })
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
@@ -189,7 +393,7 @@ contract(
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
-					.transferFrom(author, transfer, 0, {from: user})
+					.transferFrom(author, transfer, 0, { from: user })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'illegal transfer value')
 			})

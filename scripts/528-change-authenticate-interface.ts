@@ -1,9 +1,7 @@
-/* eslint-disable no-undef */
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {ethgas} from './lib/api'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
-const {CONFIG, EGS_TOKEN} = process.env
-const {log: ____log} = console
+const { CONFIG, EGS_TOKEN } = process.env
+const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
@@ -13,7 +11,7 @@ const handler = async (
 		return
 	}
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
+	const fastest = ethGasStationFetcher(EGS_TOKEN)
 
 	// Generate current contract
 	const [config] = await Promise.all([
@@ -24,7 +22,7 @@ const handler = async (
 	// Deploy
 	const nextMarketFactory = await artifacts
 		.require('MarketFactory')
-		.new(config.address, {gasPrice: await fastest(), gas})
+		.new(config.address, { gasPrice: await fastest(), gas })
 	____log('Deployed the new MarketFactory', nextMarketFactory.address)
 
 	// Enable new Contract

@@ -2,22 +2,21 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IProperty} from "contracts/src/property/IProperty.sol";
-import {IMarket} from "contracts/src/market/IMarket.sol";
-import {IMarketBehavior} from "contracts/src/market/IMarketBehavior.sol";
-import {IPolicy} from "contracts/src/policy/IPolicy.sol";
-import {Metrics} from "contracts/src/metrics/Metrics.sol";
-import {IMetricsFactory} from "contracts/src/metrics/IMetricsFactory.sol";
-import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
-import {ILockup} from "contracts/src/lockup/ILockup.sol";
-import {Dev} from "contracts/src/dev/Dev.sol";
+import {IProperty} from "contracts/interface/IProperty.sol";
+import {IMarket} from "contracts/interface/IMarket.sol";
+import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
+import {IMetrics} from "contracts/interface/IMetrics.sol";
+import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
+import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
+import {ILockup} from "contracts/interface/ILockup.sol";
+import {IDev} from "contracts/interface/IDev.sol";
 
 /**
  * A user-proposable contract for authenticating and associating assets with Property.
  * A user deploys a contract that inherits IMarketBehavior and creates this Market contract with the MarketFactory contract.
  */
-contract Market is UsingConfig, IMarket, UsingValidator {
+contract Market is UsingConfig, IMarket {
 	using SafeMath for uint256;
 	bool public enabled;
 	address public behavior;
@@ -36,9 +35,9 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		/**
 		 * Validates the sender is MarketFactory contract.
 		 */
-		addressValidator().validateAddress(
-			msg.sender,
-			config().marketFactory()
+		require(
+			msg.sender == config().marketFactory(),
+			"this is illegal address"
 		);
 
 		/**
@@ -55,8 +54,8 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		 * Sets the period during which voting by voters can be accepted.
 		 * This period is determined by `Policy.marketVotingBlocks`.
 		 */
-		uint256 marketVotingBlocks = IPolicy(config().policy())
-			.marketVotingBlocks();
+		uint256 marketVotingBlocks =
+			IPolicy(config().policy()).marketVotingBlocks();
 		votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
 
@@ -64,9 +63,9 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	 * Validates the sender is the passed Property's author.
 	 */
 	function propertyValidation(address _prop) private view {
-		addressValidator().validateAddress(
-			msg.sender,
-			IProperty(_prop).author()
+		require(
+			msg.sender == IProperty(_prop).author(),
+			"this is illegal address"
 		);
 		require(enabled, "market is not enabled");
 	}
@@ -83,7 +82,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	 * Modifier for validates the sender is the author of the Property associated with the passed Metrics contract.
 	 */
 	modifier onlyLinkedPropertyAuthor(address _metrics) {
-		address _prop = Metrics(_metrics).property();
+		address _prop = IMetrics(_metrics).property();
 		propertyValidation(_prop);
 		_;
 	}
@@ -93,11 +92,12 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 	 * Called from VoteCounter contract when passed the voting or from MarketFactory contract when the first Market is created.
 	 */
 	function toEnable() external {
-		addressValidator().validateAddresses(
-			msg.sender,
-			config().marketFactory(),
-			config().voteCounter()
-		);
+		if (msg.sender != config().marketFactory()) {
+			require(
+				msg.sender == config().voteCounter(),
+				"this is illegal address"
+			);
+		}
 		enabled = true;
 	}
 
@@ -139,9 +139,9 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		/**
 		 * Validates the sender is PropertyFactory.
 		 */
-		addressValidator().validateAddress(
-			msg.sender,
-			config().propertyFactory()
+		require(
+			msg.sender == config().propertyFactory(),
+			"this is illegal address"
 		);
 
 		/**
@@ -199,9 +199,8 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		view
 		returns (uint256)
 	{
-		uint256 tokenValue = ILockup(config().lockup()).getPropertyValue(
-			_property
-		);
+		uint256 tokenValue =
+			ILockup(config().lockup()).getPropertyValue(_property);
 		IPolicy policy = IPolicy(config().policy());
 		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
 		return
@@ -222,7 +221,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		/**
 		 * Validates the sender is the saved IMarketBehavior address.
 		 */
-		addressValidator().validateAddress(msg.sender, behavior);
+		require(msg.sender == behavior, "this is illegal address");
 		require(enabled, "market is not enabled");
 
 		/**
@@ -239,9 +238,8 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		/**
 		 * Publishes a new Metrics contract and associate the Property with the asset.
 		 */
-		IMetricsFactory metricsFactory = IMetricsFactory(
-			config().metricsFactory()
-		);
+		IMetricsFactory metricsFactory =
+			IMetricsFactory(config().metricsFactory());
 		address metrics = metricsFactory.create(_property);
 		idHashMetricsMap[metrics] = _idHash;
 
@@ -250,7 +248,7 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		 */
 		uint256 authenticationFee = getAuthenticationFee(_property);
 		require(
-			Dev(config().token()).fee(sender, authenticationFee),
+			IDev(config().token()).fee(sender, authenticationFee),
 			"dev fee failed"
 		);
 
@@ -283,9 +281,8 @@ contract Market is UsingConfig, IMarket, UsingValidator {
 		/**
 		 * Removes the passed Metrics contract from the Metrics address set.
 		 */
-		IMetricsFactory metricsFactory = IMetricsFactory(
-			config().metricsFactory()
-		);
+		IMetricsFactory metricsFactory =
+			IMetricsFactory(config().metricsFactory());
 		metricsFactory.destroy(_metrics);
 
 		/**

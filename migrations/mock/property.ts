@@ -1,6 +1,6 @@
 import Web3 from 'web3'
-import {PropertyFactoryInstance} from '../../types/truffle-contracts'
-import {AddressInfo, createInstance} from './common'
+import { PropertyFactoryInstance } from '../../types/truffle-contracts'
+import { AddressInfo, createInstance } from './common'
 
 export async function createProperty(
 	artifacts: Truffle.Artifacts,
@@ -17,7 +17,7 @@ export async function createProperty(
 			address
 		)
 		const propertyAddress = await eventLog.logs.filter(
-			(e: {event: string}) => e.event === 'Create'
+			(e: { event: string }) => e.event === 'Create'
 		)[0].args._property
 		console.log(`property${index}`)
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions

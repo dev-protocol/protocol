@@ -1,7 +1,7 @@
-import {MarketInstance, IPolicyInstance} from '../../types/truffle-contracts'
-import {DevProtocolInstance} from '../test-lib/instance'
-import {mine, toBigNumber} from '../test-lib/utils/common'
-import {getPropertyAddress, getMarketAddress} from '../test-lib/utils/log'
+import { MarketInstance, IPolicyInstance } from '../../types/truffle-contracts'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { mine, toBigNumber } from '../test-lib/utils/common'
+import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
@@ -39,7 +39,7 @@ contract(
 			await createPolicy(dev)
 			const propertyAddress = await createProperty(dev)
 			const marketInstance = await createMarket(dev)
-			await dev.dev.mint(propertyAuther, 10000, {from: deployer})
+			await dev.dev.mint(propertyAuther, 10000, { from: deployer })
 			const marketInstance2 = await createMarket(dev)
 			await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 			return [dev, propertyAddress, marketInstance2, marketInstance]
@@ -80,9 +80,12 @@ contract(
 		const createPolicy = async (
 			dev: DevProtocolInstance
 		): Promise<IPolicyInstance> => {
-			const policy = await artifacts.require('PolicyTestForVoteCounter').new()
-			await dev.policyFactory.create(policy.address)
-			return policy
+			const policyAddress = await dev.generatePolicy('PolicyTestForVoteCounter')
+			// eslint-disable-next-line @typescript-eslint/await-thenable
+			const policyInstance = await artifacts
+				.require('PolicyTestForVoteCounter')
+				.at(policyAddress)
+			return policyInstance
 		}
 
 		describe('VoteCounter; voteMarket', () => {
@@ -90,94 +93,104 @@ contract(
 				it('The vote is cast in agree and the market is enabled.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					expect(await marketInstance.enabled()).to.be.equal(true)
 				})
 				it('Multiple users keep voting agree.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
-					await dev.dev.mint(propertyAuther2, 10000, {from: deployer})
-					await dev.dev.mint(propertyAuther3, 10000, {from: deployer})
+					await dev.dev.mint(propertyAuther2, 10000, { from: deployer })
+					await dev.dev.mint(propertyAuther3, 10000, { from: deployer })
 					const property2 = await createProperty(dev)
 
-					await dev.dev.deposit(propertyAddress, 4000, {from: propertyAuther})
-					await dev.dev.deposit(propertyAddress, 4000, {from: propertyAuther2})
-					await dev.dev.deposit(property2, 4000, {from: propertyAuther3})
+					await dev.dev.deposit(propertyAddress, 4000, { from: propertyAuther })
+					await dev.dev.deposit(propertyAddress, 4000, {
+						from: propertyAuther2,
+					})
+					await dev.dev.deposit(property2, 4000, { from: propertyAuther3 })
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther2}
+						{ from: propertyAuther2 }
 					)
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
 						property2,
 						true,
-						{from: propertyAuther3}
+						{ from: propertyAuther3 }
 					)
 					expect(await marketInstance.enabled()).to.be.equal(true)
 				})
 				it('Voted opposite, and the market is not enabled.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
 						propertyAddress,
 						false,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					expect(await marketInstance.enabled()).to.be.equal(false)
 				})
 				it('Vote for the Market that has already voted.But use a property address that you have not used yet.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					expect(await marketInstance.enabled()).to.be.equal(false)
 
 					const propertyAddress2 = await createProperty(dev)
-					await dev.dev.deposit(propertyAddress2, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress2, 5000, {
+						from: propertyAuther,
+					})
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
 						propertyAddress2,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					expect(await marketInstance.enabled()).to.be.equal(true)
 				})
 				it('Vote for a Market that you have not yet voted for. When you do so, reuse the property address.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					expect(await marketInstance.enabled()).to.be.equal(true)
 					const marketInstance2 = await createMarket(dev)
@@ -186,7 +199,7 @@ contract(
 						marketInstance2.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					expect(await marketInstance2.enabled()).to.be.equal(true)
 				})
@@ -203,7 +216,9 @@ contract(
 				it('Incorrect Property address.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					const result = await dev.voteCounter
 						.voteMarket(marketInstance.address, dummy, true)
 						.catch((err: Error) => err)
@@ -212,7 +227,9 @@ contract(
 				it('Specify an already valid Market address.', async () => {
 					const [dev, propertyAddress, , marketInstance] = await init()
 
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					const result = await dev.voteCounter
 						.voteMarket(marketInstance.address, propertyAddress, true)
 						.catch((err: Error) => err)
@@ -221,7 +238,9 @@ contract(
 				it('Specify a Market address that has expired.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					await mine(15)
 					const result = await dev.voteCounter
 						.voteMarket(marketInstance.address, propertyAddress, true)
@@ -239,13 +258,13 @@ contract(
 				it('Vote in the same Market, same Property.', async () => {
 					const [dev, propertyAddress, marketInstance] = await init()
 
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					await dev.voteCounter.voteMarket(
 						marketInstance.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					expect(await marketInstance.enabled()).to.be.equal(false)
 					const result = await dev.voteCounter
@@ -266,12 +285,12 @@ contract(
 			before(async () => {
 				const [_dev, _useProperty, _voteMarket, _notVoteMrket] = await init()
 				notUseProperty = await createProperty(_dev)
-				await _dev.dev.deposit(_useProperty, 10000, {from: propertyAuther})
+				await _dev.dev.deposit(_useProperty, 10000, { from: propertyAuther })
 				await _dev.voteCounter.voteMarket(
 					_voteMarket.address,
 					_useProperty,
 					true,
-					{from: propertyAuther}
+					{ from: propertyAuther }
 				)
 				dev = _dev
 				useProperty = _useProperty
@@ -282,7 +301,7 @@ contract(
 				const result = await dev.voteCounter.isAlreadyVoteMarket(
 					notVoteMrket.address,
 					notUseProperty,
-					{from: propertyAuther}
+					{ from: propertyAuther }
 				)
 				expect(result).to.be.equal(false)
 			})
@@ -290,7 +309,7 @@ contract(
 				const result = await dev.voteCounter.isAlreadyVoteMarket(
 					notVoteMrket.address,
 					useProperty,
-					{from: propertyAuther}
+					{ from: propertyAuther }
 				)
 				expect(result).to.be.equal(false)
 			})
@@ -298,7 +317,7 @@ contract(
 				const result = await dev.voteCounter.isAlreadyVoteMarket(
 					voteMarket.address,
 					notUseProperty,
-					{from: propertyAuther}
+					{ from: propertyAuther }
 				)
 				expect(result).to.be.equal(false)
 			})
@@ -306,7 +325,7 @@ contract(
 				const result = await dev.voteCounter.isAlreadyVoteMarket(
 					voteMarket.address,
 					useProperty,
-					{from: propertyAuther}
+					{ from: propertyAuther }
 				)
 				expect(result).to.be.equal(true)
 			})
@@ -316,12 +335,14 @@ contract(
 				it('Voted in agree, Policy becomes enabled.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const currentPolicyAddress = await dev.addressConfig.policy()
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 
 					expect(currentPolicyAddress).to.be.not.equal(
@@ -331,12 +352,14 @@ contract(
 				})
 				it('Multiple users keep voting agree.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
-					await dev.dev.mint(propertyAuther2, 10000, {from: deployer})
-					await dev.dev.mint(propertyAuther3, 10000, {from: deployer})
+					await dev.dev.mint(propertyAuther2, 10000, { from: deployer })
+					await dev.dev.mint(propertyAuther3, 10000, { from: deployer })
 					const property2 = await createProperty(dev)
-					await dev.dev.deposit(propertyAddress, 4000, {from: propertyAuther})
-					await dev.dev.deposit(propertyAddress, 4000, {from: propertyAuther2})
-					await dev.dev.deposit(property2, 4000, {from: propertyAuther3})
+					await dev.dev.deposit(propertyAddress, 4000, { from: propertyAuther })
+					await dev.dev.deposit(propertyAddress, 4000, {
+						from: propertyAuther2,
+					})
+					await dev.dev.deposit(property2, 4000, { from: propertyAuther3 })
 
 					const currentPolicyAddress = await dev.addressConfig.policy()
 
@@ -344,7 +367,7 @@ contract(
 						policy.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 
 					expect(currentPolicyAddress).to.be.equal(
@@ -358,7 +381,7 @@ contract(
 						policy.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther2}
+						{ from: propertyAuther2 }
 					)
 
 					expect(currentPolicyAddress).to.be.equal(
@@ -380,12 +403,14 @@ contract(
 				it('Voted opposite and the Policy is not enabled.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const currentPolicyAddress = await dev.addressConfig.policy()
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
 						false,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 
 					expect(currentPolicyAddress).to.be.equal(
@@ -398,12 +423,12 @@ contract(
 				it('Voting in a different Policy with a different Property during the same voting period.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const currentPolicyAddress = await dev.addressConfig.policy()
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 
 					expect(currentPolicyAddress).to.be.equal(
@@ -414,7 +439,7 @@ contract(
 					)
 					const policy2 = await createPolicy(dev)
 					const property2 = await createProperty(dev)
-					await dev.dev.deposit(property2, 5000, {from: propertyAuther})
+					await dev.dev.deposit(property2, 5000, { from: propertyAuther })
 					await dev.voteCounter.votePolicy(policy2.address, property2, true, {
 						from: propertyAuther,
 					})
@@ -431,12 +456,14 @@ contract(
 				it('Vote with the same Property address after the voting period is over.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const currentPolicyAddress = await dev.addressConfig.policy()
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 
 					expect(currentPolicyAddress).to.be.not.equal(
@@ -448,7 +475,7 @@ contract(
 						policy2.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					expect(policy.address).to.be.not.equal(
 						await dev.addressConfig.policy()
@@ -459,7 +486,9 @@ contract(
 			describe('failure', () => {
 				it('Incorrect Policy address.', async () => {
 					const [dev, propertyAddress] = await init2()
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					const result = await dev.voteCounter
 						.votePolicy(dummy, propertyAddress, true, {
 							from: propertyAuther,
@@ -469,7 +498,9 @@ contract(
 				})
 				it('Vote for the current policy.', async () => {
 					const [dev, propertyAddress] = await init2()
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					const currentPolicy = await dev.addressConfig.policy()
 					const result = await dev.voteCounter
 						.votePolicy(currentPolicy, propertyAddress, true, {
@@ -480,7 +511,9 @@ contract(
 				})
 				it('Vote for expired policies.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
-					await dev.dev.deposit(propertyAddress, 10000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 10000, {
+						from: propertyAuther,
+					})
 					await mine(10)
 					const result = await dev.voteCounter
 						.votePolicy(policy.address, propertyAddress, true, {
@@ -491,7 +524,7 @@ contract(
 				})
 				it('Vote for a different policy during the same voting period, using the same Property used for the vote.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
@@ -511,8 +544,8 @@ contract(
 				it('Voting for a different Property in the same Policy during the same voting period.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
 					const property2 = await createProperty(dev)
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
-					await dev.dev.deposit(property2, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
+					await dev.dev.deposit(property2, 5000, { from: propertyAuther })
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
@@ -543,12 +576,12 @@ contract(
 			describe('success', () => {
 				it('can cancel agree vote.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					let agree = await dev.voteCounter
 						.getStorageAgreeCount(policy.address)
@@ -561,7 +594,7 @@ contract(
 					await dev.voteCounter.cancelVotePolicy(
 						policy.address,
 						propertyAddress,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					agree = await dev.voteCounter
 						.getStorageAgreeCount(policy.address)
@@ -574,12 +607,12 @@ contract(
 				})
 				it('can cancel opposite vote.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
 						false,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					let agree = await dev.voteCounter
 						.getStorageAgreeCount(policy.address)
@@ -592,7 +625,7 @@ contract(
 					await dev.voteCounter.cancelVotePolicy(
 						policy.address,
 						propertyAddress,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					agree = await dev.voteCounter
 						.getStorageAgreeCount(policy.address)
@@ -605,12 +638,12 @@ contract(
 				})
 				it('Policies and properties of cancelled votes can be reused.', async () => {
 					const [dev, propertyAddress, policy] = await init2()
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					let agree = await dev.voteCounter
 						.getStorageAgreeCount(policy.address)
@@ -623,7 +656,7 @@ contract(
 					await dev.voteCounter.cancelVotePolicy(
 						policy.address,
 						propertyAddress,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					agree = await dev.voteCounter
 						.getStorageAgreeCount(policy.address)
@@ -637,7 +670,7 @@ contract(
 						policy.address,
 						propertyAddress,
 						false,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					agree = await dev.voteCounter
 						.getStorageAgreeCount(policy.address)
@@ -650,7 +683,7 @@ contract(
 					await dev.voteCounter.cancelVotePolicy(
 						policy.address,
 						propertyAddress,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					agree = await dev.voteCounter
 						.getStorageAgreeCount(policy.address)
@@ -667,12 +700,12 @@ contract(
 					const [dev, propertyAddress, policy] = await init2()
 					const property = await createProperty(dev)
 
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					const result = await dev.voteCounter
 						.cancelVotePolicy(policy.address, property, {
@@ -685,12 +718,12 @@ contract(
 					const [dev, propertyAddress, policy] = await init2()
 					const policy2 = await createPolicy(dev)
 
-					await dev.dev.deposit(propertyAddress, 5000, {from: propertyAuther})
+					await dev.dev.deposit(propertyAddress, 5000, { from: propertyAuther })
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
 						true,
-						{from: propertyAuther}
+						{ from: propertyAuther }
 					)
 					const result = await dev.voteCounter
 						.cancelVotePolicy(policy2.address, propertyAddress, {

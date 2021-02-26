@@ -16,12 +16,6 @@ contract('Policy', () => {
 			expect(result.toNumber()).to.be.equal(9346)
 		})
 	})
-	describe('PolicyTest1; assetValue', () => {
-		it('Returns the asset value when the value of index calculated by Market and the number of lockups is passed', async () => {
-			const result = await policy.assetValue(858, 2345)
-			expect(result.toNumber()).to.be.equal(2012010)
-		})
-	})
 	describe('PolicyTest1; authenticationFee', () => {
 		it('Returns the authentication fee when the total number of assets and the number of lockups is passed', async () => {
 			const result = await policy.authenticationFee(1000, 100)
@@ -50,18 +44,6 @@ contract('Policy', () => {
 		it('Returns the number of the blocks of the voting period for the new Policy', async () => {
 			const result = await policy.policyVotingBlocks()
 			expect(result.toNumber()).to.be.equal(20)
-		})
-	})
-	describe('PolicyTest1; abstentionPenalty', () => {
-		it('Returns the number of penalty blocks when the number of abstentions is passed', async () => {
-			const result = await policy.abstentionPenalty(3)
-			expect(result.toNumber()).to.be.equal(17280)
-		})
-	})
-	describe('PolicyTest1; lockUpBlocks', () => {
-		it('Returns the minimum number of lockup blocks.', async () => {
-			const result = await policy.lockUpBlocks()
-			expect(result.toNumber()).to.be.equal(1)
 		})
 	})
 })

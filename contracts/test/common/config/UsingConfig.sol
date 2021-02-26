@@ -1,13 +1,12 @@
 pragma solidity 0.5.17;
 
-import {AddressConfig} from "contracts/src/common/config/AddressConfig.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
 
 contract UsingConfigTest is UsingConfig {
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
-	function getConfig() external view returns (AddressConfig) {
-		return config();
+	function getToken() external view returns (address) {
+		return config().token();
 	}
 }

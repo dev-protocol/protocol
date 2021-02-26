@@ -6,7 +6,7 @@ import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 contract LockupStorage is UsingStorage {
 	using SafeMath for uint256;
 
-	uint256 public constant basis = 100000000000000000000000000000000;
+	uint256 private constant BASIS = 100000000000000000000000000000000;
 
 	//AllValue
 	function setStorageAllValue(uint256 _value) internal {
@@ -139,7 +139,7 @@ contract LockupStorage is UsingStorage {
 		uint256 _amount,
 		uint256 _block
 	) internal {
-		uint256 record = _amount.mul(basis).add(_block);
+		uint256 record = _amount.mul(BASIS).add(_block);
 		eternalStorage().setUint(
 			getStorageLastSameRewardsAmountAndBlockKey(),
 			record
@@ -151,11 +151,12 @@ contract LockupStorage is UsingStorage {
 		view
 		returns (uint256 _amount, uint256 _block)
 	{
-		uint256 record = eternalStorage().getUint(
-			getStorageLastSameRewardsAmountAndBlockKey()
-		);
-		uint256 amount = record.div(basis);
-		uint256 blockNumber = record.sub(amount.mul(basis));
+		uint256 record =
+			eternalStorage().getUint(
+				getStorageLastSameRewardsAmountAndBlockKey()
+			);
+		uint256 amount = record.div(BASIS);
+		uint256 blockNumber = record.sub(amount.mul(BASIS));
 		return (amount, blockNumber);
 	}
 
@@ -185,144 +186,6 @@ contract LockupStorage is UsingStorage {
 		returns (bytes32)
 	{
 		return keccak256(abi.encodePacked("_cumulativeGlobalRewards"));
-	}
-
-	//LastCumulativeGlobalReward
-	function setStorageLastCumulativeGlobalReward(
-		address _property,
-		address _user,
-		uint256 _value
-	) internal {
-		eternalStorage().setUint(
-			getStorageLastCumulativeGlobalRewardKey(_property, _user),
-			_value
-		);
-	}
-
-	function getStorageLastCumulativeGlobalReward(
-		address _property,
-		address _user
-	) public view returns (uint256) {
-		return
-			eternalStorage().getUint(
-				getStorageLastCumulativeGlobalRewardKey(_property, _user)
-			);
-	}
-
-	function getStorageLastCumulativeGlobalRewardKey(
-		address _property,
-		address _user
-	) private pure returns (bytes32) {
-		return
-			keccak256(
-				abi.encodePacked(
-					"_LastCumulativeGlobalReward",
-					_property,
-					_user
-				)
-			);
-	}
-
-	//LastCumulativePropertyInterest
-	function setStorageLastCumulativePropertyInterest(
-		address _property,
-		address _user,
-		uint256 _value
-	) internal {
-		eternalStorage().setUint(
-			getStorageLastCumulativePropertyInterestKey(_property, _user),
-			_value
-		);
-	}
-
-	function getStorageLastCumulativePropertyInterest(
-		address _property,
-		address _user
-	) public view returns (uint256) {
-		return
-			eternalStorage().getUint(
-				getStorageLastCumulativePropertyInterestKey(_property, _user)
-			);
-	}
-
-	function getStorageLastCumulativePropertyInterestKey(
-		address _property,
-		address _user
-	) private pure returns (bytes32) {
-		return
-			keccak256(
-				abi.encodePacked(
-					"_lastCumulativePropertyInterest",
-					_property,
-					_user
-				)
-			);
-	}
-
-	//CumulativeLockedUpUnitAndBlock
-	function setStorageCumulativeLockedUpUnitAndBlock(
-		address _addr,
-		uint256 _unit,
-		uint256 _block
-	) internal {
-		uint256 record = _unit.mul(basis).add(_block);
-		eternalStorage().setUint(
-			getStorageCumulativeLockedUpUnitAndBlockKey(_addr),
-			record
-		);
-	}
-
-	function getStorageCumulativeLockedUpUnitAndBlock(address _addr)
-		public
-		view
-		returns (uint256 _unit, uint256 _block)
-	{
-		uint256 record = eternalStorage().getUint(
-			getStorageCumulativeLockedUpUnitAndBlockKey(_addr)
-		);
-		uint256 unit = record.div(basis);
-		uint256 blockNumber = record.sub(unit.mul(basis));
-		return (unit, blockNumber);
-	}
-
-	function getStorageCumulativeLockedUpUnitAndBlockKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return
-			keccak256(
-				abi.encodePacked("_cumulativeLockedUpUnitAndBlock", _addr)
-			);
-	}
-
-	//CumulativeLockedUpValue
-	function setStorageCumulativeLockedUpValue(address _addr, uint256 _value)
-		internal
-	{
-		eternalStorage().setUint(
-			getStorageCumulativeLockedUpValueKey(_addr),
-			_value
-		);
-	}
-
-	function getStorageCumulativeLockedUpValue(address _addr)
-		public
-		view
-		returns (uint256)
-	{
-		return
-			eternalStorage().getUint(
-				getStorageCumulativeLockedUpValueKey(_addr)
-			);
-	}
-
-	function getStorageCumulativeLockedUpValueKey(address _addr)
-		private
-		pure
-		returns (bytes32)
-	{
-		return keccak256(abi.encodePacked("_cumulativeLockedUpValue", _addr));
 	}
 
 	//PendingWithdrawal
@@ -368,47 +231,6 @@ contract LockupStorage is UsingStorage {
 
 	function getStorageDIP4GenesisBlockKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_dip4GenesisBlock"));
-	}
-
-	//LastCumulativeLockedUpAndBlock
-	function setStorageLastCumulativeLockedUpAndBlock(
-		address _property,
-		address _user,
-		uint256 _cLocked,
-		uint256 _block
-	) internal {
-		uint256 record = _cLocked.mul(basis).add(_block);
-		eternalStorage().setUint(
-			getStorageLastCumulativeLockedUpAndBlockKey(_property, _user),
-			record
-		);
-	}
-
-	function getStorageLastCumulativeLockedUpAndBlock(
-		address _property,
-		address _user
-	) public view returns (uint256 _cLocked, uint256 _block) {
-		uint256 record = eternalStorage().getUint(
-			getStorageLastCumulativeLockedUpAndBlockKey(_property, _user)
-		);
-		uint256 cLocked = record.div(basis);
-		uint256 blockNumber = record.sub(cLocked.mul(basis));
-
-		return (cLocked, blockNumber);
-	}
-
-	function getStorageLastCumulativeLockedUpAndBlockKey(
-		address _property,
-		address _user
-	) private pure returns (bytes32) {
-		return
-			keccak256(
-				abi.encodePacked(
-					"_lastCumulativeLockedUpAndBlock",
-					_property,
-					_user
-				)
-			);
 	}
 
 	//lastStakedInterestPrice

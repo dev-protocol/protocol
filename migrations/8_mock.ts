@@ -1,9 +1,9 @@
-import {createPolicy} from './mock/policy'
-import {createProperty} from './mock/property'
-import {changeBalance} from './mock/token'
-import {lockup} from './mock/lockup'
-import {createMarket} from './mock/market'
-import {createMetrics} from './mock/metrics'
+import { createPolicy } from './mock/policy'
+import { createProperty } from './mock/property'
+import { changeBalance } from './mock/token'
+import { lockup } from './mock/lockup'
+import { createMarket } from './mock/market'
+import { createMetrics } from './mock/metrics'
 
 const handler = async function (deployer, network) {
 	if (network !== 'mock') {
@@ -14,7 +14,6 @@ const handler = async function (deployer, network) {
 	await createPolicy(artifacts)
 	console.log('---finish---')
 	console.log('[create property]')
-	// eslint-disable-next-line no-undef
 	const addressInfo = await createProperty(artifacts, web3)
 	console.log('---finish---')
 	console.log('[balance adjustment]')

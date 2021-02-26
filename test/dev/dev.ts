@@ -1,6 +1,6 @@
-import {DevProtocolInstance} from '../test-lib/instance'
-import {DevInstance} from '../../types/truffle-contracts'
-import {validateErrorMessage} from '../test-lib/utils/error'
+import { DevProtocolInstance } from '../test-lib/instance'
+import { DevInstance } from '../../types/truffle-contracts'
+import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 	const createDev = async (): Promise<DevInstance> => {
@@ -49,7 +49,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		})
 		it('should fail to run mint when sent from other than minter', async () => {
 			const dev = await createDev()
-			await dev.mint(deployer, 100, {from: user1}).catch((err: Error) => err)
+			await dev.mint(deployer, 100, { from: user1 }).catch((err: Error) => err)
 			expect((await dev.totalSupply()).toNumber()).to.equal(0)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(0)
 		})
@@ -58,14 +58,14 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await dev.addMinter(user1)
 			expect(await dev.isMinter(user1)).to.equal(true)
 
-			await dev.addMinter(user2, {from: user1})
+			await dev.addMinter(user2, { from: user1 })
 			expect(await dev.isMinter(user2)).to.equal(true)
 		})
 		it('renounce minter by running renounceMinter', async () => {
 			const dev = await createDev()
 			await dev.addMinter(user1)
 			expect(await dev.isMinter(user1)).to.equal(true)
-			await dev.renounceMinter({from: user1})
+			await dev.renounceMinter({ from: user1 })
 			expect(await dev.isMinter(user1)).to.equal(false)
 		})
 	})
@@ -96,7 +96,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 
-			const res = await dev.burn(50, {from: user1}).catch((err: Error) => err)
+			const res = await dev.burn(50, { from: user1 }).catch((err: Error) => err)
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
 			expect(res).to.be.an.instanceof(Error)
 		})
@@ -107,7 +107,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 
 			await dev.approve(user1, 50)
-			await dev.burnFrom(deployer, 50, {from: user1})
+			await dev.burnFrom(deployer, 50, { from: user1 })
 			expect((await dev.totalSupply()).toNumber()).to.equal(50)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
 		})
@@ -119,7 +119,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 
 			await dev.approve(user1, 50)
 			const res = await dev
-				.burnFrom(deployer, 51, {from: user1})
+				.burnFrom(deployer, 51, { from: user1 })
 				.catch((err: Error) => err)
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
@@ -157,7 +157,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
 
 			const res = await dev
-				.transfer(user2, 50, {from: user1})
+				.transfer(user2, 50, { from: user1 })
 				.catch((err: Error) => err)
 			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
@@ -179,7 +179,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
 
 			await dev.approve(user1, 50)
-			await dev.transferFrom(deployer, user2, 50, {from: user1})
+			await dev.transferFrom(deployer, user2, 50, { from: user1 })
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(50)
 		})
@@ -190,7 +190,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 
 			await dev.approve(user1, 50)
 			const res = await dev
-				.transferFrom(deployer, user2, 51, {from: user1})
+				.transferFrom(deployer, user2, 51, { from: user1 })
 				.catch((err: Error) => err)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
@@ -203,14 +203,14 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 
 			await dev.approve(user1, 50)
 			const res = await dev
-				.transferFrom(deployer, user2, 51, {from: user1})
+				.transferFrom(deployer, user2, 51, { from: user1 })
 				.catch((err: Error) => err)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
 			expect(res).to.be.an.instanceof(Error)
 
 			await dev.increaseAllowance(user1, 1)
-			await dev.transferFrom(deployer, user2, 50, {from: user1})
+			await dev.transferFrom(deployer, user2, 50, { from: user1 })
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(50)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(50)
 		})
@@ -222,7 +222,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await dev.approve(user1, 50)
 			await dev.decreaseAllowance(user1, 1)
 			const res = await dev
-				.transferFrom(deployer, user2, 50, {from: user1})
+				.transferFrom(deployer, user2, 50, { from: user1 })
 				.catch((err: Error) => err)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
@@ -244,8 +244,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 				dev.generatePolicyFactory(),
 				dev.generatePolicyGroup(),
 			])
-			const iPolicyInstance = await dev.getPolicy('PolicyTest1', user1)
-			await dev.policyFactory.create(iPolicyInstance.address)
+			await dev.generatePolicy('PolicyTest1')
 			return dev
 		}
 
@@ -261,7 +260,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const prop = await createProperty(dev)
 			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
-			await dev.dev.deposit(prop, 50, {from: user1})
+			await dev.dev.deposit(prop, 50, { from: user1 })
 			const balance = await dev.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(50)
@@ -274,7 +273,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const prop = await createProperty(dev)
 			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
-			const transaction = await dev.dev.deposit(prop, 50, {from: user1})
+			const transaction = await dev.dev.deposit(prop, 50, { from: user1 })
 			const gasPrice = Number(transaction.receipt.gasUsed)
 			console.log(gasPrice)
 			expect(gasPrice <= 849424).to.be.equal(true)
@@ -285,7 +284,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
-				.deposit(prop, 0, {from: user1})
+				.deposit(prop, 0, { from: user1 })
 				.catch((err: Error) => err)
 			const balance = await dev.dev.balanceOf(user1)
 
@@ -298,7 +297,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
 			const res = await dev.dev
-				.deposit(prop, 100, {from: user1})
+				.deposit(prop, 100, { from: user1 })
 				.catch((err: Error) => err)
 			const balance = await dev.dev.balanceOf(user1)
 
@@ -311,7 +310,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
-				.deposit(prop, 101, {from: user1})
+				.deposit(prop, 101, { from: user1 })
 				.catch((err: Error) => err)
 			const balance = await dev.dev.balanceOf(user1)
 
@@ -324,7 +323,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
-				.deposit(user2, 50, {from: user1})
+				.deposit(user2, 50, { from: user1 })
 				.catch((err: Error) => err)
 			const balance = await dev.dev.balanceOf(user1)
 
@@ -337,7 +336,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
-				.deposit(prop, 0, {from: user1})
+				.deposit(prop, 0, { from: user1 })
 				.catch((err: Error) => err)
 			const balance = await dev.dev.balanceOf(user1)
 
@@ -350,8 +349,8 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const prop = await createProperty(dev)
 			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
-			await dev.dev.approve(user2, 50, {from: user1})
-			await dev.dev.depositFrom(user1, prop, 50, {from: user2})
+			await dev.dev.approve(user2, 50, { from: user1 })
+			await dev.dev.depositFrom(user1, prop, 50, { from: user2 })
 			const balance = await dev.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(50)
@@ -363,9 +362,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
-			await dev.dev.approve(user2, 50, {from: user1})
+			await dev.dev.approve(user2, 50, { from: user1 })
 			const res = await dev.dev
-				.depositFrom(user1, prop, 51, {from: user2})
+				.depositFrom(user1, prop, 51, { from: user2 })
 				.catch((err: Error) => err)
 			const balance = await dev.dev.balanceOf(user1)
 
@@ -386,28 +385,28 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('burn token as a fee', async () => {
 			const dev = await generateEnv()
 			await dev.addressConfig.setMarketFactory(marketFactory)
-			await dev.marketGroup.addGroup(market, {from: marketFactory})
+			await dev.marketGroup.addGroup(market, { from: marketFactory })
 			await dev.dev.mint(user1, 100)
-			await dev.dev.fee(user1, 1, {from: market})
+			await dev.dev.fee(user1, 1, { from: market })
 			const balance = await dev.dev.balanceOf(user1)
 			expect(balance.toNumber()).to.be.equal(99)
 		})
 		it('burn 0 tokens as a fee', async () => {
 			const dev = await generateEnv()
 			await dev.addressConfig.setMarketFactory(marketFactory)
-			await dev.marketGroup.addGroup(market, {from: marketFactory})
+			await dev.marketGroup.addGroup(market, { from: marketFactory })
 			await dev.dev.mint(user1, 100)
-			await dev.dev.fee(user1, 0, {from: market})
+			await dev.dev.fee(user1, 0, { from: market })
 			const balance = await dev.dev.balanceOf(user1)
 			expect(balance.toNumber()).to.be.equal(100)
 		})
 		it('should fail to burn when sent from no balance account', async () => {
 			const dev = await generateEnv()
 			await dev.addressConfig.setMarketFactory(marketFactory)
-			await dev.marketGroup.addGroup(market, {from: marketFactory})
+			await dev.marketGroup.addGroup(market, { from: marketFactory })
 			const balance = await dev.dev.balanceOf(user1)
 			const res = await dev.dev
-				.fee(user1, 1, {from: market})
+				.fee(user1, 1, { from: market })
 				.catch((err: Error) => err)
 			expect(balance.toNumber()).to.be.equal(0)
 			expect(res).to.be.an.instanceOf(Error)
@@ -415,10 +414,10 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('should fail to burn when sent from an insufficient balance account', async () => {
 			const dev = await generateEnv()
 			await dev.addressConfig.setMarketFactory(marketFactory)
-			await dev.marketGroup.addGroup(market, {from: marketFactory})
+			await dev.marketGroup.addGroup(market, { from: marketFactory })
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
-				.fee(user1, 101, {from: market})
+				.fee(user1, 101, { from: market })
 				.catch((err: Error) => err)
 			const balance = await dev.dev.balanceOf(user1)
 			expect(balance.toNumber()).to.be.equal(100)
@@ -427,10 +426,10 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		it('should fail to burn when sent from other than market contract', async () => {
 			const dev = await generateEnv()
 			await dev.addressConfig.setMarketFactory(marketFactory)
-			await dev.marketGroup.addGroup(market, {from: marketFactory})
+			await dev.marketGroup.addGroup(market, { from: marketFactory })
 			await dev.dev.mint(user1, 100)
 			const res = await dev.dev
-				.fee(user1, 1, {from: user2})
+				.fee(user1, 1, { from: user2 })
 				.catch((err: Error) => err)
 			const balance = await dev.dev.balanceOf(user1)
 			expect(balance.toNumber()).to.be.equal(100)

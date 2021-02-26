@@ -1,5 +1,5 @@
-import {VoteCounterStorageTestInstance} from '../../types/truffle-contracts'
-import {toBigNumber} from '../test-lib/utils/common'
+import { VoteCounterStorageTestInstance } from '../../types/truffle-contracts'
+import { toBigNumber } from '../test-lib/utils/common'
 
 contract('VoteCounterStorageTest', ([sender, target, property, policy]) => {
 	let storage: VoteCounterStorageTestInstance

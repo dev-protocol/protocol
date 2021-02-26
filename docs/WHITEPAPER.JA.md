@@ -1,6 +1,6 @@
 # Dev Protocol ホワイトペーパー
 
-Version: **`3.2.1`**
+Version: **`3.3.0`**
 
 _このホワイトペーパーは更新される可能性があります。更新時、バージョン番号は[セマンティックバージョニング](https://semver.org/)にしたがって増加します。_
 
@@ -156,7 +156,6 @@ contract IMarketBehavior {
 		string memory,
 		string memory,
 		string memory,
-		// solium-disable-next-line no-trailing-whitespace
 		address market,
 		address
 	) public returns (bool) {
@@ -207,6 +206,12 @@ Property Contract が資産を表す状態となるためには、Property Contr
 Property Factory Contract は新しい Property Contract を生成する。
 
 Property Contract の生成は `create` 関数を実行することで行われる。引数として `name` と `symbol` を指定する。Property Contract の比較容易性のために `totalSupply` は `10000000`(Solidity では `10000000000000000000000000`) に、 `decimals` は `18` に固定する。
+
+Property Factory Contract が新しい Property Contract を生成すると、総供給量の一部が Treasury Contract に割り当てられる。
+
+Treasury Contract に割り当てられたトークンは、より柔軟なユースケース開発のために Dev Protocol 開発者チームによって使用されるか、Property Contract の作成者に返還される。
+
+Treasury Contract への割り当てシェアは、Policy Contract の `shareOfTreasury` 関数によって決定される。 また、Treasury Contract のアドレスは、Policy Contract の `treasury` 関数によって決定される。
 
 ## Metrics
 
@@ -343,13 +348,6 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 
 ステーキング実行者の受け取るシェアは Holders Share の余剰分となる。
 
-### assetValue
-
-資産価値。Allocator Contract でマーケット報酬の計算過程で呼び出され、以下の変数から資産価値を計算する。
-
-- Property に紐づく総ステーキング数
-- Market Contract による資産評価
-
 ### authenticationFee
 
 資産認証の手数料。Market Contract の `authenticatedCallback` の中で呼び出され、以下の変数から資産認証の手数料を計算する。
@@ -379,20 +377,15 @@ Property Contract(Token) ホルダーが受け取るマーケット報酬のシ�
 
 新しい Policy Contract が提案されてから投票を終了するまでのブロック数。投票を終了すると、Policy Contract は否決される。
 
-### abstentionPenalty
+### shareOfTreasury
 
-Property Contract オーナーが Market Contract 及び Policy Contract への投票を棄権した場合のペナルティ。ペナルティはマーケット報酬の計算対象外期間( ブロック数 )を設けることで罰則とする。Allocator Contract の `allocate` の中で呼び出され、以下の変数からペナルティを決定する。
+Treasury Contract が受け取る、新たに発行された Property Contract のシェア。Property Contract の `constructor` の中で現行の Policy Contract の `shareOfTreasury` が呼び出され、以下の変数から Treasury Contract への割り当てシェアを決定する。
 
-- 棄権回数
+- Property Contract の総供給量
 
-計算対象外期間を算出し返却する。対象外期間の開始ブロックは `allocate` の前回実行ブロックとする。計算対象外期間中は `allocate` の実行が失敗し、期間経過後も期間中の資産価値は考慮されない。
+### treasury
 
-棄権回数の算出のために、Market Contract 及び Policy Contract の投票受付期間中に投票しなかった Property Contract を記録している。
-
-### lockUpBlocks
-
-ステーキングの解除申請後の継続ブロック数。
-ユーザーは Property Contract に対してステーキングしている DEV を解除することができるが、解除が要請されてから指定されたブロック数だけステーキングが継続する。
+現行の Treasury Contract のアドレス。
 
 ## Policy Factory
 

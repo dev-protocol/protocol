@@ -1,20 +1,19 @@
 pragma solidity 0.5.17;
 
+import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IPolicyGroup} from "contracts/src/policy/IPolicyGroup.sol";
-import {IPolicyFactory} from "contracts/src/policy/IPolicyFactory.sol";
+import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
+import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
 
 /**
  * A factory contract that creates a new Policy contract.
  */
-contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
+contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 	event Create(address indexed _from, address _policy);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**
@@ -24,7 +23,7 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
-		addressValidator().validateIllegalAddress(_newPolicyAddress);
+		require(_newPolicyAddress != address(0), "this is illegal address");
 
 		emit Create(msg.sender, _newPolicyAddress);
 
@@ -51,18 +50,43 @@ contract PolicyFactory is UsingConfig, UsingValidator, IPolicyFactory {
 		/**
 		 * Verify sender is VoteCounter contract
 		 */
-		addressValidator().validateAddress(msg.sender, config().voteCounter());
+		require(
+			msg.sender == config().voteCounter(),
+			"this is illegal address"
+		);
 
+		setPolicy(_currentPolicyAddress);
+	}
+
+	/**
+	 * Set the policy to force a policy without a vote.
+	 */
+	function forceAttach(address _policy) external onlyOwner {
+		/**
+		 * Validates the passed Policy address is included the Policy address set
+		 */
+		require(
+			IPolicyGroup(config().policyGroup()).isGroup(_policy),
+			"this is illegal address"
+		);
+
+		setPolicy(_policy);
+	}
+
+	/**
+	 * Sets the Policy
+	 */
+	function setPolicy(address _policy) private {
 		/**
 		 * Sets the passed Policy to current Policy.
 		 */
-		config().setPolicy(_currentPolicyAddress);
+		config().setPolicy(_policy);
 
 		/**
 		 * Resets the Policy address set that is accepting votes.
 		 */
 		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		policyGroup.incrementVotingGroupIndex();
-		policyGroup.addGroup(_currentPolicyAddress);
+		policyGroup.addGroup(_policy);
 	}
 }

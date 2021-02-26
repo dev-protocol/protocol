@@ -1,9 +1,7 @@
-/* eslint-disable no-undef */
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {ethgas} from './lib/api'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
-const {CONFIG, EGS_TOKEN} = process.env
-const {log: ____log} = console
+const { CONFIG, EGS_TOKEN } = process.env
+const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
@@ -24,12 +22,12 @@ const handler = async (
 	])
 	____log('Generated current Dev contract', dev.address)
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
+	const fastest = ethGasStationFetcher(EGS_TOKEN)
 
 	// Deploy new Withdraw
 	const nextWithdraw = await artifacts
 		.require('Withdraw')
-		.new(config.address, {gasPrice: await fastest(), gas})
+		.new(config.address, { gasPrice: await fastest(), gas })
 		.catch(console.error)
 	if (!nextWithdraw) {
 		return
@@ -39,7 +37,7 @@ const handler = async (
 
 	// Add minter
 	await dev
-		.addMinter(nextWithdraw.address, {gasPrice: await fastest(), gas})
+		.addMinter(nextWithdraw.address, { gasPrice: await fastest(), gas })
 		.catch(console.error)
 	____log('Added next Withdraw as a minter')
 

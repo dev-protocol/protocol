@@ -1,5 +1,5 @@
-import {LockupStorageTestInstance} from '../../types/truffle-contracts'
-import {toBigNumber} from '../test-lib/utils/common'
+import { LockupStorageTestInstance } from '../../types/truffle-contracts'
+import { toBigNumber } from '../test-lib/utils/common'
 
 contract('LockupStorageTest', ([property, user]) => {
 	let storage: LockupStorageTestInstance
@@ -101,66 +101,6 @@ contract('LockupStorageTest', ([property, user]) => {
 			expect(result.toNumber()).to.be.equal(3000000000)
 		})
 	})
-	describe('LockupStorage; setLastCumulativeGlobalReward, getLastCumulativeGlobalReward', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getStorageLastCumulativeGlobalReward(
-				property,
-				user
-			)
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageLastCumulativeGlobalRewardTest(
-				property,
-				user,
-				30000000000
-			)
-			const result = await storage.getStorageLastCumulativeGlobalReward(
-				property,
-				user
-			)
-			expect(result.toNumber()).to.be.equal(30000000000)
-		})
-	})
-	describe('LockupStorage; setCumulativeLockedUpUnitAndBlock, getCumulativeLockedUpUnitAndBlock', () => {
-		it('Initial value is 0 and 0.', async () => {
-			const result = await storage.getStorageCumulativeLockedUpUnitAndBlock(
-				property
-			)
-			expect(result[0].toNumber()).to.be.equal(0)
-			expect(result[1].toNumber()).to.be.equal(0)
-		})
-		it('Save two values combine to one value.', async () => {
-			const unit = toBigNumber(
-				'999999999999999999999999999.999999999999999999'
-			).times(1e18)
-			const block = '888888888888888888'
-			await storage.setStorageCumulativeLockedUpUnitAndBlockTest(
-				property,
-				unit,
-				block
-			)
-			const result = await storage.getStorageCumulativeLockedUpUnitAndBlock(
-				property
-			)
-			expect(toBigNumber(result[0]).toFixed()).to.be.equal(unit.toFixed())
-			expect(toBigNumber(result[1]).toFixed()).to.be.equal(block)
-		})
-	})
-	describe('LockupStorage; setCumulativeLockedUpValue, getCumulativeLockedUpValue', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getStorageCumulativeLockedUpValue(property)
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageCumulativeLockedUpValueTest(
-				property,
-				300000000000
-			)
-			const result = await storage.getStorageCumulativeLockedUpValue(property)
-			expect(result.toNumber()).to.be.equal(300000000000)
-		})
-	})
 	describe('LockupStorage; setStorageDIP4GenesisBlock, getStorageDIP4GenesisBlock', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getStorageDIP4GenesisBlock()
@@ -169,56 +109,6 @@ contract('LockupStorageTest', ([property, user]) => {
 		it('The set value can be taken as it is.', async () => {
 			await storage.setStorageDIP4GenesisBlockTest(300000000000)
 			const result = await storage.getStorageDIP4GenesisBlock()
-			expect(result.toNumber()).to.be.equal(300000000000)
-		})
-	})
-	describe('LockupStorage; setStorageLastCumulativeLockedUpAndBlock, getStorageLastCumulativeLockedUpAndBlock', () => {
-		it('Initial value is 0 and 0.', async () => {
-			const result = await storage.getStorageLastCumulativeLockedUpAndBlock(
-				property,
-				user
-			)
-			expect(result[0].toNumber()).to.be.equal(0)
-			expect(result[1].toNumber()).to.be.equal(0)
-		})
-		it('Save two values combine to one value.', async () => {
-			const cLocked = toBigNumber(
-				'999999999999999999999999999.999999999999999999'
-			).times(1e18)
-			const block = '888888888888888888'
-
-			await storage.setStorageLastCumulativeLockedUpAndBlockTest(
-				property,
-				user,
-				cLocked,
-				block
-			)
-			const result = await storage.getStorageLastCumulativeLockedUpAndBlock(
-				property,
-				user
-			)
-			expect(toBigNumber(result[0]).toFixed()).to.be.equal(cLocked.toFixed())
-			expect(toBigNumber(result[1]).toFixed()).to.be.equal(block)
-		})
-	})
-	describe('LockupStorage; setStorageLastCumulativePropertyInterest, getStorageLastCumulativePropertyInterest', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getStorageLastCumulativePropertyInterest(
-				property,
-				user
-			)
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setStorageLastCumulativePropertyInterestTest(
-				property,
-				user,
-				300000000000
-			)
-			const result = await storage.getStorageLastCumulativePropertyInterest(
-				property,
-				user
-			)
 			expect(result.toNumber()).to.be.equal(300000000000)
 		})
 	})

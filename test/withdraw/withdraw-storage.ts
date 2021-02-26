@@ -1,4 +1,4 @@
-import {WithdrawStorageTestInstance} from '../../types/truffle-contracts'
+import { WithdrawStorageTestInstance } from '../../types/truffle-contracts'
 
 contract('WithdrawStorageTest', ([withdraw, property, user]) => {
 	let storage: WithdrawStorageTestInstance
@@ -40,40 +40,6 @@ contract('WithdrawStorageTest', ([withdraw, property, user]) => {
 			expect(result.toNumber()).to.be.equal(50)
 		})
 	})
-	describe('WithdrawStorageTest; setWithdrawalLimitTotal, getWithdrawalLimitTotal', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getWithdrawalLimitTotal(property, user, {
-				from: withdraw,
-			})
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setWithdrawalLimitTotalTest(property, user, 500, {
-				from: withdraw,
-			})
-			const result = await storage.getWithdrawalLimitTotal(property, user, {
-				from: withdraw,
-			})
-			expect(result.toNumber()).to.be.equal(500)
-		})
-	})
-	describe('WithdrawStorageTest; setWithdrawalLimitBalance, getWithdrawalLimitBalance', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getWithdrawalLimitBalance(property, user, {
-				from: withdraw,
-			})
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setWithdrawalLimitBalanceTest(property, user, 5000, {
-				from: withdraw,
-			})
-			const result = await storage.getWithdrawalLimitBalance(property, user, {
-				from: withdraw,
-			})
-			expect(result.toNumber()).to.be.equal(5000)
-		})
-	})
 	describe('WithdrawStorageTest; setLastWithdrawalPrice, getLastWithdrawalPrice', () => {
 		it('Initial value is 0.', async () => {
 			const result = await storage.getLastWithdrawalPrice(property, user, {
@@ -106,36 +72,6 @@ contract('WithdrawStorageTest', ([withdraw, property, user]) => {
 				from: withdraw,
 			})
 			expect(result.toNumber()).to.be.equal(500000)
-		})
-	})
-	describe('WithdrawStorageTest; setLastCumulativeHoldersReward, getLastCumulativeHoldersReward', () => {
-		it('Initial value is 0.', async () => {
-			const result = await storage.getLastCumulativeHoldersReward(
-				property,
-				user,
-				{
-					from: withdraw,
-				}
-			)
-			expect(result.toNumber()).to.be.equal(0)
-		})
-		it('The set value can be taken as it is.', async () => {
-			await storage.setLastCumulativeHoldersRewardTest(
-				property,
-				user,
-				50000000,
-				{
-					from: withdraw,
-				}
-			)
-			const result = await storage.getLastCumulativeHoldersReward(
-				property,
-				user,
-				{
-					from: withdraw,
-				}
-			)
-			expect(result.toNumber()).to.be.equal(50000000)
 		})
 	})
 })

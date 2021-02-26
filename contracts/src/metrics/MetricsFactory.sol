@@ -1,22 +1,22 @@
 pragma solidity 0.5.17;
 
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
-import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
-import {IMetricsFactory} from "contracts/src/metrics/IMetricsFactory.sol";
+import {IMetrics} from "contracts/interface/IMetrics.sol";
+import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
+import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
+import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
 
 /**
  * A factory contract for creating new Metrics contracts and logical deletion of Metrics contracts.
  */
-contract MetricsFactory is UsingConfig, UsingValidator, IMetricsFactory {
+contract MetricsFactory is UsingConfig, IMetricsFactory {
 	event Create(address indexed _from, address _metrics);
 	event Destroy(address indexed _from, address _metrics);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**
@@ -26,7 +26,10 @@ contract MetricsFactory is UsingConfig, UsingValidator, IMetricsFactory {
 		/**
 		 * Validates the sender is included in the Market address set.
 		 */
-		addressValidator().validateGroup(msg.sender, config().marketGroup());
+		require(
+			IMarketGroup(config().marketGroup()).isGroup(msg.sender),
+			"this is illegal address"
+		);
 
 		/**
 		 * Creates a new Metrics contract.
@@ -57,13 +60,16 @@ contract MetricsFactory is UsingConfig, UsingValidator, IMetricsFactory {
 		/**
 		 * Validates the sender is included in the Market address set.
 		 */
-		addressValidator().validateGroup(msg.sender, config().marketGroup());
+		require(
+			IMarketGroup(config().marketGroup()).isGroup(msg.sender),
+			"this is illegal address"
+		);
 
 		/**
 		 *  Validates the sender is the Market contract associated with the passed Metrics.
 		 */
-		Metrics metrics = Metrics(_metrics);
-		addressValidator().validateAddress(msg.sender, metrics.market());
+		IMetrics metrics = IMetrics(_metrics);
+		require(msg.sender == metrics.market(), "this is illegal address");
 
 		/**
 		 * Logical deletions a Metrics contract.

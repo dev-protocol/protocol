@@ -1,20 +1,20 @@
 pragma solidity 0.5.17;
 
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 // prettier-ignore
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
-import {IWithdraw} from "contracts/src/withdraw/IWithdraw.sol";
-import {ILockup} from "contracts/src/lockup/ILockup.sol";
-import {IMetricsGroup} from "contracts/src/metrics/IMetricsGroup.sol";
+import {IWithdraw} from "contracts/interface/IWithdraw.sol";
+import {ILockup} from "contracts/interface/ILockup.sol";
+import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
+import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 
 /**
  * A contract that manages the withdrawal of holder rewards for Property holders.
  */
-contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
+contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	event PropertyTransfer(address _property, address _from, address _to);
@@ -22,7 +22,6 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**
@@ -31,17 +30,18 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 	function withdraw(address _property) external {
 		/**
 		 * Validate
-		 s the passed Property address is included the Property address set.
+		 * the passed Property address is included the Property address set.
 		 */
-		addressValidator().validateGroup(_property, config().propertyGroup());
+		require(
+			IPropertyGroup(config().propertyGroup()).isGroup(_property),
+			"this is illegal address"
+		);
 
 		/**
 		 * Gets the withdrawable rewards amount and the latest cumulative sum of the maximum mint amount.
 		 */
-		(uint256 value, uint256 lastPrice) = _calculateWithdrawableAmount(
-			_property,
-			msg.sender
-		);
+		(uint256 value, uint256 lastPrice) =
+			_calculateWithdrawableAmount(_property, msg.sender);
 
 		/**
 		 * Validates the result is not 0.
@@ -95,15 +95,13 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Validates the sender is Allocator contract.
 		 */
-		addressValidator().validateAddress(msg.sender, config().allocator());
+		require(msg.sender == config().allocator(), "this is illegal address");
 
 		/**
 		 * Gets the cumulative sum of the transfer source's "before transfer" withdrawable reward amount and the cumulative sum of the maximum mint amount.
 		 */
-		(uint256 amountFrom, uint256 priceFrom) = _calculateAmount(
-			_property,
-			_from
-		);
+		(uint256 amountFrom, uint256 priceFrom) =
+			_calculateAmount(_property, _from);
 
 		/**
 		 * Gets the cumulative sum of the transfer destination's "before receive" withdrawable reward amount and the cumulative sum of the maximum mint amount.
@@ -145,9 +143,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets the latest cumulative sum of the holder reward.
 		 */
-		uint256 reward = lockup.calculateCumulativeHoldersRewardAmount(
-			_property
-		);
+		uint256 reward =
+			lockup.calculateCumulativeHoldersRewardAmount(_property);
 
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
@@ -196,9 +193,8 @@ contract Withdraw is IWithdraw, UsingConfig, UsingValidator, WithdrawStorage {
 		/**
 		 * Gets the reward amount in saved without withdrawal and returns the sum of all values.
 		 */
-		uint256 value = _value.add(getPendingWithdrawal(_property, _user)).add(
-			legacy
-		);
+		uint256 value =
+			_value.add(getPendingWithdrawal(_property, _user)).add(legacy);
 		return (value, price);
 	}
 

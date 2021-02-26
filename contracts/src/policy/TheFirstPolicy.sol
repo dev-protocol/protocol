@@ -1,9 +1,11 @@
+/* solhint-disable const-name-snakecase */
+/* solhint-disable var-name-mixedcase */
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IPolicy} from "contracts/src/policy/IPolicy.sol";
+import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 /**
  * TheFirstPolicy is the first policy contract.
@@ -12,7 +14,6 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	using SafeMath for uint256;
 	uint256 public marketVotingBlocks = 525600;
 	uint256 public policyVotingBlocks = 525600;
-	uint256 public lockUpBlocks = 175200;
 
 	uint256 private constant basis = 10000000000000000000000000;
 	uint256 private constant power_basis = 10000000000;
@@ -29,10 +30,13 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		uint256 t = ERC20(config().token()).totalSupply();
 		uint256 s = (_lockups.mul(basis)).div(t);
 		uint256 _d = basis.sub(s);
-		uint256 _p = (
-			(power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))
-		)
-			.div(2);
+		uint256 _p =
+			(
+				(power_basis.mul(12)).sub(
+					s.div((basis.div((power_basis.mul(10)))))
+				)
+			)
+				.div(2);
 		uint256 p = _p.div(power_basis);
 		uint256 rp = p.add(1);
 		uint256 f = _p.sub(p.mul(power_basis));
@@ -59,14 +63,6 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		return _lockups > 0 ? (_reward.mul(95)).div(100) : _reward;
 	}
 
-	function assetValue(uint256 _value, uint256 _lockups)
-		external
-		view
-		returns (uint256)
-	{
-		return (_lockups.add(1)).mul(_value);
-	}
-
 	function authenticationFee(uint256 total_assets, uint256 property_lockups)
 		external
 		view
@@ -88,9 +84,8 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		if (_up_votes < 9999999999999999999) {
 			return false;
 		}
-		uint256 negative_votes = _negative_votes > 0
-			? _negative_votes
-			: 1000000000000000000;
+		uint256 negative_votes =
+			_negative_votes > 0 ? _negative_votes : 1000000000000000000;
 		return _up_votes > negative_votes.mul(10);
 	}
 
@@ -102,21 +97,16 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 		if (_up_votes < 9999999999999999999) {
 			return false;
 		}
-		uint256 negative_votes = _negative_votes > 0
-			? _negative_votes
-			: 1000000000000000000;
+		uint256 negative_votes =
+			_negative_votes > 0 ? _negative_votes : 1000000000000000000;
 		return _up_votes > negative_votes.mul(10);
 	}
 
-	function abstentionPenalty(uint256 abstentions)
-		external
-		view
-		returns (uint256)
-	{
-		uint256 penalty = 0;
-		if (abstentions > 10) {
-			penalty = 175200;
-		}
-		return penalty;
+	function shareOfTreasury(uint256) external view returns (uint256) {
+		return 0;
+	}
+
+	function treasury() external view returns (address) {
+		return address(0);
 	}
 }

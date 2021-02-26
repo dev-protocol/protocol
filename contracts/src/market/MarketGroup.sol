@@ -3,32 +3,28 @@ pragma solidity 0.5.17;
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {UsingValidator} from "contracts/src/common/validate/UsingValidator.sol";
-import {IMarketGroup} from "contracts/src/market/IMarketGroup.sol";
+import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 
-contract MarketGroup is
-	UsingConfig,
-	UsingStorage,
-	UsingValidator,
-	IMarketGroup
-{
+contract MarketGroup is UsingConfig, UsingStorage, IMarketGroup {
 	using SafeMath for uint256;
 
-	// solium-disable-next-line no-empty-blocks
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	function addGroup(address _addr) external {
-		addressValidator().validateAddress(
-			msg.sender,
-			config().marketFactory()
+		require(
+			msg.sender == config().marketFactory(),
+			"this is illegal address"
 		);
 
-		require(isGroup(_addr) == false, "already enabled");
+		require(
+			eternalStorage().getBool(getGroupKey(_addr)) == false,
+			"already enabled"
+		);
 		eternalStorage().setBool(getGroupKey(_addr), true);
 		addCount();
 	}
 
-	function isGroup(address _addr) public view returns (bool) {
+	function isGroup(address _addr) external view returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 
@@ -46,5 +42,9 @@ contract MarketGroup is
 
 	function getCountKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_count"));
+	}
+
+	function getGroupKey(address _addr) private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_group", _addr));
 	}
 }

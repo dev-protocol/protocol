@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity 0.5.17;
 
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
 
@@ -11,22 +11,6 @@ contract WithdrawStorageTest is WithdrawStorage {
 		external
 	{
 		setCumulativePrice(_property, _value);
-	}
-
-	function setWithdrawalLimitTotalTest(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		setWithdrawalLimitTotal(_property, _user, _value);
-	}
-
-	function setWithdrawalLimitBalanceTest(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		setWithdrawalLimitBalance(_property, _user, _value);
 	}
 
 	function setLastWithdrawalPriceTest(
@@ -43,13 +27,5 @@ contract WithdrawStorageTest is WithdrawStorage {
 		uint256 _value
 	) external {
 		setPendingWithdrawal(_property, _user, _value);
-	}
-
-	function setLastCumulativeHoldersRewardTest(
-		address _property,
-		address _user,
-		uint256 _value
-	) external {
-		setLastCumulativeHoldersReward(_property, _user, _value);
 	}
 }

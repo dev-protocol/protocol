@@ -1,9 +1,7 @@
-import {createFastestGasPriceFetcher} from './lib/ethgas'
-import {ethgas} from './lib/api'
+import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
-/* eslint-disable no-undef */
-const {CONFIG, EGS_TOKEN} = process.env
-const {log: ____log} = console
+const { CONFIG, EGS_TOKEN } = process.env
+const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
@@ -24,12 +22,12 @@ const handler = async (
 	])
 	____log('Generated current MetricsGroup contract', metricsGroup.address)
 
-	const fastest = createFastestGasPriceFetcher(ethgas(EGS_TOKEN), web3)
+	const fastest = ethGasStationFetcher(EGS_TOKEN)
 
 	// Deploy new MetricsGroup
 	const nextMetricsGroup = await artifacts
 		.require('MetricsGroup')
-		.new(config.address, {gasPrice: await fastest(), gas})
+		.new(config.address, { gasPrice: await fastest(), gas })
 	____log('Deployed the new MetricsGroup', nextMetricsGroup.address)
 
 	// Delegate storage for MetricsGroup

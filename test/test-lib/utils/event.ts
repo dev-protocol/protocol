@@ -2,13 +2,13 @@ import Web3 from 'web3'
 
 export const watch = (deployedContract: any) => (
 	name: string,
-	handler: (err: Error, values: {[key: string]: string}) => void
+	handler: (err: Error, values: Record<string, string>) => void
 ): void => {
-	const {contract: deployed} = deployedContract
+	const { contract: deployed } = deployedContract
 	const web3WithWebsockets = new Web3(
 		new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
 	)
-	const {events} = new web3WithWebsockets.eth.Contract(
+	const { events } = new web3WithWebsockets.eth.Contract(
 		deployed._jsonInterface,
 		deployed._address
 	)
@@ -25,10 +25,13 @@ export const waitForEvent = (deployedContract: any) => async (
 	timeout = 10000
 ): Promise<Error | void> =>
 	new Promise((resolve, reject) => {
-		setTimeout(() => reject(new Error()), timeout)
+		setTimeout(() => {
+			reject(new Error())
+		}, timeout)
 		watch(deployedContract)(name, (err) => {
 			if (err) {
-				return reject(err)
+				reject(err)
+				return
 			}
 
 			resolve()
@@ -41,10 +44,13 @@ export const getEventValue = (deployedContract: any) => async (
 	timeout = 10000
 ): Promise<Error | string> =>
 	new Promise((resolve, reject) => {
-		setTimeout(() => reject(new Error()), timeout)
+		setTimeout(() => {
+			reject(new Error())
+		}, timeout)
 		watch(deployedContract)(name, (err, values) => {
 			if (err) {
-				return reject(err)
+				reject(err)
+				return
 			}
 
 			resolve(values[arg])
