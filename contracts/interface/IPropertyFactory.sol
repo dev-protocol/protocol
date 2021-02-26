@@ -17,5 +17,11 @@ interface IPropertyFactory {
 		string calldata _args3
 	) external returns (bool);
 
-	function createChangeAuthorEvent(address _before, address _after) external;
+	function createChangeAuthorEvent(address _old, address _new) external;
+
+	function createChangeNameEvent(string calldata _old, string calldata _new)
+		external;
+
+	function createChangeSymbolEvent(string calldata _old, string calldata _new)
+		external;
 }
