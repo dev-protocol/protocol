@@ -120,7 +120,7 @@ const handler = async (
 		return
 	}
 
-	const gasFetcher = async () => 1700000
+	const gasFetcher = async () => 0
 	const gasPriceFetcher = ethGasStationFetcher(egsApiKey)
 	const dev = new DevCommonInstance(
 		artifacts,
@@ -144,11 +144,18 @@ const handler = async (
 	 */
 	const createdTxs = await queue.addAll(
 		properties.map((prop) => async () =>
-			pfc
-				.create(prop.name, prop.symbol, prop.author, await dev.gasInfo)
-				.catch((err) => {
-					console.log(1, err)
-				})
+			pfc.create
+				.estimateGas(prop.name, prop.symbol, prop.author)
+				.then(async (gas) =>
+					pfc
+						.create(prop.name, prop.symbol, prop.author, {
+							gas,
+							gasPrice: await gasPriceFetcher(),
+						})
+						.catch((err) => {
+							console.log(1, err)
+						})
+				)
 		)
 	)
 
@@ -181,11 +188,18 @@ const handler = async (
 	await queue.addAll(
 		createProperties.map((prop) => async () =>
 			prop
-				? prop
-						.transfer(TREASURY, ADDITIONAL_FEE, await dev.gasInfo)
-						.catch((err) => {
-							console.log(3, err)
-						})
+				? prop.transfer
+						.estimateGas(TREASURY, ADDITIONAL_FEE)
+						.then(async (gas) =>
+							prop
+								.transfer(TREASURY, ADDITIONAL_FEE, {
+									gas,
+									gasPrice: await gasPriceFetcher(),
+								})
+								.catch((err) => {
+									console.log(3, err)
+								})
+						)
 				: prop
 		)
 	)
@@ -198,11 +212,18 @@ const handler = async (
 	await queue.addAll(
 		createProperties.map((prop) => async () =>
 			prop
-				? prop
-						.transfer(incubator, BALANCE_OF_INCUBATOR, await dev.gasInfo)
-						.catch((err) => {
-							console.log(4, err)
-						})
+				? prop.transfer
+						.estimateGas(incubator, BALANCE_OF_INCUBATOR)
+						.then(async (gas) =>
+							prop
+								.transfer(incubator, BALANCE_OF_INCUBATOR, {
+									gas,
+									gasPrice: await gasPriceFetcher(),
+								})
+								.catch((err) => {
+									console.log(4, err)
+								})
+						)
 				: prop
 		)
 	)
@@ -215,9 +236,16 @@ const handler = async (
 	await queue.addAll(
 		createProperties.map((prop) => async () =>
 			prop
-				? prop.changeAuthor(incubator, await dev.gasInfo).catch((err) => {
-						console.log(5, err)
-				  })
+				? prop.changeAuthor.estimateGas(incubator).then(async (gas) =>
+						prop
+							.changeAuthor(incubator, {
+								gas,
+								gasPrice: await gasPriceFetcher(),
+							})
+							.catch((err) => {
+								console.log(5, err)
+							})
+				  )
 				: prop
 		)
 	)
