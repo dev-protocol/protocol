@@ -114,7 +114,7 @@ const handler = async (
 		return
 	}
 
-	const [, author] = await web3.eth.getAccounts()
+	const [author] = await web3.eth.getAccounts()
 
 	if ((author as string).toLowerCase() !== AUTHOR?.toLowerCase()) {
 		return
