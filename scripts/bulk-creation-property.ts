@@ -3,12 +3,14 @@ import { config } from 'dotenv'
 import PQueue from 'p-queue'
 import { DevCommonInstance } from './lib/instance/common'
 import { PropertyFactory } from './lib/instance/property-factory'
+import { getPropertyAddress } from '../test/test-lib/utils/log'
 
 config()
 const {
 	CONFIG: configAddress,
 	EGS_TOKEN: egsApiKey,
 	AUTHOR: author,
+	INCUBATOR: incubator,
 } = process.env
 
 const list = [
@@ -95,10 +97,16 @@ const list = [
 ]
 const data = (own: string) => list.map((x) => ({ ...x, author: own }))
 
+const ADDITIONAL_FEE = '250000000000000000000000'
+const BALANCE_OF_INCUBATOR = '9250000000000000000000000'
+const TREASURY = '0x8F9dc5C9CE6834D8C9897Faf5d44Ac36CA073595'
+
+const queue = new PQueue({ concurrency: 2 })
+
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!configAddress || !egsApiKey || !author) {
+	if (!configAddress || !egsApiKey || !author || !incubator) {
 		return
 	}
 
@@ -114,12 +122,50 @@ const handler = async (
 
 	const properties = data(author)
 
+	const createProperty = async (address: string) =>
+		Promise.all([artifacts.require('Property').at(address)]).then(([x]) => x)
 	const pf = new PropertyFactory(dev)
 	const pfc = await pf.load()
 
-	await new PQueue({ concurrency: 2 }).addAll(
+	/**
+	 * =========================
+	 * Create Properties in bulk
+	 * =========================
+	 */
+	const createdTxs = await queue.addAll(
 		properties.map((prop) => async () =>
 			pfc.create(prop.name, prop.symbol, prop.author)
+		)
+	)
+
+	/**
+	 * ==============================
+	 * Generate all Property Instance
+	 * ==============================
+	 */
+	const createProperties = await Promise.all(
+		createdTxs.map(async (tx) => createProperty(getPropertyAddress(tx)))
+	)
+
+	/**
+	 * ================================
+	 * Transfer additional fees in bulk
+	 * ================================
+	 */
+	await queue.addAll(
+		createProperties.map((prop) => async () =>
+			prop.transfer(TREASURY, ADDITIONAL_FEE)
+		)
+	)
+
+	/**
+	 * =================================
+	 * Transfer remaining amount in bulk
+	 * =================================
+	 */
+	await queue.addAll(
+		createProperties.map((prop) => async () =>
+			prop.transfer(incubator, BALANCE_OF_INCUBATOR)
 		)
 	)
 
