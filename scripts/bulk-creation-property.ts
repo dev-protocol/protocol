@@ -192,6 +192,21 @@ const handler = async (
 		)
 	)
 
+	/**
+	 * =============================
+	 * 5. Transfer authority in bulk
+	 * =============================
+	 */
+	await queue.addAll(
+		createProperties.map((prop) => async () =>
+			prop
+				? prop.changeAuthor(incubator, await dev.gasInfo).catch((err) => {
+						console.log(5, err)
+				  })
+				: prop
+		)
+	)
+
 	callback(null)
 }
 
