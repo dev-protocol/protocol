@@ -4,13 +4,11 @@ import PQueue from 'p-queue'
 import { DevCommonInstance } from './lib/instance/common'
 import { PropertyFactory } from './lib/instance/property-factory'
 import { getPropertyAddress } from '../test/test-lib/utils/log'
-import { pbkdf2Sync } from 'crypto'
 
 config()
 const {
 	CONFIG: configAddress,
 	EGS_TOKEN: egsApiKey,
-	AUTHOR: author,
 	INCUBATOR: incubator,
 } = process.env
 
@@ -107,9 +105,11 @@ const queue = new PQueue({ concurrency: 2 })
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!configAddress || !egsApiKey || !author || !incubator) {
+	if (!configAddress || !egsApiKey || !incubator) {
 		return
 	}
+
+	const [, author] = await web3.eth.getAccounts()
 
 	const gasFetcher = async () => 1700000
 	const gasPriceFetcher = ethGasStationFetcher(egsApiKey)
