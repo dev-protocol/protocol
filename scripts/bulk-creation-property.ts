@@ -10,6 +10,8 @@ const {
 	CONFIG: configAddress,
 	EGS_TOKEN: egsApiKey,
 	INCUBATOR: incubator,
+	LIST_FROM,
+	LIST_TO,
 	AUTHOR,
 } = process.env
 
@@ -102,6 +104,8 @@ const BALANCE_OF_INCUBATOR = '9250000000000000000000000'
 const TREASURY = '0x8F9dc5C9CE6834D8C9897Faf5d44Ac36CA073595'
 
 const queue = new PQueue({ concurrency: 2 })
+const listFrom = LIST_FROM ? Number(LIST_FROM) : 0
+const listTo = LIST_TO ? Number(LIST_TO) : Infinity
 
 const handler = async (
 	callback: (err: Error | null) => void
@@ -126,7 +130,7 @@ const handler = async (
 	)
 	await dev.prepare()
 
-	const properties = data(author)
+	const properties = data(author).slice(listFrom, listTo)
 
 	const createProperty = async (address: string) =>
 		Promise.all([artifacts.require('Property').at(address)]).then(([x]) => x)
