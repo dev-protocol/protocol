@@ -4,6 +4,7 @@ import PQueue from 'p-queue'
 import { DevCommonInstance } from './lib/instance/common'
 import { PropertyFactory } from './lib/instance/property-factory'
 import { getPropertyAddress } from '../test/test-lib/utils/log'
+import { pbkdf2Sync } from 'crypto'
 
 config()
 const {
@@ -129,43 +130,65 @@ const handler = async (
 
 	/**
 	 * =========================
-	 * Create Properties in bulk
+	 * 1. Create Properties in bulk
 	 * =========================
 	 */
 	const createdTxs = await queue.addAll(
 		properties.map((prop) => async () =>
-			pfc.create(prop.name, prop.symbol, prop.author)
+			pfc
+				.create(prop.name, prop.symbol, prop.author, await dev.gasInfo)
+				.catch((err) => {
+					console.log(1, err)
+				})
 		)
 	)
 
 	/**
 	 * ==============================
-	 * Generate all Property Instance
+	 * 2. Generate all Property Instance
 	 * ==============================
 	 */
 	const createProperties = await Promise.all(
-		createdTxs.map(async (tx) => createProperty(getPropertyAddress(tx)))
+		createdTxs.map(async (tx) =>
+			tx
+				? createProperty(getPropertyAddress(tx)).catch((err) => {
+						console.log(2, err)
+				  })
+				: tx
+		)
 	)
 
 	/**
 	 * ================================
-	 * Transfer additional fees in bulk
+	 * 3. Transfer additional fees in bulk
 	 * ================================
 	 */
 	await queue.addAll(
 		createProperties.map((prop) => async () =>
-			prop.transfer(TREASURY, ADDITIONAL_FEE)
+			prop
+				? prop
+						.transfer(TREASURY, ADDITIONAL_FEE, await dev.gasInfo)
+						.catch((err) => {
+							console.log(3, err)
+						})
+				: prop
 		)
 	)
 
 	/**
 	 * =================================
-	 * Transfer remaining amount in bulk
+	 * 4. Transfer remaining amount in bulk
 	 * =================================
 	 */
 	await queue.addAll(
 		createProperties.map((prop) => async () =>
-			prop.transfer(incubator, BALANCE_OF_INCUBATOR)
+			prop
+				? prop
+						.transfer(incubator, BALANCE_OF_INCUBATOR, await dev.gasInfo)
+						.catch((err) => {
+							console.log(4, err)
+						})
+				: prop
 		)
 	)
 
