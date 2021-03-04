@@ -158,6 +158,12 @@ const handler = async (
 		)
 	)
 
+	console.log('Properties')
+	properties.forEach((prop, i) => {
+		const instance = createProperties[i] || undefined
+		console.log(prop.name, instance?.address)
+	})
+
 	/**
 	 * ================================
 	 * 3. Transfer additional fees in bulk
