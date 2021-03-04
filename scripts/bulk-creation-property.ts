@@ -10,6 +10,7 @@ const {
 	CONFIG: configAddress,
 	EGS_TOKEN: egsApiKey,
 	INCUBATOR: incubator,
+	AUTHOR,
 } = process.env
 
 const list = [
@@ -110,6 +111,10 @@ const handler = async (
 	}
 
 	const [, author] = await web3.eth.getAccounts()
+
+	if ((author as string).toLowerCase() !== AUTHOR?.toLowerCase()) {
+		return
+	}
 
 	const gasFetcher = async () => 1700000
 	const gasPriceFetcher = ethGasStationFetcher(egsApiKey)
