@@ -134,9 +134,9 @@ const handler = async (
 	const pfc = await pf.load()
 
 	/**
-	 * =========================
+	 * ============================
 	 * 1. Create Properties in bulk
-	 * =========================
+	 * ============================
 	 */
 	const createdTxs = await queue.addAll(
 		properties.map((prop) => async () =>
@@ -149,9 +149,9 @@ const handler = async (
 	)
 
 	/**
-	 * ==============================
+	 * =================================
 	 * 2. Generate all Property Instance
-	 * ==============================
+	 * =================================
 	 */
 	const createProperties = await Promise.all(
 		createdTxs.map(async (tx) =>
@@ -170,9 +170,9 @@ const handler = async (
 	})
 
 	/**
-	 * ================================
+	 * ===================================
 	 * 3. Transfer additional fees in bulk
-	 * ================================
+	 * ===================================
 	 */
 	await queue.addAll(
 		createProperties.map((prop) => async () =>
@@ -187,9 +187,9 @@ const handler = async (
 	)
 
 	/**
-	 * =================================
+	 * ====================================
 	 * 4. Transfer remaining amount in bulk
-	 * =================================
+	 * ====================================
 	 */
 	await queue.addAll(
 		createProperties.map((prop) => async () =>
