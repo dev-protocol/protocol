@@ -46,7 +46,7 @@
 		"prettier": "2.2.1",
 		"prettier-plugin-solidity": "1.0.0-beta.5",
 		"rimraf": "3.0.2",
-		"solhint": "3.3.2",
+		"solhint": "3.3.3",
 		"truffle": "5.2.2",
 		"truffle-typings": "1.0.8",
 		"ts-generator": "0.1.1",
