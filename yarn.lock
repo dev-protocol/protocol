@@ -1968,10 +1968,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.14.tgz#f7fd5f3cc8521301119f63910f0fb965c7d761ae"
   integrity sha512-UHnOPWVWV1z+VV8k6L1HhG7UbGBgIdghqF3l9Ny9ApPghbjICXkUJSd/b9gOgQfjM1r+37cipdw/HJ3F6ICEnQ==
 
-"@types/node@13.13.45":
-  version "13.13.45"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.45.tgz#e6676bcca092bae5751d015f074a234d5a82eb63"
-  integrity sha512-703YTEp8AwQeapI0PTXDOj+Bs/mtdV/k9VcTP7z/de+lx6XjFMKdB+JhKnK+6PZ5za7omgZ3V6qm/dNkMj/Zow==
+"@types/node@13.13.46":
+  version "13.13.46"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.46.tgz#5471e176f3fa15e018dea7992072bf8ca208a3a6"
+  integrity sha512-dqpbzK/KDsOlEt+oyB3rv+u1IxlLFziZu/Z0adfRKoelkr+sTd6QcgiQC+HWq/vkYkHwG5ot2LxgV05aAjnhcg==
 
 "@types/node@^10.1.0":
   version "10.17.54"
