@@ -25,7 +25,7 @@
 	"author": "aggre",
 	"license": "MPL-2.0",
 	"devDependencies": {
-		"@devprotocol/util-ts": "2.1.0",
+		"@devprotocol/util-ts": "2.2.1",
 		"@truffle/hdwallet-provider": "1.2.2",
 		"@types/bent": "7.3.2",
 		"@types/dotenv": "8.2.0",
