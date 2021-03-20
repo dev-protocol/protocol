@@ -129,7 +129,7 @@ contract('Patch662', ([deployer, treasury, uesr]) => {
 			expect(
 				await patch662[method](e18ize(100000).times(0.99).minus(1), 0)
 			).to.be.equal(false)
-			expect(await patch662[method](e18ize(100000).times(0.98), 0)).to.be.equal(
+			expect(await patch662[method](e18ize(100000).times(0.99), 0)).to.be.equal(
 				false
 			)
 		})
