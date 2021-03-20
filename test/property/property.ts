@@ -273,7 +273,6 @@ contract(
 				propertyAddress = getPropertyAddress(result)
 			})
 			it('When executed from other than the lockup address', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.withdraw(user, 10, { from: deployer })
@@ -282,7 +281,6 @@ contract(
 			})
 			it('Dev token balance does not exist in property contract', async () => {
 				await dev.addressConfig.setLockup(lockup)
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.withdraw(user, 10, { from: lockup })
@@ -292,7 +290,6 @@ contract(
 			it('Dev token balance does not exist in property contract', async () => {
 				await dev.addressConfig.setLockup(lockup)
 				await dev.dev.mint(propertyAddress, 10)
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				await property.withdraw(user, 10, { from: lockup })
 			})
@@ -324,7 +321,6 @@ contract(
 				propertyAddress = getPropertyAddress(result)
 			})
 			it('An error occurs if the address is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transfer(DEFAULT_ADDRESS, 10, { from: user })
@@ -332,7 +328,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('An error occurs if the value is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transfer(transfer, 0, { from: user })
@@ -340,7 +335,6 @@ contract(
 				validateErrorMessage(result, 'illegal transfer value')
 			})
 			it('transfer success', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property.transfer(transfer, 10, { from: author })
 				const toAddress = getTransferToAddress(result)
@@ -374,7 +368,6 @@ contract(
 				propertyAddress = getPropertyAddress(result)
 			})
 			it('An error occurs if the from address is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transferFrom(DEFAULT_ADDRESS, transfer, 10, { from: user })
@@ -382,7 +375,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('An error occurs if the to address is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transferFrom(transfer, DEFAULT_ADDRESS, 10, { from: user })
@@ -390,7 +382,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('An error occurs if the value is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transferFrom(author, transfer, 0, { from: user })
@@ -398,7 +389,6 @@ contract(
 				validateErrorMessage(result, 'illegal transfer value')
 			})
 			it('get an error, dont have enough allowance', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transferFrom(author, transfer, 10, {
@@ -408,7 +398,6 @@ contract(
 				validateErrorMessage(result, 'ERC20: transfer amount exceeds allowance')
 			})
 			it('transfer success', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				await property.approve(author, 10, {
 					from: author,
