@@ -128,9 +128,9 @@ contract('Patch662', ([deployer, treasury, uesr]) => {
 			await dev.lockupTest.setStorageAllValueTest(e18ize(100000))
 			expect(
 				await patch662[method](e18ize(100000).times(0.99).minus(1), 0)
-			).to.be.equal(true)
+			).to.be.equal(false)
 			expect(await patch662[method](e18ize(100000).times(0.98), 0)).to.be.equal(
-				true
+				false
 			)
 		})
 	})
