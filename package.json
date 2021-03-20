@@ -14,7 +14,8 @@
 		"lint:format": "prettier --write '**/*.{sol,js,json,md,yml}'",
 		"prepack": "yarn build",
 		"build": "tsc -p tsconfig.build.json",
-		"prebuild": "rimraf ['migrations/**/*.js', 'scripts/**/*.js'] && yarn generate"
+		"prebuild": "rimraf ['migrations/**/*.js', 'scripts/**/*.js'] && yarn generate",
+		"prepare": "husky install"
 	},
 	"bin": {
 		"dev-protocol": "cli/index.js"
@@ -80,10 +81,5 @@
 	"bugs": {
 		"url": "https://github.com/dev-protocol/protocol/issues"
 	},
-	"homepage": "https://github.com/dev-protocol/protocol#readme",
-	"husky": {
-		"hooks": {
-			"pre-commit": "yarn lint"
-		}
-	}
+	"homepage": "https://github.com/dev-protocol/protocol#readme"
 }
