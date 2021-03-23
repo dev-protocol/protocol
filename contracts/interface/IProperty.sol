@@ -6,5 +6,9 @@ interface IProperty {
 
 	function changeAuthor(address _nextAuthor) external;
 
+	function changeName(string calldata _name) external;
+
+	function changeSymbol(string calldata _symbol) external;
+
 	function withdraw(address _sender, uint256 _value) external;
 }

@@ -1,6 +1,6 @@
 # Dev Protocol Whitepaper
 
-Version: **`3.3.0`**
+Version: **`3.4.0`**
 
 _There is a possibility that this white paper will be updated. When there is an update, the version number will increase according to [Semantic Versioning](https://semver.org/)._
 
@@ -12,102 +12,99 @@ Economic activities are built on top of many real world activities. These activi
 
 ## Overview
 
-Individuals produce value through activities. Dev Protocol offers market, staking, and reward distribution features to capitalize the value produced by these activities and trade it through P2P. When activities are capitalized, the following is achieved.
+Individuals produce value through activities. Dev Protocol offers market, staking, and reward distribution features for tokenizing these activities and trading them through P2P. When activities are tokenized, the following is achieved.
 
-- Market rewards are obtained based on the value produced by the activities
-- The property undergoes Staking (financial support) by third parties
+- Market rewards are obtained based on the staked
+- A tokenized activity undergoes Staking (financial support) by third parties
 - Providing value as an incentive for Staking
 - Sharing properties with joint activity participants and distributing market rewards
 
 Staking is a new form of trading money that uses the inflation mechanism. Through staking, the sustainability of users’ activities is secured, and users receive value at zero financial cost. This is a mechanism that provides profit for all properties that had previously been released for free or through other indirect monetization mechanisms. Dev Protocol aims for a total value staked that surpasses donation activities that have been taking place through legal tender.
 
-Dev Protocol transfers the formulation of its policy, which serves as the guiding principle for its governance, to the community so that it can be updated depending on the circumstances. Users can freely propose a new policy through the protocol. In order for a policy to take effect, approval must be granted through a vote of property holders. A policy can be related to a decision on the inflation rate and other aspects of the ecosystem. The current policy is [here](./POLICY.md).
+Dev Protocol transfers the formulation of its policy, which serves as the guiding principle for its governance, to the community so that it can be updated depending on the circumstances. Users can freely propose a new policy through the protocol. In order for a policy to take effect, approval must be granted through a vote of staking users(a.k.a. stakers). A policy can be related to a decision on the inflation rate and other aspects of the ecosystem. The current policy is [here](./POLICY.md).
 
 ## Market
 
 The market serves to provide assuring identity by certifying an individual’s activity on the blockchain. A market is created for each authentication target, and the community can propose the opening of new markets.
 
-## Capitalization
+## Tokenization
 
 As a premise, ownership of a user’s activities is certified to belong to the user in Dev Protocol. This differs from the model employed in existing web platforms, in which the platform owns the user data, and separates the ownership and utilization of properties. A property can be used infinitely through the application layer built on top of Dev protocol.
 
-## Capitalization Method
+## Tokenization Method
 
-By authenticating an external account that expresses ownership of the activity on Dev Protocol, users can define their activity as a “property” on the market and certify that they are the owner of the property. When authenticating a property, the user pays a commission in DEV that has been defined by the policy, and the commission that has been paid is instantly burned. Users can authenticate multiple properties and connect them to multiple markets. The maximum number of properties that can be authenticated is defined by the policy.
+By authenticating an external account that expresses ownership of the activity on Dev Protocol, users can define their activity as a “property” on the market and certify that they are the owner of the property. When authenticating a property, the user pays a commission in DEV that has been defined by the policy, and the commission that has been paid is instantly burned. Users can authenticate multiple properties and connect them to multiple markets.
 
 ## Profit, Market Reward, Inflation, Deflation
 
-An owner of a property receives a market reward based on the value of the property. If staking is done on a property that a user owns, a market reward will be added based on the total value staked.
+An owner of a Property receives a market reward based on the total staked of the property.
 
-The flow of DEV in the protocol can be summarized through the following lifecycle. For simplicity, the owner of a property is listed as an “activity participant,” and a third party who receives some form of utility is listed as a “user,” although a user can be classified as both.
+The flow of DEV in the protocol can be summarized through the following lifecycle. For simplicity, the owner of a Property is listed as an “activity participant,” and a third party who receives some form of utility is listed as a “user,” although a user can be classified as both.
 
-1. DEV is newly issued by an activity participant and undergoes inflation.
+1. DEV is newly minted by an activity participant and undergoes inflation.
 2. A user stakes the DEV for the activity participant.
-3. The more staking that a property receives, the more DEV this activity participant can newly issue.
-4. As consideration for staking, the activity participant provides the user with utility.
+3. The more staking that a Property collectes, the more DEV this activity participant can newly mint.
+4. As a perk for staking, the activity participant can provide the user with utility optionally.
 5. When the user cancels staking, the user is able to withdraw the staking amount, as well as a portion of the DEV that the activity participant obtained through the offering.
 
-The total amount of rewards is determined (dynamically or statically) based on the policy regarding the inflation rate for DEV. The initial policy is [here](./POLICY.md). Through the protocol, DEV is newly issued, burned, staked, and fluctuates based on demand.
+The total amount of rewards is determined (dynamically or statically) based on the policy regarding the inflation rate for DEV. The current policy is [here](./POLICY.md). Through the protocol, DEV is newly issued, burned, staked, and fluctuates based on demand.
 
 ## Shared Rights with Joint Activity Participants
 
-The owner of a property initially owns 100% of the ownership rights. Owning 100% of the ownership rights is equivalent to the right to receive all of the market rewards. It is possible for multiple people, such as joint activity participants, to own the ownership rights by transferring a portion of the ownership rights. Ownership rights holders can receive a portion of market rewards based on the ownership ratio. This is realized by the fact that the Property Contract that represents ownership rights conforms to ERC20 standard.
+The owner of a Property initially owns 100% of the ownership rights. Owning 100% of the ownership rights is equivalent to the right to receive all of the market rewards. It is possible for multiple people, such as joint activity participants, to own the ownership rights by transferring a portion of the ownership rights. Ownership rights holders can receive a portion of market rewards based on the ownership ratio. This is realized by the fact that the Property Contract that represents ownership rights conforms to ERC20 standard.
+
+## Treasury
+
+Property ownership is by default 100% owned by the Property owner. However, the percentage specified by Policy will be sent to Treasury Contract. The current policy is [here](./POLICY.md). Treasury Contract earns/accumulates a portion of the market rewards earned from a Property by holding a portion of the Property tokenized over the protocol. Treasury Contract accumulates Properties and DEV, which are used as financial resources for the community.
 
 ## Staking
 
-Staking is used in Dev Protocol as a new payment system that enables trading of various properties. Staking is a mechanism that increases market rewards through the temporary deposit of DEV toward a property. As consideration for staking, the payer receives utility from the activity participant, and the activity participant receives the market rewards that have increased during the staking period. Staking continues while the payer needs this utility, increasing the scarcity value of DEV. By receiving staking, activity participant secure the sustainability of their activity.
+Staking is used in Dev Protocol as a new supporting system that enables trading of various Properties. Staking is a mechanism that increases market rewards through the temporary deposit of DEV toward a property. As consideration for staking, the payer receives utility from the activity participant, and the activity participant receives the market rewards that have increased during the staking period. Staking continues while the payer needs this utility, increasing the scarcity value of DEV. By receiving staking, activity participant secure the sustainability of their activity.
 
-### Payment Flow
+### Supporting Flow
 
-1. By staking DEV in a property over a specific period of time, the payer receives some sort of consideration.
+1. By staking DEV in a Property over a specific period of time, the supporter receives some sort of perk optionally.
 2. Based on the amount of DEV staked, a market reward (inflation) amount is added for the property. The longer the staking period by the payer, the more market rewards are promised to the activity participant.
-3. As interest, the user receives a portion of the DEV that is newly acquired by the activity participant. The amount that can be received at this time is determined by the amount that the user has staked in comparison with the total amount staked.
+3. As interest, the supporter receives a portion of the DEV that is newly acquired by the activity participant. The amount that can be received at this time is determined by the amount that the user has staked in comparison with the total amount staked.
 4. When the staking period ends, the DEV staked in the property is released, and the user can withdraw it.
 
 ## Governance
 
-Many incentives are built into Dev Protocol so that all users can receive profit without encroaching on each other’s interests. There is no decisive theory on the interaction of these incentives, and our hope is for the community, including stakeholders, to constantly propose improvements. In Dev Protocol, indices with uncertainty are accepted from external sources as part of the policy. And, the initial policy is [here](./POLICY.md).
+Many incentives are built into Dev Protocol so that all users can receive profit without encroaching on each other’s interests. There is no decisive theory on the interaction of these incentives, and our hope is for the community, including stakeholders, to constantly propose improvements. In Dev Protocol, indices with uncertainty are accepted from external sources as part of the policy. And, the current policy is [here](./POLICY.md).
 
 ## Application Layer
 
-By staking their DEV toward an activity participant, users receive some sort of consideration from this activity participant. The consideration is paid in the form of rights or labor. (Although it is possible for the staking user to contact the activity participant and request consideration in a direct manner) The application layer automatically executes a series of trades. The application layer relays the user’s staking to the activity participant and relays the activity participant’s consideration to the user. The motivation to build out an application layer depends on each individual’s intentions, but below are possible motivations.
+By staking their DEV toward an activity participant, users receive some sort of perk from this activity participant. (Although it is possible for the staking user to contact the activity participant and request perk in a direct manner) The application layer automatically executes a series of trades. The application layer relays the user’s staking to the activity participant and relays the activity participant’s perk to the user. The motivation to build out an application layer depends on each individual’s intentions, but below are possible motivations.
 
 - Increase the value of DEV owned
 - Receive a portion of the rewards by inheriting a portion of the activity participant’s Property
 - Collect commission from the user
 
-# Token Distribution
-
-The Dev Protocol plans a token distribution of the core token "DEV."
-
-The following graph shows the latest allocation plan.
-
-![Token Distribution](https://devprtcl.com/image/token-distribution.svg)
-
-See [the Medium post](https://medium.com/devprtcl/dev-token-allocation-update-e1d7dd424087) for more information on token distribution.
+If a staking user gets some staking perk, those perks will be provided via the application layers.
 
 # Mechanism
 
-Dev Protocol is comprised of the following 13 main contracts.
+Dev Protocol is comprised of the following 14 main contracts.
 
-- Market
-- Market Factory
-- Property
-- Property Factory
-- Metrics
-- Policy
-- Policy Factory
-- Lockup
-- Allocator
-- Policy
-- Policy Factory
-- Address Config
-- DEV
+- Market Contract
+- Market Factory Contract
+- Property Contract
+- Property Factory Contract
+- Metrics Contract
+- Policy Contract
+- Policy Factory Contract
+- Lockup Contract
+- Allocator Contract
+- Policy Contract
+- Policy Factory Contract
+- Address Config Contract
+- Treasury Contract
+- Dev Contract
 
 Synoptic Chart of Contracts:
 ![Overview](https://i.imgur.com/5JwNQ3o.png)
 
-## Market
+## Market Contract
 
 The Market Contract represents a specific group of properties. The properties handled by Dev Protocol can be defined through the `authenticate` function.
 
@@ -115,7 +112,7 @@ Anybody can freely propose a Market Contract. However, in order for it to take e
 
 The `authenticate` function authenticates the executor of the function as the owner of the property. For example, a GitHub repository is assigned, and the fact that the executor is the owner of this GitHub repository is authenticated. Therefore, it should not be possible for anybody other than the owner of the Property Contract to execute the `authenticate` function. This function is called directly by a user, and it is expected for `authenticatedCallback` to be called for a successful authentication. When executing the `authenticate` function, a commission defined by the Policy Contract is paid in DEV, and the commission paid is automatically burned.
 
-## Market Factory
+## Market Factory Contract
 
 The Market Factory Contract generates a new Market Contract.
 
@@ -140,50 +137,48 @@ contract IMarketBehavior {
 
 ```
 
-When you implement the `authenticate` function, strongly recommended verifying the sender is associated Market Contract. To verify, please create a function to set the accotiated Market Contract address.
+When you implement the `authenticate` function, strongly recommended to verify the sender is associated with the Market Contract. To verify, please create a function to set the associated Market Contract address.
 
 ```solidity
-	function authenticate(
-		address _prop,
-		string memory _args1,
-		string memory,
-		string memory,
-		string memory,
-		string memory,
-		address market,
-		address
-	) public returns (bool) {
-		require(msg.sender == associatedMarket, "Invalid sender");
-		・
-		・
-		・
-		・
-	}
+function authenticate(
+	address _prop,
+	string memory _args1,
+	string memory,
+	string memory,
+	string memory,
+	string memory,
+	address market,
+	address
+) public returns (bool) {
+	require(msg.sender == associatedMarket, 'Invalid sender');
+	// Unique authentication method
+}
+
 ```
 
 The `schema` is an array-type JSON character string that explains the significance of the arguments that the `authenticate` function receives for authentication. The maximum for these arguments is 5, in addition to the address of the Property Contract. An example is presented below.
 
 ```solidity
-string public schema = "['Your asset identity', 'Read-only token', 'More something']";
+string public schema = '["Your asset identity", "Read-only token", "More something"]';
 ```
 
 The `authenticate` function always handles the 2nd argument as the unique ID. Accordingly, values that cannot secure uniqueness should not be assigned. The following schema is an incorrect example.
 
 ```solidity
-string public schema = "['Read-only token', 'Your GitHub repository(e.g. your-name/repos)']";
+string public schema = '["Read-only token", "Your GitHub repository(e.g. your-name/repos)"]';
 ```
 
 And the following schema is a correct example.
 
 ```solidity
-string public schema = "['Your GitHub repository(e.g. your-name/repos)', 'Read-only token']";
+string public schema = '["Your GitHub repository(e.g. your-name/repos)", "Read-only token"]';
 ```
 
 The `getId` function receives an argument as a Metrics contract address and returns the authenticated asset name. For example, that return value is like `dev-protocol/dev-kit-js`.
 
 The Market Factory Contract creates a new Market Contract that has the proxy method and other elements for the contract. There are 3 proxy methods, which are `authenticate`, `schema`, and `getId`. The `authenticatedCallback` function, which receives the successful authentication, and the vote function, which accepts votes, are also added.
 
-## Property
+## Property Contract
 
 The Property Contract represents the user’s property group. This is a token that conforms to ERC20 and can be transferred to any email address.
 
@@ -191,11 +186,11 @@ Each Property Contract(Token) holder will receive market rewards based on the ba
 
 The `transfer` function for the Property Contract requests the Allocator Contract to adjust the amount that can be withdrawn, since the amount of market rewards that can be withdrawn varies based on changes to the balance.
 
-A Property Contract in its initial state is not assuring assets.
+A Property Contract in its initial state is not assuring assets (e.g., GitHub repositories).
 
 In order for a Property to be associated with an asset, a Market Contract must be associated with the Property Contract. The association is established by the `authenticatedCallback` function for the Market Contract. Multiple Market Contracts can be associated with a Property Contract. 1 Property Contract can represent a specific assets group or a Property Contract can be created for each asset.
 
-## Property Factory
+## Property Factory Contract
 
 The Property Factory Contract generates a new Property Contract.
 
@@ -207,14 +202,17 @@ Tokens assigned to the Treasury Contract will be used by the Dev Protocol develo
 
 The allocation share to the Treasury Contract is determined by the Policy Contract's `shareOfTreasury` function. Besides, the Treasury Contract's address is determined by the `treasury` function of the Policy Contract.
 
-## Metrics
+Users who do not yet have a Property Contract will want to create a Property Contract and authenticate with a Market Contract at the same time. To do this, the Property Factory Contract exposes the `createAndAuthenticate` method. The `createAndAuthenticate` method creates a Property Contract and consistently uses that Property Contract to authenticate with a Market Contract.
+
+## Metrics Contract
 
 The Metrics Contract represents the association between Property Contracts and Market Contracts.
 
 When `authenticatedCallback` of the Market Contract is called, a Metrics Contract that retains the addresses of the Property Contract and Market Contract is generated.
-`authenticatedCallback` for the Market Contract returns the address for the Metrics Contract. By creating a map that brings the addresses for the Market Contract and Metrics Contract together, it is possible to retain the context for the authentication. The context for the authentication can be used when calculating the market rewards.
 
-## Lockup
+`authenticatedCallback` for the Market Contract returns the address for the Metrics Contract. By creating a map that brings the addresses for the Market Contract and Metrics Contract together, it is possible to retain the authentication context.
+
+## Lockup Contract
 
 The Lockup Contract manages staking in Property Contracts.
 
@@ -222,54 +220,47 @@ The Lockup Contract manages staking in Property Contracts.
 
 When a user stakes their own DEV in a Property Contract. This function can only be executed from the `deposit` function for DEV.
 
-By assigning the address of the Property Contract to stake in and the quantity of DEV, the Lockup Contract stakes the DEV. The DEV that has been staked can be withdrawn after a certain amount of time has passed after executing the `cancel` function. Stakes can be added as many times as desired until the `cancel` function is executed.
+Bypassing the Property Contract address to stake in and the amount of DEV, the Lockup Contract stakes the DEV. Stakes can be added as many times as desired.
 
-By staking DEV, users can receive some sort of utility from the owner of the corresponding Property Contract. Staking continues until the utility is needed, increasing the scarcity value of DEV.
+By staking DEV, users can receive some utility from the corresponding Property Contract owner. Staking continues until the utility is needed, increasing the scarcity value of DEV.
 
 A cumulative total reward amount at a time of staking (accumulation of the return value of the `calculateMaxRewardsPerBlock` function of the Allocator Contract according to the elapsed block) is recorded and used for the withdrawal reward calculation.
 
-An amount of remuneration is determined by a staking ratio of a Property Contract. Therefore, the Lockup Contract also records a cumulative staking amount of a Property contract (cumulative staking amount according to elapsed block), and a total cumulative staking amount (all cumulative staking amount according to elapsed block).
-
-A total reward allocation is determined from a ratio of a cumulative staking amount of a Property and a cumulative total staking amount.
+An amount of reward is the same regardless of the Property Contract of the staking destination, but it changes all as the staking ratio changes. Therefore, the Lockup Contract keeps track of the "cumulative sum of the per-staking remuneration" and updates the value every time staking is added or removed.
 
 The following variables are used to calculate a reward amount for a staking user.
 
 - `r`: Cumulative total reward amount(accumulation of a return value of the `calculateMaxRewardsPerBlock` function of the Allocator Contract according to elapsed block)
-- `p`: Cumulative staking amount(cumulative staking amount according to elapsed block)
-- `t`: Total cumulative staking amount(all cumulative staking amount according to elapsed block)
-- `l`: `r` at a time of staking
+- `t`: Total staked amount
+- `s`: User's staked amount
 - `Policy.holdersShare`: Reward rate function receive by a Property Contract holder
 
 The calculation formula is as follows.
 
 ```
-total interest = (p / t * (r -l)) - Policy.holdersShare(p / t * (r -l))
+total_interest = s(r / t - Policy.holdersShare(r / t, t))
 ```
 
-That withdrawable interest amount is calculated by dividing its result by a staking amount for a Property Contract and multiplying by a staking amount by a staking person.
+The `r / t` in the above formula shows the "cumulative sum of the per-staking remuneration."
 
-When a staking person gets a reward, a value of `l` overrides with the latest value. In this way, a withdrawable interest amount does not exceed the maximum amount that one person can withdraw. This is exemplified below. `p` and `t` are not considered for simplicity.
+The amount of interest that can be withdrawn per user can be calculated by subtracting the value of `total_interest` when the user's last staking or withdrawal from the latest `total_interest`.
 
-1. Alice is staking 500 DEV for the first time when the `r` is 100. When `r` reaches 500, the withdrawable interest amount is `(500-100) × 500 = 200000`.
-2. `r` becomes 520, and Alice withdraws again. The withdrawable interest amount is `(520-500) × 500 = 10000`.
+When a staking person gets a reward, a value of `total_interest` per user overrides with the latest value. In this way, a withdrawable interest amount does not exceed the maximum amount that one person can withdraw. This is exemplified below. `r`, `t` and `s` are not considered for simplicity.
 
-Alice withdraws it twice and earns `200000 + 10000 = 210000`. If Alice didn't make the first withdrawal, Alice's withdrawable interest amount is `(520-100) × 500 = 210000` now. From this, it is clear that the withdrawable interest amount does not change regardless of the timing of withdrawal.
+1. Alice is staking 500 DEV for the first time when the `total_interest` is 100. When `total_interest` reaches 500, the withdrawable interest amount is `(500-100) × 500 = 200000`.
+2. `total_interest` becomes 520, and Alice withdraws again. The withdrawable interest amount is `(520-500) × 500 = 10000`.
 
-This formula holds only when the staking amount of a staking person is constant. Therefore, it is necessary to update `l` when executing the `withdraw` function of the Lockup Contract.
+Alice withdraws it twice and earns `200000 + 10000 = 210000`. If Alice did not make the first withdrawal, Alice's withdrawable interest amount is `(520-100) × 500 = 210000` now. From this, it is clear that the withdrawable interest amount does not change regardless of withdrawal timing.
 
-### cancel
-
-The DEV that the user has staked in the Property Contract is released. Staking continues for a certain amount of time after the release has been requested. This period is determined by the number of blocks defined in the Policy Contract.
+This formula holds only when the staking amount of a staking person is constant. Therefore, it is necessary to update `total_interest` and snapshots the withdrawable interest amount when executing the `withdraw` function of the Lockup Contract.
 
 ### withdraw
 
-The DEV that the user has staked in the Property Contract is withdrawn. Withdrawal is not possible unless a release has been requested through the `cancel` function. Additionally, withdrawal is not possible until the number of blocks that has been set by the release request is reached.
+All or part of the DEV that the user has staked in the Property Contract and the full amount of interest that can be withdrawn will be withdrawn.
 
-If the block count that has been set by the release request is reached, the full amount of DEV that the user staked in the Property Contract is transferred to the user.
+## Allocator Contract
 
-## Allocator
-
-The Allocator Contract plays several roles to determine market rewards.
+The Allocator Contract plays several roles in determining market rewards.
 
 ### calculateMaxRewardsPerBlock
 
@@ -277,7 +268,7 @@ Calculate and return a value per block of a total reward given to all users.
 
 Take a total staking amount of DEV at a time of a calculation and a total number of authenticated assets. This function acts as a proxy for the `rewards` function of Policy Contract. Correlation between arguments and return values is defined by [Policy](./POLICY.md#rewards).
 
-## Withdraw
+## Withdraw Contract
 
 The Winthdraw Contract plays several roles for managing the amount of market rewards that can be withdrawn.
 
@@ -285,44 +276,43 @@ The Winthdraw Contract plays several roles for managing the amount of market rew
 
 Withdraws the market rewards for the Property Contract. The executor withdraws the amount that can be withdrawn when it is called.
 
-An amount of remuneration is determined by a staking ratio of a Property Contract. Therefore, the Withdraw Contract queries to the Lockup Contract a cumulative staking amount of property contract (cumulative staking amount according to elapsed block), and a total cumulative staking amount (all cumulative staking amount according to elapsed block), and calculate a withdrawable amount.
-
-A total reward allocation is determined from a ratio of a cumulative staking amounts of a Property and a cumulative total staking amounts.
+An amount of remuneration is determined by a staking ratio of a Property Contract. Therefore, the Withdraw Contract queries to the Lockup Contract a cumulative holder's reward amount for Property Contract (cumulative holder's reward amount according to elapsed block) and calculate a withdrawable amount.
 
 The following variables are used to calculate a reward amount for a Property holder.
 
 - `r`: Cumulative total reward amount(accumulation of a return value of the `calculateMaxRewardsPerBlock` function of the Allocator Contract according to elapsed block)
-- `p`: Cumulative staking amount(cumulative staking amount according to elapsed block)
-- `t`: Total cumulative staking amount(all cumulative staking amount according to elapsed block)
-- `l`: `r` at a time of last withdrawal
+- `t`: Total staked amount
+- `s`: Property Contract's staked amount
+- `ts`: Total supply of the Property Contract
+- `b`: Balance of the Property Contract for the user
 - `Policy.holdersShare`: Reward rate function receive by a Property Contract holder
 
 The calculation formula is as follows.
 
 ```
-total reward = Policy.holdersShare(p / t * (r -l)
+total_reward = b(s(Policy.holdersShare(r / t, t)) / ts)
 ```
 
-That withdrawable amount is calculated by dividing its result by a `totalSupply` for a Property Contract and multiplying by a balance of a user.
+The amount of reward that can be withdrawn per Property Contract holder can be calculated by subtracting the value of `Policy.holdersShare(r / t, t)` when the user's last withdrawal from the latest `Policy.holdersShare(r / t, t)` and multiply the `b`.
 
-When a Property holder gets a reward, a value of `l` overrides with the latest value. In this way, a withdrawable amount does not exceed the maximum amount that one person can withdraw. This is exemplified below. `p` and `t` are not considered for simplicity.
+In this way, a withdrawable reward amount does not exceed the maximum amount that one person can withdraw. This is exemplified below. `Policy.holdersShare(r / t, t)` are assigned as `i` for simplicity.
 
-1. Alice has 500 tokens of a Property Contract. When `r` reaches 100, the withdrawal amount is `(100-0) × 500 = 50000`.
-2. `r` becomes 120 and Alice withdraws again. The withdrawal amount is `(120-100) × 500 = 10000`.
+1. Alice has 500 tokens of a Property Contract. When `i` reaches 100, the withdrawal amount is `(100-0) × 500 = 50000`.
+2. `i` becomes 120 and Alice withdraws again. The withdrawal amount is `(120-100) × 500 = 10000`.
 
 Alice withdraws it twice and earns `50000 + 10000 = 60000`. If Alice didn't make the first withdrawal, Alice's withdrawable amount is `(120 - 0) × 500 = 60000` now. From this, it is clear that the withdrawable amount does not change regardless of the timing of withdrawal.
 
-This formula holds only when the balance of a Property holder is constant. Therefore, it is necessary to update `l` when executing the `transfer` function of a Property Contract.
+This formula holds only when the balance of a Property holder is constant. Therefore, it is necessary to update `i` when executing the `transfer` function of a Property Contract.
 
-## Policy
+## Policy Contract
 
 The Policy Contract represents the policy of Dev Protocol. Dev Protocol assigns the formulation of uncertain indices to the community and updates the indices based on the circumstances.
 
-Anybody can freely propose a Policy Contract. However, in order for it to take effect, it must be approved through a vote of the existing Property Contract owners. The number of votes will be the sum of the count staked in the Property Contract and the `totals`. The vote is completed by executing `vote` for the Policy Contract. Generally, votes are expected to be carried out by property owners, but stake executors can use their own count of stakes as the number of votes in order to vote. In this case, the address of the Property Contract subject to staking will be assigned.
+Anybody can freely propose a Policy Contract. However, for it to take effect, it must be approved through a vote of staking users. The number of votes will be the staking amount for each Property Contract per user. The vote is completed by executing `vote` for the Policy Contract.
 
-As soon as the new Policy Contract receives enough affirmative votes to meet the conditions to take effect, it will take effect, and the old Policy Contract will ceases to exist. Currently, formulation of the initial policy is in progress.
+As soon as the new Policy Contract receives enough affirmative votes to meet the conditions, it will take effect, and the old Policy Contract will cease to exist.
 
-The following indices are decided by the Policy Contract.
+The Policy Contract decides the following indices.
 
 ### rewards
 
@@ -379,15 +369,15 @@ The share of total supply of newly issued Property Contracts received by the Tre
 
 The contract address of the current Treasury Contract.
 
-## Policy Factory
+## Policy Factory Contract
 
 The Policy Factory Contract generates a new Policy Contract.
 
-The generation of a Policy Contract is carried out by executing a `create` function. The `create` function obtains the address of the Policy Contract and adds the `vote` function that accepts votes to generate a new Policy Contract.
+The generation of a Policy Contract is carried out by executing a `create` function. The `create` function gets the address of the Policy Contract created by a user and allows the `vote` function to accept votes.
 
-## State
+## Lockup Storage Contract, Market Group Contract, Policy Group Contract, Property Group Contract, Vote Counter Storage Contract, Withdraw Storage Contract
 
-The State Contract is a contract that makes the state of the other contracts persistent. Its responsibility is to exclusively maintain the state and getter method without waiting for implementation.
+Those Contracts are a contract that makes the state of the other contracts persistent. Its responsibility is to exclusively maintain the state and getter method without waiting for implementation.
 
 ## DEV
 
@@ -401,7 +391,6 @@ Dev Protocol is OSS, and anybody can participate in its development.
 
 - GitHub: https://github.com/dev-protocol/protocol
 - Discord: https://discord.gg/VwJp4KM
-- Spectrum: https://spectrum.chat/devtoken
 - Twitter: https://twitter.com/devprtcl
-- Blog: https://medium.com/devtoken
-- Web site: https://devprtcl.com
+- Blog: https://medium.com/devprtcl
+- Web site: https://devprotocol.xyz
