@@ -8,6 +8,14 @@ contract Curve {
 	uint256 private constant basis = 10000000000000000000000000;
 	uint256 private constant power_basis = 10000000000;
 
+	/**
+	 * @dev From the passed variables, calculate the amount of reward reduced along the curve.
+	 * @param _lockups Total number of locked up tokens.
+	 * @param _assets Total number of authenticated assets.
+	 * @param _totalSupply Total supply the token.
+	 * @param _mintPerBlockAndAseet Maximum number of reward per block per asset.
+	 * @return Calculated reward amount per block per asset.
+	 */
 	function curveRewards(
 		uint256 _lockups,
 		uint256 _assets,
