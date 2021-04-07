@@ -1,5 +1,5 @@
 import {
-	Dip1Instance,
+	DIP1Instance,
 	TheFirstPolicyInstance,
 } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js'
 import { batchRandom } from './utils'
 
 contract('DIP1', ([deployer]) => {
-	let dip1: Dip1Instance
+	let dip1: DIP1Instance
 	let theFirstPolicy: TheFirstPolicyInstance
 
 	before(async () => {

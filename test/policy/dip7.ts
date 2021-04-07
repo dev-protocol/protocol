@@ -1,12 +1,12 @@
-import { Dip7Instance, Dip1Instance } from '../../types/truffle-contracts'
+import { DIP7Instance, DIP1Instance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
 import { toBigNumber } from '../test-lib/utils/common'
 import { batchRandom } from './utils'
 
 contract('DIP7', ([deployer]) => {
-	let dip7: Dip7Instance
-	let dip1: Dip1Instance
+	let dip7: DIP7Instance
+	let dip1: DIP1Instance
 
 	before(async () => {
 		const dev = new DevProtocolInstance(deployer)
