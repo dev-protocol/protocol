@@ -56,14 +56,6 @@
 	"dependencies": {
 		"@openzeppelin/contracts": "^2.5.0"
 	},
-	"bundleddependencies": [
-		"truffle",
-		"shelljs",
-		"commander",
-		"dotenv",
-		"ts-node",
-		"truffle-hdwallet-provider"
-	],
 	"directories": {
 		"doc": "docs",
 		"test": "test"
