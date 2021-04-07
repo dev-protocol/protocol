@@ -2,7 +2,7 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
@@ -13,7 +13,7 @@ import {IPolicy} from "contracts/interface/IPolicy.sol";
  * Property contract inherits ERC20.
  * Holders of Property contracts(tokens) receive holder rewards according to their share.
  */
-contract Property is ERC20, UsingConfig, IProperty {
+contract Property is ERC20, UsingRegistry, IProperty {
 	using SafeMath for uint256;
 	uint8 private constant PROPERTY_DECIMALS = 18;
 	uint256 private constant SUPPLY = 10000000000000000000000000;
@@ -23,23 +23,23 @@ contract Property is ERC20, UsingConfig, IProperty {
 	uint8 private __decimals;
 
 	/**
-	 * @dev Initializes the passed value as AddressConfig address, author address, token name, and token symbol.
-	 * @param _config AddressConfig address.
+	 * @dev Initializes the passed value as Registry address, author address, token name, and token symbol.
+	 * @param _registry Registry address.
 	 * @param _own The author address.
 	 * @param _name The name of the new Property.
 	 * @param _symbol The symbol of the new Property.
 	 */
 	constructor(
-		address _config,
+		address _registry,
 		address _own,
 		string memory _name,
 		string memory _symbol
-	) public UsingConfig(_config) {
+	) public UsingRegistry(_registry) {
 		/**
 		 * Validates the sender is PropertyFactory contract.
 		 */
 		require(
-			msg.sender == config().propertyFactory(),
+			msg.sender == registry().get("PropertyFactory"),
 			"this is illegal address"
 		);
 		/**
@@ -57,7 +57,7 @@ contract Property is ERC20, UsingConfig, IProperty {
 		/**
 		 * Mints to the author and  treasury contract.
 		 */
-		IPolicy policy = IPolicy(config().policy());
+		IPolicy policy = IPolicy(registry().get("Policy"));
 		uint256 toTreasury = policy.shareOfTreasury(SUPPLY);
 		uint256 toAuthor = SUPPLY.sub(toTreasury);
 		require(toAuthor != 0, "share of author is 0");
@@ -122,10 +122,8 @@ contract Property is ERC20, UsingConfig, IProperty {
 		/**
 		 * save author information
 		 */
-		IPropertyFactory(config().propertyFactory()).createChangeAuthorEvent(
-			__author,
-			_nextAuthor
-		);
+		IPropertyFactory(registry().get("PropertyFactory"))
+			.createChangeAuthorEvent(__author, _nextAuthor);
 
 		/**
 		 * Changes the author.
@@ -138,10 +136,8 @@ contract Property is ERC20, UsingConfig, IProperty {
 	 * @param _name The new name.
 	 */
 	function changeName(string calldata _name) external onlyAuthor {
-		IPropertyFactory(config().propertyFactory()).createChangeNameEvent(
-			__name,
-			_name
-		);
+		IPropertyFactory(registry().get("PropertyFactory"))
+			.createChangeNameEvent(__name, _name);
 
 		__name = _name;
 	}
@@ -151,10 +147,8 @@ contract Property is ERC20, UsingConfig, IProperty {
 	 * @param _symbol The new symbol.
 	 */
 	function changeSymbol(string calldata _symbol) external onlyAuthor {
-		IPropertyFactory(config().propertyFactory()).createChangeSymbolEvent(
-			__symbol,
-			_symbol
-		);
+		IPropertyFactory(registry().get("PropertyFactory"))
+			.createChangeSymbolEvent(__symbol, _symbol);
 
 		__symbol = _symbol;
 	}
@@ -175,7 +169,7 @@ contract Property is ERC20, UsingConfig, IProperty {
 		 * Calls Withdraw contract via Allocator contract.
 		 * Passing through the Allocator contract is due to the historical reason for the old Property contract.
 		 */
-		IAllocator(config().allocator()).beforeBalanceChange(
+		IAllocator(registry().get("Allocator")).beforeBalanceChange(
 			address(this),
 			msg.sender,
 			_to
@@ -210,7 +204,7 @@ contract Property is ERC20, UsingConfig, IProperty {
 		 * Calls Withdraw contract via Allocator contract.
 		 * Passing through the Allocator contract is due to the historical reason for the old Property contract.
 		 */
-		IAllocator(config().allocator()).beforeBalanceChange(
+		IAllocator(registry().get("Allocator")).beforeBalanceChange(
 			address(this),
 			_from,
 			_to
@@ -245,12 +239,15 @@ contract Property is ERC20, UsingConfig, IProperty {
 		/**
 		 * Validates the sender is Lockup contract.
 		 */
-		require(msg.sender == config().lockup(), "this is illegal address");
+		require(
+			msg.sender == registry().get("Lockup"),
+			"this is illegal address"
+		);
 
 		/**
 		 * Transfers the passed amount to the original owner.
 		 */
-		ERC20 devToken = ERC20(config().token());
+		ERC20 devToken = ERC20(registry().get("Token"));
 		bool result = devToken.transfer(_sender, _value);
 		require(result, "dev transfer failed");
 	}

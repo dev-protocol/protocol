@@ -1,15 +1,15 @@
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 
-contract PolicyGroup is UsingConfig, UsingStorage, IPolicyGroup {
+contract PolicyGroup is UsingRegistry, UsingStorage, IPolicyGroup {
 	using SafeMath for uint256;
 
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	function addGroup(address _addr) external {
 		innerAddGroupWithoutSetVotingEnd(_addr);
@@ -25,7 +25,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IPolicyGroup {
 
 	function incrementVotingGroupIndex() external {
 		require(
-			msg.sender == config().policyFactory(),
+			msg.sender == registry().get("PolicyFactory"),
 			"this is illegal address"
 		);
 
@@ -51,7 +51,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IPolicyGroup {
 
 	function innerAddGroupWithoutSetVotingEnd(address _addr) private {
 		require(
-			msg.sender == config().policyFactory(),
+			msg.sender == registry().get("PolicyFactory"),
 			"this is illegal address"
 		);
 
@@ -64,7 +64,7 @@ contract PolicyGroup is UsingConfig, UsingStorage, IPolicyGroup {
 
 	function setVotingEndBlockNumber(address _policy) private {
 		bytes32 key = getVotingEndBlockNumberKey(_policy);
-		uint256 tmp = IPolicy(config().policy()).policyVotingBlocks();
+		uint256 tmp = IPolicy(registry().get("Policy")).policyVotingBlocks();
 		uint256 votingEndBlockNumber = block.number.add(tmp);
 		eternalStorage().setUint(key, votingEndBlockNumber);
 	}

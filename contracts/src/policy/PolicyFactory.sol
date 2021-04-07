@@ -1,20 +1,20 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
 import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
 
 /**
  * A factory contract that creates a new Policy contract.
  */
-contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
+contract PolicyFactory is UsingRegistry, IPolicyFactory, Ownable {
 	event Create(address indexed _from, address _policy);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * Creates a new Policy contract.
@@ -30,9 +30,9 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 		/**
 		 * In the case of the first Policy, it will be activated immediately.
 		 */
-		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
-		if (config().policy() == address(0)) {
-			config().setPolicy(_newPolicyAddress);
+		IPolicyGroup policyGroup = IPolicyGroup(registry().get("PolicyGroup"));
+		if (registry().get("Policy") == address(0)) {
+			registry().set("Policy", _newPolicyAddress);
 			policyGroup.addGroupWithoutSetVotingEnd(_newPolicyAddress);
 			return;
 		}
@@ -51,7 +51,7 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 		 * Verify sender is VoteCounter contract
 		 */
 		require(
-			msg.sender == config().voteCounter(),
+			msg.sender == registry().get("VoteCounter"),
 			"this is illegal address"
 		);
 
@@ -66,7 +66,7 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 		 * Validates the passed Policy address is included the Policy address set
 		 */
 		require(
-			IPolicyGroup(config().policyGroup()).isGroup(_policy),
+			IPolicyGroup(registry().get("PolicyGroup")).isGroup(_policy),
 			"this is illegal address"
 		);
 
@@ -80,12 +80,12 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 		/**
 		 * Sets the passed Policy to current Policy.
 		 */
-		config().setPolicy(_policy);
+		registry().set("Policy", _policy);
 
 		/**
 		 * Resets the Policy address set that is accepting votes.
 		 */
-		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
+		IPolicyGroup policyGroup = IPolicyGroup(registry().get("PolicyGroup"));
 		policyGroup.incrementVotingGroupIndex();
 		policyGroup.addGroup(_policy);
 	}

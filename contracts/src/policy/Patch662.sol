@@ -8,14 +8,14 @@ import {ILockup} from "contracts/interface/ILockup.sol";
 contract Patch662 is TreasuryFee {
 	using SafeMath for uint256;
 
-	constructor(address _config) public TreasuryFee(_config) {}
+	constructor(address _registry) public TreasuryFee(_registry) {}
 
 	function marketApproval(uint256 upVotes, uint256)
 		external
 		view
 		returns (bool)
 	{
-		address lockup = config().lockup();
+		address lockup = registry().get("Lockup");
 		uint256 allValue = ILockup(lockup).getAllValue();
 		uint256 border = allValue.mul(99).div(100);
 		return upVotes > border;

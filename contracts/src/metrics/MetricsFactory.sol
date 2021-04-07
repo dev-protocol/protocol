@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {Metrics} from "contracts/src/metrics/Metrics.sol";
 import {IMetrics} from "contracts/interface/IMetrics.sol";
 import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
@@ -10,14 +10,14 @@ import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
 /**
  * A factory contract for creating new Metrics contracts and logical deletion of Metrics contracts.
  */
-contract MetricsFactory is UsingConfig, IMetricsFactory {
+contract MetricsFactory is UsingRegistry, IMetricsFactory {
 	event Create(address indexed _from, address _metrics);
 	event Destroy(address indexed _from, address _metrics);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * Creates a new Metrics contract.
@@ -27,7 +27,7 @@ contract MetricsFactory is UsingConfig, IMetricsFactory {
 		 * Validates the sender is included in the Market address set.
 		 */
 		require(
-			IMarketGroup(config().marketGroup()).isGroup(msg.sender),
+			IMarketGroup(registry().get("MarketGroup")).isGroup(msg.sender),
 			"this is illegal address"
 		);
 
@@ -39,7 +39,8 @@ contract MetricsFactory is UsingConfig, IMetricsFactory {
 		/**
 		 *  Adds the new Metrics contract to the Metrics address set.
 		 */
-		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
+		IMetricsGroup metricsGroup =
+			IMetricsGroup(registry().get("MetricsGroup"));
 		address metricsAddress = address(metrics);
 		metricsGroup.addGroup(metricsAddress);
 
@@ -54,14 +55,15 @@ contract MetricsFactory is UsingConfig, IMetricsFactory {
 		/**
 		 * Validates the passed address is included in the Metrics address set.
 		 */
-		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
+		IMetricsGroup metricsGroup =
+			IMetricsGroup(registry().get("MetricsGroup"));
 		require(metricsGroup.isGroup(_metrics), "address is not metrics");
 
 		/**
 		 * Validates the sender is included in the Market address set.
 		 */
 		require(
-			IMarketGroup(config().marketGroup()).isGroup(msg.sender),
+			IMarketGroup(registry().get("MarketGroup")).isGroup(msg.sender),
 			"this is illegal address"
 		);
 
@@ -74,7 +76,7 @@ contract MetricsFactory is UsingConfig, IMetricsFactory {
 		/**
 		 * Logical deletions a Metrics contract.
 		 */
-		IMetricsGroup(config().metricsGroup()).removeGroup(_metrics);
+		metricsGroup.removeGroup(_metrics);
 		emit Destroy(msg.sender, _metrics);
 	}
 }

@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {Market} from "contracts/src/market/Market.sol";
 import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
 import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
@@ -8,13 +8,13 @@ import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 /**
  * A factory contract that creates a new Market contract.
  */
-contract MarketFactory is IMarketFactory, UsingConfig {
+contract MarketFactory is IMarketFactory, UsingRegistry {
 	event Create(address indexed _from, address _market);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * Creates a new Market contract.
@@ -28,13 +28,13 @@ contract MarketFactory is IMarketFactory, UsingConfig {
 		/**
 		 * Creates a new Market contract with the passed address as the IMarketBehavior.
 		 */
-		Market market = new Market(address(config()), _addr);
+		Market market = new Market(address(registry()), _addr);
 
 		/**
 		 * Adds the created Market contract to the Market address set.
 		 */
 		address marketAddr = address(market);
-		IMarketGroup marketGroup = IMarketGroup(config().marketGroup());
+		IMarketGroup marketGroup = IMarketGroup(registry().get("MarketGroup"));
 		marketGroup.addGroup(marketAddr);
 
 		/**

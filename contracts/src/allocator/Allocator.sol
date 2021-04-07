@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
 import {IWithdraw} from "contracts/interface/IWithdraw.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
@@ -12,11 +12,11 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
  * A contract that determines the total number of mint.
  * Lockup contract and Withdraw contract mint new DEV tokens based on the total number of new mint determined by this contract.
  */
-contract Allocator is UsingConfig, IAllocator {
+contract Allocator is UsingRegistry, IAllocator {
 	/**
-	 * Initialize the argument as AddressConfig address.
+	 * Initialize the argument as Registry address.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * Returns the maximum new mint count per block.
@@ -24,8 +24,9 @@ contract Allocator is UsingConfig, IAllocator {
 	 */
 	function calculateMaxRewardsPerBlock() external view returns (uint256) {
 		uint256 totalAssets =
-			IMetricsGroup(config().metricsGroup()).totalIssuedMetrics();
-		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
+			IMetricsGroup(registry().get("MetricsGroup")).totalIssuedMetrics();
+		uint256 totalLockedUps =
+			ILockup(registry().get("Lockup")).getAllValue();
 		return IPolicy(config().policy()).rewards(totalLockedUps, totalAssets);
 	}
 
@@ -40,11 +41,11 @@ contract Allocator is UsingConfig, IAllocator {
 		address _to
 	) external {
 		require(
-			IPropertyGroup(config().propertyGroup()).isGroup(msg.sender),
+			IPropertyGroup(registry().get("PropertyGroup")).isGroup(msg.sender),
 			"this is illegal address"
 		);
 
-		IWithdraw(config().withdraw()).beforeBalanceChange(
+		IWithdraw(registry().get("Withdraw")).beforeBalanceChange(
 			_property,
 			_from,
 			_to

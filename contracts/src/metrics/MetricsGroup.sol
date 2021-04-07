@@ -1,19 +1,19 @@
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {IMetrics} from "contracts/interface/IMetrics.sol";
 import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 
-contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
+contract MetricsGroup is UsingRegistry, UsingStorage, IMetricsGroup {
 	using SafeMath for uint256;
 
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	function addGroup(address _addr) external {
 		require(
-			msg.sender == config().metricsFactory(),
+			msg.sender == registry().get("MetricsFactory"),
 			"this is illegal address"
 		);
 
@@ -33,7 +33,7 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 
 	function removeGroup(address _addr) external {
 		require(
-			msg.sender == config().metricsFactory(),
+			msg.sender == registry().get("MetricsFactory"),
 			"this is illegal address"
 		);
 

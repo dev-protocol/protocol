@@ -4,7 +4,7 @@ pragma solidity 0.5.17;
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
@@ -40,7 +40,7 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
  * - After 10 blocks, Carol stakes 40 DEV on Property-A (Alice's staking state on Property-A: `M`=500, `B`=20, `P`=140, `S`=200, `U`=100)
  * - After 10 blocks, Alice withdraws Property-A staking reward. The reward at this time is 5000 DEV (10 blocks * 500 DEV) + 3125 DEV (10 blocks * 62.5% * 500 DEV) + 2500 DEV (10 blocks * 50% * 500 DEV).
  */
-contract Lockup is ILockup, UsingConfig, LockupStorage {
+contract Lockup is ILockup, UsingRegistry, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	struct RewardPrices {
@@ -53,7 +53,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	/**
 	 * Adds staking.
@@ -67,7 +67,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Validates the sender is Dev contract.
 		 */
-		require(msg.sender == config().token(), "this is illegal address");
+		require(
+			msg.sender == registry().get("Token"),
+			"this is illegal address"
+		);
 
 		/**
 		 * Validates _value is not 0.
@@ -78,7 +81,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Validates the passed Property has greater than 1 asset.
 		 */
 		require(
-			IMetricsGroup(config().metricsGroup()).hasAssets(_property),
+			IMetricsGroup(registry().get("MetricsGroup")).hasAssets(_property),
 			"unable to stake to unauthenticated property"
 		);
 
@@ -192,7 +195,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Calculates the holders reward out of the total reward amount.
 		 */
 		uint256 holdersShare =
-			IPolicy(config().policy()).holdersShare(price, allStakes);
+			IPolicy(registry().get("Policy")).holdersShare(price, allStakes);
 
 		/**
 		 * Calculates and returns each reward.
@@ -273,7 +276,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Gets the latest mint amount per block from Allocator contract.
 		 */
 		uint256 rewardsAmount =
-			IAllocator(config().allocator()).calculateMaxRewardsPerBlock();
+			IAllocator(registry().get("Allocator"))
+				.calculateMaxRewardsPerBlock();
 
 		/**
 		 * Gets the maximum mint amount per block, and the last recorded block number from `LastSameRewardsAmountAndBlock` storage.
@@ -356,7 +360,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * If the passed Property has not authenticated, returns always 0.
 		 */
 		if (
-			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+			IMetricsGroup(registry().get("MetricsGroup")).hasAssets(
+				_property
+			) == false
 		) {
 			return (0, RewardPrices(0, 0, 0));
 		}
@@ -417,7 +423,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Creates a Dev token instance.
 		 */
-		ERC20Mintable erc20 = ERC20Mintable(config().token());
+		ERC20Mintable erc20 = ERC20Mintable(registry().get("Token"));
 
 		/**
 		 * Updates the staking status to avoid double rewards.

@@ -4,13 +4,13 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 
 /**
  * DIP1 is a contract that simply changed TheFirstPolicy to DIP numbering.
  */
-contract DIP1 is IPolicy, UsingConfig {
+contract DIP1 is IPolicy, UsingRegistry {
 	using SafeMath for uint256;
 	uint256 public marketVotingBlocks = 525600;
 	uint256 public policyVotingBlocks = 525600;
@@ -19,7 +19,7 @@ contract DIP1 is IPolicy, UsingConfig {
 	uint256 private constant power_basis = 10000000000;
 	uint256 private constant mint_per_block_and_aseet = 250000000000000;
 
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _registry) public UsingRegistry(_registry) {}
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		external
@@ -27,7 +27,7 @@ contract DIP1 is IPolicy, UsingConfig {
 		returns (uint256)
 	{
 		uint256 max = _assets.mul(mint_per_block_and_aseet);
-		uint256 t = ERC20(config().token()).totalSupply();
+		uint256 t = ERC20(registry().get("Token")).totalSupply();
 		uint256 s = (_lockups.mul(basis)).div(t);
 		uint256 _d = basis.sub(s);
 		uint256 _p =

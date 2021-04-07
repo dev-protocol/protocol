@@ -1,18 +1,22 @@
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
+import {UsingRegistry} from "contracts/src/common/registry/UsingRegistry.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 
-contract MarketGroup is UsingConfig, UsingStorage, IMarketGroup {
+contract MarketGroup is UsingRegistry, UsingStorage, IMarketGroup {
 	using SafeMath for uint256;
 
-	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
+	constructor(address _registry)
+		public
+		UsingRegistry(_registry)
+		UsingStorage()
+	{}
 
 	function addGroup(address _addr) external {
 		require(
-			msg.sender == config().marketFactory(),
+			msg.sender == registry().get("MarketFactory"),
 			"this is illegal address"
 		);
 

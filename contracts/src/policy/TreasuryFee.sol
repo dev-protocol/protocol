@@ -10,7 +10,7 @@ import {DIP7} from "contracts/src/policy/DIP7.sol";
 contract TreasuryFee is DIP7, Ownable {
 	address private treasuryAddress;
 
-	constructor(address _config) public DIP7(_config) {}
+	constructor(address _registry) public DIP7(_registry) {}
 
 	function shareOfTreasury(uint256 _supply) external view returns (uint256) {
 		return _supply.div(100).mul(5);
