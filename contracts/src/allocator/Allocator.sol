@@ -14,13 +14,14 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
  */
 contract Allocator is UsingConfig, IAllocator {
 	/**
-	 * Initialize the argument as AddressConfig address.
+	 * @dev Initialize the passed address as AddressConfig address.
+	 * @param _config AddressConfig address.
 	 */
 	constructor(address _config) public UsingConfig(_config) {}
 
 	/**
-	 * Returns the maximum new mint count per block.
-	 * This function gets the total number of Metrics contracts and total number of lockups and returns the calculation result of `Policy.rewards`.
+	 * @dev Returns the maximum number of mints per block.
+	 * @return Maximum number of mints per block.
 	 */
 	function calculateMaxRewardsPerBlock() external view returns (uint256) {
 		uint256 totalAssets =
@@ -30,9 +31,10 @@ contract Allocator is UsingConfig, IAllocator {
 	}
 
 	/**
-	 * Passthrough to `Withdraw.beforeBalanceChange` funtion.
-	 * This function just passthrough function.
-	 * Cannot be deleted because there are existing contracts that does not directly execute `Withdraw.beforeBalanceChange` function.
+	 * @dev Passthrough to `Withdraw.beforeBalanceChange` funtion.
+	 * @param _property Address of the Property address to transfer.
+	 * @param _from Address of the sender.
+	 * @param _to Address of the recipient.
 	 */
 	function beforeBalanceChange(
 		address _property,
