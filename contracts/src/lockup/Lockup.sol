@@ -1,11 +1,11 @@
 pragma solidity 0.5.17;
 
 // prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
+import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
@@ -415,11 +415,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
 
 		/**
-		 * Creates a Dev token instance.
-		 */
-		ERC20Mintable erc20 = ERC20Mintable(config().token());
-
-		/**
 		 * Updates the staking status to avoid double rewards.
 		 */
 		setStorageLastStakedInterestPrice(
@@ -432,7 +427,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Mints the reward.
 		 */
-		require(erc20.mint(msg.sender, value), "dev mint failed");
+		require(
+			IDevMinter(getStorageDevMinter()).mint(msg.sender, value),
+			"dev mint failed"
+		);
 
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.

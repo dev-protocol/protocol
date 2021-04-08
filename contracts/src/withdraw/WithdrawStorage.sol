@@ -140,4 +140,17 @@ contract WithdrawStorage is UsingStorage {
 				abi.encodePacked("_lastWithdrawnReward", _property, _user)
 			);
 	}
+
+	//DevMinter
+	function setStorageDevMinter(address _devMinter) internal {
+		eternalStorage().setAddress(getStorageDevMinterKey(), _devMinter);
+	}
+
+	function getStorageDevMinter() public view returns (address) {
+		return eternalStorage().getAddress(getStorageDevMinterKey());
+	}
+
+	function getStorageDevMinterKey() private pure returns (bytes32) {
+		return keccak256(abi.encodePacked("_devMinter"));
+	}
 }
