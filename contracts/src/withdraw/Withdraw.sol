@@ -18,12 +18,18 @@ import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	address private devMinter;
 	event PropertyTransfer(address _property, address _from, address _to);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _config, address _devMinter)
+		public
+		UsingConfig(_config)
+	{
+		devMinter = _devMinter;
+	}
 
 	/**
 	 * Withdraws rewards.
@@ -69,7 +75,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		 * Mints the holder reward.
 		 */
 		require(
-			IDevMinter(getStorageDevMinter()).mint(msg.sender, value),
+			IDevMinter(devMinter).mint(msg.sender, value),
 			"dev mint failed"
 		);
 

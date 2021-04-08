@@ -20,12 +20,11 @@ export class Withdraw {
 		return withdraw
 	}
 
-	public async create(): Promise<WithdrawInstance> {
+	public async create(devMinter = ''): Promise<WithdrawInstance> {
 		const withdraw = await this._dev.artifacts
 			.require('Withdraw')
-			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, devMinter, await this._dev.gasInfo)
 		console.log('new Withdraw contract', withdraw.address)
-		await this._addMinter(withdraw)
 		return withdraw
 	}
 
@@ -47,11 +46,5 @@ export class Withdraw {
 		await before.changeOwner(after.address, await this._dev.gasInfo)
 
 		console.log(`change owner from ${before.address} to ${after.address}`)
-	}
-
-	private async _addMinter(withdraw: InstanceOfWithdraw): Promise<void> {
-		await this._dev.dev.addMinter(withdraw.address, await this._dev.gasInfo)
-
-		console.log(`add minter ${withdraw.address}`)
 	}
 }

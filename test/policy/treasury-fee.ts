@@ -1,5 +1,5 @@
 import {
-	DIP7Instance,
+	Dip7Instance,
 	TreasuryFeeInstance,
 } from '../../types/truffle-contracts'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import { batchRandom } from './utils'
 import { validateNotOwnerErrorMessage } from '../test-lib/utils/error'
 contract('TreasuryFee', ([deployer, treasury, uesr]) => {
-	let dip7: DIP7Instance
+	let dip7: Dip7Instance
 	let treasuryFee: TreasuryFeeInstance
 	let dev: DevProtocolInstance
 
@@ -16,6 +16,7 @@ contract('TreasuryFee', ([deployer, treasury, uesr]) => {
 		dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		dip7 = await artifacts.require('DIP7').new(dev.addressConfig.address)
 		treasuryFee = await artifacts

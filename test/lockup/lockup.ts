@@ -23,6 +23,8 @@ contract('LockupTest', ([deployer, user1]) => {
 	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
+		await dev.generateDev()
+		await dev.generateDevMinter()
 		await Promise.all([
 			dev.generateAllocator(),
 			dev.generateMarketFactory(),
@@ -36,7 +38,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			dev.generateVoteCounter(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
-			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const policyAddress = await dev.generatePolicy('PolicyTestBase')
@@ -54,7 +55,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			(await dev.createMetrics(deployer, property.address)).address
 		)
 
-		await dev.dev.addMinter(dev.lockup.address)
 		if (initialUpdate) {
 			await dev.lockup.update()
 		}

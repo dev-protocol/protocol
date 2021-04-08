@@ -1,13 +1,13 @@
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
-const { CONFIG, EGS_TOKEN } = process.env
+const { CONFIG, EGS_TOKEN, DEV_MINTER } = process.env
 const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!CONFIG || !EGS_TOKEN) {
+	if (!CONFIG || !EGS_TOKEN || !DEV_MINTER) {
 		return
 	}
 
@@ -30,7 +30,7 @@ const handler = async (
 	// Deploy new Lockup
 	const nextLockup = await artifacts
 		.require('Lockup')
-		.new(config.address, { gasPrice: await fastest(), gas })
+		.new(config.address, DEV_MINTER, { gasPrice: await fastest(), gas })
 	____log('Deployed the new Lockup', nextLockup.address)
 
 	// Deploy MetricsGroupMigration as a new MetricsGroup
@@ -51,7 +51,7 @@ const handler = async (
 	// Deploy new Withdraw
 	const nextWithdraw = await artifacts
 		.require('Withdraw')
-		.new(config.address, { gasPrice: await fastest(), gas })
+		.new(config.address, DEV_MINTER, { gasPrice: await fastest(), gas })
 	____log('Deployed the new Withdraw', nextWithdraw.address)
 
 	// Add minter

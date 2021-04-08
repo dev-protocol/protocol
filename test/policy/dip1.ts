@@ -1,5 +1,5 @@
 import {
-	DIP1Instance,
+	Dip1Instance,
 	TheFirstPolicyInstance,
 } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
@@ -7,13 +7,14 @@ import BigNumber from 'bignumber.js'
 import { batchRandom } from './utils'
 
 contract('DIP1', ([deployer]) => {
-	let dip1: DIP1Instance
+	let dip1: Dip1Instance
 	let theFirstPolicy: TheFirstPolicyInstance
 
 	before(async () => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		dip1 = await artifacts.require('DIP1').new(dev.addressConfig.address)
 		theFirstPolicy = await artifacts

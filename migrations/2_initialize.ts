@@ -4,22 +4,15 @@ const handler = function (deployer, network) {
 	}
 
 	const { address } = artifacts.require('AddressConfig')
-	const decimals = artifacts.require('Decimals')
-
-	// Library
-	deployer.deploy(decimals)
 
 	// Allocator
-	deployer.link(decimals, artifacts.require('Allocator'))
 	deployer.deploy(artifacts.require('Allocator'), address)
-	deployer.deploy(artifacts.require('AllocatorStorage'))
 
 	// Dev
 	deployer.deploy(artifacts.require('Dev'), address)
 
 	// Lockup
-	deployer.link(decimals, artifacts.require('Lockup'))
-	deployer.deploy(artifacts.require('Lockup'), address)
+	deployer.deploy(artifacts.require('Lockup'), address, '')
 
 	// Market
 	deployer.deploy(artifacts.require('MarketFactory'), address)
@@ -42,8 +35,7 @@ const handler = function (deployer, network) {
 	deployer.deploy(artifacts.require('VoteCounter'), address)
 
 	// Withdraw
-	deployer.link(decimals, artifacts.require('Withdraw'))
-	deployer.deploy(artifacts.require('Withdraw'), address)
+	deployer.deploy(artifacts.require('Withdraw'), address, '')
 } as Truffle.Migration
 
 export = handler
