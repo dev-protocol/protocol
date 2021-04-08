@@ -1,5 +1,5 @@
 import {
-	Dip7Instance,
+	DIP7Instance,
 	TreasuryFeeInstance,
 } from '../../types/truffle-contracts'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js'
 import { batchRandom } from './utils'
 import { validateNotOwnerErrorMessage } from '../test-lib/utils/error'
 contract('TreasuryFee', ([deployer, treasury, uesr]) => {
-	let dip7: Dip7Instance
+	let dip7: DIP7Instance
 	let treasuryFee: TreasuryFeeInstance
 	let dev: DevProtocolInstance
 

@@ -300,6 +300,8 @@ contract(
 			let propertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
@@ -347,6 +349,8 @@ contract(
 			let propertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generateWithdraw(),

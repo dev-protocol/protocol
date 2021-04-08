@@ -301,6 +301,7 @@ export class DevProtocolInstance {
 	public async generateWithdrawTest(): Promise<void> {
 		this._withdrawTest = await contract('WithdrawTest').new(
 			this.addressConfig.address,
+			this.devMinter.address,
 			this.fromDeployer
 		)
 		await this._addressConfig.setWithdraw(
@@ -313,6 +314,7 @@ export class DevProtocolInstance {
 	public async generateLockupTest(): Promise<void> {
 		this._lockupTest = await contract('LockupTest').new(
 			this.addressConfig.address,
+			this.devMinter.address,
 			this.fromDeployer
 		)
 		await this._addressConfig.setLockup(
