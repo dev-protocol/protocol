@@ -15,7 +15,11 @@ contract DevMinter is UsingConfig, Pausable, IDevMinter {
 	/**
 	 * Mint Dev token
 	 */
-	function mint(address account, uint256 amount) external whenNotPaused returns (bool) {
+	function mint(address account, uint256 amount)
+		external
+		whenNotPaused
+		returns (bool)
+	{
 		return ERC20Mintable(config().token()).mint(account, amount);
 	}
 }
