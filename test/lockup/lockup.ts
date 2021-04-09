@@ -1689,4 +1689,11 @@ contract('LockupTest', ([deployer, user1]) => {
 			expect(res).to.be.instanceOf(Error)
 		})
 	})
+	describe('Lockup; devMinter', () => {
+		it('get the address of the DevMinter contract.', async () => {
+			const [dev] = await init()
+			const devMinterAddress = await dev.lockup.devMinter()
+			expect(devMinterAddress).to.be.equal(dev.devMinter.address)
+		})
+	})
 })

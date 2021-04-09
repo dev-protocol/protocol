@@ -18,7 +18,7 @@ import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	address private devMinter;
+	address public devMinter;
 	event PropertyTransfer(address _property, address _from, address _to);
 
 	/**

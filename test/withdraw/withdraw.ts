@@ -1496,4 +1496,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			)
 		})
 	})
+	describe('Withdraw; devMinter', () => {
+		it('get the address of the DevMinter contract.', async () => {
+			const [dev] = await init()
+			const devMinterAddress = await dev.withdraw.devMinter()
+			expect(devMinterAddress).to.be.equal(dev.devMinter.address)
+		})
+	})
 })

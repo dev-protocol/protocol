@@ -43,7 +43,7 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 contract Lockup is ILockup, UsingConfig, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
-	address private devMinter;
+	address public devMinter;
 	struct RewardPrices {
 		uint256 reward;
 		uint256 holders;
