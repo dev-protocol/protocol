@@ -1,9 +1,5 @@
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
-	DevInstance,
-	AddressConfigInstance,
-	DevMinterInstance,
-} from '../../types/truffle-contracts'
+import { DevMinterInstance } from '../../types/truffle-contracts'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('DevMinter', ([deployer, user1, user2, marketFactory, market]) => {
