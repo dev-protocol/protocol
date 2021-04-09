@@ -2,7 +2,7 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import { DevMinterInstance } from '../../types/truffle-contracts'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
-contract('DevMinter', ([deployer, user1, user2, marketFactory, market]) => {
+contract('DevMinter', ([deployer, user1]) => {
 	const createDevInstance = async (): Promise<DevProtocolInstance> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
