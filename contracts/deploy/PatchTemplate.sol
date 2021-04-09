@@ -11,7 +11,7 @@ import {Allocator} from "contracts/src/allocator/Allocator.sol";
 contract PatchTemplate is IPatch {
 	address public config;
 	address public upgrader;
-	address public ownerble;
+	address public deployedContract;
 
 	/**
 	 * @dev Initialize the passed address as AddressConfig address and Upgrader address.
@@ -37,6 +37,6 @@ contract PatchTemplate is IPatch {
 	function deploy() external onlyUpgrader {
 		// ex) Allocator
 		Allocator allocator = new Allocator(config);
-		ownerble = address(allocator);
+		deployedContract = address(allocator);
 	}
 }

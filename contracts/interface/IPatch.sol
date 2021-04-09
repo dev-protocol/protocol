@@ -6,7 +6,7 @@ interface IPatch {
 
 	function upgrader() external view returns (address);
 
-	function ownerble() external view returns (address);
+	function deployedContract() external view returns (address);
 
 	function deploy() external;
 }

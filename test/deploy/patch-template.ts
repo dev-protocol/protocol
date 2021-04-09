@@ -11,8 +11,8 @@ contract('Patch', ([config, upgrader]) => {
 			expect(configAddress).to.equal(config)
 			const upgraderAddress = await patch.upgrader()
 			expect(upgraderAddress).to.equal(upgrader)
-			const ownerbleAddress = await patch.ownerble()
-			expect(ownerbleAddress).to.equal(DEFAULT_ADDRESS)
+			const deployedContractAddress = await patch.deployedContract()
+			expect(deployedContractAddress).to.equal(DEFAULT_ADDRESS)
 		})
 	})
 	describe('deploy', () => {
@@ -20,8 +20,8 @@ contract('Patch', ([config, upgrader]) => {
 			it('deploy contracts.', async () => {
 				const patch = await contract('PatchTemplate').new(config, upgrader)
 				await patch.deploy({ from: upgrader })
-				const ownerbleAddress = await patch.ownerble()
-				expect(ownerbleAddress).to.not.equal(DEFAULT_ADDRESS)
+				const deployedContractAddress = await patch.deployedContract()
+				expect(deployedContractAddress).to.not.equal(DEFAULT_ADDRESS)
 			})
 		})
 		describe('fail', () => {
