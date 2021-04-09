@@ -178,7 +178,6 @@ export class DevProtocolInstance {
 		const block = await getBlock()
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 		await this._lockup.createStorage()
-		await this._lockup.setDIP4GenesisBlock(block)
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
