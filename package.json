@@ -1,6 +1,6 @@
 {
 	"name": "@devprotocol/protocol",
-	"version": "3.0.9",
+	"version": "3.0.10",
 	"description": "Securitize for Internet assets",
 	"scripts": {
 		"test": "truffle test",
