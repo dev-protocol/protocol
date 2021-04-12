@@ -18,6 +18,11 @@ export class Lockup {
 	}
 
 	public async create(devMinter = ''): Promise<LockupInstance> {
+		if (devMinter === '') {
+			const tmp = await this.load()
+			devMinter = await tmp.devMinter()
+		}
+
 		const lockup = await this._dev.artifacts
 			.require('Lockup')
 			.new(this._dev.addressConfig.address, devMinter, await this._dev.gasInfo)

@@ -21,6 +21,11 @@ export class Withdraw {
 	}
 
 	public async create(devMinter = ''): Promise<WithdrawInstance> {
+		if (devMinter === '') {
+			const tmp = await this.load()
+			devMinter = await tmp.devMinter()
+		}
+
 		const withdraw = await this._dev.artifacts
 			.require('Withdraw')
 			.new(this._dev.addressConfig.address, devMinter, await this._dev.gasInfo)
