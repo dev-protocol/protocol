@@ -20,6 +20,10 @@ contract DevMinter is UsingConfig, Pausable, IDevMinter {
 		whenNotPaused
 		returns (bool)
 	{
+		bool isSenderLockup = msg.sender == config().lockup();
+		bool isSenderWithdraw = msg.sender == config().withdraw();
+		bool islegalAccess = isSenderLockup == true || isSenderWithdraw == true;
+		require(islegalAccess, "illegal access");
 		return ERC20Mintable(config().token()).mint(account, amount);
 	}
 }
