@@ -2,7 +2,7 @@ pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
-import { IUpgrader } from "contracts/interface/IUpgrader.sol";
+import {IUpgrader} from "contracts/interface/IUpgrader.sol";
 import {IPatch} from "contracts/interface/IPatch.sol";
 import {IUsingStorage} from "contracts/interface/IUsingStorage.sol";
 import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
@@ -20,7 +20,11 @@ contract PatchBase is Pausable, IPatch {
 		_;
 	}
 
-	function setConfigAddress(address _config) external onlyUpgrader whenNotPaused {
+	function setConfigAddress(address _config)
+		external
+		onlyUpgrader
+		whenNotPaused
+	{
 		config = _config;
 	}
 

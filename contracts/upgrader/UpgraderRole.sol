@@ -1,12 +1,12 @@
 pragma solidity 0.5.17;
 
-import { Roles } from "@openzeppelin/contracts/access/Roles.sol";
+import {Roles} from "@openzeppelin/contracts/access/Roles.sol";
 
 contract UpgraderRole {
 	using Roles for Roles.Role;
 
-    Roles.Role private _admins;
-    Roles.Role private _operators;
+	Roles.Role private _admins;
+	Roles.Role private _operators;
 
 	modifier onlyAdmin() {
 		require(_admins.has(msg.sender), "does not have admin role");
@@ -14,10 +14,7 @@ contract UpgraderRole {
 	}
 
 	modifier onlyOperator() {
-		require(
-			isOperator(),
-			"does not have operator role."
-		);
+		require(isOperator(), "does not have operator role.");
 		_;
 	}
 
