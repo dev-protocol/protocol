@@ -42,7 +42,10 @@ contract UpgraderRole {
 	function removeAdmin(address _account) external onlyAdmin {
 		_admins.remove(_account);
 		_adminCounter.decrement();
-		require(_adminCounter.current() =! 0, "last administrator can not be removed");
+		require(
+			_adminCounter.current() = !0,
+			"last administrator can not be removed"
+		);
 	}
 
 	function hasAdmin(address _account) external {
