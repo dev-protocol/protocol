@@ -1,67 +1,6 @@
-import { DevProtocolInstance } from '../test-lib/instance'
-import BigNumber from 'bignumber.js'
-import { toBigNumber } from '../test-lib/utils/common'
-import { PropertyInstance } from '../../types/truffle-contracts'
-import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
-import { validateAddressErrorMessage } from '../test-lib/utils/error'
+import { validateErrorMessage } from '../test-lib/utils/error'
 
-contract('UpgraderRole', ([deployer, user1]) => {
-	// Const marketContract = artifacts.require('Market')
-	// const init = async (): Promise<[DevProtocolInstance, PropertyInstance]> => {
-	// 	const dev = new DevProtocolInstance(deployer)
-	// 	await dev.generateAddressConfig()
-	// 	await dev.generateDev()
-	// 	await dev.generateDevMinter()
-	// 	await Promise.all([
-	// 		dev.generateAllocator(),
-	// 		dev.generateMarketFactory(),
-	// 		dev.generateMarketGroup(),
-	// 		dev.generateMetricsFactory(),
-	// 		dev.generateMetricsGroup(),
-	// 		dev.generateLockup(),
-	// 		dev.generateWithdraw(),
-	// 		dev.generatePropertyFactory(),
-	// 		dev.generatePropertyGroup(),
-	// 		dev.generateVoteCounter(),
-	// 		dev.generatePolicyFactory(),
-	// 		dev.generatePolicyGroup(),
-	// 	])
-
-	// 	await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
-	// 	await dev.generatePolicy('PolicyTestForAllocator')
-	// 	const propertyAddress = getPropertyAddress(
-	// 		await dev.propertyFactory.create('test', 'TEST', deployer)
-	// 	)
-	// 	const [property] = await Promise.all([
-	// 		artifacts.require('Property').at(propertyAddress),
-	// 	])
-	// 	await dev.metricsGroup.__setMetricsCountPerProperty(property.address, 1)
-	// 	return [dev, property]
-	// }
-
-	// const authenticate = async (
-	// 	dev: DevProtocolInstance,
-	// 	propertyAddress: string
-	// ): Promise<void> => {
-	// 	const behavuor = await dev.getMarket('MarketTest3', user1)
-	// 	let createMarketResult = await dev.marketFactory.create(behavuor.address)
-	// 	const marketAddress = getMarketAddress(createMarketResult)
-	// 	// eslint-disable-next-line @typescript-eslint/await-thenable
-	// 	const marketInstance = await marketContract.at(marketAddress)
-	// 	await (behavuor as any).setAssociatedMarket(marketAddress, {
-	// 		from: user1,
-	// 	})
-	// 	await marketInstance.authenticate(
-	// 		propertyAddress,
-	// 		'id-key',
-	// 		'',
-	// 		'',
-	// 		'',
-	// 		'',
-	// 		{ from: deployer }
-	// 	)
-	// }
-
+contract('UpgraderRole', ([deployer, user1, user2]) => {
 	describe('constructor', () => {
 		it('The deployer gets admin privileges.', async () => {
 			const upgraderRole = await artifacts.require('UpgraderRole').new()
@@ -72,11 +11,123 @@ contract('UpgraderRole', ([deployer, user1]) => {
 		})
 	})
 
-	describe('addAdmin', () => {
-		it('The deployer gets admin privileges..', async () => {
+	describe('addAdmin, removeAdmin, hasAdmin', () => {
+		it('Permissions can be added or removed.', async () => {
 			const upgraderRole = await artifacts.require('UpgraderRole').new()
+			let hasAdmin = await upgraderRole.hasAdmin(user1)
+			expect(hasAdmin).to.be.equal(false)
+			await upgraderRole.addAdmin(user1)
+			hasAdmin = await upgraderRole.hasAdmin(user1)
+			expect(hasAdmin).to.be.equal(true)
+			await upgraderRole.removeAdmin(user1)
 			hasAdmin = await upgraderRole.hasAdmin(user1)
 			expect(hasAdmin).to.be.equal(false)
+		})
+		it('Only administrators can add permissions.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRole').new()
+			const result = await upgraderRole
+				.addAdmin(user1, { from: user1 })
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'does not have admin role')
+		})
+		it('Only administrators can remove permissions.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRole').new()
+			const result = await upgraderRole
+				.removeAdmin(user1, { from: user1 })
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'does not have admin role')
+		})
+		it('Anyone can check to see if who has permissions.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRole').new()
+			const hasAdmin = await upgraderRole.hasAdmin(deployer, { from: user1 })
+			expect(hasAdmin).to.be.equal(true)
+		})
+		it('we can not remove all administrators.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRole').new()
+			const result = await upgraderRole
+				.removeAdmin(deployer)
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'last administrator can not be removed')
+			const hasAdmin = await upgraderRole.hasAdmin(deployer)
+			expect(hasAdmin).to.be.equal(true)
+		})
+	})
+	describe('addOperator, removeOperator, hasOperator', () => {
+		it('Permissions can be added or removed.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRole').new()
+			let hasAdmin = await upgraderRole.hasOperator(user1)
+			expect(hasAdmin).to.be.equal(false)
+			await upgraderRole.addOperator(user1)
+			hasAdmin = await upgraderRole.hasOperator(user1)
+			expect(hasAdmin).to.be.equal(true)
+			await upgraderRole.removeOperator(user1)
+			hasAdmin = await upgraderRole.hasOperator(user1)
+			expect(hasAdmin).to.be.equal(false)
+		})
+		it('Only administrators can add permissions.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRole').new()
+			let result = await upgraderRole
+				.addOperator(user2, { from: user1 })
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'does not have admin role')
+			await upgraderRole.addOperator(user1)
+			result = await upgraderRole
+				.addOperator(user2, { from: user1 })
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'does not have admin role')
+		})
+		it('Only administrators can remove permissions.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRole').new()
+			await upgraderRole.addOperator(user1)
+			const result = await upgraderRole
+				.removeOperator(user1, { from: user1 })
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'does not have admin role')
+		})
+		it('Anyone can check to see if who has permissions.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRole').new()
+			const hasAdmin = await upgraderRole.hasOperator(deployer, { from: user1 })
+			expect(hasAdmin).to.be.equal(false)
+		})
+	})
+	describe('hasOperatingPrivilegesTest', () => {
+		it('Admin has the operating privileges.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRoleTest').new()
+			const isOperator = await upgraderRole.hasOperatingPrivilegesTest(deployer)
+			expect(isOperator).to.be.equal(true)
+		})
+		it('If user do not have operating privileges.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRoleTest').new()
+			const isOperator = await upgraderRole.hasOperatingPrivilegesTest(user1)
+			expect(isOperator).to.be.equal(false)
+		})
+		it('Operator has the operating privileges.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRoleTest').new()
+			await upgraderRole.addOperator(user1)
+			const isOperator = await upgraderRole.hasOperatingPrivilegesTest(user1)
+			expect(isOperator).to.be.equal(true)
+		})
+	})
+	describe('onlyAdminAndOperatorTest', () => {
+		it('Admin have the operating privileges.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRoleTest').new()
+			const isOperator = await upgraderRole.onlyAdminAndOperatorTest()
+			expect(isOperator).to.be.equal(true)
+		})
+		it('If you do not have operating privileges.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRoleTest').new()
+			const result = await upgraderRole
+				.onlyAdminAndOperatorTest({ from: user1 })
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'does not have operator role', false)
+		})
+		it('Operator has the operating privileges.', async () => {
+			const upgraderRole = await artifacts.require('UpgraderRoleTest').new()
+			await upgraderRole.addOperator(user1)
+			const isOperator = await upgraderRole.onlyAdminAndOperatorTest({
+				from: user1,
+			})
+			expect(isOperator).to.be.equal(true)
 		})
 	})
 })

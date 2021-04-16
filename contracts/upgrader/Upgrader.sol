@@ -15,16 +15,18 @@ contract Upgrader is UpgraderRole, IUpgrader {
 	address public patch;
 	address public patchSetter;
 
+	event Upgrade(string _name, address _current, address _next);
+
 	constructor(address _config) public {
 		addressConfig = _config;
 	}
 
-	function setPatch(address _patch) external onlyOperator {
+	function setPatch(address _patch) external onlyAdminAndOperator {
 		patch = _patch;
 		patchSetter = msg.sender;
 	}
 
-	function execute() external onlyOperator {
+	function execute() external onlyAdminAndOperator {
 		require(patchSetter != msg.sender, "not another operator");
 		Pausable patchPause = Pausable(patch);
 		require(patchPause.paused() == false, "already executed");
@@ -37,7 +39,7 @@ contract Upgrader is UpgraderRole, IUpgrader {
 	}
 
 	function transferOwnership(address _target) external {
-		bool result = isOperator();
+		bool result = hasOperatingPrivileges(msg.sender);
 		if (result == false) {
 			result = patch == msg.sender;
 		}
@@ -45,17 +47,22 @@ contract Upgrader is UpgraderRole, IUpgrader {
 		Ownable(_target).transferOwnership(msg.sender);
 	}
 
-	function pauseDevMinter() external onlyOperator {
+	function pauseDevMinter() external onlyAdminAndOperator {
 		Pausable devMinter = getDevMintContract();
 		devMinter.pause();
 	}
 
-	function unpauseDevMinter() external onlyOperator {
+	function unpauseDevMinter() external onlyAdminAndOperator {
 		Pausable devMinter = getDevMintContract();
 		devMinter.unpause();
 	}
 
-	function forceAttachPolicy(address _nextPolicy) external onlyOperator {
+	function addUpgradeEvent(string calldata _name, address _current, address _next) external {
+		require(msg.sender == patch, "illegal access");
+		emit Upgrade(_name, _current, _next);
+	}
+
+	function forceAttachPolicy(address _nextPolicy) external onlyAdminAndOperator {
 		address policyFactoryAddress =
 			IAddressConfig(addressConfig).policyFactory();
 		IPolicyFactory(policyFactoryAddress).forceAttach(_nextPolicy);

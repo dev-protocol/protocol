@@ -13,4 +13,6 @@ interface IUpgrader {
 	function forceAttachPolicy(address _nextPolicy) external;
 
 	function transferOwnership(address _target) external;
+
+	function addUpgradeEvent(string calldata _name, address _current, address _next) external;
 }

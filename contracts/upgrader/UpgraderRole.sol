@@ -21,17 +21,17 @@ contract UpgraderRole {
 		_;
 	}
 
-	modifier onlyOperator() {
-		require(isOperator(), "does not have operator role.");
+	modifier onlyAdminAndOperator() {
+		require(hasOperatingPrivileges(msg.sender), "does not have operator role");
 		_;
 	}
 
-	function isOperator() internal returns (bool) {
-		bool hasAdminRole = _admins.has(msg.sender);
+	function hasOperatingPrivileges(address _sender) internal view returns (bool) {
+		bool hasAdminRole = _admins.has(_sender);
 		if (hasAdminRole) {
 			return true;
 		}
-		return _operators.has(msg.sender);
+		return _operators.has(_sender);
 	}
 
 	function addAdmin(address _account) external onlyAdmin {
@@ -43,13 +43,13 @@ contract UpgraderRole {
 		_admins.remove(_account);
 		_adminCounter.decrement();
 		require(
-			_adminCounter.current() = !0,
+			_adminCounter.current() >= 1,
 			"last administrator can not be removed"
 		);
 	}
 
-	function hasAdmin(address _account) external {
-		_admins.has(_account);
+	function hasAdmin(address _account) external view returns (bool) {
+		return _admins.has(_account);
 	}
 
 	function addOperator(address _account) external onlyAdmin {
@@ -60,7 +60,7 @@ contract UpgraderRole {
 		_operators.remove(_account);
 	}
 
-	function hasOperator(address _account) external {
-		_operators.has(_account);
+	function hasOperator(address _account) external view returns (bool) {
+		return _operators.has(_account);
 	}
 }

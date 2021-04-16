@@ -13,6 +13,7 @@ contract PatchBase is Pausable, IPatch {
 
 	constructor(address _upgrader) public {
 		upgrader = _upgrader;
+		addPauser(upgrader);
 	}
 
 	modifier onlyUpgrader() {
@@ -34,22 +35,30 @@ contract PatchBase is Pausable, IPatch {
 
 	function afterDeployAllocator(address _next) internal {
 		IAddressConfig addressConfig = IAddressConfig(config);
+		address tmp = addressConfig.allocator();
 		addressConfig.setAllocator(_next);
+		IUpgrader(upgrader).addUpgradeEvent("Allocator", tmp, _next);
 	}
 
 	function afterDeployMarketFactory(address _next) internal {
 		IAddressConfig addressConfig = IAddressConfig(config);
+		address tmp = addressConfig.marketFactory();
 		addressConfig.setMarketFactory(_next);
+		IUpgrader(upgrader).addUpgradeEvent("MarketFactory", tmp, _next);
 	}
 
 	function afterDeployMetricsFactory(address _next) internal {
 		IAddressConfig addressConfig = IAddressConfig(config);
+		address tmp = addressConfig.metricsFactory();
 		addressConfig.setMetricsFactory(_next);
+		IUpgrader(upgrader).addUpgradeEvent("MetricsFactory", tmp, _next);
 	}
 
 	function afterDeployPropertyFactory(address _next) internal {
 		IAddressConfig addressConfig = IAddressConfig(config);
+		address tmp = addressConfig.propertyFactory();
 		addressConfig.setPropertyFactory(_next);
+		IUpgrader(upgrader).addUpgradeEvent("PropertyFactory", tmp, _next);
 	}
 
 	function afterDeployWithdraw(address _next) internal {
@@ -57,6 +66,7 @@ contract PatchBase is Pausable, IPatch {
 		address current = addressConfig.withdraw();
 		afterDeployUsingStorage(current, _next);
 		addressConfig.setWithdraw(_next);
+		IUpgrader(upgrader).addUpgradeEvent("Withdraw", current, _next);
 	}
 
 	function afterDeployVoteCounter(address _next) internal {
@@ -64,6 +74,7 @@ contract PatchBase is Pausable, IPatch {
 		address current = addressConfig.voteCounter();
 		afterDeployUsingStorage(current, _next);
 		addressConfig.setVoteCounter(_next);
+		IUpgrader(upgrader).addUpgradeEvent("VoteCounter", current, _next);
 	}
 
 	function afterDeployPropertyGroup(address _next) internal {
@@ -71,6 +82,7 @@ contract PatchBase is Pausable, IPatch {
 		address current = addressConfig.propertyGroup();
 		afterDeployUsingStorage(current, _next);
 		addressConfig.setPropertyGroup(_next);
+		IUpgrader(upgrader).addUpgradeEvent("VoteCounter", current, _next);
 	}
 
 	function afterDeployPolicyGroup(address _next) internal {
@@ -78,6 +90,7 @@ contract PatchBase is Pausable, IPatch {
 		address current = addressConfig.policyGroup();
 		afterDeployUsingStorage(current, _next);
 		addressConfig.setPolicyGroup(_next);
+		IUpgrader(upgrader).addUpgradeEvent("PolicyGroup", current, _next);
 	}
 
 	function afterDeployPolicyFactory(address _next) internal {
@@ -87,6 +100,7 @@ contract PatchBase is Pausable, IPatch {
 		Ownable(current).transferOwnership(upgrader);
 		Ownable(_next).transferOwnership(upgrader);
 		addressConfig.setPolicyFactory(_next);
+		IUpgrader(upgrader).addUpgradeEvent("PolicyFactory", current, _next);
 	}
 
 	function afterDeployMetricsGroup(address _next) internal {
@@ -94,6 +108,7 @@ contract PatchBase is Pausable, IPatch {
 		address current = addressConfig.metricsGroup();
 		afterDeployUsingStorage(current, _next);
 		addressConfig.setMetricsGroup(_next);
+		IUpgrader(upgrader).addUpgradeEvent("MetricsGroup", current, _next);
 	}
 
 	function afterDeployMarketGroup(address _next) internal {
@@ -101,6 +116,7 @@ contract PatchBase is Pausable, IPatch {
 		address current = addressConfig.marketGroup();
 		afterDeployUsingStorage(current, _next);
 		addressConfig.setMarketGroup(_next);
+		IUpgrader(upgrader).addUpgradeEvent("MarketGroup", current, _next);
 	}
 
 	function afterDeployLockup(address _next) internal {
@@ -108,6 +124,7 @@ contract PatchBase is Pausable, IPatch {
 		address current = addressConfig.lockup();
 		afterDeployUsingStorage(current, _next);
 		addressConfig.setLockup(_next);
+		IUpgrader(upgrader).addUpgradeEvent("Lockup", current, _next);
 	}
 
 	function afterDeployUsingStorage(address _current, address _next) private {
