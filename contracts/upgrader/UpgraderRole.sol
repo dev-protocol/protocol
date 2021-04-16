@@ -22,11 +22,18 @@ contract UpgraderRole {
 	}
 
 	modifier onlyAdminAndOperator() {
-		require(hasOperatingPrivileges(msg.sender), "does not have operator role");
+		require(
+			hasOperatingPrivileges(msg.sender),
+			"does not have operator role"
+		);
 		_;
 	}
 
-	function hasOperatingPrivileges(address _sender) internal view returns (bool) {
+	function hasOperatingPrivileges(address _sender)
+		internal
+		view
+		returns (bool)
+	{
 		bool hasAdminRole = _admins.has(_sender);
 		if (hasAdminRole) {
 			return true;

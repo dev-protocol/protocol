@@ -8,16 +8,13 @@ import {PropertyFactory} from "contracts/src/property/PropertyFactory.sol";
 import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
-
 contract PatchPlane is PatchBase {
-
 	constructor(address _upgrader) public PatchBase(_upgrader) {}
 
 	function run() external onlyUpgrader whenNotPaused {}
 }
 
 contract PatchAllocator is PatchBase {
-
 	constructor(address _upgrader) public PatchBase(_upgrader) {}
 
 	function run() external onlyUpgrader whenNotPaused {
@@ -27,7 +24,6 @@ contract PatchAllocator is PatchBase {
 }
 
 contract PatchMarketFactory is PatchBase {
-
 	constructor(address _upgrader) public PatchBase(_upgrader) {}
 
 	function run() external onlyUpgrader whenNotPaused {
@@ -37,7 +33,6 @@ contract PatchMarketFactory is PatchBase {
 }
 
 contract PatchMetricsFactory is PatchBase {
-
 	constructor(address _upgrader) public PatchBase(_upgrader) {}
 
 	function run() external onlyUpgrader whenNotPaused {
@@ -47,7 +42,6 @@ contract PatchMetricsFactory is PatchBase {
 }
 
 contract PatchPropertyFactory is PatchBase {
-
 	constructor(address _upgrader) public PatchBase(_upgrader) {}
 
 	function run() external onlyUpgrader whenNotPaused {
@@ -57,15 +51,14 @@ contract PatchPropertyFactory is PatchBase {
 }
 
 contract PatchWithdraw is PatchBase {
-
 	constructor(address _upgrader) public PatchBase(_upgrader) {}
 
 	function run() external onlyUpgrader whenNotPaused {
-		Withdraw tmp = new Withdraw(config, 0x6A0A88907548a5601857191aAD8727884881Ac46);
+		Withdraw tmp =
+			new Withdraw(config, 0x6A0A88907548a5601857191aAD8727884881Ac46);
 		afterDeployWithdraw(address(tmp));
 	}
 }
-
 
 contract StorageContract is UsingStorage {
 	constructor() public UsingStorage() {}

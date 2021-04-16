@@ -57,12 +57,19 @@ contract Upgrader is UpgraderRole, IUpgrader {
 		devMinter.unpause();
 	}
 
-	function addUpgradeEvent(string calldata _name, address _current, address _next) external {
+	function addUpgradeEvent(
+		string calldata _name,
+		address _current,
+		address _next
+	) external {
 		require(msg.sender == patch, "illegal access");
 		emit Upgrade(_name, _current, _next);
 	}
 
-	function forceAttachPolicy(address _nextPolicy) external onlyAdminAndOperator {
+	function forceAttachPolicy(address _nextPolicy)
+		external
+		onlyAdminAndOperator
+	{
 		address policyFactoryAddress =
 			IAddressConfig(addressConfig).policyFactory();
 		IPolicyFactory(policyFactoryAddress).forceAttach(_nextPolicy);
