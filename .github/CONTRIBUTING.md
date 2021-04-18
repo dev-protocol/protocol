@@ -2,7 +2,7 @@
 
 ## How to contribute?
 
-You can find problems from [Issues](https://github.com/dev-protocol/repository-token/issues) or fix other problems.
+You can find problems from [Issues](https://github.com/dev-protocol/protocol/issues) or fix other problems.
 
 Basic Pull Request steps:
 
@@ -17,8 +17,8 @@ Basic Pull Request steps:
 First as follows:
 
 ```
-git clone git@github.com:YOUR/repository-token.git
-cd repository-token
+git clone git@github.com:YOUR/protocol.git
+cd protocol
 yarn
 yarn generate
 ```
