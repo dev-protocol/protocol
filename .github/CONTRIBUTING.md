@@ -17,7 +17,7 @@ Basic Pull Request steps:
 First as follows:
 
 ```
-git clone git@github.com:YOUR_USERNAME/protocol.git
+git clone git@github.com:YOUR-USERNAME/protocol.git
 cd protocol
 yarn
 yarn generate
