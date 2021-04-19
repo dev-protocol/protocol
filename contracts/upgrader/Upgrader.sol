@@ -1,8 +1,11 @@
 pragma solidity 0.5.17;
 
+// prettier-ignore
+import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
+import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IUpgrader} from "contracts/interface/IUpgrader.sol";
 import {IPatch} from "contracts/interface/IPatch.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
@@ -47,14 +50,14 @@ contract Upgrader is UpgraderRole, IUpgrader {
 		Ownable(_target).transferOwnership(msg.sender);
 	}
 
-	function pauseDevMinter() external onlyAdminAndOperator {
-		Pausable devMinter = getDevMintContract();
-		devMinter.pause();
+	function renounceMinter() external onlyAdminAndOperator {
+		IDevMinter devMinter = getDevMintContract();
+		devMinter.renounceMinter();
 	}
 
-	function unpauseDevMinter() external onlyAdminAndOperator {
-		Pausable devMinter = getDevMintContract();
-		devMinter.unpause();
+	function addMinter(address _account) external onlyAdminAndOperator {
+		address token = IAddressConfig(addressConfig).token();
+		ERC20Mintable(token).addMinter(_account);
 	}
 
 	function addUpgradeEvent(
@@ -75,9 +78,9 @@ contract Upgrader is UpgraderRole, IUpgrader {
 		IPolicyFactory(policyFactoryAddress).forceAttach(_nextPolicy);
 	}
 
-	function getDevMintContract() private returns (Pausable) {
+	function getDevMintContract() private returns (IDevMinter) {
 		address withdrawAddress = IAddressConfig(addressConfig).withdraw();
 		address devMinter = ILockup(withdrawAddress).devMinter();
-		return Pausable(devMinter);
+		return IDevMinter(devMinter);
 	}
 }
