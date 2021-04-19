@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 /* eslint-disable max-nested-callbacks */
-import { AddressConfigInstance } from '../../../types/truffle-contracts'
+import {
+	AddressConfigInstance,
+	StorageContractInstance,
+} from '../../../types/truffle-contracts'
 import { validateErrorMessage } from '../../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../../test-lib/const'
 
-contract('Patch', ([deployer, upgrader]) => {
+contract('Patch', ([deployer, upgrader, operator]) => {
 	describe('constructor', () => {
 		it('セットしたupgraderが取得できる', async () => {
 			const patch = await artifacts.require('PatchPlane').new(upgrader)
@@ -69,16 +73,58 @@ contract('Patch', ([deployer, upgrader]) => {
 			})
 		})
 	})
+
+	describe('afterDeployUsingStorage', () => {
+		it('Storage permissions transition and the owner becomes the upgrader.', async () => {
+			const addressConfig = await artifacts.require('AddressConfig').new()
+			const storageContract = await artifacts.require('StorageContract').new()
+			await storageContract.createStorage()
+			await storageContract.increment()
+			expect((await storageContract.getValue()).toString()).to.be.equal('1')
+
+			await addressConfig.setLockup(storageContract.address)
+			const upgrader = await artifacts
+				.require('Upgrader')
+				.new(addressConfig.address)
+			await storageContract.transferOwnership(upgrader.address)
+			await upgrader.addOperator(operator)
+			await addressConfig.transferOwnership(upgrader.address)
+			const patch = await artifacts.require('PatchPlane').new(upgrader.address)
+			await upgrader.setPatch(patch.address)
+			await upgrader.execute({ from: operator })
+			const next = await addressConfig.lockup()
+			const nextStorageContract = await artifacts
+				.require('StorageContract')
+				.at(next)
+			expect(await storageContract.owner()).to.be.equal(upgrader.address)
+			expect(await nextStorageContract.owner()).to.be.equal(upgrader.address)
+			const beforeStorageAddress = await storageContract.getStorageAddress()
+			const afterStorageAddress = await nextStorageContract.getStorageAddress()
+			expect(beforeStorageAddress).to.be.equal(afterStorageAddress)
+
+			await nextStorageContract.increment()
+			expect((await nextStorageContract.getValue()).toString()).to.be.equal('2')
+			const result = await storageContract
+				.increment()
+				.catch((err: Error) => err)
+			validateErrorMessage(result, 'not current owner')
+		})
+	})
 })
 
-contract('PatchAllocator', ([deployer, operator, current]) => {
+contract('Patch(afterDeploy)', ([deployer, operator, current]) => {
 	const getUpgraderEvent = async (
 		addressConfig: AddressConfigInstance,
-		patchName: string
+		patchName: string,
+		generateCurrentContract: StorageContractInstance | undefined = undefined
 	): Promise<any> => {
 		const upgrader = await artifacts
 			.require('Upgrader')
 			.new(addressConfig.address)
+		if (typeof generateCurrentContract !== 'undefined') {
+			await generateCurrentContract.transferOwnership(upgrader.address)
+		}
+
 		await upgrader.addOperator(operator)
 		await addressConfig.transferOwnership(upgrader.address)
 		const patch = await artifacts.require(patchName).new(upgrader.address)
@@ -90,21 +136,20 @@ contract('PatchAllocator', ([deployer, operator, current]) => {
 		return eventArgs
 	}
 
-	describe.only('afterDeploy', () => {
-		it('Allocatorが更新される', async () => {
+	describe('afterDeploy', () => {
+		it('Allocator will be updated.', async () => {
 			const addressConfig = await artifacts.require('AddressConfig').new()
 			await addressConfig.setAllocator(current)
 
 			const eventArgs = await getUpgraderEvent(addressConfig, 'PatchAllocator')
 
 			const next = await addressConfig.allocator()
-			expect(next).to.be.not.equal(current)
 			expect(eventArgs._name).to.be.equal('Allocator')
 			expect(eventArgs._current).to.be.equal(current)
 			expect(eventArgs._next).to.be.equal(next)
 		})
 
-		it('MarketFactoryが更新される', async () => {
+		it('MarketFactory will be updated.', async () => {
 			const addressConfig = await artifacts.require('AddressConfig').new()
 			await addressConfig.setMarketFactory(current)
 
@@ -114,13 +159,12 @@ contract('PatchAllocator', ([deployer, operator, current]) => {
 			)
 
 			const next = await addressConfig.marketFactory()
-			expect(next).to.be.not.equal(current)
 			expect(eventArgs._name).to.be.equal('MarketFactory')
 			expect(eventArgs._current).to.be.equal(current)
 			expect(eventArgs._next).to.be.equal(next)
 		})
 
-		it('MetricsFactoryが更新される', async () => {
+		it('MetricsFactory will be updated.', async () => {
 			const addressConfig = await artifacts.require('AddressConfig').new()
 			await addressConfig.setMetricsFactory(current)
 
@@ -130,13 +174,12 @@ contract('PatchAllocator', ([deployer, operator, current]) => {
 			)
 
 			const next = await addressConfig.metricsFactory()
-			expect(next).to.be.not.equal(current)
 			expect(eventArgs._name).to.be.equal('MetricsFactory')
 			expect(eventArgs._current).to.be.equal(current)
 			expect(eventArgs._next).to.be.equal(next)
 		})
 
-		it('PropertyFactoryが更新される', async () => {
+		it('PropertyFactory will be updated.', async () => {
 			const addressConfig = await artifacts.require('AddressConfig').new()
 			await addressConfig.setPropertyFactory(current)
 
@@ -146,23 +189,147 @@ contract('PatchAllocator', ([deployer, operator, current]) => {
 			)
 
 			const next = await addressConfig.propertyFactory()
-			expect(next).to.be.not.equal(current)
 			expect(eventArgs._name).to.be.equal('PropertyFactory')
 			expect(eventArgs._current).to.be.equal(current)
 			expect(eventArgs._next).to.be.equal(next)
 		})
 
-		it('Withdrawが更新される', async () => {
+		it('Withdraw will be updated.', async () => {
 			const addressConfig = await artifacts.require('AddressConfig').new()
-			const ownerbleContract = await artifacts.require('OwnerbleContract').new()
-			await addressConfig.setWithdraw(ownerbleContract.address)
+			const storageContract = await artifacts.require('StorageContract').new()
+			await storageContract.createStorage()
+			await addressConfig.setWithdraw(storageContract.address)
 
-			const eventArgs = await getUpgraderEvent(addressConfig, 'PatchWithdraw')
+			const eventArgs = await getUpgraderEvent(
+				addressConfig,
+				'PatchWithdraw',
+				storageContract
+			)
 
 			const next = await addressConfig.withdraw()
-			expect(next).to.be.not.equal(current)
 			expect(eventArgs._name).to.be.equal('Withdraw')
+			expect(eventArgs._current).to.be.equal(storageContract.address)
+			expect(eventArgs._next).to.be.equal(next)
+		})
+
+		it('VoteCounter will be updated.', async () => {
+			const addressConfig = await artifacts.require('AddressConfig').new()
+			const storageContract = await artifacts.require('StorageContract').new()
+			await storageContract.createStorage()
+			await addressConfig.setVoteCounter(storageContract.address)
+
+			const eventArgs = await getUpgraderEvent(
+				addressConfig,
+				'PatchVoteCounter',
+				storageContract
+			)
+
+			const next = await addressConfig.voteCounter()
+			expect(eventArgs._name).to.be.equal('VoteCounter')
+			expect(eventArgs._current).to.be.equal(storageContract.address)
+			expect(eventArgs._next).to.be.equal(next)
+		})
+
+		it('PropertyGroup will be updated.', async () => {
+			const addressConfig = await artifacts.require('AddressConfig').new()
+			const storageContract = await artifacts.require('StorageContract').new()
+			await storageContract.createStorage()
+			await addressConfig.setPropertyGroup(storageContract.address)
+
+			const eventArgs = await getUpgraderEvent(
+				addressConfig,
+				'PatchPropertyGroup',
+				storageContract
+			)
+
+			const next = await addressConfig.propertyGroup()
+			expect(eventArgs._name).to.be.equal('PropertyGroup')
+			expect(eventArgs._current).to.be.equal(storageContract.address)
+			expect(eventArgs._next).to.be.equal(next)
+		})
+		it('PolicyGroup will be updated.', async () => {
+			const addressConfig = await artifacts.require('AddressConfig').new()
+			const storageContract = await artifacts.require('StorageContract').new()
+			await storageContract.createStorage()
+			await addressConfig.setPolicyGroup(storageContract.address)
+
+			const eventArgs = await getUpgraderEvent(
+				addressConfig,
+				'PatchPolicyGroup',
+				storageContract
+			)
+
+			const next = await addressConfig.policyGroup()
+			expect(eventArgs._name).to.be.equal('PolicyGroup')
+			expect(eventArgs._current).to.be.equal(storageContract.address)
+			expect(eventArgs._next).to.be.equal(next)
+		})
+		it('PolicyFactory will be updated.', async () => {
+			const addressConfig = await artifacts.require('AddressConfig').new()
+			await addressConfig.setPolicyFactory(current)
+
+			const eventArgs = await getUpgraderEvent(
+				addressConfig,
+				'PatchPolicyFactory'
+			)
+
+			const next = await addressConfig.policyFactory()
+			expect(eventArgs._name).to.be.equal('PolicyFactory')
 			expect(eventArgs._current).to.be.equal(current)
+			expect(eventArgs._next).to.be.equal(next)
+
+			const nextpolicyFactory = artifacts.require('PolicyFactory').at(next)
+			expect(await nextpolicyFactory.owner()).to.be.equal(deployer)
+		})
+		it('MetricsGroup will be updated.', async () => {
+			const addressConfig = await artifacts.require('AddressConfig').new()
+			const storageContract = await artifacts.require('StorageContract').new()
+			await storageContract.createStorage()
+			await addressConfig.setMetricsGroup(storageContract.address)
+
+			const eventArgs = await getUpgraderEvent(
+				addressConfig,
+				'PatchMetricsGroup',
+				storageContract
+			)
+
+			const next = await addressConfig.metricsGroup()
+			expect(eventArgs._name).to.be.equal('MetricsGroup')
+			expect(eventArgs._current).to.be.equal(storageContract.address)
+			expect(eventArgs._next).to.be.equal(next)
+		})
+		it('MarketGroup will be updated.', async () => {
+			const addressConfig = await artifacts.require('AddressConfig').new()
+			const storageContract = await artifacts.require('StorageContract').new()
+			await storageContract.createStorage()
+			await addressConfig.setMarketGroup(storageContract.address)
+
+			const eventArgs = await getUpgraderEvent(
+				addressConfig,
+				'PatchMarketGroup',
+				storageContract
+			)
+
+			const next = await addressConfig.marketGroup()
+			expect(eventArgs._name).to.be.equal('MarketGroup')
+			expect(eventArgs._current).to.be.equal(storageContract.address)
+			expect(eventArgs._next).to.be.equal(next)
+		})
+		it('Lockup will be updated.', async () => {
+			const addressConfig = await artifacts.require('AddressConfig').new()
+			const storageContract = await artifacts.require('StorageContract').new()
+			await storageContract.createStorage()
+			await addressConfig.setLockup(storageContract.address)
+
+			const eventArgs = await getUpgraderEvent(
+				addressConfig,
+				'PatchLockup',
+				storageContract
+			)
+
+			const next = await addressConfig.lockup()
+			expect(eventArgs._name).to.be.equal('Lockup')
+			expect(eventArgs._current).to.be.equal(storageContract.address)
 			expect(eventArgs._next).to.be.equal(next)
 		})
 	})

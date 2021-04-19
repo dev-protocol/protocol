@@ -6,17 +6,17 @@ interface IUpgrader {
 
 	function execute() external;
 
-	function pauseDevMinter() external;
-
-	function unpauseDevMinter() external;
-
-	function forceAttachPolicy(address _nextPolicy) external;
-
 	function transferOwnership(address _target) external;
+
+	function renounceMinter() external;
+
+	function addMinter(address _account) external;
 
 	function addUpgradeEvent(
 		string calldata _name,
 		address _current,
 		address _next
 	) external;
+
+	function forceAttachPolicy(address _nextPolicy) external;
 }

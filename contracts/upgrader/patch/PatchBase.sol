@@ -82,7 +82,7 @@ contract PatchBase is Pausable, IPatch {
 		address current = addressConfig.propertyGroup();
 		afterDeployUsingStorage(current, _next);
 		addressConfig.setPropertyGroup(_next);
-		IUpgrader(upgrader).addUpgradeEvent("VoteCounter", current, _next);
+		IUpgrader(upgrader).addUpgradeEvent("PropertyGroup", current, _next);
 	}
 
 	function afterDeployPolicyGroup(address _next) internal {
@@ -96,8 +96,6 @@ contract PatchBase is Pausable, IPatch {
 	function afterDeployPolicyFactory(address _next) internal {
 		IAddressConfig addressConfig = IAddressConfig(config);
 		address current = addressConfig.policyFactory();
-		IUpgrader(upgrader).transferOwnership(current);
-		Ownable(current).transferOwnership(upgrader);
 		Ownable(_next).transferOwnership(upgrader);
 		addressConfig.setPolicyFactory(_next);
 		IUpgrader(upgrader).addUpgradeEvent("PolicyFactory", current, _next);
