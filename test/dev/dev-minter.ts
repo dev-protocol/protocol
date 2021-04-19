@@ -67,20 +67,40 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 					'MinterRole: caller does not have the Minter role'
 				)
 			})
-			it('Cannot mint Dev token when DevMinter is in pause, even if DevMinter has minter privilege.', async () => {
-				const dev = await createDevInstance()
-				await dev.devMinter.pause()
-				const result = await dev.devMinter
-					.mint(user1, 100, { from: withdraw })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'Pausable: paused')
-			})
 			it('Error when minting from other than Lockup and Withdraw contracts', async () => {
 				const dev = await createDevInstance()
 				const result = await dev.devMinter
 					.mint(user1, 100)
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'illegal access')
+			})
+		})
+	})
+	describe('renounceMinter', () => {
+		describe('success', () => {
+			it('we can remove mint privileges.', async () => {
+				const dev = await createDevInstance()
+				const before = await dev.dev.isMinter(dev.devMinter.address)
+				expect(before).to.equal(true)
+				await dev.devMinter.renounceMinter()
+				const after = await dev.dev.isMinter(dev.devMinter.address)
+				expect(after).to.equal(false)
+				const result = await dev.devMinter
+					.mint(user1, 100, { from: withdraw })
+					.catch((err: Error) => err)
+				validateErrorMessage(
+					result,
+					'MinterRole: caller does not have the Minter role'
+				)
+			})
+		})
+		describe('fail', () => {
+			it('Only the owner can run it.', async () => {
+				const dev = await createDevInstance()
+				const result = await dev.devMinter
+					.renounceMinter({ from: user1 })
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'Ownable: caller is not the owner')
 			})
 		})
 	})
