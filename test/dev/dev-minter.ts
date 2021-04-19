@@ -100,10 +100,7 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 				const result = await dev.devMinter
 					.renounceMinter({ from: user1 })
 					.catch((err: Error) => err)
-				validateErrorMessage(
-					result,
-					'MinterRole: caller does not have the Minter role'
-				)
+				validateErrorMessage(result, 'Ownable: caller is not the owner')
 			})
 		})
 	})
