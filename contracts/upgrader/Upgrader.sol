@@ -26,6 +26,10 @@ contract Upgrader is UpgraderRole, IUpgrader {
 
 	function setPatch(address _patch) external onlyAdminAndOperator {
 		patch = _patch;
+		require(
+			IPatch(_patch).upgrader() == address(this),
+			"upgrader is different"
+		);
 		patchSetter = msg.sender;
 	}
 
