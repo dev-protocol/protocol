@@ -9,7 +9,7 @@ import { DEFAULT_ADDRESS } from '../../test-lib/const'
 
 contract('Patch', ([deployer, upgrader, operator]) => {
 	describe('constructor', () => {
-		it('セットしたupgraderが取得できる', async () => {
+		it('it can get the set upgrader address.', async () => {
 			const patch = await artifacts.require('PatchPlane').new(upgrader)
 			const upgraderAddress = await patch.upgrader()
 			expect(upgraderAddress).to.be.equal(upgrader)
@@ -18,7 +18,7 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 
 	describe('setConfigAddress', () => {
 		describe('success', () => {
-			it('セットしたconfigアドレスが取得できる.', async () => {
+			it('get the set config address', async () => {
 				const patch = await artifacts.require('PatchPlane').new(upgrader)
 				const addressConfig = await artifacts.require('AddressConfig').new()
 				expect(await patch.config()).to.be.equal(DEFAULT_ADDRESS)
@@ -27,14 +27,14 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 			})
 		})
 		describe('fail', () => {
-			it('upgrader以外からはセットできない.', async () => {
+			it('only executed by upgrader contract', async () => {
 				const patch = await artifacts.require('PatchPlane').new(upgrader)
 				const result = await patch
 					.setConfigAddress(DEFAULT_ADDRESS)
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'illegal access')
 			})
-			it('pauseされていたらセットできない.', async () => {
+			it('if we execute pause, we can not set config address', async () => {
 				const patch = await artifacts.require('PatchPlane').new(upgrader)
 				await patch.pause()
 				const result = await patch
@@ -47,7 +47,7 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 
 	describe('afterRun', () => {
 		describe('success', () => {
-			it('addressConfigのオーナーをupgraderにセットできる.', async () => {
+			it('The owner of AddressConfig can be an upgrader.', async () => {
 				const patch = await artifacts.require('PatchPlane').new(upgrader)
 				const addressConfig = await artifacts.require('AddressConfig').new()
 				await addressConfig.transferOwnership(patch.address)
@@ -58,12 +58,12 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 			})
 		})
 		describe('fail', () => {
-			it('upgrader以外からはセットできない.', async () => {
+			it('Cannot be set except from the upgrader.', async () => {
 				const patch = await artifacts.require('PatchPlane').new(upgrader)
 				const result = await patch.afterRun().catch((err: Error) => err)
 				validateErrorMessage(result, 'illegal access')
 			})
-			it('pauseされていたらセットできない.', async () => {
+			it('Can not set it if it is paused.', async () => {
 				const patch = await artifacts.require('PatchPlane').new(upgrader)
 				await patch.pause()
 				const result = await patch

@@ -2,9 +2,9 @@
 pragma solidity >=0.5.17;
 
 interface IPatch {
-	function upgrader() external view returns (bool);
+	function upgrader() external view returns (address);
 
-	function config() external view returns (bool);
+	function config() external view returns (address);
 
 	function setConfigAddress(address _config) external;
 
