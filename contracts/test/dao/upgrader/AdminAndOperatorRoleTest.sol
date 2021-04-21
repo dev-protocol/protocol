@@ -1,6 +1,8 @@
 pragma solidity 0.5.17;
 
-import {AdminAndOperatorRole} from "contracts/dao/upgrader/AdminAndOperatorRole.sol";
+import {
+	AdminAndOperatorRole
+} from "contracts/dao/upgrader/AdminAndOperatorRole.sol";
 
 contract AdminAndOperatorRoleTest is AdminAndOperatorRole {
 	function hasOperatingPrivilegesTest(address _sender)
