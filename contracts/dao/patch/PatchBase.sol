@@ -3,6 +3,7 @@ pragma solidity 0.5.17;
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {IUpgrader} from "contracts/interface/IUpgrader.sol";
+import {IDevProtocolAccess} from "contracts/interface/IDevProtocolAccess.sol";
 import {IPatch} from "contracts/interface/IPatch.sol";
 import {IUsingStorage} from "contracts/interface/IUsingStorage.sol";
 import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
@@ -126,7 +127,7 @@ contract PatchBase is Pausable, IPatch {
 	}
 
 	function afterDeployUsingStorage(address _current, address _next) private {
-		IUpgrader(upgrader).transferOwnership(_current);
+		IDevProtocolAccess(upgrader).transferOwnership(_current);
 		changeStorageOwner(_current, _next);
 		Ownable(_current).transferOwnership(upgrader);
 		Ownable(_next).transferOwnership(upgrader);

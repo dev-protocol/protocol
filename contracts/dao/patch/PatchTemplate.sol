@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {PatchBase} from "contracts/upgrader/patch/PatchBase.sol";
+import {PatchBase} from "contracts/dao/patch/PatchBase.sol";
 
 contract PatchTemplate is PatchBase {
 	function run() external onlyUpgrader whenNotPaused {

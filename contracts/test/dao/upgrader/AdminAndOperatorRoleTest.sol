@@ -1,8 +1,8 @@
 pragma solidity 0.5.17;
 
-import {UpgraderRole} from "contracts/upgrader/UpgraderRole.sol";
+import {AdminAndOperatorRole} from "contracts/dao/upgrader/AdminAndOperatorRole.sol";
 
-contract UpgraderRoleTest is UpgraderRole {
+contract AdminAndOperatorRoleTest is AdminAndOperatorRole {
 	function hasOperatingPrivilegesTest(address _sender)
 		external
 		view

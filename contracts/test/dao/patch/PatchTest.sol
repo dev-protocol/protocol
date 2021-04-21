@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {PatchBase} from "contracts/upgrader/patch/PatchBase.sol";
+import {PatchBase} from "contracts/dao/patch/PatchBase.sol";
 import {Allocator} from "contracts/src/allocator/Allocator.sol";
 import {MarketFactory} from "contracts/src/market/MarketFactory.sol";
 import {MetricsFactory} from "contracts/src/metrics/MetricsFactory.sol";
