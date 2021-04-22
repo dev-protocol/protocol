@@ -29,9 +29,17 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 		})
 	})
 
+	describe('constructor', () => {
+		it('it can get the set AddressConfig address.', async () => {
+			const [upgrader, addressConfig] = await getTestInstance()
+			const addressConfigAddress = await upgrader.addressConfig()
+			expect(addressConfigAddress).to.be.equal(addressConfig.address)
+		})
+	})
+
 	describe('forceAttachPolicy', () => {
 		describe('success', () => {
-			it('patchコントラクトのアドレスをセットできる', async () => {
+			it('policyをセットできる', async () => {
 				const testFunc = async (executer: string): Promise<void> => {
 					const [upgrader, addressConfig] = await getTestInstance()
 					const policyFactory = await artifacts
@@ -64,7 +72,7 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 			})
 		})
 		describe('fail', () => {
-			it('adminかoperator権限がないとエラーになる', async () => {
+			it('できない', async () => {
 				const [upgrader] = await getTestInstance()
 				const result = await upgrader
 					.forceAttachPolicy(dummy, { from: user1 })
@@ -74,23 +82,11 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 		})
 	})
 
-	describe('addUpgradeEvent', () => {
-		describe('fail', () => {
-			it('patchがないとエラーになる', async () => {
-				const [upgrader] = await getUpgrader()
-				const result = await upgrader
-					.addUpgradeEvent('dummy', dummy, dummy, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal access')
-			})
-		})
-	})
-
 	describe('addMinter', () => {
 		describe('success', () => {
-			it.only('patchコントラクトのアドレスをセットできる', async () => {
+			it('minterに慣れる', async () => {
 				const testFunc = async (executer: string): Promise<void> => {
-					const [upgrader, addressConfig] = await getUpgrader()
+					const [upgrader, addressConfig] = await getTestInstance()
 					const dev = await artifacts.require('Dev').new(addressConfig.address)
 					await addressConfig.setToken(dev.address)
 					await dev.addMinter(upgrader.address)
@@ -104,6 +100,54 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 				for await (const executer of getAdminAndOperatorAddresses()) {
 					await testFunc(executer)
 				}
+			})
+		})
+
+		describe('fail', () => {
+			it('できない', async () => {
+				const [upgrader] = await getTestInstance()
+				const result = await upgrader
+					.addMinter(dummy, { from: user1 })
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'does not have operator role')
+			})
+		})
+	})
+	describe('renounceMinter', () => {
+		describe('success', () => {
+			it('minterでなくす', async () => {
+				const testFunc = async (executer: string): Promise<void> => {
+					const [upgrader, addressConfig] = await getTestInstance()
+					const dev = await artifacts.require('Dev').new(addressConfig.address)
+					const devMinter = await artifacts
+						.require('DevMinter')
+						.new(addressConfig.address)
+					const lockup = await artifacts
+						.require('Lockup')
+						.new(addressConfig.address, devMinter.address)
+					await dev.addMinter(devMinter.address)
+					await addressConfig.setToken(dev.address)
+					await addressConfig.setLockup(lockup.address)
+					await dev.addMinter(upgrader.address)
+					let isMinter = await dev.isMinter(devMinter.address)
+					expect(isMinter).to.be.equal(true)
+					await upgrader.renounceMinter({ from: executer })
+					isMinter = await dev.isMinter(devMinter.address)
+					expect(isMinter).to.be.equal(false)
+				}
+
+				for await (const executer of getAdminAndOperatorAddresses()) {
+					await testFunc(executer)
+				}
+			})
+		})
+		describe('fail', () => {
+			it('できない', async () => {
+				const [upgrader] = await getTestInstance()
+				const result = await upgrader
+					.renounceMinter({ from: user1 })
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'does not have operator role')
 			})
 		})
 	})

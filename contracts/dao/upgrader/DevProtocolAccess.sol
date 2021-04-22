@@ -1,8 +1,7 @@
 pragma solidity 0.5.17;
 
-// prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
+import {MinterRole} from "@openzeppelin/contracts/access/roles/MinterRole.sol";
 import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
 import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
@@ -13,7 +12,7 @@ import {PatchProvider} from "contracts/dao/upgrader/PatchProvider.sol";
 contract DevProtocolAccess is PatchProvider, IDevProtocolAccess {
 	address public addressConfig;
 
-	constructor(address _config) public {
+	constructor(address _config) public PatchProvider() {
 		addressConfig = _config;
 	}
 
@@ -26,14 +25,20 @@ contract DevProtocolAccess is PatchProvider, IDevProtocolAccess {
 		Ownable(_target).transferOwnership(msg.sender);
 	}
 
-	function renounceMinter() external onlyAdminAndOperator {
-		IDevMinter devMinter = getDevMintContract();
+	function renounceMinter() public onlyAdminAndOperator {
+		IDevMinter devMinter = IDevMinter(getDevMintContract());
 		devMinter.renounceMinter();
 	}
 
-	function addMinter(address _account) external onlyAdminAndOperator {
-		address token = IAddressConfig(addressConfig).token();
-		ERC20Mintable(token).addMinter(_account);
+	function addMinter() public onlyAdminAndOperator {
+		IAddressConfig config = IAddressConfig(addressConfig);
+		address token = config.token();
+		MinterRole role = MinterRole(token);
+		address devMinter = getDevMintContract();
+		if (role.isMinter(devMinter)) {
+			return;
+		}
+		role.addMinter(devMinter);
 	}
 
 	function forceAttachPolicy(address _nextPolicy)
@@ -45,9 +50,8 @@ contract DevProtocolAccess is PatchProvider, IDevProtocolAccess {
 		IPolicyFactory(policyFactoryAddress).forceAttach(_nextPolicy);
 	}
 
-	function getDevMintContract() private returns (IDevMinter) {
-		address withdrawAddress = IAddressConfig(addressConfig).withdraw();
-		address devMinter = ILockup(withdrawAddress).devMinter();
-		return IDevMinter(devMinter);
+	function getDevMintContract() private view returns (address) {
+		address lockup = IAddressConfig(addressConfig).lockup();
+		return ILockup(lockup).devMinter();
 	}
 }

@@ -9,15 +9,23 @@ import {DevProtocolAccess} from "contracts/dao/upgrader/DevProtocolAccess.sol";
 contract Upgrader is DevProtocolAccess, IUpgrader {
 	event Upgrade(string _name, address _current, address _next);
 
-	function execute() external onlyAdminAndOperator {
+	constructor(address _config) public DevProtocolAccess(_config) {}
+
+	function execute(bool _deleteMintRole) external onlyAdminAndOperator {
 		require(patchSetter != msg.sender, "not another operator");
 		Pausable patchPause = Pausable(patch);
 		require(patchPause.paused() == false, "already executed");
+		if (_deleteMintRole) {
+			renounceMinter();
+		}
 		Ownable(addressConfig).transferOwnership(patch);
 		IPatch patchContract = IPatch(patch);
 		patchContract.setConfigAddress(addressConfig);
 		patchContract.run();
 		patchContract.afterRun();
+		if (_deleteMintRole) {
+			addMinter();
+		}
 		patchPause.pause();
 	}
 

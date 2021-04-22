@@ -2,9 +2,8 @@ pragma solidity 0.5.17;
 
 import {Roles} from "@openzeppelin/contracts/access/Roles.sol";
 import {Counters} from "@openzeppelin/contracts/drafts/Counters.sol";
-import {
-	IAdminAndOperatorRole
-} from "contracts/interface/IAdminAndOperatorRole.sol";
+// prettier-ignore
+import {IAdminAndOperatorRole} from "contracts/interface/IAdminAndOperatorRole.sol";
 
 contract AdminAndOperatorRole is IAdminAndOperatorRole {
 	using Roles for Roles.Role;

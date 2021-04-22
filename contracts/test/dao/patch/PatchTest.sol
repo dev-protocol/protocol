@@ -18,6 +18,10 @@ import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 contract PatchPlane is PatchBase {
 	constructor(address _upgrader) public PatchBase(_upgrader) {}
 
+	function getDevMinterTest() external view returns (address) {
+		return getDevMinter();
+	}
+
 	function run() external onlyUpgrader whenNotPaused {
 		StorageContract tmp = new StorageContract();
 		afterDeployLockup(address(tmp));

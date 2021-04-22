@@ -7,6 +7,7 @@ import {IDevProtocolAccess} from "contracts/interface/IDevProtocolAccess.sol";
 import {IPatch} from "contracts/interface/IPatch.sol";
 import {IUsingStorage} from "contracts/interface/IUsingStorage.sol";
 import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
+import {ILockup} from "contracts/interface/ILockup.sol";
 
 contract PatchBase is Pausable, IPatch {
 	address public upgrader;
@@ -124,6 +125,11 @@ contract PatchBase is Pausable, IPatch {
 		afterDeployUsingStorage(current, _next);
 		addressConfig.setLockup(_next);
 		IUpgrader(upgrader).addUpgradeEvent("Lockup", current, _next);
+	}
+
+	function getDevMinter() internal view returns (address){
+		address lockup = IAddressConfig(config).lockup();
+		return ILockup(lockup).devMinter();
 	}
 
 	function afterDeployUsingStorage(address _current, address _next) private {

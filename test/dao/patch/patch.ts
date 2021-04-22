@@ -16,6 +16,23 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 		})
 	})
 
+	describe('getDevMinter', () => {
+		it('get the set dev minter address', async () => {
+			const patch = await artifacts.require('PatchPlane').new(upgrader)
+			const addressConfig = await artifacts.require('AddressConfig').new()
+			const devMinter = await artifacts
+				.require('DevMinter')
+				.new(addressConfig.address)
+			const lockup = await artifacts
+				.require('Lockup')
+				.new(addressConfig.address, devMinter.address)
+			await addressConfig.setLockup(lockup.address)
+			await patch.setConfigAddress(addressConfig.address, { from: upgrader })
+			const devminterAddress = await patch.getDevMinterTest()
+			expect(devminterAddress).to.be.equal(devMinter.address)
+		})
+	})
+
 	describe('setConfigAddress', () => {
 		describe('success', () => {
 			it('get the set config address', async () => {
@@ -74,7 +91,7 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 		})
 	})
 
-	describe('afterDeployUsingStorage', () => {
+	describe.only('afterDeployUsingStorage', () => {
 		it('Storage permissions transition and the owner becomes the upgrader.', async () => {
 			const addressConfig = await artifacts.require('AddressConfig').new()
 			const storageContract = await artifacts.require('StorageContract').new()
@@ -91,7 +108,7 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 			await addressConfig.transferOwnership(upgrader.address)
 			const patch = await artifacts.require('PatchPlane').new(upgrader.address)
 			await upgrader.setPatch(patch.address)
-			await upgrader.execute({ from: operator })
+			// Await upgrader.execute({ from: operator })
 			const next = await addressConfig.lockup()
 			const nextStorageContract = await artifacts
 				.require('StorageContract')
@@ -104,10 +121,14 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 
 			await nextStorageContract.increment()
 			expect((await nextStorageContract.getValue()).toString()).to.be.equal('2')
+			console.log(1)
 			const result = await storageContract
 				.increment()
 				.catch((err: Error) => err)
+			console.log(2)
+			console.log(result)
 			validateErrorMessage(result, 'not current owner')
+			console.log(3)
 		})
 	})
 })

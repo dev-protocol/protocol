@@ -2,7 +2,7 @@
 pragma solidity >=0.5.17;
 
 interface IUpgrader {
-	function execute() external;
+	function execute(bool _deleteMintRole) external;
 
 	function addUpgradeEvent(
 		string calldata _name,

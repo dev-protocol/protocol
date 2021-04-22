@@ -4,9 +4,8 @@ import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {Pausable} from "@openzeppelin/contracts/lifecycle/Pausable.sol";
 import {IPatchProvider} from "contracts/interface/IPatchProvider.sol";
 import {IPatch} from "contracts/interface/IPatch.sol";
-import {
-	AdminAndOperatorRole
-} from "contracts/dao/upgrader/AdminAndOperatorRole.sol";
+// prettier-ignore
+import {AdminAndOperatorRole} from "contracts/dao/upgrader/AdminAndOperatorRole.sol";
 
 contract PatchProvider is AdminAndOperatorRole, IPatchProvider {
 	address public patch;
