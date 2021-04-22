@@ -20,7 +20,7 @@
 		"contracts/interface"
 	],
 	"author": "aggre",
-	"license": "BUSL-1.1",
+	"license": "MPL-2.0",
 	"devDependencies": {
 		"@devprotocol/util-ts": "2.2.1",
 		"@truffle/hdwallet-provider": "1.2.6",

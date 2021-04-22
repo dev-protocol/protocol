@@ -42,7 +42,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		propertyAddress: string
 	): Promise<void> => {
 		const behavuor = await dev.getMarket('MarketTest3', user1)
-		const createMarketResult = await dev.marketFactory.create(behavuor.address)
+		let createMarketResult = await dev.marketFactory.create(behavuor.address)
 		const marketAddress = getMarketAddress(createMarketResult)
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const marketInstance = await marketContract.at(marketAddress)

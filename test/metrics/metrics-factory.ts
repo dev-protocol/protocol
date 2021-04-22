@@ -121,7 +121,7 @@ contract(
 				expect(metricsAddress1).to.be.equal(metrics)
 			})
 			it('can not also run the destroy method in owner.', async () => {
-				const result = await dev.metricsGroup.isGroup(metricsAddress2, {
+				let result = await dev.metricsGroup.isGroup(metricsAddress2, {
 					from: deployer,
 				})
 				expect(result).to.be.equal(true)
