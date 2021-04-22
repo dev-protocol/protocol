@@ -9,7 +9,7 @@ contract PatchTemplate is PatchBase {
 		// ex) Allocator
 		// Allocator allocator = new Allocator(config)
 		// afterDeployAllocator(address(allocator));
-        //
+		//
 		// ex) Lockup
 		// Lockup lockup = new Lockup(config, getDevMinter())
 		// afterDeployLockup(address(lockup));

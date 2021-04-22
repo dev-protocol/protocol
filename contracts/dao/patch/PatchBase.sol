@@ -127,7 +127,7 @@ contract PatchBase is Pausable, IPatch {
 		IUpgrader(upgrader).addUpgradeEvent("Lockup", current, _next);
 	}
 
-	function getDevMinter() internal view returns (address){
+	function getDevMinter() internal view returns (address) {
 		address lockup = IAddressConfig(config).lockup();
 		return ILockup(lockup).devMinter();
 	}

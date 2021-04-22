@@ -2,7 +2,7 @@
 pragma solidity >=0.5.17;
 
 interface IDevProtocolAccess {
-	function addressConfig() external view returns(bool);
+	function addressConfig() external view returns (bool);
 
 	function transferOwnership(address _target) external;
 
