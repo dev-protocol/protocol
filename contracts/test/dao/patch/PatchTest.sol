@@ -13,6 +13,7 @@ import {PolicyFactory} from "contracts/src/policy/PolicyFactory.sol";
 import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
 import {MarketGroup} from "contracts/src/market/MarketGroup.sol";
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
+import {DevMinter} from "contracts/src/dev/DevMinter.sol";
 import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
 
 contract PatchPlane is PatchBase {
@@ -137,6 +138,30 @@ contract PatchLockup is PatchBase {
 		afterDeployLockup(address(tmp));
 	}
 }
+
+contract PatchPlane2 is PatchBase {
+	constructor(address _upgrader) public PatchBase(_upgrader) {}
+
+	function run() external onlyUpgrader whenNotPaused {
+		PlaneContract tmp = new PlaneContract();
+		afterDeployAllocator(address(tmp));
+	}
+}
+
+contract PatchLockup2 is PatchBase {
+	constructor(address _upgrader) public PatchBase(_upgrader) {}
+
+	function run() external onlyUpgrader whenNotPaused {
+		DevMinter minter = DevMinter(config);
+		Lockup tmp = new Lockup(config, address(minter));
+		afterDeployLockup(address(tmp));
+	}
+}
+
+contract PlaneContract {
+
+}
+
 
 contract StorageContract is UsingStorage {
 	constructor() public UsingStorage() {}

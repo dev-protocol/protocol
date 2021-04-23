@@ -1,73 +1,118 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import {
 	AddressConfigInstance,
-	DevProtocolAccessInstance,
+	UpgraderInstance,
+	PatchPlaneInstance,
 } from '../../../types/truffle-contracts'
 import { validateErrorMessage } from '../../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../../test-lib/const'
 
 contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
-	const getTestInstance = async (): Promise<
-		[DevProtocolAccessInstance, AddressConfigInstance]
-	> => {
+	const getTestInstance = async (
+		patchName = 'PatchPlane',
+		patchSetter = admin
+	): Promise<[UpgraderInstance, AddressConfigInstance, PatchPlaneInstance]> => {
 		const addressConfig = await artifacts.require('AddressConfig').new()
 		const upgrader = await artifacts
-			.require('DevProtocolAccess')
+			.require('Upgrader')
 			.new(addressConfig.address)
+		const patch = await artifacts.require(patchName).new(upgrader.address)
 		await upgrader.addOperator(operator)
-		return [upgrader, addressConfig]
+		await upgrader.setPatch(patch.address, { from: patchSetter })
+		return [upgrader, addressConfig, patch]
 	}
 
-	const getAdminAndOperatorAddresses = (): string[] => {
-		return [admin, operator]
-	}
-
-	describe('constructor', () => {
-		it('it can get the set AddressConfig address.', async () => {
-			const [upgrader, addressConfig] = await getTestInstance()
-			const addressConfigAddress = await upgrader.addressConfig()
-			expect(addressConfigAddress).to.be.equal(addressConfig.address)
-		})
-	})
-
-	describe('forceAttachPolicy', () => {
+	describe('execute', () => {
 		describe('success', () => {
-			it('patchコントラクトのアドレスをセットできる', async () => {
-				const testFunc = async (executer: string): Promise<void> => {
-					const [upgrader, addressConfig] = await getTestInstance()
-					const policyFactory = await artifacts
-						.require('PolicyFactory')
-						.new(addressConfig.address)
-					const policyGroup = await artifacts
-						.require('PolicyGroup')
-						.new(addressConfig.address)
-					await policyGroup.createStorage()
-					await addressConfig.setPolicyFactory(policyFactory.address)
-					await addressConfig.setPolicyGroup(policyGroup.address)
-					const dip1 = await artifacts
-						.require('DIP1')
-						.new(addressConfig.address)
-					const dip7 = await artifacts
-						.require('DIP7')
-						.new(addressConfig.address)
-					await policyFactory.transferOwnership(upgrader.address)
-					await policyGroup.transferOwnership(upgrader.address)
-					await policyFactory.create(dip1.address)
-					await policyFactory.create(dip7.address)
-					expect(await addressConfig.policy()).to.be.equal(dip1.address)
-					await upgrader.forceAttachPolicy(dip7.address, { from: executer })
-					expect(await addressConfig.policy()).to.be.equal(dip7.address)
+			it('devMinterからmit roleを削除する', async () => {
+				const [upgrader, addressConfig, patch] = await getTestInstance(
+					'PatchLockup'
+				)
+				const dev = await artifacts.require('Dev').new(addressConfig.address)
+				const devMinter = await artifacts
+					.require('DevMinter')
+					.new(addressConfig.address)
+				await dev.addMinter(devMinter.address)
+				await dev.addMinter(upgrader.address)
+				const lockup = await artifacts
+					.require('Lockup')
+					.new(addressConfig.address, devMinter.address)
+				await lockup.createStorage()
+				await lockup.transferOwnership(upgrader.address)
+				await addressConfig.setLockup(lockup.address)
+				await addressConfig.setToken(dev.address)
+				await addressConfig.transferOwnership(upgrader.address)
+				await devMinter.transferOwnership(upgrader.address)
+
+				expect(await patch.paused()).to.be.equal(false)
+				expect(await dev.isMinter(devMinter.address)).to.be.equal(true)
+				expect(await addressConfig.owner()).to.be.equal(upgrader.address)
+				const tx = await upgrader.exexute(true, { from: operator })
+				const nextLockup = tx.logs.filter((log) => {
+					return log.event === 'Upgrade' && log.args._name === 'Lockup'
+				})[0].args._next
+				expect(await addressConfig.lockup()).to.be.equal(nextLockup)
+				expect(await patch.paused()).to.be.equal(true)
+				expect(await addressConfig.owner()).to.be.equal(upgrader.address)
+				expect(await dev.isMinter(devMinter.address)).to.be.equal(false)
+				const nextLockupInstance = await artifacts
+					.require('Lockup')
+					.at(nextLockup)
+				const nextDevMinterAddress = await nextLockupInstance.devMinter()
+				expect(await dev.isMinter(nextDevMinterAddress)).to.be.equal(true)
+			})
+			it('devMinterからmit roleを削除しない', async () => {
+				const [upgrader, addressConfig, patch] = await getTestInstance(
+					'PatchPlane2'
+				)
+				await addressConfig.transferOwnership(upgrader.address)
+				expect(await addressConfig.allocator()).to.be.equal(DEFAULT_ADDRESS)
+				expect(await patch.paused()).to.be.equal(false)
+				expect(await addressConfig.owner()).to.be.equal(upgrader.address)
+				const tx = await upgrader.exexute(false, { from: operator })
+				const nextAllocator = tx.logs.filter((log) => {
+					return log.event === 'Upgrade' && log.args._name === 'Allocator'
+				})[0].args._next
+				expect(await addressConfig.allocator()).to.be.equal(nextAllocator)
+				expect(await patch.paused()).to.be.equal(true)
+				expect(await addressConfig.owner()).to.be.equal(upgrader.address)
+			})
+			it.only('Can be run by admin and operator', async () => {
+				const testFunc = async (
+					setPatcher: string,
+					executer: string
+				): Promise<void> => {
+					const [upgrader, addressConfig, patch] = await getTestInstance(
+						'PatchPlane2',
+						setPatcher
+					)
+					await upgrader.addOperator(admin)
+					await addressConfig.transferOwnership(upgrader.address)
+					await upgrader.exexute(false, { from: executer })
 				}
 
-				for await (const executer of getAdminAndOperatorAddresses()) {
-					await testFunc(executer)
-				}
+				await testFunc(admin, operator)
+				await testFunc(operator, admin)
 			})
 		})
 		describe('fail', () => {
-			it('adminかoperator権限がないとエラーになる', async () => {
+			it('patchSetter == msg.sender', async () => {
 				const [upgrader] = await getTestInstance()
+				const result = await upgrader.exexute(false).catch((err: Error) => err)
+				validateErrorMessage(result, 'not another operator')
+			})
+			it('patchがpause', async () => {
+				const [upgrader, , patch] = await getTestInstance()
+				await patch.pause()
 				const result = await upgrader
-					.forceAttachPolicy(dummy, { from: user1 })
+					.exexute(false, { from: operator })
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'already executed')
+			})
+			it('patchがpause', async () => {
+				const [upgrader, , patch] = await getTestInstance()
+				const result = await upgrader
+					.exexute(false, { from: user1 })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'does not have operator role')
 			})
@@ -76,34 +121,12 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 
 	describe('addUpgradeEvent', () => {
 		describe('fail', () => {
-			it('patchがないとエラーになる', async () => {
-				const [upgrader] = await getUpgrader()
+			it('patch以外からのアクセス', async () => {
+				const [upgrader] = await getTestInstance()
 				const result = await upgrader
 					.addUpgradeEvent('dummy', dummy, dummy, { from: user1 })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'illegal access')
-			})
-		})
-	})
-
-	describe('addMinter', () => {
-		describe('success', () => {
-			it.only('patchコントラクトのアドレスをセットできる', async () => {
-				const testFunc = async (executer: string): Promise<void> => {
-					const [upgrader, addressConfig] = await getUpgrader()
-					const dev = await artifacts.require('Dev').new(addressConfig.address)
-					await addressConfig.setToken(dev.address)
-					await dev.addMinter(upgrader.address)
-					let isMinter = await dev.isMinter(dummy)
-					expect(isMinter).to.be.equal(false)
-					await upgrader.addMinter(dummy, { from: executer })
-					isMinter = await dev.isMinter(dummy)
-					expect(isMinter).to.be.equal(true)
-				}
-
-				for await (const executer of getAdminAndOperatorAddresses()) {
-					await testFunc(executer)
-				}
 			})
 		})
 	})
