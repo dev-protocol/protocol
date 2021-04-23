@@ -158,10 +158,7 @@ contract PatchLockup2 is PatchBase {
 	}
 }
 
-contract PlaneContract {
-
-}
-
+contract PlaneContract {}
 
 contract StorageContract is UsingStorage {
 	constructor() public UsingStorage() {}
