@@ -24,7 +24,7 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 
 	describe('execute', () => {
 		describe('success', () => {
-			it('devMinterからmit roleを削除する', async () => {
+			it('Update the contract. In doing so, remove the mint role from the old DevMinter contract and assign the mint role to the new DevMinter contract.', async () => {
 				const [upgrader, addressConfig, patch] = await getTestInstance(
 					'PatchLockup'
 				)
@@ -47,6 +47,8 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 				expect(await patch.paused()).to.be.equal(false)
 				expect(await dev.isMinter(devMinter.address)).to.be.equal(true)
 				expect(await addressConfig.owner()).to.be.equal(upgrader.address)
+				expect(await upgrader.patch()).to.be.equal(patch.address)
+				expect(await upgrader.patchSetter()).to.be.equal(admin)
 				const tx = await upgrader.exexute(true, { from: operator })
 				const nextLockup = tx.logs.filter((log) => {
 					return log.event === 'Upgrade' && log.args._name === 'Lockup'
@@ -60,8 +62,10 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 					.at(nextLockup)
 				const nextDevMinterAddress = await nextLockupInstance.devMinter()
 				expect(await dev.isMinter(nextDevMinterAddress)).to.be.equal(true)
+				expect(await upgrader.patch()).to.be.equal(DEFAULT_ADDRESS)
+				expect(await upgrader.patchSetter()).to.be.equal(DEFAULT_ADDRESS)
 			})
-			it('devMinterからmit roleを削除しない', async () => {
+			it('Update the contract.', async () => {
 				const [upgrader, addressConfig, patch] = await getTestInstance(
 					'PatchPlane2'
 				)
@@ -69,6 +73,8 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 				expect(await addressConfig.allocator()).to.be.equal(DEFAULT_ADDRESS)
 				expect(await patch.paused()).to.be.equal(false)
 				expect(await addressConfig.owner()).to.be.equal(upgrader.address)
+				expect(await upgrader.patch()).to.be.equal(patch.address)
+				expect(await upgrader.patchSetter()).to.be.equal(admin)
 				const tx = await upgrader.exexute(false, { from: operator })
 				const nextAllocator = tx.logs.filter((log) => {
 					return log.event === 'Upgrade' && log.args._name === 'Allocator'
@@ -76,13 +82,15 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 				expect(await addressConfig.allocator()).to.be.equal(nextAllocator)
 				expect(await patch.paused()).to.be.equal(true)
 				expect(await addressConfig.owner()).to.be.equal(upgrader.address)
+				expect(await upgrader.patch()).to.be.equal(DEFAULT_ADDRESS)
+				expect(await upgrader.patchSetter()).to.be.equal(DEFAULT_ADDRESS)
 			})
-			it.only('Can be run by admin and operator', async () => {
+			it('Can be run by admin and operator', async () => {
 				const testFunc = async (
 					setPatcher: string,
 					executer: string
 				): Promise<void> => {
-					const [upgrader, addressConfig, patch] = await getTestInstance(
+					const [upgrader, addressConfig] = await getTestInstance(
 						'PatchPlane2',
 						setPatcher
 					)
@@ -96,12 +104,12 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 			})
 		})
 		describe('fail', () => {
-			it('patchSetter == msg.sender', async () => {
+			it('If the wallet where the patch contract address is set and the wallet where the execute function is executed are the same, an error occurs.', async () => {
 				const [upgrader] = await getTestInstance()
 				const result = await upgrader.exexute(false).catch((err: Error) => err)
 				validateErrorMessage(result, 'not another operator')
 			})
-			it('patchがpause', async () => {
+			it('Error when patch contract is in pause state.', async () => {
 				const [upgrader, , patch] = await getTestInstance()
 				await patch.pause()
 				const result = await upgrader
@@ -109,8 +117,8 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'already executed')
 			})
-			it('patchがpause', async () => {
-				const [upgrader, , patch] = await getTestInstance()
+			it('If the wallet does not have Admin or operator privileges, an error will occur.', async () => {
+				const [upgrader] = await getTestInstance()
 				const result = await upgrader
 					.exexute(false, { from: user1 })
 					.catch((err: Error) => err)
@@ -121,7 +129,7 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 
 	describe('addUpgradeEvent', () => {
 		describe('fail', () => {
-			it('patch以外からのアクセス', async () => {
+			it('Access from outside the patch contract will result in an error.', async () => {
 				const [upgrader] = await getTestInstance()
 				const result = await upgrader
 					.addUpgradeEvent('dummy', dummy, dummy, { from: user1 })

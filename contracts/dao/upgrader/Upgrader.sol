@@ -27,6 +27,8 @@ contract Upgrader is DevProtocolAccess, IUpgrader {
 			addMinter();
 		}
 		patchPause.pause();
+		patch = address(0);
+		patchSetter = address(0);
 	}
 
 	function addUpgradeEvent(
