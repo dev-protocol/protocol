@@ -146,7 +146,7 @@ contract('Patch(afterDeploy)', ([deployer, operator, current]) => {
 		await addressConfig.transferOwnership(upgrader.address)
 		const patch = await artifacts.require(patchName).new(upgrader.address)
 		await upgrader.setPatch(patch.address)
-		const tx = await upgrader.execute({ from: operator })
+		const tx = await upgrader.execute(false, { from: operator })
 		const eventArgs = tx.logs.filter((log: Truffle.TransactionLog) => {
 			return log.event === 'Upgrade'
 		})[0].args
