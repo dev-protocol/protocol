@@ -49,7 +49,7 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 				expect(await addressConfig.owner()).to.be.equal(upgrader.address)
 				expect(await upgrader.patch()).to.be.equal(patch.address)
 				expect(await upgrader.patchSetter()).to.be.equal(admin)
-				const tx = await upgrader.exexute(true, { from: operator })
+				const tx = await upgrader.execute(true, { from: operator })
 				const nextLockup = tx.logs.filter((log) => {
 					return log.event === 'Upgrade' && log.args._name === 'Lockup'
 				})[0].args._next
@@ -75,7 +75,7 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 				expect(await addressConfig.owner()).to.be.equal(upgrader.address)
 				expect(await upgrader.patch()).to.be.equal(patch.address)
 				expect(await upgrader.patchSetter()).to.be.equal(admin)
-				const tx = await upgrader.exexute(false, { from: operator })
+				const tx = await upgrader.execute(false, { from: operator })
 				const nextAllocator = tx.logs.filter((log) => {
 					return log.event === 'Upgrade' && log.args._name === 'Allocator'
 				})[0].args._next
@@ -96,7 +96,7 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 					)
 					await upgrader.addOperator(admin)
 					await addressConfig.transferOwnership(upgrader.address)
-					await upgrader.exexute(false, { from: executer })
+					await upgrader.execute(false, { from: executer })
 				}
 
 				await testFunc(admin, operator)
@@ -106,21 +106,21 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 		describe('fail', () => {
 			it('If the wallet where the patch contract address is set and the wallet where the execute function is executed are the same, an error occurs.', async () => {
 				const [upgrader] = await getTestInstance()
-				const result = await upgrader.exexute(false).catch((err: Error) => err)
+				const result = await upgrader.execute(false).catch((err: Error) => err)
 				validateErrorMessage(result, 'not another operator')
 			})
 			it('Error when patch contract is in pause state.', async () => {
 				const [upgrader, , patch] = await getTestInstance()
 				await patch.pause()
 				const result = await upgrader
-					.exexute(false, { from: operator })
+					.execute(false, { from: operator })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'already executed')
 			})
 			it('If the wallet does not have Admin or operator privileges, an error will occur.', async () => {
 				const [upgrader] = await getTestInstance()
 				const result = await upgrader
-					.exexute(false, { from: user1 })
+					.execute(false, { from: user1 })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'does not have operator role')
 			})

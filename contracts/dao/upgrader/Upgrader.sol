@@ -11,7 +11,7 @@ contract Upgrader is DevProtocolAccess, IUpgrader {
 
 	constructor(address _config) public DevProtocolAccess(_config) {}
 
-	function exexute(bool _deleteMintRole) external onlyAdminAndOperator {
+	function execute(bool _deleteMintRole) external onlyAdminAndOperator {
 		require(patchSetter != msg.sender, "not another operator");
 		Pausable patchPause = Pausable(patch);
 		require(patchPause.paused() == false, "already executed");

@@ -108,7 +108,7 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 			await addressConfig.transferOwnership(upgrader.address)
 			const patch = await artifacts.require('PatchPlane').new(upgrader.address)
 			await upgrader.setPatch(patch.address)
-			// Await upgrader.execute({ from: operator })
+			await upgrader.execute(false, { from: operator })
 			const next = await addressConfig.lockup()
 			const nextStorageContract = await artifacts
 				.require('StorageContract')
@@ -121,14 +121,10 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 
 			await nextStorageContract.increment()
 			expect((await nextStorageContract.getValue()).toString()).to.be.equal('2')
-			console.log(1)
 			const result = await storageContract
 				.increment()
 				.catch((err: Error) => err)
-			console.log(2)
-			console.log(result)
 			validateErrorMessage(result, 'not current owner')
-			console.log(3)
 		})
 	})
 })
