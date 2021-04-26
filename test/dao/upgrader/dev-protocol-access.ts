@@ -4,7 +4,7 @@ import {
 } from '../../../types/truffle-contracts'
 import { validateErrorMessage } from '../../test-lib/utils/error'
 
-contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
+contract('DevProtocolAccess', ([admin, operator, nextOwner, user1, dummy]) => {
 	const getTestInstance = async (): Promise<
 		[DevProtocolAccessInstance, AddressConfigInstance]
 	> => {
@@ -19,14 +19,6 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 	const getAdminAndOperatorAddresses = (): string[] => {
 		return [admin, operator]
 	}
-
-	describe('constructor', () => {
-		it('it can get the set AddressConfig address.', async () => {
-			const [devProtocolAccess, addressConfig] = await getTestInstance()
-			const addressConfigAddress = await devProtocolAccess.addressConfig()
-			expect(addressConfigAddress).to.be.equal(addressConfig.address)
-		})
-	})
 
 	describe('constructor', () => {
 		it('it can get the set AddressConfig address.', async () => {
@@ -74,8 +66,8 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 		})
 		describe('fail', () => {
 			it('Cannot be executed if not authorized', async () => {
-				const [upgrader] = await getTestInstance()
-				const result = await upgrader
+				const [devProtocolAccess] = await getTestInstance()
+				const result = await devProtocolAccess
 					.forceAttachPolicy(dummy, { from: user1 })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'does not have operator role')
@@ -157,6 +149,45 @@ contract('DevProtocolAccess', ([admin, operator, user1, dummy]) => {
 					.renounceMinter({ from: user1 })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'does not have operator role')
+			})
+		})
+	})
+
+	describe('transferOwnership', () => {
+		describe('success', () => {
+			it('transfer ownership', async () => {
+				const testFunc = async (executer: string): Promise<void> => {
+					const [devProtocolAccess] = await getTestInstance()
+					const storageContract = await artifacts
+						.require('StorageContract')
+						.new()
+					await storageContract.createStorage()
+					await storageContract.transferOwnership(devProtocolAccess.address)
+					expect(await storageContract.owner()).to.be.equal(
+						devProtocolAccess.address
+					)
+					await devProtocolAccess.transferOwnership(
+						storageContract.address,
+						nextOwner,
+						{
+							from: executer,
+						}
+					)
+					expect(await storageContract.owner()).to.be.equal(nextOwner)
+				}
+
+				for await (const executer of getAdminAndOperatorAddresses()) {
+					await testFunc(executer)
+				}
+			})
+		})
+		describe('fail', () => {
+			it('Cannot be executed if not authorized', async () => {
+				const [devProtocolAccess] = await getTestInstance()
+				const result = await devProtocolAccess
+					.transferOwnership(dummy, dummy, { from: user1 })
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal access')
 			})
 		})
 	})

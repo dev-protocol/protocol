@@ -133,7 +133,7 @@ contract PatchBase is Pausable, IPatch {
 	}
 
 	function afterDeployUsingStorage(address _current, address _next) private {
-		IDevProtocolAccess(upgrader).transferOwnership(_current);
+		IDevProtocolAccess(upgrader).transferOwnership(_current, address(this));
 		changeStorageOwner(_current, _next);
 		Ownable(_current).transferOwnership(upgrader);
 		Ownable(_next).transferOwnership(upgrader);

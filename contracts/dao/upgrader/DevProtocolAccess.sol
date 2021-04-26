@@ -16,13 +16,13 @@ contract DevProtocolAccess is PatchProvider, IDevProtocolAccess {
 		addressConfig = _config;
 	}
 
-	function transferOwnership(address _target) external {
+	function transferOwnership(address _target, address _newOwner) external {
 		bool result = hasOperatingPrivileges(msg.sender);
 		if (result == false) {
 			result = isPatchAddress(msg.sender);
 		}
 		require(result, "illegal access");
-		Ownable(_target).transferOwnership(msg.sender);
+		Ownable(_target).transferOwnership(_newOwner);
 	}
 
 	function renounceMinter() public onlyAdminAndOperator {
