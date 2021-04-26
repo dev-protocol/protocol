@@ -91,7 +91,7 @@ contract('Patch', ([deployer, upgrader, operator]) => {
 		})
 	})
 
-	describe.only('afterDeployUsingStorage', () => {
+	describe('afterDeployUsingStorage', () => {
 		it('Storage permissions transition and the owner becomes the upgrader.', async () => {
 			const addressConfig = await artifacts.require('AddressConfig').new()
 			const storageContract = await artifacts.require('StorageContract').new()
