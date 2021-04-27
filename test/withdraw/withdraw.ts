@@ -1622,12 +1622,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				from: alis,
 			})
 
-			const geometricMean = calculateCap([
+			const cap = calculateCap([
 				toBigNumber(10000),
 				toBigNumber(20000),
 				toBigNumber(30000),
 			])
-			await dev.updateCap(geometricMean.toFixed())
+			await dev.updateCap(cap.toFixed())
 			await checkAmount(dev, property1, propertyAuthor)
 			await dev.dev.deposit(property1.address, toBigNumber(10000), {
 				from: alis,
@@ -1639,12 +1639,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				from: alis,
 			})
 
-			const geometricMean2 = calculateCap([
+			const cap2 = calculateCap([
 				toBigNumber(20000),
 				toBigNumber(40000),
 				toBigNumber(60000),
 			])
-			await dev.updateCap(geometricMean2.toFixed())
+			await dev.updateCap(cap2.toFixed())
 			await checkAmount(dev, property1, propertyAuthor)
 		})
 	})

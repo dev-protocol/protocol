@@ -290,7 +290,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 
 	/**
-	 * Calculates holders reward and geometric mean per Property.
+	 * Calculates holders reward and cap per Property.
 	 */
 	function calculateRewardAmount(address _property)
 		external
