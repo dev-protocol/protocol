@@ -22,15 +22,12 @@ contract(
 			[DevProtocolInstance, string, string, string]
 		> => {
 			const dev = new DevProtocolInstance(deployer)
-			let metrics1: string
-			let metrics2: string
-			let metrics3: string
 			await dev.generateAddressConfig()
 			await dev.generateMetricsGroup()
 			await dev.addressConfig.setMetricsFactory(metricsFactory, {
 				from: deployer,
 			})
-			;[metrics1, metrics2, metrics3] = await Promise.all([
+			const [metrics1, metrics2, metrics3] = await Promise.all([
 				dev.createMetrics(dummyMarket, dummyProperty1).then((x) => x.address),
 				dev.createMetrics(dummyMarket, dummyProperty1).then((x) => x.address),
 				dev.createMetrics(dummyMarket, dummyProperty2).then((x) => x.address),

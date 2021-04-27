@@ -86,6 +86,7 @@ contract(
 					}
 				)
 				const event = result.logs[0].args
+				expect(result.logs[0].event).to.be.equal('ChangeAuthor')
 				expect(event._property).to.be.equal(dummyProperty)
 				expect(event._beforeAuthor).to.be.equal(beforeAuthor)
 				expect(event._afterAuthor).to.be.equal(afterAuthor)
@@ -99,7 +100,77 @@ contract(
 				const result = await dev.propertyFactory
 					.createChangeAuthorEvent(beforeAuthor, afterAuthor)
 					.catch((err: Error) => err)
-				validateErrorMessage(result, 'this is illegal address')
+				validateErrorMessage(result, 'illegal address')
+			})
+		})
+		describe('PropertyFactory; createChangeNameEvent', () => {
+			it('Emit ChangeName event', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressConfig()
+				await dev.generatePropertyGroup()
+				await dev.addressConfig.setPropertyFactory(dummyProperFactory)
+				await dev.propertyGroup.addGroup(dummyProperty, {
+					from: dummyProperFactory,
+				})
+				await dev.generatePropertyFactory()
+				const result = await dev.propertyFactory.createChangeNameEvent(
+					'old',
+					'new',
+					{
+						from: dummyProperty,
+					}
+				)
+				const event = result.logs[0].args
+				expect(result.logs[0].event).to.be.equal('ChangeName')
+				expect(event._property).to.be.equal(dummyProperty)
+				expect(event._old).to.be.equal('old')
+				expect(event._new).to.be.equal('new')
+			})
+
+			it('should fail to call when the sender is not Property', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressConfig()
+				await dev.generatePropertyGroup()
+				await dev.generatePropertyFactory()
+				const result = await dev.propertyFactory
+					.createChangeNameEvent('old', 'new')
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal address')
+			})
+		})
+		describe('PropertyFactory; createChangeSymbolEvent', () => {
+			it('Emit ChangeSymbol event', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressConfig()
+				await dev.generatePropertyGroup()
+				await dev.addressConfig.setPropertyFactory(dummyProperFactory)
+				await dev.propertyGroup.addGroup(dummyProperty, {
+					from: dummyProperFactory,
+				})
+				await dev.generatePropertyFactory()
+				const result = await dev.propertyFactory.createChangeSymbolEvent(
+					'old',
+					'new',
+					{
+						from: dummyProperty,
+					}
+				)
+				const event = result.logs[0].args
+				expect(result.logs[0].event).to.be.equal('ChangeSymbol')
+				expect(event._property).to.be.equal(dummyProperty)
+				expect(event._old).to.be.equal('old')
+				expect(event._new).to.be.equal('new')
+			})
+
+			it('should fail to call when the sender is not Property', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressConfig()
+				await dev.generatePropertyGroup()
+				await dev.generatePropertyFactory()
+				const result = await dev.propertyFactory
+					.createChangeSymbolEvent('old', 'new')
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal address')
 			})
 		})
 		describe('PropertyFactory; createAndAuthenticate', () => {

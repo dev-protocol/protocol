@@ -19,6 +19,7 @@ import {
 	MetricsInstance,
 	TreasuryTestInstance,
 	IPolicyContract,
+	LockupTestInstance,
 } from '../../types/truffle-contracts'
 import { getBlock } from './utils/common'
 
@@ -42,6 +43,7 @@ export class DevProtocolInstance {
 	private _metricsGroup!: MetricsGroupTestInstance
 	private _withdraw!: WithdrawInstance
 	private _withdrawTest!: WithdrawTestInstance
+	private _lockupTest!: LockupTestInstance
 	private _treasury!: TreasuryTestInstance
 	private readonly _policy!: IPolicyContract
 
@@ -111,6 +113,10 @@ export class DevProtocolInstance {
 
 	public get withdrawTest(): WithdrawTestInstance {
 		return this._withdrawTest
+	}
+
+	public get lockupTest(): LockupTestInstance {
+		return this._lockupTest
 	}
 
 	public get treasury(): TreasuryTestInstance {
@@ -286,6 +292,18 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this._withdrawTest.createStorage(this.fromDeployer)
+	}
+
+	public async generateLockupTest(): Promise<void> {
+		this._lockupTest = await contract('LockupTest').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setLockup(
+			this._lockupTest.address,
+			this.fromDeployer
+		)
+		await this._lockupTest.createStorage(this.fromDeployer)
 	}
 
 	public async generatePolicy(

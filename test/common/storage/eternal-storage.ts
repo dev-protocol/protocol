@@ -192,7 +192,7 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 		})
 	})
 	describe('EternalStorage; upgradeOwner', () => {
-		let key = web3.utils.keccak256('key')
+		const key = web3.utils.keccak256('key')
 		before(async () => {
 			await eternalStorage.changeOwner(newOwner, { from: deployer })
 		})
