@@ -55,5 +55,5 @@ interface ILockup {
 
 	function cap() external view returns (uint256);
 
-	function updateCap(uint256 _geometricMean) external;
+	function updateCap(uint256 _cap) external;
 }

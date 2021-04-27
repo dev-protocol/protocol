@@ -2,15 +2,15 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {TreasuryFee} from "contracts/src/policy/TreasuryFee.sol";
+import {Patch780} from "contracts/src/policy/Patch780.sol";
 
 /**
  * GeometricMean is a contract that changes the `rewards` of DIP7.
  */
-contract GeometricMean is TreasuryFee {
+contract DIP55 is Patch780 {
 	address private capSetterAddress;
 
-	constructor(address _config) public TreasuryFee(_config) {}
+	constructor(address _config) public Patch780(_config) {}
 
 	function setCapSetter(address _setter) external onlyOwner {
 		capSetterAddress = _setter;

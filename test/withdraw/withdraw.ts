@@ -1535,7 +1535,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			return [dev, [property, property2, property3]]
 		}
 
-		const calculateGeometricMean = (args: BigNumber[]): BigNumber => {
+		// TODO capの計算方法が変わった
+		// 修正が必要かもしれない
+		const calculateCap = (args: BigNumber[]): BigNumber => {
 			const result = args.reduce((a, b) => {
 				return a.times(b)
 			})
@@ -1620,7 +1622,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				from: alis,
 			})
 
-			const geometricMean = calculateGeometricMean([
+			const geometricMean = calculateCap([
 				toBigNumber(10000),
 				toBigNumber(20000),
 				toBigNumber(30000),
@@ -1637,7 +1639,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				from: alis,
 			})
 
-			const geometricMean2 = calculateGeometricMean([
+			const geometricMean2 = calculateCap([
 				toBigNumber(20000),
 				toBigNumber(40000),
 				toBigNumber(60000),
