@@ -40,7 +40,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		/**
 		 * Gets the withdrawable rewards amount and the latest cumulative sum of the maximum mint amount.
 		 */
-		(uint256 value, uint256 lastPrice, uint256 lastPriceCap) =
+		(uint256 value, uint256 lastPrice, uint256 lastPriceCap, ) =
 			_calculateWithdrawableAmount(_property, msg.sender);
 
 		/**
@@ -101,13 +101,13 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		/**
 		 * Gets the cumulative sum of the transfer source's "before transfer" withdrawable reward amount and the cumulative sum of the maximum mint amount.
 		 */
-		(uint256 amountFrom, uint256 priceFrom, uint256 priceCapFrom) =
+		(uint256 amountFrom, uint256 priceFrom, uint256 priceCapFrom, ) =
 			_calculateAmount(_property, _from);
 
 		/**
 		 * Gets the cumulative sum of the transfer destination's "before receive" withdrawable reward amount and the cumulative sum of the maximum mint amount.
 		 */
-		(uint256 amountTo, uint256 priceTo, uint256 priceCapTo) =
+		(uint256 amountTo, uint256 priceTo, uint256 priceCapTo, ) =
 			_calculateAmount(_property, _to);
 
 		/**
@@ -142,11 +142,11 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		returns (
 			uint256 _amount,
 			uint256 _price,
-			uint256 _cap
+			uint256 _cap,
+			uint256 _allReward
 		)
 	{
 		ILockup lockup = ILockup(config().lockup());
-		ERC20Mintable property = ERC20Mintable(_property);
 
 		/**
 		 * Gets the latest reward.
@@ -156,24 +156,47 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		/**
 		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
 		 */
-		uint256 _lastReward = getStorageLastWithdrawnReward(_property, _user);
-		uint256 _lastRewardCap =
-			getStorageLastWithdrawnRewardCap(_property, _user);
 
-		uint256 balance = property.balanceOf(_user);
-		uint256 totalSupply = property.totalSupply();
-		uint256 unitPrice = reward.sub(_lastReward).mulBasis().div(totalSupply);
-		uint256 unitPriceCap =
-			cap.sub(_lastRewardCap).mulBasis().div(totalSupply);
-
-		uint256 tmp = unitPrice.mul(balance).divBasis().divBasis();
-		uint256 capped = unitPriceCap.mul(balance).divBasis().divBasis();
-		uint256 value = capped == 0 ? tmp : tmp <= capped ? tmp : capped;
+		uint256 allReward = _calculateAllReward(_property, _user, reward);
+		uint256 capped = _calculateCapped(_property, _user, cap);
+		uint256 value = capped == 0 ? allReward : allReward <= capped ? allReward : capped;
 
 		/**
 		 * Returns the result after adjusted decimals to 10^18, and the latest cumulative sum of the holder reward price.
 		 */
-		return (value, reward, cap);
+		return (value, reward, cap, allReward);
+	}
+
+	/**
+	 * Return the reward cap
+	 */
+	function _calculateCapped(address _property, address _user, uint256 _cap) private view returns (uint256) {
+		/**
+		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
+		 */
+		uint256 _lastRewardCap =
+			getStorageLastWithdrawnRewardCap(_property, _user);
+		ERC20Mintable property = ERC20Mintable(_property);
+		uint256 balance = property.balanceOf(_user);
+		uint256 totalSupply = property.totalSupply();
+		uint256 unitPriceCap =
+			_cap.sub(_lastRewardCap).mulBasis().div(totalSupply);
+		return unitPriceCap.mul(balance).divBasis().divBasis();
+	}
+
+	/**
+	 * Return the reward
+	 */
+	function _calculateAllReward(address _property, address _user, uint256 _reward) private view returns(uint256) {
+		/**
+		 * Gets the cumulative sum of the holder reward price recorded the last time you withdrew.
+		 */
+		uint256 _lastReward = getStorageLastWithdrawnReward(_property, _user);
+		ERC20Mintable property = ERC20Mintable(_property);
+		uint256 balance = property.balanceOf(_user);
+		uint256 totalSupply = property.totalSupply();
+		uint256 unitPrice = _reward.sub(_lastReward).mulBasis().div(totalSupply);
+		return unitPrice.mul(balance).divBasis().divBasis();
 	}
 
 	/**
@@ -185,13 +208,14 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		returns (
 			uint256 _amount,
 			uint256 _price,
-			uint256 _cap
+			uint256 _cap,
+			uint256 _allReward
 		)
 	{
 		/**
 		 * Gets the latest withdrawal reward amount.
 		 */
-		(uint256 _value, uint256 price, uint256 cap) =
+		(uint256 _value, uint256 price, uint256 cap, uint256 allReward) =
 			_calculateAmount(_property, _user);
 
 		/**
@@ -200,7 +224,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return (0, price, cap);
+			return (0, price, cap, 0);
 		}
 
 		/**
@@ -213,19 +237,37 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		 */
 		uint256 value =
 			_value.add(getPendingWithdrawal(_property, _user)).add(legacy);
-		return (value, price, cap);
+		return (value, price, cap, allReward);
 	}
 
 	/**
 	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
+	 * caution!!!this function is deprecated!!!
+	 * use calculateRewardAmount
 	 */
 	function calculateWithdrawableAmount(address _property, address _user)
 		external
 		view
 		returns (uint256)
 	{
-		(uint256 value, , ) = _calculateWithdrawableAmount(_property, _user);
+		(uint256 value, , , ) = _calculateWithdrawableAmount(_property, _user);
 		return value;
+	}
+
+	/**
+	 * Returns the rewards amount
+	 */
+	function calculateRewardAmount(address _property, address _user)
+		external
+		view
+		returns (
+			uint256 _amount,
+			uint256 _price,
+			uint256 _cap,
+			uint256 _allReward
+		)
+	{
+		return _calculateWithdrawableAmount(_property, _user);
 	}
 
 	/**

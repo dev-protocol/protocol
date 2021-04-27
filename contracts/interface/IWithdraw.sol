@@ -15,8 +15,22 @@ interface IWithdraw {
 		address _to
 	) external;
 
+	/**
+	 * caution!!!this function is deprecated!!!
+	 * use calculateRewardAmount
+	 */
 	function calculateWithdrawableAmount(address _property, address _user)
 		external
 		view
 		returns (uint256);
+
+	function calculateRewardAmount(address _property, address _user)
+		external
+		view
+		returns (
+			uint256 _amount,
+			uint256 _price,
+			uint256 _cap,
+			uint256 _allReward
+		);
 }
