@@ -160,6 +160,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 */
 	function _calculateLatestCap(uint256 _holdersPrice)
 		private
+		view
 		returns (uint256)
 	{
 		uint256 cap = getStorageCap();
