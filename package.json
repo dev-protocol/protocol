@@ -27,7 +27,7 @@
 		"@types/bent": "7.3.2",
 		"@types/dotenv": "8.2.0",
 		"@types/mathjs": "6.0.11",
-		"@types/node": "13.13.51",
+		"@types/node": "13.13.50",
 		"@types/shelljs": "0.8.8",
 		"@typescript-eslint/eslint-plugin": "4.22.0",
 		"@typescript-eslint/parser": "4.22.0",
