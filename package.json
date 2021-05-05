@@ -32,7 +32,7 @@
 		"@typescript-eslint/parser": "4.22.1",
 		"bent": "7.3.12",
 		"bignumber.js": "9.0.1",
-		"dotenv": "8.6.0",
+		"dotenv": "9.0.0",
 		"eslint": "7.25.0",
 		"eslint-config-prettier": "6.15.0",
 		"eslint-config-xo": "0.36.0",
