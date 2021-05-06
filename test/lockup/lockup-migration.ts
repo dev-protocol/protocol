@@ -1,14 +1,14 @@
 import { LockupMigrationTestInstance } from '../../types/truffle-contracts'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
-contract('LockupMigrationTest', ([from, property, user]) => {
+contract('LockupMigrationTest', ([from, property, user, devMinter]) => {
 	const err = (error: Error): Error => error
 
 	const init = async (): Promise<LockupMigrationTestInstance> => {
 		const config = await artifacts.require('AddressConfig').new()
 		const lockup = await artifacts
 			.require('LockupMigrationTest')
-			.new(config.address)
+			.new(config.address, devMinter)
 		await lockup.createStorage()
 		await lockup.prepare()
 		return lockup
