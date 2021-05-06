@@ -16,6 +16,7 @@ contract('TreasuryFee', ([deployer, treasury, uesr]) => {
 		dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		dip7 = await artifacts.require('DIP7').new(dev.addressConfig.address)
 		treasuryFee = await artifacts

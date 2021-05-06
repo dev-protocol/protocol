@@ -20,10 +20,15 @@ export class LockupMigration {
 		return lockup
 	}
 
-	public async create(): Promise<LockupMigrationInstance> {
+	public async create(devMinter = ''): Promise<LockupMigrationInstance> {
+		if (devMinter === '') {
+			const tmp = await this.load()
+			devMinter = await tmp.devMinter()
+		}
+
 		const lockupMigration = await this._dev.artifacts
 			.require('LockupMigration')
-			.new(this._dev.addressConfig.address, await this._dev.gasInfo)
+			.new(this._dev.addressConfig.address, devMinter, await this._dev.gasInfo)
 		console.log('new Lockup contract', lockupMigration.address)
 		await this._addMinter(lockupMigration)
 		return lockupMigration

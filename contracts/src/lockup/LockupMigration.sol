@@ -3,7 +3,7 @@ pragma solidity 0.5.17;
 import {Lockup} from "contracts/src/lockup/Lockup.sol";
 
 contract LockupMigration is Lockup {
-	constructor(address _config) public Lockup(_config) {}
+	constructor(address _config, address _devMinter) public Lockup(_config, _devMinter) {}
 
 	function lockup(
 		// solhint-disable-next-line no-unused-vars

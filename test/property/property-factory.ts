@@ -177,6 +177,8 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMarketGroup(),
@@ -187,7 +189,6 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
-					dev.generateDev(),
 					dev.generateWithdraw(),
 					dev.generateAllocator(),
 				])
@@ -202,6 +203,8 @@ contract(
 				let marketAddress: string
 				before(async () => {
 					await dev.generateAddressConfig()
+					await dev.generateDev()
+					await dev.generateDevMinter()
 					await Promise.all([
 						dev.generateMarketFactory(),
 						dev.generateMarketGroup(),
@@ -212,7 +215,6 @@ contract(
 						dev.generatePropertyFactory(),
 						dev.generatePropertyGroup(),
 						dev.generateLockup(),
-						dev.generateDev(),
 						dev.generateWithdraw(),
 						dev.generateAllocator(),
 					])

@@ -65,12 +65,16 @@ const handler = async (
 	const lockup = new Lockup(dev)
 	const lockup_current = await lockup.load()
 	const lockup_migration = new LockupMigration(dev)
-	const lockup_next = await lockup_migration.create()
+	const lockup_next = await lockup_migration.create(
+		await lockup_current.devMinter()
+	)
 
 	// Create the new Withdraw
 	const withdraw = new Withdraw(dev)
 	const withdraw_current = await withdraw.load()
-	const withdraw_next = await withdraw.create()
+	const withdraw_next = await withdraw.create(
+		await withdraw_current.devMinter()
+	)
 
 	// Delegate to all new contracts
 	await Promise.all([

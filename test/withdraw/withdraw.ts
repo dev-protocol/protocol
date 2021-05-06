@@ -40,6 +40,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
+		await dev.generateDev()
+		await dev.generateDevMinter()
 		await Promise.all([
 			dev.generateAllocator(),
 			dev.generateMarketFactory(),
@@ -52,17 +54,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			dev.generateVoteCounter(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
-			dev.generateDev(),
 		])
 		if (generateWithdrawTest) {
 			await dev.generateWithdrawTest()
-			await dev.dev.addMinter(dev.withdrawTest.address)
 		} else {
 			await dev.generateWithdraw()
-			await dev.dev.addMinter(dev.withdraw.address)
 		}
-
-		await dev.dev.addMinter(dev.lockup.address)
 
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.dev.mint(user3, new BigNumber(1e18).times(10000000))
@@ -1702,6 +1699,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			expect(treasuryAmount.times(2).toFixed()).to.be.equal(
 				afterBalance.minus(beforeBalance).toFixed()
 			)
+		})
+	})
+	describe('Withdraw; devMinter', () => {
+		it('get the address of the DevMinter contract.', async () => {
+			const [dev] = await init()
+			const devMinterAddress = await dev.withdraw.devMinter()
+			expect(devMinterAddress).to.be.equal(dev.devMinter.address)
 		})
 	})
 })

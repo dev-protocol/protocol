@@ -22,6 +22,8 @@ contract(
 		> => {
 			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressConfig()
+			await dev.generateDev()
+			await dev.generateDevMinter()
 			await Promise.all([
 				dev.generateVoteCounter(),
 				dev.generateMarketGroup(),
@@ -29,7 +31,6 @@ contract(
 				dev.generatePolicyGroup(),
 				dev.generatePolicyFactory(),
 				dev.generateLockup(),
-				dev.generateDev(),
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
 				dev.generateAllocator(),
