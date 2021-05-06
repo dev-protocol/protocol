@@ -23,6 +23,8 @@ contract(
 			let propertyAddress: string
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generatePropertyFactory(),
