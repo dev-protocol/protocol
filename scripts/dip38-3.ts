@@ -38,7 +38,7 @@ const handler = async (
 	const lockupMigration = new LockupMigration(dev)
 	const currentLockup = await lockupMigration.load()
 	const lockup = new Lockup(dev)
-	const nextLockup = await lockup.create()
+	const nextLockup = await lockup.create(await currentLockup.devMinter())
 	await lockup.set(nextLockup)
 	await lockupMigration.changeOwner(currentLockup, nextLockup)
 

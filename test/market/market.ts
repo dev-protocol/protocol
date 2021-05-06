@@ -92,6 +92,8 @@ contract(
 			let propertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMarketGroup(),
@@ -102,7 +104,6 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
-					dev.generateDev(),
 					dev.generateWithdraw(),
 					dev.generateAllocator(),
 				])
@@ -308,6 +309,8 @@ contract(
 			const propertyFactory = user1
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMarketGroup(),
@@ -318,7 +321,6 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
-					dev.generateDev(),
 					dev.generateWithdraw(),
 					dev.generateAllocator(),
 				])

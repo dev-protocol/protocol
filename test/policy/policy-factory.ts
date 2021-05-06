@@ -57,11 +57,12 @@ contract(
 		})
 		describe('PolicyFactory; convergePolicy', () => {
 			const dev = new DevProtocolInstance(deployer)
-			let policy: IPolicyInstance
 			let firstPolicyInstance: IPolicyInstance
 			let createdPropertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generatePolicyGroup(),
 					dev.generatePolicyFactory(),
@@ -74,7 +75,6 @@ contract(
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
 					dev.generateMetricsGroup(),
-					dev.generateDev(),
 				])
 				await dev.dev.mint(user1, 10000, { from: deployer })
 				const policyAddress = await dev.generatePolicy(
@@ -133,10 +133,11 @@ contract(
 		})
 		describe('PolicyFactory; forceAttach', () => {
 			const dev = new DevProtocolInstance(deployer)
-			let nextPolicyInstance: IPolicyInstance
 			let createdPropertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generatePolicyGroup(),
 					dev.generatePolicyFactory(),
@@ -149,7 +150,6 @@ contract(
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
 					dev.generateMetricsGroup(),
-					dev.generateDev(),
 				])
 				await dev.dev.mint(user1, 10000, { from: deployer })
 				await dev.generatePolicy('PolicyTestForPolicyFactory')

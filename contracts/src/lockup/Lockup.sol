@@ -1,11 +1,11 @@
 pragma solidity 0.5.17;
 
 // prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
+import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IProperty} from "contracts/interface/IProperty.sol";
 import {IPolicy} from "contracts/interface/IPolicy.sol";
 import {IAllocator} from "contracts/interface/IAllocator.sol";
@@ -43,6 +43,7 @@ import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
 contract Lockup is ILockup, UsingConfig, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	address public devMinter;
 	struct RewardPrices {
 		uint256 reward;
 		uint256 holders;
@@ -52,9 +53,14 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	event Lockedup(address _from, address _property, uint256 _value);
 
 	/**
-	 * Initialize the passed address as AddressConfig address.
+	 * Initialize the passed address as AddressConfig address and Devminter.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _config, address _devMinter)
+		public
+		UsingConfig(_config)
+	{
+		devMinter = _devMinter;
+	}
 
 	/**
 	 * Adds staking.
@@ -505,11 +511,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
 
 		/**
-		 * Creates a Dev token instance.
-		 */
-		ERC20Mintable erc20 = ERC20Mintable(config().token());
-
-		/**
 		 * Updates the staking status to avoid double rewards.
 		 */
 		setStorageLastStakedInterestPrice(
@@ -522,7 +523,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Mints the reward.
 		 */
-		require(erc20.mint(msg.sender, value), "dev mint failed");
+		require(
+			IDevMinter(devMinter).mint(msg.sender, value),
+			"dev mint failed"
+		);
 
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
@@ -749,20 +753,5 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		if (getStorageLastInterestPrice(_property, _user) != interestPrice) {
 			setStorageLastInterestPrice(_property, _user, interestPrice);
 		}
-	}
-
-	/**
-	 * Updates the block number of the time of DIP4 release.
-	 */
-	function setDIP4GenesisBlock(uint256 _block) external onlyOwner {
-		/**
-		 * Validates the value is not set.
-		 */
-		require(getStorageDIP4GenesisBlock() == 0, "already set the value");
-
-		/**
-		 * Sets the value.
-		 */
-		setStorageDIP4GenesisBlock(_block);
 	}
 }

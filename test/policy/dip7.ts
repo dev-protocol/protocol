@@ -12,6 +12,7 @@ contract('DIP7', ([deployer]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		dip7 = await artifacts.require('DIP7').new(dev.addressConfig.address)
 		dip1 = await artifacts.require('DIP1').new(dev.addressConfig.address)

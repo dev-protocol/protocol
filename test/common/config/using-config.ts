@@ -6,6 +6,7 @@ contract('UsingConfigTest', ([deployer]) => {
 	before(async () => {
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 	})
 	describe('UsingConfig; config', () => {
 		it('You can get the address of config by setting it in the constructor.', async () => {
