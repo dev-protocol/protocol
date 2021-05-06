@@ -23,6 +23,8 @@ contract('LockupTest', ([deployer, user1]) => {
 	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
+		await dev.generateDev()
+		await dev.generateDevMinter()
 		await Promise.all([
 			dev.generateAllocator(),
 			dev.generateMarketFactory(),
@@ -36,7 +38,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			dev.generateVoteCounter(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
-			dev.generateDev(),
 		])
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const policyAddress = await dev.generatePolicy('PolicyTestBase')
@@ -54,7 +55,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			(await dev.createMetrics(deployer, property.address)).address
 		)
 
-		await dev.dev.addMinter(dev.lockup.address)
 		if (initialUpdate) {
 			await dev.lockup.update()
 		}
@@ -1663,30 +1663,11 @@ contract('LockupTest', ([deployer, user1]) => {
 			})
 		})
 	})
-	describe('Lockup; setDIP4GenesisBlock', () => {
-		it('Store passed value to getStorageDIP4GenesisBlock as a block number', async () => {
+	describe('Lockup; devMinter', () => {
+		it('get the address of the DevMinter contract.', async () => {
 			const [dev] = await init()
-			const stored = await dev.lockup.getStorageDIP4GenesisBlock()
-			expect(stored.toNumber()).to.be.greaterThan(1)
-		})
-		it('Should fail to call when already updated the value', async () => {
-			const [dev] = await init()
-			const res = await dev.lockup.setDIP4GenesisBlock(456789).catch(err)
-			const stored = await dev.lockup.getStorageDIP4GenesisBlock()
-			expect(stored.toNumber()).to.be.greaterThan(1)
-			expect(res).to.be.instanceOf(Error)
-		})
-		it('Should fail to call when sent from non-pauser account', async () => {
-			const [dev] = await init()
-			const before = await dev.lockup
-				.getStorageDIP4GenesisBlock()
-				.then(toBigNumber)
-			const res = await dev.lockup
-				.setDIP4GenesisBlock(before.plus(123456), { from: user1 })
-				.catch(err)
-			const after = await dev.lockup.getStorageDIP4GenesisBlock()
-			expect(after.toNumber()).to.be.equal(before.toNumber())
-			expect(res).to.be.instanceOf(Error)
+			const devMinterAddress = await dev.lockup.devMinter()
+			expect(devMinterAddress).to.be.equal(dev.devMinter.address)
 		})
 	})
 })

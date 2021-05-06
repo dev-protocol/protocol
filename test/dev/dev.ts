@@ -7,6 +7,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 		return dev.dev
 	}
 
@@ -233,8 +234,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		const generateEnv = async (): Promise<DevProtocolInstance> => {
 			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressConfig()
+			await dev.generateDev()
+			await dev.generateDevMinter()
 			await Promise.all([
-				dev.generateDev(),
 				dev.generateLockup(),
 				dev.generatePropertyFactory(),
 				dev.generatePropertyGroup(),
@@ -378,6 +380,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const dev = new DevProtocolInstance(deployer)
 			await dev.generateAddressConfig()
 			await dev.generateDev()
+			await dev.generateDevMinter()
 			await dev.generateMarketGroup()
 			return dev
 		}
