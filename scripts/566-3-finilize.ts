@@ -1,13 +1,13 @@
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
-const { CONFIG, EGS_TOKEN } = process.env
+const { CONFIG, EGS_TOKEN, DEV_MINTER } = process.env
 const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
 	callback: (err: Error | null) => void
 ): Promise<void> => {
-	if (!CONFIG || !EGS_TOKEN) {
+	if (!CONFIG || !EGS_TOKEN || !DEV_MINTER) {
 		return
 	}
 
@@ -27,7 +27,7 @@ const handler = async (
 	// Deploy new Withdraw
 	const nextWithdraw = await artifacts
 		.require('Withdraw')
-		.new(config.address, { gasPrice: await fastest(), gas })
+		.new(config.address, DEV_MINTER, { gasPrice: await fastest(), gas })
 		.catch(console.error)
 	if (!nextWithdraw) {
 		return

@@ -19,6 +19,8 @@ import {
 	MetricsInstance,
 	TreasuryTestInstance,
 	IPolicyContract,
+	LockupTestInstance,
+	DevMinterInstance,
 } from '../../types/truffle-contracts'
 import { getBlock } from './utils/common'
 
@@ -42,7 +44,9 @@ export class DevProtocolInstance {
 	private _metricsGroup!: MetricsGroupTestInstance
 	private _withdraw!: WithdrawInstance
 	private _withdrawTest!: WithdrawTestInstance
+	private _lockupTest!: LockupTestInstance
 	private _treasury!: TreasuryTestInstance
+	private _devMinter!: DevMinterInstance
 	private readonly _policy!: IPolicyContract
 
 	constructor(deployer: string) {
@@ -55,6 +59,10 @@ export class DevProtocolInstance {
 
 	public get addressConfig(): AddressConfigInstance {
 		return this._addressConfig
+	}
+
+	public get devMinter(): DevMinterInstance {
+		return this._devMinter
 	}
 
 	public get allocator(): AllocatorInstance {
@@ -113,6 +121,10 @@ export class DevProtocolInstance {
 		return this._withdrawTest
 	}
 
+	public get lockupTest(): LockupTestInstance {
+		return this._lockupTest
+	}
+
 	public get treasury(): TreasuryTestInstance {
 		return this._treasury
 	}
@@ -128,6 +140,14 @@ export class DevProtocolInstance {
 	public async generateAddressConfig(): Promise<void> {
 		const instance = contract('AddressConfig')
 		this._addressConfig = await instance.new(this.fromDeployer)
+	}
+
+	public async generateDevMinter(): Promise<void> {
+		this._devMinter = await contract('DevMinter').new(
+			this.addressConfig.address,
+			this.fromDeployer
+		)
+		await this._dev.addMinter(this._devMinter.address)
 	}
 
 	public async generateDev(): Promise<void> {
@@ -152,12 +172,12 @@ export class DevProtocolInstance {
 	public async generateLockup(): Promise<void> {
 		this._lockup = await contract('Lockup').new(
 			this.addressConfig.address,
+			this.devMinter.address,
 			this.fromDeployer
 		)
 		const block = await getBlock()
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 		await this._lockup.createStorage()
-		await this._lockup.setDIP4GenesisBlock(block)
 	}
 
 	public async generatePropertyFactory(): Promise<void> {
@@ -267,6 +287,7 @@ export class DevProtocolInstance {
 	public async generateWithdraw(): Promise<void> {
 		this._withdraw = await contract('Withdraw').new(
 			this.addressConfig.address,
+			this.devMinter.address,
 			this.fromDeployer
 		)
 		await this._addressConfig.setWithdraw(
@@ -279,6 +300,7 @@ export class DevProtocolInstance {
 	public async generateWithdrawTest(): Promise<void> {
 		this._withdrawTest = await contract('WithdrawTest').new(
 			this.addressConfig.address,
+			this.devMinter.address,
 			this.fromDeployer
 		)
 		await this._addressConfig.setWithdraw(
@@ -286,6 +308,19 @@ export class DevProtocolInstance {
 			this.fromDeployer
 		)
 		await this._withdrawTest.createStorage(this.fromDeployer)
+	}
+
+	public async generateLockupTest(): Promise<void> {
+		this._lockupTest = await contract('LockupTest').new(
+			this.addressConfig.address,
+			this.devMinter.address,
+			this.fromDeployer
+		)
+		await this._addressConfig.setLockup(
+			this._lockupTest.address,
+			this.fromDeployer
+		)
+		await this._lockupTest.createStorage(this.fromDeployer)
 	}
 
 	public async generatePolicy(
