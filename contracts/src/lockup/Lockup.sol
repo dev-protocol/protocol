@@ -208,8 +208,14 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 
 		/**
 		 * Sets `InitialCumulativeHoldersRewardCap`.
+		 * Records this value only when the "first staking to the passed Property" is transacted.
 		 */
-		if (getStorageInitialCumulativeHoldersRewardCap(_property) == 0) {
+		if (
+			getStoragePropertyValue(_property) == 0 &&
+			getStorageInitialCumulativeHoldersRewardCap(_property) == 0 &&
+			getStorageLastCumulativeHoldersRewardAmountPerProperty(_property) ==
+			0
+		) {
 			setStorageInitialCumulativeHoldersRewardCap(
 				_property,
 				_prices.holdersCap
