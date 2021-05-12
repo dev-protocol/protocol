@@ -1226,7 +1226,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						.then(toBigNumber)
 					const expected = await calc(property3, carol)
 					expect(carolAmount.toFixed()).to.be.equal(expected.toFixed())
-					console.log(1, carolAmount.toFixed())
 				})
 			})
 			describe('after withdrawal', () => {
