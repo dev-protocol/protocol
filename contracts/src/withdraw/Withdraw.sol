@@ -192,9 +192,8 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		IERC20 property = IERC20(_property);
 		uint256 balance = property.balanceOf(_user);
 		uint256 totalSupply = property.totalSupply();
-		uint256 unitPriceCap =
-			_cap.sub(_lastRewardCap).mulBasis().div(totalSupply);
-		return unitPriceCap.mul(balance).divBasis().divBasis();
+		uint256 unitPriceCap = _cap.sub(_lastRewardCap).div(totalSupply);
+		return unitPriceCap.mul(balance).divBasis();
 	}
 
 	/**

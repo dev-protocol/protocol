@@ -205,6 +205,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_property,
 			_prices.holders
 		);
+		setStorageCumulativeHoldersRewardCap(_prices.holdersCap);
+		setStorageLastCumulativeHoldersPriceCap(_prices.holders);
 
 		/**
 		 * Sets `InitialCumulativeHoldersRewardCap`.

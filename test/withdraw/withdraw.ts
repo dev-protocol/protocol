@@ -1501,7 +1501,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		})
 	})
 
-	describe.only('Withdraw; cap', () => {
+	describe('Withdraw; cap', () => {
 		const propertyAuthor = deployer
 		const alis = user1
 		const prepare = async (): Promise<
@@ -1550,18 +1550,12 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				.minus(lastReward)
 				.times(toBigNumber(1e18))
 				.idiv(totalSupply)
-			const unitPriceCap = cap
-				.minus(lastRewardCap)
-				.times(toBigNumber(1e18))
-				.idiv(totalSupply)
+			const unitPriceCap = cap.minus(lastRewardCap).idiv(totalSupply)
 			const allReward = unitPrice
 				.times(balance)
 				.idiv(toBigNumber(1e18))
 				.idiv(toBigNumber(1e18))
-			const capped = unitPriceCap
-				.times(balance)
-				.idiv(toBigNumber(1e18))
-				.idiv(toBigNumber(1e18))
+			const capped = unitPriceCap.times(balance).idiv(toBigNumber(1e18))
 			const value = capped.isZero()
 				? allReward
 				: allReward.isLessThanOrEqualTo(capped)
@@ -1576,15 +1570,11 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			user: string
 		): Promise<void> => {
 			await mine(1)
+			const [value, capped] = await calculateRewardAndCap(dev, property, user)
 			const amount = await dev.withdraw
 				.calculateWithdrawableAmount(property.address, user)
 				.then(toBigNumber)
-			const staked = await dev.lockup
-				.getPropertyValue(property.address)
-				.then(toBigNumber)
-			const cap = await dev.lockup.cap().then(toBigNumber)
-			const [value, capped] = await calculateRewardAndCap(dev, property, user)
-			const expected = staked.isGreaterThan(cap) ? capped : value
+			const expected = value.isGreaterThan(capped) ? capped : value
 			expect(amount.toFixed()).to.be.equal(expected.toFixed())
 		}
 
