@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-import { pow, bignumber, floor } from 'mathjs'
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	MetricsInstance,
