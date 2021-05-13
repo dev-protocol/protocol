@@ -1540,7 +1540,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			const reward = toBigNumber(result[0])
 			const cap = toBigNumber(result[1])
 			const lastReward = await dev.withdraw
-				.getStorageLastWithdrawnRewardCap(property.address, user)
+				.getStorageLastWithdrawnReward(property.address, user)
 				.then(toBigNumber)
 			const lastRewardCap = await dev.withdraw
 				.getStorageLastWithdrawnRewardCap(property.address, user)
@@ -1555,7 +1555,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				.minus(lastRewardCap)
 				.times(toBigNumber(1e18))
 				.idiv(totalSupply)
-			const tmp = unitPrice
+			const allReward = unitPrice
 				.times(balance)
 				.idiv(toBigNumber(1e18))
 				.idiv(toBigNumber(1e18))
@@ -1564,9 +1564,9 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				.idiv(toBigNumber(1e18))
 				.idiv(toBigNumber(1e18))
 			const value = capped.isZero()
-				? tmp
-				: tmp.isLessThanOrEqualTo(capped)
-				? tmp
+				? allReward
+				: allReward.isLessThanOrEqualTo(capped)
+				? allReward
 				: capped
 			return [value, capped]
 		}
