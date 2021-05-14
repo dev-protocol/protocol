@@ -1,3 +1,4 @@
+/* eslint-disable max-params */
 /* eslint-disable no-await-in-loop */
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
@@ -593,7 +594,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 		})
 	})
-	describe.only('Withdraw; calculateWithdrawableAmount, calculateRewardAmount', () => {
+	describe('Withdraw; calculateWithdrawableAmount, calculateRewardAmount', () => {
 		type calcResult = {
 			readonly value: BigNumber
 			readonly reword: BigNumber
@@ -672,15 +673,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			}
 		}
 
-		const splitResult = (result: calcResult): calcResult => {
-			return {
-				value: splitValue(result.value)[0],
-				reword: result.reword,
-				cap: result.cap,
-				allReward: result.allReward,
-			}
-		}
-
 		const legacyWithdrawbleAmount = async (
 			dev: DevProtocolInstance,
 			prop: PropertyInstance,
@@ -718,14 +710,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			dev: DevProtocolInstance,
 			prop: PropertyInstance,
 			account: string,
-			result: calcResult
+			result: calcResult,
+			isTest = false
 		): Promise<void> => {
+			const instance = isTest ? dev.withdrawTest : dev.withdraw
 			const [
 				value,
 				price,
 				cap,
 				allReward,
-			] = await dev.withdraw
+			] = await instance
 				.calculateRewardAmount(prop.address, account)
 				.then(to4BigNumbers)
 			expect(result.value.eq(value)).to.be.equal(true)
@@ -1018,8 +1012,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(aliceAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult
+					)
 				})
 			})
 			describe('additional staking', () => {
@@ -1031,8 +1031,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(aliceAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult
+					)
 				})
 			})
 			describe('after staking withdrawal', () => {
@@ -1049,8 +1055,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(aliceAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult
+					)
 				})
 				it(`Alice's withdrawable holders rewards is correct when also after withdrawal by Bob`, async () => {
 					await dev.lockup.withdraw(
@@ -1064,8 +1076,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(aliceAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult
+					)
 				})
 			})
 		})
@@ -1075,8 +1093,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			let property2: PropertyInstance
 			let property3: PropertyInstance
 			let property4: PropertyInstance
-			let lastBlock1: BigNumber
-			let lastBlock2: BigNumber
 			let calc: Calculator
 
 			const alice = deployer
@@ -1130,7 +1146,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				await dev.dev.deposit(property1.address, '10000000000000000000000', {
 					from: dave,
 				})
-				lastBlock1 = await getBlock().then(toBigNumber)
 				await mine(3)
 			})
 
@@ -1139,9 +1154,15 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdraw
 						.calculateWithdrawableAmount(property4.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property4, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property4,
+						alice,
+						calcResult
+					)
 				})
 				it(`Property1 is locked-up 100% of all Property's locked-ups`, async () => {
 					const total = await dev.lockup.getAllValue().then(toBigNumber)
@@ -1155,14 +1176,19 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property1.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property1, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property1, alice)
+					expect(aliceAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property1,
+						alice,
+						calcResult
+					)
 				})
 				it(`Alice does staking 2500 to Property2, Property2 is 20% of the total rewards`, async () => {
 					await dev.dev.deposit(property2.address, '2500000000000000000000', {
 						from: dave,
 					})
-					lastBlock2 = await getBlock().then(toBigNumber)
 					const total = await dev.lockup.getAllValue().then(toBigNumber)
 					const p1 = await dev.lockup
 						.getPropertyValue(property1.address)
@@ -1181,7 +1207,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					await dev.dev.deposit(property3.address, '3750000000000000000000', {
 						from: dave,
 					})
-					lastBlock2 = await getBlock().then(toBigNumber)
 					const total = await dev.lockup.getAllValue().then(toBigNumber)
 					const p1 = await dev.lockup
 						.getPropertyValue(property1.address)
@@ -1201,18 +1226,18 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property1.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property1, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property1, alice)
+					expect(aliceAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property1,
+						alice,
+						calcResult
+					)
 				})
 			})
 			describe('after withdrawal', () => {
 				before(async () => {
-					console.log(
-						'*',
-						await dev.withdraw
-							.getStorageLastWithdrawnReward(property3.address, carol)
-							.then((x) => x.toString())
-					)
 					await dev.withdraw.withdraw(property1.address, { from: alice })
 					await dev.withdraw.withdraw(property2.address, { from: bob })
 					await dev.withdraw.withdraw(property3.address, { from: carol })
@@ -1222,30 +1247,54 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdraw
 						.calculateWithdrawableAmount(property4.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property4, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property4,
+						alice,
+						calcResult
+					)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property1.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property1, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property1, alice)
+					expect(aliceAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property1,
+						alice,
+						calcResult
+					)
 				})
 				it(`Bob's withdrawable holders rewards is correct`, async () => {
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property2.address, bob)
 						.then(toBigNumber)
-					const [expected] = await calc(property2, bob)
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property2, bob)
+					expect(bobAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property2,
+						bob,
+						calcResult
+					)
 				})
 				it(`Carol's withdrawable holders rewards is correct`, async () => {
 					const carolAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property3.address, carol)
 						.then(toBigNumber)
-					const [expected] = await calc(property3, carol)
-					expect(carolAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property3, carol)
+					expect(carolAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property3,
+						carol,
+						calcResult
+					)
 				})
 			})
 			describe('after additional staking', () => {
@@ -1265,30 +1314,54 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdraw
 						.calculateWithdrawableAmount(property4.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property4, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property4,
+						alice,
+						calcResult
+					)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property1.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property1, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property1, alice)
+					expect(aliceAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property1,
+						alice,
+						calcResult
+					)
 				})
 				it(`Bob's withdrawable holders rewards is correct`, async () => {
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property2.address, bob)
 						.then(toBigNumber)
-					const [expected] = await calc(property2, bob)
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property2, bob)
+					expect(bobAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property2,
+						bob,
+						calcResult
+					)
 				})
 				it(`Carol's withdrawable holders rewards is correct`, async () => {
-					const [expected] = await calc(property3, carol)
+					const calcResult = await calc(property3, carol)
 					const carolAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property3.address, carol)
 						.then(toBigNumber)
-					expect(carolAmount.toFixed()).to.be.equal(expected.toFixed())
+					expect(carolAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property3,
+						carol,
+						calcResult
+					)
 				})
 			})
 			describe('after staking withdrawal', () => {
@@ -1296,9 +1369,15 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdraw
 						.calculateWithdrawableAmount(property4.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property4, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property4,
+						alice,
+						calcResult
+					)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await dev.lockup.withdraw(
@@ -1310,8 +1389,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const aliceAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property1.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property1, alice)
-					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property1, alice)
+					expect(aliceAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property1,
+						alice,
+						calcResult
+					)
 				})
 				it(`Bob's withdrawable holders rewards is correct`, async () => {
 					await dev.lockup.withdraw(
@@ -1323,8 +1408,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const bobAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property2.address, bob)
 						.then(toBigNumber)
-					const [expected] = await calc(property2, bob)
-					expect(bobAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property2, bob)
+					expect(bobAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property2,
+						bob,
+						calcResult
+					)
 				})
 				it(`Carol's withdrawable holders rewards is correct`, async () => {
 					await dev.lockup.withdraw(
@@ -1336,8 +1427,14 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const carolAmount = await dev.withdraw
 						.calculateWithdrawableAmount(property3.address, carol)
 						.then(toBigNumber)
-					const [expected] = await calc(property3, carol)
-					expect(carolAmount.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property3, carol)
+					expect(carolAmount.toFixed()).to.be.equal(calcResult.value.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property3,
+						carol,
+						calcResult
+					)
 				})
 			})
 			describe('after withdrawal', () => {
@@ -1345,9 +1442,15 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdraw
 						.calculateWithdrawableAmount(property4.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property4, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property4, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property4,
+						alice,
+						calcResult
+					)
 				})
 				it(`Alice's withdrawable holders rewards is correct`, async () => {
 					await dev.withdraw.withdraw(property1.address, { from: alice })
@@ -1401,23 +1504,28 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				)
 
 				calc = createCalculator(dev)
-				// Await dev.addressConfig.setWithdraw(deployer)
 				await dev.withdrawTest.setCumulativePriceTest(property.address, 10000)
 				await dev.withdrawTest.setLastWithdrawalPriceTest(
 					property.address,
 					alice,
 					7000
 				)
-				// Await dev.addressConfig.setWithdraw(dev.withdrawTest.address)
 			})
 			describe('before withdraw interest', () => {
 				it('No staked Property is 0 reward', async () => {
 					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property2, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property2, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property2,
+						alice,
+						calcResult,
+						true
+					)
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const aliceBalance = await property.balanceOf(alice).then(toBigNumber)
@@ -1428,9 +1536,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						.minus(7000)
 						.times(aliceBalance)
 						.div(1e18)
-					const [expected] = await calc(property, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
 					expect(legacy.toFixed()).to.be.equal(result.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult,
+						true
+					)
 				})
 			})
 			describe('after withdraw interest', () => {
@@ -1442,18 +1557,32 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property2, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property2, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property2,
+						alice,
+						calcResult,
+						true
+					)
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property.address, alice)
 						.then(toBigNumber)
 					const legacy = toBigNumber(0)
-					const [expected] = await calc(property, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
 					expect(legacy.toFixed()).to.be.equal(result.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult,
+						true
+					)
 				})
 			})
 			describe('after staking', () => {
@@ -1469,9 +1598,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property2, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property2, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property2,
+						alice,
+						calcResult,
+						true
+					)
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const block = await getBlock().then(toBigNumber)
@@ -1481,10 +1617,17 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const latest = toBigNumber(90)
 						.times(1e18)
 						.times(block.minus(lastBlock))
-					const [expected] = await calc(property, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
 					const [tmp] = splitValue(latest)
 					expect(tmp.toFixed()).to.be.equal(result.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult,
+						true
+					)
 				})
 			})
 		})
@@ -1532,9 +1675,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property2, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property2, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property2,
+						alice,
+						calcResult,
+						true
+					)
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const aliceBalance = await property.balanceOf(alice).then(toBigNumber)
@@ -1549,9 +1699,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						.minus(7000)
 						.times(aliceBalance)
 						.div(1e18)
-					const [expected] = await calc(property, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
 					expect(latest.plus(legacy).toFixed()).to.be.equal(result.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult,
+						true
+					)
 				})
 			})
 			describe('after withdraw interest', () => {
@@ -1564,9 +1721,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property2, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property2, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property2,
+						alice,
+						calcResult,
+						true
+					)
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const block = await getBlock().then(toBigNumber)
@@ -1576,10 +1740,17 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const latest = toBigNumber(90)
 						.times(1e18)
 						.times(block.minus(lastBlock))
-					const [expected] = await calc(property, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
 					const [tmp] = splitValue(latest)
 					expect(tmp.toFixed()).to.be.equal(result.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult,
+						true
+					)
 				})
 			})
 			describe('after additional staking', () => {
@@ -1593,9 +1764,16 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const result = await dev.withdrawTest
 						.calculateWithdrawableAmount(property2.address, alice)
 						.then(toBigNumber)
-					const [expected] = await calc(property2, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
-					expect(expected.toFixed()).to.be.equal('0')
+					const calcResult = await calc(property2, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
+					expect(calcResult.value.toFixed()).to.be.equal('0')
+					await validateCalculateRewardAmountData(
+						dev,
+						property2,
+						alice,
+						calcResult,
+						true
+					)
 				})
 				it(`Alice's withdrawable interest is correct`, async () => {
 					const block = await getBlock().then(toBigNumber)
@@ -1605,10 +1783,17 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 					const latest = toBigNumber(90)
 						.times(1e18)
 						.times(block.minus(lastBlock))
-					const [expected] = await calc(property, alice)
-					expect(result.toFixed()).to.be.equal(expected.toFixed())
+					const calcResult = await calc(property, alice)
+					expect(result.toFixed()).to.be.equal(calcResult.value.toFixed())
 					const [tmp] = splitValue(latest)
 					expect(tmp.toFixed()).to.be.equal(result.toFixed())
+					await validateCalculateRewardAmountData(
+						dev,
+						property,
+						alice,
+						calcResult,
+						true
+					)
 				})
 			})
 		})
