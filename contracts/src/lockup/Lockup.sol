@@ -156,12 +156,24 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		(, uint256 holdersPrice, , uint256 cCap) =
 			calculateCumulativeRewardPrices();
 
-		// TODO: When this function is improved to be called on-chain, the source of `getStorageLastCumulativeHoldersPriceCap` can be rewritten to` getStorageLastCumulativeHoldersRewardPrice`.
-		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersPriceCap();
-		uint256 additionalCap = holdersPrice.sub(lastHoldersPrice).mul(_cap);
-		uint256 capValue = cCap.add(additionalCap);
-		setStorageCumulativeHoldersRewardCap(capValue);
+		// TODO: When this function is improved to be called on-chain, the source of `getStorageLastCumulativeHoldersPriceCap` can be rewritten to `getStorageLastCumulativeHoldersRewardPrice`.
+		setStorageCumulativeHoldersRewardCap(cCap);
 		setStorageLastCumulativeHoldersPriceCap(holdersPrice);
+	}
+
+	/**
+	 * Returns the latest cap
+	 */
+	function _calculateLatestCap(uint256 _holdersPrice)
+		private
+		view
+		returns (uint256)
+	{
+		uint256 cap = getStorageCap();
+		uint256 cCap = getStorageCumulativeHoldersRewardCap();
+		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersPriceCap();
+		uint256 additionalCap = _holdersPrice.sub(lastHoldersPrice).mul(cap);
+		return cCap.add(additionalCap);
 	}
 
 	/**
@@ -193,11 +205,19 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_property,
 			_prices.holders
 		);
+		setStorageCumulativeHoldersRewardCap(_prices.holdersCap);
+		setStorageLastCumulativeHoldersPriceCap(_prices.holders);
 
 		/**
 		 * Sets `InitialCumulativeHoldersRewardCap`.
+		 * Records this value only when the "first staking to the passed Property" is transacted.
 		 */
-		if (getStorageInitialCumulativeHoldersRewardCap(_property) == 0) {
+		if (
+			getStoragePropertyValue(_property) == 0 &&
+			getStorageInitialCumulativeHoldersRewardCap(_property) == 0 &&
+			getStorageLastCumulativeHoldersRewardAmountPerProperty(_property) ==
+			0
+		) {
 			setStorageInitialCumulativeHoldersRewardCap(
 				_property,
 				_prices.holdersCap
@@ -222,7 +242,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersRewardPrice();
 		uint256 lastInterestPrice = getStorageLastCumulativeInterestPrice();
 		uint256 allStakes = getStorageAllValue();
-		uint256 cCap = getStorageCumulativeHoldersRewardCap();
 
 		/**
 		 * Gets latest cumulative sum of the reward amount.
@@ -248,6 +267,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		uint256 holdersPrice = holdersShare.add(lastHoldersPrice);
 		uint256 interestPrice = price.sub(holdersShare).add(lastInterestPrice);
+		uint256 cCap = _calculateLatestCap(holdersPrice);
 		return (mReward, holdersPrice, interestPrice, cCap);
 	}
 
