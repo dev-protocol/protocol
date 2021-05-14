@@ -522,4 +522,36 @@ contract LockupStorage is UsingStorage {
 				)
 			);
 	}
+
+	//FallbackInitialCumulativeHoldersRewardCap
+	function setStorageFallbackInitialCumulativeHoldersRewardCap(uint256 _value)
+		internal
+	{
+		eternalStorage().setUint(
+			getStorageFallbackInitialCumulativeHoldersRewardCapKey(),
+			_value
+		);
+	}
+
+	function getStorageFallbackInitialCumulativeHoldersRewardCap()
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getStorageFallbackInitialCumulativeHoldersRewardCapKey()
+			);
+	}
+
+	function getStorageFallbackInitialCumulativeHoldersRewardCapKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return
+			keccak256(
+				abi.encodePacked("_fallbackInitialCumulativeHoldersRewardCap")
+			);
+	}
 }

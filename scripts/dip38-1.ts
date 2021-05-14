@@ -3,7 +3,6 @@ import { config } from 'dotenv'
 import { DevCommonInstance } from './lib/instance/common'
 import { MetricsGroup } from './lib/instance/metrics-group'
 import { Lockup } from './lib/instance/lockup'
-import { LockupMigration } from './lib/instance/lockup-migration'
 import { Withdraw } from './lib/instance/withdraw'
 import { PolicyFactory } from './lib/instance/policy-factory'
 import { Policy } from './lib/instance/policy'
@@ -64,10 +63,7 @@ const handler = async (
 	// Create the LockupMigration
 	const lockup = new Lockup(dev)
 	const lockup_current = await lockup.load()
-	const lockup_migration = new LockupMigration(dev)
-	const lockup_next = await lockup_migration.create(
-		await lockup_current.devMinter()
-	)
+	const lockup_next = await lockup.create(await lockup_current.devMinter())
 
 	// Create the new Withdraw
 	const withdraw = new Withdraw(dev)
@@ -79,10 +75,7 @@ const handler = async (
 	// Delegate to all new contracts
 	await Promise.all([
 		metrics_group.changeOwner(metrics_group_current, metrics_group_next),
-		lockup_migration.changeOwnerToMigrationContract(
-			lockup_current,
-			lockup_next
-		),
+		lockup.changeOwner(lockup_current, lockup_next),
 		withdraw.changeOwner(withdraw_current, withdraw_next),
 	])
 
@@ -98,6 +91,3 @@ const handler = async (
 }
 
 export = handler
-
-// TODO
-// 最終的にこのスクリプトでいいのか確認する
