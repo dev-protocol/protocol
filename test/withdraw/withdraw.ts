@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-import { pow, bignumber, floor } from 'mathjs'
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	MetricsInstance,
@@ -1226,7 +1225,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 						.then(toBigNumber)
 					const expected = await calc(property3, carol)
 					expect(carolAmount.toFixed()).to.be.equal(expected.toFixed())
-					console.log(1, carolAmount.toFixed())
 				})
 			})
 			describe('after withdrawal', () => {
@@ -1532,18 +1530,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			return [dev, [property, property2, property3]]
 		}
 
-		// TODO capの計算方法が変わった
-		// 修正が必要かもしれない
-		const calculateCap = (args: BigNumber[]): BigNumber => {
-			const result = args.reduce((a, b) => {
-				return a.times(b)
-			})
-			const tmp = toBigNumber(1).div(args.length)
-			const t = pow(bignumber(result.toString()), bignumber(tmp.toString()))
-			const r = floor(bignumber(t.toString()))
-			return toBigNumber(r.toString())
-		}
-
 		const calculateRewardAndCap = async (
 			dev: DevProtocolInstance,
 			property: PropertyInstance,
@@ -1553,7 +1539,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			const reward = toBigNumber(result[0])
 			const cap = toBigNumber(result[1])
 			const lastReward = await dev.withdraw
-				.getStorageLastWithdrawnRewardCap(property.address, user)
+				.getStorageLastWithdrawnReward(property.address, user)
 				.then(toBigNumber)
 			const lastRewardCap = await dev.withdraw
 				.getStorageLastWithdrawnRewardCap(property.address, user)
@@ -1564,20 +1550,17 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				.minus(lastReward)
 				.times(toBigNumber(1e18))
 				.idiv(totalSupply)
-			const unitPriceCap = cap
-				.minus(lastRewardCap)
-				.times(toBigNumber(1e18))
-				.idiv(totalSupply)
-			const tmp = unitPrice
+			const unitPriceCap = cap.minus(lastRewardCap).idiv(totalSupply)
+			const allReward = unitPrice
 				.times(balance)
 				.idiv(toBigNumber(1e18))
 				.idiv(toBigNumber(1e18))
-			const capped = unitPriceCap
-				.times(balance)
-				.idiv(toBigNumber(1e18))
-				.idiv(toBigNumber(1e18))
-			const value =
-				capped.toString() === '0' ? tmp : tmp <= capped ? tmp : capped
+			const capped = unitPriceCap.times(balance).idiv(toBigNumber(1e18))
+			const value = capped.isZero()
+				? allReward
+				: allReward.isLessThanOrEqualTo(capped)
+				? allReward
+				: capped
 			return [value, capped]
 		}
 
@@ -1586,63 +1569,47 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			property: PropertyInstance,
 			user: string
 		): Promise<void> => {
-			let beforeAmount = toBigNumber(0)
-			let count = 0
-			while (true) {
-				await mine(1)
-				const amount = await dev.withdraw
-					.calculateWithdrawableAmount(property.address, user)
-					.then(toBigNumber)
-				const [value, capped] = await calculateRewardAndCap(dev, property, user)
-				expect(amount.toFixed()).to.be.equal(value.toFixed())
-				if (amount.eq(beforeAmount)) {
-					expect(capped.toFixed()).to.be.equal(value.toFixed())
-					count++
-					if (count === 3) {
-						break
-					}
-				}
-
-				beforeAmount = amount
-			}
+			await mine(1)
+			const [value, capped] = await calculateRewardAndCap(dev, property, user)
+			const amount = await dev.withdraw
+				.calculateWithdrawableAmount(property.address, user)
+				.then(toBigNumber)
+			const expected = value.isGreaterThan(capped) ? capped : value
+			expect(amount.toFixed()).to.be.equal(expected.toFixed())
 		}
 
 		it(`cap`, async () => {
 			const [dev, [property1, property2, property3]] = await prepare()
-			await dev.dev.deposit(property1.address, toBigNumber(10000), {
+			await dev.dev.deposit(property1.address, toBigNumber(1000000000), {
 				from: alis,
 			})
-			await dev.dev.deposit(property2.address, toBigNumber(20000), {
+			await dev.dev.deposit(property2.address, toBigNumber(2000000000), {
 				from: alis,
 			})
-			await dev.dev.deposit(property3.address, toBigNumber(30000), {
+			await dev.dev.deposit(property3.address, toBigNumber(3000000000), {
 				from: alis,
 			})
 
-			const cap = calculateCap([
-				toBigNumber(10000),
-				toBigNumber(20000),
-				toBigNumber(30000),
-			])
+			const cap = toBigNumber(1817120592)
 			await dev.updateCap(cap.toFixed())
 			await checkAmount(dev, property1, propertyAuthor)
-			await dev.dev.deposit(property1.address, toBigNumber(10000), {
+			await checkAmount(dev, property2, propertyAuthor)
+			await checkAmount(dev, property3, propertyAuthor)
+			await dev.dev.deposit(property1.address, toBigNumber(1000000000), {
 				from: alis,
 			})
-			await dev.dev.deposit(property2.address, toBigNumber(20000), {
+			await dev.dev.deposit(property2.address, toBigNumber(2000000000), {
 				from: alis,
 			})
-			await dev.dev.deposit(property3.address, toBigNumber(30000), {
+			await dev.dev.deposit(property3.address, toBigNumber(3000000000), {
 				from: alis,
 			})
 
-			const cap2 = calculateCap([
-				toBigNumber(20000),
-				toBigNumber(40000),
-				toBigNumber(60000),
-			])
+			const cap2 = toBigNumber(3634241185)
 			await dev.updateCap(cap2.toFixed())
 			await checkAmount(dev, property1, propertyAuthor)
+			await checkAmount(dev, property2, propertyAuthor)
+			await checkAmount(dev, property3, propertyAuthor)
 		})
 	})
 
