@@ -1763,7 +1763,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 		})
 	})
-	describe.only('Lockup; fallbackInitialCumulativeHoldersRewardCap', () => {
+	describe('Lockup; fallbackInitialCumulativeHoldersRewardCap', () => {
 		describe('success', () => {
 			it('Set the value of FallbackInitialCumulativeHoldersRewardCap', async () => {
 				const [dev] = await init()
