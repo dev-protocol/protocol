@@ -1781,7 +1781,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const result = await dev.lockup
 					.___setFallbackInitialCumulativeHoldersRewardCap(100, { from: user1 })
 					.catch(err)
-				validateErrorMessage(result, 'caller is not the owner')
+				validateErrorMessage(result, 'caller is not the owner', false)
 			})
 		})
 		describe('fallback', () => {
