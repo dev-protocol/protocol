@@ -148,7 +148,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	function updateCap(uint256 _cap) external {
 		address setter = IPolicy(config().policy()).capSetter();
 		require(setter == msg.sender, "illegal access");
-		setStorageCap(_cap);
 
 		/**
 		 * Updates cumulative amount of the holders reward cap
@@ -159,6 +158,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		// TODO: When this function is improved to be called on-chain, the source of `getStorageLastCumulativeHoldersPriceCap` can be rewritten to `getStorageLastCumulativeHoldersRewardPrice`.
 		setStorageCumulativeHoldersRewardCap(cCap);
 		setStorageLastCumulativeHoldersPriceCap(holdersPrice);
+		setStorageCap(_cap);
 	}
 
 	/**
