@@ -43,6 +43,13 @@ const handler = async (
 	await w.changeOwner(wCurrent, wNext)
 	await w.set(wNext)
 
+	await Promise.all([
+		l.changeOwner(lCurrent, lNext),
+		l.set(lNext),
+		w.changeOwner(wCurrent, wNext),
+		w.set(wNext),
+	])
+
 	callback(null)
 }
 
