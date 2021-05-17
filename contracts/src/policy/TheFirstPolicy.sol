@@ -109,4 +109,8 @@ contract TheFirstPolicy is IPolicy, UsingConfig {
 	function treasury() external view returns (address) {
 		return address(0);
 	}
+
+	function capSetter() external view returns (address) {
+		return address(0);
+	}
 }

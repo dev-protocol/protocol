@@ -224,4 +224,11 @@ contract('TheFirstPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal(DEFAULT_ADDRESS)
 		})
 	})
+	describe('TheFirstPolicy; capSetter', () => {
+		it('Returns the capSetter address', async () => {
+			const policy = await create()
+			const result = await policy.capSetter()
+			expect(result.toString()).to.be.equal(DEFAULT_ADDRESS)
+		})
+	})
 })

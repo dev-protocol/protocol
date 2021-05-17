@@ -8,6 +8,6 @@ contract PolicyTestForVoteCounter is PolicyTestBase {
 	}
 
 	function policyVotingBlocks() external view returns (uint256) {
-		return 10;
+		return 15;
 	}
 }

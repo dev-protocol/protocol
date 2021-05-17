@@ -13,29 +13,30 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 		return dev
 	}
 
-	const createDevInstanceNotAddMinter = async (): Promise<DevMinterInstance> => {
-		const contract = artifacts.require
+	const createDevInstanceNotAddMinter =
+		async (): Promise<DevMinterInstance> => {
+			const contract = artifacts.require
 
-		const addressConfig = await contract('AddressConfig').new({
-			from: deployer,
-		})
-		const dev = await contract('Dev').new(addressConfig.address, {
-			from: deployer,
-		})
-		await addressConfig.setToken(dev.address, {
-			from: deployer,
-		})
-		const devMinter = await contract('DevMinter').new(addressConfig.address, {
-			from: deployer,
-		})
-		await addressConfig.setLockup(lockup, {
-			from: deployer,
-		})
-		await addressConfig.setWithdraw(withdraw, {
-			from: deployer,
-		})
-		return devMinter
-	}
+			const addressConfig = await contract('AddressConfig').new({
+				from: deployer,
+			})
+			const dev = await contract('Dev').new(addressConfig.address, {
+				from: deployer,
+			})
+			await addressConfig.setToken(dev.address, {
+				from: deployer,
+			})
+			const devMinter = await contract('DevMinter').new(addressConfig.address, {
+				from: deployer,
+			})
+			await addressConfig.setLockup(lockup, {
+				from: deployer,
+			})
+			await addressConfig.setWithdraw(withdraw, {
+				from: deployer,
+			})
+			return devMinter
+		}
 
 	describe('mint', () => {
 		describe('success', () => {

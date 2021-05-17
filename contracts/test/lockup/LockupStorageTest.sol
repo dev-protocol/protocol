@@ -95,4 +95,31 @@ contract LockupStorageTest is LockupStorage {
 			_value
 		);
 	}
+
+	function setStorageCapTest(uint256 _value) external {
+		setStorageCap(_value);
+	}
+
+	function setStorageCumulativeHoldersRewardCapTest(uint256 _value) external {
+		setStorageCumulativeHoldersRewardCap(_value);
+	}
+
+	function setStorageLastCumulativeHoldersPriceCapTest(uint256 _value)
+		external
+	{
+		setStorageLastCumulativeHoldersPriceCap(_value);
+	}
+
+	function setStorageInitialCumulativeHoldersRewardCapTest(
+		address _property,
+		uint256 _value
+	) external {
+		setStorageInitialCumulativeHoldersRewardCap(_property, _value);
+	}
+
+	function setStorageFallbackInitialCumulativeHoldersRewardCapTest(
+		uint256 _value
+	) external {
+		setStorageFallbackInitialCumulativeHoldersRewardCap(_value);
+	}
 }

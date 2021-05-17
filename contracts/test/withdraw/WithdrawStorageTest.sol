@@ -28,4 +28,12 @@ contract WithdrawStorageTest is WithdrawStorage {
 	) external {
 		setPendingWithdrawal(_property, _user, _value);
 	}
+
+	function setStorageLastWithdrawnRewardCapTest(
+		address _property,
+		address _user,
+		uint256 _value
+	) external {
+		setStorageLastWithdrawnRewardCap(_property, _user, _value);
+	}
 }

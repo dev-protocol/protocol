@@ -377,7 +377,6 @@ contract(
 					expect(policy.address).to.be.not.equal(
 						await dev.addressConfig.policy()
 					)
-
 					await dev.voteCounter.votePolicy(
 						policy.address,
 						propertyAddress,
@@ -391,11 +390,9 @@ contract(
 					expect(policy.address).to.be.not.equal(
 						await dev.addressConfig.policy()
 					)
-
 					await dev.voteCounter.votePolicy(policy.address, property2, true, {
 						from: propertyAuther3,
 					})
-
 					expect(currentPolicyAddress).to.be.not.equal(
 						await dev.addressConfig.policy()
 					)
@@ -515,7 +512,7 @@ contract(
 					await dev.dev.deposit(propertyAddress, 10000, {
 						from: propertyAuther,
 					})
-					await mine(10)
+					await mine(15)
 					const result = await dev.voteCounter
 						.votePolicy(policy.address, propertyAddress, true, {
 							from: propertyAuther,
