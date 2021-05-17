@@ -1771,6 +1771,114 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 		})
 	})
+	describe('Lockup; fallbackInitialCumulativeHoldersRewardCap', () => {
+		describe('success', () => {
+			it('Set the value of FallbackInitialCumulativeHoldersRewardCap', async () => {
+				const [dev] = await init()
+				const expected = 100
+				await dev.lockup.___setFallbackInitialCumulativeHoldersRewardCap(
+					expected
+				)
+				const result = await dev.lockup.getStorageFallbackInitialCumulativeHoldersRewardCap()
+				expect(result.toNumber()).to.be.equal(expected)
+			})
+		})
+		describe('fail', () => {
+			it('Shoud fail to call when the caller is not owner', async () => {
+				const [dev] = await init()
+				const result = await dev.lockup
+					.___setFallbackInitialCumulativeHoldersRewardCap(100, { from: user1 })
+					.catch(err)
+				validateErrorMessage(result, 'caller is not the owner', false)
+			})
+		})
+		describe('fallback', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			let property2: PropertyInstance
+			let property3: PropertyInstance
+
+			const alice = deployer
+			const bob = user1
+
+			before(async () => {
+				;[dev, property] = await init()
+				await dev.generateLockupTest()
+				;[property2, property3] = await Promise.all([
+					artifacts
+						.require('Property')
+						.at(
+							getPropertyAddress(
+								await dev.propertyFactory.create('test2', 'TEST2', alice)
+							)
+						),
+					artifacts
+						.require('Property')
+						.at(
+							getPropertyAddress(
+								await dev.propertyFactory.create('test3', 'TEST3', alice)
+							)
+						),
+				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property3.address,
+					1
+				)
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+			})
+
+			it('When InitialCumulativeHoldersRewardCap is 0, but if it has been stakes in the past, use fallback', async () => {
+				await dev.lockupTest.updateCap(100)
+				await dev.dev.deposit(property2.address, 100, { from: bob })
+				await dev.dev.deposit(property.address, 100, { from: bob })
+				await mine(5)
+				const holdersCap = await dev.lockupTest
+					.calculateCumulativeRewardPrices()
+					.then((r) => toBigNumber(r[3]))
+
+				await dev.lockupTest.___setFallbackInitialCumulativeHoldersRewardCap(
+					holdersCap.toFixed()
+				)
+				await dev.lockupTest.setStorageInitialCumulativeHoldersRewardCapTest(
+					property.address,
+					0
+				)
+				const holdersCap2 = await dev.lockupTest
+					.calculateCumulativeRewardPrices()
+					.then((r) => toBigNumber(r[3]))
+				const expected = holdersCap2.minus(holdersCap)
+
+				const res = await dev.lockupTest.calculateRewardAmount(property.address)
+				const cap = await dev.lockupTest.getStorageInitialCumulativeHoldersRewardCap(
+					property.address
+				)
+				expect(res[1].toString()).to.be.equal(expected.toFixed())
+				expect(cap.toString()).to.be.equal('0')
+			})
+			it('When InitialCumulativeHoldersRewardCap is not 0, to be not use fallback', async () => {
+				await dev.dev.deposit(property3.address, 100, { from: bob })
+				await mine(5)
+
+				await dev.lockupTest.___setFallbackInitialCumulativeHoldersRewardCap(
+					'999999999999999999999999999999999999999999999999999999'
+				)
+
+				const res = await dev.lockupTest.calculateRewardAmount(
+					property3.address
+				)
+				const cap = await dev.lockupTest.getStorageInitialCumulativeHoldersRewardCap(
+					property3.address
+				)
+				expect(res[0].toString()).to.be.equal(res[1].toString())
+				expect(cap.toString()).to.not.be.equal('0')
+			})
+		})
+	})
 	describe('Lockup; devMinter', () => {
 		it('get the address of the DevMinter contract.', async () => {
 			const [dev] = await init()

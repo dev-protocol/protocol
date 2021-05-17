@@ -169,10 +169,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		view
 		returns (uint256)
 	{
-		uint256 cap = getStorageCap();
 		uint256 cCap = getStorageCumulativeHoldersRewardCap();
 		uint256 lastHoldersPrice = getStorageLastCumulativeHoldersPriceCap();
-		uint256 additionalCap = _holdersPrice.sub(lastHoldersPrice).mul(cap);
+		uint256 additionalCap =
+			_holdersPrice.sub(lastHoldersPrice).mul(getStorageCap());
 		return cCap.add(additionalCap);
 	}
 
@@ -191,6 +191,22 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_calculateCumulativeHoldersRewardAmount(_prices.holders, _property);
 
 		/**
+		 * Sets `InitialCumulativeHoldersRewardCap`.
+		 * Records this value only when the "first staking to the passed Property" is transacted.
+		 */
+		if (
+			getStorageLastCumulativeHoldersRewardPricePerProperty(_property) ==
+			0 &&
+			getStorageInitialCumulativeHoldersRewardCap(_property) == 0 &&
+			getStoragePropertyValue(_property) == 0
+		) {
+			setStorageInitialCumulativeHoldersRewardCap(
+				_property,
+				_prices.holdersCap
+			);
+		}
+
+		/**
 		 * Store each value.
 		 */
 		setStorageLastStakedInterestPrice(_property, _user, _prices.interest);
@@ -207,22 +223,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		);
 		setStorageCumulativeHoldersRewardCap(_prices.holdersCap);
 		setStorageLastCumulativeHoldersPriceCap(_prices.holders);
-
-		/**
-		 * Sets `InitialCumulativeHoldersRewardCap`.
-		 * Records this value only when the "first staking to the passed Property" is transacted.
-		 */
-		if (
-			getStoragePropertyValue(_property) == 0 &&
-			getStorageInitialCumulativeHoldersRewardCap(_property) == 0 &&
-			getStorageLastCumulativeHoldersRewardAmountPerProperty(_property) ==
-			0
-		) {
-			setStorageInitialCumulativeHoldersRewardCap(
-				_property,
-				_prices.holdersCap
-			);
-		}
 	}
 
 	/**
@@ -325,8 +325,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	{
 		(, uint256 holders, , uint256 holdersCap) =
 			calculateCumulativeRewardPrices();
-		uint256 initialCap =
-			getStorageInitialCumulativeHoldersRewardCap(_property);
+		uint256 initialCap = _getInitialCap(_property);
 
 		/**
 		 * Calculates the cap
@@ -336,6 +335,24 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_calculateCumulativeHoldersRewardAmount(holders, _property),
 			capValue
 		);
+	}
+
+	function _getInitialCap(address _property) private view returns (uint256) {
+		uint256 initialCap =
+			getStorageInitialCumulativeHoldersRewardCap(_property);
+		if (initialCap > 0) {
+			return initialCap;
+		}
+
+		// Fallback when there is a data past staked.
+		if (
+			getStorageLastCumulativeHoldersRewardPricePerProperty(_property) >
+			0 ||
+			getStoragePropertyValue(_property) > 0
+		) {
+			return getStorageFallbackInitialCumulativeHoldersRewardCap();
+		}
+		return 0;
 	}
 
 	/**
@@ -761,5 +778,12 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		if (getStorageLastInterestPrice(_property, _user) != interestPrice) {
 			setStorageLastInterestPrice(_property, _user, interestPrice);
 		}
+	}
+
+	function ___setFallbackInitialCumulativeHoldersRewardCap(uint256 _value)
+		external
+		onlyOwner
+	{
+		setStorageFallbackInitialCumulativeHoldersRewardCap(_value);
 	}
 }
