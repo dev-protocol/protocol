@@ -39,9 +39,8 @@ const handler = async (
 		web3
 	)
 	const setLockupCap = setInitialCumulativeHoldersRewardCap(lockup)(from)
-	const estimateSetLockupCap = estimateGasInitialCumulativeHoldersRewardCap(
-		lockup
-	)(from)
+	const estimateSetLockupCap =
+		estimateGasInitialCumulativeHoldersRewardCap(lockup)(from)
 	const fetchGraphQL = createGraphQLPropertyAuthenticationPropertyFetcher(
 		graphql()
 	)
@@ -51,7 +50,8 @@ const handler = async (
 	 * Fetch all Properties
 	 * ====================
 	 */
-	type R = GraphQLPropertyAuthenticationPropertyResponse['data']['property_authentication']
+	type R =
+		GraphQLPropertyAuthenticationPropertyResponse['data']['property_authentication']
 	const authinticatedPropertoes = await (async () => {
 		const f = async (i = 0, prev: R = []): Promise<R> => {
 			const { data } = await fetchGraphQL(i)

@@ -54,9 +54,8 @@ contract(
 				const treasuryBalance = await propertyInstance
 					.balanceOf(dev.treasury.address)
 					.then(toBigNumber)
-				const [predictedAutherBalance, predictedTreasuryBalance] = splitValue(
-					tenMillion
-				)
+				const [predictedAutherBalance, predictedTreasuryBalance] =
+					splitValue(tenMillion)
 				expect(authorBalance.toFixed()).to.be.equal(
 					predictedAutherBalance.toFixed()
 				)

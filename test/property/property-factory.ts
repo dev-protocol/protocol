@@ -244,17 +244,13 @@ contract(
 							{ from: user }
 						)
 						.catch(console.error)
-					const [
-						propertyCreator,
-						property,
-						market,
-						metrics,
-					] = await Promise.all([
-						getEventValue(dev.propertyFactory)('Create', '_from'),
-						getEventValue(dev.propertyFactory)('Create', '_property'),
-						getEventValue(dev.metricsFactory)('Create', '_from'),
-						getEventValue(dev.metricsFactory)('Create', '_metrics'),
-					])
+					const [propertyCreator, property, market, metrics] =
+						await Promise.all([
+							getEventValue(dev.propertyFactory)('Create', '_from'),
+							getEventValue(dev.propertyFactory)('Create', '_property'),
+							getEventValue(dev.metricsFactory)('Create', '_from'),
+							getEventValue(dev.metricsFactory)('Create', '_metrics'),
+						])
 					const linkedProperty = await Promise.all([
 						artifacts.require('Metrics').at(metrics as string),
 					]).then(async ([c]) => c.property())

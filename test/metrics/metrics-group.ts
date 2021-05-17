@@ -38,12 +38,14 @@ contract(
 		describe('MetricsGroup; addGroup, removeGroup, isGroup', () => {
 			it('You can get the number of properties being authenticated.', async () => {
 				const [dev, metrics1, metrics2, metrics3] = await init()
-				const before: BigNumber = await dev.metricsGroup.totalAuthenticatedProperties()
+				const before: BigNumber =
+					await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(before.toString()).to.be.equal('0')
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
-				let after: BigNumber = await dev.metricsGroup.totalAuthenticatedProperties()
+				let after: BigNumber =
+					await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(after.toString()).to.be.equal('1')
 				await dev.metricsGroup.addGroup(metrics2, {
 					from: metricsFactory,

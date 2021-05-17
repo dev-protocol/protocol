@@ -605,73 +605,70 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			prop: PropertyInstance,
 			account: string
 		) => Promise<calcResult>
-		const createCalculator = (dev: DevProtocolInstance): Calculator => async (
-			prop: PropertyInstance,
-			account: string
-		): Promise<calcResult> => {
-			const [reword, cap] = await dev.lockup
-				.calculateRewardAmount(prop.address)
-				.then(to2BigNumbers)
-			const [
-				lastReward,
-				pending,
-				lastRewardCap,
-				totalSupply,
-				balanceOfUser,
-			] = await Promise.all([
-				dev.activeWithdraw.getStorageLastWithdrawnReward(prop.address, account),
-				dev.activeWithdraw.getPendingWithdrawal(prop.address, account),
-				dev.activeWithdraw.getStorageLastWithdrawnRewardCap(
-					prop.address,
-					account
-				),
-				prop.totalSupply(),
-				prop.balanceOf(account),
-			])
-			const unitPrice = reword
-				.minus(lastReward)
-				.times(1e18)
-				.div(totalSupply)
-				.integerValue(BigNumber.ROUND_DOWN)
-			const allReward = unitPrice
-				.times(balanceOfUser)
-				.div(1e18)
-				.div(1e18)
-				.integerValue(BigNumber.ROUND_DOWN)
-			const unitPriceCap = cap
-				.minus(lastRewardCap)
-				.times(1e18)
-				.div(totalSupply)
-				.integerValue(BigNumber.ROUND_DOWN)
-			const capped = unitPriceCap
-				.times(balanceOfUser)
-				.div(1e18)
-				.div(1e18)
-				.integerValue(BigNumber.ROUND_DOWN)
-			const _value = capped.isZero()
-				? allReward
-				: allReward.lte(capped)
-				? allReward
-				: capped
-			const hasAssets = await dev.metricsGroup.hasAssets(prop.address)
-			if (!hasAssets) {
+		const createCalculator =
+			(dev: DevProtocolInstance): Calculator =>
+			async (prop: PropertyInstance, account: string): Promise<calcResult> => {
+				const [reword, cap] = await dev.lockup
+					.calculateRewardAmount(prop.address)
+					.then(to2BigNumbers)
+				const [lastReward, pending, lastRewardCap, totalSupply, balanceOfUser] =
+					await Promise.all([
+						dev.activeWithdraw.getStorageLastWithdrawnReward(
+							prop.address,
+							account
+						),
+						dev.activeWithdraw.getPendingWithdrawal(prop.address, account),
+						dev.activeWithdraw.getStorageLastWithdrawnRewardCap(
+							prop.address,
+							account
+						),
+						prop.totalSupply(),
+						prop.balanceOf(account),
+					])
+				const unitPrice = reword
+					.minus(lastReward)
+					.times(1e18)
+					.div(totalSupply)
+					.integerValue(BigNumber.ROUND_DOWN)
+				const allReward = unitPrice
+					.times(balanceOfUser)
+					.div(1e18)
+					.div(1e18)
+					.integerValue(BigNumber.ROUND_DOWN)
+				const unitPriceCap = cap
+					.minus(lastRewardCap)
+					.times(1e18)
+					.div(totalSupply)
+					.integerValue(BigNumber.ROUND_DOWN)
+				const capped = unitPriceCap
+					.times(balanceOfUser)
+					.div(1e18)
+					.div(1e18)
+					.integerValue(BigNumber.ROUND_DOWN)
+				const _value = capped.isZero()
+					? allReward
+					: allReward.lte(capped)
+					? allReward
+					: capped
+				const hasAssets = await dev.metricsGroup.hasAssets(prop.address)
+				if (!hasAssets) {
+					return {
+						value: new BigNumber(0),
+						reword,
+						cap,
+						allReward: new BigNumber(0),
+					}
+				}
+
+				const legacy = await legacyWithdrawbleAmount(dev, prop, account)
+				const value = _value.plus(pending).plus(legacy)
 				return {
-					value: new BigNumber(0),
+					value,
 					reword,
 					cap,
-					allReward: new BigNumber(0),
+					allReward,
 				}
 			}
-
-			const legacy = await legacyWithdrawbleAmount(dev, prop, account)
-			const value = _value.plus(pending).plus(legacy)
-			return {
-				value,
-				reword,
-				cap,
-				allReward,
-			}
-		}
 
 		const legacyWithdrawbleAmount = async (
 			dev: DevProtocolInstance,
@@ -714,12 +711,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			isTest = false
 		): Promise<void> => {
 			const instance = isTest ? dev.withdrawTest : dev.withdraw
-			const [
-				value,
-				price,
-				cap,
-				allReward,
-			] = await instance
+			const [value, price, cap, allReward] = await instance
 				.calculateRewardAmount(prop.address, account)
 				.then(to4BigNumbers)
 			expect(result.value.eq(value)).to.be.equal(true)

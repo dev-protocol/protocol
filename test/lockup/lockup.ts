@@ -54,7 +54,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 
 		await dev.addressConfig.setMetricsFactory(deployer)
 		await dev.metricsGroup.addGroup(
-			(await dev.createMetrics(deployer, property.address)).address
+			(
+				await dev.createMetrics(deployer, property.address)
+			).address
 		)
 
 		if (initialUpdate) {
@@ -267,64 +269,69 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			account: string,
 			debug?: boolean
 		) => Promise<BigNumber>
-		const createCalculator = (dev: DevProtocolInstance): Calculator => async (
-			prop: PropertyInstance,
-			account: string,
-			debug = false
-		): Promise<BigNumber> =>
-			Promise.all([
-				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[0]),
-				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[1]),
-				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[2]),
-				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[3]),
-				dev.lockup.getStorageLastStakedInterestPrice(prop.address, account),
-				dev.lockup.getValue(prop.address, account),
-				dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),
-				dev.lockup.getStorageInterestPrice(prop.address),
-				dev.lockup.getStorageLastInterestPrice(prop.address, account),
-			]).then((results) => {
-				const [
-					maxRewards,
-					holdersPrice,
-					interestPrice,
-					cCap,
-					lastInterestPrice,
-					lockedUpPerUser,
-					pending,
-					legacyInterestPrice,
-					legacyInterestPricePerUser,
-				] = results.map(toBigNumber)
-				const interest = interestPrice
-					.minus(lastInterestPrice)
-					.times(lockedUpPerUser)
-				const legacyValue = legacyInterestPrice
-					.minus(legacyInterestPricePerUser)
-					.times(lockedUpPerUser)
-					.div(1e18)
-				const withdrawable = interest.div(1e18).plus(pending).plus(legacyValue)
-				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
-				if (debug) {
-					console.log(results.map(toBigNumber))
-					console.log('maxRewards', maxRewards)
-					console.log('holdersPrice', holdersPrice)
-					console.log('interestPrice', interestPrice.toFixed())
-					console.log('cCap', cCap.toFixed())
-					console.log('lastInterestPrice', lastInterestPrice.toFixed())
-					console.log('lockedUpPerUser', lockedUpPerUser.toFixed())
-					console.log('pending', pending.toFixed())
-					console.log('legacyInterestPrice', legacyInterestPrice.toFixed())
-					console.log(
-						'legacyInterestPricePerUser',
-						legacyInterestPricePerUser.toFixed()
-					)
-					console.log('interest', interest.toFixed())
-					console.log('legacyValue', legacyValue.toFixed())
-					console.log('withdrawable', withdrawable.toFixed())
-					console.log('res', res.toFixed())
-				}
+		const createCalculator =
+			(dev: DevProtocolInstance): Calculator =>
+			async (
+				prop: PropertyInstance,
+				account: string,
+				debug = false
+			): Promise<BigNumber> =>
+				Promise.all([
+					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[0]),
+					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[1]),
+					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[2]),
+					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[3]),
+					dev.lockup.getStorageLastStakedInterestPrice(prop.address, account),
+					dev.lockup.getValue(prop.address, account),
+					dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),
+					dev.lockup.getStorageInterestPrice(prop.address),
+					dev.lockup.getStorageLastInterestPrice(prop.address, account),
+				]).then((results) => {
+					const [
+						maxRewards,
+						holdersPrice,
+						interestPrice,
+						cCap,
+						lastInterestPrice,
+						lockedUpPerUser,
+						pending,
+						legacyInterestPrice,
+						legacyInterestPricePerUser,
+					] = results.map(toBigNumber)
+					const interest = interestPrice
+						.minus(lastInterestPrice)
+						.times(lockedUpPerUser)
+					const legacyValue = legacyInterestPrice
+						.minus(legacyInterestPricePerUser)
+						.times(lockedUpPerUser)
+						.div(1e18)
+					const withdrawable = interest
+						.div(1e18)
+						.plus(pending)
+						.plus(legacyValue)
+					const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
+					if (debug) {
+						console.log(results.map(toBigNumber))
+						console.log('maxRewards', maxRewards)
+						console.log('holdersPrice', holdersPrice)
+						console.log('interestPrice', interestPrice.toFixed())
+						console.log('cCap', cCap.toFixed())
+						console.log('lastInterestPrice', lastInterestPrice.toFixed())
+						console.log('lockedUpPerUser', lockedUpPerUser.toFixed())
+						console.log('pending', pending.toFixed())
+						console.log('legacyInterestPrice', legacyInterestPrice.toFixed())
+						console.log(
+							'legacyInterestPricePerUser',
+							legacyInterestPricePerUser.toFixed()
+						)
+						console.log('interest', interest.toFixed())
+						console.log('legacyValue', legacyValue.toFixed())
+						console.log('withdrawable', withdrawable.toFixed())
+						console.log('res', res.toFixed())
+					}
 
-				return res
-			})
+					return res
+				})
 
 		describe('returns correct amount', () => {
 			let dev: DevProtocolInstance
@@ -515,10 +522,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					{ from: bob }
 				)
 				await mine(1)
-				const aliceAmount = await dev.lockup.calculateWithdrawableInterestAmount(
-					property.address,
-					alice
-				)
+				const aliceAmount =
+					await dev.lockup.calculateWithdrawableInterestAmount(
+						property.address,
+						alice
+					)
 				const bobAmount = await dev.lockup.calculateWithdrawableInterestAmount(
 					property.address,
 					bob

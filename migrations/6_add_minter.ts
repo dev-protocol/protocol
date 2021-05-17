@@ -6,7 +6,7 @@ const handler = function (deployer, network) {
 	const lockup = artifacts.require('Lockup')
 	const devMigration = artifacts.require('DevMigration')
 	const withdraw = artifacts.require('Withdraw')
-	;((deployer as unknown) as Promise<void>)
+	;(deployer as unknown as Promise<void>)
 		.then(async () => {
 			return artifacts.require('Dev').deployed()
 		})

@@ -22,33 +22,31 @@ export async function mine(count: number): Promise<void> {
 export const toBigNumber = (v: string | BigNumber | number): BigNumber =>
 	new BigNumber(v)
 
-export const collectsEth = (to: string) => async (
-	accounts: Truffle.Accounts,
-	min = 50,
-	rate = 0.5
-): Promise<void> => {
-	const getBalance = async (address: string): Promise<BigNumber> =>
-		web3.eth.getBalance(address).then(toBigNumber)
-	const web3Client = new Web3(
-		new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
-	)
-	const minimum = toBigNumber(Web3.utils.toWei(`${min}`, 'ether'))
-	accounts.map(async (account) => {
-		const [balance, value] = await Promise.all([
-			getBalance(to),
-			getBalance(account),
-		])
-		if (balance.isLessThan(minimum)) {
-			await web3Client.eth
-				.sendTransaction({
-					to,
-					from: account,
-					value: value.times(rate).toFixed(),
-				})
-				.catch((err: Error) => err)
-		}
-	})
-}
+export const collectsEth =
+	(to: string) =>
+	async (accounts: Truffle.Accounts, min = 50, rate = 0.5): Promise<void> => {
+		const getBalance = async (address: string): Promise<BigNumber> =>
+			web3.eth.getBalance(address).then(toBigNumber)
+		const web3Client = new Web3(
+			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
+		)
+		const minimum = toBigNumber(Web3.utils.toWei(`${min}`, 'ether'))
+		accounts.map(async (account) => {
+			const [balance, value] = await Promise.all([
+				getBalance(to),
+				getBalance(account),
+			])
+			if (balance.isLessThan(minimum)) {
+				await web3Client.eth
+					.sendTransaction({
+						to,
+						from: account,
+						value: value.times(rate).toFixed(),
+					})
+					.catch((err: Error) => err)
+			}
+		})
+	}
 
 export const getBlock = async (): Promise<number> => web3.eth.getBlockNumber()
 

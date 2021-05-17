@@ -40,7 +40,7 @@ const handler = function (deployer, network) {
 	// Withdraw
 	const withdraw = artifacts.require('Withdraw')
 	const withdrawStorage = artifacts.require('WithdrawStorage')
-	;((deployer as unknown) as Promise<void>)
+	;(deployer as unknown as Promise<void>)
 		.then(async () => {
 			return artifacts.require('AddressConfig').deployed()
 		})
