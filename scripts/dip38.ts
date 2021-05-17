@@ -46,7 +46,6 @@ const handler = async (
 	// Create the new PolicyFactory
 	const policy_factory = new PolicyFactory(dev)
 	const policy_factory_current = await policy_factory.load()
-	const policy_factory_next = await policy_factory.create()
 
 	// Force attach the new Policy
 	await policy_factory_current.create(policy_next.address)
@@ -81,7 +80,6 @@ const handler = async (
 
 	// Set all new contracts
 	await Promise.all([
-		policy_factory.set(policy_factory_next),
 		metrics_group.set(metrics_group_next),
 		lockup.set(lockup_next),
 		withdraw.set(withdraw_next),
