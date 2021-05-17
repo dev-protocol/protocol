@@ -265,14 +265,16 @@ contract('LockupStorageTest', ([property, user]) => {
 
 	describe('LockupStorage; setStorageFallbackInitialCumulativeHoldersRewardCap, getStorageFallbackInitialCumulativeHoldersRewardCap', () => {
 		it('Initial value is 0 and 0.', async () => {
-			const result = await storage.getStorageFallbackInitialCumulativeHoldersRewardCap()
+			const result =
+				await storage.getStorageFallbackInitialCumulativeHoldersRewardCap()
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('The set value can be taken as it is.', async () => {
 			await storage.setStorageFallbackInitialCumulativeHoldersRewardCapTest(
 				800000000000
 			)
-			const result = await storage.getStorageFallbackInitialCumulativeHoldersRewardCap()
+			const result =
+				await storage.getStorageFallbackInitialCumulativeHoldersRewardCap()
 			expect(result.toNumber()).to.be.equal(800000000000)
 		})
 	})

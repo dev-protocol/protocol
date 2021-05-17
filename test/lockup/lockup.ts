@@ -1779,7 +1779,8 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.lockup.___setFallbackInitialCumulativeHoldersRewardCap(
 					expected
 				)
-				const result = await dev.lockup.getStorageFallbackInitialCumulativeHoldersRewardCap()
+				const result =
+					await dev.lockup.getStorageFallbackInitialCumulativeHoldersRewardCap()
 				expect(result.toNumber()).to.be.equal(expected)
 			})
 		})
@@ -1854,9 +1855,10 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const expected = holdersCap2.minus(holdersCap)
 
 				const res = await dev.lockupTest.calculateRewardAmount(property.address)
-				const cap = await dev.lockupTest.getStorageInitialCumulativeHoldersRewardCap(
-					property.address
-				)
+				const cap =
+					await dev.lockupTest.getStorageInitialCumulativeHoldersRewardCap(
+						property.address
+					)
 				expect(res[1].toString()).to.be.equal(expected.toFixed())
 				expect(cap.toString()).to.be.equal('0')
 			})
@@ -1871,9 +1873,10 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const res = await dev.lockupTest.calculateRewardAmount(
 					property3.address
 				)
-				const cap = await dev.lockupTest.getStorageInitialCumulativeHoldersRewardCap(
-					property3.address
-				)
+				const cap =
+					await dev.lockupTest.getStorageInitialCumulativeHoldersRewardCap(
+						property3.address
+					)
 				expect(res[0].toString()).to.be.equal(res[1].toString())
 				expect(cap.toString()).to.not.be.equal('0')
 			})
