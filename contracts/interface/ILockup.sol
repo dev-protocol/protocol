@@ -42,4 +42,6 @@ interface ILockup {
 		address _property,
 		address _user
 	) external view returns (uint256);
+
+	function devMinter() external view returns (address);
 }

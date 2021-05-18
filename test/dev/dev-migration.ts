@@ -7,6 +7,7 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 		return dev.dev
 	}
 

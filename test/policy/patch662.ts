@@ -17,6 +17,7 @@ contract('Patch662', ([deployer, treasury, uesr]) => {
 		dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 		await dev.generateLockupTest()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		patch662 = await artifacts

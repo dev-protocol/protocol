@@ -14,4 +14,4 @@ Fixes # .
 
 # Code of Conduct
 
-By submitting this pull request, I confirm I've read and complied with the [CoC](https://github.com/dev-protocol/repository-token/blob/master/CODE_OF_CONDUCT.md) 🖖
+By submitting this pull request, I confirm I've read and complied with the [CoC](https://github.com/dev-protocol/protocol/blob/main/CODE_OF_CONDUCT.md) 🖖

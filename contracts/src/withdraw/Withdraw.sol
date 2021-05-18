@@ -2,10 +2,11 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 // prettier-ignore
-import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Decimals} from "contracts/src/common/libs/Decimals.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
+import {IDevMinter} from "contracts/interface/IDevMinter.sol";
 import {IWithdraw} from "contracts/interface/IWithdraw.sol";
 import {ILockup} from "contracts/interface/ILockup.sol";
 import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
@@ -17,12 +18,18 @@ import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
 contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
+	address public devMinter;
 	event PropertyTransfer(address _property, address _from, address _to);
 
 	/**
 	 * Initialize the passed address as AddressConfig address.
 	 */
-	constructor(address _config) public UsingConfig(_config) {}
+	constructor(address _config, address _devMinter)
+		public
+		UsingConfig(_config)
+	{
+		devMinter = _devMinter;
+	}
 
 	/**
 	 * Withdraws rewards.
@@ -67,8 +74,10 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		/**
 		 * Mints the holder reward.
 		 */
-		ERC20Mintable erc20 = ERC20Mintable(config().token());
-		require(erc20.mint(msg.sender, value), "dev mint failed");
+		require(
+			IDevMinter(devMinter).mint(msg.sender, value),
+			"dev mint failed"
+		);
 
 		/**
 		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
@@ -138,7 +147,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		returns (uint256 _amount, uint256 _price)
 	{
 		ILockup lockup = ILockup(config().lockup());
-		ERC20Mintable property = ERC20Mintable(_property);
+		IERC20 property = IERC20(_property);
 
 		/**
 		 * Gets the latest cumulative sum of the holder reward.
@@ -223,7 +232,7 @@ contract Withdraw is IWithdraw, UsingConfig, WithdrawStorage {
 		uint256 _last = getLastWithdrawalPrice(_property, _user);
 		uint256 price = getCumulativePrice(_property);
 		uint256 priceGap = price.sub(_last);
-		uint256 balance = ERC20Mintable(_property).balanceOf(_user);
+		uint256 balance = IERC20(_property).balanceOf(_user);
 		uint256 value = priceGap.mul(balance);
 		return value.divBasis();
 	}

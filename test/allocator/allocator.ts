@@ -10,6 +10,8 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	const init = async (): Promise<[DevProtocolInstance, PropertyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
+		await dev.generateDev()
+		await dev.generateDevMinter()
 		await Promise.all([
 			dev.generateAllocator(),
 			dev.generateMarketFactory(),
@@ -23,8 +25,8 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			dev.generateVoteCounter(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
-			dev.generateDev(),
 		])
+
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.generatePolicy('PolicyTestForAllocator')
 		const propertyAddress = getPropertyAddress(
@@ -42,7 +44,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		propertyAddress: string
 	): Promise<void> => {
 		const behavuor = await dev.getMarket('MarketTest3', user1)
-		let createMarketResult = await dev.marketFactory.create(behavuor.address)
+		const createMarketResult = await dev.marketFactory.create(behavuor.address)
 		const marketAddress = getMarketAddress(createMarketResult)
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const marketInstance = await marketContract.at(marketAddress)

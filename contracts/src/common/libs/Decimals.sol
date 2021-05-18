@@ -10,7 +10,10 @@ library Decimals {
 	uint120 private constant BASIS_VAKUE = 1000000000000000000;
 
 	/**
-	 * Returns the ratio of the first argument to the second argument.
+	 * @dev Returns the ratio of the first argument to the second argument.
+	 * @param _a Numerator.
+	 * @param _b Fraction.
+	 * @return Calculated ratio.
 	 */
 	function outOf(uint256 _a, uint256 _b)
 		internal
@@ -28,15 +31,19 @@ library Decimals {
 	}
 
 	/**
-	 * Returns multiplied the number by 10^18.
-	 * This is used when there is a very large difference between the two numbers passed to the `outOf` function.
+	 * @dev Returns multiplied the number by 10^18.
+	 * @param _a Numerical value to be multiplied.
+	 * @return Multiplied value.
 	 */
 	function mulBasis(uint256 _a) internal pure returns (uint256) {
 		return _a.mul(BASIS_VAKUE);
 	}
 
 	/**
-	 * Returns by changing the numerical value being emulated to the original number of digits.
+	 * @dev Returns divisioned the number by 10^18.
+	 * This function can use it to restore the number of digits in the result of `outOf`.
+	 * @param _a Numerical value to be divisioned.
+	 * @return Divisioned value.
 	 */
 	function divBasis(uint256 _a) internal pure returns (uint256) {
 		return _a.div(BASIS_VAKUE);

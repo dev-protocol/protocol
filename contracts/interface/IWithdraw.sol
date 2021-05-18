@@ -19,4 +19,6 @@ interface IWithdraw {
 		external
 		view
 		returns (uint256);
+
+	function devMinter() external view returns (address);
 }
