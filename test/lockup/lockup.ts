@@ -15,7 +15,7 @@ import { getPropertyAddress } from '../test-lib/utils/log'
 import { waitForEvent, getEventValue } from '../test-lib/utils/event'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
-contract('LockupTest', ([deployer, user1]) => {
+contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	const init = async (
 		initialUpdate = true
 	): Promise<
@@ -44,7 +44,9 @@ contract('LockupTest', ([deployer, user1]) => {
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const policy = await artifacts.require('PolicyTestBase').at(policyAddress)
 		const propertyAddress = getPropertyAddress(
-			await dev.propertyFactory.create('test', 'TEST', deployer)
+			await dev.propertyFactory.create('test', 'TEST', user2, {
+				from: user2,
+			})
 		)
 		const [property] = await Promise.all([
 			artifacts.require('Property').at(propertyAddress),
@@ -52,7 +54,9 @@ contract('LockupTest', ([deployer, user1]) => {
 
 		await dev.addressConfig.setMetricsFactory(deployer)
 		await dev.metricsGroup.addGroup(
-			(await dev.createMetrics(deployer, property.address)).address
+			(
+				await dev.createMetrics(deployer, property.address)
+			).address
 		)
 
 		if (initialUpdate) {
@@ -194,19 +198,16 @@ contract('LockupTest', ([deployer, user1]) => {
 			const reward = toBigNumber(10)
 				.times(1e18)
 				.times(block - lastBlock)
-
 			expect(afterBalance.toFixed()).to.be.equal(
 				beforeBalance.plus(reward).toFixed()
 			)
 			expect(afterTotalSupply.toFixed()).to.be.equal(
 				beforeTotalSupply.plus(reward).toFixed()
 			)
-
 			await mine(3)
 			await dev.lockup.withdraw(property.address, 0)
 			const afterBalance2 = await dev.dev.balanceOf(deployer).then(toBigNumber)
 			const afterTotalSupply2 = await dev.dev.totalSupply().then(toBigNumber)
-
 			expect(afterBalance2.toFixed()).to.be.equal(afterBalance.toFixed())
 			expect(afterTotalSupply2.toFixed()).to.be.equal(
 				afterTotalSupply.toFixed()
@@ -268,61 +269,69 @@ contract('LockupTest', ([deployer, user1]) => {
 			account: string,
 			debug?: boolean
 		) => Promise<BigNumber>
-		const createCalculator = (dev: DevProtocolInstance): Calculator => async (
-			prop: PropertyInstance,
-			account: string,
-			debug = false
-		): Promise<BigNumber> =>
-			Promise.all([
-				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[0]),
-				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[1]),
-				dev.lockup.calculateCumulativeRewardPrices().then((x) => x[2]),
-				dev.lockup.getStorageLastStakedInterestPrice(prop.address, account),
-				dev.lockup.getValue(prop.address, account),
-				dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),
-				dev.lockup.getStorageInterestPrice(prop.address),
-				dev.lockup.getStorageLastInterestPrice(prop.address, account),
-			]).then((results) => {
-				const [
-					maxRewards,
-					holdersPrice,
-					interestPrice,
-					lastInterestPrice,
-					lockedUpPerUser,
-					pending,
-					legacyInterestPrice,
-					legacyInterestPricePerUser,
-				] = results.map(toBigNumber)
-				const interest = interestPrice
-					.minus(lastInterestPrice)
-					.times(lockedUpPerUser)
-				const legacyValue = legacyInterestPrice
-					.minus(legacyInterestPricePerUser)
-					.times(lockedUpPerUser)
-					.div(1e18)
-				const withdrawable = interest.div(1e18).plus(pending).plus(legacyValue)
-				const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
-				if (debug) {
-					console.log(results.map(toBigNumber))
-					console.log('maxRewards', maxRewards)
-					console.log('holdersPrice', holdersPrice)
-					console.log('interestPrice', interestPrice.toFixed())
-					console.log('lastInterestPrice', lastInterestPrice.toFixed())
-					console.log('lockedUpPerUser', lockedUpPerUser.toFixed())
-					console.log('pending', pending.toFixed())
-					console.log('legacyInterestPrice', legacyInterestPrice.toFixed())
-					console.log(
-						'legacyInterestPricePerUser',
-						legacyInterestPricePerUser.toFixed()
-					)
-					console.log('interest', interest.toFixed())
-					console.log('legacyValue', legacyValue.toFixed())
-					console.log('withdrawable', withdrawable.toFixed())
-					console.log('res', res.toFixed())
-				}
+		const createCalculator =
+			(dev: DevProtocolInstance): Calculator =>
+			async (
+				prop: PropertyInstance,
+				account: string,
+				debug = false
+			): Promise<BigNumber> =>
+				Promise.all([
+					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[0]),
+					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[1]),
+					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[2]),
+					dev.lockup.calculateCumulativeRewardPrices().then((x) => x[3]),
+					dev.lockup.getStorageLastStakedInterestPrice(prop.address, account),
+					dev.lockup.getValue(prop.address, account),
+					dev.lockup.getStoragePendingInterestWithdrawal(prop.address, account),
+					dev.lockup.getStorageInterestPrice(prop.address),
+					dev.lockup.getStorageLastInterestPrice(prop.address, account),
+				]).then((results) => {
+					const [
+						maxRewards,
+						holdersPrice,
+						interestPrice,
+						cCap,
+						lastInterestPrice,
+						lockedUpPerUser,
+						pending,
+						legacyInterestPrice,
+						legacyInterestPricePerUser,
+					] = results.map(toBigNumber)
+					const interest = interestPrice
+						.minus(lastInterestPrice)
+						.times(lockedUpPerUser)
+					const legacyValue = legacyInterestPrice
+						.minus(legacyInterestPricePerUser)
+						.times(lockedUpPerUser)
+						.div(1e18)
+					const withdrawable = interest
+						.div(1e18)
+						.plus(pending)
+						.plus(legacyValue)
+					const res = withdrawable.integerValue(BigNumber.ROUND_DOWN)
+					if (debug) {
+						console.log(results.map(toBigNumber))
+						console.log('maxRewards', maxRewards)
+						console.log('holdersPrice', holdersPrice)
+						console.log('interestPrice', interestPrice.toFixed())
+						console.log('cCap', cCap.toFixed())
+						console.log('lastInterestPrice', lastInterestPrice.toFixed())
+						console.log('lockedUpPerUser', lockedUpPerUser.toFixed())
+						console.log('pending', pending.toFixed())
+						console.log('legacyInterestPrice', legacyInterestPrice.toFixed())
+						console.log(
+							'legacyInterestPricePerUser',
+							legacyInterestPricePerUser.toFixed()
+						)
+						console.log('interest', interest.toFixed())
+						console.log('legacyValue', legacyValue.toFixed())
+						console.log('withdrawable', withdrawable.toFixed())
+						console.log('res', res.toFixed())
+					}
 
-				return res
-			})
+					return res
+				})
 
 		describe('returns correct amount', () => {
 			let dev: DevProtocolInstance
@@ -343,7 +352,6 @@ contract('LockupTest', ([deployer, user1]) => {
 			 * PolicyTestBase returns 100 as rewards
 			 * And stakers share is 10%
 			 */
-
 			it('Alice has a 100% of interests', async () => {
 				await dev.dev
 					.deposit(property.address, 1000000000000, { from: alice })
@@ -514,10 +522,11 @@ contract('LockupTest', ([deployer, user1]) => {
 					{ from: bob }
 				)
 				await mine(1)
-				const aliceAmount = await dev.lockup.calculateWithdrawableInterestAmount(
-					property.address,
-					alice
-				)
+				const aliceAmount =
+					await dev.lockup.calculateWithdrawableInterestAmount(
+						property.address,
+						alice
+					)
 				const bobAmount = await dev.lockup.calculateWithdrawableInterestAmount(
 					property.address,
 					bob
@@ -883,11 +892,12 @@ contract('LockupTest', ([deployer, user1]) => {
 			let property4: PropertyInstance
 			let calc: Calculator
 
-			const alice = deployer
+			const alice = user2
 			const bob = user1
 
 			before(async () => {
 				;[dev, property1] = await init()
+				await dev.dev.mint(alice, new BigNumber(1e18).times(10000000))
 				calc = createCalculator(dev)
 				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
 				await dev.dev.mint(bob, aliceBalance)
@@ -896,21 +906,21 @@ contract('LockupTest', ([deployer, user1]) => {
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test2', 'TEST2', deployer)
+								await dev.propertyFactory.create('test2', 'TEST2', user3)
 							)
 						),
 					artifacts
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test3', 'TEST3', deployer)
+								await dev.propertyFactory.create('test3', 'TEST3', user3)
 							)
 						),
 					artifacts
 						.require('Property')
 						.at(
 							getPropertyAddress(
-								await dev.propertyFactory.create('test4', 'TEST4', deployer)
+								await dev.propertyFactory.create('test4', 'TEST4', user3)
 							)
 						),
 				])
@@ -1660,6 +1670,215 @@ contract('LockupTest', ([deployer, user1]) => {
 						bobBalance.plus(bobLocked).plus(reward).toFixed()
 					)
 				})
+			})
+		})
+	})
+	describe('Lockup; calculateRewardAmount', () => {
+		const calculateCap = async (
+			dev: DevProtocolInstance,
+			property: PropertyInstance,
+			holderCap: BigNumber
+		): Promise<BigNumber> => {
+			const initialCap = await dev.lockup
+				.getStorageInitialCumulativeHoldersRewardCap(property.address)
+				.then(toBigNumber)
+			return holderCap.minus(initialCap)
+		}
+
+		const calculateReword = async (
+			dev: DevProtocolInstance,
+			property: PropertyInstance,
+			holders: BigNumber
+		): Promise<BigNumber> => {
+			const cHoldersReward = await dev.lockup
+				.getStorageLastCumulativeHoldersRewardAmountPerProperty(
+					property.address
+				)
+				.then(toBigNumber)
+			const lastReward = await dev.lockup
+				.getStorageLastCumulativeHoldersRewardPricePerProperty(property.address)
+				.then(toBigNumber)
+			const enabledStakingValue = await dev.lockup
+				.getStoragePropertyValue(property.address)
+				.then(toBigNumber)
+			const additionalHoldersReward = holders
+				.minus(lastReward)
+				.times(enabledStakingValue)
+			return cHoldersReward.plus(additionalHoldersReward)
+		}
+
+		const calculate = async (
+			dev: DevProtocolInstance,
+			property: PropertyInstance
+		): Promise<[BigNumber, BigNumber]> => {
+			const tmp = await dev.lockup.calculateCumulativeRewardPrices()
+			const reward = await calculateReword(dev, property, toBigNumber(tmp[1]))
+			const cap = await calculateCap(dev, property, toBigNumber(tmp[3]))
+			return [reward, cap]
+		}
+
+		it('The reward is calculated and comes back to you.', async () => {
+			const [dev, property] = await init()
+			await dev.dev.deposit(property.address, '10000000000000000000000')
+			await dev.updateCap()
+			const [reword, cap] = await calculate(dev, property)
+			const result = await dev.lockup.calculateRewardAmount(property.address)
+			expect(toBigNumber(result[0]).toFixed()).to.be.equal(reword.toFixed())
+			expect(toBigNumber(result[1]).toFixed()).to.be.equal(cap.toFixed())
+		})
+	})
+	describe('Lockup; cap, updateCap', () => {
+		const calculateCap = async (
+			dev: DevProtocolInstance,
+			cap: BigNumber
+		): Promise<[BigNumber, BigNumber]> => {
+			const tmp = await dev.lockup.calculateCumulativeRewardPrices()
+			const holderPrice = toBigNumber(tmp[1])
+			const cCap = toBigNumber(tmp[3])
+			const lastHoldersPrice = await dev.lockup
+				.getStorageLastCumulativeHoldersPriceCap()
+				.then(toBigNumber)
+			const additionalCap = holderPrice.minus(lastHoldersPrice).times(cap)
+			const capValue = cCap.plus(additionalCap)
+			return [capValue, holderPrice]
+		}
+
+		describe('success', () => {
+			it('Can set cap.', async () => {
+				const [dev] = await init()
+				await dev.lockup.updateCap(100)
+				const cap = await dev.lockup.cap()
+				expect(cap.toNumber()).to.be.equal(100)
+				const [capValue, holdersPrice] = await calculateCap(
+					dev,
+					toBigNumber(100)
+				)
+				const holderRewardCap = await dev.lockup
+					.getStorageCumulativeHoldersRewardCap()
+					.then(toBigNumber)
+				expect(holderRewardCap.toString()).to.be.equal(capValue.toString())
+				const holdersPriceCap = await dev.lockup
+					.getStorageLastCumulativeHoldersPriceCap()
+					.then(toBigNumber)
+				expect(holdersPriceCap.toString()).to.be.equal(holdersPrice.toString())
+			})
+		})
+		describe('fail', () => {
+			it('Do not accept access from addresses other than the specified one.', async () => {
+				const [dev] = await init()
+				const res = await dev.lockup.updateCap(100, { from: user1 }).catch(err)
+				validateErrorMessage(res, 'illegal access')
+			})
+		})
+	})
+	describe('Lockup; fallbackInitialCumulativeHoldersRewardCap', () => {
+		describe('success', () => {
+			it('Set the value of FallbackInitialCumulativeHoldersRewardCap', async () => {
+				const [dev] = await init()
+				const expected = 100
+				await dev.lockup.___setFallbackInitialCumulativeHoldersRewardCap(
+					expected
+				)
+				const result =
+					await dev.lockup.getStorageFallbackInitialCumulativeHoldersRewardCap()
+				expect(result.toNumber()).to.be.equal(expected)
+			})
+		})
+		describe('fail', () => {
+			it('Shoud fail to call when the caller is not owner', async () => {
+				const [dev] = await init()
+				const result = await dev.lockup
+					.___setFallbackInitialCumulativeHoldersRewardCap(100, { from: user1 })
+					.catch(err)
+				validateErrorMessage(result, 'caller is not the owner', false)
+			})
+		})
+		describe('fallback', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			let property2: PropertyInstance
+			let property3: PropertyInstance
+
+			const alice = deployer
+			const bob = user1
+
+			before(async () => {
+				;[dev, property] = await init()
+				await dev.generateLockupTest()
+				;[property2, property3] = await Promise.all([
+					artifacts
+						.require('Property')
+						.at(
+							getPropertyAddress(
+								await dev.propertyFactory.create('test2', 'TEST2', alice)
+							)
+						),
+					artifacts
+						.require('Property')
+						.at(
+							getPropertyAddress(
+								await dev.propertyFactory.create('test3', 'TEST3', alice)
+							)
+						),
+				])
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property2.address,
+					1
+				)
+				await dev.metricsGroup.__setMetricsCountPerProperty(
+					property3.address,
+					1
+				)
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+			})
+
+			it('When InitialCumulativeHoldersRewardCap is 0, but if it has been stakes in the past, use fallback', async () => {
+				await dev.lockupTest.updateCap(100)
+				await dev.dev.deposit(property2.address, 100, { from: bob })
+				await dev.dev.deposit(property.address, 100, { from: bob })
+				await mine(5)
+				const holdersCap = await dev.lockupTest
+					.calculateCumulativeRewardPrices()
+					.then((r) => toBigNumber(r[3]))
+
+				await dev.lockupTest.___setFallbackInitialCumulativeHoldersRewardCap(
+					holdersCap.toFixed()
+				)
+				await dev.lockupTest.setStorageInitialCumulativeHoldersRewardCapTest(
+					property.address,
+					0
+				)
+				const holdersCap2 = await dev.lockupTest
+					.calculateCumulativeRewardPrices()
+					.then((r) => toBigNumber(r[3]))
+				const expected = holdersCap2.minus(holdersCap)
+
+				const res = await dev.lockupTest.calculateRewardAmount(property.address)
+				const cap =
+					await dev.lockupTest.getStorageInitialCumulativeHoldersRewardCap(
+						property.address
+					)
+				expect(res[1].toString()).to.be.equal(expected.toFixed())
+				expect(cap.toString()).to.be.equal('0')
+			})
+			it('When InitialCumulativeHoldersRewardCap is not 0, to be not use fallback', async () => {
+				await dev.dev.deposit(property3.address, 100, { from: bob })
+				await mine(5)
+
+				await dev.lockupTest.___setFallbackInitialCumulativeHoldersRewardCap(
+					'999999999999999999999999999999999999999999999999999999'
+				)
+
+				const res = await dev.lockupTest.calculateRewardAmount(
+					property3.address
+				)
+				const cap =
+					await dev.lockupTest.getStorageInitialCumulativeHoldersRewardCap(
+						property3.address
+					)
+				expect(res[0].toString()).to.be.equal(res[1].toString())
+				expect(cap.toString()).to.not.be.equal('0')
 			})
 		})
 	})

@@ -23,11 +23,16 @@ contract(
 			let propertyAddress: string
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
+					dev.generateAllocator(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
+					dev.generateLockup(),
+					dev.generateMetricsGroup(),
 				])
 				await dev.generatePolicy()
 				await dev.addressConfig.setMarketFactory(marketFactory)
@@ -239,17 +244,13 @@ contract(
 							{ from: user }
 						)
 						.catch(console.error)
-					const [
-						propertyCreator,
-						property,
-						market,
-						metrics,
-					] = await Promise.all([
-						getEventValue(dev.propertyFactory)('Create', '_from'),
-						getEventValue(dev.propertyFactory)('Create', '_property'),
-						getEventValue(dev.metricsFactory)('Create', '_from'),
-						getEventValue(dev.metricsFactory)('Create', '_metrics'),
-					])
+					const [propertyCreator, property, market, metrics] =
+						await Promise.all([
+							getEventValue(dev.propertyFactory)('Create', '_from'),
+							getEventValue(dev.propertyFactory)('Create', '_property'),
+							getEventValue(dev.metricsFactory)('Create', '_from'),
+							getEventValue(dev.metricsFactory)('Create', '_metrics'),
+						])
 					const linkedProperty = await Promise.all([
 						artifacts.require('Metrics').at(metrics as string),
 					]).then(async ([c]) => c.property())

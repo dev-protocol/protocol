@@ -17,8 +17,13 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
+				await dev.generateLockup()
 				await dev.generatePolicy()
 			})
 			it('Cannot be created from other than factory', async () => {
@@ -49,9 +54,8 @@ contract(
 				const treasuryBalance = await propertyInstance
 					.balanceOf(dev.treasury.address)
 					.then(toBigNumber)
-				const [predictedAutherBalance, predictedTreasuryBalance] = splitValue(
-					tenMillion
-				)
+				const [predictedAutherBalance, predictedTreasuryBalance] =
+					splitValue(tenMillion)
 				expect(authorBalance.toFixed()).to.be.equal(
 					predictedAutherBalance.toFixed()
 				)
@@ -67,8 +71,13 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
+				await dev.generateLockup()
 				await dev.generatePolicy()
 			})
 			it('Executing a changeAuthor function with a non-Author.', async () => {
@@ -129,6 +138,11 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
+				await dev.generateLockup()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
 				await dev.generatePolicy()
@@ -191,6 +205,11 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
+				await dev.generateLockup()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
 				await dev.generatePolicy()
@@ -257,10 +276,13 @@ contract(
 				await dev.generateDev()
 				await dev.generateDevMinter()
 				await Promise.all([
+					dev.generateAllocator(),
+					dev.generateMetricsGroup(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
+					dev.generateLockup(),
 				])
 				await dev.generatePolicy()
 				const result = await dev.propertyFactory.create(

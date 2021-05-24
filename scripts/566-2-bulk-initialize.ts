@@ -54,17 +54,20 @@ const handler = async (
 	// const setLastCumulativeHoldersReward = createSetLastCumulativeHoldersReward(
 	// 	createWithdrawMigration(WITHDRAW_MIGRATION, web3)
 	// )(from)
-	const getLastCumulativeHoldersReward = createGetLastCumulativeHoldersRewardCaller(
-		createWithdrawStorage(WITHDRAW_STORAGE, web3)
-	)
+	const getLastCumulativeHoldersReward =
+		createGetLastCumulativeHoldersRewardCaller(
+			createWithdrawStorage(WITHDRAW_STORAGE, web3)
+		)
 	const all = await fetchAllWithdrawEvents(dev)
 
 	const fetchFastestGasPrice = ethGasStationFetcher(EGS_TOKEN)
 
 	const filter = all.map(({ transactionHash, ...x }) => async () => {
-		const { from: sender, to, input } = await (web3 as Web3).eth.getTransaction(
-			transactionHash
-		)
+		const {
+			from: sender,
+			to,
+			input,
+		} = await (web3 as Web3).eth.getTransaction(transactionHash)
 		const toWithdraw = to ? withdrawContracts.includes(to.toLowerCase()) : false
 		const propertyAddress = toWithdraw ? `0x${input.slice(-40)}` : undefined
 		const alreadyInitialized = await (toWithdraw && propertyAddress
@@ -105,75 +108,76 @@ const handler = async (
 
 	const initializeTasks = shouldInitilizeItems
 		? shouldInitilizeItems.map(
-				({ propertyAddress, sender, skip, blockNumber }) => async () => {
-					if (!propertyAddress) {
-						____log('Property address is not found')
-						return
-					}
+				({ propertyAddress, sender, skip, blockNumber }) =>
+					async () => {
+						if (!propertyAddress) {
+							____log('Property address is not found')
+							return
+						}
 
-					if (skip) {
-						____log('This item should skip', propertyAddress, sender)
-						return
-					}
+						if (skip) {
+							____log('This item should skip', propertyAddress, sender)
+							return
+						}
 
-					const lockup = await prepare(CONFIG, web3, blockNumber)
-					const diff = createDifferenceCaller(lockup)
+						const lockup = await prepare(CONFIG, web3, blockNumber)
+						const diff = createDifferenceCaller(lockup)
 
-					const res:
-						| Error
-						| PromiseReturn<ReturnType<ReturnType<typeof diff>>> = await diff(
-						blockNumber
-					)(propertyAddress).catch((err) => new Error(err))
-					if (res instanceof Error) {
+						const res:
+							| Error
+							| PromiseReturn<ReturnType<ReturnType<typeof diff>>> = await diff(
+							blockNumber
+						)(propertyAddress).catch((err) => new Error(err))
+						if (res instanceof Error) {
+							____log(
+								'Failed on fetch `difference`. Maybe the block is pre-DIP4.',
+								propertyAddress,
+								sender,
+								blockNumber
+							)
+							return
+						}
+
+						const lastPrice = res._holdersPrice
+						if (lastPrice === '0') {
+							____log('Last price is 0.', propertyAddress, sender, blockNumber)
+							return
+						}
+
+						const gasPrice = await fetchFastestGasPrice()
 						____log(
-							'Failed on fetch `difference`. Maybe the block is pre-DIP4.',
+							'Start initilization',
 							propertyAddress,
 							sender,
-							blockNumber
+							lastPrice,
+							gasPrice
 						)
-						return
+
+						// Already nonexistent value
+						// await new Promise((resolve) => {
+						// 	setLastCumulativeHoldersReward(
+						// 		propertyAddress,
+						// 		sender,
+						// 		lastPrice,
+						// 		gasPrice
+						// 	)
+						// 		.on('transactionHash', (hash: string) =>
+						// 			____log('Created the transaction', hash)
+						// 		)
+						// 		.on('confirmation', resolve)
+						// 		.on('error', (err) => {
+						// 			console.error(err)
+						// 			resolve(err)
+						// 		})
+						// })
+						// ____log(
+						// 	'Done initilization',
+						// 	propertyAddress,
+						// 	sender,
+						// 	blockNumber,
+						// 	lastPrice
+						// )
 					}
-
-					const lastPrice = res._holdersPrice
-					if (lastPrice === '0') {
-						____log('Last price is 0.', propertyAddress, sender, blockNumber)
-						return
-					}
-
-					const gasPrice = await fetchFastestGasPrice()
-					____log(
-						'Start initilization',
-						propertyAddress,
-						sender,
-						lastPrice,
-						gasPrice
-					)
-
-					// Already nonexistent value
-					// await new Promise((resolve) => {
-					// 	setLastCumulativeHoldersReward(
-					// 		propertyAddress,
-					// 		sender,
-					// 		lastPrice,
-					// 		gasPrice
-					// 	)
-					// 		.on('transactionHash', (hash: string) =>
-					// 			____log('Created the transaction', hash)
-					// 		)
-					// 		.on('confirmation', resolve)
-					// 		.on('error', (err) => {
-					// 			console.error(err)
-					// 			resolve(err)
-					// 		})
-					// })
-					// ____log(
-					// 	'Done initilization',
-					// 	propertyAddress,
-					// 	sender,
-					// 	blockNumber,
-					// 	lastPrice
-					// )
-				}
 		  )
 		: []
 

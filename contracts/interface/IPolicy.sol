@@ -34,4 +34,6 @@ interface IPolicy {
 	function shareOfTreasury(uint256 _supply) external view returns (uint256);
 
 	function treasury() external view returns (address);
+
+	function capSetter() external view returns (address);
 }

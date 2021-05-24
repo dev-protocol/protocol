@@ -15,7 +15,7 @@ async function getWithdrawAmount(
 	const policyInstance = await artifacts.require('IPolicy').at(policyAddress)
 	const value = await dev.lockup.getPropertyValue(propertyAddress)
 	const share = await policyInstance
-		.holdersShare(cal.toFixed(), value.toNumber())
+		.holdersShare(cal.toFixed(), value.toString())
 		.then(toBigNumber)
 	return [cal, share]
 }
