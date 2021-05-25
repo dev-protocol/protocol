@@ -21,7 +21,7 @@ const handler = async (
 		return
 	}
 
-	const gasFetcher = async () => 6721975
+	const gasFetcher = async () => 4000000
 	const gasPriceFetcher = ethGasStationFetcher(egsApiKey)
 	const dev = new DevCommonInstance(
 		artifacts,
@@ -36,7 +36,7 @@ const handler = async (
 	const policy_current = await policy.load()
 	const treasury = await policy_current.treasury()
 	const policy_next = await artifacts
-		.require('GeometricMean')
+		.require('DIP55')
 		.new(dev.addressConfig.address)
 	await Promise.all([
 		policy_next.setTreasury(treasury),
