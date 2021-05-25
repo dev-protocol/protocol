@@ -223,26 +223,5 @@ contract(
 				expect(result).to.be.equal(false)
 			})
 		})
-		describe('MetricsGroup; setTotalAuthenticatedPropertiesAdmin', () => {
-			it('An error occurs when someone other than the owner uses the function.', async () => {
-				const [dev] = await init()
-				const result = await dev.metricsGroup
-					.setTotalAuthenticatedPropertiesAdmin(10, {
-						from: user,
-					})
-					.catch((err: Error) => err)
-				validateNotOwnerErrorMessage(result)
-			})
-			it('You can get the set value.', async () => {
-				const [dev] = await init()
-				const before = await dev.metricsGroup.totalAuthenticatedProperties()
-				await dev.metricsGroup.setTotalAuthenticatedPropertiesAdmin(17354)
-				const result = await dev.metricsGroup.totalAuthenticatedProperties()
-				expect(result.toString()).to.be.equal('17354')
-				await dev.metricsGroup.setTotalAuthenticatedPropertiesAdmin(
-					before.toString()
-				)
-			})
-		})
 	}
 )
