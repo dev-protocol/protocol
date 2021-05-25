@@ -37,10 +37,10 @@ const handler = async (
 	const treasury = await policy_current.treasury()
 	const policy_next = await artifacts
 		.require('DIP55')
-		.new(dev.addressConfig.address)
+		.new(dev.addressConfig.address, await dev.gasInfo)
 	await Promise.all([
-		policy_next.setTreasury(treasury),
-		policy_next.setCapSetter(capSetter),
+		policy_next.setTreasury(treasury, await dev.gasInfo),
+		policy_next.setCapSetter(capSetter, await dev.gasInfo),
 	])
 
 	// Create the new PolicyFactory
@@ -48,7 +48,7 @@ const handler = async (
 	const policy_factory_current = await policy_factory.load()
 
 	// Force attach the new Policy
-	await policy_factory_current.create(policy_next.address)
+	await policy_factory_current.create(policy_next.address, await dev.gasInfo)
 	await policy_factory_current.forceAttach(
 		policy_next.address,
 		await dev.gasInfo
