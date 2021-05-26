@@ -1989,12 +1989,7 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@solidity-parser/parser@^0.12.1":
-  version "0.12.1"
-  resolved "https://registry.yarnpkg.com/@solidity-parser/parser/-/parser-0.12.1.tgz#10ce249890d32ba500e9ce449e60a2b26b11be7a"
-  integrity sha512-ikxVpwskNxEp2fvYS1BdRImnevHmM97zdPFBa1cVtjtNpoqCm/EmljATTZk0s9G/zsN5ZbPf9OAIAW4gbBJiRA==
-
-"@solidity-parser/parser@^0.13.0-rc.8":
+"@solidity-parser/parser@^0.13.0", "@solidity-parser/parser@^0.13.0-rc.8":
   version "0.13.0"
   resolved "https://registry.yarnpkg.com/@solidity-parser/parser/-/parser-0.13.0.tgz#4b2e52950b57c47c1ea7c51a71673e622b4f0884"
   integrity sha512-7ItU1sO9MCM0Xt2+hJPMP4cC9C4S86N3hm4jk4Cp+/S7e0kpmWDHfejQ0Pi/gBNPbxTxgYkVNzRCjJELRbwr6Q==
@@ -12017,12 +12012,12 @@ preserve@^0.2.0:
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
   integrity sha1-gV7R9uvGWSb4ZbMQwHE7yzMVzks=
 
-prettier-plugin-solidity@1.0.0-beta.10:
-  version "1.0.0-beta.10"
-  resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-1.0.0-beta.10.tgz#f2a249002733826b08d981b599335ddb7e93af8d"
-  integrity sha512-55UsEbeJfqYKB3RFR7Nvpi+ApEoUfgdKHVg2ZybrbOkRW4RTblyONLL3mEr8Vrxpo7wBbObVLbWodGg4YXIQ7g==
+prettier-plugin-solidity@1.0.0-beta.11:
+  version "1.0.0-beta.11"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-solidity/-/prettier-plugin-solidity-1.0.0-beta.11.tgz#580a16cab6517ab20cd08e65afd0300caa32125d"
+  integrity sha512-b3lh/9tn9BC3I723Aa91zebw2NDlbbBroKg7izP+jU0QfrLO6ldi0jY0XrqX3+zGqAI2aLcP8Jr1eGdymK5CgQ==
   dependencies:
-    "@solidity-parser/parser" "^0.12.1"
+    "@solidity-parser/parser" "^0.13.0"
     dir-to-object "^2.0.0"
     emoji-regex "^9.2.2"
     escape-string-regexp "^4.0.0"
