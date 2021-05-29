@@ -1989,10 +1989,17 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@solidity-parser/parser@^0.13.0", "@solidity-parser/parser@^0.13.0-rc.8":
+"@solidity-parser/parser@^0.13.0":
   version "0.13.0"
   resolved "https://registry.yarnpkg.com/@solidity-parser/parser/-/parser-0.13.0.tgz#4b2e52950b57c47c1ea7c51a71673e622b4f0884"
   integrity sha512-7ItU1sO9MCM0Xt2+hJPMP4cC9C4S86N3hm4jk4Cp+/S7e0kpmWDHfejQ0Pi/gBNPbxTxgYkVNzRCjJELRbwr6Q==
+  dependencies:
+    antlr4ts "^0.5.0-alpha.4"
+
+"@solidity-parser/parser@^0.13.2":
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/@solidity-parser/parser/-/parser-0.13.2.tgz#b6c71d8ca0b382d90a7bbed241f9bc110af65cbe"
+  integrity sha512-RwHnpRnfrnD2MSPveYoPh8nhofEvX7fgjHk1Oq+NNvCcLx4r1js91CO9o+F/F3fBzOCyvm8kKRTriFICX/odWw==
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
@@ -13326,12 +13333,12 @@ solc@^0.6.3:
     semver "^5.5.0"
     tmp "0.0.33"
 
-solhint@3.3.5:
-  version "3.3.5"
-  resolved "https://registry.yarnpkg.com/solhint/-/solhint-3.3.5.tgz#dd348e9d2d94631776d37f7044035fe3bb57a249"
-  integrity sha512-GhEZS/C5O6U34fYKc63nyqCQ7/F5qTZ9YWjfBTUOVE8OXy4E8raApwk4jXplv+CoM8olQdRgTm0o4gsmte8JmA==
+solhint@3.3.6:
+  version "3.3.6"
+  resolved "https://registry.yarnpkg.com/solhint/-/solhint-3.3.6.tgz#abe9af185a9a7defefba480047b3e42cbe9a1210"
+  integrity sha512-HWUxTAv2h7hx3s3hAab3ifnlwb02ZWhwFU/wSudUHqteMS3ll9c+m1FlGn9V8ztE2rf3Z82fQZA005Wv7KpcFA==
   dependencies:
-    "@solidity-parser/parser" "^0.13.0-rc.8"
+    "@solidity-parser/parser" "^0.13.2"
     ajv "^6.6.1"
     antlr4 "4.7.1"
     ast-parents "0.0.1"
