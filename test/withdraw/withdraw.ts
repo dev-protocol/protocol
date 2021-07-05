@@ -718,6 +718,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			expect(result.allReward.eq(allReward)).to.be.equal(true)
 		}
 
+		
 		describe('scenario; zero lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
