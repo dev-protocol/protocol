@@ -45,12 +45,11 @@ contract VoteCounterStorage is UsingStorage {
 		uint256 _votingGroupIndex,
 		bool _flg
 	) internal {
-		bytes32 key =
-			getStorageAlreadyUsePropertyKey(
-				_user,
-				_property,
-				_votingGroupIndex
-			);
+		bytes32 key = getStorageAlreadyUsePropertyKey(
+			_user,
+			_property,
+			_votingGroupIndex
+		);
 		eternalStorage().setBool(key, _flg);
 	}
 
@@ -59,12 +58,11 @@ contract VoteCounterStorage is UsingStorage {
 		address _property,
 		uint256 _votingGroupIndex
 	) public view returns (bool) {
-		bytes32 key =
-			getStorageAlreadyUsePropertyKey(
-				_user,
-				_property,
-				_votingGroupIndex
-			);
+		bytes32 key = getStorageAlreadyUsePropertyKey(
+			_user,
+			_property,
+			_votingGroupIndex
+		);
 		return eternalStorage().getBool(key);
 	}
 
@@ -91,8 +89,11 @@ contract VoteCounterStorage is UsingStorage {
 		uint256 _votingGroupIndex,
 		bool _flg
 	) internal {
-		bytes32 key =
-			getStorageAlreadyVotePolicyKey(_user, _property, _votingGroupIndex);
+		bytes32 key = getStorageAlreadyVotePolicyKey(
+			_user,
+			_property,
+			_votingGroupIndex
+		);
 		eternalStorage().setBool(key, _flg);
 	}
 
@@ -101,8 +102,11 @@ contract VoteCounterStorage is UsingStorage {
 		address _property,
 		uint256 _votingGroupIndex
 	) public view returns (bool) {
-		bytes32 key =
-			getStorageAlreadyVotePolicyKey(_user, _property, _votingGroupIndex);
+		bytes32 key = getStorageAlreadyVotePolicyKey(
+			_user,
+			_property,
+			_votingGroupIndex
+		);
 		return eternalStorage().getBool(key);
 	}
 

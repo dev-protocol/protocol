@@ -26,8 +26,9 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		uint256 metricsCountPerProperty = getMetricsCountPerProperty(property);
 		if (metricsCountPerProperty == 0) {
-			uint256 tmp =
-				eternalStorage().getUint(getTotalAuthenticatedPropertiesKey());
+			uint256 tmp = eternalStorage().getUint(
+				getTotalAuthenticatedPropertiesKey()
+			);
 			setTotalAuthenticatedProperties(tmp.add(1));
 		}
 		totalCount = totalCount.add(1);
@@ -51,8 +52,9 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		uint256 metricsCountPerProperty = getMetricsCountPerProperty(property);
 		if (metricsCountPerProperty == 1) {
-			uint256 tmp =
-				eternalStorage().getUint(getTotalAuthenticatedPropertiesKey());
+			uint256 tmp = eternalStorage().getUint(
+				getTotalAuthenticatedPropertiesKey()
+			);
 			setTotalAuthenticatedProperties(tmp.sub(1));
 		}
 		totalCount = totalCount.sub(1);

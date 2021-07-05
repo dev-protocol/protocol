@@ -151,10 +151,9 @@ contract LockupStorage is UsingStorage {
 		view
 		returns (uint256 _amount, uint256 _block)
 	{
-		uint256 record =
-			eternalStorage().getUint(
-				getStorageLastSameRewardsAmountAndBlockKey()
-			);
+		uint256 record = eternalStorage().getUint(
+			getStorageLastSameRewardsAmountAndBlockKey()
+		);
 		uint256 amount = record.div(BASIS);
 		uint256 blockNumber = record.sub(amount.mul(BASIS));
 		return (amount, blockNumber);
