@@ -1,3 +1,4 @@
+/* eslint-disable max-params */
 import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	MetricsInstance,
@@ -87,9 +88,8 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		market
 			.authenticate(property.address, 'id1', '', '', '', '')
 			.catch(console.error)
-		const metricsAddress = await (async () => {
-			return getEventValue(dev.metricsFactory)('Create', '_metrics')
-		})()
+		const metricsAddress = await (async () =>
+			getEventValue(dev.metricsFactory)('Create', '_metrics'))()
 		const [metrics] = await Promise.all([
 			artifacts.require('Metrics').at(metricsAddress as string),
 		])
@@ -718,7 +718,6 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			expect(result.allReward.eq(allReward)).to.be.equal(true)
 		}
 
-		
 		describe('scenario; zero lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance

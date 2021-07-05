@@ -108,8 +108,9 @@ function marketApproval(uint256 _up_votes, uint256 _negative_votes)
 	if (_up_votes < 9999999999999999999) {
 		return false;
 	}
-	uint256 negative_votes =
-		_negative_votes > 0 ? _negative_votes : 1000000000000000000;
+	uint256 negative_votes = _negative_votes > 0
+		? _negative_votes
+		: 1000000000000000000;
 	return _up_votes > negative_votes * 10;
 }
 
@@ -128,8 +129,9 @@ function policyApproval(uint256 _up_votes, uint256 _negative_votes)
 	if (_up_votes < 9999999999999999999) {
 		return false;
 	}
-	uint256 negative_votes =
-		_negative_votes > 0 ? _negative_votes : 1000000000000000000;
+	uint256 negative_votes = _negative_votes > 0
+		? _negative_votes
+		: 1000000000000000000;
 	return _up_votes > negative_votes * 10;
 }
 

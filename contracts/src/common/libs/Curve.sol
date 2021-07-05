@@ -27,13 +27,10 @@ contract Curve {
 		uint256 assets = _assets.mul(basis.sub(s));
 		uint256 max = assets.mul(_mintPerBlockAndAseet);
 		uint256 _d = basis.sub(s);
-		uint256 _p =
-			(
-				(power_basis.mul(12)).sub(
-					s.div((basis.div((power_basis.mul(10)))))
-				)
-			)
-				.div(2);
+		uint256 _p = (
+			(power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))
+		)
+		.div(2);
 		uint256 p = _p.div(power_basis);
 		uint256 rp = p.add(1);
 		uint256 f = _p.sub(p.mul(power_basis));

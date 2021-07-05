@@ -7,16 +7,14 @@ const handler = function (deployer, network) {
 	const devMigration = artifacts.require('DevMigration')
 	const withdraw = artifacts.require('Withdraw')
 	;(deployer as unknown as Promise<void>)
-		.then(async () => {
-			return artifacts.require('Dev').deployed()
-		})
-		.then(async (dev) => {
-			return Promise.all([
+		.then(async () => artifacts.require('Dev').deployed())
+		.then(async (dev) =>
+			Promise.all([
 				dev.addMinter(devMigration.address),
 				dev.addMinter(lockup.address),
 				dev.addMinter(withdraw.address),
 			])
-		})
+		)
 		.then(() => {
 			console.log(
 				'*** The addition of the address of the contract to mint is completed ***'

@@ -24,8 +24,8 @@ contract Allocator is UsingConfig, IAllocator {
 	 * @return Maximum number of mints per block.
 	 */
 	function calculateMaxRewardsPerBlock() external view returns (uint256) {
-		uint256 totalAssets =
-			IMetricsGroup(config().metricsGroup()).totalIssuedMetrics();
+		uint256 totalAssets = IMetricsGroup(config().metricsGroup())
+		.totalIssuedMetrics();
 		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
 		return IPolicy(config().policy()).rewards(totalLockedUps, totalAssets);
 	}
