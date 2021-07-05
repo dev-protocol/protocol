@@ -54,8 +54,8 @@ contract Market is UsingConfig, IMarket {
 		 * Sets the period during which voting by voters can be accepted.
 		 * This period is determined by `Policy.marketVotingBlocks`.
 		 */
-		uint256 marketVotingBlocks =
-			IPolicy(config().policy()).marketVotingBlocks();
+		uint256 marketVotingBlocks = IPolicy(config().policy())
+		.marketVotingBlocks();
 		votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
 
@@ -199,8 +199,9 @@ contract Market is UsingConfig, IMarket {
 		view
 		returns (uint256)
 	{
-		uint256 tokenValue =
-			ILockup(config().lockup()).getPropertyValue(_property);
+		uint256 tokenValue = ILockup(config().lockup()).getPropertyValue(
+			_property
+		);
 		IPolicy policy = IPolicy(config().policy());
 		IMetricsGroup metricsGroup = IMetricsGroup(config().metricsGroup());
 		return
@@ -238,8 +239,9 @@ contract Market is UsingConfig, IMarket {
 		/**
 		 * Publishes a new Metrics contract and associate the Property with the asset.
 		 */
-		IMetricsFactory metricsFactory =
-			IMetricsFactory(config().metricsFactory());
+		IMetricsFactory metricsFactory = IMetricsFactory(
+			config().metricsFactory()
+		);
 		address metrics = metricsFactory.create(_property);
 		idHashMetricsMap[metrics] = _idHash;
 
@@ -281,8 +283,9 @@ contract Market is UsingConfig, IMarket {
 		/**
 		 * Removes the passed Metrics contract from the Metrics address set.
 		 */
-		IMetricsFactory metricsFactory =
-			IMetricsFactory(config().metricsFactory());
+		IMetricsFactory metricsFactory = IMetricsFactory(
+			config().metricsFactory()
+		);
 		metricsFactory.destroy(_metrics);
 
 		/**
