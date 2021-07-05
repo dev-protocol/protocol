@@ -51,6 +51,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 holdersCap;
 	}
 	event Lockedup(address _from, address _property, uint256 _value);
+	event UpdateCap(uint256 _cap);
 
 	/**
 	 * Initialize the passed address as AddressConfig address and Devminter.
@@ -159,6 +160,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		setStorageCumulativeHoldersRewardCap(cCap);
 		setStorageLastCumulativeHoldersPriceCap(holdersPrice);
 		setStorageCap(_cap);
+		emit UpdateCap(_cap);
 	}
 
 	/**
