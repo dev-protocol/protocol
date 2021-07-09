@@ -1746,7 +1746,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		describe('success', () => {
 			it('Can set cap.', async () => {
 				const [dev] = await init()
-				await dev.lockup.updateCap(100)
+				const tx = await dev.lockup.updateCap(100)
+				const eventLogs = tx.logs.filter((log) => log.event === 'UpdateCap')
+				expect(eventLogs[0].args._cap.toNumber()).to.be.equal(100)
 				const cap = await dev.lockup.cap()
 				expect(cap.toNumber()).to.be.equal(100)
 				const [capValue, holdersPrice] = await calculateCap(
