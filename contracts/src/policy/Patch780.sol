@@ -2,12 +2,12 @@
 pragma solidity 0.5.17;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Patch662} from "contracts/src/policy/Patch662.sol";
+import {TreasuryFee} from "contracts/src/policy/TreasuryFee.sol";
 
-contract Patch780 is Patch662 {
+contract Patch780 is TreasuryFee {
 	uint256 private constant mint_per_block_and_aseet = 132000000000000;
 
-	constructor(address _config) public Patch662(_config) {}
+	constructor(address _config) public TreasuryFee(_config) {}
 
 	function rewards(uint256 _lockups, uint256 _assets)
 		external

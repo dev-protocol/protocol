@@ -1,14 +1,16 @@
 pragma solidity 0.5.17;
 
+import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
 import {Market} from "contracts/src/market/Market.sol";
+import {IMarket} from "contracts/interface/IMarket.sol";
 import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
 import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
 
 /**
  * A factory contract that creates a new Market contract.
  */
-contract MarketFactory is IMarketFactory, UsingConfig {
+contract MarketFactory is Ownable, IMarketFactory, UsingConfig {
 	event Create(address indexed _from, address _market);
 
 	/**
@@ -47,5 +49,27 @@ contract MarketFactory is IMarketFactory, UsingConfig {
 
 		emit Create(msg.sender, marketAddr);
 		return marketAddr;
+	}
+
+	/**
+	 * Creates a new Market contract.
+	 */
+	function beEnable(address _addr) external onlyOwner {
+		/**
+		 * Validates the passed address is not 0 address.
+		 */
+		require(_addr != address(0), "this is illegal address");
+
+		/**
+		 * Market will be enable.
+		 */
+		IMarket market = IMarket(_addr);
+		require(market.enabled() == false, "already enabled");
+
+		/**
+		 * Validates the voting deadline has not passed.
+		 */
+		require(market.isDuringVotingPeriod(), "voting deadline is over");
+		market.toEnable();
 	}
 }

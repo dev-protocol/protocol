@@ -33,29 +33,12 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
 		if (config().policy() == address(0)) {
 			config().setPolicy(_newPolicyAddress);
-			policyGroup.addGroupWithoutSetVotingEnd(_newPolicyAddress);
-			return;
 		}
 
 		/**
 		 * Adds the created Policy contract to the Policy address set.
 		 */
 		policyGroup.addGroup(_newPolicyAddress);
-	}
-
-	/**
-	 * Sets the Policy passed by a vote as an current Policy.
-	 */
-	function convergePolicy(address _currentPolicyAddress) external {
-		/**
-		 * Verify sender is VoteCounter contract
-		 */
-		require(
-			msg.sender == config().voteCounter(),
-			"this is illegal address"
-		);
-
-		setPolicy(_currentPolicyAddress);
 	}
 
 	/**
@@ -69,24 +52,21 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 			IPolicyGroup(config().policyGroup()).isGroup(_policy),
 			"this is illegal address"
 		);
+		// TODO 不要なテストを削除
+		// TODO デプロイスクリプトを作成
+		// TODO 必要なテストを作成
+		/**
+		 * Validates the voting deadline has not passed.
+		 */
+		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
+		require(
+			policyGroup.isDuringVotingPeriod(_policy),
+			"voting deadline is over"
+		);
 
-		setPolicy(_policy);
-	}
-
-	/**
-	 * Sets the Policy
-	 */
-	function setPolicy(address _policy) private {
 		/**
 		 * Sets the passed Policy to current Policy.
 		 */
 		config().setPolicy(_policy);
-
-		/**
-		 * Resets the Policy address set that is accepting votes.
-		 */
-		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
-		policyGroup.incrementVotingGroupIndex();
-		policyGroup.addGroup(_policy);
 	}
 }

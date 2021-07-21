@@ -401,7 +401,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Gets the latest mint amount per block from Allocator contract.
 		 */
 		uint256 rewardsAmount = IAllocator(config().allocator())
-		.calculateMaxRewardsPerBlock();
+			.calculateMaxRewardsPerBlock();
 
 		/**
 		 * Gets the maximum mint amount per block, and the last recorded block number from `LastSameRewardsAmountAndBlock` storage.
