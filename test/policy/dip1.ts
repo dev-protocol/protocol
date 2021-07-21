@@ -96,60 +96,6 @@ contract('DIP1', ([deployer]) => {
 			)
 		})
 	})
-	describe('DIP1; marketApproval', () => {
-		it('marketApproval equals TheFirstPolicy', async () => {
-			const method = 'marketApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip1[method](a, b)).toString()).to.be.equal(
-				(await theFirstPolicy[method](a, b)).toString()
-			)
-			expect((await dip1[method](c, d)).toString()).to.be.equal(
-				(await theFirstPolicy[method](c, d)).toString()
-			)
-			expect((await dip1[method](e, f)).toString()).to.be.equal(
-				(await theFirstPolicy[method](e, f)).toString()
-			)
-			expect((await dip1[method](a, 0)).toString()).to.be.equal(
-				(await theFirstPolicy[method](a, 0)).toString()
-			)
-			expect((await dip1[method](a, 1)).toString()).to.be.equal(
-				(await theFirstPolicy[method](a, 1)).toString()
-			)
-			expect((await dip1[method](0, a)).toString()).to.be.equal(
-				(await theFirstPolicy[method](0, a)).toString()
-			)
-			expect((await dip1[method](1, a)).toString()).to.be.equal(
-				(await theFirstPolicy[method](1, a)).toString()
-			)
-		})
-	})
-	describe('DIP1; policyApproval', () => {
-		it('policyApproval equals TheFirstPolicy', async () => {
-			const method = 'policyApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip1[method](a, b)).toString()).to.be.equal(
-				(await theFirstPolicy[method](a, b)).toString()
-			)
-			expect((await dip1[method](c, d)).toString()).to.be.equal(
-				(await theFirstPolicy[method](c, d)).toString()
-			)
-			expect((await dip1[method](e, f)).toString()).to.be.equal(
-				(await theFirstPolicy[method](e, f)).toString()
-			)
-			expect((await dip1[method](a, 0)).toString()).to.be.equal(
-				(await theFirstPolicy[method](a, 0)).toString()
-			)
-			expect((await dip1[method](a, 1)).toString()).to.be.equal(
-				(await theFirstPolicy[method](a, 1)).toString()
-			)
-			expect((await dip1[method](0, a)).toString()).to.be.equal(
-				(await theFirstPolicy[method](0, a)).toString()
-			)
-			expect((await dip1[method](1, a)).toString()).to.be.equal(
-				(await theFirstPolicy[method](1, a)).toString()
-			)
-		})
-	})
 	describe('DIP1; marketVotingBlocks', () => {
 		it('marketVotingBlocks equals TheFirstPolicy', async () => {
 			const method = 'marketVotingBlocks'

@@ -52,9 +52,6 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 			IPolicyGroup(config().policyGroup()).isGroup(_policy),
 			"this is illegal address"
 		);
-		// TODO 不要なテストを削除
-		// TODO デプロイスクリプトを作成
-		// TODO 必要なテストを作成
 		/**
 		 * Validates the voting deadline has not passed.
 		 */

@@ -54,7 +54,7 @@ contract MarketFactory is Ownable, IMarketFactory, UsingConfig {
 	/**
 	 * Creates a new Market contract.
 	 */
-	function beEnable(address _addr) external onlyOwner {
+	function enable(address _addr) external onlyOwner {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */

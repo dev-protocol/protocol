@@ -292,38 +292,6 @@ jobs:
       - name: test
         run: yarn test test/$DIR/*.ts
 
-  test-vote:
-    needs: build
-
-    env:
-      DIR: vote
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [12.x]
-
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: restore cache
-        uses: actions/cache@main
-        with:
-          path: |
-            node_modules
-            build
-            types
-          key: ${{ runner.os }}-${{ github.sha }}
-
-      - name: test
-        run: yarn test test/$DIR/*.ts
-
   test-withdraw:
     needs: build
 
