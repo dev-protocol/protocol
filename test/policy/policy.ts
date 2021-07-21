@@ -22,18 +22,6 @@ contract('Policy', ([account1, account2]) => {
 			expect(result.toNumber()).to.be.equal(1099)
 		})
 	})
-	describe('PolicyTest1; marketApproval', () => {
-		it('Returns whether the next new Market can be approved when the number of agreements and the number of protests is passed', async () => {
-			const result = await policy.marketApproval(9000, 2000)
-			expect(result).to.be.equal(true)
-		})
-	})
-	describe('PolicyTest1; policyApproval', () => {
-		it('Returns whether the next new Policy can be approved when the number of agreements and the number of protests is passed', async () => {
-			const result = await policy.policyApproval(9000, 2000)
-			expect(result).to.be.equal(true)
-		})
-	})
 	describe('PolicyTest1; marketVotingBlocks', () => {
 		it('Returns the number of the blocks of the voting period for the new Market', async () => {
 			const result = await policy.marketVotingBlocks()

@@ -29,6 +29,16 @@ contract PolicyGroup is UsingConfig, UsingStorage, IPolicyGroup {
 		return eternalStorage().getBool(getGroupKey(_addr));
 	}
 
+	function isDuringVotingPeriod(address _policy)
+		external
+		view
+		returns (bool)
+	{
+		bytes32 key = getVotingEndBlockNumberKey(_policy);
+		uint256 votingEndBlockNumber = eternalStorage().getUint(key);
+		return block.number < votingEndBlockNumber;
+	}
+
 	function setVotingEndBlockNumber(address _policy) private {
 		require(
 			msg.sender == config().policyFactory(),
@@ -38,16 +48,6 @@ contract PolicyGroup is UsingConfig, UsingStorage, IPolicyGroup {
 		uint256 tmp = IPolicy(config().policy()).policyVotingBlocks();
 		uint256 votingEndBlockNumber = block.number.add(tmp);
 		eternalStorage().setUint(key, votingEndBlockNumber);
-	}
-
-	function isDuringVotingPeriod(address _policy)
-		external
-		view
-		returns (bool)
-	{
-		bytes32 key = getVotingEndBlockNumberKey(_policy);
-		uint256 votingEndBlockNumber = eternalStorage().getUint(key);
-		return block.number < votingEndBlockNumber;
 	}
 
 	function getVotingEndBlockNumberKey(address _policy)
