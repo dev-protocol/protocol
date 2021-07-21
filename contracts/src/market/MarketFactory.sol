@@ -66,10 +66,6 @@ contract MarketFactory is Ownable, IMarketFactory, UsingConfig {
 		IMarket market = IMarket(_addr);
 		require(market.enabled() == false, "already enabled");
 
-		/**
-		 * Validates the voting deadline has not passed.
-		 */
-		require(market.isDuringVotingPeriod(), "voting deadline is over");
 		market.toEnable();
 	}
 }

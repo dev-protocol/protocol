@@ -56,10 +56,7 @@ contract PolicyFactory is UsingConfig, IPolicyFactory, Ownable {
 		 * Validates the voting deadline has not passed.
 		 */
 		IPolicyGroup policyGroup = IPolicyGroup(config().policyGroup());
-		require(
-			policyGroup.isDuringVotingPeriod(_policy),
-			"voting deadline is over"
-		);
+		require(policyGroup.isDuringVotingPeriod(_policy), "deadline is over");
 
 		/**
 		 * Sets the passed Policy to current Policy.

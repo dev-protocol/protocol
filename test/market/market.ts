@@ -1,4 +1,5 @@
 import { DevProtocolInstance } from '../test-lib/instance'
+import { mine } from '../test-lib/utils/common'
 import { MarketInstance } from '../../types/truffle-contracts'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { watch } from '../test-lib/utils/event'
@@ -61,8 +62,18 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Can be enabled from the market factory', async () => {
+				expect(await market.enabled()).to.be.equal(false)
 				await market.toEnable({ from: marketFactory })
 				expect(await market.enabled()).to.be.equal(true)
+			})
+			it('Cannot be enabled if deadline is over', async () => {
+				expect(await market.enabled()).to.be.equal(false)
+				await mine(11)
+				const result = await market
+					.toEnable({ from: marketFactory })
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'deadline is over')
+				expect(await market.enabled()).to.be.equal(false)
 			})
 		})
 		describe('Market; schema', () => {

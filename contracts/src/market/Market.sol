@@ -96,6 +96,7 @@ contract Market is UsingConfig, IMarket {
 			msg.sender == config().marketFactory(),
 			"this is illegal address"
 		);
+		require(isDuringVotingPeriod(), "deadline is over");
 		enabled = true;
 	}
 
@@ -299,7 +300,7 @@ contract Market is UsingConfig, IMarket {
 		return IMarketBehavior(behavior).schema();
 	}
 
-	function isDuringVotingPeriod() external view returns (bool) {
+	function isDuringVotingPeriod() private view returns (bool) {
 		return block.number < votingEndBlockNumber;
 	}
 }
