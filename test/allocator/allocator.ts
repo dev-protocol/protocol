@@ -22,7 +22,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			dev.generateWithdraw(),
 			dev.generatePropertyFactory(),
 			dev.generatePropertyGroup(),
-			dev.generateVoteCounter(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
 		])

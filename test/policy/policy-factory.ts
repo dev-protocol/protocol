@@ -66,7 +66,6 @@ contract(
 				await Promise.all([
 					dev.generatePolicyGroup(),
 					dev.generatePolicyFactory(),
-					dev.generateVoteCounter(),
 					dev.generateMarketFactory(),
 					dev.generateMarketGroup(),
 					dev.generatePropertyGroup(),
@@ -141,7 +140,6 @@ contract(
 				await Promise.all([
 					dev.generatePolicyGroup(),
 					dev.generatePolicyFactory(),
-					dev.generateVoteCounter(),
 					dev.generateMarketFactory(),
 					dev.generateMarketGroup(),
 					dev.generatePropertyGroup(),
