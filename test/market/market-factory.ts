@@ -1,12 +1,16 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { getMarketAddress } from '../test-lib/utils/log'
-import { validateAddressErrorMessage, validateErrorMessage } from '../test-lib/utils/error'
+import {
+	validateAddressErrorMessage,
+	validateErrorMessage,
+} from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 
 contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
-
 	const marketContract = artifacts.require('Market')
-	const init = async (): Promise<[DevProtocolInstance, string, string, [string, string]]> => {
+	const init = async (): Promise<
+		[DevProtocolInstance, string, string, [string, string]]
+	> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await Promise.all([
@@ -22,8 +26,10 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		const result = await dev.marketFactory.create(market.address, {
 			from: user,
 		})
-		const eventFrom = result.logs.filter((log)=>log.event === 'Create')[0].args._from
-		const eventMarket = result.logs.filter((log)=>log.event === 'Create')[0].args._market
+		const eventFrom = result.logs.filter((log) => log.event === 'Create')[0]
+			.args._from
+		const eventMarket = result.logs.filter((log) => log.event === 'Create')[0]
+			.args._market
 		const marketAddress = getMarketAddress(result)
 		return [dev, marketAddress, marketBehaviorAddress, [eventFrom, eventMarket]]
 	}
@@ -61,7 +67,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			expect(marketAddress).to.be.equal(market)
 		})
 		it('The second and subsequent markets will not be automatically enabled.', async () => {
-			const [dev, ] = await init()
+			const [dev] = await init()
 			const secoundMarket = await dev.getMarket('MarketTest1', user)
 			const result = await dev.marketFactory.create(secoundMarket.address, {
 				from: user,
@@ -88,9 +94,11 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
 				await dev.generateMarketFactory()
-				const res = await dev.marketFactory.enable(DEFAULT_ADDRESS, {
-					from: user,
-				}).catch((err: Error) => err)
+				const res = await dev.marketFactory
+					.enable(DEFAULT_ADDRESS, {
+						from: user,
+					})
+					.catch((err: Error) => err)
 				validateErrorMessage(res, 'caller is not the owner', false)
 			})
 			it('Only the market address can be specified.', async () => {
@@ -98,12 +106,16 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				await dev.generateAddressConfig()
 				await dev.generateMarketGroup()
 				await dev.generateMarketFactory()
-				const res = await dev.marketFactory.enable(dummyMarketAddress).catch((err: Error) => err)
+				const res = await dev.marketFactory
+					.enable(dummyMarketAddress)
+					.catch((err: Error) => err)
 				validateAddressErrorMessage(res)
 			})
 			it('we cannot specify the address of an active market.', async () => {
 				const [dev, market] = await init()
-				const res = await dev.marketFactory.enable(market).catch((err: Error) => err)
+				const res = await dev.marketFactory
+					.enable(market)
+					.catch((err: Error) => err)
 				validateErrorMessage(res, 'already enabled')
 			})
 		})
