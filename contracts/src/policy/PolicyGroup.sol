@@ -16,12 +16,9 @@ contract PolicyGroup is UsingConfig, UsingStorage, IPolicyGroup {
 			msg.sender == config().policyFactory(),
 			"this is illegal address"
 		);
-
-		require(
-			eternalStorage().getBool(getGroupKey(_addr)) == false,
-			"already group"
-		);
-		eternalStorage().setBool(getGroupKey(_addr), true);
+		bytes32 key = getGroupKey(_addr);
+		require(eternalStorage().getBool(key) == false, "already group");
+		eternalStorage().setBool(key, true);
 		setVotingEndBlockNumber(_addr);
 	}
 
