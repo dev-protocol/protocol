@@ -58,7 +58,8 @@ contract MarketFactory is Ownable, IMarketFactory, UsingConfig {
 		/**
 		 * Validates the passed address is not 0 address.
 		 */
-		require(_addr != address(0), "this is illegal address");
+		IMarketGroup marketGroup = IMarketGroup(config().marketGroup());
+		require(marketGroup.isGroup(_addr), "this is illegal address");
 
 		/**
 		 * Market will be enable.
