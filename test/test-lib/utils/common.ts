@@ -5,7 +5,7 @@ import { SHARE_OF_TREASURY } from './../const'
 export async function mine(count: number): Promise<void> {
 	for (let i = 0; i < count; i++) {
 		// eslint-disable-next-line no-await-in-loop
-		await new Promise(function (resolve) {
+		await new Promise((resolve) => {
 			web3.currentProvider.send(
 				{
 					jsonrpc: '2.0',

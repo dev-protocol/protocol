@@ -4,15 +4,10 @@
 		"project": "./tsconfig.json",
 		"tsconfigRootDir": "."
 	},
-	"plugins": ["@typescript-eslint", "prettier"],
-	"extends": [
-		"xo",
-		"xo-typescript",
-		"plugin:prettier/recommended",
-		"prettier/@typescript-eslint"
-	],
+	"env": { "mocha": true },
+	"plugins": ["@typescript-eslint"],
+	"extends": ["xo", "xo-typescript", "prettier"],
 	"rules": {
-		"prettier/prettier": "error",
 		"@typescript-eslint/prefer-readonly-parameter-types": "off",
 		"@typescript-eslint/no-unsafe-member-access": "off",
 		"@typescript-eslint/no-unsafe-call": "off",
@@ -23,15 +18,8 @@
 		{
 			"files": ["test/**/*.ts"],
 			"globals": {
-				"describe": "readonly",
-				"expect": "readonly",
-				"it": "readonly",
 				"artifacts": "readonly",
 				"contract": "readonly",
-				"beforeEach": "readonly",
-				"before": "readonly",
-				"afterEach": "readonly",
-				"after": "readonly",
 				"web3": "readonly"
 			}
 		},
