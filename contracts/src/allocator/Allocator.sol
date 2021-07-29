@@ -25,7 +25,7 @@ contract Allocator is UsingConfig, IAllocator {
 	 */
 	function calculateMaxRewardsPerBlock() external view returns (uint256) {
 		uint256 totalAssets = IMetricsGroup(config().metricsGroup())
-		.totalIssuedMetrics();
+			.totalIssuedMetrics();
 		uint256 totalLockedUps = ILockup(config().lockup()).getAllValue();
 		return IPolicy(config().policy()).rewards(totalLockedUps, totalAssets);
 	}

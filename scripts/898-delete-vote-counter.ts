@@ -1,8 +1,9 @@
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { config } from 'dotenv'
 import { DevCommonInstance } from './lib/instance/common'
-import { PolicyGroup } from './lib/instance/policy-group'
+import { MarketFactry } from './lib/instance/market-factory'
 import { PolicyFactory } from './lib/instance/policy-factory'
+import { PolicyGroup } from './lib/instance/policy-group'
 
 config()
 const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
@@ -14,7 +15,7 @@ const handler = async (
 		return
 	}
 
-	const gasFetcher = async () => 6721975
+	const gasFetcher = async () => 4000000
 	const gasPriceFetcher = ethGasStationFetcher(egsApiKey)
 	const dev = new DevCommonInstance(
 		artifacts,
@@ -24,21 +25,26 @@ const handler = async (
 	)
 	await dev.prepare()
 
-	const policyGroup = new PolicyGroup(dev)
-	const currentPolicyGroup = await policyGroup.load()
-	const nextPolicyGroup = await policyGroup.create()
-	await policyGroup.changeOwner(currentPolicyGroup, nextPolicyGroup)
-	await policyGroup.set(nextPolicyGroup)
+	// MarketFactory
+	const mf = new MarketFactry(dev)
+	const mfNext = await mf.create()
+	await mf.set(mfNext)
 
-	const policyFactory = new PolicyFactory(dev)
-	const nextPolicyFactory = await policyFactory.create()
-	await policyFactory.set(nextPolicyFactory)
+	// PolicyFactory
+	const pf = new PolicyFactory(dev)
+	const pfNext = await pf.create()
+	await pf.set(pfNext)
 
-	await dev.addressConfig.setPolicySet(
-		'0x0000000000000000000000000000000000000000',
-		await dev.gasInfo
+	// PolicyGroup
+	const pg = new PolicyGroup(dev)
+	const pgCurrent = await pg.load()
+	const pgNext = await pg.create()
+	await pg.changeOwner(pgCurrent, pgNext)
+	await pg.set(pgNext)
+
+	await dev.addressConfig.setVoteCounter(
+		'0x0000000000000000000000000000000000000000'
 	)
-	console.log('PolicySet address is 0')
 
 	callback(null)
 }

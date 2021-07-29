@@ -109,60 +109,6 @@ contract('DIP55', ([deployer, treasury, capSetter, uesr]) => {
 			)
 		})
 	})
-	describe('DIP55; marketApproval', () => {
-		it('marketApproval equals Patch780', async () => {
-			const method = 'marketApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip55[method](a, b)).toString()).to.be.equal(
-				(await patch780[method](a, b)).toString()
-			)
-			expect((await dip55[method](c, d)).toString()).to.be.equal(
-				(await patch780[method](c, d)).toString()
-			)
-			expect((await dip55[method](e, f)).toString()).to.be.equal(
-				(await patch780[method](e, f)).toString()
-			)
-			expect((await dip55[method](a, 0)).toString()).to.be.equal(
-				(await patch780[method](a, 0)).toString()
-			)
-			expect((await dip55[method](a, 1)).toString()).to.be.equal(
-				(await patch780[method](a, 1)).toString()
-			)
-			expect((await dip55[method](0, a)).toString()).to.be.equal(
-				(await patch780[method](0, a)).toString()
-			)
-			expect((await dip55[method](1, a)).toString()).to.be.equal(
-				(await patch780[method](1, a)).toString()
-			)
-		})
-	})
-	describe('DIP55; policyApproval', () => {
-		it('policyApproval equals Patch780', async () => {
-			const method = 'policyApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect(await patch780[method](a, b)).to.be.equal(
-				await dip55[method](a, b)
-			)
-			expect(await patch780[method](c, d)).to.be.equal(
-				await dip55[method](c, d)
-			)
-			expect(await patch780[method](e, f)).to.be.equal(
-				await dip55[method](e, f)
-			)
-			expect(await patch780[method](a, 0)).to.be.equal(
-				await dip55[method](a, 0)
-			)
-			expect(await patch780[method](a, 1)).to.be.equal(
-				await dip55[method](a, 1)
-			)
-			expect(await patch780[method](0, a)).to.be.equal(
-				await dip55[method](0, a)
-			)
-			expect(await patch780[method](1, a)).to.be.equal(
-				await dip55[method](1, a)
-			)
-		})
-	})
 	describe('DIP55; marketVotingBlocks', () => {
 		it('marketVotingBlocks equals Patch780', async () => {
 			const method = 'marketVotingBlocks'
