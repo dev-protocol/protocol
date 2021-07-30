@@ -22,7 +22,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			dev.generateWithdraw(),
 			dev.generatePropertyFactory(),
 			dev.generatePropertyGroup(),
-			dev.generateVoteCounter(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
 		])
@@ -84,7 +83,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	})
 
 	describe('Allocator: beforeBalanceChange', () => {
-		it('If the first argument is a non-property address, an error occurs..', async () => {
+		it('If the first argument is a non-property address, an error occurs.', async () => {
 			const [dev] = await init()
 			const res = await dev.allocator
 				.beforeBalanceChange(user1, user1, user1)

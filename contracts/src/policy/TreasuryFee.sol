@@ -16,10 +16,6 @@ contract TreasuryFee is DIP7, Ownable {
 		return _supply.div(100).mul(5);
 	}
 
-	function policyApproval(uint256, uint256) external view returns (bool) {
-		return false;
-	}
-
 	function treasury() external view returns (address) {
 		return treasuryAddress;
 	}

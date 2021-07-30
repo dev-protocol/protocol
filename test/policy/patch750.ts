@@ -1,6 +1,6 @@
 import {
 	Patch780Instance,
-	Patch662Instance,
+	TreasuryFeeInstance,
 } from '../../types/truffle-contracts'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { DevProtocolInstance } from '../test-lib/instance'
@@ -11,7 +11,7 @@ import { toBigNumber } from '../test-lib/utils/common'
 
 contract('Patch780', ([deployer, treasury, uesr]) => {
 	let patch780: Patch780Instance
-	let patch662: Patch662Instance
+	let treasuryFee: TreasuryFeeInstance
 	let dev: DevProtocolInstance
 
 	before(async () => {
@@ -24,8 +24,8 @@ contract('Patch780', ([deployer, treasury, uesr]) => {
 		patch780 = await artifacts
 			.require('Patch780')
 			.new(dev.addressConfig.address)
-		patch662 = await artifacts
-			.require('Patch662')
+		treasuryFee = await artifacts
+			.require('TreasuryFee')
 			.new(dev.addressConfig.address)
 	})
 
@@ -123,150 +123,96 @@ contract('Patch780', ([deployer, treasury, uesr]) => {
 		})
 	})
 	describe('Patch780; holdersShare', () => {
-		it('holdersShare equals Patch662', async () => {
+		it('holdersShare equals TreasuryFee', async () => {
 			const method = 'holdersShare'
 			const [a, b, c, d, e, f] = batchRandom()
 			expect((await patch780[method](a, b)).toString()).to.be.equal(
-				(await patch662[method](a, b)).toString()
+				(await treasuryFee[method](a, b)).toString()
 			)
 			expect((await patch780[method](c, d)).toString()).to.be.equal(
-				(await patch662[method](c, d)).toString()
+				(await treasuryFee[method](c, d)).toString()
 			)
 			expect((await patch780[method](e, f)).toString()).to.be.equal(
-				(await patch662[method](e, f)).toString()
+				(await treasuryFee[method](e, f)).toString()
 			)
 			expect((await patch780[method](a, 0)).toString()).to.be.equal(
-				(await patch662[method](a, 0)).toString()
+				(await treasuryFee[method](a, 0)).toString()
 			)
 			expect((await patch780[method](a, 1)).toString()).to.be.equal(
-				(await patch662[method](a, 1)).toString()
+				(await treasuryFee[method](a, 1)).toString()
 			)
 			expect((await patch780[method](0, a)).toString()).to.be.equal(
-				(await patch662[method](0, a)).toString()
+				(await treasuryFee[method](0, a)).toString()
 			)
 			expect((await patch780[method](1, a)).toString()).to.be.equal(
-				(await patch662[method](1, a)).toString()
+				(await treasuryFee[method](1, a)).toString()
 			)
 		})
 	})
 	describe('Patch780; authenticationFee', () => {
-		it('authenticationFee equals Patch662', async () => {
+		it('authenticationFee equals TreasuryFee', async () => {
 			const method = 'authenticationFee'
 			const [a, b, c, d, e, f] = batchRandom()
 			expect((await patch780[method](a, b)).toString()).to.be.equal(
-				(await patch662[method](a, b)).toString()
+				(await treasuryFee[method](a, b)).toString()
 			)
 			expect((await patch780[method](c, d)).toString()).to.be.equal(
-				(await patch662[method](c, d)).toString()
+				(await treasuryFee[method](c, d)).toString()
 			)
 			expect((await patch780[method](e, f)).toString()).to.be.equal(
-				(await patch662[method](e, f)).toString()
+				(await treasuryFee[method](e, f)).toString()
 			)
 			expect((await patch780[method](a, 0)).toString()).to.be.equal(
-				(await patch662[method](a, 0)).toString()
+				(await treasuryFee[method](a, 0)).toString()
 			)
 			expect((await patch780[method](a, 1)).toString()).to.be.equal(
-				(await patch662[method](a, 1)).toString()
+				(await treasuryFee[method](a, 1)).toString()
 			)
 			expect((await patch780[method](0, a)).toString()).to.be.equal(
-				(await patch662[method](0, a)).toString()
+				(await treasuryFee[method](0, a)).toString()
 			)
 			expect((await patch780[method](1, a)).toString()).to.be.equal(
-				(await patch662[method](1, a)).toString()
-			)
-		})
-	})
-	describe('Patch780; marketApproval', () => {
-		it('marketApproval equals Patch662', async () => {
-			const method = 'marketApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await patch780[method](a, b)).toString()).to.be.equal(
-				(await patch662[method](a, b)).toString()
-			)
-			expect((await patch780[method](c, d)).toString()).to.be.equal(
-				(await patch662[method](c, d)).toString()
-			)
-			expect((await patch780[method](e, f)).toString()).to.be.equal(
-				(await patch662[method](e, f)).toString()
-			)
-			expect((await patch780[method](a, 0)).toString()).to.be.equal(
-				(await patch662[method](a, 0)).toString()
-			)
-			expect((await patch780[method](a, 1)).toString()).to.be.equal(
-				(await patch662[method](a, 1)).toString()
-			)
-			expect((await patch780[method](0, a)).toString()).to.be.equal(
-				(await patch662[method](0, a)).toString()
-			)
-			expect((await patch780[method](1, a)).toString()).to.be.equal(
-				(await patch662[method](1, a)).toString()
-			)
-		})
-	})
-	describe('Patch780; policyApproval', () => {
-		it('policyApproval equals Patch662', async () => {
-			const method = 'policyApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await patch780[method](a, b)).toString()).to.be.equal(
-				(await patch662[method](a, b)).toString()
-			)
-			expect((await patch780[method](c, d)).toString()).to.be.equal(
-				(await patch662[method](c, d)).toString()
-			)
-			expect((await patch780[method](e, f)).toString()).to.be.equal(
-				(await patch662[method](e, f)).toString()
-			)
-			expect((await patch780[method](a, 0)).toString()).to.be.equal(
-				(await patch662[method](a, 0)).toString()
-			)
-			expect((await patch780[method](a, 1)).toString()).to.be.equal(
-				(await patch662[method](a, 1)).toString()
-			)
-			expect((await patch780[method](0, a)).toString()).to.be.equal(
-				(await patch662[method](0, a)).toString()
-			)
-			expect((await patch780[method](1, a)).toString()).to.be.equal(
-				(await patch662[method](1, a)).toString()
+				(await treasuryFee[method](1, a)).toString()
 			)
 		})
 	})
 	describe('Patch780; marketVotingBlocks', () => {
-		it('marketVotingBlocks equals Patch662', async () => {
+		it('marketVotingBlocks equals TreasuryFee', async () => {
 			const method = 'marketVotingBlocks'
 			expect((await patch780[method]()).toString()).to.be.equal(
-				(await patch662[method]()).toString()
+				(await treasuryFee[method]()).toString()
 			)
 		})
 	})
 	describe('Patch780; policyVotingBlocks', () => {
-		it('policyVotingBlocks equals Patch662', async () => {
+		it('policyVotingBlocks equals TreasuryFee', async () => {
 			const method = 'policyVotingBlocks'
 			expect((await patch780[method]()).toString()).to.be.equal(
-				(await patch662[method]()).toString()
+				(await treasuryFee[method]()).toString()
 			)
 		})
 	})
 	describe('Patch780; shareOfTreasury', () => {
-		it('shareOfTreasury equals Patch662', async () => {
+		it('shareOfTreasury equals TreasuryFee', async () => {
 			const method = 'shareOfTreasury'
 			const [a, b, c, d, e, f] = batchRandom()
 			expect((await patch780[method](a)).toString()).to.be.equal(
-				(await patch662[method](a)).toString()
+				(await treasuryFee[method](a)).toString()
 			)
 			expect((await patch780[method](b)).toString()).to.be.equal(
-				(await patch662[method](b)).toString()
+				(await treasuryFee[method](b)).toString()
 			)
 			expect((await patch780[method](c)).toString()).to.be.equal(
-				(await patch662[method](c)).toString()
+				(await treasuryFee[method](c)).toString()
 			)
 			expect((await patch780[method](d)).toString()).to.be.equal(
-				(await patch662[method](d)).toString()
+				(await treasuryFee[method](d)).toString()
 			)
 			expect((await patch780[method](e)).toString()).to.be.equal(
-				(await patch662[method](e)).toString()
+				(await treasuryFee[method](e)).toString()
 			)
 			expect((await patch780[method](f)).toString()).to.be.equal(
-				(await patch662[method](f)).toString()
+				(await treasuryFee[method](f)).toString()
 			)
 		})
 	})
@@ -278,7 +224,7 @@ contract('Patch780', ([deployer, treasury, uesr]) => {
 		})
 		it('the default value is 0 address.', async () => {
 			const tmp = await artifacts
-				.require('Patch662')
+				.require('TreasuryFee')
 				.new(dev.addressConfig.address)
 			const result = await tmp.treasury()
 			expect(result).to.be.equal(DEFAULT_ADDRESS)

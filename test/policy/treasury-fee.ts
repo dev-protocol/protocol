@@ -111,46 +111,6 @@ contract('TreasuryFee', ([deployer, treasury, uesr]) => {
 			)
 		})
 	})
-	describe('TreasuryFee; marketApproval', () => {
-		it('marketApproval equals DIP7', async () => {
-			const method = 'marketApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip7[method](a, b)).toString()).to.be.equal(
-				(await treasuryFee[method](a, b)).toString()
-			)
-			expect((await dip7[method](c, d)).toString()).to.be.equal(
-				(await treasuryFee[method](c, d)).toString()
-			)
-			expect((await dip7[method](e, f)).toString()).to.be.equal(
-				(await treasuryFee[method](e, f)).toString()
-			)
-			expect((await dip7[method](a, 0)).toString()).to.be.equal(
-				(await treasuryFee[method](a, 0)).toString()
-			)
-			expect((await dip7[method](a, 1)).toString()).to.be.equal(
-				(await treasuryFee[method](a, 1)).toString()
-			)
-			expect((await dip7[method](0, a)).toString()).to.be.equal(
-				(await treasuryFee[method](0, a)).toString()
-			)
-			expect((await dip7[method](1, a)).toString()).to.be.equal(
-				(await treasuryFee[method](1, a)).toString()
-			)
-		})
-	})
-	describe('TreasuryFee; policyApproval', () => {
-		it('policyApproval returns absolutely false', async () => {
-			const method = 'policyApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect(await treasuryFee[method](a, b)).to.be.equal(false)
-			expect(await treasuryFee[method](c, d)).to.be.equal(false)
-			expect(await treasuryFee[method](e, f)).to.be.equal(false)
-			expect(await treasuryFee[method](a, 0)).to.be.equal(false)
-			expect(await treasuryFee[method](a, 1)).to.be.equal(false)
-			expect(await treasuryFee[method](0, a)).to.be.equal(false)
-			expect(await treasuryFee[method](1, a)).to.be.equal(false)
-		})
-	})
 	describe('TreasuryFee; marketVotingBlocks', () => {
 		it('marketVotingBlocks equals DIP1', async () => {
 			const method = 'marketVotingBlocks'

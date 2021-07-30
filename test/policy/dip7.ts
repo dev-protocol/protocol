@@ -165,60 +165,6 @@ contract('DIP7', ([deployer]) => {
 			)
 		})
 	})
-	describe('DIP7; marketApproval', () => {
-		it('marketApproval equals DIP1', async () => {
-			const method = 'marketApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip7[method](a, b)).toString()).to.be.equal(
-				(await dip1[method](a, b)).toString()
-			)
-			expect((await dip7[method](c, d)).toString()).to.be.equal(
-				(await dip1[method](c, d)).toString()
-			)
-			expect((await dip7[method](e, f)).toString()).to.be.equal(
-				(await dip1[method](e, f)).toString()
-			)
-			expect((await dip7[method](a, 0)).toString()).to.be.equal(
-				(await dip1[method](a, 0)).toString()
-			)
-			expect((await dip7[method](a, 1)).toString()).to.be.equal(
-				(await dip1[method](a, 1)).toString()
-			)
-			expect((await dip7[method](0, a)).toString()).to.be.equal(
-				(await dip1[method](0, a)).toString()
-			)
-			expect((await dip7[method](1, a)).toString()).to.be.equal(
-				(await dip1[method](1, a)).toString()
-			)
-		})
-	})
-	describe('DIP7; policyApproval', () => {
-		it('policyApproval equals DIP1', async () => {
-			const method = 'policyApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip7[method](a, b)).toString()).to.be.equal(
-				(await dip1[method](a, b)).toString()
-			)
-			expect((await dip7[method](c, d)).toString()).to.be.equal(
-				(await dip1[method](c, d)).toString()
-			)
-			expect((await dip7[method](e, f)).toString()).to.be.equal(
-				(await dip1[method](e, f)).toString()
-			)
-			expect((await dip7[method](a, 0)).toString()).to.be.equal(
-				(await dip1[method](a, 0)).toString()
-			)
-			expect((await dip7[method](a, 1)).toString()).to.be.equal(
-				(await dip1[method](a, 1)).toString()
-			)
-			expect((await dip7[method](0, a)).toString()).to.be.equal(
-				(await dip1[method](0, a)).toString()
-			)
-			expect((await dip7[method](1, a)).toString()).to.be.equal(
-				(await dip1[method](1, a)).toString()
-			)
-		})
-	})
 	describe('DIP7; marketVotingBlocks', () => {
 		it('marketVotingBlocks equals DIP1', async () => {
 			const method = 'marketVotingBlocks'

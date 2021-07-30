@@ -55,7 +55,7 @@ contract Market is UsingConfig, IMarket {
 		 * This period is determined by `Policy.marketVotingBlocks`.
 		 */
 		uint256 marketVotingBlocks = IPolicy(config().policy())
-		.marketVotingBlocks();
+			.marketVotingBlocks();
 		votingEndBlockNumber = block.number.add(marketVotingBlocks);
 	}
 
@@ -89,15 +89,14 @@ contract Market is UsingConfig, IMarket {
 
 	/**
 	 * Activates this Market.
-	 * Called from VoteCounter contract when passed the voting or from MarketFactory contract when the first Market is created.
+	 * Called from MarketFactory contract.
 	 */
 	function toEnable() external {
-		if (msg.sender != config().marketFactory()) {
-			require(
-				msg.sender == config().voteCounter(),
-				"this is illegal address"
-			);
-		}
+		require(
+			msg.sender == config().marketFactory(),
+			"this is illegal address"
+		);
+		require(isDuringVotingPeriod(), "deadline is over");
 		enabled = true;
 	}
 
@@ -299,5 +298,9 @@ contract Market is UsingConfig, IMarket {
 	 */
 	function schema() external view returns (string memory) {
 		return IMarketBehavior(behavior).schema();
+	}
+
+	function isDuringVotingPeriod() private view returns (bool) {
+		return block.number < votingEndBlockNumber;
 	}
 }

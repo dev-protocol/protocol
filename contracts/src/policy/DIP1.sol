@@ -32,8 +32,7 @@ contract DIP1 is IPolicy, UsingConfig {
 		uint256 _d = basis.sub(s);
 		uint256 _p = (
 			(power_basis.mul(12)).sub(s.div((basis.div((power_basis.mul(10))))))
-		)
-		.div(2);
+		).div(2);
 		uint256 p = _p.div(power_basis);
 		uint256 rp = p.add(1);
 		uint256 f = _p.sub(p.mul(power_basis));
@@ -71,34 +70,6 @@ contract DIP1 is IPolicy, UsingConfig {
 			return 0;
 		}
 		return a.sub(b);
-	}
-
-	function marketApproval(uint256 _up_votes, uint256 _negative_votes)
-		external
-		view
-		returns (bool)
-	{
-		if (_up_votes < 9999999999999999999) {
-			return false;
-		}
-		uint256 negative_votes = _negative_votes > 0
-			? _negative_votes
-			: 1000000000000000000;
-		return _up_votes > negative_votes.mul(10);
-	}
-
-	function policyApproval(uint256 _up_votes, uint256 _negative_votes)
-		external
-		view
-		returns (bool)
-	{
-		if (_up_votes < 9999999999999999999) {
-			return false;
-		}
-		uint256 negative_votes = _negative_votes > 0
-			? _negative_votes
-			: 1000000000000000000;
-		return _up_votes > negative_votes.mul(10);
 	}
 
 	function shareOfTreasury(uint256) external view returns (uint256) {
