@@ -23,11 +23,16 @@ contract(
 			let propertyAddress: string
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
+					dev.generateAllocator(),
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
+					dev.generateLockup(),
+					dev.generateMetricsGroup(),
 				])
 				await dev.generatePolicy()
 				await dev.addressConfig.setMarketFactory(marketFactory)
@@ -172,9 +177,10 @@ contract(
 		})
 		describe('PropertyFactory; createAndAuthenticate', () => {
 			const dev = new DevProtocolInstance(deployer)
-			let marketAddress: string
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMarketGroup(),
@@ -185,7 +191,6 @@ contract(
 					dev.generatePropertyFactory(),
 					dev.generatePropertyGroup(),
 					dev.generateLockup(),
-					dev.generateDev(),
 					dev.generateWithdraw(),
 					dev.generateAllocator(),
 				])
@@ -200,6 +205,8 @@ contract(
 				let marketAddress: string
 				before(async () => {
 					await dev.generateAddressConfig()
+					await dev.generateDev()
+					await dev.generateDevMinter()
 					await Promise.all([
 						dev.generateMarketFactory(),
 						dev.generateMarketGroup(),
@@ -210,7 +217,6 @@ contract(
 						dev.generatePropertyFactory(),
 						dev.generatePropertyGroup(),
 						dev.generateLockup(),
-						dev.generateDev(),
 						dev.generateWithdraw(),
 						dev.generateAllocator(),
 					])
@@ -238,17 +244,13 @@ contract(
 							{ from: user }
 						)
 						.catch(console.error)
-					const [
-						propertyCreator,
-						property,
-						market,
-						metrics,
-					] = await Promise.all([
-						getEventValue(dev.propertyFactory)('Create', '_from'),
-						getEventValue(dev.propertyFactory)('Create', '_property'),
-						getEventValue(dev.metricsFactory)('Create', '_from'),
-						getEventValue(dev.metricsFactory)('Create', '_metrics'),
-					])
+					const [propertyCreator, property, market, metrics] =
+						await Promise.all([
+							getEventValue(dev.propertyFactory)('Create', '_from'),
+							getEventValue(dev.propertyFactory)('Create', '_property'),
+							getEventValue(dev.metricsFactory)('Create', '_from'),
+							getEventValue(dev.metricsFactory)('Create', '_metrics'),
+						])
 					const linkedProperty = await Promise.all([
 						artifacts.require('Metrics').at(metrics as string),
 					]).then(async ([c]) => c.property())

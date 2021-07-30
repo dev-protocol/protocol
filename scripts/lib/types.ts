@@ -19,6 +19,15 @@ export type GraphQLPropertyFactoryCreateResponse = {
 		}>
 	}
 }
+
+export type GraphQLPropertyAuthenticationPropertyResponse = {
+	data: {
+		property_authentication: Array<{
+			property: string
+		}>
+	}
+}
+
 export type PromiseReturn<T extends Promise<any>> = T extends Promise<infer P>
 	? P
 	: never

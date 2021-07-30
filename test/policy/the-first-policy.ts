@@ -9,6 +9,7 @@ contract('TheFirstPolicy', ([deployer]) => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		const theFirstPolicyInstance = await artifacts
 			.require('TheFirstPolicy')
@@ -159,42 +160,6 @@ contract('TheFirstPolicy', ([deployer]) => {
 			expect(result.toString()).to.be.equal('0')
 		})
 	})
-	describe('TheFirstPolicy; marketApproval', () => {
-		it('Returns whether the next new Market can be approved when the number of agreements and the number of protests is passed', async () => {
-			const policy = await create()
-			const result = await policy.marketApproval(
-				new BigNumber(10 * 1e18).plus(1),
-				0
-			)
-			expect(result).to.be.equal(true)
-		})
-		it('Returns false if the upvote is less than 10 times the negative vote', async () => {
-			const policy = await create()
-			const result = await policy.marketApproval(
-				new BigNumber(10 * 1e18),
-				new BigNumber(1 * 1e18)
-			)
-			expect(result).to.be.equal(false)
-		})
-	})
-	describe('TheFirstPolicy; policyApproval', () => {
-		it('Returns whether the next new Policy can be approved when the number of agreements and the number of protests is passed', async () => {
-			const policy = await create()
-			const result = await policy.policyApproval(
-				new BigNumber(10 * 1e18).plus(1),
-				0
-			)
-			expect(result).to.be.equal(true)
-		})
-		it('Returns false if the upvote is less than 10 times the negative vote', async () => {
-			const policy = await create()
-			const result = await policy.policyApproval(
-				new BigNumber(10 * 1e18),
-				new BigNumber(1 * 1e18)
-			)
-			expect(result).to.be.equal(false)
-		})
-	})
 	describe('TheFirstPolicy; marketVotingBlocks', () => {
 		it('Returns the number of the blocks of the voting period for the new Market', async () => {
 			const policy = await create()
@@ -220,6 +185,13 @@ contract('TheFirstPolicy', ([deployer]) => {
 		it('Returns the treasury address', async () => {
 			const policy = await create()
 			const result = await policy.treasury()
+			expect(result.toString()).to.be.equal(DEFAULT_ADDRESS)
+		})
+	})
+	describe('TheFirstPolicy; capSetter', () => {
+		it('Returns the capSetter address', async () => {
+			const policy = await create()
+			const result = await policy.capSetter()
 			expect(result.toString()).to.be.equal(DEFAULT_ADDRESS)
 		})
 	})

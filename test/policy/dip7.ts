@@ -1,17 +1,18 @@
-import { Dip7Instance, Dip1Instance } from '../../types/truffle-contracts'
+import { DIP7Instance, DIP1Instance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
 import { toBigNumber } from '../test-lib/utils/common'
 import { batchRandom } from './utils'
 
 contract('DIP7', ([deployer]) => {
-	let dip7: Dip7Instance
-	let dip1: Dip1Instance
+	let dip7: DIP7Instance
+	let dip1: DIP1Instance
 
 	before(async () => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
 		await dev.generateDev()
+		await dev.generateDevMinter()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		dip7 = await artifacts.require('DIP7').new(dev.addressConfig.address)
 		dip1 = await artifacts.require('DIP1').new(dev.addressConfig.address)
@@ -164,60 +165,6 @@ contract('DIP7', ([deployer]) => {
 			)
 		})
 	})
-	describe('DIP7; marketApproval', () => {
-		it('marketApproval equals DIP1', async () => {
-			const method = 'marketApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip7[method](a, b)).toString()).to.be.equal(
-				(await dip1[method](a, b)).toString()
-			)
-			expect((await dip7[method](c, d)).toString()).to.be.equal(
-				(await dip1[method](c, d)).toString()
-			)
-			expect((await dip7[method](e, f)).toString()).to.be.equal(
-				(await dip1[method](e, f)).toString()
-			)
-			expect((await dip7[method](a, 0)).toString()).to.be.equal(
-				(await dip1[method](a, 0)).toString()
-			)
-			expect((await dip7[method](a, 1)).toString()).to.be.equal(
-				(await dip1[method](a, 1)).toString()
-			)
-			expect((await dip7[method](0, a)).toString()).to.be.equal(
-				(await dip1[method](0, a)).toString()
-			)
-			expect((await dip7[method](1, a)).toString()).to.be.equal(
-				(await dip1[method](1, a)).toString()
-			)
-		})
-	})
-	describe('DIP7; policyApproval', () => {
-		it('policyApproval equals DIP1', async () => {
-			const method = 'policyApproval'
-			const [a, b, c, d, e, f] = batchRandom()
-			expect((await dip7[method](a, b)).toString()).to.be.equal(
-				(await dip1[method](a, b)).toString()
-			)
-			expect((await dip7[method](c, d)).toString()).to.be.equal(
-				(await dip1[method](c, d)).toString()
-			)
-			expect((await dip7[method](e, f)).toString()).to.be.equal(
-				(await dip1[method](e, f)).toString()
-			)
-			expect((await dip7[method](a, 0)).toString()).to.be.equal(
-				(await dip1[method](a, 0)).toString()
-			)
-			expect((await dip7[method](a, 1)).toString()).to.be.equal(
-				(await dip1[method](a, 1)).toString()
-			)
-			expect((await dip7[method](0, a)).toString()).to.be.equal(
-				(await dip1[method](0, a)).toString()
-			)
-			expect((await dip7[method](1, a)).toString()).to.be.equal(
-				(await dip1[method](1, a)).toString()
-			)
-		})
-	})
 	describe('DIP7; marketVotingBlocks', () => {
 		it('marketVotingBlocks equals DIP1', async () => {
 			const method = 'marketVotingBlocks'
@@ -227,7 +174,7 @@ contract('DIP7', ([deployer]) => {
 		})
 	})
 	describe('DIP7; policyVotingBlocks', () => {
-		it('policyVotingBlocks equals DIP3', async () => {
+		it('policyVotingBlocks equals DIP1', async () => {
 			const method = 'policyVotingBlocks'
 			expect((await dip7[method]()).toString()).to.be.equal(
 				(await dip1[method]()).toString()
@@ -235,7 +182,7 @@ contract('DIP7', ([deployer]) => {
 		})
 	})
 	describe('DIP1; shareOfTreasury', () => {
-		it('shareOfTreasury equals DIP3', async () => {
+		it('shareOfTreasury equals DIP1', async () => {
 			const method = 'shareOfTreasury'
 			expect((await dip7[method](100)).toString()).to.be.equal(
 				(await dip1[method](100)).toString()
@@ -243,8 +190,16 @@ contract('DIP7', ([deployer]) => {
 		})
 	})
 	describe('DIP1; treasury', () => {
-		it('treasury equals DIP3', async () => {
+		it('treasury equals DIP1', async () => {
 			const method = 'treasury'
+			expect((await dip7[method]()).toString()).to.be.equal(
+				(await dip1[method]()).toString()
+			)
+		})
+	})
+	describe('DIP1; capSetter', () => {
+		it('treasury equals DIP1', async () => {
+			const method = 'capSetter'
 			expect((await dip7[method]()).toString()).to.be.equal(
 				(await dip1[method]()).toString()
 			)

@@ -17,16 +17,6 @@ interface IPolicy {
 		view
 		returns (uint256);
 
-	function marketApproval(uint256 _agree, uint256 _opposite)
-		external
-		view
-		returns (bool);
-
-	function policyApproval(uint256 _agree, uint256 _opposite)
-		external
-		view
-		returns (bool);
-
 	function marketVotingBlocks() external view returns (uint256);
 
 	function policyVotingBlocks() external view returns (uint256);
@@ -34,4 +24,6 @@ interface IPolicy {
 	function shareOfTreasury(uint256 _supply) external view returns (uint256);
 
 	function treasury() external view returns (address);
+
+	function capSetter() external view returns (address);
 }

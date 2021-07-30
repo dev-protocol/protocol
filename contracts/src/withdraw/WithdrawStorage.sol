@@ -140,4 +140,37 @@ contract WithdrawStorage is UsingStorage {
 				abi.encodePacked("_lastWithdrawnReward", _property, _user)
 			);
 	}
+
+	//lastWithdrawnRewardCap
+	function setStorageLastWithdrawnRewardCap(
+		address _property,
+		address _user,
+		uint256 _value
+	) internal {
+		eternalStorage().setUint(
+			getStorageLastWithdrawnRewardCapKey(_property, _user),
+			_value
+		);
+	}
+
+	function getStorageLastWithdrawnRewardCap(address _property, address _user)
+		public
+		view
+		returns (uint256)
+	{
+		return
+			eternalStorage().getUint(
+				getStorageLastWithdrawnRewardCapKey(_property, _user)
+			);
+	}
+
+	function getStorageLastWithdrawnRewardCapKey(
+		address _property,
+		address _user
+	) private pure returns (bytes32) {
+		return
+			keccak256(
+				abi.encodePacked("_lastWithdrawnRewardCap", _property, _user)
+			);
+	}
 }

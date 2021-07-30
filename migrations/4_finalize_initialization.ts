@@ -40,12 +40,10 @@ const handler = function (deployer, network) {
 	// Withdraw
 	const withdraw = artifacts.require('Withdraw')
 	const withdrawStorage = artifacts.require('WithdrawStorage')
-	;((deployer as unknown) as Promise<void>)
-		.then(async () => {
-			return artifacts.require('AddressConfig').deployed()
-		})
-		.then(async (addressConfig) => {
-			return Promise.all([
+	;(deployer as unknown as Promise<void>)
+		.then(async () => artifacts.require('AddressConfig').deployed())
+		.then(async (addressConfig) =>
+			Promise.all([
 				addressConfig.setAllocator(allocator.address),
 				addressConfig.setAllocatorStorage(allocatorStorage.address),
 				addressConfig.setLockup(lockup.address),
@@ -67,7 +65,7 @@ const handler = function (deployer, network) {
 				addressConfig.setWithdrawStorage(withdrawStorage.address),
 				addressConfig.setToken(token.address),
 			])
-		})
+		)
 		.then(async () => {
 			console.log('*** Setting AddressConfig is completed ***')
 
@@ -84,9 +82,9 @@ const handler = function (deployer, network) {
 				withdrawStorage.deployed(),
 			])
 		})
-		.then(async (storages) => {
-			return Promise.all(storages.map(async (x) => x.createStorage()))
-		})
+		.then(async (storages) =>
+			Promise.all(storages.map(async (x) => x.createStorage()))
+		)
 		.then(() => {
 			console.log(
 				'*** Storage creation for all storage contracts are completed ***'

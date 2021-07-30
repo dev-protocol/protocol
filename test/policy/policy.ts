@@ -1,4 +1,4 @@
-contract('Policy', () => {
+contract('Policy', ([account1, account2]) => {
 	const policyContract = artifacts.require('PolicyTest1')
 	let policy: any
 	beforeEach(async () => {
@@ -22,18 +22,6 @@ contract('Policy', () => {
 			expect(result.toNumber()).to.be.equal(1099)
 		})
 	})
-	describe('PolicyTest1; marketApproval', () => {
-		it('Returns whether the next new Market can be approved when the number of agreements and the number of protests is passed', async () => {
-			const result = await policy.marketApproval(9000, 2000)
-			expect(result).to.be.equal(true)
-		})
-	})
-	describe('PolicyTest1; policyApproval', () => {
-		it('Returns whether the next new Policy can be approved when the number of agreements and the number of protests is passed', async () => {
-			const result = await policy.policyApproval(9000, 2000)
-			expect(result).to.be.equal(true)
-		})
-	})
 	describe('PolicyTest1; marketVotingBlocks', () => {
 		it('Returns the number of the blocks of the voting period for the new Market', async () => {
 			const result = await policy.marketVotingBlocks()
@@ -44,6 +32,26 @@ contract('Policy', () => {
 		it('Returns the number of the blocks of the voting period for the new Policy', async () => {
 			const result = await policy.policyVotingBlocks()
 			expect(result.toNumber()).to.be.equal(20)
+		})
+	})
+	describe('PolicyTest1; shareOfTreasury', () => {
+		it('Returns the number of the share treasury', async () => {
+			const result = await policy.shareOfTreasury(100)
+			expect(result.toNumber()).to.be.equal(5)
+		})
+	})
+	describe('PolicyTest1; setTreasury', () => {
+		it('get the set treasury address', async () => {
+			await policy.setTreasury(account1)
+			const tmp: string = await policy.treasury()
+			expect(tmp).to.be.equal(account1)
+		})
+	})
+	describe('PolicyTest1; setCapSetter', () => {
+		it('get the set cap setter address', async () => {
+			await policy.setCapSetter(account2)
+			const tmp: string = await policy.capSetter()
+			expect(tmp).to.be.equal(account2)
 		})
 	})
 })

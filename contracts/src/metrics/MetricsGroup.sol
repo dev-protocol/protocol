@@ -25,6 +25,12 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		address property = IMetrics(_addr).property();
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		uint256 metricsCountPerProperty = getMetricsCountPerProperty(property);
+		if (metricsCountPerProperty == 0) {
+			uint256 tmp = eternalStorage().getUint(
+				getTotalAuthenticatedPropertiesKey()
+			);
+			setTotalAuthenticatedProperties(tmp.add(1));
+		}
 		totalCount = totalCount.add(1);
 		metricsCountPerProperty = metricsCountPerProperty.add(1);
 		setTotalIssuedMetrics(totalCount);
@@ -45,6 +51,12 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		address property = IMetrics(_addr).property();
 		uint256 totalCount = eternalStorage().getUint(getTotalCountKey());
 		uint256 metricsCountPerProperty = getMetricsCountPerProperty(property);
+		if (metricsCountPerProperty == 1) {
+			uint256 tmp = eternalStorage().getUint(
+				getTotalAuthenticatedPropertiesKey()
+			);
+			setTotalAuthenticatedProperties(tmp.sub(1));
+		}
 		totalCount = totalCount.sub(1);
 		metricsCountPerProperty = metricsCountPerProperty.sub(1);
 		setTotalIssuedMetrics(totalCount);
@@ -57,6 +69,10 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 
 	function totalIssuedMetrics() external view returns (uint256) {
 		return eternalStorage().getUint(getTotalCountKey());
+	}
+
+	function totalAuthenticatedProperties() external view returns (uint256) {
+		return eternalStorage().getUint(getTotalAuthenticatedPropertiesKey());
 	}
 
 	function hasAssets(address _property) external view returns (bool) {
@@ -85,6 +101,10 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 		eternalStorage().setUint(getTotalCountKey(), _value);
 	}
 
+	function setTotalAuthenticatedProperties(uint256 _value) private {
+		eternalStorage().setUint(getTotalAuthenticatedPropertiesKey(), _value);
+	}
+
 	function getTotalCountKey() private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_totalCount"));
 	}
@@ -100,5 +120,13 @@ contract MetricsGroup is UsingConfig, UsingStorage, IMetricsGroup {
 
 	function getGroupKey(address _addr) private pure returns (bytes32) {
 		return keccak256(abi.encodePacked("_group", _addr));
+	}
+
+	function getTotalAuthenticatedPropertiesKey()
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_totalAuthenticatedProperties"));
 	}
 }

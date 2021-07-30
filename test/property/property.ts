@@ -17,8 +17,13 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
+				await dev.generateLockup()
 				await dev.generatePolicy()
 			})
 			it('Cannot be created from other than factory', async () => {
@@ -49,9 +54,8 @@ contract(
 				const treasuryBalance = await propertyInstance
 					.balanceOf(dev.treasury.address)
 					.then(toBigNumber)
-				const [predictedAutherBalance, predictedTreasuryBalance] = splitValue(
-					tenMillion
-				)
+				const [predictedAutherBalance, predictedTreasuryBalance] =
+					splitValue(tenMillion)
 				expect(authorBalance.toFixed()).to.be.equal(
 					predictedAutherBalance.toFixed()
 				)
@@ -67,8 +71,13 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
+				await dev.generateLockup()
 				await dev.generatePolicy()
 			})
 			it('Executing a changeAuthor function with a non-Author.', async () => {
@@ -129,6 +138,11 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
+				await dev.generateLockup()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
 				await dev.generatePolicy()
@@ -191,6 +205,11 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			before(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
+				await dev.generateLockup()
+				await dev.generateAllocator()
+				await dev.generateMetricsGroup()
 				await dev.generatePolicyFactory()
 				await dev.generatePolicyGroup()
 				await dev.generatePolicy()
@@ -254,12 +273,16 @@ contract(
 			let propertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
+					dev.generateAllocator(),
+					dev.generateMetricsGroup(),
 					dev.generatePropertyGroup(),
 					dev.generatePropertyFactory(),
-					dev.generateDev(),
 					dev.generatePolicyFactory(),
 					dev.generatePolicyGroup(),
+					dev.generateLockup(),
 				])
 				await dev.generatePolicy()
 				const result = await dev.propertyFactory.create(
@@ -273,7 +296,6 @@ contract(
 				propertyAddress = getPropertyAddress(result)
 			})
 			it('When executed from other than the lockup address', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.withdraw(user, 10, { from: deployer })
@@ -282,7 +304,6 @@ contract(
 			})
 			it('Dev token balance does not exist in property contract', async () => {
 				await dev.addressConfig.setLockup(lockup)
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.withdraw(user, 10, { from: lockup })
@@ -292,7 +313,6 @@ contract(
 			it('Dev token balance does not exist in property contract', async () => {
 				await dev.addressConfig.setLockup(lockup)
 				await dev.dev.mint(propertyAddress, 10)
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				await property.withdraw(user, 10, { from: lockup })
 			})
@@ -302,6 +322,8 @@ contract(
 			let propertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
@@ -324,7 +346,6 @@ contract(
 				propertyAddress = getPropertyAddress(result)
 			})
 			it('An error occurs if the address is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transfer(DEFAULT_ADDRESS, 10, { from: user })
@@ -332,7 +353,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('An error occurs if the value is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transfer(transfer, 0, { from: user })
@@ -340,7 +360,6 @@ contract(
 				validateErrorMessage(result, 'illegal transfer value')
 			})
 			it('transfer success', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property.transfer(transfer, 10, { from: author })
 				const toAddress = getTransferToAddress(result)
@@ -352,6 +371,8 @@ contract(
 			let propertyAddress: string
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
+				await dev.generateDev()
+				await dev.generateDevMinter()
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generateWithdraw(),
@@ -374,7 +395,6 @@ contract(
 				propertyAddress = getPropertyAddress(result)
 			})
 			it('An error occurs if the from address is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transferFrom(DEFAULT_ADDRESS, transfer, 10, { from: user })
@@ -382,7 +402,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('An error occurs if the to address is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transferFrom(transfer, DEFAULT_ADDRESS, 10, { from: user })
@@ -390,7 +409,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('An error occurs if the value is invalid', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transferFrom(author, transfer, 0, { from: user })
@@ -398,7 +416,6 @@ contract(
 				validateErrorMessage(result, 'illegal transfer value')
 			})
 			it('get an error, dont have enough allowance', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				const result = await property
 					.transferFrom(author, transfer, 10, {
@@ -408,7 +425,6 @@ contract(
 				validateErrorMessage(result, 'ERC20: transfer amount exceeds allowance')
 			})
 			it('transfer success', async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const property = await propertyContract.at(propertyAddress)
 				await property.approve(author, 10, {
 					from: author,

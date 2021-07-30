@@ -10,6 +10,8 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	const init = async (): Promise<[DevProtocolInstance, PropertyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
+		await dev.generateDev()
+		await dev.generateDevMinter()
 		await Promise.all([
 			dev.generateAllocator(),
 			dev.generateMarketFactory(),
@@ -20,11 +22,10 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			dev.generateWithdraw(),
 			dev.generatePropertyFactory(),
 			dev.generatePropertyGroup(),
-			dev.generateVoteCounter(),
 			dev.generatePolicyFactory(),
 			dev.generatePolicyGroup(),
-			dev.generateDev(),
 		])
+
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.generatePolicy('PolicyTestForAllocator')
 		const propertyAddress = getPropertyAddress(
@@ -42,7 +43,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		propertyAddress: string
 	): Promise<void> => {
 		const behavuor = await dev.getMarket('MarketTest3', user1)
-		let createMarketResult = await dev.marketFactory.create(behavuor.address)
+		const createMarketResult = await dev.marketFactory.create(behavuor.address)
 		const marketAddress = getMarketAddress(createMarketResult)
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const marketInstance = await marketContract.at(marketAddress)
@@ -82,7 +83,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	})
 
 	describe('Allocator: beforeBalanceChange', () => {
-		it('If the first argument is a non-property address, an error occurs..', async () => {
+		it('If the first argument is a non-property address, an error occurs.', async () => {
 			const [dev] = await init()
 			const res = await dev.allocator
 				.beforeBalanceChange(user1, user1, user1)
@@ -90,12 +91,15 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			validateAddressErrorMessage(res)
 		})
 		it("If run the Allocator's beforeBalanceChange Withdraw's beforeBalanceChange is executed.", async () => {
+			const alice = deployer
+			const bob = user1
 			const [dev, property] = await init()
 			await authenticate(dev, property.address)
-			await dev.dev.deposit(property.address, 10000)
+			await dev.dev.mint(bob, 10000)
+			await dev.dev.deposit(property.address, 10000, { from: bob })
 			const totalSupply = await property.totalSupply().then(toBigNumber)
-			await property.transfer(user1, totalSupply.times(0.2), {
-				from: deployer,
+			await property.transfer(bob, totalSupply.times(0.2), {
+				from: alice,
 			})
 			await dev.addressConfig.setPropertyFactory(propertyFactory)
 			await dev.propertyGroup.addGroup(propertyAddress, {
@@ -103,17 +107,14 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 			})
 			const beforeValue = await dev.withdraw.getStorageLastWithdrawnReward(
 				property.address,
-				deployer
+				alice
 			)
-			await dev.allocator.beforeBalanceChange(
-				property.address,
-				deployer,
-				user1,
-				{ from: propertyAddress }
-			)
+			await dev.allocator.beforeBalanceChange(property.address, alice, bob, {
+				from: propertyAddress,
+			})
 			const afterValue = await dev.withdraw.getStorageLastWithdrawnReward(
 				property.address,
-				deployer
+				alice
 			)
 			// We'll just check the fact that it's "done" here.
 			expect(beforeValue.toString() !== afterValue.toString()).to.be.equal(true)

@@ -16,4 +16,6 @@ interface IMetricsGroup {
 		external
 		view
 		returns (uint256);
+
+	function totalAuthenticatedProperties() external view returns (uint256);
 }
