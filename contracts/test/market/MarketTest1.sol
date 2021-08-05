@@ -1,9 +1,9 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
+import {UsingConfig} from "../../src/common/config/UsingConfig.sol";
+import {IMarketBehavior} from "../../interface/IMarketBehavior.sol";
+import {IMarket} from "../../interface/IMarket.sol";
 
 contract MarketTest1 is Ownable, IMarketBehavior, UsingConfig {
 	string public schema = "[]";

@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {MetricsGroup} from "contracts/src/metrics/MetricsGroup.sol";
+import {MetricsGroup} from "../../src/metrics/MetricsGroup.sol";
 
 contract MetricsGroupTest is MetricsGroup {
 	constructor(address _config) public MetricsGroup(_config) {}

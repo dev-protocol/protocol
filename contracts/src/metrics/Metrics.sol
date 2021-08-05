@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {IMetrics} from "contracts/interface/IMetrics.sol";
+import "../../interface/IMetrics.sol";
 
 /**
  * A contract for associating a Property and an asset authenticated by a Market.

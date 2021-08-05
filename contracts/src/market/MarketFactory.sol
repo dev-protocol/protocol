@@ -1,11 +1,11 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {Market} from "contracts/src/market/Market.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
-import {IMarketFactory} from "contracts/interface/IMarketFactory.sol";
-import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
+import "../common/config/UsingConfig.sol";
+import "../market/Market.sol";
+import "../../interface/IMarket.sol";
+import "../../interface/IMarketFactory.sol";
+import "../../interface/IMarketGroup.sol";
 
 /**
  * A factory contract that creates a new Market contract.
