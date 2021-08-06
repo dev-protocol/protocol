@@ -55,7 +55,7 @@ export function gasLogger(txRes: Truffle.TransactionResponse) {
 }
 
 export function keccak256(...values: string[]): string {
-	return (web3 as Web3).utils.soliditySha3(...values)!
+	return web3!.utils.soliditySha3(...values)!
 }
 
 export function splitValue(

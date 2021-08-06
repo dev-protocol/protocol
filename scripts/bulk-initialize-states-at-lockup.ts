@@ -22,7 +22,7 @@ const handler = async (
 		return
 	}
 
-	const [from] = await (web3 as Web3).eth.getAccounts()
+	const [from] = await web3!.eth.getAccounts()
 
 	const lockup = await prepare(CONFIG, web3)
 	____log('Generated Lockup contract', lockup.options)

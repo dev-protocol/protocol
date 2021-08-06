@@ -67,7 +67,7 @@ const handler = async (
 			from: sender,
 			to,
 			input,
-		} = await (web3 as Web3).eth.getTransaction(transactionHash)
+		} = await web3!.eth.getTransaction(transactionHash)
 		const toWithdraw = to ? withdrawContracts.includes(to.toLowerCase()) : false
 		const propertyAddress = toWithdraw ? `0x${input.slice(-40)}` : undefined
 		const alreadyInitialized = await (toWithdraw && propertyAddress
