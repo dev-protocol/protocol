@@ -2382,10 +2382,10 @@
     emittery "^0.4.1"
     ora "^3.4.0"
 
-"@truffle/hdwallet-provider@1.4.2":
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-1.4.2.tgz#c2b516298c4a6162b601b90e7fef15b0faf5ed2f"
-  integrity sha512-oDIvQltIyjf8slR79ewVwe1jrV/Jcx8cyi422Gfx+I2z7kGwWSWsQ9cX3WMt993IDMv3Qm1uTgm7MhIUJzl2xQ==
+"@truffle/hdwallet-provider@1.4.3":
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-1.4.3.tgz#a7f9de514ce803c4da58c36845ba0790528b92dd"
+  integrity sha512-Oo8ORAQLfcbLYp6HwG1mpOx6IpVkHv8IkKy25LZUN5Q5bCCqxdlMF0F7CnSXPBdQ+UqZY9+RthC0VrXv9gXiPQ==
   dependencies:
     "@trufflesuite/web3-provider-engine" "15.0.13-1"
     ethereum-cryptography "^0.1.3"
