@@ -13,7 +13,7 @@
 		"lint:format": "prettier --write **/*.{sol,ts,js,json,md,yml}",
 		"prepack": "yarn build",
 		"build": "tsc -p tsconfig.build.json",
-		"prebuild": "del 'migrations/**/*.js' 'scripts/**/*.js' && yarn generate",
+		"prebuild": "del-cli migrations/**/*.js scripts/**/*.js && yarn generate",
 		"prepare": "husky install"
 	},
 	"files": [
