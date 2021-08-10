@@ -242,7 +242,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 
 			const storage = await dev.lockup
 				.getStorageAddress()
-				.then((x) => artifacts.require('EternalStorage').at(x))
+				.then(async (x) => artifacts.require('EternalStorage').at(x))
 			await dev.lockup.changeOwner(deployer)
 			await storage.setUint(
 				keccak256('_pendingInterestWithdrawal', property.address, deployer),
@@ -1274,7 +1274,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.lockup.changeOwner(deployer)
 				const storage = await dev.lockup
 					.getStorageAddress()
-					.then((x) => artifacts.require('EternalStorage').at(x))
+					.then(async (x) => artifacts.require('EternalStorage').at(x))
 				await storage.setUint(keccak256('_allValue'), totalLocked)
 				await storage.setUint(
 					keccak256('_value', property.address, alice),
@@ -1504,7 +1504,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.lockup.changeOwner(deployer)
 				const storage = await dev.lockup
 					.getStorageAddress()
-					.then((x) => artifacts.require('EternalStorage').at(x))
+					.then(async (x) => artifacts.require('EternalStorage').at(x))
 				await storage.setUint(keccak256('_allValue'), totalLocked)
 				await storage.setUint(
 					keccak256('_value', property.address, alice),

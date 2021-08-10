@@ -4,16 +4,16 @@
 	"description": "Securitize for Internet assets",
 	"scripts": {
 		"test": "truffle test",
-		"generate": "truffle compile && typechain --target truffle './build/**/*.json'",
+		"generate": "truffle compile && typechain --target truffle build/**/*.json",
 		"deploy": "truffle migrate --network",
 		"predeploy": "yarn build",
 		"lint": "yarn lint:eslint && yarn lint:solhint && yarn lint:format",
 		"lint:eslint": "eslint . --ext .ts,.js --fix",
 		"lint:solhint": "solhint --fix --max-warnings 0 \"contracts/**/*.sol\"",
-		"lint:format": "prettier --write '**/*.{sol,ts,js,json,md,yml}'",
+		"lint:format": "prettier --write **/*.{sol,ts,js,json,md,yml}",
 		"prepack": "yarn build",
 		"build": "tsc -p tsconfig.build.json",
-		"prebuild": "del 'migrations/**/*.js' 'scripts/**/*.js' && yarn generate",
+		"prebuild": "del-cli 'migrations/**/*.js' 'scripts/**/*.js' && yarn generate",
 		"prepare": "husky install"
 	},
 	"files": [
@@ -36,7 +36,7 @@
 		"dotenv": "10.0.0",
 		"eslint": "7.32.0",
 		"eslint-config-prettier": "8.3.0",
-		"eslint-config-xo": "0.37.0",
+		"eslint-config-xo": "0.38.0",
 		"eslint-config-xo-typescript": "0.43.0",
 		"husky": "7.0.1",
 		"p-queue": "7.1.0",
