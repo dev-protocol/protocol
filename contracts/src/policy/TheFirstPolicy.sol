@@ -4,8 +4,8 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
+import "../common/config/UsingConfig.sol";
+import "../../interface/IPolicy.sol";
 
 /**
  * TheFirstPolicy is the first policy contract.

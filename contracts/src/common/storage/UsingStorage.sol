@@ -1,8 +1,8 @@
 pragma solidity 0.5.17;
 
-import {IUsingStorage} from "contracts/interface/IUsingStorage.sol";
+import "../../../interface/IUsingStorage.sol";
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {EternalStorage} from "contracts/src/common/storage/EternalStorage.sol";
+import "./EternalStorage.sol";
 
 /**
  * Module for contrast handling EternalStorage.

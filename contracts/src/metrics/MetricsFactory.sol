@@ -1,11 +1,11 @@
 pragma solidity 0.5.17;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {Metrics} from "contracts/src/metrics/Metrics.sol";
-import {IMetrics} from "contracts/interface/IMetrics.sol";
-import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
-import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
-import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
+import "../common/config/UsingConfig.sol";
+import "../metrics/Metrics.sol";
+import "../../interface/IMetrics.sol";
+import "../../interface/IMetricsGroup.sol";
+import "../../interface/IMarketGroup.sol";
+import "../../interface/IMetricsFactory.sol";
 
 /**
  * A factory contract for creating new Metrics contracts and logical deletion of Metrics contracts.

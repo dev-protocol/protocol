@@ -1,7 +1,7 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
+import "../../../interface/IAddressConfig.sol";
 
 /**
  * A registry contract to hold the latest contract addresses.

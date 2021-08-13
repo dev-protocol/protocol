@@ -3,9 +3,9 @@ pragma solidity 0.5.17;
 // prettier-ignore
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
-import {IDevMinter} from "contracts/interface/IDevMinter.sol";
+import "../common/config/UsingConfig.sol";
+import "../../interface/IAddressConfig.sol";
+import "../../interface/IDevMinter.sol";
 
 contract DevMinter is UsingConfig, Ownable, IDevMinter {
 	/**

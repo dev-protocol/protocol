@@ -2,7 +2,7 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {DIP7} from "contracts/src/policy/DIP7.sol";
+import "./DIP7.sol";
 
 /**
  * TreasuryFee is a contract that changes the `rewards` of DIP7.

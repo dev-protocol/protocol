@@ -1,7 +1,7 @@
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
+import {IPolicy} from "../../interface/IPolicy.sol";
 
 contract PolicyTestBase is IPolicy {
 	using SafeMath for uint256;

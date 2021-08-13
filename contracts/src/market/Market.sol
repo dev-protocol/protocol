@@ -1,16 +1,16 @@
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IProperty} from "contracts/interface/IProperty.sol";
-import {IMarket} from "contracts/interface/IMarket.sol";
-import {IMarketBehavior} from "contracts/interface/IMarketBehavior.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
-import {IMetrics} from "contracts/interface/IMetrics.sol";
-import {IMetricsFactory} from "contracts/interface/IMetricsFactory.sol";
-import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
-import {IDev} from "contracts/interface/IDev.sol";
+import "../common/config/UsingConfig.sol";
+import "../../interface/IProperty.sol";
+import "../../interface/IMarket.sol";
+import "../../interface/IMarketBehavior.sol";
+import "../../interface/IPolicy.sol";
+import "../../interface/IMetrics.sol";
+import "../../interface/IMetricsFactory.sol";
+import "../../interface/IMetricsGroup.sol";
+import "../../interface/ILockup.sol";
+import "../../interface/IDev.sol";
 
 /**
  * A user-proposable contract for authenticating and associating assets with Property.

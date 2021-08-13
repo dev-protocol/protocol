@@ -2,7 +2,7 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {Patch780} from "contracts/src/policy/Patch780.sol";
+import "./Patch780.sol";
 
 /**
  * GeometricMean is a contract that changes the `rewards` of DIP7.
