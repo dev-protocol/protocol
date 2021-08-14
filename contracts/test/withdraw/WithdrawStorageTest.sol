@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {WithdrawStorage} from "contracts/src/withdraw/WithdrawStorage.sol";
+import {WithdrawStorage} from "../../src/withdraw/WithdrawStorage.sol";
 
 contract WithdrawStorageTest is WithdrawStorage {
 	function setRewardsAmountTest(address _property, uint256 _value) external {

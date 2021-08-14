@@ -1,8 +1,8 @@
 pragma solidity 0.5.17;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
+import "../common/config/UsingConfig.sol";
+import "../common/storage/UsingStorage.sol";
+import "../../interface/IPropertyGroup.sol";
 
 contract PropertyGroup is UsingConfig, UsingStorage, IPropertyGroup {
 	constructor(address _config) public UsingConfig(_config) {}

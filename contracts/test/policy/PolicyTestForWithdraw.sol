@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {PolicyTestBase} from "contracts/test/policy/PolicyTestBase.sol";
+import {PolicyTestBase} from "./PolicyTestBase.sol";
 
 contract PolicyTestForWithdraw is PolicyTestBase {
 	// solhint-disable-next-line no-unused-vars

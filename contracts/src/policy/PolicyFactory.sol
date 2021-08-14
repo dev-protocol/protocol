@@ -1,9 +1,9 @@
 pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
-import {IPolicyFactory} from "contracts/interface/IPolicyFactory.sol";
+import "../common/config/UsingConfig.sol";
+import "../../interface/IPolicyGroup.sol";
+import "../../interface/IPolicyFactory.sol";
 
 /**
  * A factory contract that creates a new Policy contract.

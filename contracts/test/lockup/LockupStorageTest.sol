@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
+import {LockupStorage} from "../../src/lockup/LockupStorage.sol";
 
 contract LockupStorageTest is LockupStorage {
 	function setStorageAllValueTest(uint256 _value) external {

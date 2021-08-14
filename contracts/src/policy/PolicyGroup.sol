@@ -1,10 +1,10 @@
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {IPolicyGroup} from "contracts/interface/IPolicyGroup.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
+import "../common/config/UsingConfig.sol";
+import "../common/storage/UsingStorage.sol";
+import "../../interface/IPolicyGroup.sol";
+import "../../interface/IPolicy.sol";
 
 contract PolicyGroup is UsingConfig, UsingStorage, IPolicyGroup {
 	using SafeMath for uint256;

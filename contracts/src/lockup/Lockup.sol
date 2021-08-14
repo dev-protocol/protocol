@@ -2,15 +2,15 @@ pragma solidity 0.5.17;
 
 // prettier-ignore
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Decimals} from "contracts/src/common/libs/Decimals.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {LockupStorage} from "contracts/src/lockup/LockupStorage.sol";
-import {IDevMinter} from "contracts/interface/IDevMinter.sol";
-import {IProperty} from "contracts/interface/IProperty.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
-import {IAllocator} from "contracts/interface/IAllocator.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
-import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
+import "../common/libs/Decimals.sol";
+import "../common/config/UsingConfig.sol";
+import "../lockup/LockupStorage.sol";
+import "../../interface/IDevMinter.sol";
+import "../../interface/IProperty.sol";
+import "../../interface/IPolicy.sol";
+import "../../interface/IAllocator.sol";
+import "../../interface/ILockup.sol";
+import "../../interface/IMetricsGroup.sol";
 
 /**
  * A contract that manages the staking of DEV tokens and calculates rewards.

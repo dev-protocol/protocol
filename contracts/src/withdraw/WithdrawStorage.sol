@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
+import "../common/storage/UsingStorage.sol";
 
 contract WithdrawStorage is UsingStorage {
 	// RewardsAmount
