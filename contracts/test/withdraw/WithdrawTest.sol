@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {Withdraw} from "contracts/src/withdraw/Withdraw.sol";
+import {Withdraw} from "../../src/withdraw/Withdraw.sol";
 
 contract WithdrawTest is Withdraw {
 	constructor(address _config, address _devMinter)

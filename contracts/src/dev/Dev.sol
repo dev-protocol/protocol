@@ -6,10 +6,10 @@ import {ERC20Detailed} from "@openzeppelin/contracts/token/ERC20/ERC20Detailed.s
 import {ERC20Mintable} from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 // prettier-ignore
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
-import {IDev} from "contracts/interface/IDev.sol";
-import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
+import "../common/config/UsingConfig.sol";
+import "../../interface/ILockup.sol";
+import "../../interface/IDev.sol";
+import "../../interface/IMarketGroup.sol";
 
 /**
  * The contract used as the DEV token.

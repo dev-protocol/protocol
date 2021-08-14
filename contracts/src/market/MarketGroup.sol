@@ -1,9 +1,9 @@
 pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
-import {IMarketGroup} from "contracts/interface/IMarketGroup.sol";
+import "../common/config/UsingConfig.sol";
+import "../common/storage/UsingStorage.sol";
+import "../../interface/IMarketGroup.sol";
 
 contract MarketGroup is UsingConfig, UsingStorage, IMarketGroup {
 	using SafeMath for uint256;

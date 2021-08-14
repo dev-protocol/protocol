@@ -1,12 +1,12 @@
 pragma solidity 0.5.17;
 
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IAllocator} from "contracts/interface/IAllocator.sol";
-import {IWithdraw} from "contracts/interface/IWithdraw.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
-import {ILockup} from "contracts/interface/ILockup.sol";
-import {IPropertyGroup} from "contracts/interface/IPropertyGroup.sol";
-import {IMetricsGroup} from "contracts/interface/IMetricsGroup.sol";
+import "../common/config/UsingConfig.sol";
+import "../../interface/IAllocator.sol";
+import "../../interface/IWithdraw.sol";
+import "../../interface/IPolicy.sol";
+import "../../interface/ILockup.sol";
+import "../../interface/IPropertyGroup.sol";
+import "../../interface/IMetricsGroup.sol";
 
 /**
  * A contract that determines the total number of mint.

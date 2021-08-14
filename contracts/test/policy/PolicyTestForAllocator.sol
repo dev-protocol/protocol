@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {PolicyTestBase} from "contracts/test/policy/PolicyTestBase.sol";
+import {PolicyTestBase} from "./PolicyTestBase.sol";
 
 contract PolicyTestForAllocator is PolicyTestBase {
 	function rewards(uint256 _lockups, uint256 _assets)

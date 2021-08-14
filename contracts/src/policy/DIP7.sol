@@ -2,8 +2,8 @@
 pragma solidity 0.5.17;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {DIP1} from "contracts/src/policy/DIP1.sol";
-import {Curve} from "contracts/src/common/libs/Curve.sol";
+import "./DIP1.sol";
+import "../common/libs/Curve.sol";
 
 /**
  * DIP7 is a contract that changes the `rewards` of DIP1.

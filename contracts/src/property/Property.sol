@@ -2,11 +2,11 @@ pragma solidity 0.5.17;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {UsingConfig} from "contracts/src/common/config/UsingConfig.sol";
-import {IAllocator} from "contracts/interface/IAllocator.sol";
-import {IProperty} from "contracts/interface/IProperty.sol";
-import {IPropertyFactory} from "contracts/interface/IPropertyFactory.sol";
-import {IPolicy} from "contracts/interface/IPolicy.sol";
+import "../common/config/UsingConfig.sol";
+import "../../interface/IAllocator.sol";
+import "../../interface/IProperty.sol";
+import "../../interface/IPropertyFactory.sol";
+import "../../interface/IPolicy.sol";
 
 /**
  * A contract that represents the assets of the user and collects staking from the stakers.

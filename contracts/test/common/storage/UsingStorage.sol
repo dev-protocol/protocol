@@ -1,6 +1,6 @@
 pragma solidity 0.5.17;
 
-import {UsingStorage} from "contracts/src/common/storage/UsingStorage.sol";
+import {UsingStorage} from "../../../src/common/storage/UsingStorage.sol";
 
 contract UsingStorageTest is UsingStorage {
 	function getEternalStorageAddress() public view returns (address) {

@@ -2,8 +2,8 @@ pragma solidity 0.5.17;
 
 import {Ownable} from "@openzeppelin/contracts/ownership/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IWithdraw} from "contracts/interface/IWithdraw.sol";
-import {IAddressConfig} from "contracts/interface/IAddressConfig.sol";
+import {IWithdraw} from "../../interface/IWithdraw.sol";
+import {IAddressConfig} from "../../interface/IAddressConfig.sol";
 
 contract TreasuryTest is Ownable {
 	IAddressConfig private config;
