@@ -1,5 +1,12 @@
 {
 	"name": "@devprotocol/protocol",
+	"eslintConfig": {
+		"extends": [
+			"xo",
+			"xo-typescript",
+			"prettier"
+		]
+	},
 	"version": "3.4.0",
 	"description": "Securitize for Internet assets",
 	"scripts": {
