@@ -7,7 +7,7 @@ import {
 } from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { toBigNumber, splitValue } from '../test-lib/utils/common'
-import { getEventValue, waitForEvent } from '../test-lib/utils/event'
+import { getEventValue } from '../test-lib/utils/event'
 
 contract(
 	'PropertyTest',
@@ -91,20 +91,16 @@ contract(
 						from: propertyFactory,
 					}
 				)
-				const result = await propertyInstance
-					.changeAuthor(nextAuthor)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal sender')
+				await propertyInstance.changeAuthor(nextAuthor).catch((err: Error) => {
+					validateErrorMessage(err, 'illegal sender')
+				})
 			})
 			it('Author is changed.', async () => {
 				await dev.generatePropertyFactory()
 				await dev.generatePropertyGroup()
-				const transaction = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', author)
 				)
-				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
 				expect(await propertyInstance.author()).to.be.equal(author)
 				await propertyInstance.changeAuthor(nextAuthor, {
@@ -115,12 +111,9 @@ contract(
 			it('Should emit ChangeAuthor event from PropertyFactory', async () => {
 				await dev.generatePropertyFactory()
 				await dev.generatePropertyGroup()
-				const transaction = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', author)
 				)
-				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
 				void propertyInstance.changeAuthor(nextAuthor, {
 					from: author,
@@ -158,20 +151,16 @@ contract(
 						from: propertyFactory,
 					}
 				)
-				const result = await propertyInstance
-					.changeName('next-name')
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal sender')
+				await propertyInstance.changeName('next-name').catch((err: Error) => {
+					validateErrorMessage(err, 'illegal sender')
+				})
 			})
 			it('Change the name', async () => {
 				await dev.generatePropertyFactory()
 				await dev.generatePropertyGroup()
-				const transaction = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', author)
 				)
-				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
 				expect(await propertyInstance.name()).to.be.equal('sample')
 				await propertyInstance.changeName('next-name', {
@@ -182,12 +171,9 @@ contract(
 			it('Should emit ChangeName event from PropertyFactory', async () => {
 				await dev.generatePropertyFactory()
 				await dev.generatePropertyGroup()
-				const transaction = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', author)
 				)
-				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
 				void propertyInstance.changeName('next-name', {
 					from: author,
@@ -225,20 +211,18 @@ contract(
 						from: propertyFactory,
 					}
 				)
-				const result = await propertyInstance
+				await propertyInstance
 					.changeSymbol('NEXTSYMBOL')
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal sender')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'illegal sender')
+					})
 			})
 			it('Change the symbol', async () => {
 				await dev.generatePropertyFactory()
 				await dev.generatePropertyGroup()
-				const transaction = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', author)
 				)
-				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
 				expect(await propertyInstance.symbol()).to.be.equal('SAMPLE')
 				await propertyInstance.changeSymbol('NEXTSYMBOL', {
@@ -249,12 +233,9 @@ contract(
 			it('Should emit ChangeSymbol event from PropertyFactory', async () => {
 				await dev.generatePropertyFactory()
 				await dev.generatePropertyGroup()
-				const transaction = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author
+				const propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', author)
 				)
-				const propertyAddress = getPropertyAddress(transaction)
 				const propertyInstance = await propertyContract.at(propertyAddress)
 				void propertyInstance.changeSymbol('NEXTSYMBOL', {
 					from: author,
@@ -285,30 +266,28 @@ contract(
 					dev.generateLockup(),
 				])
 				await dev.generatePolicy()
-				const result = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author,
-					{
+				propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', author, {
 						from: user,
-					}
+					})
 				)
-				propertyAddress = getPropertyAddress(result)
 			})
 			it('When executed from other than the lockup address', async () => {
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property
+				await property
 					.withdraw(user, 10, { from: deployer })
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('Dev token balance does not exist in property contract', async () => {
 				await dev.addressConfig.setLockup(lockup)
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property
+				await property
 					.withdraw(user, 10, { from: lockup })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'ERC20: transfer amount exceeds balance')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'ERC20: transfer amount exceeds balance')
+					})
 			})
 			it('Dev token balance does not exist in property contract', async () => {
 				await dev.addressConfig.setLockup(lockup)
@@ -335,34 +314,33 @@ contract(
 					dev.generatePolicyGroup(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
-				const result = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author,
-					{
+				propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', author, {
 						from: user,
-					}
+					})
 				)
-				propertyAddress = getPropertyAddress(result)
 			})
 			it('An error occurs if the address is invalid', async () => {
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property
+				await property
 					.transfer(DEFAULT_ADDRESS, 10, { from: user })
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('An error occurs if the value is invalid', async () => {
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property
+				await property
 					.transfer(transfer, 0, { from: user })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal transfer value')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'illegal transfer value')
+					})
 			})
 			it('transfer success', async () => {
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property.transfer(transfer, 10, { from: author })
-				const toAddress = getTransferToAddress(result)
+				const toAddress = getTransferToAddress(
+					await property.transfer(transfer, 10, { from: author })
+				)
 				expect(toAddress).to.be.equal(transfer)
 			})
 		})
@@ -384,55 +362,57 @@ contract(
 					dev.generatePolicyGroup(),
 				])
 				await dev.generatePolicy('PolicyTestForProperty')
-				const result = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					author,
-					{
+				propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', author, {
 						from: user,
-					}
+					})
 				)
-				propertyAddress = getPropertyAddress(result)
 			})
 			it('An error occurs if the from address is invalid', async () => {
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property
+				await property
 					.transferFrom(DEFAULT_ADDRESS, transfer, 10, { from: user })
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('An error occurs if the to address is invalid', async () => {
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property
+				await property
 					.transferFrom(transfer, DEFAULT_ADDRESS, 10, { from: user })
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('An error occurs if the value is invalid', async () => {
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property
+				await property
 					.transferFrom(author, transfer, 0, { from: user })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal transfer value')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'illegal transfer value')
+					})
 			})
 			it('get an error, dont have enough allowance', async () => {
 				const property = await propertyContract.at(propertyAddress)
-				const result = await property
+				await property
 					.transferFrom(author, transfer, 10, {
 						from: author,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'ERC20: transfer amount exceeds allowance')
+					.catch((err: Error) => {
+						validateErrorMessage(
+							err,
+							'ERC20: transfer amount exceeds allowance'
+						)
+					})
 			})
 			it('transfer success', async () => {
 				const property = await propertyContract.at(propertyAddress)
 				await property.approve(author, 10, {
 					from: author,
 				})
-				const result = await property.transferFrom(author, transfer, 10, {
-					from: author,
-				})
-				const toAddress = getTransferToAddress(result)
+				const toAddress = getTransferToAddress(
+					await property.transferFrom(author, transfer, 10, { from: author })
+				)
 				expect(toAddress).to.be.equal(transfer)
 			})
 		})

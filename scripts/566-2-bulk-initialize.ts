@@ -49,14 +49,14 @@ const handler = async (
 			toBlock: 'latest',
 		})
 
-	const dev = createDev(DEV, web3)
+	const dev = createDev(DEV)
 	// Already nonexistent value
 	// const setLastCumulativeHoldersReward = createSetLastCumulativeHoldersReward(
 	// 	createWithdrawMigration(WITHDRAW_MIGRATION, web3)
 	// )(from)
 	const getLastCumulativeHoldersReward =
 		createGetLastCumulativeHoldersRewardCaller(
-			createWithdrawStorage(WITHDRAW_STORAGE, web3)
+			createWithdrawStorage(WITHDRAW_STORAGE)
 		)
 	const all = await fetchAllWithdrawEvents(dev)
 

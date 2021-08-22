@@ -230,12 +230,13 @@ contract('Patch780', ([deployer, treasury, uesr]) => {
 			expect(result).to.be.equal(DEFAULT_ADDRESS)
 		})
 		it('Should fail to call when the sender is not owner.', async () => {
-			const result = await patch780
+			await patch780
 				.setTreasury(treasury, {
 					from: uesr,
 				})
-				.catch((err: Error) => err)
-			validateNotOwnerErrorMessage(result)
+				.catch((err: Error) => {
+					validateNotOwnerErrorMessage(err)
+				})
 		})
 	})
 })

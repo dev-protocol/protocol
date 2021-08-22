@@ -11,8 +11,8 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 		})
 	})
 	describe('EternalStorage; getter,setter,deleter', () => {
-		const key = web3.utils.keccak256('key')
-		const unsetKey = web3.utils.keccak256('unsetKey')
+		const key: string = web3.utils.keccak256('key') as string
+		const unsetKey: string = web3.utils.keccak256('unsetKey') as string
 		describe('uint', () => {
 			it('get.', async () => {
 				await eternalStorage.setUint(key, 10, { from: deployer })
@@ -30,22 +30,24 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 			})
 			it('cannot be set to other than the owner.', async () => {
 				/* eslint-disable max-nested-callbacks */
-				const result = await eternalStorage
+				await eternalStorage
 					.setUint(key, 10, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 			it('cannot be delete to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.deleteUint(key, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 		})
 		describe('byte32', () => {
 			let value: string
 			before(async () => {
-				value = web3.utils.keccak256('value')
+				value = web3.utils.keccak256('value') as string
 			})
 			it('get.', async () => {
 				await eternalStorage.setBytes(key, value, { from: deployer })
@@ -66,16 +68,18 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 				)
 			})
 			it('cannot be set to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.setBytes(key, value, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 			it('cannot be delete to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.deleteBytes(key, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 		})
 		describe('string', () => {
@@ -94,16 +98,18 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 				expect(result).to.be.equal('')
 			})
 			it('cannot be set to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.setString(key, 'test', { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 			it('cannot be delete to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.deleteString(key, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 		})
 		describe('bool', () => {
@@ -122,16 +128,18 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 				expect(result).to.be.equal(false)
 			})
 			it('cannot be set to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.setBool(key, true, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 			it('cannot be delete to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.deleteBool(key, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 		})
 		describe('int', () => {
@@ -150,16 +158,18 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 				expect(result.toNumber()).to.be.equal(0)
 			})
 			it('cannot be set to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.setInt(key, -1, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 			it('cannot be delete to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.deleteInt(key, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 		})
 		describe('address', () => {
@@ -178,21 +188,23 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 				expect(result).to.be.equal(DEFAULT_ADDRESS)
 			})
 			it('cannot be set to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.setAddress(key, addressValue, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 			it('cannot be delete to other than the owner.', async () => {
-				const result = await eternalStorage
+				await eternalStorage
 					.deleteAddress(key, { from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not current owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not current owner')
+					})
 			})
 		})
 	})
 	describe('EternalStorage; upgradeOwner', () => {
-		const key = web3.utils.keccak256('key')
+		const key: string = web3.utils.keccak256('key') as string
 		before(async () => {
 			await eternalStorage.changeOwner(newOwner, { from: deployer })
 		})
@@ -202,22 +214,25 @@ contract('EternalStorageTest', ([deployer, user1, newOwner, addressValue]) => {
 			expect(result.toNumber()).to.be.equal(1)
 		})
 		it('If the owner changes, the value cannot be changed by the original owner.', async () => {
-			const result = await eternalStorage
+			await eternalStorage
 				.setUint(key, 1, { from: deployer })
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'not current owner')
+				.catch((err: Error) => {
+					validateErrorMessage(err, 'not current owner')
+				})
 		})
 		it('Even if the owner changes, the value cannot be changed from an unrelated address.', async () => {
-			const result = await eternalStorage
+			await eternalStorage
 				.setUint(key, 1, { from: user1 })
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'not current owner')
+				.catch((err: Error) => {
+					validateErrorMessage(err, 'not current owner')
+				})
 		})
 		it('Even if the owner changes, owner change is not executed.', async () => {
-			const result = await eternalStorage
+			await eternalStorage
 				.changeOwner(user1, { from: user1 })
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'not current owner')
+				.catch((err: Error) => {
+					validateErrorMessage(err, 'not current owner')
+				})
 		})
 	})
 })

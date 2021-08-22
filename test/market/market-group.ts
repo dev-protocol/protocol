@@ -40,20 +40,22 @@ contract(
 				expect(result).to.be.equal(false)
 			})
 			it('Existing market cannot be added', async () => {
-				const result = await dev.marketGroup
+				await dev.marketGroup
 					.addGroup(market1, {
 						from: marketFactory,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'already enabled')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'already enabled')
+					})
 			})
 			it('Can not execute addGroup without marketFactory address', async () => {
-				const result = await dev.marketGroup
+				await dev.marketGroup
 					.addGroup(dummyMarket, {
 						from: dummyMarketFactory,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 		})
 	}

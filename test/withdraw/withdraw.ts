@@ -100,18 +100,17 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 	describe('Withdraw; withdraw', () => {
 		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
-
-			const res = await dev.withdraw
-				.withdraw(deployer)
-				.catch((err: Error) => err)
-			validateAddressErrorMessage(res)
+			await dev.withdraw.withdraw(deployer).catch((err: Error) => {
+				validateAddressErrorMessage(err)
+			})
 		})
 		it(`should fail to call when hasn't withdrawable amount`, async () => {
 			const [dev, , property] = await init()
-			const res = await dev.withdraw
+			await dev.withdraw
 				.withdraw(property.address, { from: user1 })
-				.catch((err: Error) => err)
-			validateErrorMessage(res, 'withdraw value is 0')
+				.catch((err: Error) => {
+					validateErrorMessage(err, 'withdraw value is 0')
+				})
 		})
 		describe('withdrawing interest amount', () => {
 			let dev: DevProtocolInstance
@@ -276,14 +275,15 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 				const amount = await dev.withdraw
 					.calculateWithdrawableAmount(property.address, user1)
 					.then(toBigNumber)
-				const res = await dev.withdraw
+				await dev.withdraw
 					.withdraw(property.address, { from: user1 })
-					.catch((err: Error) => err)
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'withdraw value is 0')
+					})
 				const afterBalance = await dev.dev.balanceOf(user1).then(toBigNumber)
 
 				expect(amount.toFixed()).to.be.equal('0')
 				expect(prevBalance.toFixed()).to.be.equal(afterBalance.toFixed())
-				validateErrorMessage(res, 'withdraw value is 0')
 			})
 		})
 	})
@@ -402,12 +402,13 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 			})
 
 			it('Should fail to call `beforeBalanceChange` when sent from other than Property Contract address', async () => {
-				const res = await dev.withdraw
+				await dev.withdraw
 					.beforeBalanceChange(property.address, deployer, user1, {
 						from: deployer,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(res)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 		})
 		describe('Withdraw; Alice has sent 10% tokens to Bob after 20% tokens sent. Bob has increased from 20% tokens to 30% tokens.', () => {

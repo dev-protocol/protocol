@@ -39,10 +39,9 @@ contract('UsingStorageTest', ([deployer]) => {
 			expect(result.toNumber()).to.be.equal(0)
 		})
 		it('Creating storage again after storage has been created results in an error.', async () => {
-			const result = await usingStorageTest
-				.createStorage()
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'storage is set')
+			await usingStorageTest.createStorage().catch((err: Error) => {
+				validateErrorMessage(err, 'storage is set')
+			})
 		})
 	})
 
@@ -65,16 +64,16 @@ contract('UsingStorageTest', ([deployer]) => {
 			expect(result.toNumber()).to.be.equal(1)
 		})
 		it('Before delegating authority, you can not write.', async () => {
-			const result = await usingStorageTestNext
-				.setUInt(2)
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'not current owner')
+			await usingStorageTestNext.setUInt(2).catch((err: Error) => {
+				validateErrorMessage(err, 'not current owner')
+			})
 		})
 		it('Delegation of authority is not possible from the delegate.', async () => {
-			const result = await usingStorageTestNext
+			await usingStorageTestNext
 				.changeOwner(usingStorageTestNext.address)
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'not current owner')
+				.catch((err: Error) => {
+					validateErrorMessage(err, 'not current owner')
+				})
 		})
 		it('When delegating authority, the delegate can write to storage', async () => {
 			await usingStorageTest.changeOwner(usingStorageTestNext.address)
@@ -83,10 +82,9 @@ contract('UsingStorageTest', ([deployer]) => {
 			expect(result.toNumber()).to.be.equal(2)
 		})
 		it('When delegating authority, delegation source can not write to storage.', async () => {
-			const result = await usingStorageTest
-				.setUInt(2)
-				.catch((err: Error) => err)
-			validateErrorMessage(result, 'not current owner')
+			await usingStorageTest.setUInt(2).catch((err: Error) => {
+				validateErrorMessage(err, 'not current owner')
+			})
 		})
 	})
 })

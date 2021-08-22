@@ -57,10 +57,10 @@ contract(
 					from: marketFactory,
 				})
 			})
-			it('Cannot be enabled from other than market factory', async () => {
-				const result = await market.toEnable().catch((err: Error) => err)
-				validateAddressErrorMessage(result)
-			})
+			it('Cannot be enabled from other than market factory', async () =>
+				market.toEnable().catch((err: Error) => {
+					validateAddressErrorMessage(err)
+				}))
 			it('Can be enabled from the market factory', async () => {
 				expect(await market.enabled()).to.be.equal(false)
 				await market.toEnable({ from: marketFactory })
@@ -69,10 +69,9 @@ contract(
 			it('Cannot be enabled if deadline is over', async () => {
 				expect(await market.enabled()).to.be.equal(false)
 				await mine(11)
-				const result = await market
-					.toEnable({ from: marketFactory })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'deadline is over')
+				await market.toEnable({ from: marketFactory }).catch((err: Error) => {
+					validateErrorMessage(err, 'deadline is over')
+				})
 				expect(await market.enabled()).to.be.equal(false)
 			})
 		})
@@ -121,24 +120,21 @@ contract(
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
 				await dev.generatePolicy('PolicyTest1')
-				let createMarketResult = await dev.marketFactory.create(
-					behavior1.address
+				marketAddress1 = getMarketAddress(
+					await dev.marketFactory.create(behavior1.address)
 				)
-				marketAddress1 = getMarketAddress(createMarketResult)
 				await (behavior1 as any).setAssociatedMarket(marketAddress1, {
 					from: user,
 				})
-				createMarketResult = await dev.marketFactory.create(behavior2.address)
-				marketAddress2 = getMarketAddress(createMarketResult)
+				marketAddress2 = getMarketAddress(
+					await dev.marketFactory.create(behavior2.address)
+				)
 				await (behavior2 as any).setAssociatedMarket(marketAddress2, {
 					from: user,
 				})
-				const createPropertyResult = await dev.propertyFactory.create(
-					'test',
-					'TEST',
-					propertyAuther
+				propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('test', 'TEST', propertyAuther)
 				)
-				propertyAddress = getPropertyAddress(createPropertyResult)
 				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 			})
@@ -194,30 +190,33 @@ contract(
 			it('Should fail to run when not enabled Market.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress2)
-				const result = await marketInstance
+				await marketInstance
 					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
 						from: propertyAuther,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'market is not enabled')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'market is not enabled')
+					})
 			})
 			it('Should fail to run when not passed the ID.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				const result = await marketInstance
+				await marketInstance
 					.authenticate(propertyAddress, '', '', '', '', '', {
 						from: propertyAuther,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'id is required')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'id is required')
+					})
 			})
 			it('Should fail to run when sent from other than Property Factory Contract.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				const result = await marketInstance
+				await marketInstance
 					.authenticate(propertyAddress, 'id-key', '', '', '', '')
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('Should fail to run when the passed ID is already authenticated.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -231,12 +230,13 @@ contract(
 					'',
 					{ from: propertyAuther }
 				)
-				const result = await marketInstance
+				await marketInstance
 					.authenticate(propertyAddress, 'id-key', '', '', '', '', {
 						from: propertyAuther,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'id is duplicated')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'id is duplicated')
+					})
 			})
 
 			it('Should fail to deauthenticate when sent from other than passed metrics linked property author.', async () => {
@@ -252,10 +252,11 @@ contract(
 						resolve(values._metrics)
 					})
 				})
-				const result = await marketInstance
+				await marketInstance
 					.deauthenticate(metricsAddress, { from: user })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'this is illegal address')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'this is illegal address')
+					})
 			})
 			it('When deauthenticate, decrease the issuedMetrics, emit the Destroy event.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -304,12 +305,13 @@ contract(
 				await marketInstance.deauthenticate(metricsAddress, {
 					from: propertyAuther,
 				})
-				const result = await marketInstance
+				await marketInstance
 					.deauthenticate(metricsAddress, {
 						from: propertyAuther,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'not authenticated')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'not authenticated')
+					})
 			})
 		})
 		describe('Market; authenticateFromPropertyFactory, authenticatedCallback', () => {
@@ -338,24 +340,21 @@ contract(
 				const behavior1 = await dev.getMarket('MarketTest3', user)
 				const behavior2 = await dev.getMarket('MarketTest3', user)
 				await dev.generatePolicy('PolicyTest1')
-				let createMarketResult = await dev.marketFactory.create(
-					behavior1.address
+				marketAddress1 = getMarketAddress(
+					await dev.marketFactory.create(behavior1.address)
 				)
-				marketAddress1 = getMarketAddress(createMarketResult)
 				await (behavior1 as any).setAssociatedMarket(marketAddress1, {
 					from: user,
 				})
-				createMarketResult = await dev.marketFactory.create(behavior2.address)
-				marketAddress2 = getMarketAddress(createMarketResult)
+				marketAddress2 = getMarketAddress(
+					await dev.marketFactory.create(behavior2.address)
+				)
 				await (behavior2 as any).setAssociatedMarket(marketAddress2, {
 					from: user,
 				})
-				const createPropertyResult = await dev.propertyFactory.create(
-					'test',
-					'TEST',
-					propertyAuther
+				propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('test', 'TEST', propertyAuther)
 				)
-				propertyAddress = getPropertyAddress(createPropertyResult)
 				await dev.metricsGroup.__setMetricsCountPerProperty(propertyAddress, 1)
 				await dev.dev.mint(propertyAuther, 10000000000, { from: deployer })
 				await dev.addressConfig.setPropertyFactory(propertyFactory)
@@ -420,7 +419,7 @@ contract(
 			it('Should fail to run when not enabled Market.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress2)
-				const result = await marketInstance
+				await marketInstance
 					.authenticateFromPropertyFactory(
 						propertyAddress,
 						propertyAuther,
@@ -433,13 +432,14 @@ contract(
 							from: propertyFactory,
 						}
 					)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'market is not enabled')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'market is not enabled')
+					})
 			})
 			it('Should fail to run when not passed the ID.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				const result = await marketInstance
+				await marketInstance
 					.authenticateFromPropertyFactory(
 						propertyAddress,
 						propertyAuther,
@@ -452,13 +452,14 @@ contract(
 							from: propertyFactory,
 						}
 					)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'id is required')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'id is required')
+					})
 			})
 			it('Should fail to run when sent from other than Property Factory Contract.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const marketInstance = await marketContract.at(marketAddress1)
-				const result = await marketInstance
+				await marketInstance
 					.authenticateFromPropertyFactory(
 						propertyAddress,
 						propertyAuther,
@@ -468,8 +469,9 @@ contract(
 						'',
 						''
 					)
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('Should fail to run when the passed ID is already authenticated.', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -483,7 +485,7 @@ contract(
 					'',
 					{ from: propertyAuther }
 				)
-				const result = await marketInstance
+				await marketInstance
 					.authenticateFromPropertyFactory(
 						propertyAddress,
 						user,
@@ -496,8 +498,9 @@ contract(
 							from: propertyFactory,
 						}
 					)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'id is duplicated')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'id is duplicated')
+					})
 			})
 		})
 	}

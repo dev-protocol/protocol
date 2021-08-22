@@ -49,12 +49,13 @@ contract(
 				expect(result).to.be.equal(true)
 			})
 			it('Cannot be executed from other than market contract.', async () => {
-				const result = await dev.metricsFactory
+				await dev.metricsFactory
 					.create(property2, {
 						from: user,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 		})
 		describe('MetircsFactory; destroy', () => {
@@ -70,32 +71,30 @@ contract(
 				])
 				await dev.addressConfig.setMarketFactory(marketFactory)
 				await dev.marketGroup.addGroup(market, { from: marketFactory })
-				const metricsFactoryResult1 = await dev.metricsFactory.create(
-					property1,
-					{ from: market }
+				metricsAddress1 = getMetricsAddress(
+					await dev.metricsFactory.create(property1, { from: market })
 				)
-				const metricsFactoryResult2 = await dev.metricsFactory.create(
-					property1,
-					{ from: market }
+				metricsAddress2 = getMetricsAddress(
+					await dev.metricsFactory.create(property1, { from: market })
 				)
-				metricsAddress1 = getMetricsAddress(metricsFactoryResult1)
-				metricsAddress2 = getMetricsAddress(metricsFactoryResult2)
 			})
 			it('Should fail to destroy when passed other than metrics address.', async () => {
-				const result = await dev.metricsFactory
+				await dev.metricsFactory
 					.destroy(dummyMetrics, {
 						from: market,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'address is not metrics')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'address is not metrics')
+					})
 			})
 			it('Should fail to destroy when sent from other than a Market. ', async () => {
-				const result = await dev.metricsFactory
+				await dev.metricsFactory
 					.destroy(metricsAddress1, {
 						from: user,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('When call the destroy, remove the metrics from MetricsGroup, emit Destroy event.', async () => {
 				let result = await dev.metricsGroup.isGroup(metricsAddress1, {
@@ -125,12 +124,13 @@ contract(
 					from: deployer,
 				})
 				expect(result).to.be.equal(true)
-				const destroｙResult = await dev.metricsFactory
+				await dev.metricsFactory
 					.destroy(metricsAddress2, {
 						from: deployer,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(destroｙResult)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 		})
 	}

@@ -52,15 +52,14 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 				next.address
 			)
 			await next.addMinter(migration.address)
-			const res = await migration
+			await migration
 				.migrate({ from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceof(Error))
 
 			expect((await legacy.totalSupply()).toNumber()).to.equal(100)
 			expect((await legacy.balanceOf(user1)).toNumber()).to.equal(100)
 			expect((await next.totalSupply()).toNumber()).to.equal(0)
 			expect((await next.balanceOf(user1)).toNumber()).to.equal(0)
-			expect(res).to.be.an.instanceof(Error)
 		})
 		it('should fail to migrate balance when the contract is not minter', async () => {
 			const legacy = await createDev()
@@ -80,15 +79,14 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 				(await legacy.balanceOf(user1)).toNumber(),
 				{ from: user1 }
 			)
-			const res = await migration
+			await migration
 				.migrate({ from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceof(Error))
 
 			expect((await legacy.totalSupply()).toNumber()).to.equal(100)
 			expect((await legacy.balanceOf(user1)).toNumber()).to.equal(100)
 			expect((await next.totalSupply()).toNumber()).to.equal(0)
 			expect((await next.balanceOf(user1)).toNumber()).to.equal(0)
-			expect(res).to.be.an.instanceof(Error)
 		})
 		it('the balance is not migrating when sent from no balance account', async () => {
 			const legacy = await createDev()

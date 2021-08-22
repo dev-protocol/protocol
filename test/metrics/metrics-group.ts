@@ -3,7 +3,6 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
-	validateNotOwnerErrorMessage,
 } from '../test-lib/utils/error'
 
 contract(
@@ -16,7 +15,6 @@ contract(
 		dummyMarket,
 		dummyProperty1,
 		dummyProperty2,
-		user,
 	]) => {
 		const init = async (): Promise<
 			[DevProtocolInstance, string, string, string]
@@ -92,69 +90,75 @@ contract(
 			})
 			it('Should fail to call addGroup when sent from other than MetricsFactory', async () => {
 				const [dev, metrics1] = await init()
-				const result = await dev.metricsGroup
+				await dev.metricsGroup
 					.addGroup(metrics1, {
 						from: deployer,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('Existing metrics cannot be added.', async () => {
 				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
-				const result = await dev.metricsGroup
+				await dev.metricsGroup
 					.addGroup(metrics1, {
 						from: metricsFactory,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'already enabled')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'already enabled')
+					})
 			})
 			it('Can not execute addGroup without metricsFactory address.', async () => {
 				const [dev] = await init()
-				const result = await dev.metricsGroup
+				await dev.metricsGroup
 					.addGroup(dummyMetrics, {
 						from: dummyMetricsFactory,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('Should fail to call removeGroup when sent from other than MetricsFactory', async () => {
 				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
-				const result = await dev.metricsGroup
+				await dev.metricsGroup
 					.removeGroup(metrics1, {
 						from: deployer,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('Can not execute removeGroup without metricsFactory address.', async () => {
 				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
-				const result = await dev.metricsGroup
+				await dev.metricsGroup
 					.removeGroup(metrics1, {
 						from: dummyMetricsFactory,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('Not existing metrics cannot be removed.', async () => {
 				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
-				const result = await dev.metricsGroup
+				await dev.metricsGroup
 					.removeGroup(dummyMetrics, {
 						from: metricsFactory,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'address is not group')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'address is not group')
+					})
 			})
 			it('Deleted metrics addresses are treated as if they do not exist in the group.', async () => {
 				const [dev, metrics1] = await init()

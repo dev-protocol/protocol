@@ -65,21 +65,23 @@ contract(
 			it('Existing policy cannot be added', async () => {
 				const dev = await init()
 				const currentPolicy = await dev.addressConfig.policy()
-				const result = await dev.policyGroup
+				await dev.policyGroup
 					.addGroup(currentPolicy, {
 						from: policyFactory,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'already group')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'already group')
+					})
 			})
 			it('Can not execute addGroup without policyFactory address', async () => {
 				const dev = await init()
-				const result = await dev.policyGroup
+				await dev.policyGroup
 					.addGroup(dummyPolicy, {
 						from: dummyPolicyFactory,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 		})
 		describe('PolicyGroup; isDuringVotingPeriod', () => {

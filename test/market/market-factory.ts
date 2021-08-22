@@ -23,14 +23,27 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		await dev.policyFactory.create(policy.address, { from: user })
 		const market = await dev.getMarket('MarketTest1', user)
 		const marketBehaviorAddress = market.address
-		const result = await dev.marketFactory.create(market.address, {
-			from: user,
-		})
-		const eventFrom = result.logs.filter((log) => log.event === 'Create')[0]
-			.args._from
-		const eventMarket = result.logs.filter((log) => log.event === 'Create')[0]
-			.args._market
-		const marketAddress = getMarketAddress(result)
+		interface Log {
+			event: string
+			args: {
+				_from: string
+				_market: string
+			}
+		}
+
+		let marketAddress = ''
+		const logs: Log[] = await dev.marketFactory
+			.create(market.address, {
+				from: user,
+			})
+			.then((res) => {
+				marketAddress = getMarketAddress(res)
+				return res.logs as Log[]
+			})
+
+		const eventFrom = logs.filter((log) => log.event === 'Create')[0].args._from
+		const eventMarket = logs.filter((log) => log.event === 'Create')[0].args
+			._market
 		return [dev, marketAddress, marketBehaviorAddress, [eventFrom, eventMarket]]
 	}
 
@@ -56,7 +69,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			expect(await deployedMarket.enabled()).to.be.equal(true)
 		})
 		it('A secoundly created market is not enabled,', async () => {
-			const [dev, market] = await init()
+			const [, market] = await init()
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(market)
 			expect(await deployedMarket.enabled()).to.be.equal(true)
@@ -69,22 +82,24 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		it('The second and subsequent markets will not be automatically enabled.', async () => {
 			const [dev] = await init()
 			const secoundMarket = await dev.getMarket('MarketTest1', user)
-			const result = await dev.marketFactory.create(secoundMarket.address, {
-				from: user,
-			})
-			const secoundMarketAddress = getMarketAddress(result)
+			const secoundMarketAddress = getMarketAddress(
+				await dev.marketFactory.create(secoundMarket.address, {
+					from: user,
+				})
+			)
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(secoundMarketAddress)
 			expect(await deployedMarket.enabled()).to.be.equal(false)
 		})
 		it('An error occurs if the default address is specified.', async () => {
 			const [dev] = await init()
-			const result = await dev.marketFactory
+			await dev.marketFactory
 				.create(DEFAULT_ADDRESS, {
 					from: user,
 				})
-				.catch((err: Error) => err)
-			validateAddressErrorMessage(result)
+				.catch((err: Error) => {
+					validateAddressErrorMessage(err)
+				})
 		})
 	})
 
@@ -94,39 +109,41 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
 				await dev.generateMarketFactory()
-				const res = await dev.marketFactory
+				await dev.marketFactory
 					.enable(DEFAULT_ADDRESS, {
 						from: user,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(res, 'caller is not the owner', false)
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'caller is not the owner', false)
+					})
 			})
 			it('Only the market address can be specified.', async () => {
 				const dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
 				await dev.generateMarketGroup()
 				await dev.generateMarketFactory()
-				const res = await dev.marketFactory
+				await dev.marketFactory
 					.enable(dummyMarketAddress)
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(res)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 			it('we cannot specify the address of an active market.', async () => {
 				const [dev, market] = await init()
-				const res = await dev.marketFactory
-					.enable(market)
-					.catch((err: Error) => err)
-				validateErrorMessage(res, 'already enabled')
+				await dev.marketFactory.enable(market).catch((err: Error) => {
+					validateErrorMessage(err, 'already enabled')
+				})
 			})
 		})
 		describe('success', () => {
 			it('Enabling the Market', async () => {
 				const [dev] = await init()
 				const secoundMarket = await dev.getMarket('MarketTest1', user)
-				const result = await dev.marketFactory.create(secoundMarket.address, {
-					from: user,
-				})
-				const secoundMarketAddress = getMarketAddress(result)
+				const secoundMarketAddress = getMarketAddress(
+					await dev.marketFactory.create(secoundMarket.address, {
+						from: user,
+					})
+				)
 				await dev.marketFactory.enable(secoundMarketAddress)
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const deployedMarket = await marketContract.at(secoundMarketAddress)

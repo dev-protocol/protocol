@@ -43,8 +43,9 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		propertyAddress: string
 	): Promise<void> => {
 		const behavuor = await dev.getMarket('MarketTest3', user1)
-		const createMarketResult = await dev.marketFactory.create(behavuor.address)
-		const marketAddress = getMarketAddress(createMarketResult)
+		const marketAddress = getMarketAddress(
+			await dev.marketFactory.create(behavuor.address)
+		)
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		const marketInstance = await marketContract.at(marketAddress)
 		await (behavuor as any).setAssociatedMarket(marketAddress, {
@@ -85,10 +86,11 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	describe('Allocator: beforeBalanceChange', () => {
 		it('If the first argument is a non-property address, an error occurs.', async () => {
 			const [dev] = await init()
-			const res = await dev.allocator
+			await dev.allocator
 				.beforeBalanceChange(user1, user1, user1)
-				.catch((err: Error) => err)
-			validateAddressErrorMessage(res)
+				.catch((err: Error) => {
+					validateAddressErrorMessage(err)
+				})
 		})
 		it("If run the Allocator's beforeBalanceChange Withdraw's beforeBalanceChange is executed.", async () => {
 			const alice = deployer

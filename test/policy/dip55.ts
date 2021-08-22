@@ -153,12 +153,13 @@ contract('DIP55', ([deployer, treasury, capSetter, uesr]) => {
 			expect(result).to.be.equal(DEFAULT_ADDRESS)
 		})
 		it('No one but the owner can set the address.', async () => {
-			const result = await dip55
+			await dip55
 				.setTreasury(treasury, {
 					from: uesr,
 				})
-				.catch((err: Error) => err)
-			validateNotOwnerErrorMessage(result)
+				.catch((err: Error) => {
+					validateNotOwnerErrorMessage(err)
+				})
 		})
 	})
 	describe('DIP55; capSetter', () => {
@@ -175,12 +176,13 @@ contract('DIP55', ([deployer, treasury, capSetter, uesr]) => {
 			expect(result).to.be.equal(DEFAULT_ADDRESS)
 		})
 		it('No one but the owner can set the address.', async () => {
-			const result = await dip55
+			await dip55
 				.setCapSetter(capSetter, {
 					from: uesr,
 				})
-				.catch((err: Error) => err)
-			validateNotOwnerErrorMessage(result)
+				.catch((err: Error) => {
+					validateNotOwnerErrorMessage(err)
+				})
 		})
 	})
 })

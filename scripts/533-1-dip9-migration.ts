@@ -17,7 +17,7 @@ const handler = async (
 	])
 	____log('Generated AddressConfig contract', config.address)
 
-	const [lockup, metricsGroup, dev] = await Promise.all([
+	const [lockup, , dev] = await Promise.all([
 		artifacts.require('Lockup').at(await config.lockup()),
 		artifacts.require('MetricsGroup').at(await config.metricsGroup()),
 		artifacts.require('Dev').at(await config.token()),
@@ -34,13 +34,13 @@ const handler = async (
 	____log('Deployed the new Lockup', nextLockup.address)
 
 	// Deploy MetricsGroupMigration as a new MetricsGroup
-	const nextMetricsGroup = await artifacts
-		.require('MetricsGroupMigration')
-		.new(config.address, { gasPrice: await fastest(), gas })
-	____log(
-		'Deployed the new MetricsGroupMigration as a new MetricsGroup',
-		nextMetricsGroup.address
-	)
+	// const nextMetricsGroup = await artifacts
+	// 	.require('MetricsGroupMigration')
+	// 	.new(config.address, { gasPrice: await fastest(), gas })
+	// ____log(
+	// 	'Deployed the new MetricsGroupMigration as a new MetricsGroup',
+	// 	nextMetricsGroup.address
+	// )
 
 	// Deploy new MetricsFactory
 	const nextMetricsFactory = await artifacts
@@ -70,13 +70,13 @@ const handler = async (
 	____log('Set EternalStorage address to the new Lockup')
 
 	// Delegate storage for MetricsGroup
-	const metricsGroupStorageAddress = await metricsGroup.getStorageAddress()
-	____log('Got EternalStorage address that uses by MetricsGroup')
-	await nextMetricsGroup.setStorage(metricsGroupStorageAddress, {
-		gasPrice: await fastest(),
-		gas,
-	})
-	____log('Set EternalStorage address to the new MetricsGroup')
+	// const metricsGroupStorageAddress = await metricsGroup.getStorageAddress()
+	// ____log('Got EternalStorage address that uses by MetricsGroup')
+	// await nextMetricsGroup.setStorage(metricsGroupStorageAddress, {
+	// 	gasPrice: await fastest(),
+	// 	gas,
+	// })
+	// ____log('Set EternalStorage address to the new MetricsGroup')
 
 	// Activation
 	await lockup.changeOwner(nextLockup.address, {
@@ -88,17 +88,17 @@ const handler = async (
 	await config.setLockup(nextLockup.address, { gasPrice: await fastest(), gas })
 	____log('updated AddressConfig for Lockup')
 
-	await metricsGroup.changeOwner(nextMetricsGroup.address, {
-		gasPrice: await fastest(),
-		gas,
-	})
-	____log('Delegated EternalStorage owner to the new MetricsGroup')
+	// Await metricsGroup.changeOwner(nextMetricsGroup.address, {
+	// 	gasPrice: await fastest(),
+	// 	gas,
+	// })
+	// ____log('Delegated EternalStorage owner to the new MetricsGroup')
 
-	await config.setMetricsGroup(nextMetricsGroup.address, {
-		gasPrice: await fastest(),
-		gas,
-	})
-	____log('updated AddressConfig for MetricsGroup')
+	// await config.setMetricsGroup(nextMetricsGroup.address, {
+	// 	gasPrice: await fastest(),
+	// 	gas,
+	// })
+	// ____log('updated AddressConfig for MetricsGroup')
 
 	await config.setWithdraw(nextWithdraw.address, {
 		gasPrice: await fastest(),

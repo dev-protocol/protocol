@@ -71,30 +71,34 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		it('should fail to call when sent from other than Dev Contract', async () => {
 			const [dev, property] = await init()
 
-			const res = await dev.lockup
+			await dev.lockup
 				.lockup(deployer, property.address, 10000)
-				.catch(err)
-			validateErrorMessage(res, 'this is illegal address')
+				.catch((err) => {
+					validateErrorMessage(err, 'this is illegal address')
+				})
 		})
 		it('should fail to call when passed address is not property contract', async () => {
 			const [dev] = await init()
 
-			const res = await dev.dev.deposit(user1, 10000).catch(err)
-			validateErrorMessage(res, 'unable to stake to unauthenticated property')
+			dev.dev.deposit(user1, 10000).catch((err) => {
+				validateErrorMessage(err, 'unable to stake to unauthenticated property')
+			})
 		})
 		it('should fail to call when a passed value is 0', async () => {
 			const [dev, property] = await init()
 
-			const res = await dev.dev.deposit(property.address, 0).catch(err)
-			validateErrorMessage(res, 'illegal lockup value')
+			await dev.dev.deposit(property.address, 0).catch((err) => {
+				validateErrorMessage(err, 'illegal lockup value')
+			})
 		})
 		it(`should fail to call when token's transfer was failed`, async () => {
 			const [dev, property] = await init()
 
-			const res = await dev.dev
+			await dev.dev
 				.deposit(property.address, 10000, { from: user1 })
-				.catch(err)
-			validateErrorMessage(res, 'ERC20: transfer amount exceeds balance')
+				.catch((err) => {
+					validateErrorMessage(err, 'ERC20: transfer amount exceeds balance')
+				})
 		})
 		it(`should fail to call when the passed property has not any authenticated assets`, async () => {
 			const [dev] = await init()
@@ -102,8 +106,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.propertyFactory.create('test', 'TEST', deployer)
 			)
 
-			const res = await dev.dev.deposit(propertyAddress, 10000).catch(err)
-			validateErrorMessage(res, 'unable to stake to unauthenticated property')
+			await dev.dev.deposit(propertyAddress, 10000).catch((err) => {
+				validateErrorMessage(err, 'unable to stake to unauthenticated property')
+			})
 		})
 		it('record transferred token as a lockup', async () => {
 			const [dev, property] = await init()
@@ -139,10 +144,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			const amount = 1000000
 			await dev.dev.deposit(property.address, amount)
 
-			const res = await dev.lockup
-				.withdraw(property.address, amount + 1)
-				.catch(err)
-			validateErrorMessage(res, 'insufficient tokens staked')
+			await dev.lockup.withdraw(property.address, amount + 1).catch((err) => {
+				validateErrorMessage(err, 'insufficient tokens staked')
+			})
 		})
 		it(`withdraw the amount passed`, async () => {
 			const [dev, property] = await init()
@@ -242,7 +246,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 
 			const storage = await dev.lockup
 				.getStorageAddress()
-				.then((x) => artifacts.require('EternalStorage').at(x))
+				.then(async (x) => artifacts.require('EternalStorage').at(x))
 			await dev.lockup.changeOwner(deployer)
 			await storage.setUint(
 				keccak256('_pendingInterestWithdrawal', property.address, deployer),
@@ -1274,7 +1278,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.lockup.changeOwner(deployer)
 				const storage = await dev.lockup
 					.getStorageAddress()
-					.then((x) => artifacts.require('EternalStorage').at(x))
+					.then(async (x) => artifacts.require('EternalStorage').at(x))
 				await storage.setUint(keccak256('_allValue'), totalLocked)
 				await storage.setUint(
 					keccak256('_value', property.address, alice),
@@ -1504,7 +1508,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.lockup.changeOwner(deployer)
 				const storage = await dev.lockup
 					.getStorageAddress()
-					.then((x) => artifacts.require('EternalStorage').at(x))
+					.then(async (x) => artifacts.require('EternalStorage').at(x))
 				await storage.setUint(keccak256('_allValue'), totalLocked)
 				await storage.setUint(
 					keccak256('_value', property.address, alice),
@@ -1745,9 +1749,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		describe('success', () => {
 			it('Can set cap.', async () => {
 				const [dev] = await init()
-				const tx = await dev.lockup.updateCap(100)
-				const eventLogs = tx.logs.filter((log) => log.event === 'UpdateCap')
-				expect(eventLogs[0].args._cap.toNumber()).to.be.equal(100)
+				expect(
+					(await dev.lockup.updateCap(100)).logs
+						.filter((log) => log.event === 'UpdateCap')[0]
+						.args._cap.toNumber()
+				).to.be.equal(100)
 				const cap = await dev.lockup.cap()
 				expect(cap.toNumber()).to.be.equal(100)
 				const [capValue, holdersPrice] = await calculateCap(
@@ -1767,8 +1773,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		describe('fail', () => {
 			it('Do not accept access from addresses other than the specified one.', async () => {
 				const [dev] = await init()
-				const res = await dev.lockup.updateCap(100, { from: user1 }).catch(err)
-				validateErrorMessage(res, 'illegal access')
+				await dev.lockup.updateCap(100, { from: user1 }).catch((err) => {
+					validateErrorMessage(err, 'illegal access')
+				})
 			})
 		})
 	})
@@ -1788,10 +1795,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		describe('fail', () => {
 			it('Shoud fail to call when the caller is not owner', async () => {
 				const [dev] = await init()
-				const result = await dev.lockup
+				await dev.lockup
 					.___setFallbackInitialCumulativeHoldersRewardCap(100, { from: user1 })
-					.catch(err)
-				validateErrorMessage(result, 'caller is not the owner', false)
+					.catch((err) => {
+						validateErrorMessage(err, 'caller is not the owner', false)
+					})
 			})
 		})
 		describe('fallback', () => {

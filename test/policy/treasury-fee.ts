@@ -154,12 +154,13 @@ contract('TreasuryFee', ([deployer, treasury, uesr]) => {
 			expect(result).to.be.equal(DEFAULT_ADDRESS)
 		})
 		it('No one but the owner can set the address.', async () => {
-			const result = await treasuryFee
+			await treasuryFee
 				.setTreasury(treasury, {
 					from: uesr,
 				})
-				.catch((err: Error) => err)
-			validateNotOwnerErrorMessage(result)
+				.catch((err: Error) => {
+					validateNotOwnerErrorMessage(err)
+				})
 		})
 	})
 })

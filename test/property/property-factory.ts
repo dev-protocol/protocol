@@ -5,6 +5,10 @@ import { toBigNumber } from '../test-lib/utils/common'
 import { getEventValue } from '../test-lib/utils/event'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
+interface Log {
+	event: string
+}
+
 contract(
 	'PropertyFactoryTest',
 	([
@@ -21,6 +25,7 @@ contract(
 			const dev = new DevProtocolInstance(deployer)
 			const propertyContract = artifacts.require('Property')
 			let propertyAddress: string
+
 			before(async () => {
 				await dev.generateAddressConfig()
 				await dev.generateDev()
@@ -36,15 +41,12 @@ contract(
 				])
 				await dev.generatePolicy()
 				await dev.addressConfig.setMarketFactory(marketFactory)
-				const result = await dev.propertyFactory.create(
-					'sample',
-					'SAMPLE',
-					user,
-					{
+
+				propertyAddress = getPropertyAddress(
+					await dev.propertyFactory.create('sample', 'SAMPLE', user, {
 						from: user2,
-					}
+					})
 				)
-				propertyAddress = getPropertyAddress(result)
 			})
 			it('Create a new property contract and emit create event telling created property address', async () => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
@@ -80,15 +82,26 @@ contract(
 					from: dummyProperFactory,
 				})
 				await dev.generatePropertyFactory()
-				const result = await dev.propertyFactory.createChangeAuthorEvent(
-					beforeAuthor,
-					afterAuthor,
-					{
-						from: dummyProperty,
-					}
-				)
-				const event = result.logs[0].args
-				expect(result.logs[0].event).to.be.equal('ChangeAuthor')
+
+				interface Args {
+					_beforeAuthor: string
+					_afterAuthor: string
+					_property: string
+				}
+				interface ChangeAuthorLog extends Log {
+					args: Args
+				}
+				const log: ChangeAuthorLog = (
+					await dev.propertyFactory.createChangeAuthorEvent(
+						beforeAuthor,
+						afterAuthor,
+						{
+							from: dummyProperty,
+						}
+					)
+				).logs[0] as ChangeAuthorLog
+				const event = log.args
+				expect(log.event).to.be.equal('ChangeAuthor')
 				expect(event._property).to.be.equal(dummyProperty)
 				expect(event._beforeAuthor).to.be.equal(beforeAuthor)
 				expect(event._afterAuthor).to.be.equal(afterAuthor)
@@ -99,10 +112,11 @@ contract(
 				await dev.generateAddressConfig()
 				await dev.generatePropertyGroup()
 				await dev.generatePropertyFactory()
-				const result = await dev.propertyFactory
+				await dev.propertyFactory
 					.createChangeAuthorEvent(beforeAuthor, afterAuthor)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal address')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'illegal address')
+					})
 			})
 		})
 		describe('PropertyFactory; createChangeNameEvent', () => {
@@ -115,15 +129,23 @@ contract(
 					from: dummyProperFactory,
 				})
 				await dev.generatePropertyFactory()
-				const result = await dev.propertyFactory.createChangeNameEvent(
-					'old',
-					'new',
-					{
+
+				interface Args {
+					_old: string
+					_new: string
+					_property: string
+				}
+				interface ChangeNameLog extends Log {
+					args: Args
+				}
+
+				const log: ChangeNameLog = (
+					await dev.propertyFactory.createChangeNameEvent('old', 'new', {
 						from: dummyProperty,
-					}
-				)
-				const event = result.logs[0].args
-				expect(result.logs[0].event).to.be.equal('ChangeName')
+					})
+				).logs[0] as ChangeNameLog
+				const event = log.args
+				expect(log.event).to.be.equal('ChangeName')
 				expect(event._property).to.be.equal(dummyProperty)
 				expect(event._old).to.be.equal('old')
 				expect(event._new).to.be.equal('new')
@@ -134,10 +156,11 @@ contract(
 				await dev.generateAddressConfig()
 				await dev.generatePropertyGroup()
 				await dev.generatePropertyFactory()
-				const result = await dev.propertyFactory
+				await dev.propertyFactory
 					.createChangeNameEvent('old', 'new')
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal address')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'illegal address')
+					})
 			})
 		})
 		describe('PropertyFactory; createChangeSymbolEvent', () => {
@@ -150,15 +173,25 @@ contract(
 					from: dummyProperFactory,
 				})
 				await dev.generatePropertyFactory()
-				const result = await dev.propertyFactory.createChangeSymbolEvent(
-					'old',
-					'new',
-					{
+
+				interface Args {
+					_old: string
+					_new: string
+					_property: string
+				}
+				interface ChangeSymbolLog extends Log {
+					args: Args
+				}
+
+				const log: ChangeSymbolLog = (
+					await dev.propertyFactory.createChangeSymbolEvent('old', 'new', {
 						from: dummyProperty,
-					}
-				)
-				const event = result.logs[0].args
-				expect(result.logs[0].event).to.be.equal('ChangeSymbol')
+					})
+				).logs[0] as ChangeSymbolLog
+
+				const event = log.args
+
+				expect(log.event).to.be.equal('ChangeSymbol')
 				expect(event._property).to.be.equal(dummyProperty)
 				expect(event._old).to.be.equal('old')
 				expect(event._new).to.be.equal('new')
@@ -169,10 +202,11 @@ contract(
 				await dev.generateAddressConfig()
 				await dev.generatePropertyGroup()
 				await dev.generatePropertyFactory()
-				const result = await dev.propertyFactory
+				await dev.propertyFactory
 					.createChangeSymbolEvent('old', 'new')
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal address')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'illegal address')
+					})
 			})
 		})
 		describe('PropertyFactory; createAndAuthenticate', () => {
@@ -222,11 +256,10 @@ contract(
 					])
 					await dev.generatePolicy('PolicyTest1')
 					const market = await dev.getMarket('MarketTest1', user)
-					const result = await dev.marketFactory.create(market.address, {
-						from: user,
-					})
 					await dev.dev.mint(user, 10000000000)
-					marketAddress = getMarketAddress(result)
+					marketAddress = getMarketAddress(
+						await dev.marketFactory.create(market.address, { from: user })
+					)
 					await (market as any).setAssociatedMarket(marketAddress, {
 						from: user,
 					})

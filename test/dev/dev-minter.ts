@@ -60,20 +60,20 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 		describe('fail', () => {
 			it('If DevMinter does not has minter privileges, it can not mint Dev tokens', async () => {
 				const devMinter = await createDevInstanceNotAddMinter()
-				const result = await devMinter
+				await devMinter
 					.mint(user1, 100, { from: withdraw })
-					.catch((err: Error) => err)
-				validateErrorMessage(
-					result,
-					'MinterRole: caller does not have the Minter role'
-				)
+					.catch((err: Error) => {
+						validateErrorMessage(
+							err,
+							'MinterRole: caller does not have the Minter role'
+						)
+					})
 			})
 			it('Error when minting from other than Lockup and Withdraw contracts', async () => {
 				const dev = await createDevInstance()
-				const result = await dev.devMinter
-					.mint(user1, 100)
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'illegal access')
+				await dev.devMinter.mint(user1, 100).catch((err: Error) => {
+					validateErrorMessage(err, 'illegal access')
+				})
 			})
 		})
 	})
@@ -86,22 +86,24 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 				await dev.devMinter.renounceMinter()
 				const after = await dev.dev.isMinter(dev.devMinter.address)
 				expect(after).to.equal(false)
-				const result = await dev.devMinter
+				await dev.devMinter
 					.mint(user1, 100, { from: withdraw })
-					.catch((err: Error) => err)
-				validateErrorMessage(
-					result,
-					'MinterRole: caller does not have the Minter role'
-				)
+					.catch((err: Error) => {
+						validateErrorMessage(
+							err,
+							'MinterRole: caller does not have the Minter role'
+						)
+					})
 			})
 		})
 		describe('fail', () => {
 			it('Only the owner can run it.', async () => {
 				const dev = await createDevInstance()
-				const result = await dev.devMinter
+				await dev.devMinter
 					.renounceMinter({ from: user1 })
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'Ownable: caller is not the owner')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'Ownable: caller is not the owner')
+					})
 			})
 		})
 	})

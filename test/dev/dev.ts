@@ -97,9 +97,10 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 
-			const res = await dev.burn(50, { from: user1 }).catch((err: Error) => err)
+			await dev
+				.burn(50, { from: user1 })
+				.catch((err: Error) => expect(err).to.be.an.instanceof(Error))
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
-			expect(res).to.be.an.instanceof(Error)
 		})
 		it('decrease the balance by running the burnFrom from another account after approved', async () => {
 			const dev = await createDev()
@@ -119,12 +120,11 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 
 			await dev.approve(user1, 50)
-			const res = await dev
+			await dev
 				.burnFrom(deployer, 51, { from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceof(Error))
 			expect((await dev.totalSupply()).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
-			expect(res).to.be.an.instanceof(Error)
 		})
 	})
 	describe('Dev; transfer', () => {
@@ -157,22 +157,22 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
 
-			const res = await dev
+			await dev
 				.transfer(user2, 50, { from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceof(Error))
 			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
-			expect(res).to.be.an.instanceof(Error)
 		})
 		it('should fail to transfer token when sent from an insufficient balance account', async () => {
 			const dev = await createMintedDev()
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
 
-			const res = await dev.transfer(user1, 101).catch((err: Error) => err)
+			await dev
+				.transfer(user1, 101)
+				.catch((err: Error) => expect(err).to.be.an.instanceof(Error))
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
-			expect(res).to.be.an.instanceof(Error)
 		})
 		it('transfer token from user-to-user by running the transferFrom from another account after approved', async () => {
 			const dev = await createMintedDev()
@@ -190,12 +190,11 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
 
 			await dev.approve(user1, 50)
-			const res = await dev
+			await dev
 				.transferFrom(deployer, user2, 51, { from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceof(Error))
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
-			expect(res).to.be.an.instanceof(Error)
 		})
 		it('increase the approved amount after approved', async () => {
 			const dev = await createMintedDev()
@@ -203,12 +202,11 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			expect((await dev.balanceOf(user1)).toNumber()).to.equal(0)
 
 			await dev.approve(user1, 50)
-			const res = await dev
+			await dev
 				.transferFrom(deployer, user2, 51, { from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceof(Error))
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
-			expect(res).to.be.an.instanceof(Error)
 
 			await dev.increaseAllowance(user1, 1)
 			await dev.transferFrom(deployer, user2, 50, { from: user1 })
@@ -222,12 +220,11 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 
 			await dev.approve(user1, 50)
 			await dev.decreaseAllowance(user1, 1)
-			const res = await dev
+			await dev
 				.transferFrom(deployer, user2, 50, { from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceof(Error))
 			expect((await dev.balanceOf(deployer)).toNumber()).to.equal(100)
 			expect((await dev.balanceOf(user2)).toNumber()).to.equal(0)
-			expect(res).to.be.an.instanceof(Error)
 		})
 	})
 	describe('Dev; deposit', () => {
@@ -275,8 +272,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const prop = await createProperty(dev)
 			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
-			const transaction = await dev.dev.deposit(prop, 50, { from: user1 })
-			const gasPrice = Number(transaction.receipt.gasUsed)
+			const gasPrice = Number(
+				(await dev.dev.deposit(prop, 50, { from: user1 })).receipt.gasUsed
+			)
 			console.log(gasPrice)
 			expect(gasPrice <= 849424).to.be.equal(true)
 		})
@@ -285,66 +283,61 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const prop = await createProperty(dev)
 			await dev.metricsGroup.__setMetricsCountPerProperty(prop, 1)
 			await dev.dev.mint(user1, 100)
-			const res = await dev.dev
-				.deposit(prop, 0, { from: user1 })
-				.catch((err: Error) => err)
+			await dev.dev.deposit(prop, 0, { from: user1 }).catch((err: Error) => {
+				expect(err).to.be.an.instanceOf(Error)
+				validateErrorMessage(err, 'illegal lockup value')
+			})
 			const balance = await dev.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
 			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
-			expect(res).to.be.an.instanceOf(Error)
-			validateErrorMessage(res, 'illegal lockup value')
 		})
 		it('should fail to lockup token when sent from no balance account', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
-			const res = await dev.dev
+			await dev.dev
 				.deposit(prop, 100, { from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceOf(Error))
 			const balance = await dev.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(0)
 			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
-			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to lockup token when sent from an insufficient balance account', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
-			const res = await dev.dev
+			await dev.dev
 				.deposit(prop, 101, { from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceOf(Error))
 			const balance = await dev.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
 			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
-			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to lockup token when the destination is other than property', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
-			const res = await dev.dev
+			await dev.dev
 				.deposit(user2, 50, { from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceOf(Error))
 			const balance = await dev.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
 			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
-			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to lockup token when the lockup amount is 0', async () => {
 			const dev = await generateEnv()
 			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
-			const res = await dev.dev
+			await dev.dev
 				.deposit(prop, 0, { from: user1 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceOf(Error))
 			const balance = await dev.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
 			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
-			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('lockup token by running the depositFrom from another account after approved', async () => {
 			const dev = await generateEnv()
@@ -365,14 +358,13 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const prop = await createProperty(dev)
 			await dev.dev.mint(user1, 100)
 			await dev.dev.approve(user2, 50, { from: user1 })
-			const res = await dev.dev
+			await dev.dev
 				.depositFrom(user1, prop, 51, { from: user2 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceOf(Error))
 			const balance = await dev.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
 			expect((await dev.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
-			expect(res).to.be.an.instanceOf(Error)
 		})
 	})
 	describe('Dev; fee', () => {
@@ -408,35 +400,32 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await dev.addressConfig.setMarketFactory(marketFactory)
 			await dev.marketGroup.addGroup(market, { from: marketFactory })
 			const balance = await dev.dev.balanceOf(user1)
-			const res = await dev.dev
+			await dev.dev
 				.fee(user1, 1, { from: market })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceOf(Error))
 			expect(balance.toNumber()).to.be.equal(0)
-			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to burn when sent from an insufficient balance account', async () => {
 			const dev = await generateEnv()
 			await dev.addressConfig.setMarketFactory(marketFactory)
 			await dev.marketGroup.addGroup(market, { from: marketFactory })
 			await dev.dev.mint(user1, 100)
-			const res = await dev.dev
+			await dev.dev
 				.fee(user1, 101, { from: market })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceOf(Error))
 			const balance = await dev.dev.balanceOf(user1)
 			expect(balance.toNumber()).to.be.equal(100)
-			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to burn when sent from other than market contract', async () => {
 			const dev = await generateEnv()
 			await dev.addressConfig.setMarketFactory(marketFactory)
 			await dev.marketGroup.addGroup(market, { from: marketFactory })
 			await dev.dev.mint(user1, 100)
-			const res = await dev.dev
+			await dev.dev
 				.fee(user1, 1, { from: user2 })
-				.catch((err: Error) => err)
+				.catch((err: Error) => expect(err).to.be.an.instanceOf(Error))
 			const balance = await dev.dev.balanceOf(user1)
 			expect(balance.toNumber()).to.be.equal(100)
-			expect(res).to.be.an.instanceOf(Error)
 		})
 	})
 })

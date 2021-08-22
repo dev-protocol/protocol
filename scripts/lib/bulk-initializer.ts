@@ -16,6 +16,8 @@ import builtDev from '../../build/contracts/Dev.json'
 import builtWithdrawStorage from '../../build/contracts/WithdrawStorage.json'
 import builtProperty from '../../build/contracts/Property.json'
 import { AbiItem } from 'web3-utils/types'
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const createRegistry = (configAddress: string, libWeb3: Web3) =>
 	new Contract(builtConfig.abi as AbiItem[], configAddress)
 export const prepare = async (
@@ -24,9 +26,9 @@ export const prepare = async (
 	blockNumber?: number
 ) => {
 	const configContract = createRegistry(configAddress, libWeb3)
-	const lockupAddress = await configContract.methods
+	const lockupAddress: string = (await configContract.methods
 		.lockup()
-		.call(undefined, blockNumber)
+		.call(undefined, blockNumber)) as string
 	const contract = new Contract(builtLockup.abi as AbiItem[], lockupAddress)
 	return contract
 }
@@ -36,7 +38,10 @@ export const createMetricsGroup = async (
 	libWeb3: Web3
 ) => {
 	const configContract = createRegistry(configAddress, libWeb3)
-	const metricsGroupAddress = await configContract.methods.metricsGroup().call()
+
+	const metricsGroupAddress: string = (await configContract.methods
+		.metricsGroup()
+		.call()) as string
 	const contract = new Contract(
 		builtMetricsGroup.abi as AbiItem[],
 		metricsGroupAddress
@@ -44,15 +49,16 @@ export const createMetricsGroup = async (
 	return contract
 }
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const createProperty = (libWeb3: Web3) => (property: string) => {
 	const contract = new Contract(builtProperty.abi as AbiItem[], property)
 	return contract
 }
 
-export const createWithdrawStorage = (address: string, libWeb3: Web3) =>
+export const createWithdrawStorage = (address: string) =>
 	new Contract(builtWithdrawStorage.abi as AbiItem[], address)
 
-export const createDev = (address: string, libWeb3: Web3) =>
+export const createDev = (address: string) =>
 	new Contract(builtDev.abi as AbiItem[], address)
 
 export const createGraphQLFetcher =

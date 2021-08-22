@@ -6,10 +6,12 @@ export const watch =
 		name: string,
 		handler: (err: Error, values: Record<string, string>) => void
 	): void => {
+		/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 		const { contract: deployed } = deployedContract
 		const web3WithWebsockets = new Web3(
 			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
 		)
+		/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 		const { events } = new web3WithWebsockets.eth.Contract(
 			deployed._jsonInterface,
 			deployed._address

@@ -34,20 +34,22 @@ contract(
 				expect(result).to.be.equal(false)
 			})
 			it('Existing property cannot be added', async () => {
-				const result = await dev.propertyGroup
+				await dev.propertyGroup
 					.addGroup(property, {
 						from: propertyFactory,
 					})
-					.catch((err: Error) => err)
-				validateErrorMessage(result, 'already enabled')
+					.catch((err: Error) => {
+						validateErrorMessage(err, 'already enabled')
+					})
 			})
 			it('Can not execute addGroup without propertyFactory address', async () => {
-				const result = await dev.propertyGroup
+				await dev.propertyGroup
 					.addGroup(dummyProperty, {
 						from: dummyPropertyFactory,
 					})
-					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+					.catch((err: Error) => {
+						validateAddressErrorMessage(err)
+					})
 			})
 		})
 	}
