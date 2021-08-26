@@ -7,11 +7,7 @@ import {Counters} from "@openzeppelin/contracts/drafts/Counters.sol";
 import {Strings} from "@openzeppelin/contracts/drafts/Strings.sol";
 import {IAddressConfig} from "../../interface/IAddressConfig.sol";
 
-
-contract STokensManagerTest is
-	ISTokensManager,
-	ERC721
-{
+contract STokensManagerTest is ISTokensManager, ERC721 {
 	using Counters for Counters.Counter;
 	using Strings for uint256;
 	Counters.Counter private _tokenIds;
@@ -26,15 +22,11 @@ contract STokensManagerTest is
 		_;
 	}
 
-    constructor (address _config) public ERC721() {
-        config = _config;
-    }
+	constructor(address _config) public ERC721() {
+		config = _config;
+	}
 
-	function tokenURI(uint256 _tokenId)
-		public
-		view
-		returns (string memory)
-	{
+	function tokenURI(uint256 _tokenId) public view returns (string memory) {
 		return _tokenId.fromUint256();
 	}
 

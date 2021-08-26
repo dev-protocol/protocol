@@ -58,10 +58,11 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * Initialize the passed address as AddressConfig address and Devminter.
 	 */
-	constructor(address _config, address _devMinter, address _sTokensManager)
-		public
-		UsingConfig(_config)
-	{
+	constructor(
+		address _config,
+		address _devMinter,
+		address _sTokensManager
+	) public UsingConfig(_config) {
 		devMinter = _devMinter;
 		sTokensManager = ISTokensManager(_sTokensManager);
 	}
