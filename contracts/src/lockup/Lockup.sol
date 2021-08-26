@@ -1,11 +1,14 @@
 pragma solidity 0.5.17;
+pragma experimental ABIEncoderV2;
 
 // prettier-ignore
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {ISTokensManager} from "@devprotocol/i-s-tokens/contracts/interface/ISTokensManager.sol";
 import "../common/libs/Decimals.sol";
 import "../common/config/UsingConfig.sol";
 import "../lockup/LockupStorage.sol";
+import "../../interface/IDev.sol";
 import "../../interface/IDevMinter.sol";
 import "../../interface/IProperty.sol";
 import "../../interface/IPolicy.sol";
@@ -45,6 +48,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	address public devMinter;
+	address public sTokensManager;
 	struct RewardPrices {
 		uint256 reward;
 		uint256 holders;
@@ -53,7 +57,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 	event Lockedup(address _from, address _property, uint256 _value);
 	event UpdateCap(uint256 _cap);
-	ISTokensManager public sTokensManager;
 
 	/**
 	 * Initialize the passed address as AddressConfig address and Devminter.
@@ -64,8 +67,86 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		address _sTokensManager
 	) public UsingConfig(_config) {
 		devMinter = _devMinter;
-		sTokensManager = ISTokensManager(_sTokensManager);
+		sTokensManager = _sTokensManager;
 	}
+
+	/**
+	 * Validates the passed Property has greater than 1 asset.
+	 */
+	modifier onlyAuthenticatedProperty(address _property) {
+		require(
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property),
+			"unable to stake to unauthenticated property"
+		);
+		_;
+	}
+
+	/**
+	 * Check to see if there is a position.
+	 */
+	modifier onlyPositionOwner(uint256 _tokenId) {
+		require(
+			IERC721(sTokensManager).ownerOf(_tokenId) == msg.sender,
+			"illegal sender"
+		);
+		_;
+	}
+
+	// function deposit(address _property, uint256 _amount)
+	// 	external
+	// 	onlyAuthenticatedProperty(_property)
+	// 	returns (ISTokensManager.StakingPosition memory)
+	// {
+	// 	RewardPrices memory prices = calculateCumulativeRewardPrices();
+	// 	updateValues(true, _property, _amount, prices);
+	// 	require(
+	// 		IDev(config().token()).transferFrom(msg.sender, _property, _amount),
+	// 		"dev transfer failed"
+	// 	);
+	// 	return
+	// 		ISTokensManager(sTokensManager).mint(
+	// 			ISTokensManager.MintParams(
+	// 				msg.sender,
+	// 				_property,
+	// 				_amount,
+	// 				prices.interest
+	// 			)
+	// 		);
+	// }
+
+	// function deposit(address _property, uint256 _tokenId, uint256 _amount)
+	// 	external
+	// 	onlyPositionOwner(_tokenId)
+	// 	onlyAuthenticatedProperty(_property)
+	// 	returns (ISTokensManager.StakingPosition memory)
+	// {
+	// 	ISTokensManager tokenManager = ISTokensManager(sTokensManager);
+	// 	ISTokensManager.StakingPosition memory position = tokenManager.positions(
+	// 		_tokenId
+	// 	);
+	// 	(
+	// 		uint256 withdrawable,
+	// 		RewardPrices memory prices
+	// 	) = _calculateWithdrawableInterestAmount(position);
+	// 	updateValues(true, _property, _amount, prices);
+	// 	require(
+	// 		IDev(config().token()).transferFrom(msg.sender, _property, _amount),
+	// 		"dev transfer failed"
+	// 	);
+	// 	uint256 nextAmount = position.amount.add(_amount);
+	// 	uint256 cumulative = position.cumulative.add(withdrawable);
+	// 	uint256 pending = position.pending.add(withdrawable);
+	// 	return
+	// 		tokenManager.update(
+	// 			ISTokensManager.UpdateParams(
+	// 				_tokenId,
+	// 				nextAmount,
+	// 				prices.interest,
+	// 				cumulative,
+	// 				pending
+	// 			)
+	// 		);
+	// }
 
 	/**
 	 * Adds staking.
@@ -75,7 +156,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		address _from,
 		address _property,
 		uint256 _value
-	) external {
+	) external onlyAuthenticatedProperty(_property) {
 		/**
 		 * Validates the sender is Dev contract.
 		 */
@@ -85,14 +166,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Validates _value is not 0.
 		 */
 		require(_value != 0, "illegal lockup value");
-
-		/**
-		 * Validates the passed Property has greater than 1 asset.
-		 */
-		require(
-			IMetricsGroup(config().metricsGroup()).hasAssets(_property),
-			"unable to stake to unauthenticated property"
-		);
 
 		/**
 		 * Since the reward per block that can be withdrawn will change with the addition of staking,

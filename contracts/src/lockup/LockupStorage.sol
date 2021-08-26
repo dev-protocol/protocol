@@ -553,4 +553,32 @@ contract LockupStorage is UsingStorage {
 				abi.encodePacked("_fallbackInitialCumulativeHoldersRewardCap")
 			);
 	}
+
+	//TokenId
+	function setStorageTokenId(
+		address _user,
+		address _property,
+		uint256 _tokenId
+	) internal {
+		eternalStorage().setUint(
+			getStorageTokenIdKey(_user, _property),
+			_tokenId
+		);
+	}
+
+	function getStorageTokenId(address _user, address _property)
+		public
+		view
+		returns (uint256)
+	{
+		return eternalStorage().getUint(getStorageTokenIdKey(_user, _property));
+	}
+
+	function getStorageTokenIdKey(address _user, address _property)
+		private
+		pure
+		returns (bytes32)
+	{
+		return keccak256(abi.encodePacked("_tokenId", _user, _property));
+	}
 }
