@@ -236,6 +236,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await dev.generateAddressConfig()
 			await dev.generateDev()
 			await dev.generateDevMinter()
+			await dev.generateSTokenManager()
 			await Promise.all([
 				dev.generateLockup(),
 				dev.generatePropertyFactory(),

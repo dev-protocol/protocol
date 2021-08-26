@@ -2,6 +2,7 @@ pragma solidity 0.5.17;
 
 // prettier-ignore
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {ISTokensManager} from "@devprotocol/i-s-tokens/contracts/interface/ISTokensManager.sol";
 import "../common/libs/Decimals.sol";
 import "../common/config/UsingConfig.sol";
 import "../lockup/LockupStorage.sol";
@@ -52,15 +53,17 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 	event Lockedup(address _from, address _property, uint256 _value);
 	event UpdateCap(uint256 _cap);
+	ISTokensManager public sTokensManager;
 
 	/**
 	 * Initialize the passed address as AddressConfig address and Devminter.
 	 */
-	constructor(address _config, address _devMinter)
+	constructor(address _config, address _devMinter, address _sTokensManager)
 		public
 		UsingConfig(_config)
 	{
 		devMinter = _devMinter;
+		sTokensManager = ISTokensManager(_sTokensManager);
 	}
 
 	/**
