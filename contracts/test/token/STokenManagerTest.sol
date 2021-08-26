@@ -22,7 +22,7 @@ contract STokensManagerTest is ISTokensManager, ERC721 {
 		_;
 	}
 
-	constructor(address _config) public ERC721() {
+	function initialize(address _config) external {
 		config = _config;
 	}
 

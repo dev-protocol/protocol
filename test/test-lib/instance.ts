@@ -289,9 +289,9 @@ export class DevProtocolInstance {
 
 	public async generateSTokenManager(): Promise<void> {
 		this._sTokensManager = await contract('STokensManagerTest').new(
-			this.addressConfig.address,
 			this.fromDeployer
 		)
+		await this._sTokensManager.initialize(this.addressConfig.address)
 	}
 
 	public async generateWithdrawTest(): Promise<void> {
