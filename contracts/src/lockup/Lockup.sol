@@ -94,17 +94,18 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		);
 		_;
 	}
-			// Lockupイベントを追加する
-			// コンバートのてま
-			//    https://hackmd.io/@aggre/r1BuefllY
-			//    変数を0にしておけstorageValue
-			//    getStoragePendingInterestWithdrawal
-			//    getStorageValue
-			//     leagcyなんとかも追加で
-			// DescriptorのTODO確認
-// 			Update DIP-66
-// - Add Deposited event emitting to two deposit functions
-// - Add migrateToSTokens function to Lockup
+
+	// Lockupイベントを追加する
+	// コンバートのてま
+	//    https://hackmd.io/@aggre/r1BuefllY
+	//    変数を0にしておけstorageValue
+	//    getStoragePendingInterestWithdrawal
+	//    getStorageValue
+	//     leagcyなんとかも追加で
+	// DescriptorのTODO確認
+	// 			Update DIP-66
+	// - Add Deposited event emitting to two deposit functions
+	// - Add migrateToSTokens function to Lockup
 
 	/**
 	 * @dev deposit dev token to dev protocol and generate s-token
@@ -112,7 +113,11 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * @param _amount staking value
 	 * @return tokenId The ID of the created new staking position
 	 */
-  	function deposit(address _property, uint256 _amount) external onlyAuthenticatedProperty(_property) returns(uint256) {
+	function deposit(address _property, uint256 _amount)
+		external
+		onlyAuthenticatedProperty(_property)
+		returns (uint256)
+	{
 		/**
 		 * Validates _amount is not 0.
 		 */
@@ -120,22 +125,45 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Gets the latest cumulative sum of the interest price.
 		 */
-	  	(uint256 reward, uint256 holders, uint256 interest, uint256 holdersCap) = calculateCumulativeRewardPrices();
+		(
+			uint256 reward,
+			uint256 holders,
+			uint256 interest,
+			uint256 holdersCap
+		) = calculateCumulativeRewardPrices();
 		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
 		// TODO updateValuesの引数がややこしいので、確認。RewardPricesの構成あってる？
-		updateValues(true, msg.sender, _property, _amount, RewardPrices(reward, holders, interest, holdersCap));
+		updateValues(
+			true,
+			msg.sender,
+			_property,
+			_amount,
+			RewardPrices(reward, holders, interest, holdersCap)
+		);
 		/**
 		 * transfer dev tokens
 		 */
-		require(IERC20(config().token()).transferFrom(msg.sender, _property, _amount), "dev transfer failed");
+		require(
+			IERC20(config().token()).transferFrom(
+				msg.sender,
+				_property,
+				_amount
+			),
+			"dev transfer failed"
+		);
 		/**
 		 * mint s tokens
 		 */
-		uint256 tokenId =  ISTokensManager(sTokensManager).mint(msg.sender, _property, _amount, interest);
+		uint256 tokenId = ISTokensManager(sTokensManager).mint(
+			msg.sender,
+			_property,
+			_amount,
+			interest
+		);
 		return tokenId;
-  	}
+	}
 
 	/**
 	 * @dev deposit dev token to dev protocol and update s-token status
@@ -143,7 +171,11 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * @param _amount staking value
 	 * @return bool On success, true will be returned
 	 */
-	function deposit(uint256 _tokenId, uint256 _amount) external onlyPositionOwner(_tokenId) returns(bool) {
+	function deposit(uint256 _tokenId, uint256 _amount)
+		external
+		onlyPositionOwner(_tokenId)
+		returns (bool)
+	{
 		/**
 		 * Validates _amount is not 0.
 		 */
@@ -162,7 +194,10 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Gets the withdrawable amount.
 		 */
-		(uint256 withdrawable, RewardPrices memory prices) = _calculateWithdrawableInterestAmount(property, msg.sender);
+		(
+			uint256 withdrawable,
+			RewardPrices memory prices
+		) = _calculateWithdrawableInterestAmount(property, msg.sender);
 		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
@@ -171,16 +206,28 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * transfer dev tokens
 		 */
-		require(IERC20(config().token()).transferFrom(msg.sender, property, _amount), "dev transfer failed");
+		require(
+			IERC20(config().token()).transferFrom(
+				msg.sender,
+				property,
+				_amount
+			),
+			"dev transfer failed"
+		);
 		uint256 nextAmount = amount.add(_amount);
 		uint256 cumulative = cumulativeReward.add(withdrawable);
 		uint256 pending = pendingReward.add(withdrawable);
 		/**
 		 * update s tokens information
 		 */
-		return sTokenManager.update(
-			_tokenId, nextAmount, prices.interest, cumulative, pending
-		);
+		return
+			sTokenManager.update(
+				_tokenId,
+				nextAmount,
+				prices.interest,
+				cumulative,
+				pending
+			);
 	}
 
 	/**
