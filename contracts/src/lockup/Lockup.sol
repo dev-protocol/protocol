@@ -1,9 +1,10 @@
 pragma solidity 0.5.17;
-pragma experimental ABIEncoderV2;
+//pragma experimental ABIEncoderV2;
 
 // prettier-ignore
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ISTokensManager} from "@devprotocol/i-s-tokens/contracts/interface/ISTokensManager.sol";
 import "../common/libs/Decimals.sol";
 import "../common/config/UsingConfig.sol";
@@ -71,7 +72,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 
 	/**
-	 * Validates the passed Property has greater than 1 asset.
+	 * @dev Validates the passed Property has greater than 1 asset.
+	 * @param _property property address
 	 */
 	modifier onlyAuthenticatedProperty(address _property) {
 		require(
@@ -82,7 +84,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 
 	/**
-	 * Check to see if there is a position.
+	 * @dev Check if the owner of the token is a sender.
+	 * @param _tokenId The ID of the staking position
 	 */
 	modifier onlyPositionOwner(uint256 _tokenId) {
 		require(
@@ -91,62 +94,94 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		);
 		_;
 	}
+			// Lockupイベントを追加する
+			// コンバートのてま
+			//    https://hackmd.io/@aggre/r1BuefllY
+			//    変数を0にしておけstorageValue
+			//    getStoragePendingInterestWithdrawal
+			//    getStorageValue
+			//     leagcyなんとかも追加で
+			// DescriptorのTODO確認
+// 			Update DIP-66
+// - Add Deposited event emitting to two deposit functions
+// - Add migrateToSTokens function to Lockup
 
-	// function deposit(address _property, uint256 _amount)
-	// 	external
-	// 	onlyAuthenticatedProperty(_property)
-	// 	returns (ISTokensManager.StakingPosition memory)
-	// {
-	// 	RewardPrices memory prices = calculateCumulativeRewardPrices();
-	// 	updateValues(true, _property, _amount, prices);
-	// 	require(
-	// 		IDev(config().token()).transferFrom(msg.sender, _property, _amount),
-	// 		"dev transfer failed"
-	// 	);
-	// 	return
-	// 		ISTokensManager(sTokensManager).mint(
-	// 			ISTokensManager.MintParams(
-	// 				msg.sender,
-	// 				_property,
-	// 				_amount,
-	// 				prices.interest
-	// 			)
-	// 		);
-	// }
+	/**
+	 * @dev deposit dev token to dev protocol and generate s-token
+	 * @param _property target property address
+	 * @param _amount staking value
+	 * @return tokenId The ID of the created new staking position
+	 */
+  	function deposit(address _property, uint256 _amount) external onlyAuthenticatedProperty(_property) returns(uint256) {
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+		/**
+		 * Gets the latest cumulative sum of the interest price.
+		 */
+	  	(uint256 reward, uint256 holders, uint256 interest, uint256 holdersCap) = calculateCumulativeRewardPrices();
+		/**
+		 * Saves variables that should change due to the addition of staking.
+		 */
+		// TODO updateValuesの引数がややこしいので、確認。RewardPricesの構成あってる？
+		updateValues(true, msg.sender, _property, _amount, RewardPrices(reward, holders, interest, holdersCap));
+		/**
+		 * transfer dev tokens
+		 */
+		require(IERC20(config().token()).transferFrom(msg.sender, _property, _amount), "dev transfer failed");
+		/**
+		 * mint s tokens
+		 */
+		uint256 tokenId =  ISTokensManager(sTokensManager).mint(msg.sender, _property, _amount, interest);
+		return tokenId;
+  	}
 
-	// function deposit(address _property, uint256 _tokenId, uint256 _amount)
-	// 	external
-	// 	onlyPositionOwner(_tokenId)
-	// 	onlyAuthenticatedProperty(_property)
-	// 	returns (ISTokensManager.StakingPosition memory)
-	// {
-	// 	ISTokensManager tokenManager = ISTokensManager(sTokensManager);
-	// 	ISTokensManager.StakingPosition memory position = tokenManager.positions(
-	// 		_tokenId
-	// 	);
-	// 	(
-	// 		uint256 withdrawable,
-	// 		RewardPrices memory prices
-	// 	) = _calculateWithdrawableInterestAmount(position);
-	// 	updateValues(true, _property, _amount, prices);
-	// 	require(
-	// 		IDev(config().token()).transferFrom(msg.sender, _property, _amount),
-	// 		"dev transfer failed"
-	// 	);
-	// 	uint256 nextAmount = position.amount.add(_amount);
-	// 	uint256 cumulative = position.cumulative.add(withdrawable);
-	// 	uint256 pending = position.pending.add(withdrawable);
-	// 	return
-	// 		tokenManager.update(
-	// 			ISTokensManager.UpdateParams(
-	// 				_tokenId,
-	// 				nextAmount,
-	// 				prices.interest,
-	// 				cumulative,
-	// 				pending
-	// 			)
-	// 		);
-	// }
+	/**
+	 * @dev deposit dev token to dev protocol and update s-token status
+	 * @param _tokenId s-token id
+	 * @param _amount staking value
+	 * @return bool On success, true will be returned
+	 */
+	function deposit(uint256 _tokenId, uint256 _amount) external onlyPositionOwner(_tokenId) returns(bool) {
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+		ISTokensManager sTokenManager = ISTokensManager(sTokensManager);
+		/**
+		 * get position information
+		 */
+		(
+			address property,
+			uint256 amount,
+			,
+			uint256 cumulativeReward,
+			uint256 pendingReward
+		) = sTokenManager.positions(_tokenId);
+		/**
+		 * Gets the withdrawable amount.
+		 */
+		(uint256 withdrawable, RewardPrices memory prices) = _calculateWithdrawableInterestAmount(property, msg.sender);
+		/**
+		 * Saves variables that should change due to the addition of staking.
+		 */
+		// TODO updateValuesの引数がややこしいので、確認。_amountは多分これであってるやろうけど
+		updateValues(true, msg.sender, property, _amount, prices);
+		/**
+		 * transfer dev tokens
+		 */
+		require(IERC20(config().token()).transferFrom(msg.sender, property, _amount), "dev transfer failed");
+		uint256 nextAmount = amount.add(_amount);
+		uint256 cumulative = cumulativeReward.add(withdrawable);
+		uint256 pending = pendingReward.add(withdrawable);
+		/**
+		 * update s tokens information
+		 */
+		return sTokenManager.update(
+			_tokenId, nextAmount, prices.interest, cumulative, pending
+		);
+	}
 
 	/**
 	 * Adds staking.

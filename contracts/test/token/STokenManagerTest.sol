@@ -39,14 +39,13 @@ contract STokensManagerTest is ISTokensManager, ERC721 {
 		uint256 newItemId = _tokenIds.current();
 		_safeMint(_params.owner, newItemId);
 		StakingPosition memory newPosition = StakingPosition(
-			_params.owner,
 			_params.property,
 			_params.amount,
 			_params.price,
 			0,
 			0
 		);
-		setStoragePositionV1(newItemId, newPosition);
+		setStoragePositionsV1(newItemId, newPosition);
 		return (newItemId, newPosition);
 	}
 
@@ -56,46 +55,46 @@ contract STokensManagerTest is ISTokensManager, ERC721 {
 		returns (StakingPosition memory)
 	{
 		require(_exists(_params.tokenId), "not found");
-		StakingPosition memory currentPosition = getStoragePositionV1(
+		StakingPosition memory currentPosition = getStoragePositionsV1(
 			_params.tokenId
 		);
 		currentPosition.amount = _params.amount;
 		currentPosition.price = _params.price;
 		currentPosition.cumulativeReward = _params.cumulativeReward;
 		currentPosition.pendingReward = _params.pendingReward;
-		setStoragePositionV1(_params.tokenId, currentPosition);
+		setStoragePositionsV1(_params.tokenId, currentPosition);
 		return currentPosition;
 	}
 
-	function position(uint256 _tokenId)
+	function positions(uint256 _tokenId)
 		external
 		view
 		returns (StakingPosition memory)
 	{
-		return getStoragePositionV1(_tokenId);
+		return getStoragePositionsV1(_tokenId);
 	}
 
-	function getStoragePositionV1(uint256 _tokenId)
+	function getStoragePositionsV1(uint256 _tokenId)
 		private
 		view
 		returns (StakingPosition memory)
 	{
-		bytes32 key = getStoragePositionV1Key(_tokenId);
+		bytes32 key = getStoragePositionsV1Key(_tokenId);
 		bytes memory tmp = bytesStorage[key];
 		require(keccak256(tmp) != keccak256(bytes("")), "illegal token id");
 		return abi.decode(tmp, (StakingPosition));
 	}
 
-	function setStoragePositionV1(
+	function setStoragePositionsV1(
 		uint256 _tokenId,
 		StakingPosition memory _position
 	) private {
-		bytes32 key = getStoragePositionV1Key(_tokenId);
+		bytes32 key = getStoragePositionsV1Key(_tokenId);
 		bytes memory tmp = abi.encode(_position);
 		bytesStorage[key] = tmp;
 	}
 
-	function getStoragePositionV1Key(uint256 _tokenId)
+	function getStoragePositionsV1Key(uint256 _tokenId)
 		private
 		pure
 		returns (bytes32)
