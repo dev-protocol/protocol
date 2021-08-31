@@ -134,10 +134,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
-		// TODO updateValuesの引数がややこしいので、確認。RewardPricesの構成あってる？
 		updateValues(
 			true,
-			msg.sender,
 			_property,
 			_amount,
 			RewardPrices(reward, holders, interest, holdersCap)
@@ -180,29 +178,33 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Validates _amount is not 0.
 		 */
 		require(_amount != 0, "illegal deposit amount");
-		ISTokensManager sTokenManager = ISTokensManager(sTokensManager);
+		ISTokensManager sTokenManagerInstance = ISTokensManager(sTokensManager);
 		/**
 		 * get position information
 		 */
 		(
 			address property,
 			uint256 amount,
-			,
+			uint256 price,
 			uint256 cumulativeReward,
 			uint256 pendingReward
-		) = sTokenManager.positions(_tokenId);
+		) = sTokenManagerInstance.positions(_tokenId);
 		/**
 		 * Gets the withdrawable amount.
 		 */
 		(
 			uint256 withdrawable,
 			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(property, msg.sender);
+		) = _calculateWithdrawableInterestAmount(
+				property,
+				amount,
+				price,
+				pendingReward
+			);
 		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
-		// TODO updateValuesの引数がややこしいので、確認。_amountは多分これであってるやろうけど
-		updateValues(true, msg.sender, property, _amount, prices);
+		updateValues(true, property, _amount, prices);
 		/**
 		 * transfer dev tokens
 		 */
@@ -214,19 +216,16 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			),
 			"dev transfer failed"
 		);
-		uint256 nextAmount = amount.add(_amount);
-		uint256 cumulative = cumulativeReward.add(withdrawable);
-		uint256 pending = pendingReward.add(withdrawable);
 		/**
 		 * update s tokens information
 		 */
 		return
-			sTokenManager.update(
+			sTokenManagerInstance.update(
 				_tokenId,
-				nextAmount,
+				amount.add(_amount),
 				prices.interest,
-				cumulative,
-				pending
+				cumulativeReward.add(withdrawable),
+				pendingReward.add(withdrawable)
 			);
 	}
 
@@ -261,9 +260,54 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
-		updateValues(true, _from, _property, _value, prices);
+		updateValues4Legacy(true, _from, _property, _value, prices);
 
 		emit Lockedup(_from, _property, _value);
+	}
+
+	/**
+	 * Withdraw staking.(NFT)
+	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
+	 */
+	//　TODO interfaceに追加
+	// TODO 全体的にコメント追加
+	function withdraw(uint256 _tokenId, uint256 _amount)
+		external
+		onlyPositionOwner(_tokenId)
+		returns (bool)
+	{
+		ISTokensManager sTokenManagerInstance = ISTokensManager(sTokensManager);
+		/**
+		 * get position information
+		 */
+		(
+			address property,
+			uint256 amount,
+			uint256 price,
+			uint256 cumulativeReward,
+			uint256 pendingReward
+		) = sTokenManagerInstance.positions(_tokenId);
+		require(amount >= _amount, "insufficient tokens staked");
+		(uint256 value, RewardPrices memory prices) = _withdrawInterest(
+			property,
+			amount,
+			price,
+			pendingReward
+		);
+		if (_amount != 0) {
+			IProperty(property).withdraw(msg.sender, _amount);
+		}
+		updateValues(false, property, _amount, prices);
+		// TODO ここ、cumulativeRewardでええんかな、後で確認
+		uint256 cumulative = cumulativeReward.add(value);
+		return
+			sTokenManagerInstance.update(
+				_tokenId,
+				amount.sub(_amount),
+				prices.interest,
+				cumulative,
+				0
+			);
 	}
 
 	/**
@@ -282,7 +326,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Withdraws the staking reward
 		 */
-		RewardPrices memory prices = _withdrawInterest(_property);
+		RewardPrices memory prices = _withdrawInterest4Legacy(_property);
 
 		/**
 		 * Transfer the staked amount to the sender.
@@ -294,7 +338,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Saves variables that should change due to the canceling staking..
 		 */
-		updateValues(false, msg.sender, _property, _amount, prices);
+		updateValues4Legacy(false, msg.sender, _property, _amount, prices);
 	}
 
 	/**
@@ -347,11 +391,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * Store staking states as a snapshot.
 	 */
-	function beforeStakesChanged(
-		address _property,
-		address _user,
-		RewardPrices memory _prices
-	) private {
+	function beforeStakesChanged(address _property, RewardPrices memory _prices)
+		private
+	{
 		/**
 		 * Gets latest cumulative holders reward for the passed Property.
 		 */
@@ -379,7 +421,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Store each value.
 		 */
-		setStorageLastStakedInterestPrice(_property, _user, _prices.interest);
 		setStorageLastStakesChangedCumulativeReward(_prices.reward);
 		setStorageLastCumulativeHoldersRewardPrice(_prices.holders);
 		setStorageLastCumulativeInterestPrice(_prices.interest);
@@ -600,7 +641,42 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * Returns the staker reward as interest.
 	 */
-	function _calculateInterestAmount(address _property, address _user)
+	function _calculateInterestAmount(uint256 _amount, uint256 _price)
+		private
+		view
+		returns (
+			uint256 amount_,
+			uint256 interestPrice_,
+			RewardPrices memory prices_
+		)
+	{
+		/**
+		 * Gets the latest cumulative sum of the interest price.
+		 */
+		(
+			uint256 reward,
+			uint256 holders,
+			uint256 interest,
+			uint256 holdersCap
+		) = calculateCumulativeRewardPrices();
+
+		/**
+		 * Calculates and returns the latest withdrawable reward amount from the difference.
+		 */
+		uint256 result = interest >= _price
+			? interest.sub(_price).mul(_amount).divBasis()
+			: 0;
+		return (
+			result,
+			interest,
+			RewardPrices(reward, holders, interest, holdersCap)
+		);
+	}
+
+	/**
+	 * Returns the staker reward as interest.
+	 */
+	function _calculateInterestAmount4Legacy(address _property, address _user)
 		private
 		view
 		returns (
@@ -650,6 +726,46 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 */
 	function _calculateWithdrawableInterestAmount(
 		address _property,
+		uint256 _amount,
+		uint256 _price,
+		uint256 _pendingReward
+	) private view returns (uint256 amount_, RewardPrices memory prices_) {
+		/**
+		 * If the passed Property has not authenticated, returns always 0.
+		 */
+		if (
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+		) {
+			return (0, RewardPrices(0, 0, 0, 0));
+		}
+
+		/**
+		 * Gets the reward amount in saved without withdrawal.
+		 */
+		// TODO StakingPositionの構成が変わった。ここは_pendingRewardで大丈夫なのか確認、多分いけるやろうけど
+		uint256 pending = _pendingReward;
+
+		/**
+		 * Gets the latest withdrawal reward amount.
+		 */
+		(
+			uint256 amount,
+			,
+			RewardPrices memory prices
+		) = _calculateInterestAmount(_amount, _price);
+
+		/**
+		 * Returns the sum of all values.
+		 */
+		uint256 withdrawableAmount = amount.add(pending);
+		return (withdrawableAmount, prices);
+	}
+
+	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
+	 */
+	function _calculateWithdrawableInterestAmount4Legacy(
+		address _property,
 		address _user
 	) private view returns (uint256 _amount, RewardPrices memory _prices) {
 		/**
@@ -678,7 +794,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			uint256 amount,
 			,
 			RewardPrices memory prices
-		) = _calculateInterestAmount(_property, _user);
+		) = _calculateInterestAmount4Legacy(_property, _user);
 
 		/**
 		 * Returns the sum of all values.
@@ -694,7 +810,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		address _property,
 		address _user
 	) public view returns (uint256) {
-		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
+		// TODO ここから呼び出すの、legacyの方で大丈夫？多分違う気がする
+		(uint256 amount, ) = _calculateWithdrawableInterestAmount4Legacy(
 			_property,
 			_user
 		);
@@ -704,7 +821,45 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * Withdraws staking reward as an interest.
 	 */
-	function _withdrawInterest(address _property)
+	function _withdrawInterest(
+		address _property,
+		uint256 _amount,
+		uint256 _price,
+		uint256 _pendingReward
+	) private returns (uint256 value_, RewardPrices memory prices_) {
+		/**
+		 * Gets the withdrawable amount.
+		 */
+		(
+			uint256 value,
+			RewardPrices memory prices
+		) = _calculateWithdrawableInterestAmount(
+				_property,
+				_amount,
+				_price,
+				_pendingReward
+			);
+
+		/**
+		 * Mints the reward.
+		 */
+		require(
+			IDevMinter(devMinter).mint(msg.sender, value),
+			"dev mint failed"
+		);
+
+		/**
+		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
+		 */
+		update();
+
+		return (value, prices);
+	}
+
+	/**
+	 * Withdraws staking reward as an interest.
+	 */
+	function _withdrawInterest4Legacy(address _property)
 		private
 		returns (RewardPrices memory _prices)
 	{
@@ -714,7 +869,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		(
 			uint256 value,
 			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(_property, msg.sender);
+		) = _calculateWithdrawableInterestAmount4Legacy(_property, msg.sender);
 
 		/**
 		 * Sets the unwithdrawn reward amount to 0.
@@ -747,17 +902,36 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		return prices;
 	}
 
-	/**
-	 * Status updates with the addition or release of staking.
-	 */
-	function updateValues(
+	function updateValues4Legacy(
 		bool _addition,
 		address _account,
 		address _property,
 		uint256 _value,
 		RewardPrices memory _prices
 	) private {
-		beforeStakesChanged(_property, _account, _prices);
+		setStorageLastStakedInterestPrice(
+			_property,
+			_account,
+			_prices.interest
+		);
+		updateValues(_addition, _property, _value, _prices);
+		if (_addition) {
+			addValue(_property, _account, _value);
+		} else {
+			subValue(_property, _account, _value);
+		}
+	}
+
+	/**
+	 * Status updates with the addition or release of staking.
+	 */
+	function updateValues(
+		bool _addition,
+		address _property,
+		uint256 _value,
+		RewardPrices memory _prices
+	) private {
+		beforeStakesChanged(_property, _prices);
 		/**
 		 * If added staking:
 		 */
@@ -771,12 +945,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			 * Updates the current staking amount of the Property.
 			 */
 			addPropertyValue(_property, _value);
-
-			/**
-			 * Updates the user's current staking amount in the Property.
-			 */
-			addValue(_property, _account, _value);
-
 			/**
 			 * If released staking:
 			 */
@@ -790,11 +958,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			 * Updates the current staking amount of the Property.
 			 */
 			subPropertyValue(_property, _value);
-
-			/**
-			 * Updates the current staking amount of the Property.
-			 */
-			subValue(_property, _account, _value);
 		}
 
 		/**
@@ -919,7 +1082,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		(
 			uint256 withdrawableAmount,
 			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(_property, _user);
+		) = _calculateWithdrawableInterestAmount4Legacy(_property, _user);
 
 		/**
 		 * Saves the amount to `PendingInterestWithdrawal` storage.
