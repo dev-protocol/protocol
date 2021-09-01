@@ -1,5 +1,4 @@
 pragma solidity 0.5.17;
-//pragma experimental ABIEncoderV2;
 
 // prettier-ignore
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
@@ -57,6 +56,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 holdersCap;
 	}
 	event Lockedup(address _from, address _property, uint256 _value);
+	event Deposited(address _from, uint256 _tokenId, uint256 _value);
 	event UpdateCap(uint256 _cap);
 
 	/**
@@ -94,18 +94,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		);
 		_;
 	}
-
-	// Lockupイベントを追加する
-	// コンバートのてま
-	//    https://hackmd.io/@aggre/r1BuefllY
-	//    変数を0にしておけstorageValue
-	//    getStoragePendingInterestWithdrawal
-	//    getStorageValue
-	//     leagcyなんとかも追加で
-	// DescriptorのTODO確認
-	// 			Update DIP-66
-	// - Add Deposited event emitting to two deposit functions
-	// - Add migrateToSTokens function to Lockup
 
 	/**
 	 * @dev deposit dev token to dev protocol and generate s-token
@@ -160,6 +148,11 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_amount,
 			interest
 		);
+		// TODO イベントしつこくないかな。。。ISTokensManager.mintの中でも履いてるしな。。。
+		// ガスが気になる。。。
+		emit Lockedup(msg.sender, _property, _amount);
+		// Propertyはいらないと判断して除外した。tokenIdからpositionsで取得できるから。
+		emit Deposited(msg.sender, tokenId, _amount);
 		return tokenId;
 	}
 
@@ -217,16 +210,25 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			"dev transfer failed"
 		);
 		/**
-		 * update s tokens information
+		 * update position information
 		 */
-		return
-			sTokenManagerInstance.update(
-				_tokenId,
-				amount.add(_amount),
-				prices.interest,
-				cumulativeReward.add(withdrawable),
-				pendingReward.add(withdrawable)
-			);
+		bool result = sTokenManagerInstance.update(
+			_tokenId,
+			amount.add(_amount),
+			prices.interest,
+			cumulativeReward.add(withdrawable),
+			pendingReward.add(withdrawable)
+		);
+		require(result, "failed to update");
+		/**
+		 * generate events
+		 */
+		// TODO イベントしつこくないかな。。。ISTokensManager.updateの中でも履いてるしな。。。
+		// ガスが気になる。。。
+		emit Lockedup(msg.sender, property, _amount);
+		// TODO Propertyはいらないと判断して除外した。tokenIdからpositionsで取得できるから。
+		emit Deposited(msg.sender, _tokenId, _amount);
+		return true;
 	}
 
 	/**
@@ -287,19 +289,34 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			uint256 cumulativeReward,
 			uint256 pendingReward
 		) = sTokenManagerInstance.positions(_tokenId);
+		/**
+		 * If the balance of the withdrawal request is bigger than the balance you are staking
+		 */
 		require(amount >= _amount, "insufficient tokens staked");
+		/**
+		 * Withdraws the staking reward
+		 */
 		(uint256 value, RewardPrices memory prices) = _withdrawInterest(
 			property,
 			amount,
 			price,
 			pendingReward
 		);
+		/**
+		 * Transfer the staked amount to the sender.
+		 */
 		if (_amount != 0) {
 			IProperty(property).withdraw(msg.sender, _amount);
 		}
+		/**
+		 * Saves variables that should change due to the canceling staking..
+		 */
 		updateValues(false, property, _amount, prices);
 		// TODO ここ、cumulativeRewardでええんかな、後で確認
 		uint256 cumulative = cumulativeReward.add(value);
+		/**
+		 * update position information
+		 */
 		return
 			sTokenManagerInstance.update(
 				_tokenId,
@@ -811,6 +828,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		address _user
 	) public view returns (uint256) {
 		// TODO ここから呼び出すの、legacyの方で大丈夫？多分違う気がする
+		// TODO legacyじゃない、_calculateWithdrawableInterestAmountをコールするpublic関数も作らなくちゃダメ？
 		(uint256 amount, ) = _calculateWithdrawableInterestAmount4Legacy(
 			_property,
 			_user
@@ -902,6 +920,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		return prices;
 	}
 
+	/**
+	 * Status updates with the addition or release of staking.
+	 */
 	function updateValues4Legacy(
 		bool _addition,
 		address _account,
@@ -909,12 +930,18 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 _value,
 		RewardPrices memory _prices
 	) private {
+		/**
+		 * Updates the staking status to avoid double rewards.
+		 */
 		setStorageLastStakedInterestPrice(
 			_property,
 			_account,
 			_prices.interest
 		);
 		updateValues(_addition, _property, _value, _prices);
+		/**
+		 * Updates the staking value of property by user
+		 */
 		if (_addition) {
 			addValue(_property, _account, _value);
 		} else {
@@ -1136,5 +1163,77 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		onlyOwner
 	{
 		setStorageFallbackInitialCumulativeHoldersRewardCap(_value);
+	}
+
+	/**
+	 * migration to nft
+	 */
+	function migrateToSTokens(address _property)
+		external
+		returns (uint256 tokenId_)
+	{
+		/**
+		 * Get the amount the user is staking for the Property.
+		 */
+		uint256 amount = getStorageValue(_property, msg.sender);
+		require(amount > 0, "not staked");
+		/**
+		 * Gets the withdrawable amount.
+		 */
+		// TODO ここのvalueとprocesはなんのために取得しているのか。
+		(
+			// solhint-disable-next-line no-unused-vars
+			uint256 value,
+			// solhint-disable-next-line no-unused-vars
+			RewardPrices memory prices
+		) = _calculateWithdrawableInterestAmount4Legacy(_property, msg.sender);
+
+		/**
+		 * Sets the unwithdrawn reward amount to 0.
+		 */
+		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
+		/**
+		 * The amount of the user's investment in the property is set to zero.
+		 */
+		setStorageValue(_property, msg.sender, 0);
+		// TODO ここでLegacyなんとかって言う関数を使ってvalueを0にしておくとmtgで言っていたが、どこのことか分からず。。。
+		//      __updateLegacyWithdrawableInterestAmount  <-  これ？
+		/**
+		 * Gets the cumulative sum of the interest price recorded the last time you withdrew.
+		 */
+		uint256 price = getStorageLastStakedInterestPrice(
+			_property,
+			msg.sender
+		);
+		/**
+		 * Gets the reward amount in saved without withdrawal.
+		 */
+		uint256 pending = getStoragePendingInterestWithdrawal(
+			_property,
+			msg.sender
+		);
+		ISTokensManager sTokenManagerInstance = ISTokensManager(sTokensManager);
+		/**
+		 * mint nft
+		 */
+		uint256 tokenId = sTokenManagerInstance.mint(
+			msg.sender,
+			_property,
+			amount,
+			price
+		);
+		/**
+		 * update position information
+		 */
+		// TODO 第四引数、amountであってるのか確認
+		bool result = sTokenManagerInstance.update(
+			tokenId,
+			amount,
+			price,
+			amount,
+			pending
+		);
+		require(result, "failed to update");
+		return tokenId;
 	}
 }

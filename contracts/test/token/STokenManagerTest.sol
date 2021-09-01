@@ -1,18 +1,25 @@
 pragma solidity 0.5.17;
 pragma experimental ABIEncoderV2;
 
-import {ISTokensManager} from "@devprotocol/i-s-tokens/contracts/interface/ISTokensManager.sol";
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Counters} from "@openzeppelin/contracts/drafts/Counters.sol";
 import {Strings} from "@openzeppelin/contracts/drafts/Strings.sol";
 import {IAddressConfig} from "../../interface/IAddressConfig.sol";
 
-contract STokensManagerTest is ISTokensManager, ERC721 {
+contract STokensManagerTest is ERC721 {
 	using Counters for Counters.Counter;
 	using Strings for uint256;
 	Counters.Counter private _tokenIds;
 	address public config;
 	mapping(bytes32 => bytes) private bytesStorage;
+
+	struct StakingPositionV1 {
+		address property;
+		uint256 amount;
+		uint256 price;
+		uint256 cumulativeReward;
+		uint256 pendingReward;
+	}
 
 	modifier onlyLockup() {
 		require(
@@ -26,68 +33,86 @@ contract STokensManagerTest is ISTokensManager, ERC721 {
 		config = _config;
 	}
 
-	function tokenURI(uint256 _tokenId) public view returns (string memory) {
+	function tokenURI(uint256 _tokenId) public pure returns (string memory) {
 		return _tokenId.fromUint256();
 	}
 
-	function mint(MintParams calldata _params)
-		external
-		onlyLockup
-		returns (uint256, StakingPosition memory)
-	{
+	function mint(
+		address _owner,
+		address _property,
+		uint256 _amount,
+		uint256 _price
+	) external onlyLockup returns (uint256 tikenId_) {
 		_tokenIds.increment();
-		uint256 newItemId = _tokenIds.current();
-		_safeMint(_params.owner, newItemId);
-		StakingPosition memory newPosition = StakingPosition(
-			_params.property,
-			_params.amount,
-			_params.price,
+		uint256 newTokenId = _tokenIds.current();
+		_safeMint(_owner, newTokenId);
+		StakingPositionV1 memory newPosition = StakingPositionV1(
+			_property,
+			_amount,
+			_price,
 			0,
 			0
 		);
-		setStoragePositionsV1(newItemId, newPosition);
-		return (newItemId, newPosition);
+		setStoragePositionsV1(newTokenId, newPosition);
+		return newTokenId;
 	}
 
-	function update(UpdateParams calldata _params)
-		external
-		onlyLockup
-		returns (StakingPosition memory)
-	{
-		require(_exists(_params.tokenId), "not found");
-		StakingPosition memory currentPosition = getStoragePositionsV1(
-			_params.tokenId
+	function update(
+		uint256 _tikenId,
+		uint256 _amount,
+		uint256 _price,
+		uint256 _cumulativeReward,
+		uint256 _pendingReward
+	) external onlyLockup returns (bool) {
+		require(_exists(_tikenId), "not found");
+		StakingPositionV1 memory currentPosition = getStoragePositionsV1(
+			_tikenId
 		);
-		currentPosition.amount = _params.amount;
-		currentPosition.price = _params.price;
-		currentPosition.cumulativeReward = _params.cumulativeReward;
-		currentPosition.pendingReward = _params.pendingReward;
-		setStoragePositionsV1(_params.tokenId, currentPosition);
-		return currentPosition;
+		currentPosition.amount = _amount;
+		currentPosition.price = _price;
+		currentPosition.cumulativeReward = _cumulativeReward;
+		currentPosition.pendingReward = _pendingReward;
+		setStoragePositionsV1(_tikenId, currentPosition);
+		return true;
 	}
 
 	function positions(uint256 _tokenId)
 		external
 		view
-		returns (StakingPosition memory)
+		returns (
+			address property_,
+			uint256 amount_,
+			uint256 price_,
+			uint256 cumulativeReward_,
+			uint256 pendingReward_
+		)
 	{
-		return getStoragePositionsV1(_tokenId);
+		StakingPositionV1 memory currentPosition = getStoragePositionsV1(
+			_tokenId
+		);
+		return (
+			currentPosition.property,
+			currentPosition.amount,
+			currentPosition.price,
+			currentPosition.cumulativeReward,
+			currentPosition.pendingReward
+		);
 	}
 
 	function getStoragePositionsV1(uint256 _tokenId)
 		private
 		view
-		returns (StakingPosition memory)
+		returns (StakingPositionV1 memory)
 	{
 		bytes32 key = getStoragePositionsV1Key(_tokenId);
 		bytes memory tmp = bytesStorage[key];
 		require(keccak256(tmp) != keccak256(bytes("")), "illegal token id");
-		return abi.decode(tmp, (StakingPosition));
+		return abi.decode(tmp, (StakingPositionV1));
 	}
 
 	function setStoragePositionsV1(
 		uint256 _tokenId,
-		StakingPosition memory _position
+		StakingPositionV1 memory _position
 	) private {
 		bytes32 key = getStoragePositionsV1Key(_tokenId);
 		bytes memory tmp = abi.encode(_position);
