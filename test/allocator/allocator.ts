@@ -63,7 +63,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	}
 
 	describe('Allocator: calculateMaxRewardsPerBlock', () => {
-		it.only('With no authentication or lockup, no DEV will be mint.', async () => {
+		it('With no authentication or lockup, no DEV will be mint.', async () => {
 			const [dev] = await init()
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()
 			expect(res.toNumber()).to.be.equal(0)

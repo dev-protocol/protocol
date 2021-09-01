@@ -2,11 +2,11 @@
 pragma solidity >=0.5.17;
 
 interface ILockup {
-	function deposit(address _property, uint256 _amount)
+	function depositMint(address _property, uint256 _amount)
 		external
 		returns (uint256);
 
-	function deposit(uint256 _tokenId, uint256 _amount) external returns (bool);
+	function depositUpdate(uint256 _tokenId, uint256 _amount) external returns (bool);
 
 	function lockup(
 		address _from,
@@ -18,7 +18,7 @@ interface ILockup {
 
 	function withdraw(address _property, uint256 _amount) external;
 
-	function withdraw(uint256 _tokenId, uint256 _amount)
+	function withdrawByTokenId(uint256 _tokenId, uint256 _amount)
 		external
 		returns (bool);
 
@@ -68,6 +68,8 @@ interface ILockup {
 	function updateCap(uint256 _cap) external;
 
 	function devMinter() external view returns (address);
+
+	function sTokensManager() external view returns (address);
 
 	function migrateToSTokens(address _property) external returns (uint256);
 }

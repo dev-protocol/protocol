@@ -80,11 +80,11 @@ contract STokensManagerTest is ERC721 {
 		external
 		view
 		returns (
-			address property_,
-			uint256 amount_,
-			uint256 price_,
-			uint256 cumulativeReward_,
-			uint256 pendingReward_
+			address ,
+			uint256 ,
+			uint256 ,
+			uint256 ,
+			uint256
 		)
 	{
 		StakingPositionV1 memory currentPosition = getStoragePositionsV1(
