@@ -271,8 +271,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * Withdraw staking.(NFT)
 	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
 	 */
-	//　TODO interfaceに追加
-	// TODO 全体的にコメント追加
 	function withdraw(uint256 _tokenId, uint256 _amount)
 		external
 		onlyPositionOwner(_tokenId)
@@ -829,6 +827,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	) public view returns (uint256) {
 		// TODO ここから呼び出すの、legacyの方で大丈夫？多分違う気がする
 		// TODO legacyじゃない、_calculateWithdrawableInterestAmountをコールするpublic関数も作らなくちゃダメ？
+		// TODO それとも、もうtokenIdからpositions引っ張ってきて、amount取得してもらう方針でいい？
 		(uint256 amount, ) = _calculateWithdrawableInterestAmount4Legacy(
 			_property,
 			_user
