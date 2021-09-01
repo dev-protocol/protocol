@@ -80,10 +80,10 @@ contract STokensManagerTest is ERC721 {
 		external
 		view
 		returns (
-			address ,
-			uint256 ,
-			uint256 ,
-			uint256 ,
+			address,
+			uint256,
+			uint256,
+			uint256,
 			uint256
 		)
 	{

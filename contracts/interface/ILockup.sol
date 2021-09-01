@@ -6,7 +6,9 @@ interface ILockup {
 		external
 		returns (uint256);
 
-	function depositUpdate(uint256 _tokenId, uint256 _amount) external returns (bool);
+	function depositUpdate(uint256 _tokenId, uint256 _amount)
+		external
+		returns (bool);
 
 	function lockup(
 		address _from,
