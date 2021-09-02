@@ -65,6 +65,11 @@ interface ILockup {
 		address _user
 	) external view returns (uint256);
 
+	function calculateWithdrawableInterestAmountByPosition(uint256 _tokenId)
+		external
+		view
+		returns (uint256);
+
 	function cap() external view returns (uint256);
 
 	function updateCap(uint256 _cap) external;

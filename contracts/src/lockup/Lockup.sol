@@ -824,15 +824,37 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	) public view returns (uint256) {
-		// TODO ここから呼び出すの、legacyの方で大丈夫？多分違う気がする
-		// TODO legacyじゃない、_calculateWithdrawableInterestAmountをコールするpublic関数も作らなくちゃダメ？
-		// TODO それとも、もうtokenIdからpositions引っ張ってきて、amount取得してもらう方針でいい？
+	) external view returns (uint256) {
 		(uint256 amount, ) = _calculateWithdrawableInterestAmount4Legacy(
 			_property,
 			_user
 		);
 		return amount;
+	}
+
+	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
+	 */
+	function calculateWithdrawableInterestAmountByPosition(uint256 _tokenId)
+		external
+		view
+		returns (uint256)
+	{
+		ISTokensManager sTokenManagerInstance = ISTokensManager(sTokensManager);
+		(
+			address property,
+			uint256 amount,
+			uint256 price,
+			,
+			uint256 pendingReward
+		) = sTokenManagerInstance.positions(_tokenId);
+		(uint256 result, ) = _calculateWithdrawableInterestAmount(
+			property,
+			amount,
+			price,
+			pendingReward
+		);
+		return result;
 	}
 
 	/**
