@@ -1,18 +1,9 @@
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
-	PropertyInstance,
-	PolicyTestBaseInstance,
-} from '../../types/truffle-contracts'
+import { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
-import {
-	mine,
-	toBigNumber,
-	getBlock,
-	gasLogger,
-	keccak256,
-} from '../test-lib/utils/common'
+import { toBigNumber } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
-import { waitForEvent, getEventValue } from '../test-lib/utils/event'
+import { getEventValue } from '../test-lib/utils/event'
 import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract('LockupTest', ([deployer, user1, user2, user3]) => {
@@ -71,12 +62,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			expect(address).to.be.equal(dev.sTokenManager.address)
 		})
 	})
-	describe('Lockup; deposit(mint)', () => {
+	describe('Lockup; depositToProperty', () => {
 		describe('success', () => {
 			it('get nft token.', async () => {
 				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
-				await dev.lockup.depositMint(property.address, 100)
+				await dev.lockup.depositToProperty(property.address, 100)
 				const owner = await dev.sTokenManager.ownerOf(1)
 				expect(owner).to.be.equal(deployer)
 				const position = await dev.sTokenManager.positions(1)
@@ -90,9 +81,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			it('get 2 nft token.', async () => {
 				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
-				await dev.lockup.depositMint(property.address, 100)
+				await dev.lockup.depositToProperty(property.address, 100)
 				await dev.dev.approve(dev.lockup.address, 200)
-				await dev.lockup.depositMint(property.address, 200)
+				await dev.lockup.depositToProperty(property.address, 200)
 				const owner = await dev.sTokenManager.ownerOf(2)
 				expect(owner).to.be.equal(deployer)
 				const position = await dev.sTokenManager.positions(2)
@@ -107,7 +98,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				dev.lockup.depositMint(property.address, 100)
+				dev.lockup.depositToProperty(property.address, 100)
 				const [_from, _property, _value] = await Promise.all([
 					getEventValue(dev.lockup)('Lockedup', '_from'),
 					getEventValue(dev.lockup)('Lockedup', '_property'),
@@ -121,7 +112,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				dev.lockup.depositMint(property.address, 100)
+				dev.lockup.depositToProperty(property.address, 100)
 				const [_from, _tokenId, _value] = await Promise.all([
 					getEventValue(dev.lockup)('Deposited', '_from'),
 					getEventValue(dev.lockup)('Deposited', '_tokenId'),
@@ -134,7 +125,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			it('set storage value.', async () => {
 				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
-				await dev.lockup.depositMint(property.address, 100)
+				await dev.lockup.depositToProperty(property.address, 100)
 				const allValue = await dev.lockup.getStorageAllValue()
 				expect(allValue.toString()).to.be.equal('100')
 				const propertyValue = await dev.lockup.getStoragePropertyValue(
@@ -151,7 +142,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const beforePropertyBalance = await dev.dev.balanceOf(property.address)
 				expect(beforeBalance.toString()).to.be.equal(deployerBalance.toString())
 				expect(beforePropertyBalance.toString()).to.be.equal('0')
-				await dev.lockup.depositMint(property.address, 100)
+				await dev.lockup.depositToProperty(property.address, 100)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterPropertyBalance = await dev.dev.balanceOf(property.address)
 				expect(afterBalance.toString()).to.be.equal(
@@ -169,19 +160,21 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					})
 				)
 				const res = await dev.lockup
-					.depositMint(propertyAddress, 100)
+					.depositToProperty(propertyAddress, 100)
 					.catch(err)
 				validateErrorMessage(res, 'unable to stake to unauthenticated property')
 			})
 			it('0 dev staking is not possible.', async () => {
 				const [dev, property] = await init()
-				const res = await dev.lockup.depositMint(property.address, 0).catch(err)
+				const res = await dev.lockup
+					.depositToProperty(property.address, 0)
+					.catch(err)
 				validateErrorMessage(res, 'illegal deposit amount')
 			})
 			it('user is not holding dev.', async () => {
 				const [dev, property] = await init()
 				const res = await dev.lockup
-					.depositMint(property.address, 100, { from: user3 })
+					.depositToProperty(property.address, 100, { from: user3 })
 					.catch(err)
 				validateErrorMessage(res, 'ERC20: transfer amount exceeds balance')
 			})
@@ -194,7 +187,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			const [dev, property] = await init()
 			await dev.dev.approve(dev.lockup.address, 500)
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			dev.lockup.depositMint(property.address, 100)
+			dev.lockup.depositToProperty(property.address, 100)
 			const [_from, _tokenId, _value] = await Promise.all([
 				getEventValue(dev.lockup)('Deposited', '_from'),
 				getEventValue(dev.lockup)('Deposited', '_tokenId'),
@@ -213,7 +206,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(beforePosition[2].toNumber()).to.be.equal(0)
 				expect(beforePosition[3].toNumber()).to.be.equal(0)
 				expect(beforePosition[4].toNumber()).to.be.equal(0)
-				await dev.lockup.depositUpdate(tokenId, 100)
+				await dev.lockup.depositToPosition(tokenId, 100)
 				const afterPosition = await dev.sTokenManager.positions(tokenId)
 				expect(afterPosition[0]).to.be.equal(property.address)
 				expect(afterPosition[1].toNumber()).to.be.equal(200)
@@ -229,7 +222,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			it('generate event(Lockedup).', async () => {
 				const [dev, property, tokenId] = await init2()
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				dev.lockup.depositUpdate(tokenId, 300)
+				dev.lockup.depositToPosition(tokenId, 300)
 				const [_from, _property, _value] = await Promise.all([
 					getEventValue(dev.lockup)('Lockedup', '_from'),
 					getEventValue(dev.lockup)('Lockedup', '_property'),
@@ -242,7 +235,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			it('generate event(Deposited).', async () => {
 				const [dev, , tokenId] = await init2()
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				dev.lockup.depositUpdate(tokenId, 300)
+				dev.lockup.depositToPosition(tokenId, 300)
 				const [_from, _tokenId, _value] = await Promise.all([
 					getEventValue(dev.lockup)('Deposited', '_from'),
 					getEventValue(dev.lockup)('Deposited', '_tokenId'),
@@ -254,7 +247,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			it('set storage value.', async () => {
 				const [dev, property, tokenId] = await init2()
-				await dev.lockup.depositUpdate(tokenId, 300)
+				await dev.lockup.depositToPosition(tokenId, 300)
 				const allValue = await dev.lockup.getStorageAllValue()
 				expect(allValue.toString()).to.be.equal('400')
 				const propertyValue = await dev.lockup.getStoragePropertyValue(
@@ -272,7 +265,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					deployerBalance.minus(100).toString()
 				)
 				expect(beforePropertyBalance.toString()).to.be.equal('100')
-				await dev.lockup.depositUpdate(tokenId, 300)
+				await dev.lockup.depositToPosition(tokenId, 300)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const afterPropertyBalance = await dev.dev.balanceOf(property.address)
 				expect(afterBalance.toString()).to.be.equal(
@@ -285,18 +278,18 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			it('Cannot update position if sender and owner are different.', async () => {
 				const [dev, , tokenId] = await init2()
 				const res = await dev.lockup
-					.depositUpdate(tokenId, 100, { from: user3 })
+					.depositToPosition(tokenId, 100, { from: user3 })
 					.catch(err)
 				validateErrorMessage(res, 'illegal sender')
 			})
 			it('0 dev staking is not possible.', async () => {
 				const [dev, , tokenId] = await init2()
-				const res = await dev.lockup.depositUpdate(tokenId, 0).catch(err)
+				const res = await dev.lockup.depositToPosition(tokenId, 0).catch(err)
 				validateErrorMessage(res, 'illegal deposit amount')
 			})
 			it('user is not holding dev.', async () => {
 				const [dev, , tokenId] = await init2()
-				const res = await dev.lockup.depositUpdate(tokenId, 1000).catch(err)
+				const res = await dev.lockup.depositToPosition(tokenId, 1000).catch(err)
 				validateErrorMessage(res, 'ERC20: transfer amount exceeds allowance')
 			})
 		})

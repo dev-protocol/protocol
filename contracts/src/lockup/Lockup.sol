@@ -101,7 +101,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * @param _amount staking value
 	 * @return tokenId The ID of the created new staking position
 	 */
-	function depositMint(address _property, uint256 _amount)
+	function depositToProperty(address _property, uint256 _amount)
 		external
 		onlyAuthenticatedProperty(_property)
 		returns (uint256)
@@ -162,7 +162,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * @param _amount staking value
 	 * @return bool On success, true will be returned
 	 */
-	function depositUpdate(uint256 _tokenId, uint256 _amount)
+	function depositToPosition(uint256 _tokenId, uint256 _amount)
 		external
 		onlyPositionOwner(_tokenId)
 		returns (bool)
@@ -271,7 +271,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 * Withdraw staking.(NFT)
 	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
 	 */
-	function withdrawByTokenId(uint256 _tokenId, uint256 _amount)
+	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
 		external
 		onlyPositionOwner(_tokenId)
 		returns (bool)
