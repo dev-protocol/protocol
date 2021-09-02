@@ -107,7 +107,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(position[0]).to.be.equal(property.address)
 				expect(position[1].toNumber()).to.be.equal(200)
 				// TODO ここ0でええんやろうか
-				expect(position[2].toString()).to.be.equal('200000000000000000000000000000000000')
+				expect(position[2].toString()).to.be.equal(
+					'200000000000000000000000000000000000'
+				)
 				expect(position[3].toNumber()).to.be.equal(0)
 				expect(position[4].toNumber()).to.be.equal(0)
 			})
@@ -310,14 +312,18 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(afterPosition[0]).to.be.equal(property.address)
 				expect(afterPosition[1].toNumber()).to.be.equal(0)
 				// TODO これでええんやろうか。。。なんか不安になてきた
-				expect(afterPosition[2].toString()).to.be.equal('100000000000000000000000000000000000')
+				expect(afterPosition[2].toString()).to.be.equal(
+					'100000000000000000000000000000000000'
+				)
 				// TODO これでええんやろうか。。。なんか不安になてきた
 				expect(afterPosition[3].toString()).to.be.equal('10000000000000000000')
 				expect(beforePosition[4].toNumber()).to.be.equal(0)
 			})
 			it('get reward.', async () => {
 				const [dev, , tokenId] = await init2()
-				const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
 				await dev.lockup.withdrawByPosition(tokenId, 0)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const reward = afterBalance.minus(beforeBalance)
@@ -325,7 +331,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			it('reverce staking dev token.', async () => {
 				const [dev, , tokenId] = await init2()
-				const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const beforeBalance = await dev.dev
+					.balanceOf(deployer)
+					.then(toBigNumber)
 				await dev.lockup.withdrawByPosition(tokenId, 100)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const rewardPlusStakedDev = afterBalance.minus(beforeBalance)
@@ -353,14 +361,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			it('Withdrawal amount is greater than deposit amount.', async () => {
 				const [dev, , tokenId] = await init2()
-				const res = await dev.lockup
-					.withdrawByPosition(tokenId, 200)
-					.catch(err)
+				const res = await dev.lockup.withdrawByPosition(tokenId, 200).catch(err)
 				validateErrorMessage(res, 'insufficient tokens staked')
 			})
 		})
 	})
-		// TODO depositした場合、withdrawで引き出せない
+	// TODO depositした場合、withdrawで引き出せない
 	// TODO lockupした場合、withdrawByPositionで引き出せない
 	// TODO depositとrockupの併用のテスト
 	describe('Lockup; combination', () => {
@@ -371,6 +377,5 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				validateErrorMessage(res, 'insufficient tokens staked')
 			})
 		})
-
 	})
 })
