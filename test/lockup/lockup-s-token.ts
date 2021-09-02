@@ -52,6 +52,22 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		return [dev, property]
 	}
 
+	const init2 = async (): Promise<
+		[DevProtocolInstance, PropertyInstance, number]
+	> => {
+		const [dev, property] = await init()
+		await dev.dev.approve(dev.lockup.address, 500)
+		// eslint-disable-next-line @typescript-eslint/no-floating-promises
+		dev.lockup.depositToProperty(property.address, 100)
+		const [_from, _tokenId, _value] = await Promise.all([
+			getEventValue(dev.lockup)('Deposited', '_from'),
+			getEventValue(dev.lockup)('Deposited', '_tokenId'),
+			getEventValue(dev.lockup)('Deposited', '_value'),
+		])
+
+		return [dev, property, Number(_tokenId)]
+	}
+
 	const err = (error: Error): Error => error
 
 	describe('Lockup; sTokensManager', () => {
@@ -86,11 +102,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.lockup.depositToProperty(property.address, 200)
 				const owner = await dev.sTokenManager.ownerOf(2)
 				expect(owner).to.be.equal(deployer)
+				const position_1 = await dev.sTokenManager.positions(1)
 				const position = await dev.sTokenManager.positions(2)
 				expect(position[0]).to.be.equal(property.address)
 				expect(position[1].toNumber()).to.be.equal(200)
 				// TODO ここ0でええんやろうか
-				expect(position[2].toNumber()).to.be.equal(0)
+				expect(position[2].toString()).to.be.equal('200000000000000000000000000000000000')
 				expect(position[3].toNumber()).to.be.equal(0)
 				expect(position[4].toNumber()).to.be.equal(0)
 			})
@@ -181,22 +198,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		})
 	})
 	describe('Lockup; deposit(update)', () => {
-		const init2 = async (): Promise<
-			[DevProtocolInstance, PropertyInstance, number]
-		> => {
-			const [dev, property] = await init()
-			await dev.dev.approve(dev.lockup.address, 500)
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			dev.lockup.depositToProperty(property.address, 100)
-			const [_from, _tokenId, _value] = await Promise.all([
-				getEventValue(dev.lockup)('Deposited', '_from'),
-				getEventValue(dev.lockup)('Deposited', '_tokenId'),
-				getEventValue(dev.lockup)('Deposited', '_value'),
-			])
-
-			return [dev, property, Number(_tokenId)]
-		}
-
 		describe('success', () => {
 			it('update nft.', async () => {
 				const [dev, property, tokenId] = await init2()
@@ -293,5 +294,83 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				validateErrorMessage(res, 'ERC20: transfer amount exceeds allowance')
 			})
 		})
+	})
+	describe('Lockup; withdrawByPosition', () => {
+		describe('success', () => {
+			it('update nft position.', async () => {
+				const [dev, property, tokenId] = await init2()
+				const beforePosition = await dev.sTokenManager.positions(tokenId)
+				expect(beforePosition[0]).to.be.equal(property.address)
+				expect(beforePosition[1].toNumber()).to.be.equal(100)
+				expect(beforePosition[2].toNumber()).to.be.equal(0)
+				expect(beforePosition[3].toNumber()).to.be.equal(0)
+				expect(beforePosition[4].toNumber()).to.be.equal(0)
+				await dev.lockup.withdrawByPosition(tokenId, 100)
+				const afterPosition = await dev.sTokenManager.positions(tokenId)
+				expect(afterPosition[0]).to.be.equal(property.address)
+				expect(afterPosition[1].toNumber()).to.be.equal(0)
+				// TODO これでええんやろうか。。。なんか不安になてきた
+				expect(afterPosition[2].toString()).to.be.equal('100000000000000000000000000000000000')
+				// TODO これでええんやろうか。。。なんか不安になてきた
+				expect(afterPosition[3].toString()).to.be.equal('10000000000000000000')
+				expect(beforePosition[4].toNumber()).to.be.equal(0)
+			})
+			it('get reward.', async () => {
+				const [dev, , tokenId] = await init2()
+				const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				await dev.lockup.withdrawByPosition(tokenId, 0)
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const reward = afterBalance.minus(beforeBalance)
+				expect(reward.toString()).to.be.equal('10000000000000000000')
+			})
+			it('reverce staking dev token.', async () => {
+				const [dev, , tokenId] = await init2()
+				const beforeBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				await dev.lockup.withdrawByPosition(tokenId, 100)
+				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
+				const rewardPlusStakedDev = afterBalance.minus(beforeBalance)
+				const stakedDev = rewardPlusStakedDev.minus('10000000000000000000')
+				expect(stakedDev.toString()).to.be.equal('100')
+			})
+			it('set storage value.', async () => {
+				const [dev, property, tokenId] = await init2()
+				await dev.lockup.withdrawByPosition(tokenId, 100)
+				const allValue = await dev.lockup.getStorageAllValue()
+				expect(allValue.toString()).to.be.equal('0')
+				const propertyValue = await dev.lockup.getStoragePropertyValue(
+					property.address
+				)
+				expect(propertyValue.toString()).to.be.equal('0')
+			})
+		})
+		describe('fail', () => {
+			it('Cannot withdraw reward if sender and owner are different.', async () => {
+				const [dev, , tokenId] = await init2()
+				const res = await dev.lockup
+					.withdrawByPosition(tokenId, 100, { from: user3 })
+					.catch(err)
+				validateErrorMessage(res, 'illegal sender')
+			})
+			it('Withdrawal amount is greater than deposit amount.', async () => {
+				const [dev, , tokenId] = await init2()
+				const res = await dev.lockup
+					.withdrawByPosition(tokenId, 200)
+					.catch(err)
+				validateErrorMessage(res, 'insufficient tokens staked')
+			})
+		})
+	})
+		// TODO depositした場合、withdrawで引き出せない
+	// TODO lockupした場合、withdrawByPositionで引き出せない
+	// TODO depositとrockupの併用のテスト
+	describe('Lockup; combination', () => {
+		describe('fail', () => {
+			it.only('update nft position.', async () => {
+				const [dev, property] = await init2()
+				const res = await dev.lockup.withdraw(property.address, 100).catch(err)
+				validateErrorMessage(res, 'insufficient tokens staked')
+			})
+		})
+
 	})
 })
