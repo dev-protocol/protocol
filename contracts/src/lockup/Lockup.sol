@@ -56,7 +56,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		uint256 holdersCap;
 	}
 	event Lockedup(address _from, address _property, uint256 _value);
-	event Deposited(address _from, uint256 _tokenId, uint256 _value);
 	event UpdateCap(uint256 _cap);
 
 	/**
@@ -148,11 +147,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_amount,
 			interest
 		);
-		// TODO イベントしつこくないかな。。。ISTokensManager.mintの中でも履いてるしな。。。
-		// ガスが気になる。。。
 		emit Lockedup(msg.sender, _property, _amount);
-		// Propertyはいらないと判断して除外した。tokenIdからpositionsで取得できるから。
-		emit Deposited(msg.sender, tokenId, _amount);
 		return tokenId;
 	}
 
@@ -223,11 +218,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * generate events
 		 */
-		// TODO イベントしつこくないかな。。。ISTokensManager.updateの中でも履いてるしな。。。
-		// ガスが気になる。。。
 		emit Lockedup(msg.sender, property, _amount);
-		// TODO Propertyはいらないと判断して除外した。tokenIdからpositionsで取得できるから。
-		emit Deposited(msg.sender, _tokenId, _amount);
 		return true;
 	}
 
@@ -310,7 +301,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Saves variables that should change due to the canceling staking..
 		 */
 		updateValues(false, property, _amount, prices);
-		// TODO ここ、cumulativeRewardでええんかな、後で確認
 		uint256 cumulative = cumulativeReward.add(value);
 		/**
 		 * update position information
@@ -757,7 +747,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Gets the reward amount in saved without withdrawal.
 		 */
-		// TODO StakingPositionの構成が変わった。ここは_pendingRewardで大丈夫なのか確認、多分いけるやろうけど
 		uint256 pending = _pendingReward;
 
 		/**
@@ -1198,17 +1187,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		uint256 amount = getStorageValue(_property, msg.sender);
 		require(amount > 0, "not staked");
-		/**
-		 * Gets the withdrawable amount.
-		 */
-		// TODO ここのvalueとprocesはなんのために取得しているのか。
-		(
-			// solhint-disable-next-line no-unused-vars
-			uint256 value,
-			// solhint-disable-next-line no-unused-vars
-			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount4Legacy(_property, msg.sender);
-
 		/**
 		 * Sets the unwithdrawn reward amount to 0.
 		 */

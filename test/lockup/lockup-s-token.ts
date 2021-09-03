@@ -113,7 +113,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(position[3].toNumber()).to.be.equal(0)
 				expect(position[4].toNumber()).to.be.equal(0)
 			})
-			it('generate event(Lockedup).', async () => {
+			it('generate event.', async () => {
 				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -125,20 +125,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				])
 				expect(_from).to.be.equal(deployer)
 				expect(_property).to.be.equal(property.address)
-				expect(_value).to.be.equal('100')
-			})
-			it('generate event(Deposited).', async () => {
-				const [dev, property] = await init()
-				await dev.dev.approve(dev.lockup.address, 100)
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				dev.lockup.depositToProperty(property.address, 100)
-				const [_from, _tokenId, _value] = await Promise.all([
-					getEventValue(dev.lockup)('Deposited', '_from'),
-					getEventValue(dev.lockup)('Deposited', '_tokenId'),
-					getEventValue(dev.lockup)('Deposited', '_value'),
-				])
-				expect(_from).to.be.equal(deployer)
-				expect(_tokenId).to.be.equal('1')
 				expect(_value).to.be.equal('100')
 			})
 			it('set storage value.', async () => {
@@ -222,7 +208,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				// TODO これでええんやろうか。。。なんか不安になてきた
 				expect(afterPosition[4].toString()).to.be.equal('10000000000000000000')
 			})
-			it('generate event(Lockedup).', async () => {
+			it('generate event.', async () => {
 				const [dev, property, tokenId] = await init2()
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				dev.lockup.depositToPosition(tokenId, 300)
@@ -233,19 +219,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				])
 				expect(_from).to.be.equal(deployer)
 				expect(_property).to.be.equal(property.address)
-				expect(_value).to.be.equal('300')
-			})
-			it('generate event(Deposited).', async () => {
-				const [dev, , tokenId] = await init2()
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				dev.lockup.depositToPosition(tokenId, 300)
-				const [_from, _tokenId, _value] = await Promise.all([
-					getEventValue(dev.lockup)('Deposited', '_from'),
-					getEventValue(dev.lockup)('Deposited', '_tokenId'),
-					getEventValue(dev.lockup)('Deposited', '_value'),
-				])
-				expect(_from).to.be.equal(deployer)
-				expect(_tokenId).to.be.equal(tokenId.toString())
 				expect(_value).to.be.equal('300')
 			})
 			it('set storage value.', async () => {
@@ -362,18 +335,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			it('Withdrawal amount is greater than deposit amount.', async () => {
 				const [dev, , tokenId] = await init2()
 				const res = await dev.lockup.withdrawByPosition(tokenId, 200).catch(err)
-				validateErrorMessage(res, 'insufficient tokens staked')
-			})
-		})
-	})
-	// TODO depositした場合、withdrawで引き出せない
-	// TODO lockupした場合、withdrawByPositionで引き出せない
-	// TODO depositとrockupの併用のテスト
-	describe('Lockup; combination', () => {
-		describe('fail', () => {
-			it.only('update nft position.', async () => {
-				const [dev, property] = await init2()
-				const res = await dev.lockup.withdraw(property.address, 100).catch(err)
 				validateErrorMessage(res, 'insufficient tokens staked')
 			})
 		})
