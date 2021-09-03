@@ -1,7 +1,7 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
-import { toBigNumber } from '../test-lib/utils/common'
+import { mine, toBigNumber } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
 import { getEventValue } from '../test-lib/utils/event'
 import { validateErrorMessage } from '../test-lib/utils/error'
@@ -336,6 +336,57 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const [dev, , tokenId] = await init2()
 				const res = await dev.lockup.withdrawByPosition(tokenId, 200).catch(err)
 				validateErrorMessage(res, 'insufficient tokens staked')
+			})
+		})
+	})
+
+	describe('Lockup; migrateToSTokens', () => {
+		describe('success', () => {
+			it('generate nft token.', async () => {
+				const [dev, property] = await init()
+				await dev.dev.deposit(property.address, 100)
+				const beforeBalance = await dev.sTokenManager.balanceOf(deployer)
+				expect(beforeBalance.toNumber()).to.be.equal(0)
+				await dev.lockup.migrateToSTokens(property.address)
+				const afterBalance = await dev.sTokenManager.balanceOf(deployer)
+				expect(afterBalance.toNumber()).to.be.equal(1)
+			})
+			it('update storage data.', async () => {
+				const [dev, property] = await init()
+				await dev.dev.deposit(property.address, 100)
+				await dev.lockup.migrateToSTokens(property.address)
+				const pendingInterestWithdrawal = await dev.lockup.getStoragePendingInterestWithdrawal(property.address, deployer)
+				const value = await dev.lockup.getStorageValue(property.address, deployer)
+				expect(pendingInterestWithdrawal.toNumber()).to.be.equal(0)
+				expect(value.toNumber()).to.be.equal(0)
+			})
+			it('update position information.', async () => {
+				const [dev, property] = await init()
+				await dev.dev.deposit(property.address, 100)
+				await dev.lockup.migrateToSTokens(property.address)
+				const position = await dev.sTokenManager.positions(1)
+				expect(position[0]).to.be.equal(property.address)
+				expect(position[1].toNumber()).to.be.equal(100)
+				expect(position[2].toNumber()).to.be.equal(0)
+				expect(position[3].toNumber()).to.be.equal(100)
+				expect(position[4].toNumber()).to.be.equal(0)
+			})
+		})
+		describe('fail', () => {
+			it('Not staking.', async () => {
+				const [dev, property] = await init()
+				const res = await dev.lockup
+					.migrateToSTokens(property.address)
+					.catch(err)
+				validateErrorMessage(res, 'not staked')
+			})
+			it('Different users.', async () => {
+				const [dev, property] = await init()
+				await dev.dev.deposit(property.address, 100)
+				const res = await dev.lockup
+					.migrateToSTokens(property.address, {from: user3})
+					.catch(err)
+				validateErrorMessage(res, 'not staked')
 			})
 		})
 	})

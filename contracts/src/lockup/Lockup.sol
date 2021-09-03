@@ -1187,14 +1187,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		uint256 amount = getStorageValue(_property, msg.sender);
 		require(amount > 0, "not staked");
-		/**
-		 * Sets the unwithdrawn reward amount to 0.
-		 */
-		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
-		/**
-		 * The amount of the user's investment in the property is set to zero.
-		 */
-		setStorageValue(_property, msg.sender, 0);
 		// TODO ここでLegacyなんとかって言う関数を使ってvalueを0にしておくとmtgで言っていたが、どこのことか分からず。。。
 		//      __updateLegacyWithdrawableInterestAmount  <-  これ？
 		/**
@@ -1211,6 +1203,18 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_property,
 			msg.sender
 		);
+		// TODO これでいいか確認
+		//  setStoragePendingInterestWithdrawalの後にgetStorageLastStakedInterestPriceがきていたので、
+		//  この場所に移動
+		//  これでいいよね
+		/**
+		 * Sets the unwithdrawn reward amount to 0.
+		 */
+		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
+		/**
+		 * The amount of the user's investment in the property is set to zero.
+		 */
+		setStorageValue(_property, msg.sender, 0);
 		ISTokensManager sTokenManagerInstance = ISTokensManager(sTokensManager);
 		/**
 		 * mint nft
