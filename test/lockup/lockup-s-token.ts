@@ -355,8 +355,15 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const [dev, property] = await init()
 				await dev.dev.deposit(property.address, 100)
 				await dev.lockup.migrateToSTokens(property.address)
-				const pendingInterestWithdrawal = await dev.lockup.getStoragePendingInterestWithdrawal(property.address, deployer)
-				const value = await dev.lockup.getStorageValue(property.address, deployer)
+				const pendingInterestWithdrawal =
+					await dev.lockup.getStoragePendingInterestWithdrawal(
+						property.address,
+						deployer
+					)
+				const value = await dev.lockup.getStorageValue(
+					property.address,
+					deployer
+				)
 				expect(pendingInterestWithdrawal.toNumber()).to.be.equal(0)
 				expect(value.toNumber()).to.be.equal(0)
 			})
@@ -384,7 +391,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const [dev, property] = await init()
 				await dev.dev.deposit(property.address, 100)
 				const res = await dev.lockup
-					.migrateToSTokens(property.address, {from: user3})
+					.migrateToSTokens(property.address, { from: user3 })
 					.catch(err)
 				validateErrorMessage(res, 'not staked')
 			})
