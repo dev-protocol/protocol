@@ -11,6 +11,7 @@ contract STokensManagerTest is ERC721 {
 	using Strings for uint256;
 	Counters.Counter private _tokenIds;
 	address public config;
+	uint256 public latestTokenId;
 	mapping(bytes32 => bytes) private bytesStorage;
 
 	struct StakingPositionV1 {
@@ -54,6 +55,7 @@ contract STokensManagerTest is ERC721 {
 			0
 		);
 		setStoragePositionsV1(newTokenId, newPosition);
+		latestTokenId = newTokenId;
 		return newTokenId;
 	}
 
