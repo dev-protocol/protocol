@@ -292,7 +292,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const beforeBalance = await dev.dev
 					.balanceOf(deployer)
 					.then(toBigNumber)
-				await mine(1)
 				await dev.lockup.withdrawByPosition(tokenId, 0)
 				const afterBalance = await dev.dev.balanceOf(deployer).then(toBigNumber)
 				const reward = afterBalance.minus(beforeBalance)
