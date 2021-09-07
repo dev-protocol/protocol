@@ -1182,8 +1182,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 */
 		uint256 amount = getStorageValue(_property, msg.sender);
 		require(amount > 0, "not staked");
-		// TODO ここでLegacyなんとかって言う関数を使ってvalueを0にしておくとmtgで言っていたが、どこのことか分からず。。。
-		//      __updateLegacyWithdrawableInterestAmount  <-  これ？
 		/**
 		 * Gets the cumulative sum of the interest price recorded the last time you withdrew.
 		 */
@@ -1198,10 +1196,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			_property,
 			msg.sender
 		);
-		// TODO これでいいか確認
-		//  setStoragePendingInterestWithdrawalの後にgetStorageLastStakedInterestPriceがきていたので、
-		//  この場所に移動
-		//  これでいいよね
 		/**
 		 * Sets the unwithdrawn reward amount to 0.
 		 */
@@ -1223,12 +1217,11 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * update position information
 		 */
-		// TODO 第四引数、amountであってるのか確認
 		bool result = sTokenManagerInstance.update(
 			tokenId,
 			amount,
 			price,
-			amount,
+			0,
 			pending
 		);
 		require(result, "failed to update");

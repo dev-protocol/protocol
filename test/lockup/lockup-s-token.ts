@@ -84,7 +84,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const position = await dev.sTokenManager.positions(1)
 				expect(position[0]).to.be.equal(property.address)
 				expect(position[1].toNumber()).to.be.equal(100)
-				// TODO ここ0でええんやろうか
 				expect(position[2].toNumber()).to.be.equal(0)
 				expect(position[3].toNumber()).to.be.equal(0)
 				expect(position[4].toNumber()).to.be.equal(0)
@@ -370,7 +369,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(position[0]).to.be.equal(property.address)
 				expect(position[1].toNumber()).to.be.equal(100)
 				expect(position[2].toNumber()).to.be.equal(0)
-				expect(position[3].toNumber()).to.be.equal(100)
+				expect(position[3].toNumber()).to.be.equal(0)
 				expect(position[4].toNumber()).to.be.equal(0)
 			})
 		})
