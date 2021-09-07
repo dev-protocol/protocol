@@ -708,7 +708,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 		})
 
-
 		describe('scenario; token transfer', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
@@ -760,7 +759,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 			describe('token transfer', () => {
 				before(async () => {
-					await dev.sTokenManager.safeTransferFrom(alice, bob, aliceFirstTokenId)
+					await dev.sTokenManager.safeTransferFrom(
+						alice,
+						bob,
+						aliceFirstTokenId
+					)
 				})
 				it(`withdrawable interest is 100% of the Property's interest`, async () => {
 					await mine(3)
@@ -771,15 +774,19 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.times(1e18)
 						.times(13)
 					expect(calculateAmount.toFixed()).to.be.equal(expected.toFixed())
-					const ownerAddress = await dev.sTokenManager.ownerOf(aliceFirstTokenId)
+					const ownerAddress = await dev.sTokenManager.ownerOf(
+						aliceFirstTokenId
+					)
 					expect(ownerAddress).to.be.equal(bob)
 				})
 			})
 			describe('Alice can not withdraw reward', () => {
 				it(`if Alice execute withdraw function, error is occur`, async () => {
-					const res = await dev.lockup.withdrawByPosition(aliceFirstTokenId, 0, {
-						from: alice,
-					}).catch(err)
+					const res = await dev.lockup
+						.withdrawByPosition(aliceFirstTokenId, 0, {
+							from: alice,
+						})
+						.catch(err)
 					validateErrorMessage(res, 'illegal sender')
 				})
 			})
@@ -802,9 +809,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					const bobAmount = await dev.lockup
 						.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId)
 						.then(toBigNumber)
-					const afterBobBalance = await dev.dev
-						.balanceOf(bob)
-						.then(toBigNumber)
+					const afterBobBalance = await dev.dev.balanceOf(bob).then(toBigNumber)
 					const reward = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
 						.times(1e18)
 						.times(block.minus(lastBlock))
@@ -818,7 +823,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				})
 			})
 		})
-
 
 		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
