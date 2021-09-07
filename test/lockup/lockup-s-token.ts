@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { DevProtocolInstance } from '../test-lib/instance'
 import { PropertyInstance } from '../../types/truffle-contracts'
 import BigNumber from 'bignumber.js'
@@ -29,8 +30,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		])
 		await dev.dev.mint(deployer, deployerBalance)
 		const policyAddress = await dev.generatePolicy('PolicyTestBase')
-		// eslint-disable-next-line @typescript-eslint/await-thenable
-		const policy = await artifacts.require('PolicyTestBase').at(policyAddress)
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', user2, {
 				from: user2,
@@ -89,6 +88,18 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(position[4].toNumber()).to.be.equal(0)
 			})
 			it('get 2 nft token.', async () => {
+				const getLastStakedInterestPrice = async (): Promise<string> => {
+					const [dev, property] = await init()
+					await mine(1)
+					await dev.dev.deposit(property.address, 100)
+					await mine(1)
+					await dev.dev.deposit(property.address, 200)
+					const value = await dev.lockup
+						.getStorageLastStakedInterestPrice(property.address, deployer)
+						.then(toBigNumber)
+					return value.toFixed()
+				}
+
 				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
 				await dev.lockup.depositToProperty(property.address, 100)
@@ -96,21 +107,17 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				await dev.lockup.depositToProperty(property.address, 200)
 				const owner = await dev.sTokenManager.ownerOf(2)
 				expect(owner).to.be.equal(deployer)
-				const position_1 = await dev.sTokenManager.positions(1)
 				const position = await dev.sTokenManager.positions(2)
 				expect(position[0]).to.be.equal(property.address)
 				expect(position[1].toNumber()).to.be.equal(200)
-				// TODO ここ0でええんやろうか
-				expect(position[2].toString()).to.be.equal(
-					'200000000000000000000000000000000000'
-				)
+				const testValue = await getLastStakedInterestPrice()
+				expect(position[2].toString()).to.be.equal(testValue)
 				expect(position[3].toNumber()).to.be.equal(0)
 				expect(position[4].toNumber()).to.be.equal(0)
 			})
 			it('generate event.', async () => {
 				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				dev.lockup.depositToProperty(property.address, 100)
 				const [_from, _property, _value] = await Promise.all([
 					getEventValue(dev.lockup)('Lockedup', '_from'),
@@ -182,6 +189,20 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	describe('Lockup; deposit(update)', () => {
 		describe('success', () => {
 			it('update nft.', async () => {
+				const getTestValues = async (): Promise<[string, string]> => {
+					const [dev, property] = await init()
+					await mine(1)
+					await dev.dev.deposit(property.address, 100)
+					await dev.dev.deposit(property.address, 100)
+					const value1 = await dev.lockup
+						.getStorageLastStakedInterestPrice(property.address, deployer)
+						.then(toBigNumber)
+					const value2 = await dev.lockup
+						.getStoragePendingInterestWithdrawal(property.address, deployer)
+						.then(toBigNumber)
+					return [value1.toFixed(), value2.toFixed()]
+				}
+
 				const [dev, property, tokenId] = await init2()
 				const beforePosition = await dev.sTokenManager.positions(tokenId)
 				expect(beforePosition[0]).to.be.equal(property.address)
@@ -193,18 +214,18 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const afterPosition = await dev.sTokenManager.positions(tokenId)
 				expect(afterPosition[0]).to.be.equal(property.address)
 				expect(afterPosition[1].toNumber()).to.be.equal(200)
-				// TODO これでええんやろうか。。。なんか不安になてきた
-				expect(afterPosition[2].toString()).to.be.equal(
-					'100000000000000000000000000000000000'
+				const [lastStakedInterestPrice, pendingInterestWithdrawal] =
+					await getTestValues()
+				expect(afterPosition[2].toString()).to.be.equal(lastStakedInterestPrice)
+				expect(afterPosition[3].toString()).to.be.equal(
+					pendingInterestWithdrawal
 				)
-				// TODO これでええんやろうか。。。なんか不安になてきた
-				expect(afterPosition[3].toString()).to.be.equal('10000000000000000000')
-				// TODO これでええんやろうか。。。なんか不安になてきた
-				expect(afterPosition[4].toString()).to.be.equal('10000000000000000000')
+				expect(afterPosition[4].toString()).to.be.equal(
+					pendingInterestWithdrawal
+				)
 			})
 			it('generate event.', async () => {
 				const [dev, property, tokenId] = await init2()
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				dev.lockup.depositToPosition(tokenId, 300)
 				const [_from, _property, _value] = await Promise.all([
 					getEventValue(dev.lockup)('Lockedup', '_from'),
@@ -267,6 +288,20 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	describe('Lockup; withdrawByPosition', () => {
 		describe('success', () => {
 			it('update nft position.', async () => {
+				const getTestValues = async (): Promise<[string, string]> => {
+					const [dev, property] = await init()
+					await mine(1)
+					await dev.dev.deposit(property.address, 100)
+					await dev.dev.deposit(property.address, 100)
+					const value1 = await dev.lockup
+						.getStorageLastStakedInterestPrice(property.address, deployer)
+						.then(toBigNumber)
+					const value2 = await dev.lockup
+						.getStoragePendingInterestWithdrawal(property.address, deployer)
+						.then(toBigNumber)
+					return [value1.toFixed(), value2.toFixed()]
+				}
+
 				const [dev, property, tokenId] = await init2()
 				const beforePosition = await dev.sTokenManager.positions(tokenId)
 				expect(beforePosition[0]).to.be.equal(property.address)
@@ -278,12 +313,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const afterPosition = await dev.sTokenManager.positions(tokenId)
 				expect(afterPosition[0]).to.be.equal(property.address)
 				expect(afterPosition[1].toNumber()).to.be.equal(0)
-				// TODO これでええんやろうか。。。なんか不安になてきた
-				expect(afterPosition[2].toString()).to.be.equal(
-					'100000000000000000000000000000000000'
+				const [lastStakedInterestPrice, pendingInterestWithdrawal] =
+					await getTestValues()
+				expect(afterPosition[2].toString()).to.be.equal(lastStakedInterestPrice)
+				expect(afterPosition[3].toString()).to.be.equal(
+					pendingInterestWithdrawal
 				)
-				// TODO これでええんやろうか。。。なんか不安になてきた
-				expect(afterPosition[3].toString()).to.be.equal('10000000000000000000')
 				expect(beforePosition[4].toNumber()).to.be.equal(0)
 			})
 			it('get reward.', async () => {
