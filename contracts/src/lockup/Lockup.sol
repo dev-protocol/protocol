@@ -760,37 +760,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		return (withdrawableAmount, prices);
 	}
 
-	function test5(
-		address _property,
-		uint256 _amount,
-		uint256 _price,
-		uint256 _pendingReward
-	) public view returns (uint256 amount_) {
-		/**
-		 * If the passed Property has not authenticated, returns always 0.
-		 */
-		if (
-			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
-		) {
-			return 0;
-		}
-
-		/**
-		 * Gets the latest withdrawal reward amount.
-		 */
-		(
-			uint256 amount,
-			,
-			RewardPrices memory prices
-		) = _calculateInterestAmount(_amount, _price);
-
-		/**
-		 * Returns the sum of all values.
-		 */
-		uint256 withdrawableAmount = amount.add(_pendingReward);
-		return withdrawableAmount;
-	}
-
 	/**
 	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
 	 */

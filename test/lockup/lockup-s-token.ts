@@ -708,6 +708,118 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			})
 		})
 
+
+		describe('scenario; token transfer', () => {
+			let dev: DevProtocolInstance
+			let property: PropertyInstance
+			let lastBlock: BigNumber
+
+			const alice = deployer
+			const bob = user1
+
+			const aliceFirstTokenId = 1
+
+			before(async () => {
+				;[dev, property] = await init()
+				const aliceBalance = await dev.dev.balanceOf(alice).then(toBigNumber)
+				await dev.dev.mint(bob, aliceBalance)
+				await dev.dev.approve(dev.lockup.address, aliceBalance, { from: alice })
+				await dev.lockup.depositToProperty(property.address, 10000, {
+					from: alice,
+				})
+
+				lastBlock = await getBlock().then(toBigNumber)
+			})
+
+			/*
+			 * PolicyTestBase returns 100 as rewards
+			 * And stakers share is 10%
+			 */
+
+			describe('before run', () => {
+				it(`Alice does staking 100% of the Property's total lockups`, async () => {
+					const total = await dev.lockup
+						.getPropertyValue(property.address)
+						.then(toBigNumber)
+					const position = await dev.sTokenManager.positions(aliceFirstTokenId)
+					expect(toBigNumber(position[1]).toFixed()).to.be.equal(
+						total.toFixed()
+					)
+				})
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					await mine(9)
+					const block = await getBlock().then(toBigNumber)
+					const aliceAmount = await dev.lockup
+						.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId)
+						.then(toBigNumber)
+					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
+						.times(1e18)
+						.times(block.minus(lastBlock))
+					expect(aliceAmount.toFixed()).to.be.equal(expected.toFixed())
+				})
+			})
+			describe('token transfer', () => {
+				before(async () => {
+					await dev.sTokenManager.safeTransferFrom(alice, bob, aliceFirstTokenId)
+				})
+				it(`withdrawable interest is 100% of the Property's interest`, async () => {
+					await mine(3)
+					const calculateAmount = await dev.lockup
+						.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId)
+						.then(toBigNumber)
+					const expected = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
+						.times(1e18)
+						.times(13)
+					expect(calculateAmount.toFixed()).to.be.equal(expected.toFixed())
+					const ownerAddress = await dev.sTokenManager.ownerOf(aliceFirstTokenId)
+					expect(ownerAddress).to.be.equal(bob)
+				})
+			})
+			describe('Alice can not withdraw reward', () => {
+				it(`if Alice execute withdraw function, error is occur`, async () => {
+					const res = await dev.lockup.withdrawByPosition(aliceFirstTokenId, 0, {
+						from: alice,
+					}).catch(err)
+					validateErrorMessage(res, 'illegal sender')
+				})
+			})
+
+			describe('after withdrawal', () => {
+				let bobBalance: BigNumber
+				let bobLocked: BigNumber
+				before(async () => {
+					bobBalance = await dev.dev.balanceOf(bob).then(toBigNumber)
+					const position = await dev.sTokenManager.positions(aliceFirstTokenId)
+					bobLocked = toBigNumber(position[1])
+					await dev.lockup.withdrawByPosition(aliceFirstTokenId, bobLocked, {
+						from: bob,
+					})
+				})
+				it(`Alice's withdrawable interest is 100% of the Property's interest`, async () => {
+					const block = await getBlock().then(toBigNumber)
+					const position = await dev.sTokenManager.positions(aliceFirstTokenId)
+					const bobLockup = toBigNumber(position[1])
+					const bobAmount = await dev.lockup
+						.calculateWithdrawableInterestAmountByPosition(aliceFirstTokenId)
+						.then(toBigNumber)
+					const afterBobBalance = await dev.dev
+						.balanceOf(bob)
+						.then(toBigNumber)
+					const reward = toBigNumber(10) // In PolicyTestBase, the max staker reward per block is 10.
+						.times(1e18)
+						.times(block.minus(lastBlock))
+					expect(bobAmount.toFixed()).to.be.equal('0')
+					expect(bobLockup.toFixed()).to.be.equal('0')
+					console.log(1)
+					expect(afterBobBalance.toFixed()).to.be.equal(
+						bobBalance.plus(bobLocked).plus(reward).toFixed()
+					)
+					console.log(2)
+				})
+			})
+		})
+
+
 		describe('scenario; single lockup', () => {
 			let dev: DevProtocolInstance
 			let property: PropertyInstance
