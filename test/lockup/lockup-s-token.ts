@@ -29,7 +29,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			dev.generatePolicyGroup(),
 		])
 		await dev.dev.mint(deployer, deployerBalance)
-		const policyAddress = await dev.generatePolicy('PolicyTestBase')
+		await dev.generatePolicy('PolicyTestBase')
 		const propertyAddress = getPropertyAddress(
 			await dev.propertyFactory.create('test', 'TEST', user2, {
 				from: user2,
@@ -377,6 +377,20 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const beforeBalance = await dev.sTokenManager.balanceOf(deployer)
 				expect(beforeBalance.toNumber()).to.be.equal(0)
 				await dev.lockup.migrateToSTokens(property.address)
+				const afterBalance = await dev.sTokenManager.balanceOf(deployer)
+				expect(afterBalance.toNumber()).to.be.equal(1)
+			})
+			it('creator rewards will be carried over..', async () => {
+				const [dev, property] = await init()
+				await dev.dev.deposit(property.address, 100)
+				await mine(1)
+				const reward = await dev.lockup.calculateWithdrawableInterestAmount(property.address, deployer).then(toBigNumber)
+				expect(reward.toString()).to.be.equal('10000000000000000000')
+				await dev.lockup.migrateToSTokens(property.address)
+				const reward2 = await dev.lockup.calculateWithdrawableInterestAmountByPosition(1).then(toBigNumber)
+				expect(reward2.toString()).to.be.equal('20000000000000000000')
+				const reward3 = await dev.lockup.calculateWithdrawableInterestAmount(property.address, deployer).then(toBigNumber)
+				expect(reward3.toString()).to.be.equal('0')
 				const afterBalance = await dev.sTokenManager.balanceOf(deployer)
 				expect(afterBalance.toNumber()).to.be.equal(1)
 			})
