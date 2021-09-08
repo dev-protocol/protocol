@@ -384,12 +384,18 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				const [dev, property] = await init()
 				await dev.dev.deposit(property.address, 100)
 				await mine(1)
-				const reward = await dev.lockup.calculateWithdrawableInterestAmount(property.address, deployer).then(toBigNumber)
+				const reward = await dev.lockup
+					.calculateWithdrawableInterestAmount(property.address, deployer)
+					.then(toBigNumber)
 				expect(reward.toString()).to.be.equal('10000000000000000000')
 				await dev.lockup.migrateToSTokens(property.address)
-				const reward2 = await dev.lockup.calculateWithdrawableInterestAmountByPosition(1).then(toBigNumber)
+				const reward2 = await dev.lockup
+					.calculateWithdrawableInterestAmountByPosition(1)
+					.then(toBigNumber)
 				expect(reward2.toString()).to.be.equal('20000000000000000000')
-				const reward3 = await dev.lockup.calculateWithdrawableInterestAmount(property.address, deployer).then(toBigNumber)
+				const reward3 = await dev.lockup
+					.calculateWithdrawableInterestAmount(property.address, deployer)
+					.then(toBigNumber)
 				expect(reward3.toString()).to.be.equal('0')
 				const afterBalance = await dev.sTokenManager.balanceOf(deployer)
 				expect(afterBalance.toNumber()).to.be.equal(1)
