@@ -868,11 +868,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 						.times(block.minus(lastBlock))
 					expect(bobAmount.toFixed()).to.be.equal('0')
 					expect(bobLockup.toFixed()).to.be.equal('0')
-					console.log(1)
 					expect(afterBobBalance.toFixed()).to.be.equal(
 						bobBalance.plus(bobLocked).plus(reward).toFixed()
 					)
-					console.log(2)
 				})
 			})
 		})
