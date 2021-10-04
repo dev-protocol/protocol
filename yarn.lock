@@ -642,7 +642,7 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
-"@devprotocol/i-s-tokens@^1.5.1":
+"@devprotocol/i-s-tokens@1.5.1":
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/@devprotocol/i-s-tokens/-/i-s-tokens-1.5.1.tgz#319d0deb30c971d6cb3cb0aa132954a524801d8f"
   integrity sha512-olIH5wCGFsIs4t9JvC5ou53ugR8XHPmjXr4M6FdFR7byF6U4SqWsSjEeyKbTLSaapSDR2uMu8q/2URXr6VSIJA==
