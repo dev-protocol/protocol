@@ -25,6 +25,7 @@ contract(
 				await dev.generateAddressConfig()
 				await dev.generateDev()
 				await dev.generateDevMinter()
+				await dev.generateSTokenManager()
 				await Promise.all([
 					dev.generateAllocator(),
 					dev.generatePropertyFactory(),
@@ -181,6 +182,7 @@ contract(
 				await dev.generateAddressConfig()
 				await dev.generateDev()
 				await dev.generateDevMinter()
+				await dev.generateSTokenManager()
 				await Promise.all([
 					dev.generateMarketFactory(),
 					dev.generateMarketGroup(),
@@ -207,6 +209,7 @@ contract(
 					await dev.generateAddressConfig()
 					await dev.generateDev()
 					await dev.generateDevMinter()
+					await dev.generateSTokenManager()
 					await Promise.all([
 						dev.generateMarketFactory(),
 						dev.generateMarketGroup(),

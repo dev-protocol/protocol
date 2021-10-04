@@ -41,6 +41,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 		await dev.generateAddressConfig()
 		await dev.generateDev()
 		await dev.generateDevMinter()
+		await dev.generateSTokenManager()
 		await Promise.all([
 			dev.generateAllocator(),
 			dev.generateMarketFactory(),

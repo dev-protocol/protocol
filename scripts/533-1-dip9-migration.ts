@@ -30,7 +30,7 @@ const handler = async (
 	// Deploy new Lockup
 	const nextLockup = await artifacts
 		.require('Lockup')
-		.new(config.address, DEV_MINTER, { gasPrice: await fastest(), gas })
+		.new(config.address, DEV_MINTER, '', { gasPrice: await fastest(), gas })
 	____log('Deployed the new Lockup', nextLockup.address)
 
 	// Deploy MetricsGroupMigration as a new MetricsGroup

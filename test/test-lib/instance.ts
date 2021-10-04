@@ -20,6 +20,7 @@ import {
 	IPolicyContract,
 	LockupTestInstance,
 	DevMinterInstance,
+	STokensManagerTestInstance,
 } from '../../types/truffle-contracts'
 import { getBlock } from './utils/common'
 
@@ -45,6 +46,8 @@ export class DevProtocolInstance {
 	private _lockupTest!: LockupTestInstance
 	private _treasury!: TreasuryTestInstance
 	private _devMinter!: DevMinterInstance
+	private _sTokensManager!: STokensManagerTestInstance
+
 	private readonly _policy!: IPolicyContract
 
 	constructor(deployer: string) {
@@ -123,6 +126,10 @@ export class DevProtocolInstance {
 		return this._treasury
 	}
 
+	public get sTokenManager(): STokensManagerTestInstance {
+		return this._sTokensManager
+	}
+
 	public get activeWithdraw(): WithdrawInstance | WithdrawTestInstance {
 		if (typeof this._withdraw === 'undefined') {
 			return this._withdrawTest
@@ -167,6 +174,7 @@ export class DevProtocolInstance {
 		this._lockup = await contract('Lockup').new(
 			this.addressConfig.address,
 			this.devMinter.address,
+			this.sTokenManager.address,
 			this.fromDeployer
 		)
 		const block = await getBlock()
@@ -279,6 +287,13 @@ export class DevProtocolInstance {
 		await this._withdraw.createStorage(this.fromDeployer)
 	}
 
+	public async generateSTokenManager(): Promise<void> {
+		this._sTokensManager = await contract('STokensManagerTest').new(
+			this.fromDeployer
+		)
+		await this._sTokensManager.initialize(this.addressConfig.address)
+	}
+
 	public async generateWithdrawTest(): Promise<void> {
 		this._withdrawTest = await contract('WithdrawTest').new(
 			this.addressConfig.address,
@@ -296,6 +311,7 @@ export class DevProtocolInstance {
 		this._lockupTest = await contract('LockupTest').new(
 			this.addressConfig.address,
 			this.devMinter.address,
+			this.sTokenManager.address,
 			this.fromDeployer
 		)
 		await this._addressConfig.setLockup(

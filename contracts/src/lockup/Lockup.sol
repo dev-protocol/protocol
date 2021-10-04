@@ -2,9 +2,13 @@ pragma solidity 0.5.17;
 
 // prettier-ignore
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ISTokensManager} from "@devprotocol/i-s-tokens/contracts/interface/ISTokensManager.sol";
 import "../common/libs/Decimals.sol";
 import "../common/config/UsingConfig.sol";
 import "../lockup/LockupStorage.sol";
+import "../../interface/IDev.sol";
 import "../../interface/IDevMinter.sol";
 import "../../interface/IProperty.sol";
 import "../../interface/IPolicy.sol";
@@ -44,6 +48,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	using SafeMath for uint256;
 	using Decimals for uint256;
 	address public devMinter;
+	address public sTokensManager;
 	struct RewardPrices {
 		uint256 reward;
 		uint256 holders;
@@ -56,11 +61,165 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * Initialize the passed address as AddressConfig address and Devminter.
 	 */
-	constructor(address _config, address _devMinter)
-		public
-		UsingConfig(_config)
-	{
+	constructor(
+		address _config,
+		address _devMinter,
+		address _sTokensManager
+	) public UsingConfig(_config) {
 		devMinter = _devMinter;
+		sTokensManager = _sTokensManager;
+	}
+
+	/**
+	 * @dev Validates the passed Property has greater than 1 asset.
+	 * @param _property property address
+	 */
+	modifier onlyAuthenticatedProperty(address _property) {
+		require(
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property),
+			"unable to stake to unauthenticated property"
+		);
+		_;
+	}
+
+	/**
+	 * @dev Check if the owner of the token is a sender.
+	 * @param _tokenId The ID of the staking position
+	 */
+	modifier onlyPositionOwner(uint256 _tokenId) {
+		require(
+			IERC721(sTokensManager).ownerOf(_tokenId) == msg.sender,
+			"illegal sender"
+		);
+		_;
+	}
+
+	/**
+	 * @dev deposit dev token to dev protocol and generate s-token
+	 * @param _property target property address
+	 * @param _amount staking value
+	 * @return tokenId The ID of the created new staking position
+	 */
+	function depositToProperty(address _property, uint256 _amount)
+		external
+		onlyAuthenticatedProperty(_property)
+		returns (uint256)
+	{
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+		/**
+		 * Gets the latest cumulative sum of the interest price.
+		 */
+		(
+			uint256 reward,
+			uint256 holders,
+			uint256 interest,
+			uint256 holdersCap
+		) = calculateCumulativeRewardPrices();
+		/**
+		 * Saves variables that should change due to the addition of staking.
+		 */
+		updateValues(
+			true,
+			_property,
+			_amount,
+			RewardPrices(reward, holders, interest, holdersCap)
+		);
+		/**
+		 * transfer dev tokens
+		 */
+		require(
+			IERC20(config().token()).transferFrom(
+				msg.sender,
+				_property,
+				_amount
+			),
+			"dev transfer failed"
+		);
+		/**
+		 * mint s tokens
+		 */
+		uint256 tokenId = ISTokensManager(sTokensManager).mint(
+			msg.sender,
+			_property,
+			_amount,
+			interest
+		);
+		emit Lockedup(msg.sender, _property, _amount);
+		return tokenId;
+	}
+
+	/**
+	 * @dev deposit dev token to dev protocol and update s-token status
+	 * @param _tokenId s-token id
+	 * @param _amount staking value
+	 * @return bool On success, true will be returned
+	 */
+	function depositToPosition(uint256 _tokenId, uint256 _amount)
+		external
+		onlyPositionOwner(_tokenId)
+		returns (bool)
+	{
+		/**
+		 * Validates _amount is not 0.
+		 */
+		require(_amount != 0, "illegal deposit amount");
+		ISTokensManager sTokenManagerInstance = ISTokensManager(sTokensManager);
+		/**
+		 * get position information
+		 */
+		(
+			address property,
+			uint256 amount,
+			uint256 price,
+			uint256 cumulativeReward,
+			uint256 pendingReward
+		) = sTokenManagerInstance.positions(_tokenId);
+		/**
+		 * Gets the withdrawable amount.
+		 */
+		(
+			uint256 withdrawable,
+			RewardPrices memory prices
+		) = _calculateWithdrawableInterestAmount(
+				property,
+				amount,
+				price,
+				pendingReward
+			);
+		/**
+		 * Saves variables that should change due to the addition of staking.
+		 */
+		updateValues(true, property, _amount, prices);
+		/**
+		 * transfer dev tokens
+		 */
+		require(
+			IERC20(config().token()).transferFrom(
+				msg.sender,
+				property,
+				_amount
+			),
+			"dev transfer failed"
+		);
+		/**
+		 * update position information
+		 */
+		bool result = sTokenManagerInstance.update(
+			_tokenId,
+			amount.add(_amount),
+			prices.interest,
+			cumulativeReward.add(withdrawable),
+			pendingReward.add(withdrawable)
+		);
+		require(result, "failed to update");
+		/**
+		 * generate events
+		 */
+		emit Lockedup(msg.sender, property, _amount);
+		return true;
 	}
 
 	/**
@@ -71,7 +230,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		address _from,
 		address _property,
 		uint256 _value
-	) external {
+	) external onlyAuthenticatedProperty(_property) {
 		/**
 		 * Validates the sender is Dev contract.
 		 */
@@ -81,14 +240,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		 * Validates _value is not 0.
 		 */
 		require(_value != 0, "illegal lockup value");
-
-		/**
-		 * Validates the passed Property has greater than 1 asset.
-		 */
-		require(
-			IMetricsGroup(config().metricsGroup()).hasAssets(_property),
-			"unable to stake to unauthenticated property"
-		);
 
 		/**
 		 * Since the reward per block that can be withdrawn will change with the addition of staking,
@@ -102,9 +253,66 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Saves variables that should change due to the addition of staking.
 		 */
-		updateValues(true, _from, _property, _value, prices);
+		updateValues4Legacy(true, _from, _property, _value, prices);
 
 		emit Lockedup(_from, _property, _value);
+	}
+
+	/**
+	 * Withdraw staking.(NFT)
+	 * Releases staking, withdraw rewards, and transfer the staked and withdraw rewards amount to the sender.
+	 */
+	function withdrawByPosition(uint256 _tokenId, uint256 _amount)
+		external
+		onlyPositionOwner(_tokenId)
+		returns (bool)
+	{
+		ISTokensManager sTokenManagerInstance = ISTokensManager(sTokensManager);
+		/**
+		 * get position information
+		 */
+		(
+			address property,
+			uint256 amount,
+			uint256 price,
+			uint256 cumulativeReward,
+			uint256 pendingReward
+		) = sTokenManagerInstance.positions(_tokenId);
+		/**
+		 * If the balance of the withdrawal request is bigger than the balance you are staking
+		 */
+		require(amount >= _amount, "insufficient tokens staked");
+		/**
+		 * Withdraws the staking reward
+		 */
+		(uint256 value, RewardPrices memory prices) = _withdrawInterest(
+			property,
+			amount,
+			price,
+			pendingReward
+		);
+		/**
+		 * Transfer the staked amount to the sender.
+		 */
+		if (_amount != 0) {
+			IProperty(property).withdraw(msg.sender, _amount);
+		}
+		/**
+		 * Saves variables that should change due to the canceling staking..
+		 */
+		updateValues(false, property, _amount, prices);
+		uint256 cumulative = cumulativeReward.add(value);
+		/**
+		 * update position information
+		 */
+		return
+			sTokenManagerInstance.update(
+				_tokenId,
+				amount.sub(_amount),
+				prices.interest,
+				cumulative,
+				0
+			);
 	}
 
 	/**
@@ -123,7 +331,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Withdraws the staking reward
 		 */
-		RewardPrices memory prices = _withdrawInterest(_property);
+		RewardPrices memory prices = _withdrawInterest4Legacy(_property);
 
 		/**
 		 * Transfer the staked amount to the sender.
@@ -135,7 +343,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Saves variables that should change due to the canceling staking..
 		 */
-		updateValues(false, msg.sender, _property, _amount, prices);
+		updateValues4Legacy(false, msg.sender, _property, _amount, prices);
 	}
 
 	/**
@@ -188,11 +396,9 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * Store staking states as a snapshot.
 	 */
-	function beforeStakesChanged(
-		address _property,
-		address _user,
-		RewardPrices memory _prices
-	) private {
+	function beforeStakesChanged(address _property, RewardPrices memory _prices)
+		private
+	{
 		/**
 		 * Gets latest cumulative holders reward for the passed Property.
 		 */
@@ -220,7 +426,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		/**
 		 * Store each value.
 		 */
-		setStorageLastStakedInterestPrice(_property, _user, _prices.interest);
 		setStorageLastStakesChangedCumulativeReward(_prices.reward);
 		setStorageLastCumulativeHoldersRewardPrice(_prices.holders);
 		setStorageLastCumulativeInterestPrice(_prices.interest);
@@ -441,7 +646,42 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * Returns the staker reward as interest.
 	 */
-	function _calculateInterestAmount(address _property, address _user)
+	function _calculateInterestAmount(uint256 _amount, uint256 _price)
+		private
+		view
+		returns (
+			uint256 amount_,
+			uint256 interestPrice_,
+			RewardPrices memory prices_
+		)
+	{
+		/**
+		 * Gets the latest cumulative sum of the interest price.
+		 */
+		(
+			uint256 reward,
+			uint256 holders,
+			uint256 interest,
+			uint256 holdersCap
+		) = calculateCumulativeRewardPrices();
+
+		/**
+		 * Calculates and returns the latest withdrawable reward amount from the difference.
+		 */
+		uint256 result = interest >= _price
+			? interest.sub(_price).mul(_amount).divBasis()
+			: 0;
+		return (
+			result,
+			interest,
+			RewardPrices(reward, holders, interest, holdersCap)
+		);
+	}
+
+	/**
+	 * Returns the staker reward as interest.
+	 */
+	function _calculateInterestAmount4Legacy(address _property, address _user)
 		private
 		view
 		returns (
@@ -491,6 +731,40 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	 */
 	function _calculateWithdrawableInterestAmount(
 		address _property,
+		uint256 _amount,
+		uint256 _price,
+		uint256 _pendingReward
+	) private view returns (uint256 amount_, RewardPrices memory prices_) {
+		/**
+		 * If the passed Property has not authenticated, returns always 0.
+		 */
+		if (
+			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
+		) {
+			return (0, RewardPrices(0, 0, 0, 0));
+		}
+
+		/**
+		 * Gets the latest withdrawal reward amount.
+		 */
+		(
+			uint256 amount,
+			,
+			RewardPrices memory prices
+		) = _calculateInterestAmount(_amount, _price);
+
+		/**
+		 * Returns the sum of all values.
+		 */
+		uint256 withdrawableAmount = amount.add(_pendingReward);
+		return (withdrawableAmount, prices);
+	}
+
+	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from inside the contract)
+	 */
+	function _calculateWithdrawableInterestAmount4Legacy(
+		address _property,
 		address _user
 	) private view returns (uint256 _amount, RewardPrices memory _prices) {
 		/**
@@ -519,7 +793,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			uint256 amount,
 			,
 			RewardPrices memory prices
-		) = _calculateInterestAmount(_property, _user);
+		) = _calculateInterestAmount4Legacy(_property, _user);
 
 		/**
 		 * Returns the sum of all values.
@@ -534,8 +808,8 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	function calculateWithdrawableInterestAmount(
 		address _property,
 		address _user
-	) public view returns (uint256) {
-		(uint256 amount, ) = _calculateWithdrawableInterestAmount(
+	) external view returns (uint256) {
+		(uint256 amount, ) = _calculateWithdrawableInterestAmount4Legacy(
 			_property,
 			_user
 		);
@@ -543,9 +817,72 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 
 	/**
+	 * Returns the total rewards currently available for withdrawal. (For calling from external of the contract)
+	 */
+	function calculateWithdrawableInterestAmountByPosition(uint256 _tokenId)
+		external
+		view
+		returns (uint256)
+	{
+		ISTokensManager sTokenManagerInstance = ISTokensManager(sTokensManager);
+		(
+			address property,
+			uint256 amount,
+			uint256 price,
+			,
+			uint256 pendingReward
+		) = sTokenManagerInstance.positions(_tokenId);
+		(uint256 result, ) = _calculateWithdrawableInterestAmount(
+			property,
+			amount,
+			price,
+			pendingReward
+		);
+		return result;
+	}
+
+	/**
 	 * Withdraws staking reward as an interest.
 	 */
-	function _withdrawInterest(address _property)
+	function _withdrawInterest(
+		address _property,
+		uint256 _amount,
+		uint256 _price,
+		uint256 _pendingReward
+	) private returns (uint256 value_, RewardPrices memory prices_) {
+		/**
+		 * Gets the withdrawable amount.
+		 */
+		(
+			uint256 value,
+			RewardPrices memory prices
+		) = _calculateWithdrawableInterestAmount(
+				_property,
+				_amount,
+				_price,
+				_pendingReward
+			);
+
+		/**
+		 * Mints the reward.
+		 */
+		require(
+			IDevMinter(devMinter).mint(msg.sender, value),
+			"dev mint failed"
+		);
+
+		/**
+		 * Since the total supply of tokens has changed, updates the latest maximum mint amount.
+		 */
+		update();
+
+		return (value, prices);
+	}
+
+	/**
+	 * Withdraws staking reward as an interest.
+	 */
+	function _withdrawInterest4Legacy(address _property)
 		private
 		returns (RewardPrices memory _prices)
 	{
@@ -555,7 +892,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		(
 			uint256 value,
 			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(_property, msg.sender);
+		) = _calculateWithdrawableInterestAmount4Legacy(_property, msg.sender);
 
 		/**
 		 * Sets the unwithdrawn reward amount to 0.
@@ -591,14 +928,42 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	/**
 	 * Status updates with the addition or release of staking.
 	 */
-	function updateValues(
+	function updateValues4Legacy(
 		bool _addition,
 		address _account,
 		address _property,
 		uint256 _value,
 		RewardPrices memory _prices
 	) private {
-		beforeStakesChanged(_property, _account, _prices);
+		/**
+		 * Updates the staking status to avoid double rewards.
+		 */
+		setStorageLastStakedInterestPrice(
+			_property,
+			_account,
+			_prices.interest
+		);
+		updateValues(_addition, _property, _value, _prices);
+		/**
+		 * Updates the staking value of property by user
+		 */
+		if (_addition) {
+			addValue(_property, _account, _value);
+		} else {
+			subValue(_property, _account, _value);
+		}
+	}
+
+	/**
+	 * Status updates with the addition or release of staking.
+	 */
+	function updateValues(
+		bool _addition,
+		address _property,
+		uint256 _value,
+		RewardPrices memory _prices
+	) private {
+		beforeStakesChanged(_property, _prices);
 		/**
 		 * If added staking:
 		 */
@@ -612,12 +977,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			 * Updates the current staking amount of the Property.
 			 */
 			addPropertyValue(_property, _value);
-
-			/**
-			 * Updates the user's current staking amount in the Property.
-			 */
-			addValue(_property, _account, _value);
-
 			/**
 			 * If released staking:
 			 */
@@ -631,11 +990,6 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 			 * Updates the current staking amount of the Property.
 			 */
 			subPropertyValue(_property, _value);
-
-			/**
-			 * Updates the current staking amount of the Property.
-			 */
-			subValue(_property, _account, _value);
 		}
 
 		/**
@@ -760,7 +1114,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		(
 			uint256 withdrawableAmount,
 			RewardPrices memory prices
-		) = _calculateWithdrawableInterestAmount(_property, _user);
+		) = _calculateWithdrawableInterestAmount4Legacy(_property, _user);
 
 		/**
 		 * Saves the amount to `PendingInterestWithdrawal` storage.
@@ -814,5 +1168,63 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		onlyOwner
 	{
 		setStorageFallbackInitialCumulativeHoldersRewardCap(_value);
+	}
+
+	/**
+	 * migration to nft
+	 */
+	function migrateToSTokens(address _property)
+		external
+		returns (uint256 tokenId_)
+	{
+		/**
+		 * Get the amount the user is staking for the Property.
+		 */
+		uint256 amount = getStorageValue(_property, msg.sender);
+		require(amount > 0, "not staked");
+		/**
+		 * Gets the cumulative sum of the interest price recorded the last time you withdrew.
+		 */
+		uint256 price = getStorageLastStakedInterestPrice(
+			_property,
+			msg.sender
+		);
+		/**
+		 * Gets the reward amount in saved without withdrawal.
+		 */
+		uint256 pending = getStoragePendingInterestWithdrawal(
+			_property,
+			msg.sender
+		);
+		/**
+		 * Sets the unwithdrawn reward amount to 0.
+		 */
+		setStoragePendingInterestWithdrawal(_property, msg.sender, 0);
+		/**
+		 * The amount of the user's investment in the property is set to zero.
+		 */
+		setStorageValue(_property, msg.sender, 0);
+		ISTokensManager sTokenManagerInstance = ISTokensManager(sTokensManager);
+		/**
+		 * mint nft
+		 */
+		uint256 tokenId = sTokenManagerInstance.mint(
+			msg.sender,
+			_property,
+			amount,
+			price
+		);
+		/**
+		 * update position information
+		 */
+		bool result = sTokenManagerInstance.update(
+			tokenId,
+			amount,
+			price,
+			0,
+			pending
+		);
+		require(result, "failed to update");
+		return tokenId;
 	}
 }

@@ -17,15 +17,28 @@ export class Lockup {
 		return lockup
 	}
 
-	public async create(devMinter = ''): Promise<LockupInstance> {
+	public async create(
+		devMinter = '',
+		sTokenManager = ''
+	): Promise<LockupInstance> {
 		if (devMinter === '') {
 			const tmp = await this.load()
 			devMinter = await tmp.devMinter()
 		}
 
+		if (sTokenManager === '') {
+			const tmp = await this.load()
+			sTokenManager = await tmp.sTokensManager()
+		}
+
 		const lockup = await this._dev.artifacts
 			.require('Lockup')
-			.new(this._dev.addressConfig.address, devMinter, await this._dev.gasInfo)
+			.new(
+				this._dev.addressConfig.address,
+				devMinter,
+				sTokenManager,
+				await this._dev.gasInfo
+			)
 		console.log('new Lockup contract', lockup.address)
 		return lockup
 	}

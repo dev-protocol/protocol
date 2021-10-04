@@ -53,6 +53,7 @@
 		"web3": "1.6.0"
 	},
 	"dependencies": {
+		"@devprotocol/i-s-tokens": "^1.5.1",
 		"@openzeppelin/contracts": "2.5.1"
 	},
 	"directories": {

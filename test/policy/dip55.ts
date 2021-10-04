@@ -14,6 +14,7 @@ contract('DIP55', ([deployer, treasury, capSetter, uesr]) => {
 		await dev.generateAddressConfig()
 		await dev.generateDev()
 		await dev.generateDevMinter()
+		await dev.generateSTokenManager()
 		await dev.generateLockup()
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		dip55 = await artifacts.require('DIP55').new(dev.addressConfig.address)

@@ -12,7 +12,7 @@ const handler = function (deployer, network) {
 	deployer.deploy(artifacts.require('Dev'), address)
 
 	// Lockup
-	deployer.deploy(artifacts.require('Lockup'), address, '')
+	deployer.deploy(artifacts.require('Lockup'), address, '', '')
 
 	// Market
 	deployer.deploy(artifacts.require('MarketFactory'), address)
