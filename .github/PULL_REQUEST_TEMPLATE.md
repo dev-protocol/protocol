@@ -1,17 +1,16 @@
-# Description
+### Description
 
-[ Please write here what changes this pull request ]
+<!-- Give a clear description of what modifications you have made -->
 
-# Why
+### Why is this change needed?
 
-[ Please write here about why needs this change ]
+<!-- Please write here about why needs this change -->
 
-# Related Issues
+### Related Issues
 
-Fixes # .
+<!-- If it fixes an issue, please add Closes #issue_no below with its respective issue number -->
+<!-- Feel free to add a relevant issue here -->
 
----
+### Code of Conduct
 
-# Code of Conduct
-
-By submitting this pull request, I confirm I've read and complied with the [CoC](https://github.com/dev-protocol/protocol/blob/main/CODE_OF_CONDUCT.md) 🖖
+- [ ] By submitting this pull request, I confirm I've read and complied with the [CoC](https://github.com/dev-protocol/protocol/blob/main/CODE_OF_CONDUCT.md) 🖖
