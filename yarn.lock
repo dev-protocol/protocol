@@ -2917,10 +2917,10 @@
     debug "^4.3.1"
     highlightjs-solidity "^2.0.1"
 
-"@truffle/debugger@^9.1.19":
-  version "9.1.19"
-  resolved "https://registry.yarnpkg.com/@truffle/debugger/-/debugger-9.1.19.tgz#99a8cbd90f5cb55d073800346ae34abdec90ca9b"
-  integrity sha512-JPUcIqPmOPNwFAaDgOl4N6ZKeagO6ut82EfaoWjbkaB047JLbwr0Lie2wDCylHxt/3+fvGJDjllWkC1bho0FBg==
+"@truffle/debugger@^9.1.20":
+  version "9.1.20"
+  resolved "https://registry.yarnpkg.com/@truffle/debugger/-/debugger-9.1.20.tgz#3b085895079a655ce8ebde0496104e0b611edfe2"
+  integrity sha512-9U7tPml4wytEpDP6bS/sQD/r1bxCl3W1p/CfYwhBs7zDbfSldPpiRlIrUCEEGbIz8fJOOyEVW/LZeDwHhJolIA==
   dependencies:
     "@truffle/abi-utils" "^0.2.4"
     "@truffle/codec" "^0.11.17"
@@ -15971,13 +15971,13 @@ truffle-typings@1.0.8:
     "@types/mocha" "^5.2.5"
     "@types/web3" "^1.0.18"
 
-truffle@5.4.14:
-  version "5.4.14"
-  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.4.14.tgz#ecc9d263e15f98fc9e7736c34800a161729b25b9"
-  integrity sha512-upCCheE1H/p4AV7suISyJ45HnPgolnXEHVMqonRsbiNn9aKpmyrhNqF5grtMC95B1AVV9TtccKCCTozxkL/9Mg==
+truffle@5.4.15:
+  version "5.4.15"
+  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.4.15.tgz#3370f4021a3e0cde60d74fb2a680d5fa2c11d361"
+  integrity sha512-L0+p/YWQiQL8mYdDAe/QDnVlcdkx3AlY549R2eR2G/HNGUlWCwecGwyEaWiDESeymK5MnTEsuwatxeuoekTuNQ==
   dependencies:
     "@truffle/db-loader" "^0.0.13"
-    "@truffle/debugger" "^9.1.19"
+    "@truffle/debugger" "^9.1.20"
     app-module-path "^2.2.0"
     mocha "8.1.2"
     original-require "^1.0.1"
