@@ -15983,10 +15983,10 @@ truffle-typings@1.0.8:
     "@types/mocha" "^5.2.5"
     "@types/web3" "^1.0.18"
 
-truffle@5.4.16:
-  version "5.4.16"
-  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.4.16.tgz#9e568f82785786a6d89eecf2775accb5afcfdd9b"
-  integrity sha512-70J8hpKlD8tAgZgOAktWDVP42fehBKu47Ce7jGShTpx1zuRazazuWp1AZWjOO63tRcgC4a5HaRUu6xhVOOjNhw==
+truffle@5.4.17:
+  version "5.4.17"
+  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.4.17.tgz#c45941f1b41a7855c6c1787d4dcb60e1d54245c7"
+  integrity sha512-1OsBZizD2fi0LTKCcDpEbCvRbjv4L9iB6JB4o94xIxTZNjLNBTitTP1GdtkFgsLICCVhRJLhM4u6k5SQBzgq8Q==
   dependencies:
     "@truffle/db-loader" "^0.0.14"
     "@truffle/debugger" "^9.1.21"
