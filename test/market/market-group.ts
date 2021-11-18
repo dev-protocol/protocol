@@ -15,7 +15,7 @@ contract(
 		dummyMarket,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
-		describe('MarketGroup addGroup, isGroup', () => {
+		describe('MarketGroup addGroup, isGroup, getCount', () => {
 			beforeEach(async () => {
 				await dev.generateAddressConfig()
 				await dev.generateMarketGroup()
@@ -53,7 +53,47 @@ contract(
 						from: dummyMarketFactory,
 					})
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+				validateErrorMessage(result, 'illegal access')
+			})
+		})
+		describe('MarketGroup deleteGroup, isGroup, getCount', () => {
+			beforeEach(async () => {
+				await dev.generateAddressConfig()
+				await dev.generateMarketGroup()
+				await dev.addressConfig.setMarketFactory(marketFactory, {
+					from: deployer,
+				})
+				await dev.marketGroup.addGroup(market1, { from: marketFactory })
+			})
+			it('The number reduce as you delete addresses', async () => {
+				let result = await dev.marketGroup.getCount()
+				expect(result.toNumber()).to.be.equal(1)
+				await dev.marketGroup.deleteGroup(market1, { from: marketFactory })
+				result = await dev.marketGroup.getCount()
+				expect(result.toNumber()).to.be.equal(0)
+			})
+			it('Excluded from the group', async () => {
+				let result = await dev.marketGroup.isGroup(market1)
+				expect(result).to.be.equal(true)
+				await dev.marketGroup.deleteGroup(market1, { from: marketFactory })
+				result = await dev.marketGroup.isGroup(market1)
+				expect(result).to.be.equal(false)
+			})
+			it('Existing market cannot be added', async () => {
+				const result = await dev.marketGroup
+					.deleteGroup(market2, {
+						from: marketFactory,
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'not exist')
+			})
+			it('Can not execute addGroup without marketFactory address', async () => {
+				const result = await dev.marketGroup
+					.deleteGroup(dummyMarket, {
+						from: dummyMarketFactory,
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal access')
 			})
 		})
 	}

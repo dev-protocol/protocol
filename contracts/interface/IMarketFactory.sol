@@ -5,4 +5,6 @@ interface IMarketFactory {
 	function create(address _addr) external returns (address);
 
 	function enable(address _addr) external;
+
+	function disable(address _addr) external;
 }

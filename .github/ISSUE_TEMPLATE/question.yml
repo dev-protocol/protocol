@@ -1,6 +1,6 @@
 name: Question
 description: Ask the team a question about this project
-title: "[QUESTION] <description>"
+title: '[QUESTION] <description>'
 labels: [question]
 body:
   - type: input

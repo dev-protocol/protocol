@@ -38,4 +38,6 @@ interface IMarket {
 	function votingEndBlockNumber() external view returns (uint256);
 
 	function toEnable() external;
+
+	function toDisable() external;
 }

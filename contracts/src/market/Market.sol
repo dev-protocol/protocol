@@ -92,12 +92,18 @@ contract Market is UsingConfig, IMarket {
 	 * Called from MarketFactory contract.
 	 */
 	function toEnable() external {
-		require(
-			msg.sender == config().marketFactory(),
-			"this is illegal address"
-		);
+		require(msg.sender == config().marketFactory(), "illegal accesss");
 		require(isDuringVotingPeriod(), "deadline is over");
 		enabled = true;
+	}
+
+	/**
+	 * deactivates this Market.
+	 * Called from MarketFactory contract.
+	 */
+	function toDisable() external {
+		require(msg.sender == config().marketFactory(), "illegal accesss");
+		enabled = false;
 	}
 
 	/**
