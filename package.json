@@ -26,7 +26,7 @@
 		"@truffle/hdwallet-provider": "1.7.0",
 		"@types/bent": "7.3.2",
 		"@types/dotenv": "8.2.0",
-		"@types/node": "16.11.8",
+		"@types/node": "16.11.9",
 		"@types/shelljs": "0.8.9",
 		"@typescript-eslint/eslint-plugin": "5.4.0",
 		"@typescript-eslint/parser": "5.4.0",
