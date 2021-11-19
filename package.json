@@ -23,7 +23,7 @@
 	"license": "MPL-2.0",
 	"devDependencies": {
 		"@devprotocol/util-ts": "2.2.1",
-		"@truffle/hdwallet-provider": "1.6.0",
+		"@truffle/hdwallet-provider": "1.7.0",
 		"@types/bent": "7.3.2",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "16.11.8",
