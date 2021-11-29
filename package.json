@@ -40,7 +40,7 @@
 		"eslint-config-xo-typescript": "0.37.0",
 		"husky": "7.0.4",
 		"p-queue": "7.1.0",
-		"prettier": "2.4.1",
+		"prettier": "2.5.0",
 		"prettier-plugin-solidity": "1.0.0-beta.19",
 		"solhint": "3.3.6",
 		"truffle": "5.4.22",
