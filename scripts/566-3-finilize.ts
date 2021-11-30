@@ -1,7 +1,6 @@
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
 const { CONFIG, EGS_TOKEN, DEV_MINTER } = process.env
-const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
@@ -15,12 +14,12 @@ const handler = async (
 	const [config] = await Promise.all([
 		artifacts.require('AddressConfig').at(CONFIG),
 	])
-	____log('Generated AddressConfig contract', config.address)
+	console.log('Generated AddressConfig contract', config.address)
 
 	const [dev] = await Promise.all([
 		artifacts.require('Dev').at(await config.token()),
 	])
-	____log('Generated current Dev contract', dev.address)
+	console.log('Generated current Dev contract', dev.address)
 
 	const fastest = ethGasStationFetcher(EGS_TOKEN)
 
@@ -33,13 +32,13 @@ const handler = async (
 		return
 	}
 
-	____log('Deployed the new Withdraw', nextWithdraw.address)
+	console.log('Deployed the new Withdraw', nextWithdraw.address)
 
 	// Add minter
 	await dev
 		.addMinter(nextWithdraw.address, { gasPrice: await fastest(), gas })
 		.catch(console.error)
-	____log('Added next Withdraw as a minter')
+	console.log('Added next Withdraw as a minter')
 
 	// Activation
 	await config
@@ -48,7 +47,7 @@ const handler = async (
 			gas,
 		})
 		.catch(console.error)
-	____log('updated AddressConfig for Withdraw')
+	console.log('updated AddressConfig for Withdraw')
 
 	callback(null)
 }

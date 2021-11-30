@@ -1,7 +1,6 @@
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
 const { CONFIG, EGS_TOKEN } = process.env
-const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
@@ -15,43 +14,46 @@ const handler = async (
 	const [config] = await Promise.all([
 		artifacts.require('AddressConfig').at(CONFIG),
 	])
-	____log('Generated AddressConfig contract', config.address)
+	console.log('Generated AddressConfig contract', config.address)
 
 	const [withdrawStorage, dev] = await Promise.all([
 		artifacts.require('WithdrawStorage').at(await config.withdrawStorage()),
 		artifacts.require('Dev').at(await config.token()),
 	])
-	____log('Generated current WithdrawStorage contract', withdrawStorage.address)
-	____log('Generated current Dev contract', dev.address)
+	console.log(
+		'Generated current WithdrawStorage contract',
+		withdrawStorage.address
+	)
+	console.log('Generated current Dev contract', dev.address)
 
 	const fastest = ethGasStationFetcher(EGS_TOKEN)
 
 	// Deploy WithdrawMigration as a new Withdraw
-	const nextWithdraw = await artifacts
-		.require('WithdrawMigration')
-		.new(config.address, { gasPrice: await fastest(), gas })
-		.catch(console.error)
-	if (!nextWithdraw) {
-		return
-	}
+	// const nextWithdraw = await artifacts
+	// 	.require('WithdrawMigration')
+	// 	.new(config.address, { gasPrice: await fastest(), gas })
+	// 	.catch(console.error)
+	// if (!nextWithdraw) {
+	// 	return
+	// }
 
-	____log('Deployed the new Withdraw', nextWithdraw.address)
+	// console.log('Deployed the new Withdraw', nextWithdraw.address)
 
 	// Deploy new WithdrawStorage
 	const nextWithdrawStorage = await artifacts
 		.require('WithdrawStorage')
 		.new({ gasPrice: await fastest(), gas })
-	____log('Deployed the new WithdrawStorage', nextWithdrawStorage.address)
+	console.log('Deployed the new WithdrawStorage', nextWithdrawStorage.address)
 
 	// Add minter
-	await dev
-		.addMinter(nextWithdraw.address, { gasPrice: await fastest(), gas })
-		.catch(console.error)
-	____log('Added next Withdraw as a minter')
+	// await dev
+	// 	.addMinter(nextWithdraw.address, { gasPrice: await fastest(), gas })
+	// 	.catch(console.error)
+	// console.log('Added next Withdraw as a minter')
 
 	// Delegate storage for WithdrawStorage
 	const withdrawStorageAddress = await withdrawStorage.getStorageAddress()
-	____log('Got EternalStorage address that uses by WithdrawStorage')
+	console.log('Got EternalStorage address that uses by WithdrawStorage')
 	await nextWithdrawStorage
 		.setStorage(withdrawStorageAddress, {
 			gasPrice: await fastest(),
@@ -62,7 +64,7 @@ const handler = async (
 		return
 	}
 
-	____log('Set EternalStorage address to the new WithdrawStorage')
+	console.log('Set EternalStorage address to the new WithdrawStorage')
 
 	// Activation
 	await withdrawStorage
@@ -71,7 +73,7 @@ const handler = async (
 			gas,
 		})
 		.catch(console.error)
-	____log('Delegated EternalStorage owner to the new WithdrawStorage')
+	console.log('Delegated EternalStorage owner to the new WithdrawStorage')
 
 	await config
 		.setWithdrawStorage(nextWithdrawStorage.address, {
@@ -79,15 +81,15 @@ const handler = async (
 			gas,
 		})
 		.catch(console.error)
-	____log('updated AddressConfig for WithdrawStorage')
+	console.log('updated AddressConfig for WithdrawStorage')
 
-	await config
-		.setWithdraw(nextWithdraw.address, {
-			gasPrice: await fastest(),
-			gas,
-		})
-		.catch(console.error)
-	____log('updated AddressConfig for Withdraw')
+	// Await config
+	// 	.setWithdraw(nextWithdraw.address, {
+	// 		gasPrice: await fastest(),
+	// 		gas,
+	// 	})
+	// 	.catch(console.error)
+	// console.log('updated AddressConfig for Withdraw')
 
 	callback(null)
 }

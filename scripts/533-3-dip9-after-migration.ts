@@ -1,7 +1,6 @@
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 
 const { CONFIG, EGS_TOKEN } = process.env
-const { log: ____log } = console
 const gas = 6721975
 
 const handler = async (
@@ -15,12 +14,12 @@ const handler = async (
 	const [config] = await Promise.all([
 		artifacts.require('AddressConfig').at(CONFIG),
 	])
-	____log('Generated AddressConfig contract', config.address)
+	console.log('Generated AddressConfig contract', config.address)
 
 	const [metricsGroup] = await Promise.all([
 		artifacts.require('MetricsGroup').at(await config.metricsGroup()),
 	])
-	____log('Generated current MetricsGroup contract', metricsGroup.address)
+	console.log('Generated current MetricsGroup contract', metricsGroup.address)
 
 	const fastest = ethGasStationFetcher(EGS_TOKEN)
 
@@ -28,29 +27,29 @@ const handler = async (
 	const nextMetricsGroup = await artifacts
 		.require('MetricsGroup')
 		.new(config.address, { gasPrice: await fastest(), gas })
-	____log('Deployed the new MetricsGroup', nextMetricsGroup.address)
+	console.log('Deployed the new MetricsGroup', nextMetricsGroup.address)
 
 	// Delegate storage for MetricsGroup
 	const metricsGroupStorageAddress = await metricsGroup.getStorageAddress()
-	____log('Got EternalStorage address that uses by MetricsGroup')
+	console.log('Got EternalStorage address that uses by MetricsGroup')
 	await nextMetricsGroup.setStorage(metricsGroupStorageAddress, {
 		gasPrice: await fastest(),
 		gas,
 	})
-	____log('Set EternalStorage address to the new MetricsGroup')
+	console.log('Set EternalStorage address to the new MetricsGroup')
 
 	// Activation
 	await metricsGroup.changeOwner(nextMetricsGroup.address, {
 		gasPrice: await fastest(),
 		gas,
 	})
-	____log('Delegated EternalStorage owner to the new MetricsGroup')
+	console.log('Delegated EternalStorage owner to the new MetricsGroup')
 
 	await config.setMetricsGroup(nextMetricsGroup.address, {
 		gasPrice: await fastest(),
 		gas,
 	})
-	____log('updated AddressConfig for MetricsGroup')
+	console.log('updated AddressConfig for MetricsGroup')
 
 	callback(null)
 }
