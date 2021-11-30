@@ -1,4 +1,3 @@
-import { Contract } from 'ethers'
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
 
@@ -15,10 +14,11 @@ export const watch =
 		const web3WithWebsockets = new Web3(
 			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
 		)
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const { events } = new web3WithWebsockets.eth.Contract(
 			deployed._jsonInterface,
 			deployed._address
-		) as Contract
+		)
 
 		events.allEvents((err: Error, e: any) => {
 			if (e.event === name) {
