@@ -12,7 +12,15 @@
 		"@typescript-eslint/no-unsafe-member-access": "off",
 		"@typescript-eslint/no-unsafe-call": "off",
 		"@typescript-eslint/no-unsafe-return": "off",
-		"@typescript-eslint/no-base-to-string": "off"
+		"@typescript-eslint/no-base-to-string": "off",
+		"@typescript-eslint/naming-convention": [
+			"error",
+			{
+				"selector": ["variable", "function"],
+				"format": ["camelCase", "UPPER_CASE", "PascalCase", "snake_case"],
+				"leadingUnderscore": "allow"
+			}
+		]
 	},
 	"overrides": [
 		{
