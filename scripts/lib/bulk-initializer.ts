@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-call */
 import bent from 'bent'
 import Queue from 'p-queue'
-import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import {
 	GraphQLResponse,
@@ -16,27 +15,22 @@ import builtDev from '../../build/contracts/Dev.json'
 import builtWithdrawStorage from '../../build/contracts/WithdrawStorage.json'
 import builtProperty from '../../build/contracts/Property.json'
 import { AbiItem } from 'web3-utils/types'
-export const createRegistry = (configAddress: string, libWeb3: Web3) =>
+export const createRegistry = (configAddress: string) =>
 	new Contract(builtConfig.abi as AbiItem[], configAddress)
-export const prepare = async (
-	configAddress: string,
-	libWeb3: Web3,
-	blockNumber?: number
-) => {
-	const configContract = createRegistry(configAddress, libWeb3)
-	const lockupAddress = await configContract.methods
+export const prepare = async (configAddress: string, blockNumber?: number) => {
+	const configContract = createRegistry(configAddress)
+	const lockupAddress = (await configContract.methods
 		.lockup()
-		.call(undefined, blockNumber)
+		.call(undefined, blockNumber)) as string
 	const contract = new Contract(builtLockup.abi as AbiItem[], lockupAddress)
 	return contract
 }
 
-export const createMetricsGroup = async (
-	configAddress: string,
-	libWeb3: Web3
-) => {
-	const configContract = createRegistry(configAddress, libWeb3)
-	const metricsGroupAddress = await configContract.methods.metricsGroup().call()
+export const createMetricsGroup = async (configAddress: string) => {
+	const configContract = createRegistry(configAddress)
+	const metricsGroupAddress = (await configContract.methods
+		.metricsGroup()
+		.call()) as string
 	const contract = new Contract(
 		builtMetricsGroup.abi as AbiItem[],
 		metricsGroupAddress
@@ -44,15 +38,15 @@ export const createMetricsGroup = async (
 	return contract
 }
 
-export const createProperty = (libWeb3: Web3) => (property: string) => {
+export const createProperty = () => (property: string) => {
 	const contract = new Contract(builtProperty.abi as AbiItem[], property)
 	return contract
 }
 
-export const createWithdrawStorage = (address: string, libWeb3: Web3) =>
+export const createWithdrawStorage = (address: string) =>
 	new Contract(builtWithdrawStorage.abi as AbiItem[], address)
 
-export const createDev = (address: string, libWeb3: Web3) =>
+export const createDev = (address: string) =>
 	new Contract(builtDev.abi as AbiItem[], address)
 
 export const createGraphQLFetcher =
@@ -132,10 +126,9 @@ export const createGetMetricsCountPerProperty =
 		metricsGroup.methods.getMetricsCountPerProperty(property).call()
 
 export const createWithdrawableRewardPerProperty = (
-	withdrawContract: Contract,
-	libWeb3: Web3
+	withdrawContract: Contract
 ) => {
-	const propertyCreator = createProperty(libWeb3)
+	const propertyCreator = createProperty()
 	return async (property: string): Promise<string> =>
 		withdrawContract.methods
 			.calculateWithdrawableAmount(
