@@ -3,7 +3,6 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
-	validateNotOwnerErrorMessage,
 } from '../test-lib/utils/error'
 
 contract(
@@ -16,7 +15,6 @@ contract(
 		dummyMarket,
 		dummyProperty1,
 		dummyProperty2,
-		user,
 	]) => {
 		const init = async (): Promise<
 			[DevProtocolInstance, string, string, string]
