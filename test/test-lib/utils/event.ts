@@ -1,5 +1,4 @@
 import Web3 from 'web3'
-import { Contract } from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils'
 
 export const watch =
@@ -8,11 +7,13 @@ export const watch =
 		name: string,
 		handler: (err: Error, values: Record<string, string>) => void
 	): void => {
-		const { contract: deployed } = deployedContract as {contract: {_jsonInterface: AbiItem[], _address: string}}
+		const { contract: deployed } = deployedContract as {
+			contract: { _jsonInterface: AbiItem[]; _address: string }
+		}
 		const web3WithWebsockets = new Web3(
 			new Web3.providers.WebsocketProvider(web3.eth.currentProvider.host)
 		)
-		// eslint-disable-next-line
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const { events } = new web3WithWebsockets.eth.Contract(
 			deployed._jsonInterface,
 			deployed._address
