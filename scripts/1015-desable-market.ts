@@ -3,7 +3,6 @@ import { config } from 'dotenv'
 import { DevCommonInstance } from './lib/instance/common'
 import { MarketFactry } from './lib/instance/market-factory'
 import { MarketGroup } from './lib/instance/market-group'
-import { PolicyGroup } from './lib/instance/policy-group'
 
 config()
 const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env

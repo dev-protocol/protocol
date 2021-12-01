@@ -1,8 +1,5 @@
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
-	validateErrorMessage,
-	validateAddressErrorMessage,
-} from '../test-lib/utils/error'
+import { validateErrorMessage } from '../test-lib/utils/error'
 
 contract(
 	'MarketGroupTest',
