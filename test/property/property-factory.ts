@@ -88,7 +88,11 @@ contract(
 						from: dummyProperty,
 					}
 				)
-				const event = result.logs[0].args
+				const event = result.logs[0].args as {
+					_property: string
+					_beforeAuthor: string
+					_afterAuthor: string
+				}
 				expect(result.logs[0].event).to.be.equal('ChangeAuthor')
 				expect(event._property).to.be.equal(dummyProperty)
 				expect(event._beforeAuthor).to.be.equal(beforeAuthor)
@@ -123,7 +127,11 @@ contract(
 						from: dummyProperty,
 					}
 				)
-				const event = result.logs[0].args
+				const event = result.logs[0].args as {
+					_property: string
+					_old: string
+					_new: string
+				}
 				expect(result.logs[0].event).to.be.equal('ChangeName')
 				expect(event._property).to.be.equal(dummyProperty)
 				expect(event._old).to.be.equal('old')
@@ -158,7 +166,11 @@ contract(
 						from: dummyProperty,
 					}
 				)
-				const event = result.logs[0].args
+				const event = result.logs[0].args as {
+					_property: string
+					_old: string
+					_new: string
+				}
 				expect(result.logs[0].event).to.be.equal('ChangeSymbol')
 				expect(event._property).to.be.equal(dummyProperty)
 				expect(event._old).to.be.equal('old')

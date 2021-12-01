@@ -13,7 +13,6 @@ import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { graphql } from './lib/api'
 import { GraphQLResponse, PromiseReturn } from './lib/types'
 const { CONFIG, EGS_TOKEN } = process.env
-const { log: ____log } = console
 
 const handler = async (
 	callback: (err: Error | null) => void
@@ -24,8 +23,8 @@ const handler = async (
 
 	const [from] = await (web3 as Web3).eth.getAccounts()
 
-	const lockup = await prepare(CONFIG, web3)
-	____log('Generated Lockup contract', lockup.options)
+	const lockup = await prepare(CONFIG)
+	console.log('Generated Lockup contract', lockup.options)
 
 	const fetchGraphQL = createGraphQLFetcher(graphql())
 	const all = await (async () =>
@@ -46,7 +45,7 @@ const handler = async (
 
 			f().catch(console.error)
 		}))()
-	____log('GraphQL fetched', all)
+	console.log('GraphQL fetched', all)
 
 	const fetchFastestGasPrice = ethGasStationFetcher(EGS_TOKEN)
 
@@ -56,7 +55,7 @@ const handler = async (
 		createGetStorageLastCumulativeLockedUpAndBlock(lockup)
 	const initializeStatesAtLockup = createInitializeStatesAtLockup(lockup)(from)
 
-	____log('all targets', all.length)
+	console.log('all targets', all.length)
 
 	const filteringTacks = all.map(
 		({ property_address, account_address, ...x }) =>
@@ -66,7 +65,7 @@ const handler = async (
 					lastCumulativeLockedUpAndBlock()(property_address, account_address),
 				])
 				const skip = [cReward, _cLocked, _block].every((y) => y !== '0')
-				____log(
+				console.log(
 					'Should skip item?',
 					skip,
 					property_address,
@@ -81,13 +80,13 @@ const handler = async (
 	const shouldInitilizeItems = await createQueue(10)
 		.addAll(filteringTacks)
 		.then((done) => done.filter((x) => !x.skip))
-	____log('Should skip items', all.length - shouldInitilizeItems.length)
-	____log('Should initilize items', shouldInitilizeItems.length)
+	console.log('Should skip items', all.length - shouldInitilizeItems.length)
+	console.log('Should initilize items', shouldInitilizeItems.length)
 
 	const initializeTasks = shouldInitilizeItems.map(
 		({ property_address, account_address, block_number }) =>
 			async () => {
-				const lockupAtThisTime = await prepare(CONFIG, web3, block_number)
+				const lockupAtThisTime = await prepare(CONFIG, block_number)
 				const difference = createDifferenceCaller(lockupAtThisTime)
 				const getCumulativeLockedUp =
 					createGetCumulativeLockedUpCaller(lockupAtThisTime)
@@ -103,7 +102,7 @@ const handler = async (
 					getCumulativeLockedUp(block_number)(property_address),
 				]).catch((err) => new Error(err))
 				if (res instanceof Error) {
-					____log(
+					console.log(
 						'Could be pre-DIP4 staking',
 						property_address,
 						account_address,
@@ -115,7 +114,7 @@ const handler = async (
 				const reward = res[0]._reward
 				const cLocked = res[1]._value
 				const gasPrice = await fetchFastestGasPrice()
-				____log(
+				console.log(
 					'Start initilization',
 					property_address,
 					account_address,
@@ -134,12 +133,12 @@ const handler = async (
 						gasPrice
 					)
 						.on('transactionHash', (hash: string) => {
-							____log('Created the transaction', hash)
+							console.log('Created the transaction', hash)
 						})
 						.on('confirmation', resolve)
 						.on('error', reject)
 				})
-				____log('Done initilization', property_address, account_address)
+				console.log('Done initilization', property_address, account_address)
 			}
 	)
 

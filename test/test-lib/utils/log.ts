@@ -3,7 +3,7 @@ export function getMarketAddress(
 ): string {
 	const tmp = transaction.logs.filter(
 		(e: { event: string }) => e.event === 'Create'
-	)[0].args._market
+	)[0].args._market as string
 	return tmp
 }
 
@@ -12,7 +12,7 @@ export function getMetricsAddress(
 ): string {
 	const tmp = transaction.logs.filter(
 		(e: { event: string }) => e.event === 'Create'
-	)[0].args._metrics
+	)[0].args._metrics as string
 	return tmp
 }
 
@@ -21,7 +21,7 @@ export function getPropertyAddress(
 ): string {
 	const tmp = transaction.logs.filter(
 		(e: { event: string }) => e.event === 'Create'
-	)[0].args._property
+	)[0].args._property as string
 	return tmp
 }
 
@@ -30,6 +30,6 @@ export function getTransferToAddress(
 ): string {
 	const tmp = transaction.logs.filter(
 		(e: { event: string }) => e.event === 'Transfer'
-	)[0].args.to
+	)[0].args.to as string
 	return tmp
 }

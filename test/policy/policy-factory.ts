@@ -49,7 +49,7 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 			const result = await dev.policyFactory.create(policy.address, {
 				from: user1,
 			})
-			const event = result.logs[0].args
+			const event = result.logs[0].args as { _from: string; _policy: string }
 			expect(event._from).to.be.equal(user1)
 			expect(event._policy).to.be.equal(policy.address)
 		})

@@ -16,7 +16,6 @@ import {
 import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { PromiseReturn } from './lib/types'
 const { CONFIG, EGS_TOKEN, WITHDRAW_STORAGE, WITHDRAW_MIGRATION } = process.env
-const { log: ____log } = console
 
 const DEV = '0x5cAf454Ba92e6F2c929DF14667Ee360eD9fD5b26'
 const withdrawContracts = [
@@ -49,14 +48,14 @@ const handler = async (
 			toBlock: 'latest',
 		})
 
-	const dev = createDev(DEV, web3)
+	const dev = createDev(DEV)
 	// Already nonexistent value
 	// const setLastCumulativeHoldersReward = createSetLastCumulativeHoldersReward(
 	// 	createWithdrawMigration(WITHDRAW_MIGRATION, web3)
 	// )(from)
 	const getLastCumulativeHoldersReward =
 		createGetLastCumulativeHoldersRewardCaller(
-			createWithdrawStorage(WITHDRAW_STORAGE, web3)
+			createWithdrawStorage(WITHDRAW_STORAGE)
 		)
 	const all = await fetchAllWithdrawEvents(dev)
 
@@ -76,7 +75,7 @@ const handler = async (
 			  )
 			: false)
 		const skip = alreadyInitialized || !toWithdraw
-		____log('Should skip?', skip, propertyAddress, transactionHash)
+		console.log('Should skip?', skip, propertyAddress, transactionHash)
 		return { skip, sender, propertyAddress, ...x }
 	})
 
@@ -86,7 +85,7 @@ const handler = async (
 		.catch(console.error)
 
 	if (!filteredItems) {
-		____log('Error')
+		console.log('Error')
 		return
 	}
 
@@ -103,24 +102,24 @@ const handler = async (
 	})
 	const shouldInitilizeItems = Array.from(propertyUserMap.values())
 
-	____log('Should skip items', all.length - shouldInitilizeItems.length)
-	____log('Should initilize items', shouldInitilizeItems.length)
+	console.log('Should skip items', all.length - shouldInitilizeItems.length)
+	console.log('Should initilize items', shouldInitilizeItems.length)
 
 	const initializeTasks = shouldInitilizeItems
 		? shouldInitilizeItems.map(
 				({ propertyAddress, sender, skip, blockNumber }) =>
 					async () => {
 						if (!propertyAddress) {
-							____log('Property address is not found')
+							console.log('Property address is not found')
 							return
 						}
 
 						if (skip) {
-							____log('This item should skip', propertyAddress, sender)
+							console.log('This item should skip', propertyAddress, sender)
 							return
 						}
 
-						const lockup = await prepare(CONFIG, web3, blockNumber)
+						const lockup = await prepare(CONFIG, blockNumber)
 						const diff = createDifferenceCaller(lockup)
 
 						const res:
@@ -129,7 +128,7 @@ const handler = async (
 							blockNumber
 						)(propertyAddress).catch((err) => new Error(err))
 						if (res instanceof Error) {
-							____log(
+							console.log(
 								'Failed on fetch `difference`. Maybe the block is pre-DIP4.',
 								propertyAddress,
 								sender,
@@ -140,12 +139,17 @@ const handler = async (
 
 						const lastPrice = res._holdersPrice
 						if (lastPrice === '0') {
-							____log('Last price is 0.', propertyAddress, sender, blockNumber)
+							console.log(
+								'Last price is 0.',
+								propertyAddress,
+								sender,
+								blockNumber
+							)
 							return
 						}
 
 						const gasPrice = await fetchFastestGasPrice()
-						____log(
+						console.log(
 							'Start initilization',
 							propertyAddress,
 							sender,
@@ -162,7 +166,7 @@ const handler = async (
 						// 		gasPrice
 						// 	)
 						// 		.on('transactionHash', (hash: string) =>
-						// 			____log('Created the transaction', hash)
+						// 			console.log('Created the transaction', hash)
 						// 		)
 						// 		.on('confirmation', resolve)
 						// 		.on('error', (err) => {
@@ -170,7 +174,7 @@ const handler = async (
 						// 			resolve(err)
 						// 		})
 						// })
-						// ____log(
+						// console.log(
 						// 	'Done initilization',
 						// 	propertyAddress,
 						// 	sender,
