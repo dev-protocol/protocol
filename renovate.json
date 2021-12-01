@@ -3,9 +3,7 @@
 	"automerge": true,
 	"packageRules": [
 		{
-			"packageNames": [
-				"@openzeppelin/contracts"
-			],
+			"packageNames": ["@openzeppelin/contracts"],
 			"allowedVersions": "2.5.1"
 		}
 	]
