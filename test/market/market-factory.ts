@@ -109,7 +109,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				const res = await dev.marketFactory
 					.enable(dummyMarketAddress)
 					.catch((err: Error) => err)
-				validateAddressErrorMessage(res)
+				validateErrorMessage(res, 'illegal address')
 			})
 			it('we cannot specify the address of an active market.', async () => {
 				const [dev, market] = await init()
@@ -131,6 +131,63 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const deployedMarket = await marketContract.at(secoundMarketAddress)
 				expect(await deployedMarket.enabled()).to.be.equal(true)
+			})
+		})
+	})
+	describe('MarketFactory; disable', () => {
+		describe('failed', () => {
+			it('Cannot be executed by anyone but the owner.', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressConfig()
+				await dev.generateMarketFactory()
+				const res = await dev.marketFactory
+					.disable(DEFAULT_ADDRESS, {
+						from: user,
+					})
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'caller is not the owner', false)
+			})
+			it('Only the market address can be specified.', async () => {
+				const dev = new DevProtocolInstance(deployer)
+				await dev.generateAddressConfig()
+				await dev.generateMarketGroup()
+				await dev.generateMarketFactory()
+				const res = await dev.marketFactory
+					.disable(dummyMarketAddress)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal address')
+			})
+			it('we cannot specify the address of an active market.', async () => {
+				const [dev] = await init()
+				const market = await dev.getMarket('MarketTest1', user)
+				const result = await dev.marketFactory.create(market.address, {
+					from: user,
+				})
+				const marketAddress = getMarketAddress(result)
+				const res = await dev.marketFactory
+					.disable(marketAddress)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'already disabled')
+			})
+			it('we cannot reenable the market', async () => {
+				const [dev, marketAddress] = await init()
+				await dev.marketFactory.disable(marketAddress)
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const deployedMarket = await marketContract.at(marketAddress)
+				expect(await deployedMarket.enabled()).to.be.equal(false)
+				const res = await dev.marketFactory
+					.enable(marketAddress)
+					.catch((err: Error) => err)
+				validateErrorMessage(res, 'illegal address')
+			})
+		})
+		describe('success', () => {
+			it('disabling the Market', async () => {
+				const [dev, marketAddress] = await init()
+				await dev.marketFactory.disable(marketAddress)
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				const deployedMarket = await marketContract.at(marketAddress)
+				expect(await deployedMarket.enabled()).to.be.equal(false)
 			})
 		})
 	})

@@ -11,10 +11,7 @@ contract MarketGroup is UsingConfig, UsingStorage, IMarketGroup {
 	constructor(address _config) public UsingConfig(_config) UsingStorage() {}
 
 	function addGroup(address _addr) external {
-		require(
-			msg.sender == config().marketFactory(),
-			"this is illegal address"
-		);
+		require(msg.sender == config().marketFactory(), "illegal access");
 
 		require(
 			eternalStorage().getBool(getGroupKey(_addr)) == false,
@@ -24,8 +21,26 @@ contract MarketGroup is UsingConfig, UsingStorage, IMarketGroup {
 		addCount();
 	}
 
+	function deleteGroup(address _addr) external {
+		require(msg.sender == config().marketFactory(), "illegal access");
+
+		require(
+			eternalStorage().getBool(getGroupKey(_addr)) == true,
+			"not exist"
+		);
+		eternalStorage().setBool(getGroupKey(_addr), false);
+		reduceCount();
+	}
+
 	function isGroup(address _addr) external view returns (bool) {
 		return eternalStorage().getBool(getGroupKey(_addr));
+	}
+
+	function reduceCount() private {
+		bytes32 key = getCountKey();
+		uint256 number = eternalStorage().getUint(key);
+		number = number.sub(1);
+		eternalStorage().setUint(key, number);
 	}
 
 	function addCount() private {

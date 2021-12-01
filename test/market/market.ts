@@ -59,7 +59,7 @@ contract(
 			})
 			it('Cannot be enabled from other than market factory', async () => {
 				const result = await market.toEnable().catch((err: Error) => err)
-				validateAddressErrorMessage(result)
+				validateErrorMessage(result, 'illegal accesss')
 			})
 			it('Can be enabled from the market factory', async () => {
 				expect(await market.enabled()).to.be.equal(false)
@@ -73,6 +73,34 @@ contract(
 					.toEnable({ from: marketFactory })
 					.catch((err: Error) => err)
 				validateErrorMessage(result, 'deadline is over')
+				expect(await market.enabled()).to.be.equal(false)
+			})
+		})
+		describe('Market; toDisable', () => {
+			const dev = new DevProtocolInstance(deployer)
+			let market: MarketInstance
+			beforeEach(async () => {
+				await dev.generateAddressConfig()
+				await Promise.all([
+					dev.generatePolicyFactory(),
+					dev.generatePolicyGroup(),
+				])
+				await dev.addressConfig.setMarketFactory(marketFactory)
+				const iPolicyInstance = await dev.getPolicy('PolicyTest1', user)
+				await dev.policyFactory.create(iPolicyInstance.address)
+				market = await marketContract.new(dev.addressConfig.address, behavuor, {
+					from: marketFactory,
+				})
+			})
+			it('Cannot be desabld from other than market factory', async () => {
+				const result = await market.toDisable().catch((err: Error) => err)
+				validateErrorMessage(result, 'illegal accesss')
+			})
+			it('Can be desabld from the market factory', async () => {
+				expect(await market.enabled()).to.be.equal(false)
+				await market.toEnable({ from: marketFactory })
+				expect(await market.enabled()).to.be.equal(true)
+				await market.toDisable({ from: marketFactory })
 				expect(await market.enabled()).to.be.equal(false)
 			})
 		})

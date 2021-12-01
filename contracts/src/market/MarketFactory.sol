@@ -59,7 +59,7 @@ contract MarketFactory is Ownable, IMarketFactory, UsingConfig {
 		 * Validates the passed address is not 0 address.
 		 */
 		IMarketGroup marketGroup = IMarketGroup(config().marketGroup());
-		require(marketGroup.isGroup(_addr), "this is illegal address");
+		require(marketGroup.isGroup(_addr), "illegal address");
 
 		/**
 		 * Market will be enable.
@@ -68,5 +68,25 @@ contract MarketFactory is Ownable, IMarketFactory, UsingConfig {
 		require(market.enabled() == false, "already enabled");
 
 		market.toEnable();
+	}
+
+	/**
+	 * Creates a new Market contract.
+	 */
+	function disable(address _addr) external onlyOwner {
+		/**
+		 * Validates the passed address is not 0 address.
+		 */
+		IMarketGroup marketGroup = IMarketGroup(config().marketGroup());
+		require(marketGroup.isGroup(_addr), "illegal address");
+
+		/**
+		 * Market will be enable.
+		 */
+		IMarket market = IMarket(_addr);
+		require(market.enabled() == true, "already disabled");
+
+		market.toDisable();
+		marketGroup.deleteGroup(_addr);
 	}
 }
