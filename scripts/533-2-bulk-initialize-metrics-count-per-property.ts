@@ -12,7 +12,6 @@ import { ethGasStationFetcher } from '@devprotocol/util-ts'
 import { graphql } from './lib/api'
 import { GraphQLPropertyFactoryCreateResponse } from './lib/types'
 const { CONFIG, EGS_TOKEN } = process.env
-const { log: ____log } = console
 
 const handler = async (
 	callback: (err: Error | null) => void
@@ -25,7 +24,7 @@ const handler = async (
 	// const [from] = await (web3 as Web3).eth.getAccounts()
 
 	const lockup = await prepare(CONFIG, web3)
-	____log('Generated Lockup contract', lockup.options)
+	console.log('Generated Lockup contract', lockup.options)
 
 	const fetchGraphQL = createGraphQLPropertyFactoryCreateFetcher(graphql())
 	const all = await (async () =>
@@ -48,8 +47,8 @@ const handler = async (
 
 			f().catch(console.error)
 		}))()
-	____log('GraphQL fetched', all)
-	____log('all targets', all.length)
+	console.log('GraphQL fetched', all)
+	console.log('all targets', all.length)
 
 	const fetchFastestGasPrice = ethGasStationFetcher(EGS_TOKEN)
 
@@ -63,26 +62,26 @@ const handler = async (
 		const asses = await getMetricsCountPerProperty(property)
 		const skip =
 			asses !== '0' || x.authentication_aggregate.aggregate.count === 0
-		____log('Should skip item?', skip, property)
+		console.log('Should skip item?', skip, property)
 		return { property, skip, ...x }
 	})
 	const shouldInitilizeItems = await createQueue(10)
 		.addAll(filteringTacks)
 		.then((done) => done.filter(({ skip }) => !skip))
-	____log('Should skip items', all.length - shouldInitilizeItems.length)
-	____log('Should initilize items', shouldInitilizeItems.length)
+	console.log('Should skip items', all.length - shouldInitilizeItems.length)
+	console.log('Should initilize items', shouldInitilizeItems.length)
 
 	const initializeTasks = shouldInitilizeItems.map((data) => async () => {
 		const { property } = data
 		const assets = data.authentication_aggregate.aggregate.count
 		const gasPrice = await fetchFastestGasPrice()
-		____log('Start initilization', property, assets, gasPrice)
+		console.log('Start initilization', property, assets, gasPrice)
 
 		// Already nonexistent value
 		// await new Promise((resolve) => {
 		// 	setMetricsCountPerProperty(property, assets.toString(), gasPrice)
 		// 		.on('transactionHash', (hash: string) =>
-		// 			____log('Created the transaction', hash)
+		// 			console.log('Created the transaction', hash)
 		// 		)
 		// 		.on('confirmation', resolve)
 		// 		.on('error', (err) => {
@@ -90,7 +89,7 @@ const handler = async (
 		// 			resolve(err)
 		// 		})
 		// })
-		// ____log('Done initilization', property, assets)
+		// console.log('Done initilization', property, assets)
 	})
 
 	await createQueue(2).addAll(initializeTasks).catch(console.error)

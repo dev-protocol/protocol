@@ -21,8 +21,8 @@ import {
 	LockupTestInstance,
 	DevMinterInstance,
 	STokensManagerTestInstance,
+	PolicyTestBaseInstance,
 } from '../../types/truffle-contracts'
-import { getBlock } from './utils/common'
 
 const contract = artifacts.require
 
@@ -177,7 +177,7 @@ export class DevProtocolInstance {
 			this.sTokenManager.address,
 			this.fromDeployer
 		)
-		const block = await getBlock()
+
 		await this._addressConfig.setLockup(this._lockup.address, this.fromDeployer)
 		await this._lockup.createStorage()
 	}
@@ -324,7 +324,9 @@ export class DevProtocolInstance {
 	public async generatePolicy(
 		policyContractName = 'PolicyTestBase'
 	): Promise<string> {
-		const policy = await contract(policyContractName).new()
+		const policy = (await contract(
+			policyContractName
+		).new()) as PolicyTestBaseInstance
 		this._treasury = await contract('TreasuryTest').new(
 			this.addressConfig.address
 		)
@@ -340,7 +342,9 @@ export class DevProtocolInstance {
 		contractName: string,
 		user: string
 	): Promise<IPolicyInstance> {
-		const tmp = await contract(contractName).new({ from: user })
+		const tmp = (await contract(contractName).new({
+			from: user,
+		})) as IPolicyInstance
 		return tmp
 	}
 
@@ -348,9 +352,9 @@ export class DevProtocolInstance {
 		contractName: string,
 		user: string
 	): Promise<IMarketInstance> {
-		const tmp = await contract(contractName).new(this.addressConfig.address, {
+		const tmp = (await contract(contractName).new(this.addressConfig.address, {
 			from: user,
-		})
+		})) as IMarketInstance
 		return tmp
 	}
 

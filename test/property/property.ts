@@ -7,7 +7,7 @@ import {
 } from '../test-lib/utils/error'
 import { DEFAULT_ADDRESS } from '../test-lib/const'
 import { toBigNumber, splitValue } from '../test-lib/utils/common'
-import { getEventValue, waitForEvent } from '../test-lib/utils/event'
+import { getEventValue } from '../test-lib/utils/event'
 
 contract(
 	'PropertyTest',

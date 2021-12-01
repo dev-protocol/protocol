@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
 require('ts-node/register')
 require('dotenv').config()
 const HDWalletProvider = require('@truffle/hdwallet-provider')
@@ -9,6 +10,7 @@ const {
 	ETHEREUM_WALLET_MNEMONIC,
 	ETHEREUM_MOCK_HOST,
 	ETHEREUM_MOCK_PORT,
+	ETHEREUM_ETHERSCAN_API_KEY,
 } = process.env
 
 module.exports = {
@@ -59,5 +61,9 @@ module.exports = {
 			gas: 0,
 			gasPrice: 0,
 		},
+	},
+	plugins: ['truffle-plugin-verify'],
+	api_keys: {
+		etherscan: ETHEREUM_ETHERSCAN_API_KEY,
 	},
 }

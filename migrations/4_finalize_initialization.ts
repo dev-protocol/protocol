@@ -5,7 +5,6 @@ const handler = function (deployer, network) {
 
 	// Allocator
 	const allocator = artifacts.require('Allocator')
-	const allocatorStorage = artifacts.require('AllocatorStorage')
 
 	// Dev
 	const token = artifacts.require('Dev')
@@ -25,17 +24,10 @@ const handler = function (deployer, network) {
 	// Policy
 	const policyFactory = artifacts.require('PolicyFactory')
 	const policyGroup = artifacts.require('PolicyGroup')
-	const policySet = artifacts.require('PolicySet')
 
 	// Property
 	const propertyFactory = artifacts.require('PropertyFactory')
 	const propertyGroup = artifacts.require('PropertyGroup')
-
-	// Vote
-	const voteCounter = artifacts.require('VoteCounter')
-	const voteCounterStorage = artifacts.require('VoteCounterStorage')
-	const voteTimes = artifacts.require('VoteTimes')
-	const voteTimesStorage = artifacts.require('VoteTimesStorage')
 
 	// Withdraw
 	const withdraw = artifacts.require('Withdraw')
@@ -45,7 +37,6 @@ const handler = function (deployer, network) {
 		.then(async (addressConfig) =>
 			Promise.all([
 				addressConfig.setAllocator(allocator.address),
-				addressConfig.setAllocatorStorage(allocatorStorage.address),
 				addressConfig.setLockup(lockup.address),
 				addressConfig.setLockupStorage(lockupStorage.address),
 				addressConfig.setMarketFactory(marketFactory.address),
@@ -54,13 +45,8 @@ const handler = function (deployer, network) {
 				addressConfig.setMetricsGroup(metricsGroup.address),
 				addressConfig.setPolicyFactory(policyFactory.address),
 				addressConfig.setPolicyGroup(policyGroup.address),
-				addressConfig.setPolicySet(policySet.address),
 				addressConfig.setPropertyFactory(propertyFactory.address),
 				addressConfig.setPropertyGroup(propertyGroup.address),
-				addressConfig.setVoteCounter(voteCounter.address),
-				addressConfig.setVoteCounterStorage(voteCounterStorage.address),
-				addressConfig.setVoteTimes(voteTimes.address),
-				addressConfig.setVoteTimesStorage(voteTimesStorage.address),
 				addressConfig.setWithdraw(withdraw.address),
 				addressConfig.setWithdrawStorage(withdrawStorage.address),
 				addressConfig.setToken(token.address),
@@ -70,15 +56,11 @@ const handler = function (deployer, network) {
 			console.log('*** Setting AddressConfig is completed ***')
 
 			return Promise.all([
-				allocatorStorage.deployed(),
 				lockupStorage.deployed(),
 				marketGroup.deployed(),
 				metricsGroup.deployed(),
 				policyGroup.deployed(),
-				policySet.deployed(),
 				propertyGroup.deployed(),
-				voteCounterStorage.deployed(),
-				voteTimesStorage.deployed(),
 				withdrawStorage.deployed(),
 			])
 		})

@@ -27,9 +27,9 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			from: user,
 		})
 		const eventFrom = result.logs.filter((log) => log.event === 'Create')[0]
-			.args._from
+			.args._from as string
 		const eventMarket = result.logs.filter((log) => log.event === 'Create')[0]
-			.args._market
+			.args._market as string
 		const marketAddress = getMarketAddress(result)
 		return [dev, marketAddress, marketBehaviorAddress, [eventFrom, eventMarket]]
 	}
@@ -56,7 +56,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			expect(await deployedMarket.enabled()).to.be.equal(true)
 		})
 		it('A secoundly created market is not enabled,', async () => {
-			const [dev, market] = await init()
+			const [, market] = await init()
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(market)
 			expect(await deployedMarket.enabled()).to.be.equal(true)
