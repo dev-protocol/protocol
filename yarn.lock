@@ -1724,17 +1724,17 @@
     module "^1.2.5"
     original-require "^1.0.1"
 
-"@truffle/db-loader@^0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@truffle/db-loader/-/db-loader-0.0.23.tgz#be62c3f127b9145dad340dd004c7231a23659b7b"
-  integrity sha512-pTrWEEzASddwAQm20XKhFbdFvoMFxZ7yzz0AYkLAgbl580Js4Q+Ha5kFTVKqSZylzr8hsgGBvZoIXTVSettLrQ==
+"@truffle/db-loader@^0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@truffle/db-loader/-/db-loader-0.0.24.tgz#85f8a5bb7999777f2c81ea1055336cc9b1e774f1"
+  integrity sha512-ZewGOE4FFGz4bR2tUPzhufGoAA7PITBR1+NLb0BVwF6WHd5zLRtq4qXirKxf58fXNZ3BcPeLX9f/9ObYNAN/hw==
   optionalDependencies:
-    "@truffle/db" "^0.5.44"
+    "@truffle/db" "^0.5.45"
 
-"@truffle/db@^0.5.44":
-  version "0.5.44"
-  resolved "https://registry.yarnpkg.com/@truffle/db/-/db-0.5.44.tgz#9ec66afb323c1569b7b5aec2c49ea95ad8e41d31"
-  integrity sha512-JeYX0In95ROfc80VzM3/PAcGpdCbZNqFUEg/OxgD1oeu0eCW+P0Q+v6t4Da8gYZYmdoLDWADFjPhZSFRCnHo2A==
+"@truffle/db@^0.5.45":
+  version "0.5.45"
+  resolved "https://registry.yarnpkg.com/@truffle/db/-/db-0.5.45.tgz#2ae7bd21c86b4f8a32e134cb0f4a5243c58eec43"
+  integrity sha512-n7PYPeHb/TEs6rTazIGQ2/hDGLe+qEAE5xsPGsIzGOtQ9H2X+r1baN325Er2WSc4EVdaVBqq6a8w44Quh/G+jQ==
   dependencies:
     "@graphql-tools/delegate" "^8.4.3"
     "@graphql-tools/schema" "^8.3.1"
@@ -1757,10 +1757,10 @@
     pouchdb-find "^7.0.0"
     web3-utils "1.5.3"
 
-"@truffle/debugger@^9.2.8":
-  version "9.2.8"
-  resolved "https://registry.yarnpkg.com/@truffle/debugger/-/debugger-9.2.8.tgz#4dd529e298f30536298f7a6f887fec09310b2b26"
-  integrity sha512-rL+BDhZ7V5jdVlW9rdea6FvGuYZhvPwh/pej6brPXau0hjmHZkJXHnDQeiUNjJfAPCw8jKiu6LuX70hO0gXLKg==
+"@truffle/debugger@^9.2.9":
+  version "9.2.9"
+  resolved "https://registry.yarnpkg.com/@truffle/debugger/-/debugger-9.2.9.tgz#35feee728d4d58ed8b01a9953cfd1afd35475a1d"
+  integrity sha512-L57S4gVTgeTdIsVkc4K1DfdITjrNfdhU0uaA1JVEapafaM5bno7fzPQPHALCcRXNn34xexMthXVqmZU5Z4w9UQ==
   dependencies:
     "@truffle/abi-utils" "^0.2.5"
     "@truffle/codec" "^0.11.21"
@@ -13477,18 +13477,18 @@ truffle-typings@1.0.8:
     "@types/mocha" "^5.2.5"
     "@types/web3" "^1.0.18"
 
-truffle@5.4.26:
-  version "5.4.26"
-  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.4.26.tgz#0e24031eae2d4638276eed42e6615cb83ef6449c"
-  integrity sha512-yirBt4/+j9rTvJXacyyOAGOQGFkJ0PTGcYMq+OL0m4vBpE04AWiBAg7iHYtwoC54ReV1FMWImAsxTLpwscrRFA==
+truffle@5.4.27:
+  version "5.4.27"
+  resolved "https://registry.yarnpkg.com/truffle/-/truffle-5.4.27.tgz#65a698705ac5be0fa9031de06b2b1d0e3bf46ba9"
+  integrity sha512-NaKK6TjmQZw8hRFbg20vm5UXaaQ3B0pIa6k6rXj4p/8JuJtpiTdeYlrv2dLNhFWQrVJtfVNHMSgnjFF4JmsJMA==
   dependencies:
-    "@truffle/db-loader" "^0.0.23"
-    "@truffle/debugger" "^9.2.8"
+    "@truffle/db-loader" "^0.0.24"
+    "@truffle/debugger" "^9.2.9"
     app-module-path "^2.2.0"
     mocha "8.1.2"
     original-require "^1.0.1"
   optionalDependencies:
-    "@truffle/db" "^0.5.44"
+    "@truffle/db" "^0.5.45"
     "@truffle/preserve-fs" "^0.2.4"
     "@truffle/preserve-to-buckets" "^0.2.4"
     "@truffle/preserve-to-filecoin" "^0.2.4"
