@@ -62,20 +62,78 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		)
 	}
 
+
+	let dev: DevProtocolInstance
+	let property: PropertyInstance
+
+	type Snapshot = {
+		id: number
+		jsonrpc: string
+		result: string
+	}
+
+	let snapshot: Snapshot
+	let snapshotId: string
+
+	const takeSnapshot = async () => new Promise((resolve, reject) => {
+		  web3.currentProvider.send(
+			{
+			  jsonrpc: "2.0",
+			  method: "evm_snapshot",
+			  id: new Date().getTime(),
+			},
+			(err: Error, snapshotId: number) => {
+			  if (err) {
+				reject(err); return;
+			  }
+
+			  resolve(snapshotId);
+			},
+		  );
+		});
+
+	const revertToSnapshot = async (id: any) => new Promise((resolve, reject) => {
+		  web3.currentProvider.send(
+			{
+			  jsonrpc: "2.0",
+			  method: "evm_revert",
+			  params: [id],
+			  id: new Date().getTime(),
+			},
+			(err: Error, result: unknown) => {
+			  if (err) {
+				reject(err); return;
+			  }
+
+			  resolve(result);
+			},
+		  );
+		});
+
+	before(async () => {
+		[dev, property] = await init()
+	})
+
+	beforeEach(async () => {
+        snapshot = await takeSnapshot() as Snapshot
+		snapshotId = snapshot.result;
+	})
+
+	afterEach(async () => {
+	    await revertToSnapshot(snapshotId);
+	})
+
 	describe('Allocator: calculateMaxRewardsPerBlock', () => {
 		it('With no authentication or lockup, no DEV will be mint.', async () => {
-			const [dev] = await init()
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()
 			expect(res.toNumber()).to.be.equal(0)
 		})
 		it('A DEV is not minted just by certifying it to Market.', async () => {
-			const [dev, property] = await init()
 			await authenticate(dev, property.address)
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()
 			expect(res.toNumber()).to.be.equal(0)
 		})
 		it('Dev is minted if staking and authenticated the Market.', async () => {
-			const [dev, property] = await init()
 			await authenticate(dev, property.address)
 			await dev.dev.deposit(property.address, 10000)
 			const res = await dev.allocator.calculateMaxRewardsPerBlock()
@@ -85,7 +143,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 
 	describe('Allocator: beforeBalanceChange', () => {
 		it('If the first argument is a non-property address, an error occurs.', async () => {
-			const [dev] = await init()
 			const res = await dev.allocator
 				.beforeBalanceChange(user1, user1, user1)
 				.catch((err: Error) => err)
@@ -94,7 +151,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		it("If run the Allocator's beforeBalanceChange Withdraw's beforeBalanceChange is executed.", async () => {
 			const alice = deployer
 			const bob = user1
-			const [dev, property] = await init()
 			await authenticate(dev, property.address)
 			await dev.dev.mint(bob, 10000)
 			await dev.dev.deposit(property.address, 10000, { from: bob })
