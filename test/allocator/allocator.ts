@@ -62,7 +62,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		)
 	}
 
-
 	let dev: DevProtocolInstance
 	let property: PropertyInstance
 
@@ -75,52 +74,54 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	let snapshot: Snapshot
 	let snapshotId: string
 
-	const takeSnapshot = async () => new Promise((resolve, reject) => {
-		  web3.currentProvider.send(
-			{
-			  jsonrpc: "2.0",
-			  method: "evm_snapshot",
-			  id: new Date().getTime(),
-			},
-			(err: Error, snapshotId: number) => {
-			  if (err) {
-				reject(err); return;
-			  }
+	const takeSnapshot = async () =>
+		new Promise((resolve, reject) => {
+			web3.currentProvider.send(
+				{
+					jsonrpc: '2.0',
+					method: 'evm_snapshot',
+					id: new Date().getTime(),
+				},
+				(err: Error, snapshotId: number) => {
+					if (err) {
+						reject(err)
+					}
 
-			  resolve(snapshotId);
-			},
-		  );
-		});
+					resolve(snapshotId)
+				}
+			)
+		})
 
-	const revertToSnapshot = async (id: any) => new Promise((resolve, reject) => {
-		  web3.currentProvider.send(
-			{
-			  jsonrpc: "2.0",
-			  method: "evm_revert",
-			  params: [id],
-			  id: new Date().getTime(),
-			},
-			(err: Error, result: unknown) => {
-			  if (err) {
-				reject(err); return;
-			  }
+	const revertToSnapshot = async (id: any) =>
+		new Promise((resolve, reject) => {
+			web3.currentProvider.send(
+				{
+					jsonrpc: '2.0',
+					method: 'evm_revert',
+					params: [id],
+					id: new Date().getTime(),
+				},
+				(err: Error, result: unknown) => {
+					if (err) {
+						reject(err)
+					}
 
-			  resolve(result);
-			},
-		  );
-		});
+					resolve(result)
+				}
+			)
+		})
 
 	before(async () => {
-		[dev, property] = await init()
+		;[dev, property] = await init()
 	})
 
 	beforeEach(async () => {
-        snapshot = await takeSnapshot() as Snapshot
-		snapshotId = snapshot.result;
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
 	})
 
 	afterEach(async () => {
-	    await revertToSnapshot(snapshotId);
+		await revertToSnapshot(snapshotId)
 	})
 
 	describe('Allocator: calculateMaxRewardsPerBlock', () => {
