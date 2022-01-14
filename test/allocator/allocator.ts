@@ -1,6 +1,11 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import BigNumber from 'bignumber.js'
 import { toBigNumber } from '../test-lib/utils/common'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 import { PropertyInstance } from '../../types/truffle-contracts'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
 import { validateAddressErrorMessage } from '../test-lib/utils/error'
@@ -64,52 +69,8 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 
 	let dev: DevProtocolInstance
 	let property: PropertyInstance
-
-	type Snapshot = {
-		id: number
-		jsonrpc: string
-		result: string
-	}
-
 	let snapshot: Snapshot
 	let snapshotId: string
-
-	const takeSnapshot = async () =>
-		new Promise((resolve, reject) => {
-			web3.currentProvider.send(
-				{
-					jsonrpc: '2.0',
-					method: 'evm_snapshot',
-					id: new Date().getTime(),
-				},
-				(err: Error, snapshotId: number) => {
-					if (err) {
-						reject(err)
-					}
-
-					resolve(snapshotId)
-				}
-			)
-		})
-
-	const revertToSnapshot = async (id: any) =>
-		new Promise((resolve, reject) => {
-			web3.currentProvider.send(
-				{
-					jsonrpc: '2.0',
-					method: 'evm_revert',
-					params: [id],
-					id: new Date().getTime(),
-				},
-				(err: Error, result: unknown) => {
-					if (err) {
-						reject(err)
-					}
-
-					resolve(result)
-				}
-			)
-		})
 
 	before(async () => {
 		;[dev, property] = await init()
