@@ -1,4 +1,9 @@
 import { DevProtocolInstance } from '../test-lib/instance'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 import { getMarketAddress } from '../test-lib/utils/log'
 import {
 	validateAddressErrorMessage,
@@ -34,40 +39,55 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		return [dev, marketAddress, marketBehaviorAddress, [eventFrom, eventMarket]]
 	}
 
+	let dev: DevProtocolInstance
+	let market: string
+    let marketBehavior: string
+	let fromAddress: string
+	let marketAddress: string
+	let snapshot: Snapshot
+	let snapshotId: string
+
+	before(async () => {
+		;[dev, market, marketBehavior, [fromAddress, marketAddress]] = await init()
+	})
+
+	beforeEach(async () => {
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
+	})
+
+	afterEach(async () => {
+		await revertToSnapshot(snapshotId)
+	})
+
 	describe('MarketFactory; create', () => {
 		it('Create a new market contract and emit create event telling created market address,', async () => {
-			const [, market, marketBehavior] = await init()
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(market)
 			const behaviorAddress = await deployedMarket.behavior({ from: deployer })
 			expect(behaviorAddress).to.be.equal(marketBehavior)
 		})
 		it('Adds a new Market Contract address to State Contract,', async () => {
-			const [dev, market] = await init()
 			const result = await dev.marketGroup.isGroup(market, {
 				from: deployer,
 			})
 			expect(result).to.be.equal(true)
 		})
 		it('A freshly created market is enabled,', async () => {
-			const [, market] = await init()
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(market)
 			expect(await deployedMarket.enabled()).to.be.equal(true)
 		})
 		it('A secoundly created market is not enabled,', async () => {
-			const [, market] = await init()
 			// eslint-disable-next-line @typescript-eslint/await-thenable
 			const deployedMarket = await marketContract.at(market)
 			expect(await deployedMarket.enabled()).to.be.equal(true)
 		})
 		it('generate create event', async () => {
-			const [, market, , [fromAddress, marketAddress]] = await init()
 			expect(fromAddress).to.be.equal(user)
 			expect(marketAddress).to.be.equal(market)
 		})
 		it('The second and subsequent markets will not be automatically enabled.', async () => {
-			const [dev] = await init()
 			const secoundMarket = await dev.getMarket('MarketTest1', user)
 			const result = await dev.marketFactory.create(secoundMarket.address, {
 				from: user,
@@ -78,7 +98,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 			expect(await deployedMarket.enabled()).to.be.equal(false)
 		})
 		it('An error occurs if the default address is specified.', async () => {
-			const [dev] = await init()
 			const result = await dev.marketFactory
 				.create(DEFAULT_ADDRESS, {
 					from: user,
@@ -121,7 +140,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		})
 		describe('success', () => {
 			it('Enabling the Market', async () => {
-				const [dev] = await init()
 				const secoundMarket = await dev.getMarket('MarketTest1', user)
 				const result = await dev.marketFactory.create(secoundMarket.address, {
 					from: user,
@@ -158,7 +176,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				validateErrorMessage(res, 'illegal address')
 			})
 			it('we cannot specify the address of an active market.', async () => {
-				const [dev] = await init()
 				const market = await dev.getMarket('MarketTest1', user)
 				const result = await dev.marketFactory.create(market.address, {
 					from: user,
@@ -170,7 +187,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 				validateErrorMessage(res, 'already disabled')
 			})
 			it('we cannot reenable the market', async () => {
-				const [dev, marketAddress] = await init()
 				await dev.marketFactory.disable(marketAddress)
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const deployedMarket = await marketContract.at(marketAddress)
@@ -183,7 +199,6 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 		})
 		describe('success', () => {
 			it('disabling the Market', async () => {
-				const [dev, marketAddress] = await init()
 				await dev.marketFactory.disable(marketAddress)
 				// eslint-disable-next-line @typescript-eslint/await-thenable
 				const deployedMarket = await marketContract.at(marketAddress)
