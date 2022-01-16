@@ -48,7 +48,7 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 	let snapshotId: string
 
 	before(async () => {
-        dev = await createDevInstance()
+		dev = await createDevInstance()
 	})
 
 	beforeEach(async () => {
