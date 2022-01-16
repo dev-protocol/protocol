@@ -41,7 +41,7 @@ contract('MarketFactoryTest', ([deployer, user, dummyMarketAddress]) => {
 
 	let dev: DevProtocolInstance
 	let market: string
-    let marketBehavior: string
+	let marketBehavior: string
 	let fromAddress: string
 	let marketAddress: string
 	let snapshot: Snapshot
