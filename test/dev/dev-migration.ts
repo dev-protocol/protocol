@@ -23,7 +23,7 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 
 	before(async () => {
 		legacy = await createDev()
-        next = await createDev()
+		next = await createDev()
 	})
 
 	beforeEach(async () => {
