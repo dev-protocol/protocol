@@ -33,7 +33,7 @@
 		"bent": "7.3.12",
 		"bignumber.js": "9.0.2",
 		"del-cli": "4.0.1",
-		"dotenv": "12.0.3",
+		"dotenv": "12.0.4",
 		"eslint": "8.7.0",
 		"eslint-config-prettier": "8.3.0",
 		"eslint-config-xo": "0.39.0",
