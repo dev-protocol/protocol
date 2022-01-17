@@ -16,7 +16,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 		return dev.dev
 	}
 
-    let dev: DevInstance
+	let dev: DevInstance
 	let devInstance: DevProtocolInstance
 	let snapshot: Snapshot
 	let snapshotId: string
@@ -150,6 +150,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await dev.mint(deployer, 100)
 			return dev
 		}
+
 		before(async () => {
 			dev = await createMintedDev()
 		})
@@ -282,15 +283,17 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const balance = await devInstance.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(50)
-			expect((await devInstance.lockup.getValue(prop, user1)).toNumber()).to.be.equal(
-				50
-			)
+			expect(
+				(await devInstance.lockup.getValue(prop, user1)).toNumber()
+			).to.be.equal(50)
 		})
 		it('check gas used', async () => {
 			const prop = await createProperty(devInstance)
 			await devInstance.metricsGroup.__setMetricsCountPerProperty(prop, 1)
 			await devInstance.dev.mint(user1, 100)
-			const transaction = await devInstance.dev.deposit(prop, 50, { from: user1 })
+			const transaction = await devInstance.dev.deposit(prop, 50, {
+				from: user1,
+			})
 			const gasPrice = Number(transaction.receipt.gasUsed)
 			console.log(gasPrice)
 			expect(gasPrice <= 849424).to.be.equal(true)
@@ -305,7 +308,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const balance = await devInstance.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
-			expect((await devInstance.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(
+				(await devInstance.lockup.getValue(prop, user1)).toNumber()
+			).to.be.equal(0)
 			expect(res).to.be.an.instanceOf(Error)
 			validateErrorMessage(res, 'illegal lockup value')
 		})
@@ -317,7 +322,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const balance = await devInstance.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(0)
-			expect((await devInstance.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(
+				(await devInstance.lockup.getValue(prop, user1)).toNumber()
+			).to.be.equal(0)
 			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to lockup token when sent from an insufficient balance account', async () => {
@@ -329,7 +336,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const balance = await devInstance.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
-			expect((await devInstance.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(
+				(await devInstance.lockup.getValue(prop, user1)).toNumber()
+			).to.be.equal(0)
 			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to lockup token when the destination is other than property', async () => {
@@ -341,7 +350,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const balance = await devInstance.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
-			expect((await devInstance.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(
+				(await devInstance.lockup.getValue(prop, user1)).toNumber()
+			).to.be.equal(0)
 			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('should fail to lockup token when the lockup amount is 0', async () => {
@@ -353,7 +364,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const balance = await devInstance.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
-			expect((await devInstance.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(
+				(await devInstance.lockup.getValue(prop, user1)).toNumber()
+			).to.be.equal(0)
 			expect(res).to.be.an.instanceOf(Error)
 		})
 		it('lockup token by running the depositFrom from another account after approved', async () => {
@@ -365,9 +378,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const balance = await devInstance.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(50)
-			expect((await devInstance.lockup.getValue(prop, user1)).toNumber()).to.be.equal(
-				50
-			)
+			expect(
+				(await devInstance.lockup.getValue(prop, user1)).toNumber()
+			).to.be.equal(50)
 		})
 		it('should fail to lockup token when running the depositFrom of over than approved amount from another account after approved', async () => {
 			const prop = await createProperty(devInstance)
@@ -379,7 +392,9 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			const balance = await devInstance.dev.balanceOf(user1)
 
 			expect(balance.toNumber()).to.be.equal(100)
-			expect((await devInstance.lockup.getValue(prop, user1)).toNumber()).to.be.equal(0)
+			expect(
+				(await devInstance.lockup.getValue(prop, user1)).toNumber()
+			).to.be.equal(0)
 			expect(res).to.be.an.instanceOf(Error)
 		})
 	})
@@ -392,6 +407,7 @@ contract('Dev', ([deployer, user1, user2, marketFactory, market]) => {
 			await dev.generateMarketGroup()
 			return dev
 		}
+
 		before(async () => {
 			devInstance = await generateEnv()
 		})
