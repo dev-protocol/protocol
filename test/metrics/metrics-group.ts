@@ -4,6 +4,11 @@ import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 
 contract(
 	'MetricsGroup',
@@ -33,9 +38,28 @@ contract(
 			return [dev, metrics1, metrics2, metrics3]
 		}
 
+		let dev: DevProtocolInstance
+		let metrics1: string
+		let metrics2: string
+		let metrics3: string
+		let snapshot: Snapshot
+		let snapshotId: string
+
+		before(async () => {
+			;[dev, metrics1, metrics2, metrics3] = await init()
+		})
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
+
 		describe('MetricsGroup; addGroup, removeGroup, isGroup', () => {
 			it('You can get the number of properties being authenticated.', async () => {
-				const [dev, metrics1, metrics2, metrics3] = await init()
 				const before: BigNumber =
 					await dev.metricsGroup.totalAuthenticatedProperties()
 				expect(before.toString()).to.be.equal('0')
@@ -73,7 +97,6 @@ contract(
 			})
 
 			it('When the metrics address is Specified.', async () => {
-				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
@@ -81,7 +104,6 @@ contract(
 				expect(result).to.be.equal(true)
 			})
 			it('When the metrics address is not specified.', async () => {
-				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
@@ -89,7 +111,6 @@ contract(
 				expect(result).to.be.equal(false)
 			})
 			it('Should fail to call addGroup when sent from other than MetricsFactory', async () => {
-				const [dev, metrics1] = await init()
 				const result = await dev.metricsGroup
 					.addGroup(metrics1, {
 						from: deployer,
@@ -98,7 +119,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Existing metrics cannot be added.', async () => {
-				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
@@ -110,7 +130,6 @@ contract(
 				validateErrorMessage(result, 'already enabled')
 			})
 			it('Can not execute addGroup without metricsFactory address.', async () => {
-				const [dev] = await init()
 				const result = await dev.metricsGroup
 					.addGroup(dummyMetrics, {
 						from: dummyMetricsFactory,
@@ -119,7 +138,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Should fail to call removeGroup when sent from other than MetricsFactory', async () => {
-				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
@@ -131,7 +149,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Can not execute removeGroup without metricsFactory address.', async () => {
-				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
@@ -143,7 +160,6 @@ contract(
 				validateAddressErrorMessage(result)
 			})
 			it('Not existing metrics cannot be removed.', async () => {
-				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
@@ -155,7 +171,6 @@ contract(
 				validateErrorMessage(result, 'address is not group')
 			})
 			it('Deleted metrics addresses are treated as if they do not exist in the group.', async () => {
-				const [dev, metrics1] = await init()
 				await dev.metricsGroup.addGroup(metrics1, {
 					from: metricsFactory,
 				})
@@ -166,7 +181,6 @@ contract(
 		})
 		describe('MetricsGroup; totalIssuedMetrics', () => {
 			it('Count increases when metrics are added.', async () => {
-				const [dev, , metrics2] = await init()
 				let result = await dev.metricsGroup.totalIssuedMetrics()
 				expect(result.toNumber()).to.be.equal(0)
 				await dev.metricsGroup.addGroup(metrics2, {
@@ -183,7 +197,6 @@ contract(
 		})
 		describe('MetricsGroup; getMetricsCountPerProperty', () => {
 			it('Count increases when metrics are added.', async () => {
-				const [dev, , metrics2] = await init()
 				let result = await dev.metricsGroup.getMetricsCountPerProperty(
 					dummyProperty1
 				)
@@ -206,7 +219,6 @@ contract(
 		})
 		describe('MetricsGroup; hasAssets', () => {
 			it('Returns whether the passed Property has some assets', async () => {
-				const [dev, , metrics2] = await init()
 				let result = await dev.metricsGroup.hasAssets(dummyProperty1)
 				expect(result).to.be.equal(false)
 				await dev.metricsGroup.addGroup(metrics2, {
