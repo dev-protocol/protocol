@@ -1,4 +1,9 @@
 import { DevProtocolInstance } from '../test-lib/instance'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 import { DevInstance } from '../../types/truffle-contracts'
 
 contract('DevMigration', ([deployer, user1, user2]) => {
@@ -11,10 +16,27 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 		return dev.dev
 	}
 
+	let legacy: DevInstance
+	let next: DevInstance
+	let snapshot: Snapshot
+	let snapshotId: string
+
+	before(async () => {
+		legacy = await createDev()
+		next = await createDev()
+	})
+
+	beforeEach(async () => {
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
+	})
+
+	afterEach(async () => {
+		await revertToSnapshot(snapshotId)
+	})
+
 	describe('DevMigration; migrate', () => {
 		it('migrate balance between ERC20-to-ERC20', async () => {
-			const legacy = await createDev()
-			const next = await createDev()
 			await legacy.mint(user1, 100)
 			expect((await legacy.totalSupply()).toNumber()).to.equal(100)
 			expect((await legacy.balanceOf(user1)).toNumber()).to.equal(100)
@@ -39,8 +61,6 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 			expect((await next.balanceOf(user1)).toNumber()).to.equal(100)
 		})
 		it('should fail to migrate balance when the contract is not approved', async () => {
-			const legacy = await createDev()
-			const next = await createDev()
 			await legacy.mint(user1, 100)
 			expect((await legacy.totalSupply()).toNumber()).to.equal(100)
 			expect((await legacy.balanceOf(user1)).toNumber()).to.equal(100)
@@ -63,8 +83,6 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 			expect(res).to.be.an.instanceof(Error)
 		})
 		it('should fail to migrate balance when the contract is not minter', async () => {
-			const legacy = await createDev()
-			const next = await createDev()
 			await legacy.mint(user1, 100)
 			expect((await legacy.totalSupply()).toNumber()).to.equal(100)
 			expect((await legacy.balanceOf(user1)).toNumber()).to.equal(100)
@@ -91,8 +109,6 @@ contract('DevMigration', ([deployer, user1, user2]) => {
 			expect(res).to.be.an.instanceof(Error)
 		})
 		it('the balance is not migrating when sent from no balance account', async () => {
-			const legacy = await createDev()
-			const next = await createDev()
 			await legacy.mint(user2, 100)
 			expect((await legacy.totalSupply()).toNumber()).to.equal(100)
 			expect((await legacy.balanceOf(user1)).toNumber()).to.equal(0)

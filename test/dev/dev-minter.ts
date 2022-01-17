@@ -1,6 +1,11 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { DevMinterInstance } from '../../types/truffle-contracts'
 import { validateErrorMessage } from '../test-lib/utils/error'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 
 contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 	const createDevInstance = async (): Promise<DevProtocolInstance> => {
@@ -38,10 +43,26 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 			return devMinter
 		}
 
+	let dev: DevProtocolInstance
+	let snapshot: Snapshot
+	let snapshotId: string
+
+	before(async () => {
+		dev = await createDevInstance()
+	})
+
+	beforeEach(async () => {
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
+	})
+
+	afterEach(async () => {
+		await revertToSnapshot(snapshotId)
+	})
+
 	describe('mint', () => {
 		describe('success', () => {
 			it('If DevMinter has minter privileges, it can mint Dev tokens.(Lockup)', async () => {
-				const dev = await createDevInstance()
 				const before = await dev.dev.balanceOf(user1)
 				expect(before.toString()).to.equal('0')
 				await dev.devMinter.mint(user1, 100, { from: lockup })
@@ -49,7 +70,6 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 				expect(after.toString()).to.equal('100')
 			})
 			it('If DevMinter has minter privileges, it can mint Dev tokens.(withdraw)', async () => {
-				const dev = await createDevInstance()
 				const before = await dev.dev.balanceOf(user1)
 				expect(before.toString()).to.equal('0')
 				await dev.devMinter.mint(user1, 100, { from: withdraw })
@@ -69,7 +89,6 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 				)
 			})
 			it('Error when minting from other than Lockup and Withdraw contracts', async () => {
-				const dev = await createDevInstance()
 				const result = await dev.devMinter
 					.mint(user1, 100)
 					.catch((err: Error) => err)
@@ -80,7 +99,6 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 	describe('renounceMinter', () => {
 		describe('success', () => {
 			it('we can remove mint privileges.', async () => {
-				const dev = await createDevInstance()
 				const before = await dev.dev.isMinter(dev.devMinter.address)
 				expect(before).to.equal(true)
 				await dev.devMinter.renounceMinter()
@@ -97,7 +115,6 @@ contract('DevMinter', ([deployer, user1, lockup, withdraw]) => {
 		})
 		describe('fail', () => {
 			it('Only the owner can run it.', async () => {
-				const dev = await createDevInstance()
 				const result = await dev.devMinter
 					.renounceMinter({ from: user1 })
 					.catch((err: Error) => err)
