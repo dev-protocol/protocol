@@ -6,6 +6,11 @@ import { mine, toBigNumber, getBlock } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
 import { getEventValue } from '../test-lib/utils/event'
 import { validateErrorMessage } from '../test-lib/utils/error'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 
 contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	const deployerBalance = new BigNumber(1e18).times(10000000)
@@ -64,18 +69,36 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 
 	const err = (error: Error): Error => error
 
-	describe('Lockup; sTokensManager', () => {
-		it('get s tokens manager address', async () => {
-			const [dev] = await init()
+	let dev: DevProtocolInstance
+	let property: PropertyInstance
+	let tokenId: number
+	let snapshot: Snapshot
+	let snapshotId: string
 
+	beforeEach(async () => {
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
+	})
+
+	afterEach(async () => {
+		await revertToSnapshot(snapshotId)
+	})
+
+	describe('Lockup; sTokensManager', () => {
+		before(async () => {
+            [dev] = await init()
+		})
+		it('get s tokens manager address', async () => {
 			const address = await dev.lockup.sTokensManager()
 			expect(address).to.be.equal(dev.sTokenManager.address)
 		})
 	})
 	describe('Lockup; depositToProperty', () => {
+		before(async () => {
+			[dev, property] = await init()
+		})
 		describe('success', () => {
 			it('get nft token.', async () => {
-				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
 				await dev.lockup.depositToProperty(property.address, 100)
 				const owner = await dev.sTokenManager.ownerOf(1)
@@ -100,7 +123,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					return value.toFixed()
 				}
 
-				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
 				await dev.lockup.depositToProperty(property.address, 100)
 				await dev.dev.approve(dev.lockup.address, 200)
@@ -116,7 +138,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(position[4].toNumber()).to.be.equal(0)
 			})
 			it('generate event.', async () => {
-				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
 				dev.lockup.depositToProperty(property.address, 100)
 				const [_from, _property, _value] = await Promise.all([
@@ -129,7 +150,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(_value).to.be.equal('100')
 			})
 			it('set storage value.', async () => {
-				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
 				await dev.lockup.depositToProperty(property.address, 100)
 				const allValue = await dev.lockup.getStorageAllValue()
@@ -140,7 +160,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(propertyValue.toString()).to.be.equal('100')
 			})
 			it('staking dev token.', async () => {
-				const [dev, property] = await init()
 				await dev.dev.approve(dev.lockup.address, 100)
 				const beforeBalance = await dev.dev
 					.balanceOf(deployer)
@@ -159,7 +178,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		})
 		describe('fail', () => {
 			it('Attempt to deposit money into an unauthenticated property.', async () => {
-				const [dev] = await init()
 				const propertyAddress = getPropertyAddress(
 					await dev.propertyFactory.create('test2', 'TEST2', user2, {
 						from: user2,
@@ -171,14 +189,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				validateErrorMessage(res, 'unable to stake to unauthenticated property')
 			})
 			it('0 dev staking is not possible.', async () => {
-				const [dev, property] = await init()
 				const res = await dev.lockup
 					.depositToProperty(property.address, 0)
 					.catch(err)
 				validateErrorMessage(res, 'illegal deposit amount')
 			})
 			it('user is not holding dev.', async () => {
-				const [dev, property] = await init()
 				const res = await dev.lockup
 					.depositToProperty(property.address, 100, { from: user3 })
 					.catch(err)
@@ -187,6 +203,9 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		})
 	})
 	describe('Lockup; deposit(update)', () => {
+		before(async () => {
+            [dev, property, tokenId] = await init2()
+		})
 		describe('success', () => {
 			it('update nft.', async () => {
 				const getTestValues = async (): Promise<[string, string]> => {
@@ -203,7 +222,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					return [value1.toFixed(), value2.toFixed()]
 				}
 
-				const [dev, property, tokenId] = await init2()
 				const beforePosition = await dev.sTokenManager.positions(tokenId)
 				expect(beforePosition[0]).to.be.equal(property.address)
 				expect(beforePosition[1].toNumber()).to.be.equal(100)
@@ -225,7 +243,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				)
 			})
 			it('generate event.', async () => {
-				const [dev, property, tokenId] = await init2()
 				dev.lockup.depositToPosition(tokenId, 300)
 				const [_from, _property, _value] = await Promise.all([
 					getEventValue(dev.lockup)('Lockedup', '_from'),
@@ -237,7 +254,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(_value).to.be.equal('300')
 			})
 			it('set storage value.', async () => {
-				const [dev, property, tokenId] = await init2()
 				await dev.lockup.depositToPosition(tokenId, 300)
 				const allValue = await dev.lockup.getStorageAllValue()
 				expect(allValue.toString()).to.be.equal('400')
@@ -247,7 +263,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(propertyValue.toString()).to.be.equal('400')
 			})
 			it('staking dev token.', async () => {
-				const [dev, property, tokenId] = await init2()
 				const beforeBalance = await dev.dev
 					.balanceOf(deployer)
 					.then(toBigNumber)
@@ -267,25 +282,25 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		})
 		describe('fail', () => {
 			it('Cannot update position if sender and owner are different.', async () => {
-				const [dev, , tokenId] = await init2()
 				const res = await dev.lockup
 					.depositToPosition(tokenId, 100, { from: user3 })
 					.catch(err)
 				validateErrorMessage(res, 'illegal sender')
 			})
 			it('0 dev staking is not possible.', async () => {
-				const [dev, , tokenId] = await init2()
 				const res = await dev.lockup.depositToPosition(tokenId, 0).catch(err)
 				validateErrorMessage(res, 'illegal deposit amount')
 			})
 			it('user is not holding dev.', async () => {
-				const [dev, , tokenId] = await init2()
 				const res = await dev.lockup.depositToPosition(tokenId, 1000).catch(err)
 				validateErrorMessage(res, 'ERC20: transfer amount exceeds allowance')
 			})
 		})
 	})
 	describe('Lockup; withdrawByPosition', () => {
+		before(async () => {
+			[dev, property, tokenId] = await init2()
+		})
 		describe('success', () => {
 			it('update nft position.', async () => {
 				const getTestValues = async (): Promise<[string, string]> => {
@@ -302,7 +317,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 					return [value1.toFixed(), value2.toFixed()]
 				}
 
-				const [dev, property, tokenId] = await init2()
 				const beforePosition = await dev.sTokenManager.positions(tokenId)
 				expect(beforePosition[0]).to.be.equal(property.address)
 				expect(beforePosition[1].toNumber()).to.be.equal(100)
@@ -322,7 +336,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(beforePosition[4].toNumber()).to.be.equal(0)
 			})
 			it('get reward.', async () => {
-				const [dev, , tokenId] = await init2()
 				const beforeBalance = await dev.dev
 					.balanceOf(deployer)
 					.then(toBigNumber)
@@ -332,7 +345,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(reward.toString()).to.be.equal('10000000000000000000')
 			})
 			it('reverce staking dev token.', async () => {
-				const [dev, , tokenId] = await init2()
 				const beforeBalance = await dev.dev
 					.balanceOf(deployer)
 					.then(toBigNumber)
@@ -343,7 +355,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(stakedDev.toString()).to.be.equal('100')
 			})
 			it('set storage value.', async () => {
-				const [dev, property, tokenId] = await init2()
 				await dev.lockup.withdrawByPosition(tokenId, 100)
 				const allValue = await dev.lockup.getStorageAllValue()
 				expect(allValue.toString()).to.be.equal('0')
@@ -355,14 +366,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		})
 		describe('fail', () => {
 			it('Cannot withdraw reward if sender and owner are different.', async () => {
-				const [dev, , tokenId] = await init2()
 				const res = await dev.lockup
 					.withdrawByPosition(tokenId, 100, { from: user3 })
 					.catch(err)
 				validateErrorMessage(res, 'illegal sender')
 			})
 			it('Withdrawal amount is greater than deposit amount.', async () => {
-				const [dev, , tokenId] = await init2()
 				const res = await dev.lockup.withdrawByPosition(tokenId, 200).catch(err)
 				validateErrorMessage(res, 'insufficient tokens staked')
 			})
@@ -370,9 +379,11 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	})
 
 	describe('Lockup; migrateToSTokens', () => {
+		before(async () => {
+			[dev, property] = await init()
+		})
 		describe('success', () => {
 			it('generate nft token.', async () => {
-				const [dev, property] = await init()
 				await dev.dev.deposit(property.address, 100)
 				const beforeBalance = await dev.sTokenManager.balanceOf(deployer)
 				expect(beforeBalance.toNumber()).to.be.equal(0)
@@ -381,7 +392,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(afterBalance.toNumber()).to.be.equal(1)
 			})
 			it('creator rewards will be carried over..', async () => {
-				const [dev, property] = await init()
 				await dev.dev.deposit(property.address, 100)
 				await mine(1)
 				const reward = await dev.lockup
@@ -401,7 +411,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(afterBalance.toNumber()).to.be.equal(1)
 			})
 			it('update storage data.', async () => {
-				const [dev, property] = await init()
 				await dev.dev.deposit(property.address, 100)
 				await dev.lockup.migrateToSTokens(property.address)
 				const pendingInterestWithdrawal =
@@ -417,7 +426,6 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 				expect(value.toNumber()).to.be.equal(0)
 			})
 			it('update position information.', async () => {
-				const [dev, property] = await init()
 				await dev.dev.deposit(property.address, 100)
 				await dev.lockup.migrateToSTokens(property.address)
 				const position = await dev.sTokenManager.positions(1)
@@ -430,14 +438,12 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 		})
 		describe('fail', () => {
 			it('Not staking.', async () => {
-				const [dev, property] = await init()
 				const res = await dev.lockup
 					.migrateToSTokens(property.address)
 					.catch(err)
 				validateErrorMessage(res, 'not staked')
 			})
 			it('Different users.', async () => {
-				const [dev, property] = await init()
 				await dev.dev.deposit(property.address, 100)
 				const res = await dev.lockup
 					.migrateToSTokens(property.address, { from: user3 })
