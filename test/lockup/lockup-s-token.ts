@@ -86,7 +86,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 
 	describe('Lockup; sTokensManager', () => {
 		before(async () => {
-            [dev] = await init()
+			;[dev] = await init()
 		})
 		it('get s tokens manager address', async () => {
 			const address = await dev.lockup.sTokensManager()
@@ -95,7 +95,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	})
 	describe('Lockup; depositToProperty', () => {
 		before(async () => {
-			[dev, property] = await init()
+			;[dev, property] = await init()
 		})
 		describe('success', () => {
 			it('get nft token.', async () => {
@@ -204,7 +204,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	})
 	describe('Lockup; deposit(update)', () => {
 		before(async () => {
-            [dev, property, tokenId] = await init2()
+			;[dev, property, tokenId] = await init2()
 		})
 		describe('success', () => {
 			it('update nft.', async () => {
@@ -299,7 +299,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 	})
 	describe('Lockup; withdrawByPosition', () => {
 		before(async () => {
-			[dev, property, tokenId] = await init2()
+			;[dev, property, tokenId] = await init2()
 		})
 		describe('success', () => {
 			it('update nft position.', async () => {
@@ -380,7 +380,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 
 	describe('Lockup; migrateToSTokens', () => {
 		before(async () => {
-			[dev, property] = await init()
+			;[dev, property] = await init()
 		})
 		describe('success', () => {
 			it('generate nft token.', async () => {
