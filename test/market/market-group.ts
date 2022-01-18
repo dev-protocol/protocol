@@ -1,5 +1,11 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { validateErrorMessage } from '../test-lib/utils/error'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
+
 
 contract(
 	'MarketGroupTest',
@@ -12,8 +18,19 @@ contract(
 		dummyMarket,
 	]) => {
 		const dev = new DevProtocolInstance(deployer)
+		let snapshot: Snapshot
+		let snapshotId: string
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
 		describe('MarketGroup addGroup, isGroup, getCount', () => {
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressConfig()
 				await dev.generateMarketGroup()
 				await dev.addressConfig.setMarketFactory(marketFactory, {
@@ -54,7 +71,7 @@ contract(
 			})
 		})
 		describe('MarketGroup deleteGroup, isGroup, getCount', () => {
-			beforeEach(async () => {
+			before(async () => {
 				await dev.generateAddressConfig()
 				await dev.generateMarketGroup()
 				await dev.addressConfig.setMarketFactory(marketFactory, {
