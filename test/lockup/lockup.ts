@@ -1,10 +1,6 @@
 import { err, init } from './lockup-common'
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
-	PropertyInstance,
-	PolicyTestBaseInstance,
-} from '../../types/truffle-contracts'
-import BigNumber from 'bignumber.js'
+import { PropertyInstance } from '../../types/truffle-contracts'
 import {
 	mine,
 	toBigNumber,
