@@ -6,7 +6,6 @@ import {
 	Snapshot,
 } from '../test-lib/utils/snapshot'
 
-
 contract(
 	'MarketGroupTest',
 	([
