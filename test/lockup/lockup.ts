@@ -8,7 +8,6 @@ import {
 	mine,
 	toBigNumber,
 	getBlock,
-	gasLogger,
 	keccak256,
 } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
@@ -20,7 +19,7 @@ import {
 	Snapshot,
 } from '../test-lib/utils/snapshot'
 
-contract('LockupTest', ([deployer, user1, user2, user3]) => {
+contract('LockupTest', ([deployer, user1, user2]) => {
 	const init = async (
 		initialUpdate = true
 	): Promise<
@@ -267,7 +266,7 @@ contract('LockupTest', ([deployer, user1, user2, user3]) => {
 			)
 		})
 	})
-	// describe('Lockup; calculateWithdrawableInterestAmount', () => {
+	// Describe('Lockup; calculateWithdrawableInterestAmount', () => {
 	// 	type Calculator = (
 	// 		prop: PropertyInstance,
 	// 		account: string,
