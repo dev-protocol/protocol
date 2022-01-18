@@ -2,7 +2,7 @@
 import { deployerBalance, err, init } from './lockup-s-token-common'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { PropertyInstance } from '../../types/truffle-contracts'
-import { mine, toBigNumber, getBlock } from '../test-lib/utils/common'
+import { mine, toBigNumber } from '../test-lib/utils/common'
 import { getPropertyAddress } from '../test-lib/utils/log'
 import { getEventValue } from '../test-lib/utils/event'
 import { validateErrorMessage } from '../test-lib/utils/error'
@@ -12,8 +12,7 @@ import {
 	Snapshot,
 } from '../test-lib/utils/snapshot'
 
-contract('LockupTest', ([deployer, user1, user2, user3]) => {
-
+contract('LockupTest', ([deployer, , user2, user3]) => {
 	const init2 = async (): Promise<
 		[DevProtocolInstance, PropertyInstance, number]
 	> => {
