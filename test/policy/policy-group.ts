@@ -1,6 +1,11 @@
 import { DevProtocolInstance } from '../test-lib/instance'
 import { mine } from '../test-lib/utils/common'
 import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
+import {
 	validateErrorMessage,
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
@@ -23,21 +28,35 @@ contract(
 			return dev
 		}
 
+		let dev: DevProtocolInstance
+		let snapshot: Snapshot
+		let snapshotId: string
+
+		before(async () => {
+			dev = await init()
+		})
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
+
 		describe('PolicyGroup; addGroup, isGroup', () => {
 			it('When a policy address is specified', async () => {
-				const dev = await init()
 				const currentPolicy = await dev.addressConfig.policy()
 
 				const result = await dev.policyGroup.isGroup(currentPolicy)
 				expect(result).to.be.equal(true)
 			})
 			it('When the policy address is not specified', async () => {
-				const dev = await init()
 				const result = await dev.policyGroup.isGroup(dummyPolicy)
 				expect(result).to.be.equal(false)
 			})
 			it('can add new policy', async () => {
-				const dev = await init()
 				const policy = await dev.getPolicy(
 					'PolicyTestForPolicyFactory',
 					deployer
@@ -50,7 +69,6 @@ contract(
 				expect(result).to.be.equal(true)
 			})
 			it('can add new policy', async () => {
-				const dev = await init()
 				const policy = await dev.getPolicy(
 					'PolicyTestForPolicyFactory',
 					deployer
@@ -63,7 +81,6 @@ contract(
 				expect(result).to.be.equal(true)
 			})
 			it('Existing policy cannot be added', async () => {
-				const dev = await init()
 				const currentPolicy = await dev.addressConfig.policy()
 				const result = await dev.policyGroup
 					.addGroup(currentPolicy, {
@@ -73,7 +90,6 @@ contract(
 				validateErrorMessage(result, 'already group')
 			})
 			it('Can not execute addGroup without policyFactory address', async () => {
-				const dev = await init()
 				const result = await dev.policyGroup
 					.addGroup(dummyPolicy, {
 						from: dummyPolicyFactory,
@@ -84,7 +100,6 @@ contract(
 		})
 		describe('PolicyGroup; isDuringVotingPeriod', () => {
 			it('If it is during the voting period, true will come back.', async () => {
-				const dev = await init()
 				const policy = await dev.getPolicy(
 					'PolicyTestForPolicyFactory',
 					deployer

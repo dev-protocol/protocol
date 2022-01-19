@@ -2,15 +2,17 @@ import { IPolicyInstance } from '../../types/truffle-contracts'
 import { DevProtocolInstance } from '../test-lib/instance'
 import { collectsEth, mine } from '../test-lib/utils/common'
 import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
+import {
 	validateNotOwnerErrorMessage,
 	validateAddressErrorMessage,
 	validateErrorMessage,
 } from '../test-lib/utils/error'
 
 contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
-	before(async () => {
-		await collectsEth(deployer)(accounts)
-	})
 	const init = async (): Promise<[DevProtocolInstance, IPolicyInstance]> => {
 		const dev = new DevProtocolInstance(deployer)
 		await dev.generateAddressConfig()
@@ -24,9 +26,27 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 		return [dev, policy]
 	}
 
+	let dev: DevProtocolInstance
+	let policy: IPolicyInstance
+	let snapshot: Snapshot
+	let snapshotId: string
+
+	before(async () => {
+		;[dev, policy] = await init()
+		await collectsEth(deployer)(accounts)
+	})
+
+	beforeEach(async () => {
+		snapshot = (await takeSnapshot()) as Snapshot
+		snapshotId = snapshot.result
+	})
+
+	afterEach(async () => {
+		await revertToSnapshot(snapshotId)
+	})
+
 	describe('PolicyFactory; create', () => {
 		it('If the first Policy, the Policy becomes valid.', async () => {
-			const [dev, policy] = await init()
 			await dev.policyFactory.create(policy.address, {
 				from: user1,
 			})
@@ -35,7 +55,6 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 		})
 
 		it('Added to the group.', async () => {
-			const [dev, policy] = await init()
 			const before = await dev.policyGroup.isGroup(policy.address)
 			expect(before).to.be.equal(false)
 			await dev.policyFactory.create(policy.address, {
@@ -45,7 +64,6 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 			expect(after).to.be.equal(true)
 		})
 		it('event was generated.', async () => {
-			const [dev, policy] = await init()
 			const result = await dev.policyFactory.create(policy.address, {
 				from: user1,
 			})
@@ -54,7 +72,6 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 			expect(event._policy).to.be.equal(policy.address)
 		})
 		it('If the policy already exists, it will not be applied.', async () => {
-			const [dev, policy] = await init()
 			await dev.policyFactory.create(policy.address, {
 				from: user1,
 			})
@@ -76,21 +93,18 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 	describe('PolicyFactory; forceAttach', () => {
 		describe('failed', () => {
 			it('can not be performed by anyone other than the owner.', async () => {
-				const [dev] = await init()
 				const result = await dev.policyFactory
 					.forceAttach(dummyPolicy, { from: user1 })
 					.catch((err: Error) => err)
 				validateNotOwnerErrorMessage(result)
 			})
 			it('can not specify anything other than policy.', async () => {
-				const [dev] = await init()
 				const result = await dev.policyFactory
 					.forceAttach(dummyPolicy)
 					.catch((err: Error) => err)
 				validateAddressErrorMessage(result)
 			})
 			it('deadline is over.', async () => {
-				const [dev, policy] = await init()
 				await dev.policyFactory.create(policy.address, {
 					from: user1,
 				})
@@ -114,7 +128,6 @@ contract('PolicyFactory', ([deployer, dummyPolicy, user1, ...accounts]) => {
 		})
 		describe('success', () => {
 			it('policy is force attach.', async () => {
-				const [dev, policy] = await init()
 				await dev.policyFactory.create(policy.address, {
 					from: user1,
 				})
