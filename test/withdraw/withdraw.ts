@@ -1,26 +1,6 @@
-
 import { init } from './withdraw-common'
 import { DevProtocolInstance } from '../test-lib/instance'
-import {
-	MetricsInstance,
-	PropertyInstance,
-	IPolicyInstance,
-	MarketInstance,
-} from '../../types/truffle-contracts'
-import BigNumber from 'bignumber.js'
-import {
-	mine,
-	toBigNumber,
-	getBlock,
-	splitValue,
-} from '../test-lib/utils/common'
-import {
-	getWithdrawHolderAmount,
-	getWithdrawHolderSplitAmount,
-} from '../test-lib/utils/mint-amount'
-import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
-import { SHARE_OF_TREASURY } from '../test-lib/const'
-import { getEventValue } from '../test-lib/utils/event'
+import { PropertyInstance } from '../../types/truffle-contracts'
 import {
 	takeSnapshot,
 	revertToSnapshot,
@@ -31,14 +11,14 @@ import {
 	validateAddressErrorMessage,
 } from '../test-lib/utils/error'
 
-contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
-    let dev: DevProtocolInstance
+contract('WithdrawTest', ([deployer, user1, , user3]) => {
+	let dev: DevProtocolInstance
 	let property: PropertyInstance
 	let snapshot: Snapshot
 	let snapshotId: string
 
 	before(async () => {
-		;[dev, ,property] = await init(deployer, user3)
+		;[dev, , property] = await init(deployer, user3)
 	})
 
 	beforeEach(async () => {
@@ -51,7 +31,7 @@ contract('WithdrawTest', ([deployer, user1, user2, user3, user4]) => {
 	})
 
 	describe('Withdraw; withdraw', () => {
-        it('should fail to call when passed address is not property contract', async () => {
+		it('should fail to call when passed address is not property contract', async () => {
 			const res = await dev.withdraw
 				.withdraw(deployer)
 				.catch((err: Error) => err)
