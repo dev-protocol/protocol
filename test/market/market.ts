@@ -2,6 +2,11 @@ import { DevProtocolInstance } from '../test-lib/instance'
 import { mine } from '../test-lib/utils/common'
 import { MarketInstance } from '../../types/truffle-contracts'
 import { getPropertyAddress, getMarketAddress } from '../test-lib/utils/log'
+import {
+	takeSnapshot,
+	revertToSnapshot,
+	Snapshot,
+} from '../test-lib/utils/snapshot'
 import { watch } from '../test-lib/utils/event'
 import {
 	validateErrorMessage,
@@ -12,9 +17,27 @@ contract(
 	'MarketTest',
 	([deployer, marketFactory, behavuor, user, user1, propertyAuther]) => {
 		const marketContract = artifacts.require('Market')
+
+		let dev: DevProtocolInstance
+		let market: MarketInstance
+		let marketAddress1: string
+		let marketAddress2: string
+		let propertyAddress: string
+		let snapshot: Snapshot
+		let snapshotId: string
+
+		beforeEach(async () => {
+			snapshot = (await takeSnapshot()) as Snapshot
+			snapshotId = snapshot.result
+		})
+
+		afterEach(async () => {
+			await revertToSnapshot(snapshotId)
+		})
+
 		describe('Market; constructor', () => {
-			const dev = new DevProtocolInstance(deployer)
-			beforeEach(async () => {
+			before(async () => {
+				dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
 			})
 			it('Cannot be created from other than market factory', async () => {
@@ -42,9 +65,8 @@ contract(
 			})
 		})
 		describe('Market; toEnable', () => {
-			const dev = new DevProtocolInstance(deployer)
-			let market: MarketInstance
-			beforeEach(async () => {
+			before(async () => {
+				dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
 				await Promise.all([
 					dev.generatePolicyFactory(),
@@ -77,9 +99,8 @@ contract(
 			})
 		})
 		describe('Market; toDisable', () => {
-			const dev = new DevProtocolInstance(deployer)
-			let market: MarketInstance
-			beforeEach(async () => {
+			before(async () => {
+				dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
 				await Promise.all([
 					dev.generatePolicyFactory(),
@@ -105,7 +126,9 @@ contract(
 			})
 		})
 		describe('Market; schema', () => {
-			const dev = new DevProtocolInstance(deployer)
+			before(() => {
+				dev = new DevProtocolInstance(deployer)
+			})
 			it('Get Schema of mapped Behavior Contract', async () => {
 				await dev.generateAddressConfig()
 				await Promise.all([
@@ -125,11 +148,8 @@ contract(
 			})
 		})
 		describe('Market; authenticate, authenticatedCallback', () => {
-			const dev = new DevProtocolInstance(deployer)
-			let marketAddress1: string
-			let marketAddress2: string
-			let propertyAddress: string
-			beforeEach(async () => {
+			before(async () => {
+				dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
 				await dev.generateDev()
 				await dev.generateDevMinter()
@@ -342,12 +362,9 @@ contract(
 			})
 		})
 		describe('Market; authenticateFromPropertyFactory, authenticatedCallback', () => {
-			const dev = new DevProtocolInstance(deployer)
-			let marketAddress1: string
-			let marketAddress2: string
-			let propertyAddress: string
 			const propertyFactory = user1
-			beforeEach(async () => {
+			before(async () => {
+				dev = new DevProtocolInstance(deployer)
 				await dev.generateAddressConfig()
 				await dev.generateDev()
 				await dev.generateDevMinter()
