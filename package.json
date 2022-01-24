@@ -68,8 +68,5 @@
 	"bugs": {
 		"url": "https://github.com/dev-protocol/protocol/issues"
 	},
-	"homepage": "https://github.com/dev-protocol/protocol#readme",
-	"mocha": {
-		"enableTimeouts": false
-	}
+	"homepage": "https://github.com/dev-protocol/protocol#readme"
 }
