@@ -67,4 +67,7 @@ module.exports = {
 	api_keys: {
 		etherscan: ETHEREUM_ETHERSCAN_API_KEY,
 	},
+	mocha: {
+		enableTimeouts: false
+	}
 }
