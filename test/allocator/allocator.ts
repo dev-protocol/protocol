@@ -18,19 +18,19 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		await dev.generateDev()
 		await dev.generateDevMinter()
 		await dev.generateSTokenManager()
-		await Promise.all([
-			dev.generateAllocator(),
-			dev.generateMarketFactory(),
-			dev.generateMarketGroup(),
-			dev.generateMetricsFactory(),
-			dev.generateMetricsGroup(),
-			dev.generateLockup(),
-			dev.generateWithdraw(),
-			dev.generatePropertyFactory(),
-			dev.generatePropertyGroup(),
-			dev.generatePolicyFactory(),
-			dev.generatePolicyGroup(),
-		])
+
+		await dev.generateAllocator(),
+		await dev.generateMarketFactory(),
+		await dev.generateMarketGroup(),
+		await dev.generateMetricsFactory(),
+		await dev.generateMetricsGroup(),
+		await dev.generateLockup(),
+		await dev.generateWithdraw(),
+		await dev.generatePropertyFactory(),
+		await dev.generatePropertyGroup(),
+		await dev.generatePolicyFactory(),
+		await dev.generatePolicyGroup(),
+
 
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.generatePolicy('PolicyTestForAllocator')
@@ -73,6 +73,7 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 	let snapshotId: string
 
 	before(async () => {
+		console.log("start")
 		;[dev, property] = await init()
 	})
 
