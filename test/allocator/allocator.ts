@@ -31,7 +31,6 @@ contract('Allocator', ([deployer, user1, propertyAddress, propertyFactory]) => {
 		await dev.generatePolicyFactory()
 		await dev.generatePolicyGroup()
 
-
 		await dev.dev.mint(deployer, new BigNumber(1e18).times(10000000))
 		await dev.generatePolicy('PolicyTestForAllocator')
 		const propertyAddress = getPropertyAddress(
