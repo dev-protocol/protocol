@@ -39,7 +39,7 @@
 		"eslint-config-xo": "0.39.0",
 		"eslint-config-xo-typescript": "0.49.0",
 		"husky": "7.0.4",
-		"p-queue": "7.1.0",
+		"p-queue": "7.2.0",
 		"prettier": "2.5.1",
 		"prettier-plugin-solidity": "1.0.0-beta.19",
 		"solhint": "3.3.6",
