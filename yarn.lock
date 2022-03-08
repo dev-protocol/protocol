@@ -147,13 +147,13 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
-"@devprotocol/i-s-tokens@1.6.2":
-  version "1.6.2"
-  resolved "https://registry.yarnpkg.com/@devprotocol/i-s-tokens/-/i-s-tokens-1.6.2.tgz#87a540c408450cee7be262505133c9c0231cdbd6"
-  integrity sha512-qq4v9+uNQ7a1tNcxP0t1MzqOwYGcBBC2Y6v7IZKm7XErYQwk1rnFkZKlecAqcBUIAWDew9JcokjhE4du3mCFRg==
+"@devprotocol/i-s-tokens@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@devprotocol/i-s-tokens/-/i-s-tokens-1.7.0.tgz#a225f3fd8d4ec883f2e45420a41b974f94006bcb"
+  integrity sha512-dG7EmAD2qjaqX1nbdt6tSNALhlYMv9AomDnGgnaQ4pVbebhWbD1NxfgPGBrHnRClfJx0195Bh/EJXEeum5L4Eg==
   dependencies:
     ethereum-waffle "3.4.0"
-    solhint "3.3.6"
+    solhint "3.3.7"
 
 "@devprotocol/util-ts@2.2.1":
   version "2.2.1"
@@ -1413,13 +1413,6 @@
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
-
-"@solidity-parser/parser@^0.13.2":
-  version "0.13.2"
-  resolved "https://registry.yarnpkg.com/@solidity-parser/parser/-/parser-0.13.2.tgz#b6c71d8ca0b382d90a7bbed241f9bc110af65cbe"
-  integrity sha512-RwHnpRnfrnD2MSPveYoPh8nhofEvX7fgjHk1Oq+NNvCcLx4r1js91CO9o+F/F3fBzOCyvm8kKRTriFICX/odWw==
-  dependencies:
-    antlr4ts "^0.5.0-alpha.4"
 
 "@solidity-parser/parser@^0.14.0":
   version "0.14.0"
@@ -12692,28 +12685,6 @@ solc@^0.6.3:
     require-from-string "^2.0.0"
     semver "^5.5.0"
     tmp "0.0.33"
-
-solhint@3.3.6:
-  version "3.3.6"
-  resolved "https://registry.yarnpkg.com/solhint/-/solhint-3.3.6.tgz#abe9af185a9a7defefba480047b3e42cbe9a1210"
-  integrity sha512-HWUxTAv2h7hx3s3hAab3ifnlwb02ZWhwFU/wSudUHqteMS3ll9c+m1FlGn9V8ztE2rf3Z82fQZA005Wv7KpcFA==
-  dependencies:
-    "@solidity-parser/parser" "^0.13.2"
-    ajv "^6.6.1"
-    antlr4 "4.7.1"
-    ast-parents "0.0.1"
-    chalk "^2.4.2"
-    commander "2.18.0"
-    cosmiconfig "^5.0.7"
-    eslint "^5.6.0"
-    fast-diff "^1.1.2"
-    glob "^7.1.3"
-    ignore "^4.0.6"
-    js-yaml "^3.12.0"
-    lodash "^4.17.11"
-    semver "^6.3.0"
-  optionalDependencies:
-    prettier "^1.14.3"
 
 solhint@3.3.7:
   version "3.3.7"
