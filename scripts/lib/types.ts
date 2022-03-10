@@ -50,7 +50,7 @@ export type ReceiptEvent = Record<string, Event>
 export type TxReceipt = {
 	readonly blockHash: string
 	readonly blockNumber: number
-	readonly contractAddress: string | null
+	readonly contractAddress: string | undefined
 	readonly cumulativeGasUsed: number
 	readonly events: ReceiptEvent
 	readonly from: string

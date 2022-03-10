@@ -4,7 +4,7 @@ const { CONFIG, EGS_TOKEN } = process.env
 const gas = 6721975
 
 const handler = async (
-	callback: (err: Error | null) => void
+	callback: (err: Error | undefined) => void
 ): Promise<void> => {
 	if (!CONFIG || !EGS_TOKEN) {
 		return
@@ -51,7 +51,7 @@ const handler = async (
 	})
 	console.log('updated AddressConfig for MetricsGroup')
 
-	callback(null)
+	callback(undefined)
 }
 
 export = handler

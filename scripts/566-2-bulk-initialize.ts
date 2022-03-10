@@ -30,7 +30,7 @@ const withdrawContracts = [
 ]
 
 const handler = async (
-	callback: (err: Error | null) => void
+	callback: (err: Error | undefined) => void
 ): Promise<void> => {
 	if (!CONFIG || !EGS_TOKEN || !WITHDRAW_STORAGE || !WITHDRAW_MIGRATION) {
 		return
@@ -187,7 +187,7 @@ const handler = async (
 
 	await createQueue(2).addAll(initializeTasks).catch(console.error)
 
-	callback(null)
+	callback(undefined)
 }
 
 export = handler

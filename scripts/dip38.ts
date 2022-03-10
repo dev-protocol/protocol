@@ -15,7 +15,7 @@ const {
 } = process.env
 
 const handler = async (
-	callback: (err: Error | null) => void
+	callback: (err: Error | undefined) => void
 ): Promise<void> => {
 	if (!configAddress || !egsApiKey || !capSetter) {
 		return
@@ -85,7 +85,7 @@ const handler = async (
 		withdraw.set(withdraw_next),
 	])
 
-	callback(null)
+	callback(undefined)
 }
 
 export = handler

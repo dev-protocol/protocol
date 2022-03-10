@@ -4,7 +4,7 @@ const { CONFIG, EGS_TOKEN } = process.env
 const gas = 6721975
 
 const handler = async (
-	callback: (err: Error | null) => void
+	callback: (err: Error | undefined) => void
 ): Promise<void> => {
 	if (!CONFIG || !EGS_TOKEN) {
 		return
@@ -30,7 +30,7 @@ const handler = async (
 		gas,
 	})
 	console.log('Updated MarketFactory address')
-	callback(null)
+	callback(undefined)
 }
 
 export = handler

@@ -6,7 +6,7 @@ config()
 const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
 
 const handler = async (
-	callback: (err: Error | null) => void
+	callback: (err: Error | undefined) => void
 ): Promise<void> => {
 	if (!configAddress || !egsApiKey) {
 		return
@@ -27,7 +27,7 @@ const handler = async (
 	const nextWithdraw = await withdraw.create()
 	await withdraw.set(nextWithdraw)
 
-	callback(null)
+	callback(undefined)
 }
 
 export = handler

@@ -15,7 +15,7 @@ const {
 } = process.env
 
 const handler = async (
-	callback: (err: Error | null) => void
+	callback: (err: Error | undefined) => void
 ): Promise<void> => {
 	if (!configAddress || !egsApiKey) {
 		return
@@ -56,7 +56,7 @@ const handler = async (
 	const nextPropertyFactory = await propertyFactory.create()
 	await propertyFactory.set(nextPropertyFactory)
 
-	callback(null)
+	callback(undefined)
 }
 
 export = handler

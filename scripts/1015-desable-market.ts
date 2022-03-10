@@ -8,7 +8,7 @@ config()
 const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
 
 const handler = async (
-	callback: (err: Error | null) => void
+	callback: (err: Error | undefined) => void
 ): Promise<void> => {
 	if (!configAddress || !egsApiKey) {
 		return
@@ -36,7 +36,7 @@ const handler = async (
 	await mg.changeOwner(mgCurrent, mgNext)
 	await mg.set(mgNext)
 
-	callback(null)
+	callback(undefined)
 }
 
 export = handler

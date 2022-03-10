@@ -8,7 +8,7 @@ config()
 const { CONFIG: configAddress, EGS_TOKEN: egsApiKey } = process.env
 
 const handler = async (
-	callback: (err: Error | null) => void
+	callback: (err: Error | undefined) => void
 ): Promise<void> => {
 	if (!configAddress || !egsApiKey) {
 		return
@@ -46,7 +46,7 @@ const handler = async (
 		w.set(wNext),
 	])
 
-	callback(null)
+	callback(undefined)
 }
 
 export = handler

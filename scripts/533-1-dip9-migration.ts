@@ -4,7 +4,7 @@ const { CONFIG, EGS_TOKEN, DEV_MINTER } = process.env
 const gas = 6721975
 
 const handler = async (
-	callback: (err: Error | null) => void
+	callback: (err: Error | undefined) => void
 ): Promise<void> => {
 	if (!CONFIG || !EGS_TOKEN || !DEV_MINTER) {
 		return
@@ -111,7 +111,7 @@ const handler = async (
 	})
 	console.log('updated AddressConfig for MetricsFactory')
 
-	callback(null)
+	callback(undefined)
 }
 
 export = handler
