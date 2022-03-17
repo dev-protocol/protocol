@@ -13439,10 +13439,10 @@ trim-right@^1.0.1:
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
 
-truffle-plugin-verify@0.5.23:
-  version "0.5.23"
-  resolved "https://registry.yarnpkg.com/truffle-plugin-verify/-/truffle-plugin-verify-0.5.23.tgz#231d5ca4605b1dab1c581a0a165e368289e9bad8"
-  integrity sha512-hfMWeisTLLxDNFeA8kk+pZnVx/TFEywaIrsedGn3d6gzEaHtMtElUsQGoTBaKmMEQWAYtzYMj1d1/QBEgqHQNg==
+truffle-plugin-verify@0.5.24:
+  version "0.5.24"
+  resolved "https://registry.yarnpkg.com/truffle-plugin-verify/-/truffle-plugin-verify-0.5.24.tgz#379dacbbdc1f5f437cd9856b27af4eab7696e01a"
+  integrity sha512-kDxZ8qv4iTr5AK6hCehW4Z9xVT+1cP0F/r1Xs1rNYQb+WcN3QQTxh1Uv+rOW92fpxcoOkIKF1zSS4lQ/pC7/XA==
   dependencies:
     axios "^0.26.1"
     cli-logger "^0.5.40"
