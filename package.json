@@ -51,7 +51,7 @@
 		"typechain": "4.0.3",
 		"typechain-target-truffle": "1.0.2",
 		"typescript": "4.7.4",
-		"web3": "1.7.3"
+		"web3": "1.7.4"
 	},
 	"dependencies": {
 		"@devprotocol/i-s-tokens": "1.8.0",
