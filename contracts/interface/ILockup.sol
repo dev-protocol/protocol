@@ -6,6 +6,12 @@ interface ILockup {
 		external
 		returns (uint256);
 
+	function depositToProperty(
+		address _property,
+		uint256 _amount,
+		bytes32 _data
+	) external returns (uint256);
+
 	function depositToPosition(uint256 _tokenId, uint256 _amount)
 		external
 		returns (bool);

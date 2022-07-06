@@ -13,6 +13,7 @@ contract STokensManagerTest is ERC721 {
 	address public config;
 	uint256 public latestTokenId;
 	mapping(bytes32 => bytes) private bytesStorage;
+	mapping(uint256 => bytes32) private payloadStorage;
 
 	struct StakingPositionV1 {
 		address property;
@@ -42,7 +43,8 @@ contract STokensManagerTest is ERC721 {
 		address _owner,
 		address _property,
 		uint256 _amount,
-		uint256 _price
+		uint256 _price,
+		bytes32 _payload
 	) external onlyLockup returns (uint256 tokenId_) {
 		_tokenIds.increment();
 		uint256 newTokenId = _tokenIds.current();
@@ -56,7 +58,12 @@ contract STokensManagerTest is ERC721 {
 		);
 		setStoragePositionsV1(newTokenId, newPosition);
 		latestTokenId = newTokenId;
+		payloadStorage[newTokenId] = _payload;
 		return newTokenId;
+	}
+
+	function payloadOf(uint256 _tokenId) external view returns (bytes32) {
+		return payloadStorage[_tokenId];
 	}
 
 	function update(
