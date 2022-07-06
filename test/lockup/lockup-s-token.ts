@@ -100,7 +100,7 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 					100,
 					web3.utils.keccak256('ADDITIONAL_BYTES')
 				)
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
 				const payload = await dev.sTokenManager.payloadOf(1)
 				expect(payload).to.be.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
 			})
