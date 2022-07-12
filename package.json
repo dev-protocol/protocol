@@ -55,7 +55,7 @@
 	},
 	"dependencies": {
 		"@devprotocol/i-s-tokens": "2.0.1",
-		"@openzeppelin/contracts": "2.5.1"
+		"@openzeppelin/contracts": "4.4.2"
 	},
 	"directories": {
 		"doc": "docs",
