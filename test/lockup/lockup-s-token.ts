@@ -92,6 +92,23 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 				expect(position[3].toNumber()).to.be.equal(0)
 				expect(position[4].toNumber()).to.be.equal(0)
 			})
+			it('pass the 3rd option', async () => {
+				await dev.dev.approve(dev.lockup.address, 100)
+				// @ts-ignore
+				await dev.lockup.depositToProperty(
+					property.address,
+					100,
+					web3.utils.keccak256('ADDITIONAL_BYTES')
+				)
+
+				const payload = await dev.sTokenManager.payloadOf(1)
+				expect(payload).to.be.equal(web3.utils.keccak256('ADDITIONAL_BYTES'))
+			})
+			it('0 dev staking', async () => {
+				await dev.lockup.depositToProperty(property.address, 0)
+				const position = await dev.sTokenManager.positions(1)
+				expect(toBigNumber(position[1]).toNumber()).to.be.equal(0)
+			})
 			it('generate event.', async () => {
 				await dev.dev.approve(dev.lockup.address, 100)
 				dev.lockup.depositToProperty(property.address, 100)
@@ -142,12 +159,6 @@ contract('LockupTest', ([deployer, , user2, user3]) => {
 					.depositToProperty(propertyAddress, 100)
 					.catch(err)
 				validateErrorMessage(res, 'unable to stake to unauthenticated property')
-			})
-			it('0 dev staking is not possible.', async () => {
-				const res = await dev.lockup
-					.depositToProperty(property.address, 0)
-					.catch(err)
-				validateErrorMessage(res, 'illegal deposit amount')
 			})
 			it('user is not holding dev.', async () => {
 				const res = await dev.lockup
