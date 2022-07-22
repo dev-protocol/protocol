@@ -1970,10 +1970,10 @@
     emittery "^0.4.1"
     ora "^3.4.0"
 
-"@truffle/hdwallet-provider@2.0.11":
-  version "2.0.11"
-  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.0.11.tgz#c27e16cda679a3a7f2edeb3d3735b696eb32245e"
-  integrity sha512-Wzgk6SeVhH80Fvf0CqVCnlSapaC7Ga4gDVs7TVU4T0jW+p/mwwcNlxmZbrjNetip1buC0A3232U9Upf0Cjc3CA==
+"@truffle/hdwallet-provider@2.0.12":
+  version "2.0.12"
+  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.0.12.tgz#27b80f6e3014f2e10aed2c21144927b144d40cda"
+  integrity sha512-QQPnjgSqltJoe6FcBnISANnv2tgOQ0ARzVdRH8rOKbGx8h+x0WzeQiDSnOwDv23c+lBgBP0K4eX10FXaJ2sU7Q==
   dependencies:
     "@ethereumjs/common" "^2.4.0"
     "@ethereumjs/tx" "^3.3.0"
