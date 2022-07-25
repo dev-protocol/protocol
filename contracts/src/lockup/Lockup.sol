@@ -760,7 +760,13 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return (0, RewardPrices(0, 0, 0, 0));
+			(
+				uint256 reward,
+				uint256 holders,
+				uint256 interest,
+				uint256 holdersCap
+			) = calculateCumulativeRewardPrices();
+			return (0, RewardPrices(reward, holders, interest, holdersCap));
 		}
 
 		/**
@@ -792,7 +798,13 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		if (
 			IMetricsGroup(config().metricsGroup()).hasAssets(_property) == false
 		) {
-			return (0, RewardPrices(0, 0, 0, 0));
+			(
+				uint256 reward,
+				uint256 holders,
+				uint256 interest,
+				uint256 holdersCap
+			) = calculateCumulativeRewardPrices();
+			return (0, RewardPrices(reward, holders, interest, holdersCap));
 		}
 
 		/**
