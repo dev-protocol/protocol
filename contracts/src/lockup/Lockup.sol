@@ -57,6 +57,7 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 	}
 	event Lockedup(address _from, address _property, uint256 _value);
 	event UpdateCap(uint256 _cap);
+	bool public patched;
 
 	/**
 	 * Initialize the passed address as AddressConfig address and Devminter.
@@ -1258,5 +1259,28 @@ contract Lockup is ILockup, UsingConfig, LockupStorage {
 		);
 		require(result, "failed to update");
 		return tokenId;
+	}
+
+	function ___patch() external onlyOwner {
+		// Patch for https://etherscan.io/tx/0x7cc17f4011ffc31ba22171599ab11fc202da81291dd27545df5ebec6e7f64a16
+
+		require(patched == false, "already patched");
+
+		address sender = 0xAb0658c66670d93BF47B4b8D5797edD0a60F43A0;
+		address property = 0xfb049b86Da8D2F4e335eF2281537f5dddbE77393;
+
+		// Calculated by https://github.com/dev-protocol/protocol/pull/1238#issuecomment-1194885031
+		RewardPrices memory prices = RewardPrices(
+			720446380837998467662287000000000000000000,
+			911110587772635691,
+			875380760801162753,
+			7082284239760833337061728761950587465979
+		);
+
+		setStoragePendingInterestWithdrawal(property, sender, 0);
+		setStorageLastStakedInterestPrice(property, sender, prices.interest);
+		__updateLegacyWithdrawableInterestAmount(property, sender);
+
+		updateValues4Legacy(false, sender, property, 0, prices);
 	}
 }
