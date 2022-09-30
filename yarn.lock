@@ -1980,18 +1980,20 @@
     emittery "^0.4.1"
     ora "^3.4.0"
 
-"@truffle/hdwallet-provider@2.0.15":
-  version "2.0.15"
-  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.0.15.tgz#d1c11472f052ea682f7d6f8848844211f4e3b34e"
-  integrity sha512-C1l9Lj2GJUfqkWK37Kt1U2ho9jlp0fIJIRjX4Gydppc+PNGiE0cLYvNPSnIyXwU8S32/CF2YW8Vvy7MKaTW6Mw==
+"@truffle/hdwallet-provider@2.0.16":
+  version "2.0.16"
+  resolved "https://registry.yarnpkg.com/@truffle/hdwallet-provider/-/hdwallet-provider-2.0.16.tgz#101d3052b41fb76bb4fb085f05110d3128af0584"
+  integrity sha512-YnWimWTH0UV8r+BjSHSPm1Qa/axsjq86RyjlvZf0Mv1Xdi5jkZETPaCJBcn80XqeJglMtiRHYz48OTBXNnUjDQ==
   dependencies:
     "@ethereumjs/common" "^2.4.0"
     "@ethereumjs/tx" "^3.3.0"
     "@metamask/eth-sig-util" "4.0.1"
+    "@types/web3" "^1.0.20"
     ethereum-cryptography "1.1.2"
     ethereum-protocol "^1.0.1"
     ethereumjs-util "^7.1.5"
     ethereumjs-wallet "^1.0.2"
+    web3 "1.7.4"
     web3-provider-engine "16.0.3"
 
 "@truffle/interface-adapter@^0.5.8":
@@ -2406,7 +2408,7 @@
   dependencies:
     "@types/json-schema" "*"
 
-"@types/web3@^1.0.18":
+"@types/web3@^1.0.18", "@types/web3@^1.0.20":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.2.2.tgz#d95a101547ce625c5ebd0470baa5dbd4b9f3c015"
   integrity sha512-eFiYJKggNrOl0nsD+9cMh2MLk4zVBfXfGnVeRFbpiZzBE20eet4KLA3fXcjSuHaBn0RnQzwLAGdgzgzdet4C0A==
