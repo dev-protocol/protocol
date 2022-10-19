@@ -41,7 +41,7 @@
 		"husky": "7.0.4",
 		"p-queue": "7.3.0",
 		"prettier": "2.7.1",
-		"prettier-plugin-solidity": "1.0.0-dev.23",
+		"prettier-plugin-solidity": "1.0.0-dev.24",
 		"solhint": "3.3.7",
 		"truffle": "5.4.29",
 		"truffle-plugin-verify": "0.5.31",
