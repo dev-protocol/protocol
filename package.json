@@ -34,7 +34,7 @@
 		"bignumber.js": "9.1.0",
 		"del-cli": "4.0.1",
 		"dotenv": "16.0.3",
-		"eslint": "8.25.0",
+		"eslint": "8.26.0",
 		"eslint-config-prettier": "8.5.0",
 		"eslint-config-xo": "0.42.0",
 		"eslint-config-xo-typescript": "0.50.0",
