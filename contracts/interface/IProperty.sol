@@ -11,4 +11,6 @@ interface IProperty {
 	function changeSymbol(string calldata _symbol) external;
 
 	function withdraw(address _sender, uint256 _value) external;
+	
+	function transfer(address _to, uint256 _value) public returns (bool);
 }
