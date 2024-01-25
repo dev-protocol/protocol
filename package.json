@@ -24,7 +24,7 @@
 	"devDependencies": {
 		"@devprotocol/util-ts": "2.2.1",
 		"@truffle/hdwallet-provider": "2.1.0",
-		"@types/bent": "7.3.2",
+		"@types/bent": "7.3.8",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "16.18.0",
 		"@types/shelljs": "0.8.11",
