@@ -27,7 +27,7 @@
 		"@types/bent": "7.3.2",
 		"@types/dotenv": "8.2.0",
 		"@types/node": "16.18.0",
-		"@types/shelljs": "0.8.11",
+		"@types/shelljs": "0.10.0",
 		"@typescript-eslint/eslint-plugin": "5.40.1",
 		"@typescript-eslint/parser": "5.40.1",
 		"bent": "7.3.12",
